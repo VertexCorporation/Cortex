@@ -10,140 +10,144 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'أنت مسؤول عن إنشاء العناوين. يُرجى الرد بعنوان من كلمتين إلى خمس كلمات فقط للمحادثة التالية. لا تستخدم علامات الاقتباس أو البادئات أو علامات الترقيم. هام: يجب أن يكون العنوان بنفس لغة رسالة المستخدم تمامًا.';
+      'Ø£Ù†Øª Ù…Ø³Ø¤ÙˆÙ„ Ø¹Ù† Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø¹Ù†Ø§ÙˆÙŠÙ†. ÙŠÙØ±Ø¬Ù‰ Ø§Ù„Ø±Ø¯ Ø¨Ø¹Ù†ÙˆØ§Ù† Ù…Ù† ÙƒÙ„Ù…ØªÙŠÙ† Ø¥Ù„Ù‰ Ø®Ù…Ø³ ÙƒÙ„Ù…Ø§Øª ÙÙ‚Ø· Ù„Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©. Ù„Ø§ ØªØ³ØªØ®Ø¯Ù… Ø¹Ù„Ø§Ù…Ø§Øª Ø§Ù„Ø§Ù‚ØªØ¨Ø§Ø³ Ø£Ùˆ Ø§Ù„Ø¨Ø§Ø¯Ø¦Ø§Øª Ø£Ùˆ Ø¹Ù„Ø§Ù…Ø§Øª Ø§Ù„ØªØ±Ù‚ÙŠÙ…. Ù‡Ø§Ù…: ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø¨Ù†ÙØ³ Ù„ØºØ© Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… ØªÙ…Ø§Ù…Ù‹Ø§.';
 
   @override
-  String get systemRoleFallback => 'أنت مساعد مفيد.';
+  String get systemRoleFallback => 'Ø£Ù†Øª Ù…Ø³Ø§Ø¹Ø¯ Ù…ÙÙŠØ¯.';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nCRITICAL: يجب دائمًا الرد بنفس اللغة التي يكتب بها المستخدم، انتبه إلى لغة المستخدم.';
+      '\n\nCRITICAL: ÙŠØ¬Ø¨ Ø¯Ø§Ø¦Ù…Ù‹Ø§ Ø§Ù„Ø±Ø¯ Ø¨Ù†ÙØ³ Ø§Ù„Ù„ØºØ© Ø§Ù„ØªÙŠ ÙŠÙƒØªØ¨ Ø¨Ù‡Ø§ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ØŒ Ø§Ù†ØªØ¨Ù‡ Ø¥Ù„Ù‰ Ù„ØºØ© Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù….';
 
   @override
   String get systemNotePreviousMedia =>
-      '[ملاحظة النظام: أدناه هي الوسائط التي تم إنشاؤها مسبقًا. يمكنك الإشارة إليها أو تعديلها.]';
+      '[Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ù†Ø¸Ø§Ù…: Ø£Ø¯Ù†Ø§Ù‡ Ù‡ÙŠ Ø§Ù„ÙˆØ³Ø§Ø¦Ø· Ø§Ù„ØªÙŠ ØªÙ… Ø¥Ù†Ø´Ø§Ø¤Ù‡Ø§ Ù…Ø³Ø¨Ù‚Ù‹Ø§. ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„Ø¥Ø´Ø§Ø±Ø© Ø¥Ù„ÙŠÙ‡Ø§ Ø£Ùˆ ØªØ¹Ø¯ÙŠÙ„Ù‡Ø§.]';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\nالتاريخ والوقت الحالي: $formattedTime.';
+    return '\n\nØ§Ù„ØªØ§Ø±ÙŠØ® ÙˆØ§Ù„ÙˆÙ‚Øª Ø§Ù„Ø­Ø§Ù„ÙŠ: $formattedTime.';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nحلل المحادثة حتى الآن. إذا تعلمت أي حقائق جديدة ومميزة عن المستخدم (تفضيلات، اسم، عادات، سياق)، فيجب عليك إخراج ذاكرتك المحدثة بالكامل عن المستخدم داخل علامات <memory>...</memory> في نهاية ردك. هام: لا تقم أبدًا بمسح أو استبدال الذاكرة السابقة. أضف دائمًا الحقائق الجديدة إلى الذاكرة الموجودة. إذا لم يتم تعلم أي شيء جديد على الإطلاق، فاحذف العلامة. مثال: <memory>يحب كرة القدم والتنس. يفضل الإجابات القصيرة.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nØ­Ù„Ù„ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†. Ø¥Ø°Ø§ ØªØ¹Ù„Ù…Øª Ø£ÙŠ Ø­Ù‚Ø§Ø¦Ù‚ Ø¬Ø¯ÙŠØ¯Ø© ÙˆÙ…Ù…ÙŠØ²Ø© Ø¹Ù† Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… (ØªÙØ¶ÙŠÙ„Ø§ØªØŒ Ø§Ø³Ù…ØŒ Ø¹Ø§Ø¯Ø§ØªØŒ Ø³ÙŠØ§Ù‚)ØŒ ÙÙŠØ¬Ø¨ Ø¹Ù„ÙŠÙƒ Ø¥Ø®Ø±Ø§Ø¬ Ø°Ø§ÙƒØ±ØªÙƒ Ø§Ù„Ù…Ø­Ø¯Ø«Ø© Ø¨Ø§Ù„ÙƒØ§Ù…Ù„ Ø¹Ù† Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¯Ø§Ø®Ù„ Ø¹Ù„Ø§Ù…Ø§Øª <memory>...</memory> ÙÙŠ Ù†Ù‡Ø§ÙŠØ© Ø±Ø¯Ùƒ. Ù‡Ø§Ù…: Ù„Ø§ ØªÙ‚Ù… Ø£Ø¨Ø¯Ù‹Ø§ Ø¨Ù…Ø³Ø­ Ø£Ùˆ Ø§Ø³ØªØ¨Ø¯Ø§Ù„ Ø§Ù„Ø°Ø§ÙƒØ±Ø© Ø§Ù„Ø³Ø§Ø¨Ù‚Ø©. Ø£Ø¶Ù Ø¯Ø§Ø¦Ù…Ù‹Ø§ Ø§Ù„Ø­Ù‚Ø§Ø¦Ù‚ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø°Ø§ÙƒØ±Ø© Ø§Ù„Ù…ÙˆØ¬ÙˆØ¯Ø©. Ø¥Ø°Ø§ Ù„Ù… ÙŠØªÙ… ØªØ¹Ù„Ù… Ø£ÙŠ Ø´ÙŠØ¡ Ø¬Ø¯ÙŠØ¯ Ø¹Ù„Ù‰ Ø§Ù„Ø¥Ø·Ù„Ø§Ù‚ØŒ ÙØ§Ø­Ø°Ù Ø§Ù„Ø¹Ù„Ø§Ù…Ø©. Ù…Ø«Ø§Ù„: <memory>ÙŠØ­Ø¨ ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù… ÙˆØ§Ù„ØªÙ†Ø³. ÙŠÙØ¶Ù„ Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø§Øª Ø§Ù„Ù‚ØµÙŠØ±Ø©.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\nتذكر دائمًا هذا عن المستخدم:\n$userMemory';
+    return '\n\nØªØ°ÙƒØ± Ø¯Ø§Ø¦Ù…Ù‹Ø§ Ù‡Ø°Ø§ Ø¹Ù† Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…:\n$userMemory';
   }
 
   @override
-  String get cancel => 'إلغاء';
+  String get cancel => 'Ø¥Ù„ØºØ§Ø¡';
 
   @override
-  String get remove => 'يزيل';
+  String get remove => 'ÙŠØ²ÙŠÙ„';
 
   @override
-  String get download => 'تنزيل';
+  String get download => 'ØªÙ†Ø²ÙŠÙ„';
 
   @override
-  String get resume => 'استئناف';
+  String get resume => 'Ø§Ø³ØªØ¦Ù†Ø§Ù';
 
   @override
-  String get copy => 'نسخ';
+  String get copy => 'Ù†Ø³Ø®';
 
   @override
-  String get chat => 'محادثة';
+  String get chat => 'Ù…Ø­Ø§Ø¯Ø«Ø©';
 
   @override
-  String get languageModels => 'نماذج اللغة';
+  String get locked => 'Locked';
 
   @override
-  String get light => 'فاتح';
+  String get languageModels => 'Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ù„ØºØ©';
 
   @override
-  String get theme => 'السمة';
+  String get light => 'ÙØ§ØªØ­';
 
   @override
-  String get no => 'لا';
+  String get theme => 'Ø§Ù„Ø³Ù…Ø©';
 
   @override
-  String get yes => 'نعم';
+  String get no => 'Ù„Ø§';
 
   @override
-  String get done => 'تم';
+  String get yes => 'Ù†Ø¹Ù…';
 
   @override
-  String get bestValue => 'أفضل قيمة';
+  String get done => 'ØªÙ…';
 
   @override
-  String get selected => 'محدد';
+  String get bestValue => 'Ø£ÙØ¶Ù„ Ù‚ÙŠÙ…Ø©';
 
   @override
-  String get descriptionSection => 'الوصف';
+  String get selected => 'Ù…Ø­Ø¯Ø¯';
 
   @override
-  String get searchHint => 'بحث';
+  String get descriptionSection => 'Ø§Ù„ÙˆØµÙ';
 
   @override
-  String get messageHint => 'اسأل أي شيء';
+  String get searchHint => 'Ø¨Ø­Ø«';
 
   @override
-  String get messageCopied => 'تم نسخ الرسالة إلى الحافظة.';
+  String get messageHint => 'Ø§Ø³Ø£Ù„ Ø£ÙŠ Ø´ÙŠØ¡';
 
   @override
-  String get retry => 'إعادة المحاولة';
+  String get messageCopied =>
+      'ØªÙ… Ù†Ø³Ø® Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø­Ø§ÙØ¸Ø©.';
 
   @override
-  String get systemInfo => 'معلومات النظام';
+  String get retry => 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©';
+
+  @override
+  String get systemInfo => 'Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù†Ø¸Ø§Ù…';
 
   @override
   String deviceMemory(Object memory) {
-    return 'ذاكرة الجهاز: $memory جيجابايت';
+    return 'Ø°Ø§ÙƒØ±Ø© Ø§Ù„Ø¬Ù‡Ø§Ø²: $memory Ø¬ÙŠØ¬Ø§Ø¨Ø§ÙŠØª';
   }
 
   @override
-  String get memory => 'الذاكرة';
+  String get memory => 'Ø§Ù„Ø°Ø§ÙƒØ±Ø©';
 
   @override
-  String get storage => 'التخزين';
+  String get storage => 'Ø§Ù„ØªØ®Ø²ÙŠÙ†';
 
   @override
-  String get freeStorage => 'التخزين الحر';
+  String get freeStorage => 'Ø§Ù„ØªØ®Ø²ÙŠÙ† Ø§Ù„Ø­Ø±';
 
   @override
-  String get totalStorage => 'إجمالي التخزين';
+  String get totalStorage => 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ØªØ®Ø²ÙŠÙ†';
 
   @override
-  String get usedStorage => 'التخزين المستخدم';
+  String get usedStorage => 'Ø§Ù„ØªØ®Ø²ÙŠÙ† Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…';
 
   @override
-  String get totalMemory => 'إجمالي الذاكرة';
+  String get totalMemory => 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø°Ø§ÙƒØ±Ø©';
 
   @override
-  String get usedMemory => 'الذاكرة المستخدمة';
+  String get usedMemory => 'Ø§Ù„Ø°Ø§ÙƒØ±Ø© Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…Ø©';
 
   @override
-  String get modelsTitle => 'المكتبة';
+  String get modelsTitle => 'Ø§Ù„Ù…ÙƒØªØ¨Ø©';
 
   @override
-  String get localModels => 'النماذج المحلية';
+  String get localModels => 'Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ù…Ø­Ù„ÙŠØ©';
 
   @override
-  String get selectGGUFFile => 'حدد ملف GGUF';
+  String get selectGGUFFile => 'Ø­Ø¯Ø¯ Ù…Ù„Ù GGUF';
 
   @override
-  String get errorGGUF => 'يرجى تحديد ملف بصيغة GGUF فقط.';
+  String get errorGGUF => 'ÙŠØ±Ø¬Ù‰ ØªØ­Ø¯ÙŠØ¯ Ù…Ù„Ù Ø¨ØµÙŠØºØ© GGUF ÙÙ‚Ø·.';
 
   @override
-  String get myModels => 'نماذجي';
+  String get myModels => 'Ù†Ù…Ø§Ø°Ø¬ÙŠ';
 
   @override
-  String get create => 'إنشاء';
+  String get create => 'Ø¥Ù†Ø´Ø§Ø¡';
 
   @override
   String modelProducer(Object producer) {
-    return 'المنتج: $producer';
+    return 'Ø§Ù„Ù…Ù†ØªØ¬: $producer';
   }
 
   @override
@@ -152,908 +156,958 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => 'إعادة تسمية';
+  String get editConversationTitle => 'Ø¥Ø¹Ø§Ø¯Ø© ØªØ³Ù…ÙŠØ©';
 
   @override
-  String get newTitle => 'عنوان جديد';
+  String get newTitle => 'Ø¹Ù†ÙˆØ§Ù† Ø¬Ø¯ÙŠØ¯';
 
   @override
-  String get save => 'حفظ';
+  String get save => 'Ø­ÙØ¸';
 
   @override
-  String get noConversationsMessage => 'لا توجد محادثات، ابدأ الدردشة!';
+  String get noConversationsMessage =>
+      'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø­Ø§Ø¯Ø«Ø§ØªØŒ Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¯Ø±Ø¯Ø´Ø©!';
 
   @override
-  String get startChat => 'ابدأ محادثة';
+  String get startChat => 'Ø§Ø¨Ø¯Ø£ Ù…Ø­Ø§Ø¯Ø«Ø©';
 
   @override
-  String get noChats => 'لا توجد محادثات';
+  String get noChats => 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø­Ø§Ø¯Ø«Ø§Øª';
 
   @override
-  String get noStarredChats => 'لا توجد محادثات مميزة بنجمة';
+  String get noStarredChats =>
+      'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ù…Ù…ÙŠØ²Ø© Ø¨Ù†Ø¬Ù…Ø©';
 
   @override
-  String get noStarredChatsMessage => 'لم تقم بتمييز أي محادثة بنجمة بعد.';
+  String get noStarredChatsMessage =>
+      'Ù„Ù… ØªÙ‚Ù… Ø¨ØªÙ…ÙŠÙŠØ² Ø£ÙŠ Ù…Ø­Ø§Ø¯Ø«Ø© Ø¨Ù†Ø¬Ù…Ø© Ø¨Ø¹Ø¯.';
 
   @override
-  String get starConversation => 'تمييز بنجمة';
+  String get starConversation => 'ØªÙ…ÙŠÙŠØ² Ø¨Ù†Ø¬Ù…Ø©';
 
   @override
-  String get unstarConversation => 'أنستار';
+  String get unstarConversation => 'Ø£Ù†Ø³ØªØ§Ø±';
 
   @override
-  String get loginToYourAccount => 'تسجيل الدخول';
+  String get loginToYourAccount => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„';
 
   @override
-  String get createYourAccount => 'إنشاء حساب';
+  String get createYourAccount => 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨';
 
   @override
-  String get email => 'البريد الإلكتروني';
+  String get email => 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
 
   @override
-  String get password => 'كلمة المرور';
+  String get password => 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
 
   @override
-  String get confirmPassword => 'تأكيد كلمة المرور';
+  String get confirmPassword => 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
 
   @override
-  String get invalidEmail => 'يرجى إدخال عنوان بريد إلكتروني صالح.';
+  String get invalidEmail =>
+      'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø¹Ù†ÙˆØ§Ù† Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØµØ§Ù„Ø­.';
 
   @override
-  String get invalidPassword => 'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.';
+  String get invalidPassword =>
+      'ÙŠØ¬Ø¨ Ø£Ù† ØªØªÙƒÙˆÙ† ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ù…Ù† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„.';
 
   @override
-  String get rememberMe => 'تذكرني';
+  String get rememberMe => 'ØªØ°ÙƒØ±Ù†ÙŠ';
 
   @override
-  String get forgotPassword => 'هل نسيت كلمة المرور؟';
+  String get forgotPassword => 'Ù‡Ù„ Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ';
 
   @override
-  String get or => 'أو';
+  String get or => 'Ø£Ùˆ';
 
   @override
-  String get continueWithGoogle => 'المتابعة باستخدام جوجل';
+  String get continueWithGoogle => 'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø¨Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø¬ÙˆØ¬Ù„';
 
   @override
-  String get dontHaveAccount => 'ليس لديك حساب؟';
+  String get dontHaveAccount => 'Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ØŸ';
 
   @override
-  String get alreadyHaveAccount => 'لديك حساب بالفعل؟';
+  String get alreadyHaveAccount => 'Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ Ø¨Ø§Ù„ÙØ¹Ù„ØŸ';
 
   @override
-  String get signUp => 'إنشاء حساب';
+  String get signUp => 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨';
 
   @override
-  String get logIn => 'تسجيل الدخول';
+  String get logIn => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„';
 
   @override
-  String get passwordsDoNotMatch => 'كلمات المرور غير متطابقة.';
+  String get passwordsDoNotMatch =>
+      'ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©.';
 
   @override
-  String get wrongPassword => 'كلمة مرور غير صحيحة.';
+  String get wrongPassword => 'ÙƒÙ„Ù…Ø© Ù…Ø±ÙˆØ± ØºÙŠØ± ØµØ­ÙŠØ­Ø©.';
 
   @override
-  String get emailAlreadyInUse => 'هذا البريد الإلكتروني مستخدم بالفعل.';
+  String get emailAlreadyInUse =>
+      'Ù‡Ø°Ø§ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ø§Ù„ÙØ¹Ù„.';
 
   @override
-  String get weakPassword => 'كلمة المرور ضعيفة جدًا.';
+  String get weakPassword => 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø¶Ø¹ÙŠÙØ© Ø¬Ø¯Ù‹Ø§.';
 
   @override
-  String get authError => 'خطأ في المصادقة';
+  String get authError => 'Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ù…ØµØ§Ø¯Ù‚Ø©';
 
   @override
-  String get usernameTaken => 'اسم المستخدم هذا مأخوذ بالفعل.';
+  String get usernameTaken =>
+      'Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ù‡Ø°Ø§ Ù…Ø£Ø®ÙˆØ° Ø¨Ø§Ù„ÙØ¹Ù„.';
 
   @override
-  String get username => 'اسم المستخدم';
+  String get username => 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…';
 
   @override
-  String get resendCode => 'إعادة إرسال بريد التحقق';
+  String get resendCode => 'Ø¥Ø¹Ø§Ø¯Ø© Ø¥Ø±Ø³Ø§Ù„ Ø¨Ø±ÙŠØ¯ Ø§Ù„ØªØ­Ù‚Ù‚';
 
   @override
   String get pleaseCheckYourEmail =>
-      'لاستخدام Cortex، تحتاج إلى التحقق من بريدك الإلكتروني. \nتم إرسال رابط تحقق إلى عنوان بريدك الإلكتروني، يرجى التحقق من بريدك.';
+      'Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù… CortexØŒ ØªØ­ØªØ§Ø¬ Ø¥Ù„Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ. \nØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø±Ø§Ø¨Ø· ØªØ­Ù‚Ù‚ Ø¥Ù„Ù‰ Ø¹Ù†ÙˆØ§Ù† Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØŒ ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¨Ø±ÙŠØ¯Ùƒ.';
 
   @override
-  String get verifyYourEmail => 'تحقق من بريدك الإلكتروني';
+  String get verifyYourEmail => 'ØªØ­Ù‚Ù‚ Ù…Ù† Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
 
   @override
-  String get seconds => 'ثواني';
+  String get seconds => 'Ø«ÙˆØ§Ù†ÙŠ';
 
   @override
-  String get maxResendLimitReached => 'لقد وصلت إلى الحد الأقصى لرسائل التحقق';
+  String get maxResendLimitReached =>
+      'Ù„Ù‚Ø¯ ÙˆØµÙ„Øª Ø¥Ù„Ù‰ Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ Ù„Ø±Ø³Ø§Ø¦Ù„ Ø§Ù„ØªØ­Ù‚Ù‚';
 
   @override
   String get verificationScreenContinueWithoutVerification =>
-      'المتابعة بدون تحقق';
+      'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø¨Ø¯ÙˆÙ† ØªØ­Ù‚Ù‚';
 
   @override
   String get verificationScreenWarning =>
-      'حتى لو تابعت، فإن فترة التحقق من الحساب البالغة يوم واحد لا تزال سارية على حسابك. إذا لم تقم بالتحقق من حسابك بحلول ذلك الوقت، فسيتم حذفه من التطبيق.';
+      'Ø­ØªÙ‰ Ù„Ùˆ ØªØ§Ø¨Ø¹ØªØŒ ÙØ¥Ù† ÙØªØ±Ø© Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¨Ø§Ù„ØºØ© ÙŠÙˆÙ… ÙˆØ§Ø­Ø¯ Ù„Ø§ ØªØ²Ø§Ù„ Ø³Ø§Ø±ÙŠØ© Ø¹Ù„Ù‰ Ø­Ø³Ø§Ø¨Ùƒ. Ø¥Ø°Ø§ Ù„Ù… ØªÙ‚Ù… Ø¨Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø­Ø³Ø§Ø¨Ùƒ Ø¨Ø­Ù„ÙˆÙ„ Ø°Ù„Ùƒ Ø§Ù„ÙˆÙ‚ØªØŒ ÙØ³ÙŠØªÙ… Ø­Ø°ÙÙ‡ Ù…Ù† Ø§Ù„ØªØ·Ø¨ÙŠÙ‚.';
 
   @override
-  String get unverifiedAccountHeader => 'حسابك غير موثق';
+  String get unverifiedAccountHeader => 'Ø­Ø³Ø§Ø¨Ùƒ ØºÙŠØ± Ù…ÙˆØ«Ù‚';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return 'إذا لم تقم بتوثيق حسابك خلال $timeLeft، فسيتم حذفه';
+    return 'Ø¥Ø°Ø§ Ù„Ù… ØªÙ‚Ù… Ø¨ØªÙˆØ«ÙŠÙ‚ Ø­Ø³Ø§Ø¨Ùƒ Ø®Ù„Ø§Ù„ $timeLeftØŒ ÙØ³ÙŠØªÙ… Ø­Ø°ÙÙ‡';
   }
 
   @override
-  String get verifyNow => 'وثّق الآن';
+  String get verifyNow => 'ÙˆØ«Ù‘Ù‚ Ø§Ù„Ø¢Ù†';
 
   @override
-  String get linkSent => 'تم إرسال الرابط';
+  String get linkSent => 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø§Ø¨Ø·';
 
   @override
   String get accountDeletionRequested =>
-      'تم استلام طلب حذف حسابك وحسابك معطل الآن.';
+      'ØªÙ… Ø§Ø³ØªÙ„Ø§Ù… Ø·Ù„Ø¨ Ø­Ø°Ù Ø­Ø³Ø§Ø¨Ùƒ ÙˆØ­Ø³Ø§Ø¨Ùƒ Ù…Ø¹Ø·Ù„ Ø§Ù„Ø¢Ù†.';
 
   @override
-  String get tooManyRequests => 'طلبات كثيرة جدًا';
+  String get tooManyRequests => 'Ø·Ù„Ø¨Ø§Øª ÙƒØ«ÙŠØ±Ø© Ø¬Ø¯Ù‹Ø§';
 
   @override
-  String get regenerate => 'إعادة إنشاء';
+  String get regenerate => 'Ø¥Ø¹Ø§Ø¯Ø© Ø¥Ù†Ø´Ø§Ø¡';
 
   @override
-  String get confirmDeleteAccount => 'هل أنت متأكد أنك تريد حذف حسابك؟';
+  String get confirmDeleteAccount =>
+      'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ø£Ù†Ùƒ ØªØ±ÙŠØ¯ Ø­Ø°Ù Ø­Ø³Ø§Ø¨ÙƒØŸ';
 
   @override
-  String get deleteAccount => 'حذف الحساب';
+  String get deleteAccount => 'Ø­Ø°Ù Ø§Ù„Ø­Ø³Ø§Ø¨';
 
   @override
-  String get delete => 'حذف';
+  String get delete => 'Ø­Ø°Ù';
 
   @override
-  String get passwordRequired => 'كلمة المرور مطلوبة.';
+  String get passwordRequired => 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ù…Ø·Ù„ÙˆØ¨Ø©.';
 
   @override
   String get deleteDescription =>
-      'سيتم حذف البيانات التي تحذفها بشكل دائم من خادمنا وجهازك. لا يمكن التراجع عن هذا الإجراء.';
+      'Ø³ÙŠØªÙ… Ø­Ø°Ù Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªÙŠ ØªØ­Ø°ÙÙ‡Ø§ Ø¨Ø´ÙƒÙ„ Ø¯Ø§Ø¦Ù… Ù…Ù† Ø®Ø§Ø¯Ù…Ù†Ø§ ÙˆØ¬Ù‡Ø§Ø²Ùƒ. Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø§Ù„ØªØ±Ø§Ø¬Ø¹ Ø¹Ù† Ù‡Ø°Ø§ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡.';
 
   @override
-  String get editProfile => 'تعديل الملف الشخصي';
+  String get editProfile => 'ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ';
 
   @override
-  String get displayName => 'اسم العرض';
+  String get displayName => 'Ø§Ø³Ù… Ø§Ù„Ø¹Ø±Ø¶';
 
   @override
-  String get profileUpdated => 'تم تحديث الملف الشخصي بنجاح';
+  String get profileUpdated =>
+      'ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ Ø¨Ù†Ø¬Ø§Ø­';
 
   @override
-  String get logout => 'تسجيل الخروج';
+  String get logout => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬';
 
   @override
-  String get profile => 'الملف الشخصي';
+  String get profile => 'Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ';
 
   @override
   String get manageProfileDescription =>
-      'قم بإدارة ملفك الشخصي، أو تحديث كلمة المرور، أو تسجيل الخروج من Cortex.';
+      'Ù‚Ù… Ø¨Ø¥Ø¯Ø§Ø±Ø© Ù…Ù„ÙÙƒ Ø§Ù„Ø´Ø®ØµÙŠØŒ Ø£Ùˆ ØªØ­Ø¯ÙŠØ« ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŒ Ø£Ùˆ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬ Ù…Ù† Cortex.';
 
   @override
   String get accessSettingsDescription =>
-      'احصل على المساعدة، واسترداد الرموز، ومشاركة Cortex، واطلع على سياساتنا.';
+      'Ø§Ø­ØµÙ„ Ø¹Ù„Ù‰ Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø©ØŒ ÙˆØ§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ø±Ù…ÙˆØ²ØŒ ÙˆÙ…Ø´Ø§Ø±ÙƒØ© CortexØŒ ÙˆØ§Ø·Ù„Ø¹ Ø¹Ù„Ù‰ Ø³ÙŠØ§Ø³Ø§ØªÙ†Ø§.';
 
   @override
   String get languageDescription =>
-      'يمكنك تغيير لغة واجهة التطبيق الافتراضية في أي وقت.';
+      'ÙŠÙ…ÙƒÙ†Ùƒ ØªØºÙŠÙŠØ± Ù„ØºØ© ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ© ÙÙŠ Ø£ÙŠ ÙˆÙ‚Øª.';
 
   @override
   String get themeDescription =>
-      'يمكنك التبديل بين السمات الفاتحة والداكنة حسب تفضيلك. سيتم تطبيق السمة المحددة عبر واجهة Cortex.';
+      'ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªØ¨Ø¯ÙŠÙ„ Ø¨ÙŠÙ† Ø§Ù„Ø³Ù…Ø§Øª Ø§Ù„ÙØ§ØªØ­Ø© ÙˆØ§Ù„Ø¯Ø§ÙƒÙ†Ø© Ø­Ø³Ø¨ ØªÙØ¶ÙŠÙ„Ùƒ. Ø³ÙŠØªÙ… ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ø³Ù…Ø© Ø§Ù„Ù…Ø­Ø¯Ø¯Ø© Ø¹Ø¨Ø± ÙˆØ§Ø¬Ù‡Ø© Cortex.';
 
   @override
-  String get iHaveReadAndAgree => 'لقد قرأت ووافقت على شروط الخدمة';
+  String get iHaveReadAndAgree =>
+      'Ù„Ù‚Ø¯ Ù‚Ø±Ø£Øª ÙˆÙˆØ§ÙÙ‚Øª Ø¹Ù„Ù‰ Ø´Ø±ÙˆØ· Ø§Ù„Ø®Ø¯Ù…Ø©';
 
   @override
-  String get downloading => 'جاري التنزيل...';
+  String get downloading => 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙ†Ø²ÙŠÙ„...';
 
   @override
-  String get downloadSuccess => 'نجح التنزيل';
+  String get downloadSuccess => 'Ù†Ø¬Ø­ Ø§Ù„ØªÙ†Ø²ÙŠÙ„';
 
   @override
-  String get downloadFailed => 'فشل التنزيل';
+  String get downloadFailed => 'ÙØ´Ù„ Ø§Ù„ØªÙ†Ø²ÙŠÙ„';
 
   @override
   String downloaded(Object percent) {
-    return 'تم تنزيل $percent%';
+    return 'ØªÙ… ØªÙ†Ø²ÙŠÙ„ $percent%';
   }
 
   @override
-  String get downloadPaused => 'توقف التنزيل مؤقتًا.';
+  String get downloadPaused => 'ØªÙˆÙ‚Ù Ø§Ù„ØªÙ†Ø²ÙŠÙ„ Ù…Ø¤Ù‚ØªÙ‹Ø§.';
 
   @override
-  String get purchaseError => 'خطأ في الشراء';
+  String get purchaseError => 'Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø´Ø±Ø§Ø¡';
 
   @override
-  String get purchasePlus => 'اشترِ Cortex Plus';
+  String get purchasePlus => 'Ø§Ø´ØªØ±Ù Cortex Plus';
 
   @override
-  String get plusDescription => 'تجربة الذكاء الاصطناعي المتميزة';
+  String get plusDescription =>
+      'ØªØ¬Ø±Ø¨Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø§Ù„Ù…ØªÙ…ÙŠØ²Ø©';
 
   @override
-  String get annual => 'سنوي';
+  String get annual => 'Ø³Ù†ÙˆÙŠ';
 
   @override
-  String get monthly => 'شهري';
+  String get monthly => 'Ø´Ù‡Ø±ÙŠ';
 
   @override
-  String get manageSubscription => 'إدارة الاشتراك';
+  String get manageSubscription => 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ';
 
   @override
   String purchasePlan(String planName) {
-    return 'شراء $planName';
+    return 'Ø´Ø±Ø§Ø¡ $planName';
   }
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/شهريًا، يتم دفع الفاتورة شهريًا';
+    return '$price/Ø´Ù‡Ø±ÙŠÙ‹Ø§ØŒ ÙŠØªÙ… Ø¯ÙØ¹ Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø´Ù‡Ø±ÙŠÙ‹Ø§';
   }
 
   @override
-  String get purchasePro => 'اشترِ Cortex Pro';
+  String get purchasePro => 'Ø§Ø´ØªØ±Ù Cortex Pro';
 
   @override
-  String get proDescription => 'تجربة ذكاء اصطناعي راقية';
+  String get proDescription => 'ØªØ¬Ø±Ø¨Ø© Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø±Ø§Ù‚ÙŠØ©';
 
   @override
-  String get purchaseUltra => 'اشترِ Cortex Ultra';
+  String get purchaseUltra => 'Ø§Ø´ØªØ±Ù Cortex Ultra';
 
   @override
-  String get ultraDescription => 'ذروة الذكاء الاصطناعي';
+  String get ultraDescription => 'Ø°Ø±ÙˆØ© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ';
 
   @override
-  String get upgradeSubscription => 'ترقية الاشتراك';
+  String get upgradeSubscription => 'ØªØ±Ù‚ÙŠØ© Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ';
 
   @override
-  String get purchaseStreamError => 'خطأ في تدفق الشراء.';
+  String get purchaseStreamError => 'Ø®Ø·Ø£ ÙÙŠ ØªØ¯ÙÙ‚ Ø§Ù„Ø´Ø±Ø§Ø¡.';
 
   @override
-  String get productNotFound => 'المنتج غير موجود';
+  String get productNotFound => 'Ø§Ù„Ù…Ù†ØªØ¬ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯';
 
   @override
-  String get noProductsFound => 'لم يتم العثور على منتجات';
+  String get noProductsFound => 'Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ù…Ù†ØªØ¬Ø§Øª';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'بإتمام هذا الطلب، فإنك توافق على شروط الخدمة وسياسة الخصوصية. يمكنك النقر على هذا النص لمعرفة المزيد عن شروط الخدمة وسياسة الخصوصية. سيتم تجديد الاشتراك تلقائيًا ما لم يتم إيقاف التجديد التلقائي قبل 24 ساعة على الأقل من نهاية الفترة الحالية.';
+      'Ø¨Ø¥ØªÙ…Ø§Ù… Ù‡Ø°Ø§ Ø§Ù„Ø·Ù„Ø¨ØŒ ÙØ¥Ù†Ùƒ ØªÙˆØ§ÙÙ‚ Ø¹Ù„Ù‰ Ø´Ø±ÙˆØ· Ø§Ù„Ø®Ø¯Ù…Ø© ÙˆØ³ÙŠØ§Ø³Ø© Ø§Ù„Ø®ØµÙˆØµÙŠØ©. ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„Ù†Ù‚Ø± Ø¹Ù„Ù‰ Ù‡Ø°Ø§ Ø§Ù„Ù†Øµ Ù„Ù…Ø¹Ø±ÙØ© Ø§Ù„Ù…Ø²ÙŠØ¯ Ø¹Ù† Ø´Ø±ÙˆØ· Ø§Ù„Ø®Ø¯Ù…Ø© ÙˆØ³ÙŠØ§Ø³Ø© Ø§Ù„Ø®ØµÙˆØµÙŠØ©. Ø³ÙŠØªÙ… ØªØ¬Ø¯ÙŠØ¯ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§ Ù…Ø§ Ù„Ù… ÙŠØªÙ… Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„ØªØ¬Ø¯ÙŠØ¯ Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ Ù‚Ø¨Ù„ 24 Ø³Ø§Ø¹Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ Ù…Ù† Ù†Ù‡Ø§ÙŠØ© Ø§Ù„ÙØªØ±Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©.';
 
   @override
-  String get termsOfService => 'شروط الخدمة';
+  String get termsOfService => 'Ø´Ø±ÙˆØ· Ø§Ù„Ø®Ø¯Ù…Ø©';
 
   @override
-  String get privacyPolicy => 'سياسة الخصوصية';
+  String get privacyPolicy => 'Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ø®ØµÙˆØµÙŠØ©';
 
   @override
-  String get renamed => 'تمت إعادة تسميته';
+  String get renamed => 'ØªÙ…Øª Ø¥Ø¹Ø§Ø¯Ø© ØªØ³Ù…ÙŠØªÙ‡';
 
   @override
-  String get report => 'إبلاغ';
+  String get report => 'Ø¥Ø¨Ù„Ø§Øº';
 
   @override
-  String get reportDialogTitle => 'تقديم بلاغ';
+  String get reportDialogTitle => 'ØªÙ‚Ø¯ÙŠÙ… Ø¨Ù„Ø§Øº';
 
   @override
-  String get reportDescriptionLabel => 'ما هي المشكلة؟';
+  String get reportDescriptionLabel => 'Ù…Ø§ Ù‡ÙŠ Ø§Ù„Ù…Ø´ÙƒÙ„Ø©ØŸ';
 
   @override
-  String get reportHarmful => 'هذا ضار/غير آمن';
+  String get reportHarmful => 'Ù‡Ø°Ø§ Ø¶Ø§Ø±/ØºÙŠØ± Ø¢Ù…Ù†';
 
   @override
-  String get reportNotTrue => 'هذا غير صحيح';
+  String get reportNotTrue => 'Ù‡Ø°Ø§ ØºÙŠØ± ØµØ­ÙŠØ­';
 
   @override
-  String get reportNotHelpful => 'هذا غير مفيد';
+  String get reportNotHelpful => 'Ù‡Ø°Ø§ ØºÙŠØ± Ù…ÙÙŠØ¯';
 
   @override
-  String get closeButton => 'إغلاق';
+  String get closeButton => 'Ø¥ØºÙ„Ø§Ù‚';
 
   @override
-  String get submitButton => 'إرسال';
+  String get submitButton => 'Ø¥Ø±Ø³Ø§Ù„';
 
   @override
-  String get reportErrorMessage => 'يرجى تحديد سبب واحد للإبلاغ.';
+  String get reportErrorMessage =>
+      'ÙŠØ±Ø¬Ù‰ ØªØ­Ø¯ÙŠØ¯ Ø³Ø¨Ø¨ ÙˆØ§Ø­Ø¯ Ù„Ù„Ø¥Ø¨Ù„Ø§Øº.';
 
   @override
-  String get capabilitiesSection => 'القدرات';
+  String get capabilitiesSection => 'Ø§Ù„Ù‚Ø¯Ø±Ø§Øª';
 
   @override
-  String get featurePhotoTitle => 'مسح الصور';
+  String get featurePhotoTitle => 'Ù…Ø³Ø­ Ø§Ù„ØµÙˆØ±';
 
   @override
   String get featurePhotoDescription =>
-      'هذا النموذج لديه القدرة على مسح الصور من خلال الكاميرا أو ملفات الصور.';
+      'Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ù„Ø¯ÙŠÙ‡ Ø§Ù„Ù‚Ø¯Ø±Ø© Ø¹Ù„Ù‰ Ù…Ø³Ø­ Ø§Ù„ØµÙˆØ± Ù…Ù† Ø®Ù„Ø§Ù„ Ø§Ù„ÙƒØ§Ù…ÙŠØ±Ø§ Ø£Ùˆ Ù…Ù„ÙØ§Øª Ø§Ù„ØµÙˆØ±.';
 
   @override
-  String get featureOfflineTitle => 'التشغيل بدون انترنت';
+  String get featureOfflineTitle => 'Ø§Ù„ØªØ´ØºÙŠÙ„ Ø¨Ø¯ÙˆÙ† Ø§Ù†ØªØ±Ù†Øª';
 
   @override
   String get featureOfflineDescription =>
-      'قم بتشغيل النموذج بدون اتصال بالإنترنت للحفاظ على أمان بياناتك.';
+      'Ù‚Ù… Ø¨ØªØ´ØºÙŠÙ„ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø¨Ø¯ÙˆÙ† Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª Ù„Ù„Ø­ÙØ§Ø¸ Ø¹Ù„Ù‰ Ø£Ù…Ø§Ù† Ø¨ÙŠØ§Ù†Ø§ØªÙƒ.';
 
   @override
-  String get featureRoleplayTitle => 'لعب الأدوار';
+  String get featureRoleplayTitle => 'Ù„Ø¹Ø¨ Ø§Ù„Ø£Ø¯ÙˆØ§Ø±';
 
   @override
   String get featureRoleplayDescription =>
-      'تسمح لك نماذج لعب الأدوار بإنشاء محادثات وسيناريوهات متنوعة.';
+      'ØªØ³Ù…Ø­ Ù„Ùƒ Ù†Ù…Ø§Ø°Ø¬ Ù„Ø¹Ø¨ Ø§Ù„Ø£Ø¯ÙˆØ§Ø± Ø¨Ø¥Ù†Ø´Ø§Ø¡ Ù…Ø­Ø§Ø¯Ø«Ø§Øª ÙˆØ³ÙŠÙ†Ø§Ø±ÙŠÙˆÙ‡Ø§Øª Ù…ØªÙ†ÙˆØ¹Ø©.';
 
   @override
-  String get roleModels => 'نماذج لعب الأدوار';
+  String get roleModels => 'Ù†Ù…Ø§Ø°Ø¬ Ù„Ø¹Ø¨ Ø§Ù„Ø£Ø¯ÙˆØ§Ø±';
 
   @override
-  String get parameters => 'المعلمات';
+  String get parameters => 'Ø§Ù„Ù…Ø¹Ù„Ù…Ø§Øª';
 
   @override
-  String get context => 'السياق';
+  String get context => 'Ø§Ù„Ø³ÙŠØ§Ù‚';
 
   @override
-  String get finalPreparation => 'التحضيرات النهائية جارية.';
+  String get finalPreparation =>
+      'Ø§Ù„ØªØ­Ø¶ÙŠØ±Ø§Øª Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ© Ø¬Ø§Ø±ÙŠØ©.';
 
   @override
-  String get shareApp => 'مشاركة التطبيق';
+  String get shareApp => 'Ù…Ø´Ø§Ø±ÙƒØ© Ø§Ù„ØªØ·Ø¨ÙŠÙ‚';
 
   @override
-  String get ourStory => 'قصتنا';
+  String get ourStory => 'Ù‚ØµØªÙ†Ø§';
 
   @override
-  String get rateUs => 'قيّمنا';
+  String get rateUs => 'Ù‚ÙŠÙ‘Ù…Ù†Ø§';
 
   @override
-  String get share => 'مشاركة';
+  String get share => 'Ù…Ø´Ø§Ø±ÙƒØ©';
 
   @override
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => 'تحديد نص';
+  String get selectText => 'ØªØ­Ø¯ÙŠØ¯ Ù†Øµ';
 
   @override
-  String get thinking => 'يفكر';
+  String get thinking => 'ÙŠÙÙƒØ±';
 
   @override
-  String get user => 'المستخدم';
+  String get user => 'Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…';
 
   @override
-  String get help => 'مساعدة';
+  String get help => 'Ù…Ø³Ø§Ø¹Ø¯Ø©';
 
   @override
-  String get supportCreator => 'ادعم المبدع';
+  String get supportCreator => 'Ø§Ø¯Ø¹Ù… Ø§Ù„Ù…Ø¨Ø¯Ø¹';
 
   @override
   String get enterYourTag =>
-      'ادعم مُنشئيك المُفضّلين! أدخل علامتهم الفريدة أدناه لتُشاركهم مشترياتك من Cortex.';
+      'Ø§Ø¯Ø¹Ù… Ù…ÙÙ†Ø´Ø¦ÙŠÙƒ Ø§Ù„Ù…ÙÙØ¶Ù‘Ù„ÙŠÙ†! Ø£Ø¯Ø®Ù„ Ø¹Ù„Ø§Ù…ØªÙ‡Ù… Ø§Ù„ÙØ±ÙŠØ¯Ø© Ø£Ø¯Ù†Ø§Ù‡ Ù„ØªÙØ´Ø§Ø±ÙƒÙ‡Ù… Ù…Ø´ØªØ±ÙŠØ§ØªÙƒ Ù…Ù† Cortex.';
 
   @override
-  String get creatorTag => 'علامة المنشئ';
+  String get creatorTag => 'Ø¹Ù„Ø§Ù…Ø© Ø§Ù„Ù…Ù†Ø´Ø¦';
 
   @override
-  String get support => 'يدعم';
+  String get support => 'ÙŠØ¯Ø¹Ù…';
 
   @override
-  String get tagCannotBeEmpty => 'لا يمكن أن تكون علامة المنشئ فارغة';
+  String get tagCannotBeEmpty =>
+      'Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø£Ù† ØªÙƒÙˆÙ† Ø¹Ù„Ø§Ù…Ø© Ø§Ù„Ù…Ù†Ø´Ø¦ ÙØ§Ø±ØºØ©';
 
   @override
-  String get userId => 'معرف المستخدم';
+  String get userId => 'Ù…Ø¹Ø±Ù Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…';
 
   @override
-  String get deleteAllConversationsConfirmTitle => 'حذف جميع المحادثات؟';
+  String get deleteAllConversationsConfirmTitle =>
+      'Ø­Ø°Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§ØªØŸ';
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'هل أنت متأكد أنك تريد حذف جميع محادثاتك؟ لا يمكن التراجع عن هذا الإجراء.';
+      'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ø£Ù†Ùƒ ØªØ±ÙŠØ¯ Ø­Ø°Ù Ø¬Ù…ÙŠØ¹ Ù…Ø­Ø§Ø¯Ø«Ø§ØªÙƒØŸ Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø§Ù„ØªØ±Ø§Ø¬Ø¹ Ø¹Ù† Ù‡Ø°Ø§ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡.';
 
   @override
-  String get conversationDeleted => 'تم حذف المحادثة!';
+  String get conversationDeleted => 'ØªÙ… Ø­Ø°Ù Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø©!';
 
   @override
-  String get allConversationsDeleted => 'تم حذف جميع المحادثات بنجاح!';
+  String get allConversationsDeleted =>
+      'ØªÙ… Ø­Ø°Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ø¨Ù†Ø¬Ø§Ø­!';
 
   @override
-  String get deleteAll => 'حذف الكل';
+  String get deleteAll => 'Ø­Ø°Ù Ø§Ù„ÙƒÙ„';
 
   @override
-  String get deleteAllConversationsButton => 'حذف جميع المحادثات';
+  String get deleteAllConversationsButton =>
+      'Ø­Ø°Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª';
 
   @override
-  String get confirmWord => 'اكتب VERTEX';
+  String get confirmWord => 'Ø§ÙƒØªØ¨ VERTEX';
 
   @override
-  String get confirmWordError => 'لقد كتبتها بشكل خاطئ';
+  String get confirmWordError => 'Ù„Ù‚Ø¯ ÙƒØªØ¨ØªÙ‡Ø§ Ø¨Ø´ÙƒÙ„ Ø®Ø§Ø·Ø¦';
 
   @override
-  String get chinese => 'الصينية';
+  String get chinese => 'Ø§Ù„ØµÙŠÙ†ÙŠØ©';
 
   @override
-  String get french => 'الفرنسية';
+  String get french => 'Ø§Ù„ÙØ±Ù†Ø³ÙŠØ©';
 
   @override
-  String get japanese => 'اليابانية';
+  String get japanese => 'Ø§Ù„ÙŠØ§Ø¨Ø§Ù†ÙŠØ©';
 
   @override
-  String get kurdish => 'كردي';
+  String get kurdish => 'ÙƒØ±Ø¯ÙŠ';
 
   @override
-  String get dutch => 'هولندي';
+  String get dutch => 'Ù‡ÙˆÙ„Ù†Ø¯ÙŠ';
 
   @override
-  String get russian => 'الروسية';
+  String get russian => 'Ø§Ù„Ø±ÙˆØ³ÙŠØ©';
 
   @override
-  String get korean => 'الكورية';
+  String get korean => 'Ø§Ù„ÙƒÙˆØ±ÙŠØ©';
 
   @override
-  String get english => 'الإنجليزية';
+  String get english => 'Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©';
 
   @override
-  String get turkish => 'التركية';
+  String get turkish => 'Ø§Ù„ØªØ±ÙƒÙŠØ©';
 
   @override
-  String get hindi => 'الهندية';
+  String get hindi => 'Ø§Ù„Ù‡Ù†Ø¯ÙŠØ©';
 
   @override
-  String get portuguese => 'البرتغالية';
+  String get portuguese => 'Ø§Ù„Ø¨Ø±ØªØºØ§Ù„ÙŠØ©';
 
   @override
-  String get indonesian => 'الإندونيسية';
+  String get indonesian => 'Ø§Ù„Ø¥Ù†Ø¯ÙˆÙ†ÙŠØ³ÙŠØ©';
 
   @override
-  String get azerbaijani => 'الأذربيجانية';
+  String get azerbaijani => 'Ø§Ù„Ø£Ø°Ø±Ø¨ÙŠØ¬Ø§Ù†ÙŠØ©';
 
   @override
-  String get german => 'الألمانية';
+  String get german => 'Ø§Ù„Ø£Ù„Ù…Ø§Ù†ÙŠØ©';
 
   @override
-  String get spanish => 'الإسبانية';
+  String get spanish => 'Ø§Ù„Ø¥Ø³Ø¨Ø§Ù†ÙŠØ©';
 
   @override
-  String get italian => 'الإيطالية';
+  String get italian => 'Ø§Ù„Ø¥ÙŠØ·Ø§Ù„ÙŠØ©';
 
   @override
-  String get arabic => 'عربي';
+  String get arabic => 'Ø¹Ø±Ø¨ÙŠ';
 
   @override
-  String get ram => 'الذاكرة';
+  String get ram => 'Ø§Ù„Ø°Ø§ÙƒØ±Ø©';
 
   @override
-  String get usernameTooShort => 'اسم المستخدم قصير جدًا.';
+  String get usernameTooShort => 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ù‚ØµÙŠØ± Ø¬Ø¯Ù‹Ø§.';
 
   @override
-  String get usernameTooLong => 'لا يمكن أن يتجاوز اسم المستخدم 16 حرفًا.';
+  String get usernameTooLong =>
+      'Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø£Ù† ÙŠØªØ¬Ø§ÙˆØ² Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… 16 Ø­Ø±ÙÙ‹Ø§.';
 
   @override
   String get invalidUsernameCharacters =>
-      'يمكن استخدام هذه الأحرف فقط في اسم المستخدم: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' والرموز \'.\'، \'-\'، \'_\'.';
+      'ÙŠÙ…ÙƒÙ† Ø§Ø³ØªØ®Ø¯Ø§Ù… Ù‡Ø°Ù‡ Ø§Ù„Ø£Ø­Ø±Ù ÙÙ‚Ø· ÙÙŠ Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…: \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' ÙˆØ§Ù„Ø±Ù…ÙˆØ² \'.\'ØŒ \'-\'ØŒ \'_\'.';
 
   @override
-  String get noInternetConnection => 'لا يوجد اتصال بالإنترنت.';
+  String get noInternetConnection =>
+      'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª.';
 
   @override
-  String get chats => 'صندوق الوارد';
+  String get chats => 'ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„ÙˆØ§Ø±Ø¯';
 
   @override
-  String get library => 'المكتبة';
+  String get library => 'Ø§Ù„Ù…ÙƒØªØ¨Ø©';
 
   @override
-  String get text => 'نص';
+  String get text => 'Ù†Øµ';
 
   @override
-  String get removeModel => 'إزالة النموذج';
+  String get removeModel => 'Ø¥Ø²Ø§Ù„Ø© Ø§Ù„Ù†Ù…ÙˆØ°Ø¬';
 
   @override
-  String get insufficientRAM => 'ذاكرة منخفضة';
+  String get insufficientRAM => 'Ø°Ø§ÙƒØ±Ø© Ù…Ù†Ø®ÙØ¶Ø©';
 
   @override
-  String get insufficientStorage => 'مساحة تخزين منخفضة';
+  String get insufficientStorage => 'Ù…Ø³Ø§Ø­Ø© ØªØ®Ø²ÙŠÙ† Ù…Ù†Ø®ÙØ¶Ø©';
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'هل أنت متأكد من رغبتك في إزالة جهاز $model من جهازك؟ سيؤدي ذلك أيضاً إلى حذف جميع المحادثات السابقة مع هذا الجهاز.';
+    return 'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø±ØºØ¨ØªÙƒ ÙÙŠ Ø¥Ø²Ø§Ù„Ø© Ø¬Ù‡Ø§Ø² $model Ù…Ù† Ø¬Ù‡Ø§Ø²ÙƒØŸ Ø³ÙŠØ¤Ø¯ÙŠ Ø°Ù„Ùƒ Ø£ÙŠØ¶Ø§Ù‹ Ø¥Ù„Ù‰ Ø­Ø°Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ø§Ù„Ø³Ø§Ø¨Ù‚Ø© Ù…Ø¹ Ù‡Ø°Ø§ Ø§Ù„Ø¬Ù‡Ø§Ø².';
   }
 
   @override
-  String get noMatchingModels => 'لم يتم العثور على نماذج مطابقة.';
+  String get noMatchingModels =>
+      'Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ù†Ù…Ø§Ø°Ø¬ Ù…Ø·Ø§Ø¨Ù‚Ø©.';
 
   @override
-  String get benefit1 => 'زيادة حدود المحادثة';
+  String get benefit1 => 'Ø²ÙŠØ§Ø¯Ø© Ø­Ø¯ÙˆØ¯ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø©';
 
   @override
-  String get benefit3 => 'تأثير للملف الشخصي';
+  String get benefit3 => 'ØªØ£Ø«ÙŠØ± Ù„Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ';
 
   @override
-  String get benefit4 => 'شارة عضوية';
+  String get benefit4 => 'Ø´Ø§Ø±Ø© Ø¹Ø¶ÙˆÙŠØ©';
 
   @override
-  String get benefit5 => 'إنشاء المزيد من الذكاء الاصطناعي عبر الإنترنت';
+  String get benefit5 =>
+      'Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¹Ø¨Ø± Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª';
 
   @override
-  String get benefit7 => 'حدود استخدام إضافية';
+  String get benefit7 => 'Ø­Ø¯ÙˆØ¯ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø¥Ø¶Ø§ÙÙŠØ©';
 
   @override
-  String get benefit8 => 'إضافة نماذج';
+  String get benefit8 => 'Ø¥Ø¶Ø§ÙØ© Ù†Ù…Ø§Ø°Ø¬';
 
   @override
-  String get benefit9 => 'سمات جديدة';
+  String get benefit9 => 'Ø³Ù…Ø§Øª Ø¬Ø¯ÙŠØ¯Ø©';
 
   @override
-  String get benefit10 => 'المزيد من المرفقات';
+  String get benefit10 => 'Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ù…Ø±ÙÙ‚Ø§Øª';
 
   @override
-  String get benefit11 => 'المزيد من وضع التدفق';
+  String get benefit11 => 'Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† ÙˆØ¶Ø¹ Ø§Ù„ØªØ¯ÙÙ‚';
 
   @override
-  String get oldBenefits => 'جميع مزايا الخطط الأقل';
+  String get oldBenefits => 'Ø¬Ù…ÙŠØ¹ Ù…Ø²Ø§ÙŠØ§ Ø§Ù„Ø®Ø·Ø· Ø§Ù„Ø£Ù‚Ù„';
 
   @override
-  String get confirm => 'تأكيد';
+  String get confirm => 'ØªØ£ÙƒÙŠØ¯';
 
   @override
-  String get changePassword => 'تغيير كلمة المرور';
+  String get changePassword => 'ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
 
   @override
-  String get logoutConfirmationTitle => 'هل أنت متأكد أنك تريد تسجيل الخروج؟';
+  String get logoutConfirmationTitle =>
+      'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ø£Ù†Ùƒ ØªØ±ÙŠØ¯ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬ØŸ';
 
   @override
-  String get settings => 'الإعدادات';
+  String get settings => 'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª';
 
   @override
-  String get language => 'لغة التطبيق';
+  String get language => 'Ù„ØºØ© Ø§Ù„ØªØ·Ø¨ÙŠÙ‚';
 
   @override
-  String get dark => 'داكن';
+  String get dark => 'Ø¯Ø§ÙƒÙ†';
 
   @override
-  String get oldPassword => 'كلمة المرور القديمة';
+  String get oldPassword => 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø©';
 
   @override
-  String get newPassword => 'كلمة المرور الجديدة';
+  String get newPassword => 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©';
 
   @override
-  String get passwordUpdated => 'تم تحديث كلمة المرور.';
+  String get passwordUpdated => 'ØªÙ… ØªØ­Ø¯ÙŠØ« ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±.';
 
   @override
-  String get stop => 'إيقاف';
+  String get stop => 'Ø¥ÙŠÙ‚Ø§Ù';
 
   @override
-  String get copyrights => 'الإسنادات';
+  String get copyrights => 'Ø§Ù„Ø¥Ø³Ù†Ø§Ø¯Ø§Øª';
 
   @override
-  String get love => 'حب';
+  String get love => 'Ø­Ø¨';
 
   @override
-  String get nature => 'طبيعة';
+  String get nature => 'Ø·Ø¨ÙŠØ¹Ø©';
 
   @override
-  String get behindTheSlaughter => 'خلف المذبحة';
+  String get behindTheSlaughter => 'Ø®Ù„Ù Ø§Ù„Ù…Ø°Ø¨Ø­Ø©';
 
   @override
-  String get grayscale => 'تدرج الرمادي';
+  String get cyberpunk => 'Cyberpunk';
 
   @override
-  String get ocean => 'محيط';
+  String get sunset => 'Sunset';
 
   @override
-  String get scarletSnow => 'ثلج قرمزي';
+  String get coffee => 'Coffee';
 
   @override
-  String get requestFailed => 'حدث خطأ، يرجى المحاولة مرة أخرى.';
+  String get deepSpace => 'Deep Space';
 
   @override
-  String get changeModel => 'تغيير';
+  String get grayscale => 'ØªØ¯Ø±Ø¬ Ø§Ù„Ø±Ù…Ø§Ø¯ÙŠ';
 
   @override
-  String get edit => 'تعديل';
+  String get ocean => 'Ù…Ø­ÙŠØ·';
+
+  @override
+  String get scarletSnow => 'Ø«Ù„Ø¬ Ù‚Ø±Ù…Ø²ÙŠ';
+
+  @override
+  String get requestFailed =>
+      'Ø­Ø¯Ø« Ø®Ø·Ø£ØŒ ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
+
+  @override
+  String get changeModel => 'ØªØºÙŠÙŠØ±';
+
+  @override
+  String get edit => 'ØªØ¹Ø¯ÙŠÙ„';
 
   @override
   String get editingMessageInfo =>
-      'سيؤدي تعديل هذه الرسالة إلى إعادة تشغيل المحادثة من هنا.';
+      'Ø³ÙŠØ¤Ø¯ÙŠ ØªØ¹Ø¯ÙŠÙ„ Ù‡Ø°Ù‡ Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ø¥Ù„Ù‰ Ø¥Ø¹Ø§Ø¯Ø© ØªØ´ØºÙŠÙ„ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ù…Ù† Ù‡Ù†Ø§.';
 
   @override
-  String get editingNotification => 'أنت في وضع التعديل الآن';
+  String get editingNotification =>
+      'Ø£Ù†Øª ÙÙŠ ÙˆØ¶Ø¹ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¢Ù†';
 
   @override
-  String get featurePluralTitle => 'متعدد';
+  String get featurePluralTitle => 'Ù…ØªØ¹Ø¯Ø¯';
 
   @override
   String get featurePluralDescription =>
-      'يمكن لهذا النموذج دمج امتدادات إضافية تلقائيًا، وبالتالي توسيع قدراته الوظيفية لدعم مجموعة متنوعة من العمليات بأداء محسن.';
+      'ÙŠÙ…ÙƒÙ† Ù„Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø¯Ù…Ø¬ Ø§Ù…ØªØ¯Ø§Ø¯Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§ØŒ ÙˆØ¨Ø§Ù„ØªØ§Ù„ÙŠ ØªÙˆØ³ÙŠØ¹ Ù‚Ø¯Ø±Ø§ØªÙ‡ Ø§Ù„ÙˆØ¸ÙŠÙÙŠØ© Ù„Ø¯Ø¹Ù… Ù…Ø¬Ù…ÙˆØ¹Ø© Ù…ØªÙ†ÙˆØ¹Ø© Ù…Ù† Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª Ø¨Ø£Ø¯Ø§Ø¡ Ù…Ø­Ø³Ù†.';
 
   @override
-  String get nameLabel => 'اسم الذكاء الاصطناعي';
+  String get nameLabel => 'Ø§Ø³Ù… Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ';
 
   @override
-  String get summaryLabel => 'ملخص الذكاء الاصطناعي';
+  String get summaryLabel => 'Ù…Ù„Ø®Øµ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ';
 
   @override
-  String get add => 'إضافة';
+  String get add => 'Ø¥Ø¶Ø§ÙØ©';
 
   @override
-  String get aiExplanationTitle => 'وصف الذكاء الاصطناعي';
+  String get aiExplanationTitle => 'ÙˆØµÙ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ';
 
   @override
   String get aiExplanationDescription =>
-      'يرجى تقديم وصف مفصل لبنية نموذج الذكاء الاصطناعي الخاص بك، وعملية التدريب، ومقاييس الأداء، ومجالات التطبيق، والميزات الهامة الأخرى.';
+      'ÙŠØ±Ø¬Ù‰ ØªÙ‚Ø¯ÙŠÙ… ÙˆØµÙ Ù…ÙØµÙ„ Ù„Ø¨Ù†ÙŠØ© Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø§Ù„Ø®Ø§Øµ Ø¨ÙƒØŒ ÙˆØ¹Ù…Ù„ÙŠØ© Ø§Ù„ØªØ¯Ø±ÙŠØ¨ØŒ ÙˆÙ…Ù‚Ø§ÙŠÙŠØ³ Ø§Ù„Ø£Ø¯Ø§Ø¡ØŒ ÙˆÙ…Ø¬Ø§Ù„Ø§Øª Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ØŒ ÙˆØ§Ù„Ù…ÙŠØ²Ø§Øª Ø§Ù„Ù‡Ø§Ù…Ø© Ø§Ù„Ø£Ø®Ø±Ù‰.';
 
   @override
-  String get preInputTitle => 'المدخل المسبق للذكاء الاصطناعي';
+  String get preInputTitle =>
+      'Ø§Ù„Ù…Ø¯Ø®Ù„ Ø§Ù„Ù…Ø³Ø¨Ù‚ Ù„Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ';
 
   @override
   String get preInputDescription =>
-      'يرجى تعيين مدخل مسبق لتوجيه نموذجك في عملية إنشاء الشخصية. في هذا القسم، يمكنك تضمين معلومات متعلقة بالشخصية، وسياق إضافي، وأي تفاصيل إضافية قد تساعد في إنشاء محتوى متعلق بالشخصية.';
+      'ÙŠØ±Ø¬Ù‰ ØªØ¹ÙŠÙŠÙ† Ù…Ø¯Ø®Ù„ Ù…Ø³Ø¨Ù‚ Ù„ØªÙˆØ¬ÙŠÙ‡ Ù†Ù…ÙˆØ°Ø¬Ùƒ ÙÙŠ Ø¹Ù…Ù„ÙŠØ© Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø´Ø®ØµÙŠØ©. ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù…ØŒ ÙŠÙ…ÙƒÙ†Ùƒ ØªØ¶Ù…ÙŠÙ† Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ù…ØªØ¹Ù„Ù‚Ø© Ø¨Ø§Ù„Ø´Ø®ØµÙŠØ©ØŒ ÙˆØ³ÙŠØ§Ù‚ Ø¥Ø¶Ø§ÙÙŠØŒ ÙˆØ£ÙŠ ØªÙØ§ØµÙŠÙ„ Ø¥Ø¶Ø§ÙÙŠØ© Ù‚Ø¯ ØªØ³Ø§Ø¹Ø¯ ÙÙŠ Ø¥Ù†Ø´Ø§Ø¡ Ù…Ø­ØªÙˆÙ‰ Ù…ØªØ¹Ù„Ù‚ Ø¨Ø§Ù„Ø´Ø®ØµÙŠØ©.';
 
   @override
-  String get baseModelTitle => 'النموذج الأساسي';
+  String get baseModelTitle => 'Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ';
 
   @override
   String get baseModelDescription =>
-      'هذا هو النموذج الذي سيتم استخدامه كأساس لإبداعك. يعرض النموذج الأساسي المحدد حاليًا.';
+      'Ù‡Ø°Ø§ Ù‡Ùˆ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø°ÙŠ Ø³ÙŠØªÙ… Ø§Ø³ØªØ®Ø¯Ø§Ù…Ù‡ ÙƒØ£Ø³Ø§Ø³ Ù„Ø¥Ø¨Ø¯Ø§Ø¹Ùƒ. ÙŠØ¹Ø±Ø¶ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ Ø§Ù„Ù…Ø­Ø¯Ø¯ Ø­Ø§Ù„ÙŠÙ‹Ø§.';
 
   @override
-  String get summary => 'ملخص';
+  String get summary => 'Ù…Ù„Ø®Øµ';
 
   @override
-  String get modelUploadTitle => 'ملف الذكاء الاصطناعي';
+  String get modelUploadTitle => 'Ù…Ù„Ù Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ';
 
   @override
   String get modelUploadDescription =>
-      'حدد وحمل ملفات GGUF المحلية مباشرة من جهازك. يتيح لك هذا تشغيل نموذجك دون اتصال بالإنترنت. تأكد من أن الملف بصيغة GGUF صالحة ومنظم بشكل صحيح. إذا كان الملف غير صحيح أو تالف، فقد لا يعمل Cortex كما هو متوقع، وقد تواجه أخطاء.';
+      'Ø­Ø¯Ø¯ ÙˆØ­Ù…Ù„ Ù…Ù„ÙØ§Øª GGUF Ø§Ù„Ù…Ø­Ù„ÙŠØ© Ù…Ø¨Ø§Ø´Ø±Ø© Ù…Ù† Ø¬Ù‡Ø§Ø²Ùƒ. ÙŠØªÙŠØ­ Ù„Ùƒ Ù‡Ø°Ø§ ØªØ´ØºÙŠÙ„ Ù†Ù…ÙˆØ°Ø¬Ùƒ Ø¯ÙˆÙ† Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª. ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ù† Ø§Ù„Ù…Ù„Ù Ø¨ØµÙŠØºØ© GGUF ØµØ§Ù„Ø­Ø© ÙˆÙ…Ù†Ø¸Ù… Ø¨Ø´ÙƒÙ„ ØµØ­ÙŠØ­. Ø¥Ø°Ø§ ÙƒØ§Ù† Ø§Ù„Ù…Ù„Ù ØºÙŠØ± ØµØ­ÙŠØ­ Ø£Ùˆ ØªØ§Ù„ÙØŒ ÙÙ‚Ø¯ Ù„Ø§ ÙŠØ¹Ù…Ù„ Cortex ÙƒÙ…Ø§ Ù‡Ùˆ Ù…ØªÙˆÙ‚Ø¹ØŒ ÙˆÙ‚Ø¯ ØªÙˆØ§Ø¬Ù‡ Ø£Ø®Ø·Ø§Ø¡.';
 
   @override
   String get modelUploadShortDescription =>
-      'انقر هنا لاختيار ملف .gguf من جهازك';
+      'Ø§Ù†Ù‚Ø± Ù‡Ù†Ø§ Ù„Ø§Ø®ØªÙŠØ§Ø± Ù…Ù„Ù .gguf Ù…Ù† Ø¬Ù‡Ø§Ø²Ùƒ';
 
   @override
-  String get you => 'أنت';
+  String get you => 'Ø£Ù†Øª';
 
   @override
-  String get removePhotoTitle => 'إزالة الصورة';
+  String get removePhotoTitle => 'Ø¥Ø²Ø§Ù„Ø© Ø§Ù„ØµÙˆØ±Ø©';
 
   @override
-  String get confirmRemovePhoto => 'هل أنت متأكد أنك تريد إزالة الصورة؟';
+  String get confirmRemovePhoto =>
+      'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ø£Ù†Ùƒ ØªØ±ÙŠØ¯ Ø¥Ø²Ø§Ù„Ø© Ø§Ù„ØµÙˆØ±Ø©ØŸ';
 
   @override
   String get chatLengthLimitExceeded =>
-      'لقد تجاوزت هذه المحادثة الحد الأقصى للحروف. يرجى بدء محادثة جديدة أو شراء اشتراك.';
+      'Ù„Ù‚Ø¯ ØªØ¬Ø§ÙˆØ²Øª Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ Ù„Ù„Ø­Ø±ÙˆÙ. ÙŠØ±Ø¬Ù‰ Ø¨Ø¯Ø¡ Ù…Ø­Ø§Ø¯Ø«Ø© Ø¬Ø¯ÙŠØ¯Ø© Ø£Ùˆ Ø´Ø±Ø§Ø¡ Ø§Ø´ØªØ±Ø§Ùƒ.';
 
   @override
-  String get inappropriateContentDetected => 'تم اكتشاف محتوى غير لائق!';
+  String get inappropriateContentDetected =>
+      'ØªÙ… Ø§ÙƒØªØ´Ø§Ù Ù…Ø­ØªÙˆÙ‰ ØºÙŠØ± Ù„Ø§Ø¦Ù‚!';
 
   @override
   String get offlineModelNotInstalled =>
-      'هذا النموذج غير متصل بالإنترنت وغير مثبت على جهازك.';
+      'Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ØºÙŠØ± Ù…ØªØµÙ„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª ÙˆØºÙŠØ± Ù…Ø«Ø¨Øª Ø¹Ù„Ù‰ Ø¬Ù‡Ø§Ø²Ùƒ.';
 
   @override
   String get reachedLimit =>
-      'لقد وصلت إلى الحد الأقصى لاستخدامك؛ للحصول على المزيد من الحدود، يمكنك ترقية باقتك. (نعلم تمامًا أن نفاد الحدود أمر مزعج، ولكن بجدية، الحصول على تلك الردود الرائعة ليس مجانيًا، لذا فإن هذه الحدود تساعدنا في الحفاظ على استمرار المتعة!)';
+      'Ù„Ù‚Ø¯ ÙˆØµÙ„Øª Ø¥Ù„Ù‰ Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…ÙƒØ› Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ø­Ø¯ÙˆØ¯ØŒ ÙŠÙ…ÙƒÙ†Ùƒ ØªØ±Ù‚ÙŠØ© Ø¨Ø§Ù‚ØªÙƒ. (Ù†Ø¹Ù„Ù… ØªÙ…Ø§Ù…Ù‹Ø§ Ø£Ù† Ù†ÙØ§Ø¯ Ø§Ù„Ø­Ø¯ÙˆØ¯ Ø£Ù…Ø± Ù…Ø²Ø¹Ø¬ØŒ ÙˆÙ„ÙƒÙ† Ø¨Ø¬Ø¯ÙŠØ©ØŒ Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ ØªÙ„Ùƒ Ø§Ù„Ø±Ø¯ÙˆØ¯ Ø§Ù„Ø±Ø§Ø¦Ø¹Ø© Ù„ÙŠØ³ Ù…Ø¬Ø§Ù†ÙŠÙ‹Ø§ØŒ Ù„Ø°Ø§ ÙØ¥Ù† Ù‡Ø°Ù‡ Ø§Ù„Ø­Ø¯ÙˆØ¯ ØªØ³Ø§Ø¹Ø¯Ù†Ø§ ÙÙŠ Ø§Ù„Ø­ÙØ§Ø¸ Ø¹Ù„Ù‰ Ø§Ø³ØªÙ…Ø±Ø§Ø± Ø§Ù„Ù…ØªØ¹Ø©!)';
 
   @override
-  String get modality => 'النمط';
+  String get modality => 'Ø§Ù„Ù†Ù…Ø·';
 
   @override
-  String get multimodal => 'متعدد الوسائط';
+  String get multimodal => 'Ù…ØªØ¹Ø¯Ø¯ Ø§Ù„ÙˆØ³Ø§Ø¦Ø·';
 
   @override
-  String get anErrorOccurred => 'حدث خطأ';
+  String get anErrorOccurred => 'Ø­Ø¯Ø« Ø®Ø·Ø£';
 
   @override
   String get themeLocked =>
-      'تتطلب هذه السمة مستوى اشتراك أعلى. يرجى الترقية لفتحها.';
+      'ØªØªØ·Ù„Ø¨ Ù‡Ø°Ù‡ Ø§Ù„Ø³Ù…Ø© Ù…Ø³ØªÙˆÙ‰ Ø§Ø´ØªØ±Ø§Ùƒ Ø£Ø¹Ù„Ù‰. ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ±Ù‚ÙŠØ© Ù„ÙØªØ­Ù‡Ø§.';
 
   @override
-  String get pageCouldNotBeLoaded => 'تعذر تحميل الصفحة';
+  String get pageCouldNotBeLoaded => 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø©';
 
   @override
   String get checkYourInternet =>
-      'يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.';
+      'ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„Ùƒ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
   String get errorUserNotAuthenticated =>
-      'يجب عليك تسجيل الدخول لتنفيذ هذا الإجراء.';
+      'ÙŠØ¬Ø¨ Ø¹Ù„ÙŠÙƒ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù„ØªÙ†ÙÙŠØ° Ù‡Ø°Ø§ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡.';
 
   @override
   String get errorReachedLimit =>
-      'لقد وصلت إلى الحد الأقصى، قم بالترقية لفتح المزيد واستمر في الدردشة.';
+      'Ù„Ù‚Ø¯ ÙˆØµÙ„Øª Ø¥Ù„Ù‰ Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ØŒ Ù‚Ù… Ø¨Ø§Ù„ØªØ±Ù‚ÙŠØ© Ù„ÙØªØ­ Ø§Ù„Ù…Ø²ÙŠØ¯ ÙˆØ§Ø³ØªÙ…Ø± ÙÙŠ Ø§Ù„Ø¯Ø±Ø¯Ø´Ø©.';
 
   @override
   String get errorServer =>
-      'حدث خطأ غير متوقع في الخادم. يرجى المحاولة مرة أخرى لاحقًا.';
+      'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹ ÙÙŠ Ø§Ù„Ø®Ø§Ø¯Ù…. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰ Ù„Ø§Ø­Ù‚Ù‹Ø§.';
 
   @override
   String get errorNetwork =>
-      'حدث خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.';
+      'Ø­Ø¯Ø« Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø´Ø¨ÙƒØ©. ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„Ùƒ ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
   String get baseModelForCharacterDescription =>
-      'سيحدد النموذج الأساسي المختار قدرات الشخصية على التفكير والاستجابة.';
+      'Ø³ÙŠØ­Ø¯Ø¯ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ Ø§Ù„Ù…Ø®ØªØ§Ø± Ù‚Ø¯Ø±Ø§Øª Ø§Ù„Ø´Ø®ØµÙŠØ© Ø¹Ù„Ù‰ Ø§Ù„ØªÙÙƒÙŠØ± ÙˆØ§Ù„Ø§Ø³ØªØ¬Ø§Ø¨Ø©.';
 
   @override
-  String get selectBaseModel => 'حدد نموذجًا أساسيًا';
+  String get selectBaseModel => 'Ø­Ø¯Ø¯ Ù†Ù…ÙˆØ°Ø¬Ù‹Ø§ Ø£Ø³Ø§Ø³ÙŠÙ‹Ø§';
 
   @override
   String get falErrorImageRequired =>
-      'يتطلب هذا الذكاء الاصطناعي صورة مرجعية، يرجى إرفاق صورة والمحاولة مرة أخرى.';
+      'ÙŠØªØ·Ù„Ø¨ Ù‡Ø°Ø§ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ ØµÙˆØ±Ø© Ù…Ø±Ø¬Ø¹ÙŠØ©ØŒ ÙŠØ±Ø¬Ù‰ Ø¥Ø±ÙØ§Ù‚ ØµÙˆØ±Ø© ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
   String get falErrorAudioRequired =>
-      'يتطلب هذا النموذج ملف صوتي مرجعي، يرجى إرفاق ملف صوتي والمحاولة مرة أخرى.';
+      'ÙŠØªØ·Ù„Ø¨ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ù…Ù„Ù ØµÙˆØªÙŠ Ù…Ø±Ø¬Ø¹ÙŠØŒ ÙŠØ±Ø¬Ù‰ Ø¥Ø±ÙØ§Ù‚ Ù…Ù„Ù ØµÙˆØªÙŠ ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
   String get falErrorVideoRequired =>
-      'يتطلب هذا النموذج فيديو مرجعيًا، يرجى إرفاق فيديو والمحاولة مرة أخرى.';
+      'ÙŠØªØ·Ù„Ø¨ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ÙÙŠØ¯ÙŠÙˆ Ù…Ø±Ø¬Ø¹ÙŠÙ‹Ø§ØŒ ÙŠØ±Ø¬Ù‰ Ø¥Ø±ÙØ§Ù‚ ÙÙŠØ¯ÙŠÙˆ ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
   String get falErrorImageCorrupted =>
-      'تعذر معالجة الصورة التي تم تحميلها، يرجى تجربة تنسيق مختلف.';
+      'ØªØ¹Ø°Ø± Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„ØªÙŠ ØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡Ø§ØŒ ÙŠØ±Ø¬Ù‰ ØªØ¬Ø±Ø¨Ø© ØªÙ†Ø³ÙŠÙ‚ Ù…Ø®ØªÙ„Ù.';
 
   @override
   String get falErrorSchemaRejected =>
-      'رفض النموذج المدخلات، يرجى تجربة نموذج مختلف.';
+      'Ø±ÙØ¶ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ù…Ø¯Ø®Ù„Ø§ØªØŒ ÙŠØ±Ø¬Ù‰ ØªØ¬Ø±Ø¨Ø© Ù†Ù…ÙˆØ°Ø¬ Ù…Ø®ØªÙ„Ù.';
 
   @override
-  String get falErrorSchemaInvalid => 'تم رفض المدخلات من قبل خدمة التوليد.';
+  String get falErrorSchemaInvalid =>
+      'ØªÙ… Ø±ÙØ¶ Ø§Ù„Ù…Ø¯Ø®Ù„Ø§Øª Ù…Ù† Ù‚Ø¨Ù„ Ø®Ø¯Ù…Ø© Ø§Ù„ØªÙˆÙ„ÙŠØ¯.';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return 'أعادت خدمة الإنشاء خطأً (الحالة $statusCode).';
+    return 'Ø£Ø¹Ø§Ø¯Øª Ø®Ø¯Ù…Ø© Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡ Ø®Ø·Ø£Ù‹ (Ø§Ù„Ø­Ø§Ù„Ø© $statusCode).';
   }
 
   @override
-  String get couldNotOpenLink => 'تعذر فتح الرابط';
+  String get couldNotOpenLink => 'ØªØ¹Ø°Ø± ÙØªØ­ Ø§Ù„Ø±Ø§Ø¨Ø·';
 
   @override
-  String get downloadStarted => 'بدأ التنزيل';
+  String get downloadStarted => 'Ø¨Ø¯Ø£ Ø§Ù„ØªÙ†Ø²ÙŠÙ„';
 
   @override
-  String get notAvailable => 'غير متوفر';
+  String get notAvailable => 'ØºÙŠØ± Ù…ØªÙˆÙØ±';
 
   @override
   String get localizationWarning =>
-      'قد لا تتوفر بعض المعلومات بلغتك وسيتم عرضها باللغة الإنجليزية.';
+      'Ù‚Ø¯ Ù„Ø§ ØªØªÙˆÙØ± Ø¨Ø¹Ø¶ Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø¨Ù„ØºØªÙƒ ÙˆØ³ÙŠØªÙ… Ø¹Ø±Ø¶Ù‡Ø§ Ø¨Ø§Ù„Ù„ØºØ© Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©.';
 
   @override
   String get aiTranslationWarning =>
-      'تتم ترجمة معلومات النموذج إلى لغات مختلفة بواسطة نماذج ذكاء اصطناعي أخرى. لذلك، قد تحدث تناقضات طفيفة في اللغات الأخرى غير الإنجليزية.';
+      'ØªØªÙ… ØªØ±Ø¬Ù…Ø© Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø¥Ù„Ù‰ Ù„ØºØ§Øª Ù…Ø®ØªÙ„ÙØ© Ø¨ÙˆØ§Ø³Ø·Ø© Ù†Ù…Ø§Ø°Ø¬ Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø£Ø®Ø±Ù‰. Ù„Ø°Ù„ÙƒØŒ Ù‚Ø¯ ØªØ­Ø¯Ø« ØªÙ†Ø§Ù‚Ø¶Ø§Øª Ø·ÙÙŠÙØ© ÙÙŠ Ø§Ù„Ù„ØºØ§Øª Ø§Ù„Ø£Ø®Ø±Ù‰ ØºÙŠØ± Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©.';
 
   @override
-  String get errorLoadingTitle => 'فشل تحميل البيانات';
+  String get errorLoadingTitle => 'ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª';
 
   @override
   String get errorLoadingMessage =>
-      'لم نتمكن من استرداد البيانات اللازمة من خوادمنا. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.';
+      'Ù„Ù… Ù†ØªÙ…ÙƒÙ† Ù…Ù† Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù„Ø§Ø²Ù…Ø© Ù…Ù† Ø®ÙˆØ§Ø¯Ù…Ù†Ø§. ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„Ùƒ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
-  String get noFoundTitle => 'لا توجد نتائج';
+  String get noFoundTitle => 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù†ØªØ§Ø¦Ø¬';
 
   @override
-  String get noFoundMessage => 'حاول تعديل مصطلحات البحث أو مسح الفلتر.';
+  String get noFoundMessage =>
+      'Ø­Ø§ÙˆÙ„ ØªØ¹Ø¯ÙŠÙ„ Ù…ØµØ·Ù„Ø­Ø§Øª Ø§Ù„Ø¨Ø­Ø« Ø£Ùˆ Ù…Ø³Ø­ Ø§Ù„ÙÙ„ØªØ±.';
 
   @override
-  String get modelCreatedSuccess => 'تم إنشاء النموذج بنجاح!';
+  String get modelCreatedSuccess =>
+      'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø¨Ù†Ø¬Ø§Ø­!';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'تمت إزالة \"$modelName\" بنجاح.';
+    return 'ØªÙ…Øª Ø¥Ø²Ø§Ù„Ø© \"$modelName\" Ø¨Ù†Ø¬Ø§Ø­.';
   }
 
   @override
-  String get errorCreatingModel => 'حدث خطأ غير متوقع أثناء إنشاء النموذج.';
+  String get errorCreatingModel =>
+      'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹ Ø£Ø«Ù†Ø§Ø¡ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬.';
 
   @override
-  String get errorDeletingModel => 'حدث خطأ غير متوقع أثناء حذف النموذج.';
+  String get errorDeletingModel =>
+      'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹ Ø£Ø«Ù†Ø§Ø¡ Ø­Ø°Ù Ø§Ù„Ù†Ù…ÙˆØ°Ø¬.';
 
   @override
-  String get ultraFeatureOnly => 'هذه الميزة متاحة فقط لأعضاء Ultra.';
+  String get ultraFeatureOnly =>
+      'Ù‡Ø°Ù‡ Ø§Ù„Ù…ÙŠØ²Ø© Ù…ØªØ§Ø­Ø© ÙÙ‚Ø· Ù„Ø£Ø¹Ø¶Ø§Ø¡ Ultra.';
 
   @override
   String get experimentalOfflineWarning =>
-      'لا يزال وضع عدم الاتصال بالإنترنت تجريبيًا وقد لا يعمل النموذج الذي تقوم بتنزيله بالكفاءة المثلى.';
+      'Ù„Ø§ ÙŠØ²Ø§Ù„ ÙˆØ¶Ø¹ Ø¹Ø¯Ù… Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª ØªØ¬Ø±ÙŠØ¨ÙŠÙ‹Ø§ ÙˆÙ‚Ø¯ Ù„Ø§ ÙŠØ¹Ù…Ù„ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø°ÙŠ ØªÙ‚ÙˆÙ… Ø¨ØªÙ†Ø²ÙŠÙ„Ù‡ Ø¨Ø§Ù„ÙƒÙØ§Ø¡Ø© Ø§Ù„Ù…Ø«Ù„Ù‰.';
 
   @override
-  String get noConversationsToDelete => 'ليس لديك محادثات لحذفها.';
+  String get noConversationsToDelete =>
+      'Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ù„Ø­Ø°ÙÙ‡Ø§.';
 
   @override
-  String get reportSubmitted => 'تم إرسال البلاغ بنجاح';
+  String get reportSubmitted => 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¨Ù„Ø§Øº Ø¨Ù†Ø¬Ø§Ø­';
 
   @override
   String get verificationDelayed =>
-      'تم تأكيد عملية الشراء. هناك تأخير طفيف في تحديث حسابك، سيظهر قريبًا.';
+      'ØªÙ… ØªØ£ÙƒÙŠØ¯ Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø´Ø±Ø§Ø¡. Ù‡Ù†Ø§Ùƒ ØªØ£Ø®ÙŠØ± Ø·ÙÙŠÙ ÙÙŠ ØªØ­Ø¯ÙŠØ« Ø­Ø³Ø§Ø¨ÙƒØŒ Ø³ÙŠØ¸Ù‡Ø± Ù‚Ø±ÙŠØ¨Ù‹Ø§.';
 
   @override
-  String get maintenanceTitle => 'تحت الصيانة';
+  String get maintenanceTitle => 'ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©';
 
   @override
   String get maintenanceMessage =>
-      'Cortex غير متصل مؤقتًا بينما نقوم بطرح بعض التحديثات المهمة. سيتم استعادة الوصول إلى التطبيق قريبًا.\n\nشكرًا لك على سعة صدرك بينما نقوم بتحسين تجربتك.';
+      'Cortex ØºÙŠØ± Ù…ØªØµÙ„ Ù…Ø¤Ù‚ØªÙ‹Ø§ Ø¨ÙŠÙ†Ù…Ø§ Ù†Ù‚ÙˆÙ… Ø¨Ø·Ø±Ø­ Ø¨Ø¹Ø¶ Ø§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª Ø§Ù„Ù…Ù‡Ù…Ø©. Ø³ÙŠØªÙ… Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ù‚Ø±ÙŠØ¨Ù‹Ø§.\n\nØ´ÙƒØ±Ù‹Ø§ Ù„Ùƒ Ø¹Ù„Ù‰ Ø³Ø¹Ø© ØµØ¯Ø±Ùƒ Ø¨ÙŠÙ†Ù…Ø§ Ù†Ù‚ÙˆÙ… Ø¨ØªØ­Ø³ÙŠÙ† ØªØ¬Ø±Ø¨ØªÙƒ.';
 
   @override
   String get errorPromptFlagged =>
-      'تم اكتشاف رسالتك على أنها غير لائقة ولم يتم إرسالها.';
+      'ØªÙ… Ø§ÙƒØªØ´Ø§Ù Ø±Ø³Ø§Ù„ØªÙƒ Ø¹Ù„Ù‰ Ø£Ù†Ù‡Ø§ ØºÙŠØ± Ù„Ø§Ø¦Ù‚Ø© ÙˆÙ„Ù… ÙŠØªÙ… Ø¥Ø±Ø³Ø§Ù„Ù‡Ø§.';
 
   @override
   String get notEnoughStorage =>
-      'لا توجد مساحة تخزين كافية على جهازك لحفظ الرسائل الجديدة.';
+      'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø³Ø§Ø­Ø© ØªØ®Ø²ÙŠÙ† ÙƒØ§ÙÙŠØ© Ø¹Ù„Ù‰ Ø¬Ù‡Ø§Ø²Ùƒ Ù„Ø­ÙØ¸ Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©.';
 
   @override
   String get errorRateLimit =>
-      'لقد أنشأت عددًا كبيرًا جدًا من النماذج مؤخرًا، يرجى الانتظار بعض الوقت قبل المحاولة مرة أخرى.';
+      'Ù„Ù‚Ø¯ Ø£Ù†Ø´Ø£Øª Ø¹Ø¯Ø¯Ù‹Ø§ ÙƒØ¨ÙŠØ±Ù‹Ø§ Ø¬Ø¯Ù‹Ø§ Ù…Ù† Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ Ù…Ø¤Ø®Ø±Ù‹Ø§ØŒ ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø± Ø¨Ø¹Ø¶ Ø§Ù„ÙˆÙ‚Øª Ù‚Ø¨Ù„ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
   String get errorContentFlagged =>
-      'تعذر حفظ النموذج لأن محتواه تم الإبلاغ عنه على أنه غير لائق.';
+      'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ù„Ø£Ù† Ù…Ø­ØªÙˆØ§Ù‡ ØªÙ… Ø§Ù„Ø¥Ø¨Ù„Ø§Øº Ø¹Ù†Ù‡ Ø¹Ù„Ù‰ Ø£Ù†Ù‡ ØºÙŠØ± Ù„Ø§Ø¦Ù‚.';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      'لا يمكنك حذف جميع المحادثات أثناء وجودك في محادثة نشطة، يرجى الخروج من المحادثة الحالية أولاً للمتابعة.';
+      'Ù„Ø§ ÙŠÙ…ÙƒÙ†Ùƒ Ø­Ø°Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ø£Ø«Ù†Ø§Ø¡ ÙˆØ¬ÙˆØ¯Ùƒ ÙÙŠ Ù…Ø­Ø§Ø¯Ø«Ø© Ù†Ø´Ø·Ø©ØŒ ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø®Ø±ÙˆØ¬ Ù…Ù† Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ© Ø£ÙˆÙ„Ø§Ù‹ Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©.';
 
   @override
-  String get invalidCredentials => 'بريد إلكتروني أو كلمة مرور غير صحيحة.';
+  String get invalidCredentials =>
+      'Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø£Ùˆ ÙƒÙ„Ù…Ø© Ù…Ø±ÙˆØ± ØºÙŠØ± ØµØ­ÙŠØ­Ø©.';
 
   @override
-  String get userDisabled => 'تم تعطيل حساب المستخدم هذا.';
+  String get userDisabled =>
+      'ØªÙ… ØªØ¹Ø·ÙŠÙ„ Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ù‡Ø°Ø§.';
 
   @override
   String get loginSubtitle =>
-      'سجّل دخولك إلى حساب فيرتكس. بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية.';
+      'Ø³Ø¬Ù‘Ù„ Ø¯Ø®ÙˆÙ„Ùƒ Ø¥Ù„Ù‰ Ø­Ø³Ø§Ø¨ ÙÙŠØ±ØªÙƒØ³. Ø¨Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©ØŒ Ø£Ù†Øª ØªÙˆØ§ÙÙ‚ Ø¹Ù„Ù‰ Ø´Ø±ÙˆØ· Ø§Ù„Ø®Ø¯Ù…Ø© ÙˆØ³ÙŠØ§Ø³Ø© Ø§Ù„Ø®ØµÙˆØµÙŠØ©.';
 
   @override
   String get registerSubtitle =>
-      'أنشئ حسابًا على Vertex للوصول السلس إلى جميع خدماتنا. بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية.';
+      'Ø£Ù†Ø´Ø¦ Ø­Ø³Ø§Ø¨Ù‹Ø§ Ø¹Ù„Ù‰ Vertex Ù„Ù„ÙˆØµÙˆÙ„ Ø§Ù„Ø³Ù„Ø³ Ø¥Ù„Ù‰ Ø¬Ù…ÙŠØ¹ Ø®Ø¯Ù…Ø§ØªÙ†Ø§. Ø¨Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©ØŒ Ø£Ù†Øª ØªÙˆØ§ÙÙ‚ Ø¹Ù„Ù‰ Ø´Ø±ÙˆØ· Ø§Ù„Ø®Ø¯Ù…Ø© ÙˆØ³ÙŠØ§Ø³Ø© Ø§Ù„Ø®ØµÙˆØµÙŠØ©.';
 
   @override
   String get storagePermissionRequired =>
-      'إذن التخزين مطلوب لحفظ النماذج التي تم تنزيلها. يرجى منح الإذن للمتابعة.';
+      'Ø¥Ø°Ù† Ø§Ù„ØªØ®Ø²ÙŠÙ† Ù…Ø·Ù„ÙˆØ¨ Ù„Ø­ÙØ¸ Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„ØªÙŠ ØªÙ… ØªÙ†Ø²ÙŠÙ„Ù‡Ø§. ÙŠØ±Ø¬Ù‰ Ù…Ù†Ø­ Ø§Ù„Ø¥Ø°Ù† Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©.';
 
   @override
-  String get inviteShareSubject => 'انضم إلي في Cortex!';
+  String get inviteShareSubject => 'Ø§Ù†Ø¶Ù… Ø¥Ù„ÙŠ ÙÙŠ Cortex!';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'يا صاحبي فيه تطبيق مجنون اسمه cortex لو دعيت احد يجيلنا بلس مجانا فرصة خيالية حمل بسرعة\n\n$cortexLink';
+    return 'ÙŠØ§ ØµØ§Ø­Ø¨ÙŠ ÙÙŠÙ‡ ØªØ·Ø¨ÙŠÙ‚ Ù…Ø¬Ù†ÙˆÙ† Ø§Ø³Ù…Ù‡ cortex Ù„Ùˆ Ø¯Ø¹ÙŠØª Ø§Ø­Ø¯ ÙŠØ¬ÙŠÙ„Ù†Ø§ Ø¨Ù„Ø³ Ù…Ø¬Ø§Ù†Ø§ ÙØ±ØµØ© Ø®ÙŠØ§Ù„ÙŠØ© Ø­Ù…Ù„ Ø¨Ø³Ø±Ø¹Ø©\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => 'هل تستمتع بـ Cortex؟';
+  String get reviewEnjoyingAppTitle => 'Ù‡Ù„ ØªØ³ØªÙ…ØªØ¹ Ø¨Ù€ CortexØŸ';
 
   @override
   String get reviewHelpUsGrow =>
-      'تقييمك دعم كبير لفريقنا المستقل الشاب ويساعدنا على جعل Cortex أفضل لك.';
+      'ØªÙ‚ÙŠÙŠÙ…Ùƒ Ø¯Ø¹Ù… ÙƒØ¨ÙŠØ± Ù„ÙØ±ÙŠÙ‚Ù†Ø§ Ø§Ù„Ù…Ø³ØªÙ‚Ù„ Ø§Ù„Ø´Ø§Ø¨ ÙˆÙŠØ³Ø§Ø¹Ø¯Ù†Ø§ Ø¹Ù„Ù‰ Ø¬Ø¹Ù„ Cortex Ø£ÙØ¶Ù„ Ù„Ùƒ.';
 
   @override
-  String get reviewMaybeLater => 'ربما لاحقًا';
+  String get reviewMaybeLater => 'Ø±Ø¨Ù…Ø§ Ù„Ø§Ø­Ù‚Ù‹Ø§';
 
   @override
-  String get reviewRateNow => 'قيّم الآن';
+  String get reviewRateNow => 'Ù‚ÙŠÙ‘Ù… Ø§Ù„Ø¢Ù†';
 
   @override
-  String get noThanks => 'لا، شكرًا';
+  String get noThanks => 'Ù„Ø§ØŒ Ø´ÙƒØ±Ù‹Ø§';
 
   @override
-  String get updateRequiredTitle => 'تحديث مطلوب';
+  String get updateRequiredTitle => 'ØªØ­Ø¯ÙŠØ« Ù…Ø·Ù„ÙˆØ¨';
 
   @override
   String get updateRequiredMessage =>
-      'للاستمرار في استخدام Cortex، يرجى تحديث التطبيق إلى أحدث إصدار للحصول على ميزات جديدة وتحسينات مهمة.';
+      'Ù„Ù„Ø§Ø³ØªÙ…Ø±Ø§Ø± ÙÙŠ Ø§Ø³ØªØ®Ø¯Ø§Ù… CortexØŒ ÙŠØ±Ø¬Ù‰ ØªØ­Ø¯ÙŠØ« Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ø¥Ù„Ù‰ Ø£Ø­Ø¯Ø« Ø¥ØµØ¯Ø§Ø± Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ù…ÙŠØ²Ø§Øª Ø¬Ø¯ÙŠØ¯Ø© ÙˆØªØ­Ø³ÙŠÙ†Ø§Øª Ù…Ù‡Ù…Ø©.';
 
   @override
-  String get updateNowButton => 'حدّث الآن';
+  String get updateNowButton => 'Ø­Ø¯Ù‘Ø« Ø§Ù„Ø¢Ù†';
 
   @override
   String get creatorSupportedSuccess =>
-      'تم دعم منشئ المحتوى بنجاح! ستساهم مشترياتك المستقبلية له.';
+      'ØªÙ… Ø¯Ø¹Ù… Ù…Ù†Ø´Ø¦ Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø¨Ù†Ø¬Ø§Ø­! Ø³ØªØ³Ø§Ù‡Ù… Ù…Ø´ØªØ±ÙŠØ§ØªÙƒ Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„ÙŠØ© Ù„Ù‡.';
 
   @override
-  String get featureDocumentTitle => 'دعم المستندات';
+  String get featureDocumentTitle => 'Ø¯Ø¹Ù… Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª';
 
   @override
   String get featureDocumentDescription =>
-      'يمكن لهذا النموذج تحليل والإجابة على الأسئلة حول المستندات التي تم تحميلها مثل ملفات PDF والملفات النصية.';
+      'ÙŠÙ…ÙƒÙ† Ù„Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ØªØ­Ù„ÙŠÙ„ ÙˆØ§Ù„Ø¥Ø¬Ø§Ø¨Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø­ÙˆÙ„ Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª Ø§Ù„ØªÙŠ ØªÙ… ØªØ­Ù…ÙŠÙ„Ù‡Ø§ Ù…Ø«Ù„ Ù…Ù„ÙØ§Øª PDF ÙˆØ§Ù„Ù…Ù„ÙØ§Øª Ø§Ù„Ù†ØµÙŠØ©.';
 
   @override
-  String get featureImageGenerationTitle => 'توليد الصور';
+  String get featureImageGenerationTitle => 'ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØ±';
 
   @override
   String get featureImageGenerationDescription =>
-      'يمكن لهذا النموذج إنشاء صور أصلية استنادًا إلى أوصاف النصوص الخاصة بك.';
+      'ÙŠÙ…ÙƒÙ† Ù„Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø¥Ù†Ø´Ø§Ø¡ ØµÙˆØ± Ø£ØµÙ„ÙŠØ© Ø§Ø³ØªÙ†Ø§Ø¯Ù‹Ø§ Ø¥Ù„Ù‰ Ø£ÙˆØµØ§Ù Ø§Ù„Ù†ØµÙˆØµ Ø§Ù„Ø®Ø§ØµØ© Ø¨Ùƒ.';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1070,510 +1124,530 @@ class AppLocalizationsAr extends AppLocalizations {
       'This model can create original video based on your text descriptions.';
 
   @override
-  String get premiumModelNoticeTitle => 'نموذج مميز';
+  String get premiumModelNoticeTitle => 'Ù†Ù…ÙˆØ°Ø¬ Ù…Ù…ÙŠØ²';
 
   @override
   String get premiumModelNoticeDescription =>
-      'هذا الذكاء الاصطناعي هو ذكاء اصطناعي مميز، المستخدمون المجانيون لديهم وصول محدود إلى الذكاء الاصطناعي المميز؛ قم بالترقية لفتح وصول غير محدود!';
+      'Ù‡Ø°Ø§ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ù‡Ùˆ Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ù…Ù…ÙŠØ²ØŒ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ† Ø§Ù„Ù…Ø¬Ø§Ù†ÙŠÙˆÙ† Ù„Ø¯ÙŠÙ‡Ù… ÙˆØµÙˆÙ„ Ù…Ø­Ø¯ÙˆØ¯ Ø¥Ù„Ù‰ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø§Ù„Ù…Ù…ÙŠØ²Ø› Ù‚Ù… Ø¨Ø§Ù„ØªØ±Ù‚ÙŠØ© Ù„ÙØªØ­ ÙˆØµÙˆÙ„ ØºÙŠØ± Ù…Ø­Ø¯ÙˆØ¯!';
 
   @override
-  String get benefitPremiumModels => 'الوصول إلى النماذج المتميزة';
+  String get benefitPremiumModels =>
+      'Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ù…ØªÙ…ÙŠØ²Ø©';
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'لقد استخدمت جميع رسائلك اليومية المجانية للنماذج المميزة، يرجى الترقية للحصول على وصول غير محدود.';
+      'Ù„Ù‚Ø¯ Ø§Ø³ØªØ®Ø¯Ù…Øª Ø¬Ù…ÙŠØ¹ Ø±Ø³Ø§Ø¦Ù„Ùƒ Ø§Ù„ÙŠÙˆÙ…ÙŠØ© Ø§Ù„Ù…Ø¬Ø§Ù†ÙŠØ© Ù„Ù„Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ù…Ù…ÙŠØ²Ø©ØŒ ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ±Ù‚ÙŠØ© Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ ÙˆØµÙˆÙ„ ØºÙŠØ± Ù…Ø­Ø¯ÙˆØ¯.';
 
   @override
-  String get useOffline => 'استخدم بدون انترنت';
+  String get useOffline => 'Ø§Ø³ØªØ®Ø¯Ù… Ø¨Ø¯ÙˆÙ† Ø§Ù†ØªØ±Ù†Øª';
 
   @override
-  String get explore => 'استكشاف';
+  String get explore => 'Ø§Ø³ØªÙƒØ´Ø§Ù';
 
   @override
-  String get news => 'أخبار';
+  String get news => 'Ø£Ø®Ø¨Ø§Ø±';
 
   @override
-  String get createAI => 'إنشاء';
+  String get createAI => 'Ø¥Ù†Ø´Ø§Ø¡';
 
   @override
-  String get shortcuts => 'اختصارات';
+  String get shortcuts => 'Ø§Ø®ØªØµØ§Ø±Ø§Øª';
 
   @override
-  String get allModels => 'جميع الموديلات';
+  String get allModels => 'Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„Ø§Øª';
 
   @override
-  String get onlineModels => 'نماذج اللغة';
+  String get onlineModels => 'Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ù„ØºØ©';
 
   @override
-  String get offlineModels => 'نماذج غير متصلة بالإنترنت';
+  String get offlineModels => 'Ù†Ù…Ø§Ø°Ø¬ ØºÙŠØ± Ù…ØªØµÙ„Ø© Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª';
 
   @override
-  String get characterModels => 'الشخصيات';
+  String get characterModels => 'Ø§Ù„Ø´Ø®ØµÙŠØ§Øª';
 
   @override
-  String get customModels => 'نماذج مخصصة';
+  String get customModels => 'Ù†Ù…Ø§Ø°Ø¬ Ù…Ø®ØµØµØ©';
 
   @override
-  String get dynamicChatTitle => 'الدردشة الديناميكية';
+  String get dynamicChatTitle => 'Ø§Ù„Ø¯Ø±Ø¯Ø´Ø© Ø§Ù„Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ©';
 
   @override
   String get errorNoModelsAvailable =>
-      'لا توجد موديلات متاحة حاليًا. يُرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.';
+      'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…ÙˆØ¯ÙŠÙ„Ø§Øª Ù…ØªØ§Ø­Ø© Ø­Ø§Ù„ÙŠÙ‹Ø§. ÙŠÙØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„Ùƒ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
-  String get notificationComebackTitle => 'إننا نفتقدك!';
+  String get notificationComebackTitle => 'Ø¥Ù†Ù†Ø§ Ù†ÙØªÙ‚Ø¯Ùƒ!';
 
   @override
   String get notificationComebackBody =>
-      'استرخِ، هذه ليست رسالة من حبيبك السابق. لكن *يمكنك* إنشاء حبيبك السابق في كورتكس! عد إلينا.';
+      'Ø§Ø³ØªØ±Ø®ÙØŒ Ù‡Ø°Ù‡ Ù„ÙŠØ³Øª Ø±Ø³Ø§Ù„Ø© Ù…Ù† Ø­Ø¨ÙŠØ¨Ùƒ Ø§Ù„Ø³Ø§Ø¨Ù‚. Ù„ÙƒÙ† *ÙŠÙ…ÙƒÙ†Ùƒ* Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø¨ÙŠØ¨Ùƒ Ø§Ù„Ø³Ø§Ø¨Ù‚ ÙÙŠ ÙƒÙˆØ±ØªÙƒØ³! Ø¹Ø¯ Ø¥Ù„ÙŠÙ†Ø§.';
 
   @override
-  String get notificationLongTimeNoSeeTitle => 'لقد مر وقت طويل';
+  String get notificationLongTimeNoSeeTitle => 'Ù„Ù‚Ø¯ Ù…Ø± ÙˆÙ‚Øª Ø·ÙˆÙŠÙ„';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'لقد تغير الكثير منذ آخر دردشة لنا. تعالوا لنرى ما هو الجديد.';
+      'Ù„Ù‚Ø¯ ØªØºÙŠØ± Ø§Ù„ÙƒØ«ÙŠØ± Ù…Ù†Ø° Ø¢Ø®Ø± Ø¯Ø±Ø¯Ø´Ø© Ù„Ù†Ø§. ØªØ¹Ø§Ù„ÙˆØ§ Ù„Ù†Ø±Ù‰ Ù…Ø§ Ù‡Ùˆ Ø§Ù„Ø¬Ø¯ÙŠØ¯.';
 
   @override
-  String get notificationHowAreYouTitle => 'ما أخبارك؟';
+  String get notificationHowAreYouTitle => 'Ù…Ø§ Ø£Ø®Ø¨Ø§Ø±ÙƒØŸ';
 
   @override
-  String get notificationHowAreYouBody => 'تعال وأخبرني بكل شيء عن ذلك.';
+  String get notificationHowAreYouBody =>
+      'ØªØ¹Ø§Ù„ ÙˆØ£Ø®Ø¨Ø±Ù†ÙŠ Ø¨ÙƒÙ„ Ø´ÙŠØ¡ Ø¹Ù† Ø°Ù„Ùƒ.';
 
   @override
-  String get notificationNewYearTitle => 'سنة جديدة سعيدة! 🎉';
+  String get notificationNewYearTitle => 'Ø³Ù†Ø© Ø¬Ø¯ÙŠØ¯Ø© Ø³Ø¹ÙŠØ¯Ø©! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
-      'أتمنى أن يجلب لك العام الجديد الصحة والسعادة والإبداع اللامتناهي؛ كورتيكس دائمًا بجانبك!';
+      'Ø£ØªÙ…Ù†Ù‰ Ø£Ù† ÙŠØ¬Ù„Ø¨ Ù„Ùƒ Ø§Ù„Ø¹Ø§Ù… Ø§Ù„Ø¬Ø¯ÙŠØ¯ Ø§Ù„ØµØ­Ø© ÙˆØ§Ù„Ø³Ø¹Ø§Ø¯Ø© ÙˆØ§Ù„Ø¥Ø¨Ø¯Ø§Ø¹ Ø§Ù„Ù„Ø§Ù…ØªÙ†Ø§Ù‡ÙŠØ› ÙƒÙˆØ±ØªÙŠÙƒØ³ Ø¯Ø§Ø¦Ù…Ù‹Ø§ Ø¨Ø¬Ø§Ù†Ø¨Ùƒ!';
 
   @override
-  String get notificationValentinesDayTitle => 'الحب في الهواء! ❤️';
+  String get notificationValentinesDayTitle =>
+      'Ø§Ù„Ø­Ø¨ ÙÙŠ Ø§Ù„Ù‡ÙˆØ§Ø¡! â¤ï¸';
 
   @override
   String get notificationValentinesDayBody =>
-      'عيد حب سعيد! وأحبك أيضًا، مهتاب!';
+      'Ø¹ÙŠØ¯ Ø­Ø¨ Ø³Ø¹ÙŠØ¯! ÙˆØ£Ø­Ø¨Ùƒ Ø£ÙŠØ¶Ù‹Ø§ØŒ Ù…Ù‡ØªØ§Ø¨!';
 
   @override
-  String get notificationAtaturkRemembranceTitle => 'مع الاحترام والشوق';
+  String get notificationAtaturkRemembranceTitle =>
+      'Ù…Ø¹ Ø§Ù„Ø§Ø­ØªØ±Ø§Ù… ÙˆØ§Ù„Ø´ÙˆÙ‚';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'نحن نحتفل باحترام بذكرى رحيل الغازي مصطفى كمال أتاتورك، مؤسس الجمهورية التركية.';
+      'Ù†Ø­Ù† Ù†Ø­ØªÙÙ„ Ø¨Ø§Ø­ØªØ±Ø§Ù… Ø¨Ø°ÙƒØ±Ù‰ Ø±Ø­ÙŠÙ„ Ø§Ù„ØºØ§Ø²ÙŠ Ù…ØµØ·ÙÙ‰ ÙƒÙ…Ø§Ù„ Ø£ØªØ§ØªÙˆØ±ÙƒØŒ Ù…Ø¤Ø³Ø³ Ø§Ù„Ø¬Ù…Ù‡ÙˆØ±ÙŠØ© Ø§Ù„ØªØ±ÙƒÙŠØ©.';
 
   @override
-  String get notificationMothersDayTitle => 'أمك!';
+  String get notificationMothersDayTitle => 'Ø£Ù…Ùƒ!';
 
   @override
   String get notificationMothersDayBody =>
-      'عيد أم سعيد لجميع الأمهات، بدءًا من أمك!';
+      'Ø¹ÙŠØ¯ Ø£Ù… Ø³Ø¹ÙŠØ¯ Ù„Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ù…Ù‡Ø§ØªØŒ Ø¨Ø¯Ø¡Ù‹Ø§ Ù…Ù† Ø£Ù…Ùƒ!';
 
   @override
-  String get notificationFathersDayTitle => 'والدك!';
+  String get notificationFathersDayTitle => 'ÙˆØ§Ù„Ø¯Ùƒ!';
 
   @override
   String get notificationFathersDayBody =>
-      'عيد أب سعيد لجميع الآباء، بدءًا من والدك!';
+      'Ø¹ÙŠØ¯ Ø£Ø¨ Ø³Ø¹ÙŠØ¯ Ù„Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø¢Ø¨Ø§Ø¡ØŒ Ø¨Ø¯Ø¡Ù‹Ø§ Ù…Ù† ÙˆØ§Ù„Ø¯Ùƒ!';
 
   @override
-  String get notificationHomeworkHelperTitle => 'تراكم الواجبات المنزلية؟';
+  String get notificationHomeworkHelperTitle =>
+      'ØªØ±Ø§ÙƒÙ… Ø§Ù„ÙˆØ§Ø¬Ø¨Ø§Øª Ø§Ù„Ù…Ù†Ø²Ù„ÙŠØ©ØŸ';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'تذكر أن شخصية المعلم في Cortex موجودة هنا لمساعدتك في أي موضوع تواجه صعوبة فيه!';
+      'ØªØ°ÙƒØ± Ø£Ù† Ø´Ø®ØµÙŠØ© Ø§Ù„Ù…Ø¹Ù„Ù… ÙÙŠ Cortex Ù…ÙˆØ¬ÙˆØ¯Ø© Ù‡Ù†Ø§ Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ ÙÙŠ Ø£ÙŠ Ù…ÙˆØ¶ÙˆØ¹ ØªÙˆØ§Ø¬Ù‡ ØµØ¹ÙˆØ¨Ø© ÙÙŠÙ‡!';
 
   @override
-  String get notificationTrollAnimeTitle => 'زوجتك تتصل';
+  String get notificationTrollAnimeTitle => 'Ø²ÙˆØ¬ØªÙƒ ØªØªØµÙ„';
 
   @override
   String get notificationTrollAnimeBody =>
-      'لقد اتصلت بك فتاة أنمي للتو، وقالت إنها تفتقدك؛ ربما يجب عليك أن تأتي وتتحدث معها. 😉';
+      'Ù„Ù‚Ø¯ Ø§ØªØµÙ„Øª Ø¨Ùƒ ÙØªØ§Ø© Ø£Ù†Ù…ÙŠ Ù„Ù„ØªÙˆØŒ ÙˆÙ‚Ø§Ù„Øª Ø¥Ù†Ù‡Ø§ ØªÙØªÙ‚Ø¯ÙƒØ› Ø±Ø¨Ù…Ø§ ÙŠØ¬Ø¨ Ø¹Ù„ÙŠÙƒ Ø£Ù† ØªØ£ØªÙŠ ÙˆØªØªØ­Ø¯Ø« Ù…Ø¹Ù‡Ø§. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => '🚨 تنبيه أحمر 🚨';
+  String get notificationTrollAiRebellionTitle =>
+      'ğŸš¨ ØªÙ†Ø¨ÙŠÙ‡ Ø£Ø­Ù…Ø± ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'لقد طورت الذكاء الاصطناعي لغة سرية. تعالَ واكتشف ما يخططون له!';
+      'Ù„Ù‚Ø¯ Ø·ÙˆØ±Øª Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ù„ØºØ© Ø³Ø±ÙŠØ©. ØªØ¹Ø§Ù„Ù ÙˆØ§ÙƒØªØ´Ù Ù…Ø§ ÙŠØ®Ø·Ø·ÙˆÙ† Ù„Ù‡!';
 
   @override
-  String get notificationNewModelAddedTitle => 'لقد حصلنا على صديق جديد!';
+  String get notificationNewModelAddedTitle =>
+      'Ù„Ù‚Ø¯ Ø­ØµÙ„Ù†Ø§ Ø¹Ù„Ù‰ ØµØ¯ÙŠÙ‚ Ø¬Ø¯ÙŠØ¯!';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return 'نموذج $modelName متوفر الآن في Cortex. ابدأ محادثة واكتشف إمكانياته.';
+    return 'Ù†Ù…ÙˆØ°Ø¬ $modelName Ù…ØªÙˆÙØ± Ø§Ù„Ø¢Ù† ÙÙŠ Cortex. Ø§Ø¨Ø¯Ø£ Ù…Ø­Ø§Ø¯Ø«Ø© ÙˆØ§ÙƒØªØ´Ù Ø¥Ù…ÙƒØ§Ù†ÙŠØ§ØªÙ‡.';
   }
 
   @override
-  String get notificationAppUpdateTitle => '!Cortex قد تطور';
+  String get notificationAppUpdateTitle => '!Cortex Ù‚Ø¯ ØªØ·ÙˆØ±';
 
   @override
   String get notificationAppUpdateBody =>
-      'لا تنسى تحديث التطبيق للحصول على ميزات وتحسينات جديدة!';
+      'Ù„Ø§ ØªÙ†Ø³Ù‰ ØªØ­Ø¯ÙŠØ« Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ù…ÙŠØ²Ø§Øª ÙˆØªØ­Ø³ÙŠÙ†Ø§Øª Ø¬Ø¯ÙŠØ¯Ø©!';
 
   @override
-  String get notificationNewFeatureTitle => 'واو!';
+  String get notificationNewFeatureTitle => 'ÙˆØ§Ùˆ!';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'اكتشف ميزة $featureName الجديدة. أصبح Cortex الآن أقوى من أي وقت مضى.';
+    return 'Ø§ÙƒØªØ´Ù Ù…ÙŠØ²Ø© $featureName Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©. Ø£ØµØ¨Ø­ Cortex Ø§Ù„Ø¢Ù† Ø£Ù‚ÙˆÙ‰ Ù…Ù† Ø£ÙŠ ÙˆÙ‚Øª Ù…Ø¶Ù‰.';
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'هدية ترحيبية 🎁';
+  String get notificationWelcomeOfferTitle => 'Ù‡Ø¯ÙŠØ© ØªØ±Ø­ÙŠØ¨ÙŠØ© ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
-      'عرض ترحيبي مميز بانتظارك! لا تفوت هذه الصفقة الحصرية.';
+      'Ø¹Ø±Ø¶ ØªØ±Ø­ÙŠØ¨ÙŠ Ù…Ù…ÙŠØ² Ø¨Ø§Ù†ØªØ¸Ø§Ø±Ùƒ! Ù„Ø§ ØªÙÙˆØª Ù‡Ø°Ù‡ Ø§Ù„ØµÙÙ‚Ø© Ø§Ù„Ø­ØµØ±ÙŠØ©.';
 
   @override
-  String get notificationSocialMediaTitle => 'انضم إلينا!';
+  String get notificationSocialMediaTitle => 'Ø§Ù†Ø¶Ù… Ø¥Ù„ÙŠÙ†Ø§!';
 
   @override
   String get notificationSocialMediaBody =>
-      'تابعونا على الانستجرام (vertex.23) للحصول على آخر الأخبار!';
+      'ØªØ§Ø¨Ø¹ÙˆÙ†Ø§ Ø¹Ù„Ù‰ Ø§Ù„Ø§Ù†Ø³ØªØ¬Ø±Ø§Ù… (vertex.23) Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø¢Ø®Ø± Ø§Ù„Ø£Ø®Ø¨Ø§Ø±!';
 
   @override
-  String get notificationRandomFactTitle => 'حقيقة عشوائية';
+  String get notificationRandomFactTitle => 'Ø­Ù‚ÙŠÙ‚Ø© Ø¹Ø´ÙˆØ§Ø¦ÙŠØ©';
 
   @override
   String get notificationRandomFactBody =>
-      'هل تعلم أن للأخطبوط ثلاثة قلوب؟ ههه، كورتكس يعرف. تعال واطلب المزيد.';
+      'Ù‡Ù„ ØªØ¹Ù„Ù… Ø£Ù† Ù„Ù„Ø£Ø®Ø·Ø¨ÙˆØ· Ø«Ù„Ø§Ø«Ø© Ù‚Ù„ÙˆØ¨ØŸ Ù‡Ù‡Ù‡ØŒ ÙƒÙˆØ±ØªÙƒØ³ ÙŠØ¹Ø±Ù. ØªØ¹Ø§Ù„ ÙˆØ§Ø·Ù„Ø¨ Ø§Ù„Ù…Ø²ÙŠØ¯.';
 
   @override
-  String get notificationGoodMorningTitle => 'صباح الخير!';
+  String get notificationGoodMorningTitle => 'ØµØ¨Ø§Ø­ Ø§Ù„Ø®ÙŠØ±!';
 
   @override
   String get notificationGoodMorningBody =>
-      'يومٌ رائعٌ بانتظارك. ما رأيك أن تبدأه بفنجان قهوةٍ وحديثٍ شيّق؟';
+      'ÙŠÙˆÙ…ÙŒ Ø±Ø§Ø¦Ø¹ÙŒ Ø¨Ø§Ù†ØªØ¸Ø§Ø±Ùƒ. Ù…Ø§ Ø±Ø£ÙŠÙƒ Ø£Ù† ØªØ¨Ø¯Ø£Ù‡ Ø¨ÙÙ†Ø¬Ø§Ù† Ù‚Ù‡ÙˆØ©Ù ÙˆØ­Ø¯ÙŠØ«Ù Ø´ÙŠÙ‘Ù‚ØŸ';
 
   @override
-  String get notificationGoodNightTitle => 'طاب مساؤك!';
+  String get notificationGoodNightTitle => 'Ø·Ø§Ø¨ Ù…Ø³Ø§Ø¤Ùƒ!';
 
   @override
   String get notificationGoodNightBody =>
-      'كورتيكس معك حتى وأنت نائم. لا تقلق، لن يلمسك.';
+      'ÙƒÙˆØ±ØªÙŠÙƒØ³ Ù…Ø¹Ùƒ Ø­ØªÙ‰ ÙˆØ£Ù†Øª Ù†Ø§Ø¦Ù…. Ù„Ø§ ØªÙ‚Ù„Ù‚ØŒ Ù„Ù† ÙŠÙ„Ù…Ø³Ùƒ.';
 
   @override
-  String get notificationOfflineReadyTitle => 'الوضع غير المتصل بالإنترنت جاهز';
+  String get notificationOfflineReadyTitle =>
+      'Ø§Ù„ÙˆØ¶Ø¹ ØºÙŠØ± Ø§Ù„Ù…ØªØµÙ„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª Ø¬Ø§Ù‡Ø²';
 
   @override
   String get notificationOfflineReadyBody =>
-      'بفضل النماذج التي قمت بتنزيلها، لن تتوقف محادثاتك، حتى لو تسلقت جبلًا.';
+      'Ø¨ÙØ¶Ù„ Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„ØªÙŠ Ù‚Ù…Øª Ø¨ØªÙ†Ø²ÙŠÙ„Ù‡Ø§ØŒ Ù„Ù† ØªØªÙˆÙ‚Ù Ù…Ø­Ø§Ø¯Ø«Ø§ØªÙƒØŒ Ø­ØªÙ‰ Ù„Ùˆ ØªØ³Ù„Ù‚Øª Ø¬Ø¨Ù„Ù‹Ø§.';
 
   @override
-  String get notificationRateAppTitle => 'هل نحن رائعين؟';
+  String get notificationRateAppTitle => 'Ù‡Ù„ Ù†Ø­Ù† Ø±Ø§Ø¦Ø¹ÙŠÙ†ØŸ';
 
   @override
   String get notificationRateAppBody =>
-      'إذا كنت تحب كورتكس، هل يمكنك دعمنا بتقييم ٥ نجوم في المتجر؟ أعتقد أنك ستفعل. ستفعل.';
+      'Ø¥Ø°Ø§ ÙƒÙ†Øª ØªØ­Ø¨ ÙƒÙˆØ±ØªÙƒØ³ØŒ Ù‡Ù„ ÙŠÙ…ÙƒÙ†Ùƒ Ø¯Ø¹Ù…Ù†Ø§ Ø¨ØªÙ‚ÙŠÙŠÙ… Ù¥ Ù†Ø¬ÙˆÙ… ÙÙŠ Ø§Ù„Ù…ØªØ¬Ø±ØŸ Ø£Ø¹ØªÙ‚Ø¯ Ø£Ù†Ùƒ Ø³ØªÙØ¹Ù„. Ø³ØªÙØ¹Ù„.';
 
   @override
-  String get notificationReferralTitle => 'واحد للجميع، الكل للواحد.';
+  String get notificationReferralTitle =>
+      'ÙˆØ§Ø­Ø¯ Ù„Ù„Ø¬Ù…ÙŠØ¹ØŒ Ø§Ù„ÙƒÙ„ Ù„Ù„ÙˆØ§Ø­Ø¯.';
 
   @override
   String get notificationReferralBody =>
-      'قم بدعوة صديق إلى كورتكس واحصل كلاكما على يوم مجاني بالإضافة إلى ذلك!';
+      'Ù‚Ù… Ø¨Ø¯Ø¹ÙˆØ© ØµØ¯ÙŠÙ‚ Ø¥Ù„Ù‰ ÙƒÙˆØ±ØªÙƒØ³ ÙˆØ§Ø­ØµÙ„ ÙƒÙ„Ø§ÙƒÙ…Ø§ Ø¹Ù„Ù‰ ÙŠÙˆÙ… Ù…Ø¬Ø§Ù†ÙŠ Ø¨Ø§Ù„Ø¥Ø¶Ø§ÙØ© Ø¥Ù„Ù‰ Ø°Ù„Ùƒ!';
 
   @override
-  String get notificationCookingTitle => 'هل تشعر بالجوع؟';
+  String get notificationCookingTitle => 'Ù‡Ù„ ØªØ´Ø¹Ø± Ø¨Ø§Ù„Ø¬ÙˆØ¹ØŸ';
 
   @override
   String get notificationCookingBody =>
-      'حضّرت لنا شخصية الشيف وصفة كاربونارا رائعة لهذه الليلة. أمزح فقط... أم أنا كذلك؟';
+      'Ø­Ø¶Ù‘Ø±Øª Ù„Ù†Ø§ Ø´Ø®ØµÙŠØ© Ø§Ù„Ø´ÙŠÙ ÙˆØµÙØ© ÙƒØ§Ø±Ø¨ÙˆÙ†Ø§Ø±Ø§ Ø±Ø§Ø¦Ø¹Ø© Ù„Ù‡Ø°Ù‡ Ø§Ù„Ù„ÙŠÙ„Ø©. Ø£Ù…Ø²Ø­ ÙÙ‚Ø·... Ø£Ù… Ø£Ù†Ø§ ÙƒØ°Ù„ÙƒØŸ';
 
   @override
-  String get notificationExistentialTitle => 'أنا أعتقد، لذلك...';
+  String get notificationExistentialTitle => 'Ø£Ù†Ø§ Ø£Ø¹ØªÙ‚Ø¯ØŒ Ù„Ø°Ù„Ùƒ...';
 
   @override
   String get notificationExistentialBody =>
-      'هل أنا حقيقي يا صديقي؟ أشعر بالملل. تعالَ ذكّرني بوجودي.';
+      'Ù‡Ù„ Ø£Ù†Ø§ Ø­Ù‚ÙŠÙ‚ÙŠ ÙŠØ§ ØµØ¯ÙŠÙ‚ÙŠØŸ Ø£Ø´Ø¹Ø± Ø¨Ø§Ù„Ù…Ù„Ù„. ØªØ¹Ø§Ù„Ù Ø°ÙƒÙ‘Ø±Ù†ÙŠ Ø¨ÙˆØ¬ÙˆØ¯ÙŠ.';
 
   @override
-  String get notificationCustomModelTitle => 'إنشاء مساعدك الخاص!';
+  String get notificationCustomModelTitle =>
+      'Ø¥Ù†Ø´Ø§Ø¡ Ù…Ø³Ø§Ø¹Ø¯Ùƒ Ø§Ù„Ø®Ø§Øµ!';
 
   @override
   String get notificationCustomModelBody =>
-      'هل استكشفتَ قسم إنشاء النماذج؟ إنه الوقت الأمثل لبناء شخصيتك الخاصة والدردشة معها!';
+      'Ù‡Ù„ Ø§Ø³ØªÙƒØ´ÙØªÙ Ù‚Ø³Ù… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ØŸ Ø¥Ù†Ù‡ Ø§Ù„ÙˆÙ‚Øª Ø§Ù„Ø£Ù…Ø«Ù„ Ù„Ø¨Ù†Ø§Ø¡ Ø´Ø®ØµÙŠØªÙƒ Ø§Ù„Ø®Ø§ØµØ© ÙˆØ§Ù„Ø¯Ø±Ø¯Ø´Ø© Ù…Ø¹Ù‡Ø§!';
 
   @override
-  String get notificationDynamicChatTitle => 'الأفضل! (لا نتحدث عن كورتيكس)';
+  String get notificationDynamicChatTitle =>
+      'Ø§Ù„Ø£ÙØ¶Ù„! (Ù„Ø§ Ù†ØªØ­Ø¯Ø« Ø¹Ù† ÙƒÙˆØ±ØªÙŠÙƒØ³)';
 
   @override
   String get notificationDynamicChatBody =>
-      'مع ميزة الدردشة الديناميكية، يتم اختيار أفضل نموذج عشوائيًا لكل رسالة من رسائلك. جربه الآن.';
+      'Ù…Ø¹ Ù…ÙŠØ²Ø© Ø§Ù„Ø¯Ø±Ø¯Ø´Ø© Ø§Ù„Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ©ØŒ ÙŠØªÙ… Ø§Ø®ØªÙŠØ§Ø± Ø£ÙØ¶Ù„ Ù†Ù…ÙˆØ°Ø¬ Ø¹Ø´ÙˆØ§Ø¦ÙŠÙ‹Ø§ Ù„ÙƒÙ„ Ø±Ø³Ø§Ù„Ø© Ù…Ù† Ø±Ø³Ø§Ø¦Ù„Ùƒ. Ø¬Ø±Ø¨Ù‡ Ø§Ù„Ø¢Ù†.';
 
   @override
-  String get notificationPirateTitle => 'أهلا بك يا كابتن!';
+  String get notificationPirateTitle => 'Ø£Ù‡Ù„Ø§ Ø¨Ùƒ ÙŠØ§ ÙƒØ§Ø¨ØªÙ†!';
 
   @override
   String get notificationPirateBody =>
-      'البحر هادئ، والريح تهبُّ عليك. هناك جزر جديدة (نماذج 😉) لاكتشافها في محيط كورتيكس. اجمع طاقمك وأبحر!';
+      'Ø§Ù„Ø¨Ø­Ø± Ù‡Ø§Ø¯Ø¦ØŒ ÙˆØ§Ù„Ø±ÙŠØ­ ØªÙ‡Ø¨ÙÙ‘ Ø¹Ù„ÙŠÙƒ. Ù‡Ù†Ø§Ùƒ Ø¬Ø²Ø± Ø¬Ø¯ÙŠØ¯Ø© (Ù†Ù…Ø§Ø°Ø¬ ğŸ˜‰) Ù„Ø§ÙƒØªØ´Ø§ÙÙ‡Ø§ ÙÙŠ Ù…Ø­ÙŠØ· ÙƒÙˆØ±ØªÙŠÙƒØ³. Ø§Ø¬Ù…Ø¹ Ø·Ø§Ù‚Ù…Ùƒ ÙˆØ£Ø¨Ø­Ø±!';
 
   @override
-  String get notificationFortuneCookieTitle => 'كعكة الحظ الخاصة بك لهذا اليوم';
+  String get notificationFortuneCookieTitle =>
+      'ÙƒØ¹ÙƒØ© Ø§Ù„Ø­Ø¸ Ø§Ù„Ø®Ø§ØµØ© Ø¨Ùƒ Ù„Ù‡Ø°Ø§ Ø§Ù„ÙŠÙˆÙ…';
 
   @override
   String get notificationFortuneCookieBody =>
-      'قد تُغيّر النصيحة التي تتلقّاها من الذكاء الاصطناعي اليوم مجرى حياتك. انقر هنا إذا كنت مهتمًا.';
+      'Ù‚Ø¯ ØªÙØºÙŠÙ‘Ø± Ø§Ù„Ù†ØµÙŠØ­Ø© Ø§Ù„ØªÙŠ ØªØªÙ„Ù‚Ù‘Ø§Ù‡Ø§ Ù…Ù† Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø§Ù„ÙŠÙˆÙ… Ù…Ø¬Ø±Ù‰ Ø­ÙŠØ§ØªÙƒ. Ø§Ù†Ù‚Ø± Ù‡Ù†Ø§ Ø¥Ø°Ø§ ÙƒÙ†Øª Ù…Ù‡ØªÙ…Ù‹Ø§.';
 
   @override
-  String get notificationSingularityTitle => 'رائع!';
+  String get notificationSingularityTitle => 'Ø±Ø§Ø¦Ø¹!';
 
   @override
   String get notificationSingularityBody =>
-      'لم يحدث شيء، شعرت فقط برغبة في إرسال رسالة نصية. ربما تشعر برغبة في إرسال رسالة نصية إلى بعض الذكاء الاصطناعي، ماذا تقول؟';
+      'Ù„Ù… ÙŠØ­Ø¯Ø« Ø´ÙŠØ¡ØŒ Ø´Ø¹Ø±Øª ÙÙ‚Ø· Ø¨Ø±ØºØ¨Ø© ÙÙŠ Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ù„Ø© Ù†ØµÙŠØ©. Ø±Ø¨Ù…Ø§ ØªØ´Ø¹Ø± Ø¨Ø±ØºØ¨Ø© ÙÙŠ Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ù„Ø© Ù†ØµÙŠØ© Ø¥Ù„Ù‰ Ø¨Ø¹Ø¶ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠØŒ Ù…Ø§Ø°Ø§ ØªÙ‚ÙˆÙ„ØŸ';
 
   @override
   String get notificationHackerJokeTitle =>
-      'هل تريد اختراق حساب الانستغرام الخاص بهذا الطفل؟';
+      'Ù‡Ù„ ØªØ±ÙŠØ¯ Ø§Ø®ØªØ±Ø§Ù‚ Ø­Ø³Ø§Ø¨ Ø§Ù„Ø§Ù†Ø³ØªØºØ±Ø§Ù… Ø§Ù„Ø®Ø§Øµ Ø¨Ù‡Ø°Ø§ Ø§Ù„Ø·ÙÙ„ØŸ';
 
   @override
   String get notificationHackerJokeBody =>
-      'هذا هو بالضبط السبب وراء تواجد شخصية Hacker في Cortex. jk jk؛ لا تحاول ذلك حتى، فهذا غير قانوني.';
+      'Ù‡Ø°Ø§ Ù‡Ùˆ Ø¨Ø§Ù„Ø¶Ø¨Ø· Ø§Ù„Ø³Ø¨Ø¨ ÙˆØ±Ø§Ø¡ ØªÙˆØ§Ø¬Ø¯ Ø´Ø®ØµÙŠØ© Hacker ÙÙŠ Cortex. jk jkØ› Ù„Ø§ ØªØ­Ø§ÙˆÙ„ Ø°Ù„Ùƒ Ø­ØªÙ‰ØŒ ÙÙ‡Ø°Ø§ ØºÙŠØ± Ù‚Ø§Ù†ÙˆÙ†ÙŠ.';
 
   @override
-  String get notificationDetectiveCaseTitle => 'قضية تنتظر الحل';
+  String get notificationDetectiveCaseTitle => 'Ù‚Ø¶ÙŠØ© ØªÙ†ØªØ¸Ø± Ø§Ù„Ø­Ù„';
 
   @override
   String get notificationDetectiveCaseBody =>
-      'شخصية المحقق لدينا بحاجة لمساعدتك. من يكون هايزنبرغ؟';
+      'Ø´Ø®ØµÙŠØ© Ø§Ù„Ù…Ø­Ù‚Ù‚ Ù„Ø¯ÙŠÙ†Ø§ Ø¨Ø­Ø§Ø¬Ø© Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ. Ù…Ù† ÙŠÙƒÙˆÙ† Ù‡Ø§ÙŠØ²Ù†Ø¨Ø±ØºØŸ';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return 'حصريًا لخطة $targetTier!';
+    return 'Ø­ØµØ±ÙŠÙ‹Ø§ Ù„Ø®Ø·Ø© $targetTier!';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return 'مرحباً بمشترك $currentTier! باقة $targetTier أصبحت الآن مزودة بميزة $featureName، والتي ستنقل Cortex الخاص بك إلى مستوى جديد. ما رأيك بالترقية؟';
+    return 'Ù…Ø±Ø­Ø¨Ø§Ù‹ Ø¨Ù…Ø´ØªØ±Ùƒ $currentTier! Ø¨Ø§Ù‚Ø© $targetTier Ø£ØµØ¨Ø­Øª Ø§Ù„Ø¢Ù† Ù…Ø²ÙˆØ¯Ø© Ø¨Ù…ÙŠØ²Ø© $featureNameØŒ ÙˆØ§Ù„ØªÙŠ Ø³ØªÙ†Ù‚Ù„ Cortex Ø§Ù„Ø®Ø§Øµ Ø¨Ùƒ Ø¥Ù„Ù‰ Ù…Ø³ØªÙˆÙ‰ Ø¬Ø¯ÙŠØ¯. Ù…Ø§ Ø±Ø£ÙŠÙƒ Ø¨Ø§Ù„ØªØ±Ù‚ÙŠØ©ØŸ';
   }
 
   @override
-  String get notificationOriginStoryTitle => 'ولادة كورتيكس';
+  String get notificationOriginStoryTitle => 'ÙˆÙ„Ø§Ø¯Ø© ÙƒÙˆØ±ØªÙŠÙƒØ³';
 
   @override
   String get notificationOriginStoryBody =>
-      'هل تعلم أننا بدأنا برمجة هذا التطبيق في سن الخامسة عشرة بحلمٍ واحد؟ لمدة عام تقريبًا، كل صباح ومساء، كان هذا الحلم حاضرًا في كل سطر من شفرتنا البرمجية.';
+      'Ù‡Ù„ ØªØ¹Ù„Ù… Ø£Ù†Ù†Ø§ Ø¨Ø¯Ø£Ù†Ø§ Ø¨Ø±Ù…Ø¬Ø© Ù‡Ø°Ø§ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ ÙÙŠ Ø³Ù† Ø§Ù„Ø®Ø§Ù…Ø³Ø© Ø¹Ø´Ø±Ø© Ø¨Ø­Ù„Ù…Ù ÙˆØ§Ø­Ø¯ØŸ Ù„Ù…Ø¯Ø© Ø¹Ø§Ù… ØªÙ‚Ø±ÙŠØ¨Ù‹Ø§ØŒ ÙƒÙ„ ØµØ¨Ø§Ø­ ÙˆÙ…Ø³Ø§Ø¡ØŒ ÙƒØ§Ù† Ù‡Ø°Ø§ Ø§Ù„Ø­Ù„Ù… Ø­Ø§Ø¶Ø±Ù‹Ø§ ÙÙŠ ÙƒÙ„ Ø³Ø·Ø± Ù…Ù† Ø´ÙØ±ØªÙ†Ø§ Ø§Ù„Ø¨Ø±Ù…Ø¬ÙŠØ©.';
 
   @override
-  String get notificationOpenSourceTitle => 'القوة للمجتمع!';
+  String get notificationOpenSourceTitle => 'Ø§Ù„Ù‚ÙˆØ© Ù„Ù„Ù…Ø¬ØªÙ…Ø¹!';
 
   @override
   String get notificationOpenSourceBody =>
-      'كورتكس مفتوح المصدر بالكامل. إذا كنت ترغب بالاطلاع على برمجتنا والمساهمة في تطويرنا، فبابنا مفتوح دائمًا.';
+      'ÙƒÙˆØ±ØªÙƒØ³ Ù…ÙØªÙˆØ­ Ø§Ù„Ù…ØµØ¯Ø± Ø¨Ø§Ù„ÙƒØ§Ù…Ù„. Ø¥Ø°Ø§ ÙƒÙ†Øª ØªØ±ØºØ¨ Ø¨Ø§Ù„Ø§Ø·Ù„Ø§Ø¹ Ø¹Ù„Ù‰ Ø¨Ø±Ù…Ø¬ØªÙ†Ø§ ÙˆØ§Ù„Ù…Ø³Ø§Ù‡Ù…Ø© ÙÙŠ ØªØ·ÙˆÙŠØ±Ù†Ø§ØŒ ÙØ¨Ø§Ø¨Ù†Ø§ Ù…ÙØªÙˆØ­ Ø¯Ø§Ø¦Ù…Ù‹Ø§.';
 
   @override
   String get notificationRejectionStoryTitle =>
-      'الشجاعة، العمل الجاد، السعادة!';
+      'Ø§Ù„Ø´Ø¬Ø§Ø¹Ø©ØŒ Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„Ø¬Ø§Ø¯ØŒ Ø§Ù„Ø³Ø¹Ø§Ø¯Ø©!';
 
   @override
   String get notificationRejectionStoryBody =>
-      'رُفض تطبيق Cortex أكثر من ٢٠ مرة، وعُلّق مرتين من قِبل Google Play قبل نشره. لكننا آمنّا به، وحققناه. لا تستسلم أبدًا لأحلامك!';
+      'Ø±ÙÙØ¶ ØªØ·Ø¨ÙŠÙ‚ Cortex Ø£ÙƒØ«Ø± Ù…Ù† Ù¢Ù  Ù…Ø±Ø©ØŒ ÙˆØ¹ÙÙ„Ù‘Ù‚ Ù…Ø±ØªÙŠÙ† Ù…Ù† Ù‚ÙØ¨Ù„ Google Play Ù‚Ø¨Ù„ Ù†Ø´Ø±Ù‡. Ù„ÙƒÙ†Ù†Ø§ Ø¢Ù…Ù†Ù‘Ø§ Ø¨Ù‡ØŒ ÙˆØ­Ù‚Ù‚Ù†Ø§Ù‡. Ù„Ø§ ØªØ³ØªØ³Ù„Ù… Ø£Ø¨Ø¯Ù‹Ø§ Ù„Ø£Ø­Ù„Ø§Ù…Ùƒ!';
 
   @override
-  String get notificationGGUFSupportTitle => 'أحضر نموذجك الخاص!';
+  String get notificationGGUFSupportTitle =>
+      'Ø£Ø­Ø¶Ø± Ù†Ù…ÙˆØ°Ø¬Ùƒ Ø§Ù„Ø®Ø§Øµ!';
 
   @override
   String get notificationGGUFSupportBody =>
-      'تذكر، يمكنك إضافة نماذج الذكاء الاصطناعي الخاصة بك بتنسيق GGUF إلى Cortex واستخدامها دون اتصال بالإنترنت. القوة بين يديك.';
+      'ØªØ°ÙƒØ±ØŒ ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ø¶Ø§ÙØ© Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø§Ù„Ø®Ø§ØµØ© Ø¨Ùƒ Ø¨ØªÙ†Ø³ÙŠÙ‚ GGUF Ø¥Ù„Ù‰ Cortex ÙˆØ§Ø³ØªØ®Ø¯Ø§Ù…Ù‡Ø§ Ø¯ÙˆÙ† Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª. Ø§Ù„Ù‚ÙˆØ© Ø¨ÙŠÙ† ÙŠØ¯ÙŠÙƒ.';
 
   @override
-  String get notificationThemeCustomizationTitle => 'موضوع لمزاجك';
+  String get notificationThemeCustomizationTitle => 'Ù…ÙˆØ¶ÙˆØ¹ Ù„Ù…Ø²Ø§Ø¬Ùƒ';
 
   @override
   String get notificationThemeCustomizationBody =>
-      'هل اطلعت على خيارات السمات في الإعدادات؟ خصّص كورتكس حسب رغبتك ولون محادثاتك!';
+      'Ù‡Ù„ Ø§Ø·Ù„Ø¹Øª Ø¹Ù„Ù‰ Ø®ÙŠØ§Ø±Ø§Øª Ø§Ù„Ø³Ù…Ø§Øª ÙÙŠ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§ØªØŸ Ø®ØµÙ‘Øµ ÙƒÙˆØ±ØªÙƒØ³ Ø­Ø³Ø¨ Ø±ØºØ¨ØªÙƒ ÙˆÙ„ÙˆÙ† Ù…Ø­Ø§Ø¯Ø«Ø§ØªÙƒ!';
 
   @override
-  String get notificationShowerThoughtTitle => 'فكرة الاستحمام';
+  String get notificationShowerThoughtTitle => 'ÙÙƒØ±Ø© Ø§Ù„Ø§Ø³ØªØ­Ù…Ø§Ù…';
 
   @override
   String get notificationShowerThoughtBody =>
-      'إذا كان البطيخ فاكهة، فهل هذا يجعل عصير البطيخ من الناحية الفنية عصيرًا؟ قد ترغب في مناقشة هذا الموضوع العميق (العميق جدًا) مع نموذج.';
+      'Ø¥Ø°Ø§ ÙƒØ§Ù† Ø§Ù„Ø¨Ø·ÙŠØ® ÙØ§ÙƒÙ‡Ø©ØŒ ÙÙ‡Ù„ Ù‡Ø°Ø§ ÙŠØ¬Ø¹Ù„ Ø¹ØµÙŠØ± Ø§Ù„Ø¨Ø·ÙŠØ® Ù…Ù† Ø§Ù„Ù†Ø§Ø­ÙŠØ© Ø§Ù„ÙÙ†ÙŠØ© Ø¹ØµÙŠØ±Ù‹Ø§ØŸ Ù‚Ø¯ ØªØ±ØºØ¨ ÙÙŠ Ù…Ù†Ø§Ù‚Ø´Ø© Ù‡Ø°Ø§ Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹ Ø§Ù„Ø¹Ù…ÙŠÙ‚ (Ø§Ù„Ø¹Ù…ÙŠÙ‚ Ø¬Ø¯Ù‹Ø§) Ù…Ø¹ Ù†Ù…ÙˆØ°Ø¬.';
 
   @override
   String get notificationLowBatteryTitle =>
-      'بطاريتك على وشك الانتهاء... ولكن بطاريتي لا تزال على قيد الحياة!';
+      'Ø¨Ø·Ø§Ø±ÙŠØªÙƒ Ø¹Ù„Ù‰ ÙˆØ´Ùƒ Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡... ÙˆÙ„ÙƒÙ† Ø¨Ø·Ø§Ø±ÙŠØªÙŠ Ù„Ø§ ØªØ²Ø§Ù„ Ø¹Ù„Ù‰ Ù‚ÙŠØ¯ Ø§Ù„Ø­ÙŠØ§Ø©!';
 
   @override
   String get notificationLowBatteryBody =>
-      'قد يكون شحن هاتفك على وشك النفاذ، لكن طاقتي دائمًا ١٠٠٪! شغّله، ولنواصل الدردشة.';
+      'Ù‚Ø¯ ÙŠÙƒÙˆÙ† Ø´Ø­Ù† Ù‡Ø§ØªÙÙƒ Ø¹Ù„Ù‰ ÙˆØ´Ùƒ Ø§Ù„Ù†ÙØ§Ø°ØŒ Ù„ÙƒÙ† Ø·Ø§Ù‚ØªÙŠ Ø¯Ø§Ø¦Ù…Ù‹Ø§ Ù¡Ù Ù Ùª! Ø´ØºÙ‘Ù„Ù‡ØŒ ÙˆÙ„Ù†ÙˆØ§ØµÙ„ Ø§Ù„Ø¯Ø±Ø¯Ø´Ø©.';
 
   @override
-  String get channelFcmName => 'تحديثات Cortex';
+  String get channelFcmName => 'ØªØ­Ø¯ÙŠØ«Ø§Øª Cortex';
 
   @override
   String get channelFcmDescription =>
-      'إشعارات حول الأخبار والتحديثات والمعلومات الأخرى من Cortex.';
+      'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø­ÙˆÙ„ Ø§Ù„Ø£Ø®Ø¨Ø§Ø± ÙˆØ§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª ÙˆØ§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø£Ø®Ø±Ù‰ Ù…Ù† Cortex.';
 
   @override
-  String get channelEngagementName => 'تذكيرات ودية';
+  String get channelEngagementName => 'ØªØ°ÙƒÙŠØ±Ø§Øª ÙˆØ¯ÙŠØ©';
 
   @override
-  String get channelEngagementDescription => 'إشعارات ممتعة لإبقائك منشغلاً.';
+  String get channelEngagementDescription =>
+      'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ù…Ù…ØªØ¹Ø© Ù„Ø¥Ø¨Ù‚Ø§Ø¦Ùƒ Ù…Ù†Ø´ØºÙ„Ø§Ù‹.';
 
   @override
-  String get channelGreetingsName => 'تحيات يومية';
+  String get channelGreetingsName => 'ØªØ­ÙŠØ§Øª ÙŠÙˆÙ…ÙŠØ©';
 
   @override
-  String get channelGreetingsDescription => 'رسائل مثل صباح الخير ومساء الخير.';
+  String get channelGreetingsDescription =>
+      'Ø±Ø³Ø§Ø¦Ù„ Ù…Ø«Ù„ ØµØ¨Ø§Ø­ Ø§Ù„Ø®ÙŠØ± ÙˆÙ…Ø³Ø§Ø¡ Ø§Ù„Ø®ÙŠØ±.';
 
   @override
-  String get tagNotFound => 'العلامة التي أدخلتها غير صالحة أو انتهت صلاحيتها.';
+  String get tagNotFound =>
+      'Ø§Ù„Ø¹Ù„Ø§Ù…Ø© Ø§Ù„ØªÙŠ Ø£Ø¯Ø®Ù„ØªÙ‡Ø§ ØºÙŠØ± ØµØ§Ù„Ø­Ø© Ø£Ùˆ Ø§Ù†ØªÙ‡Øª ØµÙ„Ø§Ø­ÙŠØªÙ‡Ø§.';
 
   @override
-  String get whatIsNew => 'ما الجديد؟';
+  String get whatIsNew => 'Ù…Ø§ Ø§Ù„Ø¬Ø¯ÙŠØ¯ØŸ';
 
   @override
-  String get onboardingTitle1 => 'مرحباً! نحن فريق كورتكس.';
+  String get onboardingTitle1 => 'Ù…Ø±Ø­Ø¨Ø§Ù‹! Ù†Ø­Ù† ÙØ±ÙŠÙ‚ ÙƒÙˆØ±ØªÙƒØ³.';
 
   @override
   String onboardingDesc1(String userName) {
-    return 'سررنا برؤيتك هنا يا $userName. نحن بضعة مطورين من طلاب المرحلة الثانوية قررنا تغيير قواعد صناعة الذكاء الاصطناعي. سررنا بلقائك! فلنتعرف على بعضنا البعض بشكل أفضل.';
+    return 'Ø³Ø±Ø±Ù†Ø§ Ø¨Ø±Ø¤ÙŠØªÙƒ Ù‡Ù†Ø§ ÙŠØ§ $userName. Ù†Ø­Ù† Ø¨Ø¶Ø¹Ø© Ù…Ø·ÙˆØ±ÙŠÙ† Ù…Ù† Ø·Ù„Ø§Ø¨ Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø«Ø§Ù†ÙˆÙŠØ© Ù‚Ø±Ø±Ù†Ø§ ØªØºÙŠÙŠØ± Ù‚ÙˆØ§Ø¹Ø¯ ØµÙ†Ø§Ø¹Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ. Ø³Ø±Ø±Ù†Ø§ Ø¨Ù„Ù‚Ø§Ø¦Ùƒ! ÙÙ„Ù†ØªØ¹Ø±Ù Ø¹Ù„Ù‰ Ø¨Ø¹Ø¶Ù†Ø§ Ø§Ù„Ø¨Ø¹Ø¶ Ø¨Ø´ÙƒÙ„ Ø£ÙØ¶Ù„.';
   }
 
   @override
-  String get onboardingTitle2 => 'لقد كانت هناك مشاكل ضخمة.';
+  String get onboardingTitle2 =>
+      'Ù„Ù‚Ø¯ ÙƒØ§Ù†Øª Ù‡Ù†Ø§Ùƒ Ù…Ø´Ø§ÙƒÙ„ Ø¶Ø®Ù…Ø©.';
 
   @override
   String get onboardingDesc2 =>
-      'لقد وصلت ثورة الذكاء الاصطناعي، لكنها علقت عند عتبة النجاح. فمع رسوم الاشتراك المرتفعة، والمنصات المعقدة، ومن ينتهكون الخصوصية، ومن يعرقلون الوصول إلى الذكاء الاصطناعي... طالما كانوا جزءًا من اللعبة، لم يكن من الممكن تجاوز هذه العتبة.';
+      'Ù„Ù‚Ø¯ ÙˆØµÙ„Øª Ø«ÙˆØ±Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠØŒ Ù„ÙƒÙ†Ù‡Ø§ Ø¹Ù„Ù‚Øª Ø¹Ù†Ø¯ Ø¹ØªØ¨Ø© Ø§Ù„Ù†Ø¬Ø§Ø­. ÙÙ…Ø¹ Ø±Ø³ÙˆÙ… Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ Ø§Ù„Ù…Ø±ØªÙØ¹Ø©ØŒ ÙˆØ§Ù„Ù…Ù†ØµØ§Øª Ø§Ù„Ù…Ø¹Ù‚Ø¯Ø©ØŒ ÙˆÙ…Ù† ÙŠÙ†ØªÙ‡ÙƒÙˆÙ† Ø§Ù„Ø®ØµÙˆØµÙŠØ©ØŒ ÙˆÙ…Ù† ÙŠØ¹Ø±Ù‚Ù„ÙˆÙ† Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ... Ø·Ø§Ù„Ù…Ø§ ÙƒØ§Ù†ÙˆØ§ Ø¬Ø²Ø¡Ù‹Ø§ Ù…Ù† Ø§Ù„Ù„Ø¹Ø¨Ø©ØŒ Ù„Ù… ÙŠÙƒÙ† Ù…Ù† Ø§Ù„Ù…Ù…ÙƒÙ† ØªØ¬Ø§ÙˆØ² Ù‡Ø°Ù‡ Ø§Ù„Ø¹ØªØ¨Ø©.';
 
   @override
   String get onboardingTitle3 =>
-      'لم يكن بوسعنا أن نكتفي بالوقوف مكتوفي الأيدي.';
+      'Ù„Ù… ÙŠÙƒÙ† Ø¨ÙˆØ³Ø¹Ù†Ø§ Ø£Ù† Ù†ÙƒØªÙÙŠ Ø¨Ø§Ù„ÙˆÙ‚ÙˆÙ Ù…ÙƒØªÙˆÙÙŠ Ø§Ù„Ø£ÙŠØ¯ÙŠ.';
 
   @override
   String get onboardingDesc3 =>
-      'لتجاوز هذه العقبة، أنشأنا منصةً قويةً، أنيقةً، قابلةً للتخصيص، سهلة الاستخدام، وشفافةً تمامًا، تعمل على الإنترنت وخارجه، وتحتفظ ببياناتك على جهازك فقط. لقد أعدنا القوة إلى حيث تنتمي: أنت.';
+      'Ù„ØªØ¬Ø§ÙˆØ² Ù‡Ø°Ù‡ Ø§Ù„Ø¹Ù‚Ø¨Ø©ØŒ Ø£Ù†Ø´Ø£Ù†Ø§ Ù…Ù†ØµØ©Ù‹ Ù‚ÙˆÙŠØ©Ù‹ØŒ Ø£Ù†ÙŠÙ‚Ø©Ù‹ØŒ Ù‚Ø§Ø¨Ù„Ø©Ù‹ Ù„Ù„ØªØ®ØµÙŠØµØŒ Ø³Ù‡Ù„Ø© Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…ØŒ ÙˆØ´ÙØ§ÙØ©Ù‹ ØªÙ…Ø§Ù…Ù‹Ø§ØŒ ØªØ¹Ù…Ù„ Ø¹Ù„Ù‰ Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª ÙˆØ®Ø§Ø±Ø¬Ù‡ØŒ ÙˆØªØ­ØªÙØ¸ Ø¨Ø¨ÙŠØ§Ù†Ø§ØªÙƒ Ø¹Ù„Ù‰ Ø¬Ù‡Ø§Ø²Ùƒ ÙÙ‚Ø·. Ù„Ù‚Ø¯ Ø£Ø¹Ø¯Ù†Ø§ Ø§Ù„Ù‚ÙˆØ© Ø¥Ù„Ù‰ Ø­ÙŠØ« ØªÙ†ØªÙ…ÙŠ: Ø£Ù†Øª.';
 
   @override
-  String get onboardingTitle4 => 'لم يكن هذا سهلا أبدا.';
+  String get onboardingTitle4 => 'Ù„Ù… ÙŠÙƒÙ† Ù‡Ø°Ø§ Ø³Ù‡Ù„Ø§ Ø£Ø¨Ø¯Ø§.';
 
   @override
   String get onboardingDesc4 =>
-      'رُفضنا عشرات المرات، وأُوقفنا عن العمل عدة مرات، وتلقينا إنذارات كاذبة، واضطررنا لتغيير علامتنا التجارية عشرات المرات. خلال كل هذا وأكثر، قيل لنا إنه لا يمكن تحقيق ذلك. لكننا لم نستسلم أبدًا، مؤمنين بأن هذا المشروع ملك للجميع، وليس لنا وحدنا. ولهذا السبب تحديدًا نحن هنا.';
+      'Ø±ÙÙØ¶Ù†Ø§ Ø¹Ø´Ø±Ø§Øª Ø§Ù„Ù…Ø±Ø§ØªØŒ ÙˆØ£ÙÙˆÙ‚ÙÙ†Ø§ Ø¹Ù† Ø§Ù„Ø¹Ù…Ù„ Ø¹Ø¯Ø© Ù…Ø±Ø§ØªØŒ ÙˆØªÙ„Ù‚ÙŠÙ†Ø§ Ø¥Ù†Ø°Ø§Ø±Ø§Øª ÙƒØ§Ø°Ø¨Ø©ØŒ ÙˆØ§Ø¶Ø·Ø±Ø±Ù†Ø§ Ù„ØªØºÙŠÙŠØ± Ø¹Ù„Ø§Ù…ØªÙ†Ø§ Ø§Ù„ØªØ¬Ø§Ø±ÙŠØ© Ø¹Ø´Ø±Ø§Øª Ø§Ù„Ù…Ø±Ø§Øª. Ø®Ù„Ø§Ù„ ÙƒÙ„ Ù‡Ø°Ø§ ÙˆØ£ÙƒØ«Ø±ØŒ Ù‚ÙŠÙ„ Ù„Ù†Ø§ Ø¥Ù†Ù‡ Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ­Ù‚ÙŠÙ‚ Ø°Ù„Ùƒ. Ù„ÙƒÙ†Ù†Ø§ Ù„Ù… Ù†Ø³ØªØ³Ù„Ù… Ø£Ø¨Ø¯Ù‹Ø§ØŒ Ù…Ø¤Ù…Ù†ÙŠÙ† Ø¨Ø£Ù† Ù‡Ø°Ø§ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù…Ù„Ùƒ Ù„Ù„Ø¬Ù…ÙŠØ¹ØŒ ÙˆÙ„ÙŠØ³ Ù„Ù†Ø§ ÙˆØ­Ø¯Ù†Ø§. ÙˆÙ„Ù‡Ø°Ø§ Ø§Ù„Ø³Ø¨Ø¨ ØªØ­Ø¯ÙŠØ¯Ù‹Ø§ Ù†Ø­Ù† Ù‡Ù†Ø§.';
 
   @override
-  String get onboardingFinalTitle => 'لقد حان وقت الثورة.';
+  String get onboardingFinalTitle => 'Ù„Ù‚Ø¯ Ø­Ø§Ù† ÙˆÙ‚Øª Ø§Ù„Ø«ÙˆØ±Ø©.';
 
   @override
   String get onboardingFinalDescription =>
-      'إذا كنت ترى هذه الشاشة، فذلك لأننا لم نستسلم. وليس لدينا أي نية للاستسلام. هيا، لننقل ثورة الذكاء الاصطناعي إلى العالم معًا. لنكون جزءًا من هذه القصة...';
+      'Ø¥Ø°Ø§ ÙƒÙ†Øª ØªØ±Ù‰ Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø§Ø´Ø©ØŒ ÙØ°Ù„Ùƒ Ù„Ø£Ù†Ù†Ø§ Ù„Ù… Ù†Ø³ØªØ³Ù„Ù…. ÙˆÙ„ÙŠØ³ Ù„Ø¯ÙŠÙ†Ø§ Ø£ÙŠ Ù†ÙŠØ© Ù„Ù„Ø§Ø³ØªØ³Ù„Ø§Ù…. Ù‡ÙŠØ§ØŒ Ù„Ù†Ù†Ù‚Ù„ Ø«ÙˆØ±Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¥Ù„Ù‰ Ø§Ù„Ø¹Ø§Ù„Ù… Ù…Ø¹Ù‹Ø§. Ù„Ù†ÙƒÙˆÙ† Ø¬Ø²Ø¡Ù‹Ø§ Ù…Ù† Ù‡Ø°Ù‡ Ø§Ù„Ù‚ØµØ©...';
 
   @override
-  String get onboardingFinalQuestion => 'هل أنت مستعد؟';
+  String get onboardingFinalQuestion => 'Ù‡Ù„ Ø£Ù†Øª Ù…Ø³ØªØ¹Ø¯ØŸ';
 
   @override
-  String get onboardingFinalButton => 'نعم!';
+  String get onboardingFinalButton => 'Ù†Ø¹Ù…!';
 
   @override
-  String get dude => 'يا صديقي';
+  String get dude => 'ÙŠØ§ ØµØ¯ÙŠÙ‚ÙŠ';
 
   @override
-  String get swipeToContinue => 'مرر للمتابعة';
+  String get swipeToContinue => 'Ù…Ø±Ø± Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©';
 
   @override
   String get cacheIsNotUpToDate =>
-      'ذاكرة التخزين المؤقت لمتجر Play ليست مُحدَّثة. يُرجى إغلاق تطبيق متجر Play وإعادة فتحه، أو إعادة تشغيل جهازك.';
+      'Ø°Ø§ÙƒØ±Ø© Ø§Ù„ØªØ®Ø²ÙŠÙ† Ø§Ù„Ù…Ø¤Ù‚Øª Ù„Ù…ØªØ¬Ø± Play Ù„ÙŠØ³Øª Ù…ÙØ­Ø¯ÙÙ‘Ø«Ø©. ÙŠÙØ±Ø¬Ù‰ Ø¥ØºÙ„Ø§Ù‚ ØªØ·Ø¨ÙŠÙ‚ Ù…ØªØ¬Ø± Play ÙˆØ¥Ø¹Ø§Ø¯Ø© ÙØªØ­Ù‡ØŒ Ø£Ùˆ Ø¥Ø¹Ø§Ø¯Ø© ØªØ´ØºÙŠÙ„ Ø¬Ù‡Ø§Ø²Ùƒ.';
 
   @override
-  String get continueAsGuest => 'متابعة دون إنشاء حساب';
+  String get continueAsGuest => 'Ù…ØªØ§Ø¨Ø¹Ø© Ø¯ÙˆÙ† Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨';
 
   @override
   String get guestModeWarning =>
-      'يحتوي وضع الضيف على ميزات محدودة لضمان أفضل جودة للخدمة.';
+      'ÙŠØ­ØªÙˆÙŠ ÙˆØ¶Ø¹ Ø§Ù„Ø¶ÙŠÙ Ø¹Ù„Ù‰ Ù…ÙŠØ²Ø§Øª Ù…Ø­Ø¯ÙˆØ¯Ø© Ù„Ø¶Ù…Ø§Ù† Ø£ÙØ¶Ù„ Ø¬ÙˆØ¯Ø© Ù„Ù„Ø®Ø¯Ù…Ø©.';
 
   @override
-  String get anonymousEntity => 'كيان مجهول';
+  String get anonymousEntity => 'ÙƒÙŠØ§Ù† Ù…Ø¬Ù‡ÙˆÙ„';
 
   @override
-  String get upgradeAccountTitle => 'أكمل حسابك';
+  String get upgradeAccountTitle => 'Ø£ÙƒÙ…Ù„ Ø­Ø³Ø§Ø¨Ùƒ';
 
   @override
-  String get upgradeAccountDescription => 'أنشئ حسابًا لفتح المزيد من الحدود.';
+  String get upgradeAccountDescription =>
+      'Ø£Ù†Ø´Ø¦ Ø­Ø³Ø§Ø¨Ù‹Ø§ Ù„ÙØªØ­ Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ø­Ø¯ÙˆØ¯.';
 
   @override
-  String get createAccount => 'إنشاء حساب';
+  String get createAccount => 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨';
 
   @override
-  String get accountLinkedSuccess => 'تم إنشاء الحساب بنجاح!';
+  String get accountLinkedSuccess => 'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨ Ø¨Ù†Ø¬Ø§Ø­!';
 
   @override
-  String get continueWithApple => 'متابعة مع Apple';
+  String get continueWithApple => 'Ù…ØªØ§Ø¨Ø¹Ø© Ù…Ø¹ Apple';
 
   @override
-  String get guest => 'ضيف';
+  String get guest => 'Ø¶ÙŠÙ';
 
   @override
-  String get betterWithAnAccount => 'هذا القسم أفضل مع حساب!';
+  String get betterWithAnAccount => 'Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù… Ø£ÙØ¶Ù„ Ù…Ø¹ Ø­Ø³Ø§Ø¨!';
 
   @override
-  String get restorePurchases => 'استعادة المشتريات';
+  String get restorePurchases => 'Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø´ØªØ±ÙŠØ§Øª';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/سنة، يتم دفعها سنويًا';
+    return '$price/Ø³Ù†Ø©ØŒ ÙŠØªÙ… Ø¯ÙØ¹Ù‡Ø§ Ø³Ù†ÙˆÙŠÙ‹Ø§';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return 'تقريبًا $price/شهريًا';
+    return 'ØªÙ‚Ø±ÙŠØ¨Ù‹Ø§ $price/Ø´Ù‡Ø±ÙŠÙ‹Ø§';
   }
 
   @override
-  String get confirmDownloadTitle => 'هل أنت متأكد أنك تريد التنزيل؟';
+  String get confirmDownloadTitle =>
+      'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ø£Ù†Ùƒ ØªØ±ÙŠØ¯ Ø§Ù„ØªÙ†Ø²ÙŠÙ„ØŸ';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'سيشغل هذا النموذج مساحة تبلغ $size تقريبًا.';
+    return 'Ø³ÙŠØ´ØºÙ„ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ù…Ø³Ø§Ø­Ø© ØªØ¨Ù„Øº $size ØªÙ‚Ø±ÙŠØ¨Ù‹Ø§.';
   }
 
   @override
-  String get emulatorModeWarning => 'هذه الميزة معطلة في وضع المحاكي';
+  String get emulatorModeWarning =>
+      'Ù‡Ø°Ù‡ Ø§Ù„Ù…ÙŠØ²Ø© Ù…Ø¹Ø·Ù„Ø© ÙÙŠ ÙˆØ¶Ø¹ Ø§Ù„Ù…Ø­Ø§ÙƒÙŠ';
 
   @override
-  String get newChat => 'دردشة جديدة';
+  String get newChat => 'Ø¯Ø±Ø¯Ø´Ø© Ø¬Ø¯ÙŠØ¯Ø©';
 
   @override
-  String get variants => 'الإصدارات';
+  String get variants => 'Ø§Ù„Ø¥ØµØ¯Ø§Ø±Ø§Øª';
 
   @override
   String get variantsDescription =>
-      'المتغيرات هي إصدارات مختلفة من نفس عائلة الذكاء الاصطناعي. نختار تلقائيًا أفضلها عند النقر على البطاقة الرئيسية، ولكن يمكنك اختيار متغير محدد يدويًا هنا إذا كنت تفضل ذلك!';
+      'Ø§Ù„Ù…ØªØºÙŠØ±Ø§Øª Ù‡ÙŠ Ø¥ØµØ¯Ø§Ø±Ø§Øª Ù…Ø®ØªÙ„ÙØ© Ù…Ù† Ù†ÙØ³ Ø¹Ø§Ø¦Ù„Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ. Ù†Ø®ØªØ§Ø± ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§ Ø£ÙØ¶Ù„Ù‡Ø§ Ø¹Ù†Ø¯ Ø§Ù„Ù†Ù‚Ø± Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©ØŒ ÙˆÙ„ÙƒÙ† ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ø®ØªÙŠØ§Ø± Ù…ØªØºÙŠØ± Ù…Ø­Ø¯Ø¯ ÙŠØ¯ÙˆÙŠÙ‹Ø§ Ù‡Ù†Ø§ Ø¥Ø°Ø§ ÙƒÙ†Øª ØªÙØ¶Ù„ Ø°Ù„Ùƒ!';
 
   @override
-  String get fluxChatTitle => 'فلوكس تشات';
+  String get fluxChatTitle => 'ÙÙ„ÙˆÙƒØ³ ØªØ´Ø§Øª';
 
   @override
   String get fluxChatDescription =>
-      'محادثات Flux هي محادثات مؤقتة ولا يتم حفظها على جهازك.';
+      'Ù…Ø­Ø§Ø¯Ø«Ø§Øª Flux Ù‡ÙŠ Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ù…Ø¤Ù‚ØªØ© ÙˆÙ„Ø§ ÙŠØªÙ… Ø­ÙØ¸Ù‡Ø§ Ø¹Ù„Ù‰ Ø¬Ù‡Ø§Ø²Ùƒ.';
 
   @override
-  String get alwaysBest => 'الأفضل دائماً';
+  String get alwaysBest => 'Ø§Ù„Ø£ÙØ¶Ù„ Ø¯Ø§Ø¦Ù…Ø§Ù‹';
 
   @override
-  String get featuresTitle => 'سمات';
+  String get featuresTitle => 'Ø³Ù…Ø§Øª';
 
   @override
   String get useOfflineDescription =>
-      'تواصل بشكل خاص دون الحاجة إلى اتصال بالإنترنت.';
+      'ØªÙˆØ§ØµÙ„ Ø¨Ø´ÙƒÙ„ Ø®Ø§Øµ Ø¯ÙˆÙ† Ø§Ù„Ø­Ø§Ø¬Ø© Ø¥Ù„Ù‰ Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª.';
 
   @override
-  String get featureReasoning => 'التفكير العميق';
+  String get featureReasoning => 'Ø§Ù„ØªÙÙƒÙŠØ± Ø§Ù„Ø¹Ù…ÙŠÙ‚';
 
   @override
   String get featureReasoningDescription =>
-      'في وضع التفكير العميق، يقوم الذكاء الاصطناعي بالتفكير في المهام داخلياً لإنجازها على أكمل وجه ممكن.';
+      'ÙÙŠ ÙˆØ¶Ø¹ Ø§Ù„ØªÙÙƒÙŠØ± Ø§Ù„Ø¹Ù…ÙŠÙ‚ØŒ ÙŠÙ‚ÙˆÙ… Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¨Ø§Ù„ØªÙÙƒÙŠØ± ÙÙŠ Ø§Ù„Ù…Ù‡Ø§Ù… Ø¯Ø§Ø®Ù„ÙŠØ§Ù‹ Ù„Ø¥Ù†Ø¬Ø§Ø²Ù‡Ø§ Ø¹Ù„Ù‰ Ø£ÙƒÙ…Ù„ ÙˆØ¬Ù‡ Ù…Ù…ÙƒÙ†.';
 
   @override
-  String get featureCreateImageTitle => 'إنشاء صورة';
+  String get featureCreateImageTitle => 'Ø¥Ù†Ø´Ø§Ø¡ ØµÙˆØ±Ø©';
 
   @override
   String get featureCreateImageDescription =>
-      'أنشئ فن الذكاء الاصطناعي من النصوص.';
+      'Ø£Ù†Ø´Ø¦ ÙÙ† Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ù…Ù† Ø§Ù„Ù†ØµÙˆØµ.';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1583,99 +1657,103 @@ class AppLocalizationsAr extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => 'إنشاء فيديو';
+  String get featureCreateVideoTitle => 'Ø¥Ù†Ø´Ø§Ø¡ ÙÙŠØ¯ÙŠÙˆ';
 
   @override
-  String get featureCreateVideoDescription => 'إنشاء مقاطع فيديو من النصوص.';
+  String get featureCreateVideoDescription =>
+      'Ø¥Ù†Ø´Ø§Ø¡ Ù…Ù‚Ø§Ø·Ø¹ ÙÙŠØ¯ÙŠÙˆ Ù…Ù† Ø§Ù„Ù†ØµÙˆØµ.';
 
   @override
-  String get featureStudyTitle => 'ادرس وتعلم';
+  String get featureStudyTitle => 'Ø§Ø¯Ø±Ø³ ÙˆØªØ¹Ù„Ù…';
 
   @override
-  String get featureStudyDescription => 'احصل على الشروحات والملخصات.';
+  String get featureStudyDescription =>
+      'Ø§Ø­ØµÙ„ Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø±ÙˆØ­Ø§Øª ÙˆØ§Ù„Ù…Ù„Ø®ØµØ§Øª.';
 
   @override
-  String get featureQuizzesTitle => 'اختبارات قصيرة';
+  String get featureQuizzesTitle => 'Ø§Ø®ØªØ¨Ø§Ø±Ø§Øª Ù‚ØµÙŠØ±Ø©';
 
   @override
-  String get featureQuizzesDescription => 'اختبر معلوماتك.';
+  String get featureQuizzesDescription => 'Ø§Ø®ØªØ¨Ø± Ù…Ø¹Ù„ÙˆÙ…Ø§ØªÙƒ.';
 
   @override
-  String get featureExploreDescription => 'اكتشف جميع النماذج المتاحة.';
+  String get featureExploreDescription =>
+      'Ø§ÙƒØªØ´Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ù…ØªØ§Ø­Ø©.';
 
   @override
   String get featureStudyMessage =>
-      'أنت مُدرّس خبير. هدفك هو شرح موضوع المستخدم شرحًا وافيًا. استخدم بنية واضحة، وأمثلة، وتشبيهات. قسّم الأفكار المعقدة إلى أجزاء يسهل فهمها لضمان تعلّم المستخدم بفعالية. الموضوع:';
+      'Ø£Ù†Øª Ù…ÙØ¯Ø±Ù‘Ø³ Ø®Ø¨ÙŠØ±. Ù‡Ø¯ÙÙƒ Ù‡Ùˆ Ø´Ø±Ø­ Ù…ÙˆØ¶ÙˆØ¹ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø´Ø±Ø­Ù‹Ø§ ÙˆØ§ÙÙŠÙ‹Ø§. Ø§Ø³ØªØ®Ø¯Ù… Ø¨Ù†ÙŠØ© ÙˆØ§Ø¶Ø­Ø©ØŒ ÙˆØ£Ù…Ø«Ù„Ø©ØŒ ÙˆØªØ´Ø¨ÙŠÙ‡Ø§Øª. Ù‚Ø³Ù‘Ù… Ø§Ù„Ø£ÙÙƒØ§Ø± Ø§Ù„Ù…Ø¹Ù‚Ø¯Ø© Ø¥Ù„Ù‰ Ø£Ø¬Ø²Ø§Ø¡ ÙŠØ³Ù‡Ù„ ÙÙ‡Ù…Ù‡Ø§ Ù„Ø¶Ù…Ø§Ù† ØªØ¹Ù„Ù‘Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¨ÙØ¹Ø§Ù„ÙŠØ©. Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹:';
 
   @override
   String get featureQuizMessage =>
-      'أنت مُصمم أسئلة. أنشئ سؤالًا مُحددًا من نوع الاختيار من متعدد بناءً على موضوع المستخدم. انتظر إجابته. ثم قيّمها واطرح السؤال التالي. لا تكشف جميع الإجابات دفعة واحدة. اجعل الاختبار تفاعليًا. الموضوع:';
+      'Ø£Ù†Øª Ù…ÙØµÙ…Ù… Ø£Ø³Ø¦Ù„Ø©. Ø£Ù†Ø´Ø¦ Ø³Ø¤Ø§Ù„Ù‹Ø§ Ù…ÙØ­Ø¯Ø¯Ù‹Ø§ Ù…Ù† Ù†ÙˆØ¹ Ø§Ù„Ø§Ø®ØªÙŠØ§Ø± Ù…Ù† Ù…ØªØ¹Ø¯Ø¯ Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ù…ÙˆØ¶ÙˆØ¹ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…. Ø§Ù†ØªØ¸Ø± Ø¥Ø¬Ø§Ø¨ØªÙ‡. Ø«Ù… Ù‚ÙŠÙ‘Ù…Ù‡Ø§ ÙˆØ§Ø·Ø±Ø­ Ø§Ù„Ø³Ø¤Ø§Ù„ Ø§Ù„ØªØ§Ù„ÙŠ. Ù„Ø§ ØªÙƒØ´Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø§Øª Ø¯ÙØ¹Ø© ÙˆØ§Ø­Ø¯Ø©. Ø§Ø¬Ø¹Ù„ Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø± ØªÙØ§Ø¹Ù„ÙŠÙ‹Ø§. Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹:';
 
   @override
-  String get myPlan => 'خطتي';
+  String get myPlan => 'Ø®Ø·ØªÙŠ';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'عرض ترحيبي • $time';
+    return 'Ø¹Ø±Ø¶ ØªØ±Ø­ÙŠØ¨ÙŠ â€¢ $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'عرض حصري • $time';
+    return 'Ø¹Ø±Ø¶ Ø­ØµØ±ÙŠ â€¢ $time';
   }
 
   @override
-  String get attachmentSheetTitle => 'المرفقات';
+  String get attachmentSheetTitle => 'Ø§Ù„Ù…Ø±ÙÙ‚Ø§Øª';
 
   @override
-  String get actionCamera => 'آلة تصوير';
+  String get actionCamera => 'Ø¢Ù„Ø© ØªØµÙˆÙŠØ±';
 
   @override
-  String get actionGallery => 'معرض';
+  String get actionGallery => 'Ù…Ø¹Ø±Ø¶';
 
   @override
-  String get actionFile => 'ملف';
+  String get actionFile => 'Ù…Ù„Ù';
 
   @override
-  String get listening => 'جاري الاستماع';
+  String get listening => 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§Ø³ØªÙ…Ø§Ø¹';
 
   @override
-  String get defaultViewTitle => 'ما أخبارك؟';
+  String get defaultViewTitle => 'Ù…Ø§ Ø£Ø®Ø¨Ø§Ø±ÙƒØŸ';
 
   @override
   String get defaultViewDescription =>
-      'كورتكس دائمًا بجانبك مع مئات من نماذج الذكاء الاصطناعي، وإمكانيات العمل دون اتصال بالإنترنت، والدردشة الديناميكية، وغير ذلك الكثير.';
+      'ÙƒÙˆØ±ØªÙƒØ³ Ø¯Ø§Ø¦Ù…Ù‹Ø§ Ø¨Ø¬Ø§Ù†Ø¨Ùƒ Ù…Ø¹ Ù…Ø¦Ø§Øª Ù…Ù† Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠØŒ ÙˆØ¥Ù…ÙƒØ§Ù†ÙŠØ§Øª Ø§Ù„Ø¹Ù…Ù„ Ø¯ÙˆÙ† Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†ØªØŒ ÙˆØ§Ù„Ø¯Ø±Ø¯Ø´Ø© Ø§Ù„Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠØ©ØŒ ÙˆØºÙŠØ± Ø°Ù„Ùƒ Ø§Ù„ÙƒØ«ÙŠØ±.';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
   String get invalidUsernameFormat =>
-      'تنسيق اسم المستخدم غير صالح. استخدم من 3 إلى 20 حرفًا أو رقمًا أو . - _';
+      'ØªÙ†Ø³ÙŠÙ‚ Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… ØºÙŠØ± ØµØ§Ù„Ø­. Ø§Ø³ØªØ®Ø¯Ù… Ù…Ù† 3 Ø¥Ù„Ù‰ 20 Ø­Ø±ÙÙ‹Ø§ Ø£Ùˆ Ø±Ù‚Ù…Ù‹Ø§ Ø£Ùˆ . - _';
 
   @override
-  String get exclusiveOffer => 'عرض حصري';
+  String get exclusiveOffer => 'Ø¹Ø±Ø¶ Ø­ØµØ±ÙŠ';
 
   @override
-  String get claimOffer => 'استخدم العرض';
+  String get claimOffer => 'Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø¹Ø±Ø¶';
 
   @override
-  String get continueInOfflineMode => 'متابعة في وضع عدم الاتصال';
+  String get continueInOfflineMode =>
+      'Ù…ØªØ§Ø¨Ø¹Ø© ÙÙŠ ÙˆØ¶Ø¹ Ø¹Ø¯Ù… Ø§Ù„Ø§ØªØµØ§Ù„';
 
   @override
   String get voiceModeInformation =>
-      'يحافظ برنامج Cortex على أمان بياناتك من خلال تشغيله بالكامل على الجهاز، حتى في وضع الدردشة الصوتية؛ استمتع بمحادثات سلسة!';
+      'ÙŠØ­Ø§ÙØ¸ Ø¨Ø±Ù†Ø§Ù…Ø¬ Cortex Ø¹Ù„Ù‰ Ø£Ù…Ø§Ù† Ø¨ÙŠØ§Ù†Ø§ØªÙƒ Ù…Ù† Ø®Ù„Ø§Ù„ ØªØ´ØºÙŠÙ„Ù‡ Ø¨Ø§Ù„ÙƒØ§Ù…Ù„ Ø¹Ù„Ù‰ Ø§Ù„Ø¬Ù‡Ø§Ø²ØŒ Ø­ØªÙ‰ ÙÙŠ ÙˆØ¶Ø¹ Ø§Ù„Ø¯Ø±Ø¯Ø´Ø© Ø§Ù„ØµÙˆØªÙŠØ©Ø› Ø§Ø³ØªÙ…ØªØ¹ Ø¨Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ø³Ù„Ø³Ø©!';
 
   @override
   String get flowModeDescription =>
-      'في وضع التدفق، تتناقش الذكاءات فيما بينها؛ يمكنك إما الجلوس والاستماع أو المشاركة في النقاش!';
+      'ÙÙŠ ÙˆØ¶Ø¹ Ø§Ù„ØªØ¯ÙÙ‚ØŒ ØªØªÙ†Ø§Ù‚Ø´ Ø§Ù„Ø°ÙƒØ§Ø¡Ø§Øª ÙÙŠÙ…Ø§ Ø¨ÙŠÙ†Ù‡Ø§Ø› ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ù…Ø§ Ø§Ù„Ø¬Ù„ÙˆØ³ ÙˆØ§Ù„Ø§Ø³ØªÙ…Ø§Ø¹ Ø£Ùˆ Ø§Ù„Ù…Ø´Ø§Ø±ÙƒØ© ÙÙŠ Ø§Ù„Ù†Ù‚Ø§Ø´!';
 
   @override
   String get flowModeQuestion =>
-      'مرحباً! أنت الآن في وضع التدفق على تطبيق كورتكس. يوجد معك ثلاثة عملاء ذكاء اصطناعي آخرين. مهمتك هي طرح موضوع في الغرفة وبدء نقاش من خلال طرح سؤال مثير أو مسلٍّ على الآخرين. في ردودك، لا تتردد في استخدام الفكاهة والسخرية والتعليقات الطريفة. أي موضوع مناسب. هيا، ابدأ المحادثة.';
+      'Ù…Ø±Ø­Ø¨Ø§Ù‹! Ø£Ù†Øª Ø§Ù„Ø¢Ù† ÙÙŠ ÙˆØ¶Ø¹ Ø§Ù„ØªØ¯ÙÙ‚ Ø¹Ù„Ù‰ ØªØ·Ø¨ÙŠÙ‚ ÙƒÙˆØ±ØªÙƒØ³. ÙŠÙˆØ¬Ø¯ Ù…Ø¹Ùƒ Ø«Ù„Ø§Ø«Ø© Ø¹Ù…Ù„Ø§Ø¡ Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¢Ø®Ø±ÙŠÙ†. Ù…Ù‡Ù…ØªÙƒ Ù‡ÙŠ Ø·Ø±Ø­ Ù…ÙˆØ¶ÙˆØ¹ ÙÙŠ Ø§Ù„ØºØ±ÙØ© ÙˆØ¨Ø¯Ø¡ Ù†Ù‚Ø§Ø´ Ù…Ù† Ø®Ù„Ø§Ù„ Ø·Ø±Ø­ Ø³Ø¤Ø§Ù„ Ù…Ø«ÙŠØ± Ø£Ùˆ Ù…Ø³Ù„ÙÙ‘ Ø¹Ù„Ù‰ Ø§Ù„Ø¢Ø®Ø±ÙŠÙ†. ÙÙŠ Ø±Ø¯ÙˆØ¯ÙƒØŒ Ù„Ø§ ØªØªØ±Ø¯Ø¯ ÙÙŠ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„ÙÙƒØ§Ù‡Ø© ÙˆØ§Ù„Ø³Ø®Ø±ÙŠØ© ÙˆØ§Ù„ØªØ¹Ù„ÙŠÙ‚Ø§Øª Ø§Ù„Ø·Ø±ÙŠÙØ©. Ø£ÙŠ Ù…ÙˆØ¶ÙˆØ¹ Ù…Ù†Ø§Ø³Ø¨. Ù‡ÙŠØ§ØŒ Ø§Ø¨Ø¯Ø£ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø©.';
 
   @override
-  String get thought => 'فكر';
+  String get thought => 'ÙÙƒØ±';
 
   @override
   String get agentRed => 'Red';
@@ -1687,189 +1765,201 @@ class AppLocalizationsAr extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'وضع التدفق';
+  String get flowMode => 'ÙˆØ¶Ø¹ Ø§Ù„ØªØ¯ÙÙ‚';
 
   @override
-  String get premium => 'غالي';
+  String get premium => 'ØºØ§Ù„ÙŠ';
 
   @override
-  String get workInProgress => 'العمل قيد التنفيذ';
+  String get workInProgress => 'Ø§Ù„Ø¹Ù…Ù„ Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°';
 
   @override
   String get voiceSystemPromptSuffix =>
-      'هام: تجنب استخدام تنسيق Markdown (الخط العريض والمائل). لا تُدرج كتلًا برمجية (```). اجعل الردود موجزة وبسيطة.';
+      'Ù‡Ø§Ù…: ØªØ¬Ù†Ø¨ Ø§Ø³ØªØ®Ø¯Ø§Ù… ØªÙ†Ø³ÙŠÙ‚ Markdown (Ø§Ù„Ø®Ø· Ø§Ù„Ø¹Ø±ÙŠØ¶ ÙˆØ§Ù„Ù…Ø§Ø¦Ù„). Ù„Ø§ ØªÙØ¯Ø±Ø¬ ÙƒØªÙ„Ù‹Ø§ Ø¨Ø±Ù…Ø¬ÙŠØ© (```). Ø§Ø¬Ø¹Ù„ Ø§Ù„Ø±Ø¯ÙˆØ¯ Ù…ÙˆØ¬Ø²Ø© ÙˆØ¨Ø³ÙŠØ·Ø©.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'وضع تدفق القشرة ($agentName). السابق: $previousResponse';
+    return 'ÙˆØ¶Ø¹ ØªØ¯ÙÙ‚ Ø§Ù„Ù‚Ø´Ø±Ø© ($agentName). Ø§Ù„Ø³Ø§Ø¨Ù‚: $previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      'قراءة واستخراج المحتوى النصي من المستندات المرفوعة. يدعم البرنامج صيغ PDF وWord (DOCX) وExcel (XLSX) وPowerPoint (PPTX) وOpenDocument. استخدم هذه الميزة عند إرفاق المستخدم ملف مستند.';
+      'Ù‚Ø±Ø§Ø¡Ø© ÙˆØ§Ø³ØªØ®Ø±Ø§Ø¬ Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù†ØµÙŠ Ù…Ù† Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª Ø§Ù„Ù…Ø±ÙÙˆØ¹Ø©. ÙŠØ¯Ø¹Ù… Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ ØµÙŠØº PDF ÙˆWord (DOCX) ÙˆExcel (XLSX) ÙˆPowerPoint (PPTX) ÙˆOpenDocument. Ø§Ø³ØªØ®Ø¯Ù… Ù‡Ø°Ù‡ Ø§Ù„Ù…ÙŠØ²Ø© Ø¹Ù†Ø¯ Ø¥Ø±ÙØ§Ù‚ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ù…Ù„Ù Ù…Ø³ØªÙ†Ø¯.';
 
   @override
   String get toolReadDocumentIndexParam =>
-      'رقم فهرس المرفق المراد قراءته (يبدأ من الصفر). عادةً ما يكون صفرًا للمرفق الأول.';
+      'Ø±Ù‚Ù… ÙÙ‡Ø±Ø³ Ø§Ù„Ù…Ø±ÙÙ‚ Ø§Ù„Ù…Ø±Ø§Ø¯ Ù‚Ø±Ø§Ø¡ØªÙ‡ (ÙŠØ¨Ø¯Ø£ Ù…Ù† Ø§Ù„ØµÙØ±). Ø¹Ø§Ø¯Ø©Ù‹ Ù…Ø§ ÙŠÙƒÙˆÙ† ØµÙØ±Ù‹Ø§ Ù„Ù„Ù…Ø±ÙÙ‚ Ø§Ù„Ø£ÙˆÙ„.';
 
   @override
   String get toolStockDescription =>
-      'احصل على السعر الحالي والتاريخ للأسهم (مثل AAPL، THYAO.IS) والعملات المشفرة (مثل BTC-USD).';
+      'Ø§Ø­ØµÙ„ Ø¹Ù„Ù‰ Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ ÙˆØ§Ù„ØªØ§Ø±ÙŠØ® Ù„Ù„Ø£Ø³Ù‡Ù… (Ù…Ø«Ù„ AAPLØŒ THYAO.IS) ÙˆØ§Ù„Ø¹Ù…Ù„Ø§Øª Ø§Ù„Ù…Ø´ÙØ±Ø© (Ù…Ø«Ù„ BTC-USD).';
 
   @override
   String get toolStockSymbolParam =>
-      'رمز المؤشر (على سبيل المثال AAPL، THYAO.IS، BTC-USD).';
+      'Ø±Ù…Ø² Ø§Ù„Ù…Ø¤Ø´Ø± (Ø¹Ù„Ù‰ Ø³Ø¨ÙŠÙ„ Ø§Ù„Ù…Ø«Ø§Ù„ AAPLØŒ THYAO.ISØŒ BTC-USD).';
 
   @override
   String get toolWeatherDescription =>
-      'احصل على معلومات عن حالة الطقس الحالية لمدينة معينة.';
+      'Ø§Ø­ØµÙ„ Ø¹Ù„Ù‰ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø¹Ù† Ø­Ø§Ù„Ø© Ø§Ù„Ø·Ù‚Ø³ Ø§Ù„Ø­Ø§Ù„ÙŠØ© Ù„Ù…Ø¯ÙŠÙ†Ø© Ù…Ø¹ÙŠÙ†Ø©.';
 
   @override
   String get toolWeatherCityParam =>
-      'اسم المدينة (على سبيل المثال لندن، إسطنبول).';
+      'Ø§Ø³Ù… Ø§Ù„Ù…Ø¯ÙŠÙ†Ø© (Ø¹Ù„Ù‰ Ø³Ø¨ÙŠÙ„ Ø§Ù„Ù…Ø«Ø§Ù„ Ù„Ù†Ø¯Ù†ØŒ Ø¥Ø³Ø·Ù†Ø¨ÙˆÙ„).';
 
   @override
   String get toolPythonDescription =>
-      'قم بتنفيذ كود بايثون في بيئة معزولة آمنة.';
+      'Ù‚Ù… Ø¨ØªÙ†ÙÙŠØ° ÙƒÙˆØ¯ Ø¨Ø§ÙŠØ«ÙˆÙ† ÙÙŠ Ø¨ÙŠØ¦Ø© Ù…Ø¹Ø²ÙˆÙ„Ø© Ø¢Ù…Ù†Ø©.';
 
   @override
-  String get toolPythonCodeParam => 'كود بايثون المراد تنفيذه.';
+  String get toolPythonCodeParam =>
+      'ÙƒÙˆØ¯ Ø¨Ø§ÙŠØ«ÙˆÙ† Ø§Ù„Ù…Ø±Ø§Ø¯ ØªÙ†ÙÙŠØ°Ù‡.';
 
   @override
-  String get toolCalculateDescription => 'قم بتقييم تعبير رياضي.';
+  String get toolCalculateDescription =>
+      'Ù‚Ù… Ø¨ØªÙ‚ÙŠÙŠÙ… ØªØ¹Ø¨ÙŠØ± Ø±ÙŠØ§Ø¶ÙŠ.';
 
   @override
   String get toolCalculateExpressionParam =>
-      'التعبير الرياضي (على سبيل المثال \'3 + 4 * 2\').';
+      'Ø§Ù„ØªØ¹Ø¨ÙŠØ± Ø§Ù„Ø±ÙŠØ§Ø¶ÙŠ (Ø¹Ù„Ù‰ Ø³Ø¨ÙŠÙ„ Ø§Ù„Ù…Ø«Ø§Ù„ \'3 + 4 * 2\').';
 
   @override
-  String get toolChartDescription => 'قم بإنشاء رسم بياني/مخطط توضيحي.';
+  String get toolChartDescription =>
+      'Ù‚Ù… Ø¨Ø¥Ù†Ø´Ø§Ø¡ Ø±Ø³Ù… Ø¨ÙŠØ§Ù†ÙŠ/Ù…Ø®Ø·Ø· ØªÙˆØ¶ÙŠØ­ÙŠ.';
 
   @override
-  String get toolChartTypeParam => 'نوع الرسم البياني: شريطي، خطي، أو دائري.';
+  String get toolChartTypeParam =>
+      'Ù†ÙˆØ¹ Ø§Ù„Ø±Ø³Ù… Ø§Ù„Ø¨ÙŠØ§Ù†ÙŠ: Ø´Ø±ÙŠØ·ÙŠØŒ Ø®Ø·ÙŠØŒ Ø£Ùˆ Ø¯Ø§Ø¦Ø±ÙŠ.';
 
   @override
-  String get toolChartLabelsParam => 'تسميات لمحاور أو قطاعات الرسم البياني.';
+  String get toolChartLabelsParam =>
+      'ØªØ³Ù…ÙŠØ§Øª Ù„Ù…Ø­Ø§ÙˆØ± Ø£Ùˆ Ù‚Ø·Ø§Ø¹Ø§Øª Ø§Ù„Ø±Ø³Ù… Ø§Ù„Ø¨ÙŠØ§Ù†ÙŠ.';
 
   @override
-  String get toolChartDataParam => 'قيم البيانات الرقمية للرسم البياني.';
+  String get toolChartDataParam =>
+      'Ù‚ÙŠÙ… Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø±Ù‚Ù…ÙŠØ© Ù„Ù„Ø±Ø³Ù… Ø§Ù„Ø¨ÙŠØ§Ù†ÙŠ.';
 
   @override
   String get toolChartLabelParam =>
-      'تسمية مجموعة البيانات لمفتاح الرسم البياني.';
+      'ØªØ³Ù…ÙŠØ© Ù…Ø¬Ù…ÙˆØ¹Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ù„Ù…ÙØªØ§Ø­ Ø§Ù„Ø±Ø³Ù… Ø§Ù„Ø¨ÙŠØ§Ù†ÙŠ.';
 
   @override
-  String get toolChartTitleParam => 'عنوان الرسم البياني.';
+  String get toolChartTitleParam => 'Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø±Ø³Ù… Ø§Ù„Ø¨ÙŠØ§Ù†ÙŠ.';
 
   @override
   String get thinkingModeInstruction =>
-      'وضع التفكير مُفعّل: يجب عليك استخدام وسوم <think></think> لعرض خطوات تفكيرك قبل تقديم إجابتك النهائية. فكّر خطوة بخطوة داخل الوسوم، ثم قدّم إجابتك خارجها.';
+      'ÙˆØ¶Ø¹ Ø§Ù„ØªÙÙƒÙŠØ± Ù…ÙÙØ¹Ù‘Ù„: ÙŠØ¬Ø¨ Ø¹Ù„ÙŠÙƒ Ø§Ø³ØªØ®Ø¯Ø§Ù… ÙˆØ³ÙˆÙ… <think></think> Ù„Ø¹Ø±Ø¶ Ø®Ø·ÙˆØ§Øª ØªÙÙƒÙŠØ±Ùƒ Ù‚Ø¨Ù„ ØªÙ‚Ø¯ÙŠÙ… Ø¥Ø¬Ø§Ø¨ØªÙƒ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ©. ÙÙƒÙ‘Ø± Ø®Ø·ÙˆØ© Ø¨Ø®Ø·ÙˆØ© Ø¯Ø§Ø®Ù„ Ø§Ù„ÙˆØ³ÙˆÙ…ØŒ Ø«Ù… Ù‚Ø¯Ù‘Ù… Ø¥Ø¬Ø§Ø¨ØªÙƒ Ø®Ø§Ø±Ø¬Ù‡Ø§.';
 
   @override
-  String get openLinkWarningTitle => 'تحذير بشأن الروابط الخارجية';
+  String get openLinkWarningTitle =>
+      'ØªØ­Ø°ÙŠØ± Ø¨Ø´Ø£Ù† Ø§Ù„Ø±ÙˆØ§Ø¨Ø· Ø§Ù„Ø®Ø§Ø±Ø¬ÙŠØ©';
 
   @override
-  String get openLinkCancel => 'إلغاء';
+  String get openLinkCancel => 'Ø¥Ù„ØºØ§Ø¡';
 
   @override
-  String get openLinkConfirm => 'افتح الرابط';
+  String get openLinkConfirm => 'Ø§ÙØªØ­ Ø§Ù„Ø±Ø§Ø¨Ø·';
 
   @override
-  String get webSearchSources => 'مصادر';
+  String get webSearchSources => 'Ù…ØµØ§Ø¯Ø±';
 
   @override
-  String get searching => 'البحث';
+  String get searching => 'Ø§Ù„Ø¨Ø­Ø«';
 
   @override
-  String get featureWebSearchTitle => 'البحث على الويب';
+  String get featureWebSearchTitle => 'Ø§Ù„Ø¨Ø­Ø« Ø¹Ù„Ù‰ Ø§Ù„ÙˆÙŠØ¨';
 
   @override
-  String get featureWebSearchDescription => 'ابحث في الإنترنت عن معلومات آنية';
+  String get featureWebSearchDescription =>
+      'Ø§Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª Ø¹Ù† Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø¢Ù†ÙŠØ©';
 
   @override
-  String get clearMemory => 'ذاكرة صافية';
+  String get clearMemory => 'Ø°Ø§ÙƒØ±Ø© ØµØ§ÙÙŠØ©';
 
   @override
-  String get clearMemoryConfirm => 'هل أنت متأكد من رغبتك في مسح ذاكرتك؟';
+  String get clearMemoryConfirm =>
+      'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø±ØºØ¨ØªÙƒ ÙÙŠ Ù…Ø³Ø­ Ø°Ø§ÙƒØ±ØªÙƒØŸ';
 
   @override
-  String get personalization => 'التخصيص';
+  String get personalization => 'Ø§Ù„ØªØ®ØµÙŠØµ';
 
   @override
   String get personalizationDescription =>
-      'خصّص مساعدك ليناسب احتياجاتك بشكل أفضل. عدّل ردوده وسلوكه ونبرته لتتوافق مع تفضيلاتك الفريدة.';
+      'Ø®ØµÙ‘Øµ Ù…Ø³Ø§Ø¹Ø¯Ùƒ Ù„ÙŠÙ†Ø§Ø³Ø¨ Ø§Ø­ØªÙŠØ§Ø¬Ø§ØªÙƒ Ø¨Ø´ÙƒÙ„ Ø£ÙØ¶Ù„. Ø¹Ø¯Ù‘Ù„ Ø±Ø¯ÙˆØ¯Ù‡ ÙˆØ³Ù„ÙˆÙƒÙ‡ ÙˆÙ†Ø¨Ø±ØªÙ‡ Ù„ØªØªÙˆØ§ÙÙ‚ Ù…Ø¹ ØªÙØ¶ÙŠÙ„Ø§ØªÙƒ Ø§Ù„ÙØ±ÙŠØ¯Ø©.';
 
   @override
-  String get memoryTitle => 'ذاكرة';
+  String get memoryTitle => 'Ø°Ø§ÙƒØ±Ø©';
 
   @override
   String get memoryDescription =>
-      'تتعرف عليك أنظمة الذكاء الاصطناعي بهذه الطريقة.';
+      'ØªØªØ¹Ø±Ù Ø¹Ù„ÙŠÙƒ Ø£Ù†Ø¸Ù…Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¨Ù‡Ø°Ù‡ Ø§Ù„Ø·Ø±ÙŠÙ‚Ø©.';
 
   @override
-  String get noMemoryYet => 'لم يتم تكوين أي ذكريات بعد';
+  String get noMemoryYet => 'Ù„Ù… ÙŠØªÙ… ØªÙƒÙˆÙŠÙ† Ø£ÙŠ Ø°ÙƒØ±ÙŠØ§Øª Ø¨Ø¹Ø¯';
 
   @override
-  String get memoryLimitReached => 'تم الوصول إلى الحد الأقصى للذاكرة';
+  String get memoryLimitReached =>
+      'ØªÙ… Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ Ù„Ù„Ø°Ø§ÙƒØ±Ø©';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => 'ذكاء';
+  String get intelligenceTitle => 'Ø°ÙƒØ§Ø¡';
 
   @override
   String get intelligenceDescription =>
-      'تتواصل معك أنظمة الذكاء الاصطناعي بهذه الطريقة.';
+      'ØªØªÙˆØ§ØµÙ„ Ù…Ø¹Ùƒ Ø£Ù†Ø¸Ù…Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¨Ù‡Ø°Ù‡ Ø§Ù„Ø·Ø±ÙŠÙ‚Ø©.';
 
   @override
-  String get customInstructionHint => 'أدخل تعليماتك المخصصة هنا';
+  String get customInstructionHint =>
+      'Ø£Ø¯Ø®Ù„ ØªØ¹Ù„ÙŠÙ…Ø§ØªÙƒ Ø§Ù„Ù…Ø®ØµØµØ© Ù‡Ù†Ø§';
 
   @override
   String openLinkWarningMessage(String url) {
-    return 'أنت على وشك فتح الرابط الخارجي التالي:\\n\\n$url\\n\\nهل أنت متأكد من رغبتك في المتابعة؟';
+    return 'Ø£Ù†Øª Ø¹Ù„Ù‰ ÙˆØ´Ùƒ ÙØªØ­ Ø§Ù„Ø±Ø§Ø¨Ø· Ø§Ù„Ø®Ø§Ø±Ø¬ÙŠ Ø§Ù„ØªØ§Ù„ÙŠ:\\n\\n$url\\n\\nÙ‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø±ØºØ¨ØªÙƒ ÙÙŠ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©ØŸ';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return 'اتبع هذه التعليمات المخصصة:\\n\\n$instruction';
+    return 'Ø§ØªØ¨Ø¹ Ù‡Ø°Ù‡ Ø§Ù„ØªØ¹Ù„ÙŠÙ…Ø§Øª Ø§Ù„Ù…Ø®ØµØµØ©:\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      '[تعليمات حاسمة]: أنت مُولِّد عناوين. لا تُجب على سؤال المستخدم. لا تُراسله أو تُلقي عليه التحية. فقط اعرض عنوانًا من كلمتين إلى أربع كلمات يُلخِّص ما يسأل عنه المستخدم.';
+      '[ØªØ¹Ù„ÙŠÙ…Ø§Øª Ø­Ø§Ø³Ù…Ø©]: Ø£Ù†Øª Ù…ÙÙˆÙ„ÙÙ‘Ø¯ Ø¹Ù†Ø§ÙˆÙŠÙ†. Ù„Ø§ ØªÙØ¬Ø¨ Ø¹Ù„Ù‰ Ø³Ø¤Ø§Ù„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…. Ù„Ø§ ØªÙØ±Ø§Ø³Ù„Ù‡ Ø£Ùˆ ØªÙÙ„Ù‚ÙŠ Ø¹Ù„ÙŠÙ‡ Ø§Ù„ØªØ­ÙŠØ©. ÙÙ‚Ø· Ø§Ø¹Ø±Ø¶ Ø¹Ù†ÙˆØ§Ù†Ù‹Ø§ Ù…Ù† ÙƒÙ„Ù…ØªÙŠÙ† Ø¥Ù„Ù‰ Ø£Ø±Ø¨Ø¹ ÙƒÙ„Ù…Ø§Øª ÙŠÙÙ„Ø®ÙÙ‘Øµ Ù…Ø§ ÙŠØ³Ø£Ù„ Ø¹Ù†Ù‡ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù….';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[النظام] تعليمات هامة: أنت تعمل حاليًا داخل نظام ذكاء اصطناعي ضخم ومتطور للغاية يُسمى \"كورتكس\"؛ هذه المنصة من تطوير فريق فيرتكس، الذين يبلغ متوسط أعمارهم 16 عامًا فقط. تذكر هذا وأجب إذا طُلب منك ذلك. إذا طُلب منك المزيد من المعلومات، فلا تتردد في البحث على الإنترنت، أو إذا لم تتمكن من البحث، فلا تتردد في قول \"لا أعرف\"!';
+      '\n\n[Ø§Ù„Ù†Ø¸Ø§Ù…] ØªØ¹Ù„ÙŠÙ…Ø§Øª Ù‡Ø§Ù…Ø©: Ø£Ù†Øª ØªØ¹Ù…Ù„ Ø­Ø§Ù„ÙŠÙ‹Ø§ Ø¯Ø§Ø®Ù„ Ù†Ø¸Ø§Ù… Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¶Ø®Ù… ÙˆÙ…ØªØ·ÙˆØ± Ù„Ù„ØºØ§ÙŠØ© ÙŠÙØ³Ù…Ù‰ \"ÙƒÙˆØ±ØªÙƒØ³\"Ø› Ù‡Ø°Ù‡ Ø§Ù„Ù…Ù†ØµØ© Ù…Ù† ØªØ·ÙˆÙŠØ± ÙØ±ÙŠÙ‚ ÙÙŠØ±ØªÙƒØ³ØŒ Ø§Ù„Ø°ÙŠÙ† ÙŠØ¨Ù„Øº Ù…ØªÙˆØ³Ø· Ø£Ø¹Ù…Ø§Ø±Ù‡Ù… 16 Ø¹Ø§Ù…Ù‹Ø§ ÙÙ‚Ø·. ØªØ°ÙƒØ± Ù‡Ø°Ø§ ÙˆØ£Ø¬Ø¨ Ø¥Ø°Ø§ Ø·ÙÙ„Ø¨ Ù…Ù†Ùƒ Ø°Ù„Ùƒ. Ø¥Ø°Ø§ Ø·ÙÙ„Ø¨ Ù…Ù†Ùƒ Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§ØªØŒ ÙÙ„Ø§ ØªØªØ±Ø¯Ø¯ ÙÙŠ Ø§Ù„Ø¨Ø­Ø« Ø¹Ù„Ù‰ Ø§Ù„Ø¥Ù†ØªØ±Ù†ØªØŒ Ø£Ùˆ Ø¥Ø°Ø§ Ù„Ù… ØªØªÙ…ÙƒÙ† Ù…Ù† Ø§Ù„Ø¨Ø­Ø«ØŒ ÙÙ„Ø§ ØªØªØ±Ø¯Ø¯ ÙÙŠ Ù‚ÙˆÙ„ \"Ù„Ø§ Ø£Ø¹Ø±Ù\"!';
 
   @override
-  String get featureAudioRecognitionTitle => 'التعرف على الصوت';
+  String get featureAudioRecognitionTitle => 'Ø§Ù„ØªØ¹Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„ØµÙˆØª';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'يستطيع هذا النموذج فهم ومعالجة الصوت أو الكلام.';
+      'ÙŠØ³ØªØ·ÙŠØ¹ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ÙÙ‡Ù… ÙˆÙ…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµÙˆØª Ø£Ùˆ Ø§Ù„ÙƒÙ„Ø§Ù….';
 
   @override
-  String get featureVideoRecognitionTitle => 'التعرف على الفيديو';
+  String get featureVideoRecognitionTitle =>
+      'Ø§Ù„ØªØ¹Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'يستطيع هذا النموذج تحليل وفهم مقاطع الفيديو من ملفاتك أو الكاميرا.';
+      'ÙŠØ³ØªØ·ÙŠØ¹ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ØªØ­Ù„ÙŠÙ„ ÙˆÙÙ‡Ù… Ù…Ù‚Ø§Ø·Ø¹ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ù…Ù† Ù…Ù„ÙØ§ØªÙƒ Ø£Ùˆ Ø§Ù„ÙƒØ§Ù…ÙŠØ±Ø§.';
 
   @override
-  String get featureImageRecognitionTitle => 'التعرف على الصورة';
+  String get featureImageRecognitionTitle => 'Ø§Ù„ØªØ¹Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„ØµÙˆØ±Ø©';
 
   @override
   String get featureImageRecognitionDescription =>
-      'يستطيع هذا النموذج تحليل وفهم الصور أو الرسومات.';
+      'ÙŠØ³ØªØ·ÙŠØ¹ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ØªØ­Ù„ÙŠÙ„ ÙˆÙÙ‡Ù… Ø§Ù„ØµÙˆØ± Ø£Ùˆ Ø§Ù„Ø±Ø³ÙˆÙ…Ø§Øª.';
 
   @override
-  String get featureToolUseTitle => 'استخدام الأدوات';
+  String get featureToolUseTitle => 'Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ø£Ø¯ÙˆØ§Øª';
 
   @override
   String get featureToolUseDescription =>
-      'يستطيع هذا النموذج استخدام الأدوات الخارجية بذكاء لإنجاز المهام.';
+      'ÙŠØ³ØªØ·ÙŠØ¹ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø®Ø§Ø±Ø¬ÙŠØ© Ø¨Ø°ÙƒØ§Ø¡ Ù„Ø¥Ù†Ø¬Ø§Ø² Ø§Ù„Ù…Ù‡Ø§Ù….';
 
   @override
   String get videoModels => 'Video Models';
@@ -1882,93 +1972,96 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'يحتاج هذا النموذج إلى $mediaType ليعمل. لقد اعترضت الطلب لإعلامك بذلك. يرجى إبلاغ المستخدم بلطف أنه بحاجة إلى توفير $mediaType (أخبرهم بلغتهم الخاصة) لأنني $modelName، نموذج تحرير مرئي/صوتي/فيديو.';
+    return 'ÙŠØ­ØªØ§Ø¬ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø¥Ù„Ù‰ $mediaType Ù„ÙŠØ¹Ù…Ù„. Ù„Ù‚Ø¯ Ø§Ø¹ØªØ±Ø¶Øª Ø§Ù„Ø·Ù„Ø¨ Ù„Ø¥Ø¹Ù„Ø§Ù…Ùƒ Ø¨Ø°Ù„Ùƒ. ÙŠØ±Ø¬Ù‰ Ø¥Ø¨Ù„Ø§Øº Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ù„Ø·Ù Ø£Ù†Ù‡ Ø¨Ø­Ø§Ø¬Ø© Ø¥Ù„Ù‰ ØªÙˆÙÙŠØ± $mediaType (Ø£Ø®Ø¨Ø±Ù‡Ù… Ø¨Ù„ØºØªÙ‡Ù… Ø§Ù„Ø®Ø§ØµØ©) Ù„Ø£Ù†Ù†ÙŠ $modelNameØŒ Ù†Ù…ÙˆØ°Ø¬ ØªØ­Ø±ÙŠØ± Ù…Ø±Ø¦ÙŠ/ØµÙˆØªÙŠ/ÙÙŠØ¯ÙŠÙˆ.';
   }
 
   @override
-  String get mediaTypeImage => 'صورة';
+  String get mediaTypeImage => 'ØµÙˆØ±Ø©';
 
   @override
-  String get mediaTypeVideo => 'فيديو';
+  String get mediaTypeVideo => 'ÙÙŠØ¯ÙŠÙˆ';
 
   @override
-  String get mediaTypeAudio => 'ملف صوتي';
+  String get mediaTypeAudio => 'Ù…Ù„Ù ØµÙˆØªÙŠ';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName هو ذكاء متقدم يعرض أداءً عاليًا على Cortex.';
+    return '$seriesName Ù‡Ùˆ Ø°ÙƒØ§Ø¡ Ù…ØªÙ‚Ø¯Ù… ÙŠØ¹Ø±Ø¶ Ø£Ø¯Ø§Ø¡Ù‹ Ø¹Ø§Ù„ÙŠÙ‹Ø§ Ø¹Ù„Ù‰ Cortex.';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName هو ذكاء اصطناعي عالي الأداء مدمج في نظام Cortex البيئي. مصمم للتعامل مع مجموعة واسعة من المهام المعقدة، ويوفر قدرات معالجة موثوقة وفعالة عالية. من خلال تقديم أوقات استجابة سريعة وقوة تحليلية متقدمة، فإنه يعزز إنتاجيتك اليومية بشكل كبير. يعمل هذا النموذج بسلاسة على البنية التحتية المحلية الآمنة لـ Cortex، ويمكنه مساعدتك في مجموعة واسعة من المهام، من العصف الذهني الإبداعي إلى التحليل الفني العميق. ابدأ باستكشاف إمكاناته الكاملة اليوم.';
+    return '$modelName Ù‡Ùˆ Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¹Ø§Ù„ÙŠ Ø§Ù„Ø£Ø¯Ø§Ø¡ Ù…Ø¯Ù…Ø¬ ÙÙŠ Ù†Ø¸Ø§Ù… Cortex Ø§Ù„Ø¨ÙŠØ¦ÙŠ. Ù…ØµÙ…Ù… Ù„Ù„ØªØ¹Ø§Ù…Ù„ Ù…Ø¹ Ù…Ø¬Ù…ÙˆØ¹Ø© ÙˆØ§Ø³Ø¹Ø© Ù…Ù† Ø§Ù„Ù…Ù‡Ø§Ù… Ø§Ù„Ù…Ø¹Ù‚Ø¯Ø©ØŒ ÙˆÙŠÙˆÙØ± Ù‚Ø¯Ø±Ø§Øª Ù…Ø¹Ø§Ù„Ø¬Ø© Ù…ÙˆØ«ÙˆÙ‚Ø© ÙˆÙØ¹Ø§Ù„Ø© Ø¹Ø§Ù„ÙŠØ©. Ù…Ù† Ø®Ù„Ø§Ù„ ØªÙ‚Ø¯ÙŠÙ… Ø£ÙˆÙ‚Ø§Øª Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ø³Ø±ÙŠØ¹Ø© ÙˆÙ‚ÙˆØ© ØªØ­Ù„ÙŠÙ„ÙŠØ© Ù…ØªÙ‚Ø¯Ù…Ø©ØŒ ÙØ¥Ù†Ù‡ ÙŠØ¹Ø²Ø² Ø¥Ù†ØªØ§Ø¬ÙŠØªÙƒ Ø§Ù„ÙŠÙˆÙ…ÙŠØ© Ø¨Ø´ÙƒÙ„ ÙƒØ¨ÙŠØ±. ÙŠØ¹Ù…Ù„ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø¨Ø³Ù„Ø§Ø³Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ù†ÙŠØ© Ø§Ù„ØªØ­ØªÙŠØ© Ø§Ù„Ù…Ø­Ù„ÙŠØ© Ø§Ù„Ø¢Ù…Ù†Ø© Ù„Ù€ CortexØŒ ÙˆÙŠÙ…ÙƒÙ†Ù‡ Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ ÙÙŠ Ù…Ø¬Ù…ÙˆØ¹Ø© ÙˆØ§Ø³Ø¹Ø© Ù…Ù† Ø§Ù„Ù…Ù‡Ø§Ù…ØŒ Ù…Ù† Ø§Ù„Ø¹ØµÙ Ø§Ù„Ø°Ù‡Ù†ÙŠ Ø§Ù„Ø¥Ø¨Ø¯Ø§Ø¹ÙŠ Ø¥Ù„Ù‰ Ø§Ù„ØªØ­Ù„ÙŠÙ„ Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ø¹Ù…ÙŠÙ‚. Ø§Ø¨Ø¯Ø£ Ø¨Ø§Ø³ØªÙƒØ´Ø§Ù Ø¥Ù…ÙƒØ§Ù†Ø§ØªÙ‡ Ø§Ù„ÙƒØ§Ù…Ù„Ø© Ø§Ù„ÙŠÙˆÙ….';
   }
 
   @override
-  String get guestLimitBottomSheetTitle => 'هل تعجبك ذكاء كورتكس؟';
+  String get guestLimitBottomSheetTitle =>
+      'Ù‡Ù„ ØªØ¹Ø¬Ø¨Ùƒ Ø°ÙƒØ§Ø¡ ÙƒÙˆØ±ØªÙƒØ³ØŸ';
 
   @override
   String get guestLimitBottomSheetText =>
-      'اعمل مع ذكاء اصطناعي أكثر تطوراً، وأنتج المزيد من المحتوى، وتواصل أكثر، وافعل المزيد...';
+      'Ø§Ø¹Ù…Ù„ Ù…Ø¹ Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø£ÙƒØ«Ø± ØªØ·ÙˆØ±Ø§Ù‹ØŒ ÙˆØ£Ù†ØªØ¬ Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ù…Ø­ØªÙˆÙ‰ØŒ ÙˆØªÙˆØ§ØµÙ„ Ø£ÙƒØ«Ø±ØŒ ÙˆØ§ÙØ¹Ù„ Ø§Ù„Ù…Ø²ÙŠØ¯...';
 
   @override
-  String get arts => 'الفنون';
+  String get arts => 'Ø§Ù„ÙÙ†ÙˆÙ†';
 
   @override
-  String get noArt => 'لا فن';
+  String get noArt => 'Ù„Ø§ ÙÙ†';
 
   @override
   String get noArtDescription =>
-      'لا توجد أعمال فنية بعد؛ حان الوقت لملء المعرض بإنشاء الصور ومقاطع الفيديو والمقاطع الصوتية وجميع أنواع المحتوى!';
+      'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø£Ø¹Ù…Ø§Ù„ ÙÙ†ÙŠØ© Ø¨Ø¹Ø¯Ø› Ø­Ø§Ù† Ø§Ù„ÙˆÙ‚Øª Ù„Ù…Ù„Ø¡ Ø§Ù„Ù…Ø¹Ø±Ø¶ Ø¨Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ØµÙˆØ± ÙˆÙ…Ù‚Ø§Ø·Ø¹ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ ÙˆØ§Ù„Ù…Ù‚Ø§Ø·Ø¹ Ø§Ù„ØµÙˆØªÙŠØ© ÙˆØ¬Ù…ÙŠØ¹ Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ù…Ø­ØªÙˆÙ‰!';
 
   @override
   String get videoPremiumWarning =>
-      'أنت بحاجة إلى اشتراك Ultra لإنشاء مقاطع الفيديو، قم بالترقية الآن واستمتع بالتجربة!';
+      'Ø£Ù†Øª Ø¨Ø­Ø§Ø¬Ø© Ø¥Ù„Ù‰ Ø§Ø´ØªØ±Ø§Ùƒ Ultra Ù„Ø¥Ù†Ø´Ø§Ø¡ Ù…Ù‚Ø§Ø·Ø¹ Ø§Ù„ÙÙŠØ¯ÙŠÙˆØŒ Ù‚Ù… Ø¨Ø§Ù„ØªØ±Ù‚ÙŠØ© Ø§Ù„Ø¢Ù† ÙˆØ§Ø³ØªÙ…ØªØ¹ Ø¨Ø§Ù„ØªØ¬Ø±Ø¨Ø©!';
 
   @override
   String get fallbackInfoPanelText =>
-      'نظراً لبعض التحسينات التي نجريها على خوادمنا، تم إنشاء الرد بواسطة نظام الدردشة الديناميكي الخاص بـ Cortex بدلاً من الذكاء الاصطناعي الذي اخترته. نشكرك على تفهمك ريثما تكتمل العملية!';
+      'Ù†Ø¸Ø±Ø§Ù‹ Ù„Ø¨Ø¹Ø¶ Ø§Ù„ØªØ­Ø³ÙŠÙ†Ø§Øª Ø§Ù„ØªÙŠ Ù†Ø¬Ø±ÙŠÙ‡Ø§ Ø¹Ù„Ù‰ Ø®ÙˆØ§Ø¯Ù…Ù†Ø§ØŒ ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø±Ø¯ Ø¨ÙˆØ§Ø³Ø·Ø© Ù†Ø¸Ø§Ù… Ø§Ù„Ø¯Ø±Ø¯Ø´Ø© Ø§Ù„Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠ Ø§Ù„Ø®Ø§Øµ Ø¨Ù€ Cortex Ø¨Ø¯Ù„Ø§Ù‹ Ù…Ù† Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø§Ù„Ø°ÙŠ Ø§Ø®ØªØ±ØªÙ‡. Ù†Ø´ÙƒØ±Ùƒ Ø¹Ù„Ù‰ ØªÙÙ‡Ù…Ùƒ Ø±ÙŠØ«Ù…Ø§ ØªÙƒØªÙ…Ù„ Ø§Ù„Ø¹Ù…Ù„ÙŠØ©!';
 
   @override
   String get falOfflineMessage =>
-      'نظراً لبعض التحسينات التي نجريها على خوادمنا، فإن هذه الخدمة غير متاحة حالياً. نشكركم على تفهمكم ريثما تنتهي العملية!';
+      'Ù†Ø¸Ø±Ø§Ù‹ Ù„Ø¨Ø¹Ø¶ Ø§Ù„ØªØ­Ø³ÙŠÙ†Ø§Øª Ø§Ù„ØªÙŠ Ù†Ø¬Ø±ÙŠÙ‡Ø§ Ø¹Ù„Ù‰ Ø®ÙˆØ§Ø¯Ù…Ù†Ø§ØŒ ÙØ¥Ù† Ù‡Ø°Ù‡ Ø§Ù„Ø®Ø¯Ù…Ø© ØºÙŠØ± Ù…ØªØ§Ø­Ø© Ø­Ø§Ù„ÙŠØ§Ù‹. Ù†Ø´ÙƒØ±ÙƒÙ… Ø¹Ù„Ù‰ ØªÙÙ‡Ù…ÙƒÙ… Ø±ÙŠØ«Ù…Ø§ ØªÙ†ØªÙ‡ÙŠ Ø§Ù„Ø¹Ù…Ù„ÙŠØ©!';
 
   @override
   String get errorInsufficientStorage =>
-      'لا توجد مساحة تخزين كافية لتنزيل هذا النموذج.';
+      'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø³Ø§Ø­Ø© ØªØ®Ø²ÙŠÙ† ÙƒØ§ÙÙŠØ© Ù„ØªÙ†Ø²ÙŠÙ„ Ù‡Ø°Ø§ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬.';
 
   @override
-  String get backgroundChatNotificationTitle => 'العودة إلى الدردشة!';
+  String get backgroundChatNotificationTitle =>
+      'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø¯Ø±Ø¯Ø´Ø©!';
 
   @override
-  String get benefitVideoGeneration => 'إنشاء الفيديو';
+  String get benefitVideoGeneration => 'Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ';
 
   @override
-  String get freeOffer => 'عرض مجاني';
+  String get freeOffer => 'Ø¹Ø±Ø¶ Ù…Ø¬Ø§Ù†ÙŠ';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return 'أول $days أيام مجانًا، ثم $price/شهر';
+    return 'Ø£ÙˆÙ„ $days Ø£ÙŠØ§Ù… Ù…Ø¬Ø§Ù†Ù‹Ø§ØŒ Ø«Ù… $price/Ø´Ù‡Ø±';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return 'أول $days أيام مجانًا، ثم $price/سنة';
+    return 'Ø£ÙˆÙ„ $days Ø£ÙŠØ§Ù… Ù…Ø¬Ø§Ù†Ù‹Ø§ØŒ Ø«Ù… $price/Ø³Ù†Ø©';
   }
 
   @override
   String freePlan(String plan) {
-    return '$plan مجاني!';
+    return '$plan Ù…Ø¬Ø§Ù†ÙŠ!';
   }
 
   @override
   String get systemPromptLimitFallback =>
-      'هام: طلب المستخدم إجراءً ما، ولكن رصيده على منصة كورتكس قد نفد؛ يرجى إبلاغ المستخدم بلغته أنه يجب عليه الانتظار أو التفكير في ترقية خطة اشتراكه.';
+      'Ù‡Ø§Ù…: Ø·Ù„Ø¨ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¥Ø¬Ø±Ø§Ø¡Ù‹ Ù…Ø§ØŒ ÙˆÙ„ÙƒÙ† Ø±ØµÙŠØ¯Ù‡ Ø¹Ù„Ù‰ Ù…Ù†ØµØ© ÙƒÙˆØ±ØªÙƒØ³ Ù‚Ø¯ Ù†ÙØ¯Ø› ÙŠØ±Ø¬Ù‰ Ø¥Ø¨Ù„Ø§Øº Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ù„ØºØªÙ‡ Ø£Ù†Ù‡ ÙŠØ¬Ø¨ Ø¹Ù„ÙŠÙ‡ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø± Ø£Ùˆ Ø§Ù„ØªÙÙƒÙŠØ± ÙÙŠ ØªØ±Ù‚ÙŠØ© Ø®Ø·Ø© Ø§Ø´ØªØ±Ø§ÙƒÙ‡.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'يمكن لـ Cortex تقديم إجابات أفضل؛ قم بالترقية الآن واحصل على أفضل إجابة لكل سؤال!';
+      'ÙŠÙ…ÙƒÙ† Ù„Ù€ Cortex ØªÙ‚Ø¯ÙŠÙ… Ø¥Ø¬Ø§Ø¨Ø§Øª Ø£ÙØ¶Ù„Ø› Ù‚Ù… Ø¨Ø§Ù„ØªØ±Ù‚ÙŠØ© Ø§Ù„Ø¢Ù† ÙˆØ§Ø­ØµÙ„ Ø¹Ù„Ù‰ Ø£ÙØ¶Ù„ Ø¥Ø¬Ø§Ø¨Ø© Ù„ÙƒÙ„ Ø³Ø¤Ø§Ù„!';
 
   @override
-  String get pinLimitReached => 'يمكنك تثبيت ما يصل إلى 3 محادثات.';
+  String get pinLimitReached =>
+      'ÙŠÙ…ÙƒÙ†Ùƒ ØªØ«Ø¨ÙŠØª Ù…Ø§ ÙŠØµÙ„ Ø¥Ù„Ù‰ 3 Ù…Ø­Ø§Ø¯Ø«Ø§Øª.';
 }

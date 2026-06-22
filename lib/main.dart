@@ -241,8 +241,16 @@ class AppBootstrap {
 
     // 7. Determine Initial Model (Optimistic) [NEW]
     // The key 'cortex' is defined in ChatSessionProvider as _prefDefaultModelKey
-    final String initialModelId = activePrefs.getString('cortex') ?? 'cortex/auto';
-    final String initialModelTitle = activePrefs.getString('cortex_title') ?? '';
+    // FIX: Filter out internal/system IDs (like 'trash') that should never be
+    // loaded as an initial session model. Fall back to cortex/auto instead.
+    const invalidModelIds = {'trash', 'recycle', 'delete', 'bin'};
+    final String savedModelId = activePrefs.getString('cortex') ?? 'cortex/auto';
+    final String initialModelId = invalidModelIds.contains(savedModelId)
+        ? 'cortex/auto'
+        : savedModelId;
+    final String initialModelTitle = invalidModelIds.contains(savedModelId)
+        ? ''
+        : (activePrefs.getString('cortex_title') ?? '');
 
     // 8. Preload User Data for synchronous startup (Fixes Guest flash)
     final String? initialUserDataJson = activePrefs.getString('cached_user_data');

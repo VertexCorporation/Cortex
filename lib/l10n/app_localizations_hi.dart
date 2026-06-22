@@ -10,140 +10,146 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'आप एक शीर्षक निर्माता हैं। कृपया निम्नलिखित वार्तालाप के लिए केवल 2-5 शब्दों का शीर्षक ही लिखें। उद्धरण चिह्नों, उपसर्गों या विराम चिह्नों का प्रयोग न करें। महत्वपूर्ण: शीर्षक उपयोगकर्ता के संदेश की भाषा में ही होना चाहिए।';
+      'à¤†à¤ª à¤à¤• à¤¶à¥€à¤°à¥à¤·à¤• à¤¨à¤¿à¤°à¥à¤®à¤¾à¤¤à¤¾ à¤¹à¥ˆà¤‚à¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¨à¤¿à¤®à¥à¤¨à¤²à¤¿à¤–à¤¿à¤¤ à¤µà¤¾à¤°à¥à¤¤à¤¾à¤²à¤¾à¤ª à¤•à¥‡ à¤²à¤¿à¤ à¤•à¥‡à¤µà¤² 2-5 à¤¶à¤¬à¥à¤¦à¥‹à¤‚ à¤•à¤¾ à¤¶à¥€à¤°à¥à¤·à¤• à¤¹à¥€ à¤²à¤¿à¤–à¥‡à¤‚à¥¤ à¤‰à¤¦à¥à¤§à¤°à¤£ à¤šà¤¿à¤¹à¥à¤¨à¥‹à¤‚, à¤‰à¤ªà¤¸à¤°à¥à¤—à¥‹à¤‚ à¤¯à¤¾ à¤µà¤¿à¤°à¤¾à¤® à¤šà¤¿à¤¹à¥à¤¨à¥‹à¤‚ à¤•à¤¾ à¤ªà¥à¤°à¤¯à¥‹à¤— à¤¨ à¤•à¤°à¥‡à¤‚à¥¤ à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£: à¤¶à¥€à¤°à¥à¤·à¤• à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤¸à¤‚à¤¦à¥‡à¤¶ à¤•à¥€ à¤­à¤¾à¤·à¤¾ à¤®à¥‡à¤‚ à¤¹à¥€ à¤¹à¥‹à¤¨à¤¾ à¤šà¤¾à¤¹à¤¿à¤à¥¤';
 
   @override
-  String get systemRoleFallback => 'आप एक मददगार सहायक हैं।';
+  String get systemRoleFallback =>
+      'à¤†à¤ª à¤à¤• à¤®à¤¦à¤¦à¤—à¤¾à¤° à¤¸à¤¹à¤¾à¤¯à¤• à¤¹à¥ˆà¤‚à¥¤';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nCRITICAL: हमेशा उसी भाषा में उत्तर दें जिसमें उपयोगकर्ता लिखता है, उपयोगकर्ता की भाषा पर ध्यान दें।';
+      '\n\nCRITICAL: à¤¹à¤®à¥‡à¤¶à¤¾ à¤‰à¤¸à¥€ à¤­à¤¾à¤·à¤¾ à¤®à¥‡à¤‚ à¤‰à¤¤à¥à¤¤à¤° à¤¦à¥‡à¤‚ à¤œà¤¿à¤¸à¤®à¥‡à¤‚ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤²à¤¿à¤–à¤¤à¤¾ à¤¹à¥ˆ, à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥€ à¤­à¤¾à¤·à¤¾ à¤ªà¤° à¤§à¥à¤¯à¤¾à¤¨ à¤¦à¥‡à¤‚à¥¤';
 
   @override
   String get systemNotePreviousMedia =>
-      '[सिस्टम नोट: नीचे पूर्व में उत्पन्न मीडिया है। आप इसे संदर्भित या संपादित कर सकते हैं।]';
+      '[à¤¸à¤¿à¤¸à¥à¤Ÿà¤® à¤¨à¥‹à¤Ÿ: à¤¨à¥€à¤šà¥‡ à¤ªà¥‚à¤°à¥à¤µ à¤®à¥‡à¤‚ à¤‰à¤¤à¥à¤ªà¤¨à¥à¤¨ à¤®à¥€à¤¡à¤¿à¤¯à¤¾ à¤¹à¥ˆà¥¤ à¤†à¤ª à¤‡à¤¸à¥‡ à¤¸à¤‚à¤¦à¤°à¥à¤­à¤¿à¤¤ à¤¯à¤¾ à¤¸à¤‚à¤ªà¤¾à¤¦à¤¿à¤¤ à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤]';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\nवर्तमान दिनांक और समय: $formattedTime.';
+    return '\n\nà¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤¦à¤¿à¤¨à¤¾à¤‚à¤• à¤”à¤° à¤¸à¤®à¤¯: $formattedTime.';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nअब तक की बातचीत का विश्लेषण करें। यदि आपको उपयोगकर्ता के बारे में कोई भी नया विशिष्ट तथ्य (पसंद, नाम, आदतें, संदर्भ) पता चला है, तो आपको अपने उत्तर के बिल्कुल अंत में <memory>...</memory> टैग के अंदर उपयोगकर्ता के बारे में अपनी पूरी अद्यतन जानकारी अवश्य लिखनी चाहिए। महत्वपूर्ण: आपको पिछली जानकारी को कभी भी मिटाना या ओवरराइट नहीं करना है। हमेशा मौजूदा जानकारी में नए तथ्य जोड़ें। यदि बिल्कुल भी कुछ नया पता नहीं चला है, तो टैग को छोड़ दें। उदाहरण: <memory>फुटबॉल और टेनिस पसंद करता है। संक्षिप्त उत्तर पसंद करता है।</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nà¤…à¤¬ à¤¤à¤• à¤•à¥€ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤•à¤¾ à¤µà¤¿à¤¶à¥à¤²à¥‡à¤·à¤£ à¤•à¤°à¥‡à¤‚à¥¤ à¤¯à¤¦à¤¿ à¤†à¤ªà¤•à¥‹ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤•à¥‹à¤ˆ à¤­à¥€ à¤¨à¤¯à¤¾ à¤µà¤¿à¤¶à¤¿à¤·à¥à¤Ÿ à¤¤à¤¥à¥à¤¯ (à¤ªà¤¸à¤‚à¤¦, à¤¨à¤¾à¤®, à¤†à¤¦à¤¤à¥‡à¤‚, à¤¸à¤‚à¤¦à¤°à¥à¤­) à¤ªà¤¤à¤¾ à¤šà¤²à¤¾ à¤¹à¥ˆ, à¤¤à¥‹ à¤†à¤ªà¤•à¥‹ à¤…à¤ªà¤¨à¥‡ à¤‰à¤¤à¥à¤¤à¤° à¤•à¥‡ à¤¬à¤¿à¤²à¥à¤•à¥à¤² à¤…à¤‚à¤¤ à¤®à¥‡à¤‚ <memory>...</memory> à¤Ÿà¥ˆà¤— à¤•à¥‡ à¤…à¤‚à¤¦à¤° à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤…à¤ªà¤¨à¥€ à¤ªà¥‚à¤°à¥€ à¤…à¤¦à¥à¤¯à¤¤à¤¨ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤…à¤µà¤¶à¥à¤¯ à¤²à¤¿à¤–à¤¨à¥€ à¤šà¤¾à¤¹à¤¿à¤à¥¤ à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£: à¤†à¤ªà¤•à¥‹ à¤ªà¤¿à¤›à¤²à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤•à¥‹ à¤•à¤­à¥€ à¤­à¥€ à¤®à¤¿à¤Ÿà¤¾à¤¨à¤¾ à¤¯à¤¾ à¤“à¤µà¤°à¤°à¤¾à¤‡à¤Ÿ à¤¨à¤¹à¥€à¤‚ à¤•à¤°à¤¨à¤¾ à¤¹à¥ˆà¥¤ à¤¹à¤®à¥‡à¤¶à¤¾ à¤®à¥Œà¤œà¥‚à¤¦à¤¾ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤®à¥‡à¤‚ à¤¨à¤ à¤¤à¤¥à¥à¤¯ à¤œà¥‹à¤¡à¤¼à¥‡à¤‚à¥¤ à¤¯à¤¦à¤¿ à¤¬à¤¿à¤²à¥à¤•à¥à¤² à¤­à¥€ à¤•à¥à¤› à¤¨à¤¯à¤¾ à¤ªà¤¤à¤¾ à¤¨à¤¹à¥€à¤‚ à¤šà¤²à¤¾ à¤¹à¥ˆ, à¤¤à¥‹ à¤Ÿà¥ˆà¤— à¤•à¥‹ à¤›à¥‹à¤¡à¤¼ à¤¦à¥‡à¤‚à¥¤ à¤‰à¤¦à¤¾à¤¹à¤°à¤£: <memory>à¤«à¥à¤Ÿà¤¬à¥‰à¤² à¤”à¤° à¤Ÿà¥‡à¤¨à¤¿à¤¸ à¤ªà¤¸à¤‚à¤¦ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤¸à¤‚à¤•à¥à¤·à¤¿à¤ªà¥à¤¤ à¤‰à¤¤à¥à¤¤à¤° à¤ªà¤¸à¤‚à¤¦ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\nउपयोगकर्ता के बारे में हमेशा यह याद रखें:\n$userMemory';
+    return '\n\nà¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤¹à¤®à¥‡à¤¶à¤¾ à¤¯à¤¹ à¤¯à¤¾à¤¦ à¤°à¤–à¥‡à¤‚:\n$userMemory';
   }
 
   @override
-  String get cancel => 'रद्द करें';
+  String get cancel => 'à¤°à¤¦à¥à¤¦ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get remove => 'निकालना';
+  String get remove => 'à¤¨à¤¿à¤•à¤¾à¤²à¤¨à¤¾';
 
   @override
-  String get download => 'डाउनलोड करें';
+  String get download => 'à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get resume => 'फिर से शुरू करें';
+  String get resume => 'à¤«à¤¿à¤° à¤¸à¥‡ à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get copy => 'कॉपी करें';
+  String get copy => 'à¤•à¥‰à¤ªà¥€ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get chat => 'चैट';
+  String get chat => 'à¤šà¥ˆà¤Ÿ';
 
   @override
-  String get languageModels => 'भाषा मॉडल';
+  String get locked => 'Locked';
 
   @override
-  String get light => 'लाइट';
+  String get languageModels => 'à¤­à¤¾à¤·à¤¾ à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get theme => 'थीम';
+  String get light => 'à¤²à¤¾à¤‡à¤Ÿ';
 
   @override
-  String get no => 'नहीं';
+  String get theme => 'à¤¥à¥€à¤®';
 
   @override
-  String get yes => 'हाँ';
+  String get no => 'à¤¨à¤¹à¥€à¤‚';
 
   @override
-  String get done => 'हो गया';
+  String get yes => 'à¤¹à¤¾à¤';
 
   @override
-  String get bestValue => 'सबसे अच्छा मूल्य';
+  String get done => 'à¤¹à¥‹ à¤—à¤¯à¤¾';
 
   @override
-  String get selected => 'चुना हुआ';
+  String get bestValue => 'à¤¸à¤¬à¤¸à¥‡ à¤…à¤šà¥à¤›à¤¾ à¤®à¥‚à¤²à¥à¤¯';
 
   @override
-  String get descriptionSection => 'विवरण';
+  String get selected => 'à¤šà¥à¤¨à¤¾ à¤¹à¥à¤†';
 
   @override
-  String get searchHint => 'खोजें';
+  String get descriptionSection => 'à¤µà¤¿à¤µà¤°à¤£';
 
   @override
-  String get messageHint => 'कुछ भी पूछें';
+  String get searchHint => 'à¤–à¥‹à¤œà¥‡à¤‚';
 
   @override
-  String get messageCopied => 'संदेश क्लिपबोर्ड पर कॉपी किया गया।';
+  String get messageHint => 'à¤•à¥à¤› à¤­à¥€ à¤ªà¥‚à¤›à¥‡à¤‚';
 
   @override
-  String get retry => 'पुनः प्रयास करें';
+  String get messageCopied =>
+      'à¤¸à¤‚à¤¦à¥‡à¤¶ à¤•à¥à¤²à¤¿à¤ªà¤¬à¥‹à¤°à¥à¤¡ à¤ªà¤° à¤•à¥‰à¤ªà¥€ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾à¥¤';
 
   @override
-  String get systemInfo => 'सिस्टम जानकारी';
+  String get retry => 'à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚';
+
+  @override
+  String get systemInfo => 'à¤¸à¤¿à¤¸à¥à¤Ÿà¤® à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€';
 
   @override
   String deviceMemory(Object memory) {
-    return 'डिवाइस मेमोरी: $memory GB';
+    return 'à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤®à¥‡à¤®à¥‹à¤°à¥€: $memory GB';
   }
 
   @override
-  String get memory => 'मेमोरी';
+  String get memory => 'à¤®à¥‡à¤®à¥‹à¤°à¥€';
 
   @override
-  String get storage => 'स्टोरेज';
+  String get storage => 'à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ';
 
   @override
-  String get freeStorage => 'फ्री स्टोरेज';
+  String get freeStorage => 'à¤«à¥à¤°à¥€ à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ';
 
   @override
-  String get totalStorage => 'कुल स्टोरेज';
+  String get totalStorage => 'à¤•à¥à¤² à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ';
 
   @override
-  String get usedStorage => 'प्रयुक्त स्टोरेज';
+  String get usedStorage => 'à¤ªà¥à¤°à¤¯à¥à¤•à¥à¤¤ à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ';
 
   @override
-  String get totalMemory => 'कुल मेमोरी';
+  String get totalMemory => 'à¤•à¥à¤² à¤®à¥‡à¤®à¥‹à¤°à¥€';
 
   @override
-  String get usedMemory => 'प्रयुक्त मेमोरी';
+  String get usedMemory => 'à¤ªà¥à¤°à¤¯à¥à¤•à¥à¤¤ à¤®à¥‡à¤®à¥‹à¤°à¥€';
 
   @override
-  String get modelsTitle => 'लाइब्रेरी';
+  String get modelsTitle => 'à¤²à¤¾à¤‡à¤¬à¥à¤°à¥‡à¤°à¥€';
 
   @override
-  String get localModels => 'स्थानीय मॉडल';
+  String get localModels => 'à¤¸à¥à¤¥à¤¾à¤¨à¥€à¤¯ à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get selectGGUFFile => 'GGUF फ़ाइल चुनें';
+  String get selectGGUFFile => 'GGUF à¤«à¤¼à¤¾à¤‡à¤² à¤šà¥à¤¨à¥‡à¤‚';
 
   @override
-  String get errorGGUF => 'कृपया केवल GGUF प्रारूप में एक फ़ाइल चुनें।';
+  String get errorGGUF =>
+      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤•à¥‡à¤µà¤² GGUF à¤ªà¥à¤°à¤¾à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤à¤• à¤«à¤¼à¤¾à¤‡à¤² à¤šà¥à¤¨à¥‡à¤‚à¥¤';
 
   @override
-  String get myModels => 'मेरे मॉडल';
+  String get myModels => 'à¤®à¥‡à¤°à¥‡ à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get create => 'बनाएं';
+  String get create => 'à¤¬à¤¨à¤¾à¤à¤‚';
 
   @override
   String modelProducer(Object producer) {
-    return 'निर्माता: $producer';
+    return 'à¤¨à¤¿à¤°à¥à¤®à¤¾à¤¤à¤¾: $producer';
   }
 
   @override
@@ -152,916 +158,997 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => 'नाम बदलें';
+  String get editConversationTitle => 'à¤¨à¤¾à¤® à¤¬à¤¦à¤²à¥‡à¤‚';
 
   @override
-  String get newTitle => 'नया शीर्षक';
+  String get newTitle => 'à¤¨à¤¯à¤¾ à¤¶à¥€à¤°à¥à¤·à¤•';
 
   @override
-  String get save => 'सहेजें';
+  String get save => 'à¤¸à¤¹à¥‡à¤œà¥‡à¤‚';
 
   @override
-  String get noConversationsMessage => 'कोई बातचीत नहीं, चैट करना शुरू करें!';
+  String get noConversationsMessage =>
+      'à¤•à¥‹à¤ˆ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¨à¤¹à¥€à¤‚, à¤šà¥ˆà¤Ÿ à¤•à¤°à¤¨à¤¾ à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚!';
 
   @override
-  String get startChat => 'एक चैट शुरू करें';
+  String get startChat => 'à¤à¤• à¤šà¥ˆà¤Ÿ à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get noChats => 'कोई चैट नहीं';
+  String get noChats => 'à¤•à¥‹à¤ˆ à¤šà¥ˆà¤Ÿ à¤¨à¤¹à¥€à¤‚';
 
   @override
-  String get noStarredChats => 'कोई तारांकित चैट नहीं';
+  String get noStarredChats =>
+      'à¤•à¥‹à¤ˆ à¤¤à¤¾à¤°à¤¾à¤‚à¤•à¤¿à¤¤ à¤šà¥ˆà¤Ÿ à¤¨à¤¹à¥€à¤‚';
 
   @override
   String get noStarredChatsMessage =>
-      'आपने अभी तक किसी चैट को तारांकित नहीं किया है।';
+      'à¤†à¤ªà¤¨à¥‡ à¤…à¤­à¥€ à¤¤à¤• à¤•à¤¿à¤¸à¥€ à¤šà¥ˆà¤Ÿ à¤•à¥‹ à¤¤à¤¾à¤°à¤¾à¤‚à¤•à¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤•à¤¿à¤¯à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get starConversation => 'तारांकित करें';
+  String get starConversation => 'à¤¤à¤¾à¤°à¤¾à¤‚à¤•à¤¿à¤¤ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get unstarConversation => 'अतारांकित';
+  String get unstarConversation => 'à¤…à¤¤à¤¾à¤°à¤¾à¤‚à¤•à¤¿à¤¤';
 
   @override
-  String get loginToYourAccount => 'लॉगिन करें';
+  String get loginToYourAccount => 'à¤²à¥‰à¤—à¤¿à¤¨ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get createYourAccount => 'रजिस्टर करें';
+  String get createYourAccount => 'à¤°à¤œà¤¿à¤¸à¥à¤Ÿà¤° à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get email => 'ईमेल';
+  String get email => 'à¤ˆà¤®à¥‡à¤²';
 
   @override
-  String get password => 'पासवर्ड';
+  String get password => 'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡';
 
   @override
-  String get confirmPassword => 'पासवर्ड की पुष्टि कीजिये';
+  String get confirmPassword =>
+      'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤•à¥€ à¤ªà¥à¤·à¥à¤Ÿà¤¿ à¤•à¥€à¤œà¤¿à¤¯à¥‡';
 
   @override
-  String get invalidEmail => 'कृपया एक मान्य ईमेल पता दर्ज करें।';
+  String get invalidEmail =>
+      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤à¤• à¤®à¤¾à¤¨à¥à¤¯ à¤ˆà¤®à¥‡à¤² à¤ªà¤¤à¤¾ à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get invalidPassword => 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।';
+  String get invalidPassword =>
+      'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤•à¤® à¤¸à¥‡ à¤•à¤® 6 à¤…à¤•à¥à¤·à¤°à¥‹à¤‚ à¤•à¤¾ à¤¹à¥‹à¤¨à¤¾ à¤šà¤¾à¤¹à¤¿à¤à¥¤';
 
   @override
-  String get rememberMe => 'मुझे याद रखना';
+  String get rememberMe => 'à¤®à¥à¤à¥‡ à¤¯à¤¾à¤¦ à¤°à¤–à¤¨à¤¾';
 
   @override
-  String get forgotPassword => 'पासवर्ड भूल गए?';
+  String get forgotPassword => 'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤­à¥‚à¤² à¤—à¤?';
 
   @override
-  String get or => 'या';
+  String get or => 'à¤¯à¤¾';
 
   @override
-  String get continueWithGoogle => 'Google के साथ जारी रखें';
+  String get continueWithGoogle =>
+      'Google à¤•à¥‡ à¤¸à¤¾à¤¥ à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚';
 
   @override
-  String get dontHaveAccount => 'खाता नहीं है?';
+  String get dontHaveAccount => 'à¤–à¤¾à¤¤à¤¾ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆ?';
 
   @override
-  String get alreadyHaveAccount => 'पहले से ही एक खाता है?';
+  String get alreadyHaveAccount =>
+      'à¤ªà¤¹à¤²à¥‡ à¤¸à¥‡ à¤¹à¥€ à¤à¤• à¤–à¤¾à¤¤à¤¾ à¤¹à¥ˆ?';
 
   @override
-  String get signUp => 'साइन अप करें';
+  String get signUp => 'à¤¸à¤¾à¤‡à¤¨ à¤…à¤ª à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get logIn => 'लॉग इन करें';
+  String get logIn => 'à¤²à¥‰à¤— à¤‡à¤¨ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get passwordsDoNotMatch => 'पासवर्ड मेल नहीं खाते।';
+  String get passwordsDoNotMatch =>
+      'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤®à¥‡à¤² à¤¨à¤¹à¥€à¤‚ à¤–à¤¾à¤¤à¥‡à¥¤';
 
   @override
-  String get wrongPassword => 'गलत पासवर्ड।';
+  String get wrongPassword => 'à¤—à¤²à¤¤ à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡à¥¤';
 
   @override
-  String get emailAlreadyInUse => 'यह ईमेल पहले से ही उपयोग में है।';
+  String get emailAlreadyInUse =>
+      'à¤¯à¤¹ à¤ˆà¤®à¥‡à¤² à¤ªà¤¹à¤²à¥‡ à¤¸à¥‡ à¤¹à¥€ à¤‰à¤ªà¤¯à¥‹à¤— à¤®à¥‡à¤‚ à¤¹à¥ˆà¥¤';
 
   @override
-  String get weakPassword => 'पासवर्ड बहुत कमजोर है।';
+  String get weakPassword =>
+      'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤¬à¤¹à¥à¤¤ à¤•à¤®à¤œà¥‹à¤° à¤¹à¥ˆà¥¤';
 
   @override
-  String get authError => 'प्रमाणीकरण त्रुटि';
+  String get authError => 'à¤ªà¥à¤°à¤®à¤¾à¤£à¥€à¤•à¤°à¤£ à¤¤à¥à¤°à¥à¤Ÿà¤¿';
 
   @override
-  String get usernameTaken => 'यह उपयोगकर्ता नाम पहले ही ले लिया गया है।';
+  String get usernameTaken =>
+      'à¤¯à¤¹ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¤¾à¤® à¤ªà¤¹à¤²à¥‡ à¤¹à¥€ à¤²à¥‡ à¤²à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get username => 'उपयोगकर्ता नाम';
+  String get username => 'à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¤¾à¤®';
 
   @override
-  String get resendCode => 'सत्यापन ई-मेल पुनः भेजें';
+  String get resendCode =>
+      'à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨ à¤ˆ-à¤®à¥‡à¤² à¤ªà¥à¤¨à¤ƒ à¤­à¥‡à¤œà¥‡à¤‚';
 
   @override
   String get pleaseCheckYourEmail =>
-      'Cortex का उपयोग करने के लिए, आपको अपना ईमेल सत्यापित करना होगा। \nआपके ईमेल पते पर एक सत्यापन लिंक भेजा गया है, कृपया अपना ईमेल जांचें।';
+      'Cortex à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤, à¤†à¤ªà¤•à¥‹ à¤…à¤ªà¤¨à¤¾ à¤ˆà¤®à¥‡à¤² à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤•à¤°à¤¨à¤¾ à¤¹à¥‹à¤—à¤¾à¥¤ \nà¤†à¤ªà¤•à¥‡ à¤ˆà¤®à¥‡à¤² à¤ªà¤¤à¥‡ à¤ªà¤° à¤à¤• à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨ à¤²à¤¿à¤‚à¤• à¤­à¥‡à¤œà¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤ˆà¤®à¥‡à¤² à¤œà¤¾à¤‚à¤šà¥‡à¤‚à¥¤';
 
   @override
-  String get verifyYourEmail => 'अपना ईमेल सत्यापित करें';
+  String get verifyYourEmail =>
+      'à¤…à¤ªà¤¨à¤¾ à¤ˆà¤®à¥‡à¤² à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get seconds => 'सेकंड';
+  String get seconds => 'à¤¸à¥‡à¤•à¤‚à¤¡';
 
   @override
   String get maxResendLimitReached =>
-      'आप सत्यापन ईमेल की अधिकतम संख्या तक पहुंच गए हैं';
+      'à¤†à¤ª à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨ à¤ˆà¤®à¥‡à¤² à¤•à¥€ à¤…à¤§à¤¿à¤•à¤¤à¤® à¤¸à¤‚à¤–à¥à¤¯à¤¾ à¤¤à¤• à¤ªà¤¹à¥à¤‚à¤š à¤—à¤ à¤¹à¥ˆà¤‚';
 
   @override
   String get verificationScreenContinueWithoutVerification =>
-      'सत्यापन के बिना जारी रखें';
+      'à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨ à¤•à¥‡ à¤¬à¤¿à¤¨à¤¾ à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚';
 
   @override
   String get verificationScreenWarning =>
-      'भले ही आप जारी रखें, आपके खाते के लिए 1-दिवसीय खाता सत्यापन अवधि अभी भी प्रभावी है। यदि आपने तब तक अपना खाता सत्यापित नहीं किया है, तो इसे ऐप से हटा दिया जाएगा।';
+      'à¤­à¤²à¥‡ à¤¹à¥€ à¤†à¤ª à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚, à¤†à¤ªà¤•à¥‡ à¤–à¤¾à¤¤à¥‡ à¤•à¥‡ à¤²à¤¿à¤ 1-à¤¦à¤¿à¤µà¤¸à¥€à¤¯ à¤–à¤¾à¤¤à¤¾ à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨ à¤…à¤µà¤§à¤¿ à¤…à¤­à¥€ à¤­à¥€ à¤ªà¥à¤°à¤­à¤¾à¤µà¥€ à¤¹à¥ˆà¥¤ à¤¯à¤¦à¤¿ à¤†à¤ªà¤¨à¥‡ à¤¤à¤¬ à¤¤à¤• à¤…à¤ªà¤¨à¤¾ à¤–à¤¾à¤¤à¤¾ à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤•à¤¿à¤¯à¤¾ à¤¹à¥ˆ, à¤¤à¥‹ à¤‡à¤¸à¥‡ à¤à¤ª à¤¸à¥‡ à¤¹à¤Ÿà¤¾ à¤¦à¤¿à¤¯à¤¾ à¤œà¤¾à¤à¤—à¤¾à¥¤';
 
   @override
-  String get unverifiedAccountHeader => 'आपका खाता सत्यापित नहीं है';
+  String get unverifiedAccountHeader =>
+      'à¤†à¤ªà¤•à¤¾ à¤–à¤¾à¤¤à¤¾ à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆ';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return 'यदि आप $timeLeft के भीतर अपने खाते को सत्यापित नहीं करते हैं, तो इसे हटा दिया जाएगा';
+    return 'à¤¯à¤¦à¤¿ à¤†à¤ª $timeLeft à¤•à¥‡ à¤­à¥€à¤¤à¤° à¤…à¤ªà¤¨à¥‡ à¤–à¤¾à¤¤à¥‡ à¤•à¥‹ à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤•à¤°à¤¤à¥‡ à¤¹à¥ˆà¤‚, à¤¤à¥‹ à¤‡à¤¸à¥‡ à¤¹à¤Ÿà¤¾ à¤¦à¤¿à¤¯à¤¾ à¤œà¤¾à¤à¤—à¤¾';
   }
 
   @override
-  String get verifyNow => 'अभी सत्यापित करें';
+  String get verifyNow => 'à¤…à¤­à¥€ à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get linkSent => 'लिंक भेजा गया';
+  String get linkSent => 'à¤²à¤¿à¤‚à¤• à¤­à¥‡à¤œà¤¾ à¤—à¤¯à¤¾';
 
   @override
   String get accountDeletionRequested =>
-      'आपके खाते को हटाने का अनुरोध प्राप्त हो गया है और आपका खाता अब अक्षम है।';
+      'à¤†à¤ªà¤•à¥‡ à¤–à¤¾à¤¤à¥‡ à¤•à¥‹ à¤¹à¤Ÿà¤¾à¤¨à¥‡ à¤•à¤¾ à¤…à¤¨à¥à¤°à¥‹à¤§ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤¹à¥‹ à¤—à¤¯à¤¾ à¤¹à¥ˆ à¤”à¤° à¤†à¤ªà¤•à¤¾ à¤–à¤¾à¤¤à¤¾ à¤…à¤¬ à¤…à¤•à¥à¤·à¤® à¤¹à¥ˆà¥¤';
 
   @override
-  String get tooManyRequests => 'बहुत सारे अनुरोध';
+  String get tooManyRequests => 'à¤¬à¤¹à¥à¤¤ à¤¸à¤¾à¤°à¥‡ à¤…à¤¨à¥à¤°à¥‹à¤§';
 
   @override
-  String get regenerate => 'पुनः उत्पन्न करें';
+  String get regenerate => 'à¤ªà¥à¤¨à¤ƒ à¤‰à¤¤à¥à¤ªà¤¨à¥à¤¨ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get confirmDeleteAccount => 'क्या आप वाकई अपना खाता हटाना चाहते हैं?';
+  String get confirmDeleteAccount =>
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤…à¤ªà¤¨à¤¾ à¤–à¤¾à¤¤à¤¾ à¤¹à¤Ÿà¤¾à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
-  String get deleteAccount => 'खाता हटाएं';
+  String get deleteAccount => 'à¤–à¤¾à¤¤à¤¾ à¤¹à¤Ÿà¤¾à¤à¤‚';
 
   @override
-  String get delete => 'हटाएं';
+  String get delete => 'à¤¹à¤Ÿà¤¾à¤à¤‚';
 
   @override
-  String get passwordRequired => 'पासवर्ड आवश्यक है।';
+  String get passwordRequired =>
+      'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤†à¤µà¤¶à¥à¤¯à¤• à¤¹à¥ˆà¥¤';
 
   @override
   String get deleteDescription =>
-      'आपके द्वारा हटाया गया डेटा हमारे सर्वर और आपके डिवाइस से स्थायी रूप से हटा दिया जाएगा। यह कार्रवाई पूर्ववत नहीं की जा सकती।';
+      'à¤†à¤ªà¤•à¥‡ à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤¹à¤Ÿà¤¾à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¡à¥‡à¤Ÿà¤¾ à¤¹à¤®à¤¾à¤°à¥‡ à¤¸à¤°à¥à¤µà¤° à¤”à¤° à¤†à¤ªà¤•à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤¸à¥‡ à¤¸à¥à¤¥à¤¾à¤¯à¥€ à¤°à¥‚à¤ª à¤¸à¥‡ à¤¹à¤Ÿà¤¾ à¤¦à¤¿à¤¯à¤¾ à¤œà¤¾à¤à¤—à¤¾à¥¤ à¤¯à¤¹ à¤•à¤¾à¤°à¥à¤°à¤µà¤¾à¤ˆ à¤ªà¥‚à¤°à¥à¤µà¤µà¤¤ à¤¨à¤¹à¥€à¤‚ à¤•à¥€ à¤œà¤¾ à¤¸à¤•à¤¤à¥€à¥¤';
 
   @override
-  String get editProfile => 'प्रोफ़ाइल संपादित करें';
+  String get editProfile =>
+      'à¤ªà¥à¤°à¥‹à¤«à¤¼à¤¾à¤‡à¤² à¤¸à¤‚à¤ªà¤¾à¤¦à¤¿à¤¤ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get displayName => 'प्रदर्शित होने वाला नाम';
+  String get displayName =>
+      'à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¿à¤¤ à¤¹à¥‹à¤¨à¥‡ à¤µà¤¾à¤²à¤¾ à¤¨à¤¾à¤®';
 
   @override
-  String get profileUpdated => 'प्रोफ़ाइल सफलतापूर्वक अपडेट की गई';
+  String get profileUpdated =>
+      'à¤ªà¥à¤°à¥‹à¤«à¤¼à¤¾à¤‡à¤² à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¥€ à¤—à¤ˆ';
 
   @override
-  String get logout => 'लॉगआउट';
+  String get logout => 'à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ';
 
   @override
-  String get profile => 'प्रोफ़ाइल';
+  String get profile => 'à¤ªà¥à¤°à¥‹à¤«à¤¼à¤¾à¤‡à¤²';
 
   @override
   String get manageProfileDescription =>
-      'अपनी प्रोफ़ाइल प्रबंधित करें, अपना पासवर्ड अपडेट करें, या Cortex से लॉग आउट करें।';
+      'à¤…à¤ªà¤¨à¥€ à¤ªà¥à¤°à¥‹à¤«à¤¼à¤¾à¤‡à¤² à¤ªà¥à¤°à¤¬à¤‚à¤§à¤¿à¤¤ à¤•à¤°à¥‡à¤‚, à¤…à¤ªà¤¨à¤¾ à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚, à¤¯à¤¾ Cortex à¤¸à¥‡ à¤²à¥‰à¤— à¤†à¤‰à¤Ÿ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get accessSettingsDescription =>
-      'सहायता तक पहुंचें, कोड रिडीम करें, Cortex साझा करें, और हमारी नीतियां देखें।';
+      'à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤¤à¤• à¤ªà¤¹à¥à¤‚à¤šà¥‡à¤‚, à¤•à¥‹à¤¡ à¤°à¤¿à¤¡à¥€à¤® à¤•à¤°à¥‡à¤‚, Cortex à¤¸à¤¾à¤à¤¾ à¤•à¤°à¥‡à¤‚, à¤”à¤° à¤¹à¤®à¤¾à¤°à¥€ à¤¨à¥€à¤¤à¤¿à¤¯à¤¾à¤‚ à¤¦à¥‡à¤–à¥‡à¤‚à¥¤';
 
   @override
   String get languageDescription =>
-      'आप किसी भी समय अपनी डिफ़ॉल्ट ऐप इंटरफ़ेस भाषा बदल सकते हैं।';
+      'à¤†à¤ª à¤•à¤¿à¤¸à¥€ à¤­à¥€ à¤¸à¤®à¤¯ à¤…à¤ªà¤¨à¥€ à¤¡à¤¿à¤«à¤¼à¥‰à¤²à¥à¤Ÿ à¤à¤ª à¤‡à¤‚à¤Ÿà¤°à¤«à¤¼à¥‡à¤¸ à¤­à¤¾à¤·à¤¾ à¤¬à¤¦à¤² à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
   String get themeDescription =>
-      'आप पसंद के अनुसार लाइट और डार्क थीम के बीच स्विच कर सकते हैं। चयनित थीम Cortex इंटरफ़ेस पर लागू होगी।';
+      'à¤†à¤ª à¤ªà¤¸à¤‚à¤¦ à¤•à¥‡ à¤…à¤¨à¥à¤¸à¤¾à¤° à¤²à¤¾à¤‡à¤Ÿ à¤”à¤° à¤¡à¤¾à¤°à¥à¤• à¤¥à¥€à¤® à¤•à¥‡ à¤¬à¥€à¤š à¤¸à¥à¤µà¤¿à¤š à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤ à¤šà¤¯à¤¨à¤¿à¤¤ à¤¥à¥€à¤® Cortex à¤‡à¤‚à¤Ÿà¤°à¤«à¤¼à¥‡à¤¸ à¤ªà¤° à¤²à¤¾à¤—à¥‚ à¤¹à¥‹à¤—à¥€à¥¤';
 
   @override
   String get iHaveReadAndAgree =>
-      'मैंने सेवा की शर्तों को पढ़ लिया है और उनसे सहमत हूं';
+      'à¤®à¥ˆà¤‚à¤¨à¥‡ à¤¸à¥‡à¤µà¤¾ à¤•à¥€ à¤¶à¤°à¥à¤¤à¥‹à¤‚ à¤•à¥‹ à¤ªà¤¢à¤¼ à¤²à¤¿à¤¯à¤¾ à¤¹à¥ˆ à¤”à¤° à¤‰à¤¨à¤¸à¥‡ à¤¸à¤¹à¤®à¤¤ à¤¹à¥‚à¤‚';
 
   @override
-  String get downloading => 'डाउनलोड हो रहा है...';
+  String get downloading => 'à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤¹à¥‹ à¤°à¤¹à¤¾ à¤¹à¥ˆ...';
 
   @override
-  String get downloadSuccess => 'डाउनलोड सफल';
+  String get downloadSuccess => 'à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤¸à¤«à¤²';
 
   @override
-  String get downloadFailed => 'डाउनलोड विफल';
+  String get downloadFailed => 'à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤µà¤¿à¤«à¤²';
 
   @override
   String downloaded(Object percent) {
-    return '$percent% डाउनलोड किया गया';
+    return '$percent% à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾';
   }
 
   @override
-  String get downloadPaused => 'डाउनलोड रोक दिया गया।';
+  String get downloadPaused =>
+      'à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤°à¥‹à¤• à¤¦à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾à¥¤';
 
   @override
-  String get purchaseError => 'खरीद त्रुटि';
+  String get purchaseError => 'à¤–à¤°à¥€à¤¦ à¤¤à¥à¤°à¥à¤Ÿà¤¿';
 
   @override
-  String get purchasePlus => 'Cortex प्लस खरीदें';
+  String get purchasePlus => 'Cortex à¤ªà¥à¤²à¤¸ à¤–à¤°à¥€à¤¦à¥‡à¤‚';
 
   @override
-  String get plusDescription => 'विशिष्ट कृत्रिम बुद्धिमत्ता अनुभव';
+  String get plusDescription =>
+      'à¤µà¤¿à¤¶à¤¿à¤·à¥à¤Ÿ à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤…à¤¨à¥à¤­à¤µ';
 
   @override
-  String get annual => 'वार्षिक';
+  String get annual => 'à¤µà¤¾à¤°à¥à¤·à¤¿à¤•';
 
   @override
-  String get monthly => 'मासिक';
+  String get monthly => 'à¤®à¤¾à¤¸à¤¿à¤•';
 
   @override
-  String get manageSubscription => 'सदस्यता प्रबंधित करें';
+  String get manageSubscription =>
+      'à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤ªà¥à¤°à¤¬à¤‚à¤§à¤¿à¤¤ à¤•à¤°à¥‡à¤‚';
 
   @override
   String purchasePlan(String planName) {
-    return '$planName खरीदें';
+    return '$planName à¤–à¤°à¥€à¤¦à¥‡à¤‚';
   }
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/माह, मासिक बिल';
+    return '$price/à¤®à¤¾à¤¹, à¤®à¤¾à¤¸à¤¿à¤• à¤¬à¤¿à¤²';
   }
 
   @override
-  String get purchasePro => 'Cortex प्रो खरीदें';
+  String get purchasePro => 'Cortex à¤ªà¥à¤°à¥‹ à¤–à¤°à¥€à¤¦à¥‡à¤‚';
 
   @override
-  String get proDescription => 'सर्वश्रेष्ठ कृत्रिम बुद्धिमत्ता अनुभव';
+  String get proDescription =>
+      'à¤¸à¤°à¥à¤µà¤¶à¥à¤°à¥‡à¤·à¥à¤  à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤…à¤¨à¥à¤­à¤µ';
 
   @override
-  String get purchaseUltra => 'Cortex अल्ट्रा खरीदें';
+  String get purchaseUltra => 'Cortex à¤…à¤²à¥à¤Ÿà¥à¤°à¤¾ à¤–à¤°à¥€à¤¦à¥‡à¤‚';
 
   @override
-  String get ultraDescription => 'कृत्रिम बुद्धिमत्ता का शिखर';
+  String get ultraDescription =>
+      'à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤•à¤¾ à¤¶à¤¿à¤–à¤°';
 
   @override
-  String get upgradeSubscription => 'सदस्यता अपग्रेड करें';
+  String get upgradeSubscription =>
+      'à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get purchaseStreamError => 'खरीद स्ट्रीम त्रुटि।';
+  String get purchaseStreamError =>
+      'à¤–à¤°à¥€à¤¦ à¤¸à¥à¤Ÿà¥à¤°à¥€à¤® à¤¤à¥à¤°à¥à¤Ÿà¤¿à¥¤';
 
   @override
-  String get productNotFound => 'उत्पाद नहीं मिला';
+  String get productNotFound => 'à¤‰à¤¤à¥à¤ªà¤¾à¤¦ à¤¨à¤¹à¥€à¤‚ à¤®à¤¿à¤²à¤¾';
 
   @override
-  String get noProductsFound => 'कोई उत्पाद नहीं मिला';
+  String get noProductsFound =>
+      'à¤•à¥‹à¤ˆ à¤‰à¤¤à¥à¤ªà¤¾à¤¦ à¤¨à¤¹à¥€à¤‚ à¤®à¤¿à¤²à¤¾';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'इस आदेश को देकर, आप सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं। आप हमारी सेवा की शर्तों और गोपनीयता नीति के बारे में अधिक जानने के लिए इस टेक्स्ट पर क्लिक कर सकते हैं। सदस्यता स्वचालित रूप से नवीनीकृत हो जाएगी जब तक कि वर्तमान अवधि के अंत से कम से कम 24 घंटे पहले स्वतः-नवीनीकरण बंद न हो।';
+      'à¤‡à¤¸ à¤†à¤¦à¥‡à¤¶ à¤•à¥‹ à¤¦à¥‡à¤•à¤°, à¤†à¤ª à¤¸à¥‡à¤µà¤¾ à¤•à¥€ à¤¶à¤°à¥à¤¤à¥‹à¤‚ à¤”à¤° à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿ à¤¸à¥‡ à¤¸à¤¹à¤®à¤¤ à¤¹à¥‹à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤ à¤†à¤ª à¤¹à¤®à¤¾à¤°à¥€ à¤¸à¥‡à¤µà¤¾ à¤•à¥€ à¤¶à¤°à¥à¤¤à¥‹à¤‚ à¤”à¤° à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤…à¤§à¤¿à¤• à¤œà¤¾à¤¨à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤‡à¤¸ à¤Ÿà¥‡à¤•à¥à¤¸à¥à¤Ÿ à¤ªà¤° à¤•à¥à¤²à¤¿à¤• à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤ à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤¸à¥à¤µà¤šà¤¾à¤²à¤¿à¤¤ à¤°à¥‚à¤ª à¤¸à¥‡ à¤¨à¤µà¥€à¤¨à¥€à¤•à¥ƒà¤¤ à¤¹à¥‹ à¤œà¤¾à¤à¤—à¥€ à¤œà¤¬ à¤¤à¤• à¤•à¤¿ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤…à¤µà¤§à¤¿ à¤•à¥‡ à¤…à¤‚à¤¤ à¤¸à¥‡ à¤•à¤® à¤¸à¥‡ à¤•à¤® 24 à¤˜à¤‚à¤Ÿà¥‡ à¤ªà¤¹à¤²à¥‡ à¤¸à¥à¤µà¤¤à¤ƒ-à¤¨à¤µà¥€à¤¨à¥€à¤•à¤°à¤£ à¤¬à¤‚à¤¦ à¤¨ à¤¹à¥‹à¥¤';
 
   @override
-  String get termsOfService => 'सेवा की शर्तें';
+  String get termsOfService => 'à¤¸à¥‡à¤µà¤¾ à¤•à¥€ à¤¶à¤°à¥à¤¤à¥‡à¤‚';
 
   @override
-  String get privacyPolicy => 'गोपनीयता नीति';
+  String get privacyPolicy => 'à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿';
 
   @override
-  String get renamed => 'नाम बदला गया';
+  String get renamed => 'à¤¨à¤¾à¤® à¤¬à¤¦à¤²à¤¾ à¤—à¤¯à¤¾';
 
   @override
-  String get report => 'रिपोर्ट';
+  String get report => 'à¤°à¤¿à¤ªà¥‹à¤°à¥à¤Ÿ';
 
   @override
-  String get reportDialogTitle => 'रिपोर्ट सबमिट करें';
+  String get reportDialogTitle =>
+      'à¤°à¤¿à¤ªà¥‹à¤°à¥à¤Ÿ à¤¸à¤¬à¤®à¤¿à¤Ÿ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get reportDescriptionLabel => 'समस्या क्या है?';
+  String get reportDescriptionLabel =>
+      'à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤•à¥à¤¯à¤¾ à¤¹à¥ˆ?';
 
   @override
-  String get reportHarmful => 'यह हानिकारक/असुरक्षित है';
+  String get reportHarmful =>
+      'à¤¯à¤¹ à¤¹à¤¾à¤¨à¤¿à¤•à¤¾à¤°à¤•/à¤…à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤¹à¥ˆ';
 
   @override
-  String get reportNotTrue => 'यह सच नहीं है';
+  String get reportNotTrue => 'à¤¯à¤¹ à¤¸à¤š à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆ';
 
   @override
-  String get reportNotHelpful => 'यह मददगार नहीं है';
+  String get reportNotHelpful =>
+      'à¤¯à¤¹ à¤®à¤¦à¤¦à¤—à¤¾à¤° à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆ';
 
   @override
-  String get closeButton => 'बंद करें';
+  String get closeButton => 'à¤¬à¤‚à¤¦ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get submitButton => 'सबमिट करें';
+  String get submitButton => 'à¤¸à¤¬à¤®à¤¿à¤Ÿ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get reportErrorMessage => 'कृपया रिपोर्ट करने के लिए एक कारण चुनें।';
+  String get reportErrorMessage =>
+      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤°à¤¿à¤ªà¥‹à¤°à¥à¤Ÿ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤•à¤¾à¤°à¤£ à¤šà¥à¤¨à¥‡à¤‚à¥¤';
 
   @override
-  String get capabilitiesSection => 'क्षमताएं';
+  String get capabilitiesSection => 'à¤•à¥à¤·à¤®à¤¤à¤¾à¤à¤‚';
 
   @override
-  String get featurePhotoTitle => 'फोटो स्कैनिंग';
+  String get featurePhotoTitle => 'à¤«à¥‹à¤Ÿà¥‹ à¤¸à¥à¤•à¥ˆà¤¨à¤¿à¤‚à¤—';
 
   @override
   String get featurePhotoDescription =>
-      'इस मॉडल में कैमरे या छवि फ़ाइलों के माध्यम से फ़ोटो को स्कैन करने की क्षमता है।';
+      'à¤‡à¤¸ à¤®à¥‰à¤¡à¤² à¤®à¥‡à¤‚ à¤•à¥ˆà¤®à¤°à¥‡ à¤¯à¤¾ à¤›à¤µà¤¿ à¤«à¤¼à¤¾à¤‡à¤²à¥‹à¤‚ à¤•à¥‡ à¤®à¤¾à¤§à¥à¤¯à¤® à¤¸à¥‡ à¤«à¤¼à¥‹à¤Ÿà¥‹ à¤•à¥‹ à¤¸à¥à¤•à¥ˆà¤¨ à¤•à¤°à¤¨à¥‡ à¤•à¥€ à¤•à¥à¤·à¤®à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get featureOfflineTitle => 'ऑफ़लाइन ऑपरेशन';
+  String get featureOfflineTitle => 'à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤‘à¤ªà¤°à¥‡à¤¶à¤¨';
 
   @override
   String get featureOfflineDescription =>
-      'अपने डेटा को सुरक्षित रखने के लिए इंटरनेट कनेक्शन के बिना मॉडल चलाएं।';
+      'à¤…à¤ªà¤¨à¥‡ à¤¡à¥‡à¤Ÿà¤¾ à¤•à¥‹ à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤°à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤•à¥‡ à¤¬à¤¿à¤¨à¤¾ à¤®à¥‰à¤¡à¤² à¤šà¤²à¤¾à¤à¤‚à¥¤';
 
   @override
-  String get featureRoleplayTitle => 'रोल प्ले';
+  String get featureRoleplayTitle => 'à¤°à¥‹à¤² à¤ªà¥à¤²à¥‡';
 
   @override
   String get featureRoleplayDescription =>
-      'रोल-प्लेइंग मॉडल आपको विभिन्न चैट और परिदृश्य बनाने की अनुमति देते हैं।';
+      'à¤°à¥‹à¤²-à¤ªà¥à¤²à¥‡à¤‡à¤‚à¤— à¤®à¥‰à¤¡à¤² à¤†à¤ªà¤•à¥‹ à¤µà¤¿à¤­à¤¿à¤¨à¥à¤¨ à¤šà¥ˆà¤Ÿ à¤”à¤° à¤ªà¤°à¤¿à¤¦à¥ƒà¤¶à¥à¤¯ à¤¬à¤¨à¤¾à¤¨à¥‡ à¤•à¥€ à¤…à¤¨à¥à¤®à¤¤à¤¿ à¤¦à¥‡à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get roleModels => 'रोलप्ले मॉडल';
+  String get roleModels => 'à¤°à¥‹à¤²à¤ªà¥à¤²à¥‡ à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get parameters => 'पैरामीटर';
+  String get parameters => 'à¤ªà¥ˆà¤°à¤¾à¤®à¥€à¤Ÿà¤°';
 
   @override
-  String get context => 'संदर्भ';
+  String get context => 'à¤¸à¤‚à¤¦à¤°à¥à¤­';
 
   @override
-  String get finalPreparation => 'अंतिम तैयारी की जा रही है।';
+  String get finalPreparation =>
+      'à¤…à¤‚à¤¤à¤¿à¤® à¤¤à¥ˆà¤¯à¤¾à¤°à¥€ à¤•à¥€ à¤œà¤¾ à¤°à¤¹à¥€ à¤¹à¥ˆà¥¤';
 
   @override
-  String get shareApp => 'ऐप साझा करें';
+  String get shareApp => 'à¤à¤ª à¤¸à¤¾à¤à¤¾ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get ourStory => 'हमारी कहानी';
+  String get ourStory => 'à¤¹à¤®à¤¾à¤°à¥€ à¤•à¤¹à¤¾à¤¨à¥€';
 
   @override
-  String get rateUs => 'हमें रेट करें';
+  String get rateUs => 'à¤¹à¤®à¥‡à¤‚ à¤°à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get share => 'साझा करें';
+  String get share => 'à¤¸à¤¾à¤à¤¾ à¤•à¤°à¥‡à¤‚';
 
   @override
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => 'टेक्स्ट चुनें';
+  String get selectText => 'à¤Ÿà¥‡à¤•à¥à¤¸à¥à¤Ÿ à¤šà¥à¤¨à¥‡à¤‚';
 
   @override
-  String get thinking => 'सोच रहा है';
+  String get thinking => 'à¤¸à¥‹à¤š à¤°à¤¹à¤¾ à¤¹à¥ˆ';
 
   @override
-  String get user => 'उपयोगकर्ता';
+  String get user => 'à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾';
 
   @override
-  String get help => 'मदद';
+  String get help => 'à¤®à¤¦à¤¦';
 
   @override
-  String get supportCreator => 'एक निर्माता का समर्थन करें';
+  String get supportCreator =>
+      'à¤à¤• à¤¨à¤¿à¤°à¥à¤®à¤¾à¤¤à¤¾ à¤•à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤•à¤°à¥‡à¤‚';
 
   @override
   String get enterYourTag =>
-      'अपने पसंदीदा रचनाकारों का समर्थन करें! नीचे उनका अनूठा टैग दर्ज करें और उन्हें अपनी कॉर्टेक्स खरीदारी में हिस्सा दें।';
+      'à¤…à¤ªà¤¨à¥‡ à¤ªà¤¸à¤‚à¤¦à¥€à¤¦à¤¾ à¤°à¤šà¤¨à¤¾à¤•à¤¾à¤°à¥‹à¤‚ à¤•à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤•à¤°à¥‡à¤‚! à¤¨à¥€à¤šà¥‡ à¤‰à¤¨à¤•à¤¾ à¤…à¤¨à¥‚à¤ à¤¾ à¤Ÿà¥ˆà¤— à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤…à¤ªà¤¨à¥€ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤–à¤°à¥€à¤¦à¤¾à¤°à¥€ à¤®à¥‡à¤‚ à¤¹à¤¿à¤¸à¥à¤¸à¤¾ à¤¦à¥‡à¤‚à¥¤';
 
   @override
-  String get creatorTag => 'निर्माता टैग';
+  String get creatorTag => 'à¤¨à¤¿à¤°à¥à¤®à¤¾à¤¤à¤¾ à¤Ÿà¥ˆà¤—';
 
   @override
-  String get support => 'समर्थन करें';
+  String get support => 'à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get tagCannotBeEmpty => 'निर्माता टैग रिक्त नहीं हो सकता';
+  String get tagCannotBeEmpty =>
+      'à¤¨à¤¿à¤°à¥à¤®à¤¾à¤¤à¤¾ à¤Ÿà¥ˆà¤— à¤°à¤¿à¤•à¥à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤¸à¤•à¤¤à¤¾';
 
   @override
-  String get userId => 'उपयोगकर्ता आईडी';
+  String get userId => 'à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤†à¤ˆà¤¡à¥€';
 
   @override
-  String get deleteAllConversationsConfirmTitle => 'सभी चैट हटाएं?';
+  String get deleteAllConversationsConfirmTitle =>
+      'à¤¸à¤­à¥€ à¤šà¥ˆà¤Ÿ à¤¹à¤Ÿà¤¾à¤à¤‚?';
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'क्या आप वाकई अपनी सभी चैट हटाना चाहते हैं? यह पूर्ववत नहीं किया जा सकता।';
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤…à¤ªà¤¨à¥€ à¤¸à¤­à¥€ à¤šà¥ˆà¤Ÿ à¤¹à¤Ÿà¤¾à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚? à¤¯à¤¹ à¤ªà¥‚à¤°à¥à¤µà¤µà¤¤ à¤¨à¤¹à¥€à¤‚ à¤•à¤¿à¤¯à¤¾ à¤œà¤¾ à¤¸à¤•à¤¤à¤¾à¥¤';
 
   @override
-  String get conversationDeleted => 'बातचीत हटा दी गई!';
+  String get conversationDeleted =>
+      'à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¹à¤Ÿà¤¾ à¤¦à¥€ à¤—à¤ˆ!';
 
   @override
-  String get allConversationsDeleted => 'सभी बातचीत सफलतापूर्वक हटा दी गई!';
+  String get allConversationsDeleted =>
+      'à¤¸à¤­à¥€ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¹à¤Ÿà¤¾ à¤¦à¥€ à¤—à¤ˆ!';
 
   @override
-  String get deleteAll => 'सभी को हटा दें';
+  String get deleteAll => 'à¤¸à¤­à¥€ à¤•à¥‹ à¤¹à¤Ÿà¤¾ à¤¦à¥‡à¤‚';
 
   @override
-  String get deleteAllConversationsButton => 'सभी बातचीत हटाएं';
+  String get deleteAllConversationsButton =>
+      'à¤¸à¤­à¥€ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¹à¤Ÿà¤¾à¤à¤‚';
 
   @override
-  String get confirmWord => 'VERTEX टाइप करें';
+  String get confirmWord => 'VERTEX à¤Ÿà¤¾à¤‡à¤ª à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get confirmWordError => 'आपने इसे गलत टाइप किया है';
+  String get confirmWordError =>
+      'à¤†à¤ªà¤¨à¥‡ à¤‡à¤¸à¥‡ à¤—à¤²à¤¤ à¤Ÿà¤¾à¤‡à¤ª à¤•à¤¿à¤¯à¤¾ à¤¹à¥ˆ';
 
   @override
-  String get chinese => 'चीनी';
+  String get chinese => 'à¤šà¥€à¤¨à¥€';
 
   @override
-  String get french => 'फ्रेंच';
+  String get french => 'à¤«à¥à¤°à¥‡à¤‚à¤š';
 
   @override
-  String get japanese => 'जापानी';
+  String get japanese => 'à¤œà¤¾à¤ªà¤¾à¤¨à¥€';
 
   @override
-  String get kurdish => 'कुर्द';
+  String get kurdish => 'à¤•à¥à¤°à¥à¤¦';
 
   @override
-  String get dutch => 'डच';
+  String get dutch => 'à¤¡à¤š';
 
   @override
-  String get russian => 'रूसी';
+  String get russian => 'à¤°à¥‚à¤¸à¥€';
 
   @override
-  String get korean => 'कोरियाई';
+  String get korean => 'à¤•à¥‹à¤°à¤¿à¤¯à¤¾à¤ˆ';
 
   @override
-  String get english => 'अंग्रेज़ी';
+  String get english => 'à¤…à¤‚à¤—à¥à¤°à¥‡à¤œà¤¼à¥€';
 
   @override
-  String get turkish => 'तुर्की';
+  String get turkish => 'à¤¤à¥à¤°à¥à¤•à¥€';
 
   @override
-  String get hindi => 'हिन्दी';
+  String get hindi => 'à¤¹à¤¿à¤¨à¥à¤¦à¥€';
 
   @override
-  String get portuguese => 'पुर्तगाली';
+  String get portuguese => 'à¤ªà¥à¤°à¥à¤¤à¤—à¤¾à¤²à¥€';
 
   @override
-  String get indonesian => 'इन्डोनेशियाई';
+  String get indonesian => 'à¤‡à¤¨à¥à¤¡à¥‹à¤¨à¥‡à¤¶à¤¿à¤¯à¤¾à¤ˆ';
 
   @override
-  String get azerbaijani => 'अज़रबैजानी';
+  String get azerbaijani => 'à¤…à¤œà¤¼à¤°à¤¬à¥ˆà¤œà¤¾à¤¨à¥€';
 
   @override
-  String get german => 'जर्मन';
+  String get german => 'à¤œà¤°à¥à¤®à¤¨';
 
   @override
-  String get spanish => 'स्पेनिश';
+  String get spanish => 'à¤¸à¥à¤ªà¥‡à¤¨à¤¿à¤¶';
 
   @override
-  String get italian => 'इतालवी';
+  String get italian => 'à¤‡à¤¤à¤¾à¤²à¤µà¥€';
 
   @override
-  String get arabic => 'अरबी';
+  String get arabic => 'à¤…à¤°à¤¬à¥€';
 
   @override
-  String get ram => 'रैम';
+  String get ram => 'à¤°à¥ˆà¤®';
 
   @override
-  String get usernameTooShort => 'उपयोगकर्ता नाम बहुत छोटा है।';
+  String get usernameTooShort =>
+      'à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¤¾à¤® à¤¬à¤¹à¥à¤¤ à¤›à¥‹à¤Ÿà¤¾ à¤¹à¥ˆà¥¤';
 
   @override
   String get usernameTooLong =>
-      'उपयोगकर्ता नाम 16 अक्षरों से अधिक नहीं हो सकता।';
+      'à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¤¾à¤® 16 à¤…à¤•à¥à¤·à¤°à¥‹à¤‚ à¤¸à¥‡ à¤…à¤§à¤¿à¤• à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤¸à¤•à¤¤à¤¾à¥¤';
 
   @override
   String get invalidUsernameCharacters =>
-      'उपयोगकर्ता नाम में केवल ये अक्षर: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' और वर्ण \'.\', \'-\', \'_\' का उपयोग किया जा सकता है।';
+      'à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¤¾à¤® à¤®à¥‡à¤‚ à¤•à¥‡à¤µà¤² à¤¯à¥‡ à¤…à¤•à¥à¤·à¤°: \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' à¤”à¤° à¤µà¤°à¥à¤£ \'.\', \'-\', \'_\' à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤¿à¤¯à¤¾ à¤œà¤¾ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get noInternetConnection => 'कोई इंटरनेट कनेक्शन नहीं।';
+  String get noInternetConnection =>
+      'à¤•à¥‹à¤ˆ à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤¨à¤¹à¥€à¤‚à¥¤';
 
   @override
-  String get chats => 'इनबॉक्स';
+  String get chats => 'à¤‡à¤¨à¤¬à¥‰à¤•à¥à¤¸';
 
   @override
-  String get library => 'लाइब्रेरी';
+  String get library => 'à¤²à¤¾à¤‡à¤¬à¥à¤°à¥‡à¤°à¥€';
 
   @override
-  String get text => 'टेक्स्ट';
+  String get text => 'à¤Ÿà¥‡à¤•à¥à¤¸à¥à¤Ÿ';
 
   @override
-  String get removeModel => 'मॉडल हटाएं';
+  String get removeModel => 'à¤®à¥‰à¤¡à¤² à¤¹à¤Ÿà¤¾à¤à¤‚';
 
   @override
-  String get insufficientRAM => 'कम मेमोरी';
+  String get insufficientRAM => 'à¤•à¤® à¤®à¥‡à¤®à¥‹à¤°à¥€';
 
   @override
-  String get insufficientStorage => 'कम स्टोरेज';
+  String get insufficientStorage => 'à¤•à¤® à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ';
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'क्या आप वाकई $model मॉडल को अपने डिवाइस से हटाना चाहते हैं? ऐसा करने से उस मॉडल के साथ हुई सभी पिछली बातचीत भी डिलीट हो जाएगी।';
+    return 'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ $model à¤®à¥‰à¤¡à¤² à¤•à¥‹ à¤…à¤ªà¤¨à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤¸à¥‡ à¤¹à¤Ÿà¤¾à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚? à¤à¤¸à¤¾ à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤‰à¤¸ à¤®à¥‰à¤¡à¤² à¤•à¥‡ à¤¸à¤¾à¤¥ à¤¹à¥à¤ˆ à¤¸à¤­à¥€ à¤ªà¤¿à¤›à¤²à¥€ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤­à¥€ à¤¡à¤¿à¤²à¥€à¤Ÿ à¤¹à¥‹ à¤œà¤¾à¤à¤—à¥€à¥¤';
   }
 
   @override
-  String get noMatchingModels => 'कोई मेल खाने वाला मॉडल नहीं मिला।';
+  String get noMatchingModels =>
+      'à¤•à¥‹à¤ˆ à¤®à¥‡à¤² à¤–à¤¾à¤¨à¥‡ à¤µà¤¾à¤²à¤¾ à¤®à¥‰à¤¡à¤² à¤¨à¤¹à¥€à¤‚ à¤®à¤¿à¤²à¤¾à¥¤';
 
   @override
-  String get benefit1 => 'बातचीत की सीमाएँ बढ़ाई गईं';
+  String get benefit1 =>
+      'à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤•à¥€ à¤¸à¥€à¤®à¤¾à¤à¤ à¤¬à¤¢à¤¼à¤¾à¤ˆ à¤—à¤ˆà¤‚';
 
   @override
-  String get benefit3 => 'प्रोफ़ाइल प्रभाव';
+  String get benefit3 => 'à¤ªà¥à¤°à¥‹à¤«à¤¼à¤¾à¤‡à¤² à¤ªà¥à¤°à¤­à¤¾à¤µ';
 
   @override
-  String get benefit4 => 'सदस्यता बिल्ला';
+  String get benefit4 => 'à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤¬à¤¿à¤²à¥à¤²à¤¾';
 
   @override
-  String get benefit5 => 'और अधिक ऑनलाइन कृत्रिम बुद्धिमत्ता बनाएं';
+  String get benefit5 =>
+      'à¤”à¤° à¤…à¤§à¤¿à¤• à¤‘à¤¨à¤²à¤¾à¤‡à¤¨ à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤‚';
 
   @override
-  String get benefit7 => 'अधिक उपयोग सीमाएँ';
+  String get benefit7 => 'à¤…à¤§à¤¿à¤• à¤‰à¤ªà¤¯à¥‹à¤— à¤¸à¥€à¤®à¤¾à¤à¤';
 
   @override
-  String get benefit8 => 'मॉडल जोड़ें';
+  String get benefit8 => 'à¤®à¥‰à¤¡à¤² à¤œà¥‹à¤¡à¤¼à¥‡à¤‚';
 
   @override
-  String get benefit9 => 'नई थीम';
+  String get benefit9 => 'à¤¨à¤ˆ à¤¥à¥€à¤®';
 
   @override
-  String get benefit10 => 'अधिक अटैचमेंट';
+  String get benefit10 => 'à¤…à¤§à¤¿à¤• à¤…à¤Ÿà¥ˆà¤šà¤®à¥‡à¤‚à¤Ÿ';
 
   @override
-  String get benefit11 => 'अधिक प्रवाह मोड';
+  String get benefit11 => 'à¤…à¤§à¤¿à¤• à¤ªà¥à¤°à¤µà¤¾à¤¹ à¤®à¥‹à¤¡';
 
   @override
-  String get oldBenefits => 'निचली योजनाओं से सभी लाभ';
+  String get oldBenefits =>
+      'à¤¨à¤¿à¤šà¤²à¥€ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚ à¤¸à¥‡ à¤¸à¤­à¥€ à¤²à¤¾à¤­';
 
   @override
-  String get confirm => 'पुष्टि करें';
+  String get confirm => 'à¤ªà¥à¤·à¥à¤Ÿà¤¿ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get changePassword => 'पासवर्ड बदलें';
+  String get changePassword => 'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤¬à¤¦à¤²à¥‡à¤‚';
 
   @override
-  String get logoutConfirmationTitle => 'क्या आप वाकई लॉग आउट करना चाहते हैं?';
+  String get logoutConfirmationTitle =>
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤²à¥‰à¤— à¤†à¤‰à¤Ÿ à¤•à¤°à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
-  String get settings => 'सेटिंग्स';
+  String get settings => 'à¤¸à¥‡à¤Ÿà¤¿à¤‚à¤—à¥à¤¸';
 
   @override
-  String get language => 'ऐप भाषा';
+  String get language => 'à¤à¤ª à¤­à¤¾à¤·à¤¾';
 
   @override
-  String get dark => 'डार्क';
+  String get dark => 'à¤¡à¤¾à¤°à¥à¤•';
 
   @override
-  String get oldPassword => 'पुराना पासवर्ड';
+  String get oldPassword => 'à¤ªà¥à¤°à¤¾à¤¨à¤¾ à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡';
 
   @override
-  String get newPassword => 'नया पासवर्ड';
+  String get newPassword => 'à¤¨à¤¯à¤¾ à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡';
 
   @override
-  String get passwordUpdated => 'पासवर्ड अपडेट किया गया।';
+  String get passwordUpdated =>
+      'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾à¥¤';
 
   @override
-  String get stop => 'रोकें';
+  String get stop => 'à¤°à¥‹à¤•à¥‡à¤‚';
 
   @override
-  String get copyrights => 'योगदान';
+  String get copyrights => 'à¤¯à¥‹à¤—à¤¦à¤¾à¤¨';
 
   @override
-  String get love => 'प्यार';
+  String get love => 'à¤ªà¥à¤¯à¤¾à¤°';
 
   @override
-  String get nature => 'प्रकृति';
+  String get nature => 'à¤ªà¥à¤°à¤•à¥ƒà¤¤à¤¿';
 
   @override
-  String get behindTheSlaughter => 'कत्लेआम के पीछे';
+  String get behindTheSlaughter => 'à¤•à¤¤à¥à¤²à¥‡à¤†à¤® à¤•à¥‡ à¤ªà¥€à¤›à¥‡';
 
   @override
-  String get grayscale => 'ग्रेस्केल';
+  String get cyberpunk => 'Cyberpunk';
 
   @override
-  String get ocean => 'महासागर';
+  String get sunset => 'Sunset';
 
   @override
-  String get scarletSnow => 'स्कार्लेट स्नो';
+  String get coffee => 'Coffee';
 
   @override
-  String get requestFailed => 'एक त्रुटि हुई, कृपया पुनः प्रयास करें।';
+  String get deepSpace => 'Deep Space';
 
   @override
-  String get changeModel => 'बदलें';
+  String get grayscale => 'à¤—à¥à¤°à¥‡à¤¸à¥à¤•à¥‡à¤²';
 
   @override
-  String get edit => 'संपादित करें';
+  String get ocean => 'à¤®à¤¹à¤¾à¤¸à¤¾à¤—à¤°';
+
+  @override
+  String get scarletSnow => 'à¤¸à¥à¤•à¤¾à¤°à¥à¤²à¥‡à¤Ÿ à¤¸à¥à¤¨à¥‹';
+
+  @override
+  String get requestFailed =>
+      'à¤à¤• à¤¤à¥à¤°à¥à¤Ÿà¤¿ à¤¹à¥à¤ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
+
+  @override
+  String get changeModel => 'à¤¬à¤¦à¤²à¥‡à¤‚';
+
+  @override
+  String get edit => 'à¤¸à¤‚à¤ªà¤¾à¤¦à¤¿à¤¤ à¤•à¤°à¥‡à¤‚';
 
   @override
   String get editingMessageInfo =>
-      'इस संदेश को संपादित करने से बातचीत यहीं से फिर से शुरू हो जाएगी।';
+      'à¤‡à¤¸ à¤¸à¤‚à¤¦à¥‡à¤¶ à¤•à¥‹ à¤¸à¤‚à¤ªà¤¾à¤¦à¤¿à¤¤ à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¯à¤¹à¥€à¤‚ à¤¸à¥‡ à¤«à¤¿à¤° à¤¸à¥‡ à¤¶à¥à¤°à¥‚ à¤¹à¥‹ à¤œà¤¾à¤à¤—à¥€à¥¤';
 
   @override
-  String get editingNotification => 'आप अभी संपादन मोड में हैं';
+  String get editingNotification =>
+      'à¤†à¤ª à¤…à¤­à¥€ à¤¸à¤‚à¤ªà¤¾à¤¦à¤¨ à¤®à¥‹à¤¡ à¤®à¥‡à¤‚ à¤¹à¥ˆà¤‚';
 
   @override
-  String get featurePluralTitle => 'बहुल';
+  String get featurePluralTitle => 'à¤¬à¤¹à¥à¤²';
 
   @override
   String get featurePluralDescription =>
-      'यह मॉडल स्वचालित रूप से अतिरिक्त एक्सटेंशन को एकीकृत कर सकता है, जिससे इसकी कार्यात्मक क्षमताओं का विस्तार हो सकता है ताकि उन्नत प्रदर्शन के साथ विविध प्रकार के संचालन का समर्थन किया जा सके।';
+      'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤¸à¥à¤µà¤šà¤¾à¤²à¤¿à¤¤ à¤°à¥‚à¤ª à¤¸à¥‡ à¤…à¤¤à¤¿à¤°à¤¿à¤•à¥à¤¤ à¤à¤•à¥à¤¸à¤Ÿà¥‡à¤‚à¤¶à¤¨ à¤•à¥‹ à¤à¤•à¥€à¤•à¥ƒà¤¤ à¤•à¤° à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆ, à¤œà¤¿à¤¸à¤¸à¥‡ à¤‡à¤¸à¤•à¥€ à¤•à¤¾à¤°à¥à¤¯à¤¾à¤¤à¥à¤®à¤• à¤•à¥à¤·à¤®à¤¤à¤¾à¤“à¤‚ à¤•à¤¾ à¤µà¤¿à¤¸à¥à¤¤à¤¾à¤° à¤¹à¥‹ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆ à¤¤à¤¾à¤•à¤¿ à¤‰à¤¨à¥à¤¨à¤¤ à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥‡ à¤¸à¤¾à¤¥ à¤µà¤¿à¤µà¤¿à¤§ à¤ªà¥à¤°à¤•à¤¾à¤° à¤•à¥‡ à¤¸à¤‚à¤šà¤¾à¤²à¤¨ à¤•à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤•à¤¿à¤¯à¤¾ à¤œà¤¾ à¤¸à¤•à¥‡à¥¤';
 
   @override
-  String get nameLabel => 'एआई नाम';
+  String get nameLabel => 'à¤à¤†à¤ˆ à¤¨à¤¾à¤®';
 
   @override
-  String get summaryLabel => 'एआई सारांश';
+  String get summaryLabel => 'à¤à¤†à¤ˆ à¤¸à¤¾à¤°à¤¾à¤‚à¤¶';
 
   @override
-  String get add => 'जोड़ें';
+  String get add => 'à¤œà¥‹à¤¡à¤¼à¥‡à¤‚';
 
   @override
-  String get aiExplanationTitle => 'कृत्रिम बुद्धिमत्ता विवरण';
+  String get aiExplanationTitle =>
+      'à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤µà¤¿à¤µà¤°à¤£';
 
   @override
   String get aiExplanationDescription =>
-      'कृपया अपने एआई मॉडल की वास्तुकला, प्रशिक्षण प्रक्रिया, प्रदर्शन मेट्रिक्स, अनुप्रयोग क्षेत्रों और अन्य महत्वपूर्ण विशेषताओं का विस्तृत विवरण प्रदान करें।';
+      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¥‡ à¤à¤†à¤ˆ à¤®à¥‰à¤¡à¤² à¤•à¥€ à¤µà¤¾à¤¸à¥à¤¤à¥à¤•à¤²à¤¾, à¤ªà¥à¤°à¤¶à¤¿à¤•à¥à¤·à¤£ à¤ªà¥à¤°à¤•à¥à¤°à¤¿à¤¯à¤¾, à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¨ à¤®à¥‡à¤Ÿà¥à¤°à¤¿à¤•à¥à¤¸, à¤…à¤¨à¥à¤ªà¥à¤°à¤¯à¥‹à¤— à¤•à¥à¤·à¥‡à¤¤à¥à¤°à¥‹à¤‚ à¤”à¤° à¤…à¤¨à¥à¤¯ à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£ à¤µà¤¿à¤¶à¥‡à¤·à¤¤à¤¾à¤“à¤‚ à¤•à¤¾ à¤µà¤¿à¤¸à¥à¤¤à¥ƒà¤¤ à¤µà¤¿à¤µà¤°à¤£ à¤ªà¥à¤°à¤¦à¤¾à¤¨ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get preInputTitle => 'कृत्रिम बुद्धिमत्ता पूर्व-इनपुट';
+  String get preInputTitle =>
+      'à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤ªà¥‚à¤°à¥à¤µ-à¤‡à¤¨à¤ªà¥à¤Ÿ';
 
   @override
   String get preInputDescription =>
-      'कृपया एक पूर्व-इनपुट सेट करें जो चरित्र निर्माण प्रक्रिया में आपके मॉडल का मार्गदर्शन करेगा। इस खंड में, आप चरित्र-संबंधी जानकारी, अतिरिक्त संदर्भ, और कोई भी अतिरिक्त विवरण शामिल कर सकते हैं जो चरित्र से संबंधित सामग्री उत्पन्न करने में सहायता कर सकता है।';
+      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤à¤• à¤ªà¥‚à¤°à¥à¤µ-à¤‡à¤¨à¤ªà¥à¤Ÿ à¤¸à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚ à¤œà¥‹ à¤šà¤°à¤¿à¤¤à¥à¤° à¤¨à¤¿à¤°à¥à¤®à¤¾à¤£ à¤ªà¥à¤°à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¥‡ à¤®à¥‰à¤¡à¤² à¤•à¤¾ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¤°à¥‡à¤—à¤¾à¥¤ à¤‡à¤¸ à¤–à¤‚à¤¡ à¤®à¥‡à¤‚, à¤†à¤ª à¤šà¤°à¤¿à¤¤à¥à¤°-à¤¸à¤‚à¤¬à¤‚à¤§à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€, à¤…à¤¤à¤¿à¤°à¤¿à¤•à¥à¤¤ à¤¸à¤‚à¤¦à¤°à¥à¤­, à¤”à¤° à¤•à¥‹à¤ˆ à¤­à¥€ à¤…à¤¤à¤¿à¤°à¤¿à¤•à¥à¤¤ à¤µà¤¿à¤µà¤°à¤£ à¤¶à¤¾à¤®à¤¿à¤² à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚ à¤œà¥‹ à¤šà¤°à¤¿à¤¤à¥à¤° à¤¸à¥‡ à¤¸à¤‚à¤¬à¤‚à¤§à¤¿à¤¤ à¤¸à¤¾à¤®à¤—à¥à¤°à¥€ à¤‰à¤¤à¥à¤ªà¤¨à¥à¤¨ à¤•à¤°à¤¨à¥‡ à¤®à¥‡à¤‚ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¤° à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get baseModelTitle => 'आधार मॉडल';
+  String get baseModelTitle => 'à¤†à¤§à¤¾à¤° à¤®à¥‰à¤¡à¤²';
 
   @override
   String get baseModelDescription =>
-      'यह वह मॉडल है जिसका उपयोग आपकी रचना के लिए नींव के रूप में किया जाएगा। यह वर्तमान में चयनित आधार मॉडल को प्रदर्शित करता है।';
+      'à¤¯à¤¹ à¤µà¤¹ à¤®à¥‰à¤¡à¤² à¤¹à¥ˆ à¤œà¤¿à¤¸à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤†à¤ªà¤•à¥€ à¤°à¤šà¤¨à¤¾ à¤•à¥‡ à¤²à¤¿à¤ à¤¨à¥€à¤‚à¤µ à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤•à¤¿à¤¯à¤¾ à¤œà¤¾à¤à¤—à¤¾à¥¤ à¤¯à¤¹ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤®à¥‡à¤‚ à¤šà¤¯à¤¨à¤¿à¤¤ à¤†à¤§à¤¾à¤° à¤®à¥‰à¤¡à¤² à¤•à¥‹ à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¿à¤¤ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get summary => 'सारांश';
+  String get summary => 'à¤¸à¤¾à¤°à¤¾à¤‚à¤¶';
 
   @override
-  String get modelUploadTitle => 'कृत्रिम बुद्धिमत्ता फ़ाइल';
+  String get modelUploadTitle =>
+      'à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤«à¤¼à¤¾à¤‡à¤²';
 
   @override
   String get modelUploadDescription =>
-      'अपने डिवाइस से सीधे अपनी स्थानीय GGUF फ़ाइलों का चयन और अपलोड करें। यह आपको इंटरनेट कनेक्शन की आवश्यकता के बिना अपने मॉडल को ऑफ़लाइन चलाने देता है। सुनिश्चित करें कि फ़ाइल मान्य GGUF प्रारूप में है और ठीक से संरचित है। यदि फ़ाइल गलत या दूषित है, तो Cortex अपेक्षा के अनुरूप काम नहीं कर सकता है, और आपको त्रुटियों का सामना करना पड़ सकता है।';
+      'à¤…à¤ªà¤¨à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤¸à¥‡ à¤¸à¥€à¤§à¥‡ à¤…à¤ªà¤¨à¥€ à¤¸à¥à¤¥à¤¾à¤¨à¥€à¤¯ GGUF à¤«à¤¼à¤¾à¤‡à¤²à¥‹à¤‚ à¤•à¤¾ à¤šà¤¯à¤¨ à¤”à¤° à¤…à¤ªà¤²à¥‹à¤¡ à¤•à¤°à¥‡à¤‚à¥¤ à¤¯à¤¹ à¤†à¤ªà¤•à¥‹ à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤•à¥‡ à¤¬à¤¿à¤¨à¤¾ à¤…à¤ªà¤¨à¥‡ à¤®à¥‰à¤¡à¤² à¤•à¥‹ à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤šà¤²à¤¾à¤¨à¥‡ à¤¦à¥‡à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤¸à¥à¤¨à¤¿à¤¶à¥à¤šà¤¿à¤¤ à¤•à¤°à¥‡à¤‚ à¤•à¤¿ à¤«à¤¼à¤¾à¤‡à¤² à¤®à¤¾à¤¨à¥à¤¯ GGUF à¤ªà¥à¤°à¤¾à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤¹à¥ˆ à¤”à¤° à¤ à¥€à¤• à¤¸à¥‡ à¤¸à¤‚à¤°à¤šà¤¿à¤¤ à¤¹à¥ˆà¥¤ à¤¯à¤¦à¤¿ à¤«à¤¼à¤¾à¤‡à¤² à¤—à¤²à¤¤ à¤¯à¤¾ à¤¦à¥‚à¤·à¤¿à¤¤ à¤¹à¥ˆ, à¤¤à¥‹ Cortex à¤…à¤ªà¥‡à¤•à¥à¤·à¤¾ à¤•à¥‡ à¤…à¤¨à¥à¤°à¥‚à¤ª à¤•à¤¾à¤® à¤¨à¤¹à¥€à¤‚ à¤•à¤° à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆ, à¤”à¤° à¤†à¤ªà¤•à¥‹ à¤¤à¥à¤°à¥à¤Ÿà¤¿à¤¯à¥‹à¤‚ à¤•à¤¾ à¤¸à¤¾à¤®à¤¨à¤¾ à¤•à¤°à¤¨à¤¾ à¤ªà¤¡à¤¼ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
   String get modelUploadShortDescription =>
-      'अपने डिवाइस से .gguf फ़ाइल चुनने के लिए यहां टैप करें';
+      'à¤…à¤ªà¤¨à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤¸à¥‡ .gguf à¤«à¤¼à¤¾à¤‡à¤² à¤šà¥à¤¨à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤¯à¤¹à¤¾à¤‚ à¤Ÿà¥ˆà¤ª à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get you => 'आप';
+  String get you => 'à¤†à¤ª';
 
   @override
-  String get removePhotoTitle => 'फोटो हटाएं';
+  String get removePhotoTitle => 'à¤«à¥‹à¤Ÿà¥‹ à¤¹à¤Ÿà¤¾à¤à¤‚';
 
   @override
-  String get confirmRemovePhoto => 'क्या आप वाकई फोटो हटाना चाहते हैं?';
+  String get confirmRemovePhoto =>
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤«à¥‹à¤Ÿà¥‹ à¤¹à¤Ÿà¤¾à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
   String get chatLengthLimitExceeded =>
-      'यह चैट वर्ण सीमा को पार कर गई है। कृपया एक नई चैट शुरू करें या सदस्यता खरीदें।';
+      'à¤¯à¤¹ à¤šà¥ˆà¤Ÿ à¤µà¤°à¥à¤£ à¤¸à¥€à¤®à¤¾ à¤•à¥‹ à¤ªà¤¾à¤° à¤•à¤° à¤—à¤ˆ à¤¹à¥ˆà¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤à¤• à¤¨à¤ˆ à¤šà¥ˆà¤Ÿ à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚ à¤¯à¤¾ à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤–à¤°à¥€à¤¦à¥‡à¤‚à¥¤';
 
   @override
-  String get inappropriateContentDetected => 'अनुचित सामग्री का पता चला!';
+  String get inappropriateContentDetected =>
+      'à¤…à¤¨à¥à¤šà¤¿à¤¤ à¤¸à¤¾à¤®à¤—à¥à¤°à¥€ à¤•à¤¾ à¤ªà¤¤à¤¾ à¤šà¤²à¤¾!';
 
   @override
   String get offlineModelNotInstalled =>
-      'यह ऑफ़लाइन मॉडल आपके डिवाइस पर स्थापित नहीं है।';
+      'à¤¯à¤¹ à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤®à¥‰à¤¡à¤² à¤†à¤ªà¤•à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤ªà¤° à¤¸à¥à¤¥à¤¾à¤ªà¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤';
 
   @override
   String get reachedLimit =>
-      'आप अपनी उपयोग सीमा तक पहुँच चुके हैं; अधिक सीमाएँ प्राप्त करने के लिए, आप अपना प्लान अपग्रेड कर सकते हैं। (हाँ, हम समझते हैं कि सीमा समाप्त होना निराशाजनक होता है। लेकिन सच में, उन शानदार जवाबों को पाना मुफ़्त नहीं है, इसलिए ये सीमाएँ वास्तव में हमें इस मज़े को जारी रखने में मदद करती हैं।)';
+      'à¤†à¤ª à¤…à¤ªà¤¨à¥€ à¤‰à¤ªà¤¯à¥‹à¤— à¤¸à¥€à¤®à¤¾ à¤¤à¤• à¤ªà¤¹à¥à¤à¤š à¤šà¥à¤•à¥‡ à¤¹à¥ˆà¤‚; à¤…à¤§à¤¿à¤• à¤¸à¥€à¤®à¤¾à¤à¤ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤, à¤†à¤ª à¤…à¤ªà¤¨à¤¾ à¤ªà¥à¤²à¤¾à¤¨ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤ (à¤¹à¤¾à¤, à¤¹à¤® à¤¸à¤®à¤à¤¤à¥‡ à¤¹à¥ˆà¤‚ à¤•à¤¿ à¤¸à¥€à¤®à¤¾ à¤¸à¤®à¤¾à¤ªà¥à¤¤ à¤¹à¥‹à¤¨à¤¾ à¤¨à¤¿à¤°à¤¾à¤¶à¤¾à¤œà¤¨à¤• à¤¹à¥‹à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤²à¥‡à¤•à¤¿à¤¨ à¤¸à¤š à¤®à¥‡à¤‚, à¤‰à¤¨ à¤¶à¤¾à¤¨à¤¦à¤¾à¤° à¤œà¤µà¤¾à¤¬à¥‹à¤‚ à¤•à¥‹ à¤ªà¤¾à¤¨à¤¾ à¤®à¥à¤«à¤¼à¥à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆ, à¤‡à¤¸à¤²à¤¿à¤ à¤¯à¥‡ à¤¸à¥€à¤®à¤¾à¤à¤ à¤µà¤¾à¤¸à¥à¤¤à¤µ à¤®à¥‡à¤‚ à¤¹à¤®à¥‡à¤‚ à¤‡à¤¸ à¤®à¤œà¤¼à¥‡ à¤•à¥‹ à¤œà¤¾à¤°à¥€ à¤°à¤–à¤¨à¥‡ à¤®à¥‡à¤‚ à¤®à¤¦à¤¦ à¤•à¤°à¤¤à¥€ à¤¹à¥ˆà¤‚à¥¤)';
 
   @override
-  String get modality => 'मोडैलिटी';
+  String get modality => 'à¤®à¥‹à¤¡à¥ˆà¤²à¤¿à¤Ÿà¥€';
 
   @override
-  String get multimodal => 'मल्टीमॉडल';
+  String get multimodal => 'à¤®à¤²à¥à¤Ÿà¥€à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get anErrorOccurred => 'एक त्रुटि हुई';
+  String get anErrorOccurred => 'à¤à¤• à¤¤à¥à¤°à¥à¤Ÿà¤¿ à¤¹à¥à¤ˆ';
 
   @override
   String get themeLocked =>
-      'इस थीम के लिए उच्च सदस्यता स्तर की आवश्यकता है। अनलॉक करने के लिए कृपया अपग्रेड करें।';
+      'à¤‡à¤¸ à¤¥à¥€à¤® à¤•à¥‡ à¤²à¤¿à¤ à¤‰à¤šà¥à¤š à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤¸à¥à¤¤à¤° à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤…à¤¨à¤²à¥‰à¤• à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get pageCouldNotBeLoaded => 'पेज लोड नहीं हो सका';
+  String get pageCouldNotBeLoaded =>
+      'à¤ªà¥‡à¤œ à¤²à¥‹à¤¡ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤¸à¤•à¤¾';
 
   @override
   String get checkYourInternet =>
-      'कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।';
+      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤œà¤¾à¤‚à¤šà¥‡à¤‚ à¤”à¤° à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get errorUserNotAuthenticated =>
-      'इस क्रिया को करने के लिए आपको लॉग इन होना चाहिए।';
+      'à¤‡à¤¸ à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤•à¥‹ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤†à¤ªà¤•à¥‹ à¤²à¥‰à¤— à¤‡à¤¨ à¤¹à¥‹à¤¨à¤¾ à¤šà¤¾à¤¹à¤¿à¤à¥¤';
 
   @override
   String get errorReachedLimit =>
-      'आप अपनी सीमा तक पहुँच चुके हैं, अधिक अनलॉक करने और चैट जारी रखने के लिए अपग्रेड करें।';
+      'à¤†à¤ª à¤…à¤ªà¤¨à¥€ à¤¸à¥€à¤®à¤¾ à¤¤à¤• à¤ªà¤¹à¥à¤à¤š à¤šà¥à¤•à¥‡ à¤¹à¥ˆà¤‚, à¤…à¤§à¤¿à¤• à¤…à¤¨à¤²à¥‰à¤• à¤•à¤°à¤¨à¥‡ à¤”à¤° à¤šà¥ˆà¤Ÿ à¤œà¤¾à¤°à¥€ à¤°à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get errorServer =>
-      'एक अप्रत्याशित सर्वर त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।';
+      'à¤à¤• à¤…à¤ªà¥à¤°à¤¤à¥à¤¯à¤¾à¤¶à¤¿à¤¤ à¤¸à¤°à¥à¤µà¤° à¤¤à¥à¤°à¥à¤Ÿà¤¿ à¤¹à¥à¤ˆà¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¬à¤¾à¤¦ à¤®à¥‡à¤‚ à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get errorNetwork =>
-      'एक नेटवर्क त्रुटि हुई। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।';
+      'à¤à¤• à¤¨à¥‡à¤Ÿà¤µà¤°à¥à¤• à¤¤à¥à¤°à¥à¤Ÿà¤¿ à¤¹à¥à¤ˆà¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤œà¤¾à¤‚à¤šà¥‡à¤‚ à¤”à¤° à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get baseModelForCharacterDescription =>
-      'चयनित आधार मॉडल चरित्र के तर्क और प्रतिक्रिया क्षमताओं को निर्धारित करेगा।';
+      'à¤šà¤¯à¤¨à¤¿à¤¤ à¤†à¤§à¤¾à¤° à¤®à¥‰à¤¡à¤² à¤šà¤°à¤¿à¤¤à¥à¤° à¤•à¥‡ à¤¤à¤°à¥à¤• à¤”à¤° à¤ªà¥à¤°à¤¤à¤¿à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤•à¥à¤·à¤®à¤¤à¤¾à¤“à¤‚ à¤•à¥‹ à¤¨à¤¿à¤°à¥à¤§à¤¾à¤°à¤¿à¤¤ à¤•à¤°à¥‡à¤—à¤¾à¥¤';
 
   @override
-  String get selectBaseModel => 'एक आधार मॉडल चुनें';
+  String get selectBaseModel =>
+      'à¤à¤• à¤†à¤§à¤¾à¤° à¤®à¥‰à¤¡à¤² à¤šà¥à¤¨à¥‡à¤‚';
 
   @override
   String get falErrorImageRequired =>
-      'इस एआई को एक संदर्भ छवि की आवश्यकता है, कृपया एक छवि संलग्न करें और पुनः प्रयास करें।';
+      'à¤‡à¤¸ à¤à¤†à¤ˆ à¤•à¥‹ à¤à¤• à¤¸à¤‚à¤¦à¤°à¥à¤­ à¤›à¤µà¤¿ à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤à¤• à¤›à¤µà¤¿ à¤¸à¤‚à¤²à¤—à¥à¤¨ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get falErrorAudioRequired =>
-      'इस मॉडल के लिए एक संदर्भ ऑडियो फ़ाइल की आवश्यकता है, कृपया एक ऑडियो फ़ाइल संलग्न करें और पुनः प्रयास करें।';
+      'à¤‡à¤¸ à¤®à¥‰à¤¡à¤² à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤¸à¤‚à¤¦à¤°à¥à¤­ à¤‘à¤¡à¤¿à¤¯à¥‹ à¤«à¤¼à¤¾à¤‡à¤² à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤à¤• à¤‘à¤¡à¤¿à¤¯à¥‹ à¤«à¤¼à¤¾à¤‡à¤² à¤¸à¤‚à¤²à¤—à¥à¤¨ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get falErrorVideoRequired =>
-      'इस मॉडल के लिए एक संदर्भ वीडियो की आवश्यकता है, कृपया एक वीडियो संलग्न करें और पुनः प्रयास करें।';
+      'à¤‡à¤¸ à¤®à¥‰à¤¡à¤² à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤¸à¤‚à¤¦à¤°à¥à¤­ à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤à¤• à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤¸à¤‚à¤²à¤—à¥à¤¨ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get falErrorImageCorrupted =>
-      'अपलोड की गई छवि संसाधित नहीं हो सकी, कृपया कोई दूसरा प्रारूप आजमाएं।';
+      'à¤…à¤ªà¤²à¥‹à¤¡ à¤•à¥€ à¤—à¤ˆ à¤›à¤µà¤¿ à¤¸à¤‚à¤¸à¤¾à¤§à¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤¸à¤•à¥€, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤•à¥‹à¤ˆ à¤¦à¥‚à¤¸à¤°à¤¾ à¤ªà¥à¤°à¤¾à¤°à¥‚à¤ª à¤†à¤œà¤®à¤¾à¤à¤‚à¥¤';
 
   @override
   String get falErrorSchemaRejected =>
-      'मॉडल ने इनपुट को अस्वीकार कर दिया है, कृपया कोई दूसरा मॉडल आजमाएं।';
+      'à¤®à¥‰à¤¡à¤² à¤¨à¥‡ à¤‡à¤¨à¤ªà¥à¤Ÿ à¤•à¥‹ à¤…à¤¸à¥à¤µà¥€à¤•à¤¾à¤° à¤•à¤° à¤¦à¤¿à¤¯à¤¾ à¤¹à¥ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤•à¥‹à¤ˆ à¤¦à¥‚à¤¸à¤°à¤¾ à¤®à¥‰à¤¡à¤² à¤†à¤œà¤®à¤¾à¤à¤‚à¥¤';
 
   @override
   String get falErrorSchemaInvalid =>
-      'उत्पादन सेवा द्वारा इनपुट को अस्वीकार कर दिया गया।';
+      'à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤¨ à¤¸à¥‡à¤µà¤¾ à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤‡à¤¨à¤ªà¥à¤Ÿ à¤•à¥‹ à¤…à¤¸à¥à¤µà¥€à¤•à¤¾à¤° à¤•à¤° à¤¦à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾à¥¤';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return 'जनरेशन सेवा ने एक त्रुटि (स्थिति $statusCode) वापस कर दी।';
+    return 'à¤œà¤¨à¤°à¥‡à¤¶à¤¨ à¤¸à¥‡à¤µà¤¾ à¤¨à¥‡ à¤à¤• à¤¤à¥à¤°à¥à¤Ÿà¤¿ (à¤¸à¥à¤¥à¤¿à¤¤à¤¿ $statusCode) à¤µà¤¾à¤ªà¤¸ à¤•à¤° à¤¦à¥€à¥¤';
   }
 
   @override
-  String get couldNotOpenLink => 'लिंक नहीं खोल सका';
+  String get couldNotOpenLink =>
+      'à¤²à¤¿à¤‚à¤• à¤¨à¤¹à¥€à¤‚ à¤–à¥‹à¤² à¤¸à¤•à¤¾';
 
   @override
-  String get downloadStarted => 'डाउनलोड शुरू हो गया';
+  String get downloadStarted =>
+      'à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤¶à¥à¤°à¥‚ à¤¹à¥‹ à¤—à¤¯à¤¾';
 
   @override
-  String get notAvailable => 'उपलब्ध नहीं है';
+  String get notAvailable => 'à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆ';
 
   @override
   String get localizationWarning =>
-      'कुछ जानकारी आपकी भाषा में उपलब्ध नहीं हो सकती है और अंग्रेजी में प्रदर्शित की जाएगी।';
+      'à¤•à¥à¤› à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤†à¤ªà¤•à¥€ à¤­à¤¾à¤·à¤¾ à¤®à¥‡à¤‚ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤¸à¤•à¤¤à¥€ à¤¹à¥ˆ à¤”à¤° à¤…à¤‚à¤—à¥à¤°à¥‡à¤œà¥€ à¤®à¥‡à¤‚ à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¿à¤¤ à¤•à¥€ à¤œà¤¾à¤à¤—à¥€à¥¤';
 
   @override
   String get aiTranslationWarning =>
-      'मॉडल की जानकारी अन्य एआई मॉडल द्वारा विभिन्न भाषाओं में अनुवादित की जाती है। इसलिए, अंग्रेजी के अलावा अन्य भाषाओं में मामूली विसंगतियां हो सकती हैं।';
+      'à¤®à¥‰à¤¡à¤² à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤…à¤¨à¥à¤¯ à¤à¤†à¤ˆ à¤®à¥‰à¤¡à¤² à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤µà¤¿à¤­à¤¿à¤¨à¥à¤¨ à¤­à¤¾à¤·à¤¾à¤“à¤‚ à¤®à¥‡à¤‚ à¤…à¤¨à¥à¤µà¤¾à¤¦à¤¿à¤¤ à¤•à¥€ à¤œà¤¾à¤¤à¥€ à¤¹à¥ˆà¥¤ à¤‡à¤¸à¤²à¤¿à¤, à¤…à¤‚à¤—à¥à¤°à¥‡à¤œà¥€ à¤•à¥‡ à¤…à¤²à¤¾à¤µà¤¾ à¤…à¤¨à¥à¤¯ à¤­à¤¾à¤·à¤¾à¤“à¤‚ à¤®à¥‡à¤‚ à¤®à¤¾à¤®à¥‚à¤²à¥€ à¤µà¤¿à¤¸à¤‚à¤—à¤¤à¤¿à¤¯à¤¾à¤‚ à¤¹à¥‹ à¤¸à¤•à¤¤à¥€ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get errorLoadingTitle => 'डेटा लोड करने में विफल';
+  String get errorLoadingTitle =>
+      'à¤¡à¥‡à¤Ÿà¤¾ à¤²à¥‹à¤¡ à¤•à¤°à¤¨à¥‡ à¤®à¥‡à¤‚ à¤µà¤¿à¤«à¤²';
 
   @override
   String get errorLoadingMessage =>
-      'हम अपने सर्वर से आवश्यक डेटा प्राप्त नहीं कर सके। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।';
+      'à¤¹à¤® à¤…à¤ªà¤¨à¥‡ à¤¸à¤°à¥à¤µà¤° à¤¸à¥‡ à¤†à¤µà¤¶à¥à¤¯à¤• à¤¡à¥‡à¤Ÿà¤¾ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤¨à¤¹à¥€à¤‚ à¤•à¤° à¤¸à¤•à¥‡à¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤œà¤¾à¤‚à¤šà¥‡à¤‚ à¤”à¤° à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get noFoundTitle => 'कोई परिणाम नहीं';
+  String get noFoundTitle => 'à¤•à¥‹à¤ˆ à¤ªà¤°à¤¿à¤£à¤¾à¤® à¤¨à¤¹à¥€à¤‚';
 
   @override
   String get noFoundMessage =>
-      'अपनी खोज शब्दों को समायोजित करने या फ़िल्टर को साफ़ करने का प्रयास करें।';
+      'à¤…à¤ªà¤¨à¥€ à¤–à¥‹à¤œ à¤¶à¤¬à¥à¤¦à¥‹à¤‚ à¤•à¥‹ à¤¸à¤®à¤¾à¤¯à¥‹à¤œà¤¿à¤¤ à¤•à¤°à¤¨à¥‡ à¤¯à¤¾ à¤«à¤¼à¤¿à¤²à¥à¤Ÿà¤° à¤•à¥‹ à¤¸à¤¾à¤«à¤¼ à¤•à¤°à¤¨à¥‡ à¤•à¤¾ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get modelCreatedSuccess => 'मॉडल सफलतापूर्वक बनाया गया!';
+  String get modelCreatedSuccess =>
+      'à¤®à¥‰à¤¡à¤² à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¬à¤¨à¤¾à¤¯à¤¾ à¤—à¤¯à¤¾!';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return '“$modelName” सफलतापूर्वक हटा दिया गया था।';
+    return 'â€œ$modelNameâ€ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¹à¤Ÿà¤¾ à¤¦à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¥à¤¾à¥¤';
   }
 
   @override
-  String get errorCreatingModel => 'मॉडल बनाते समय एक अप्रत्याशित त्रुटि हुई।';
+  String get errorCreatingModel =>
+      'à¤®à¥‰à¤¡à¤² à¤¬à¤¨à¤¾à¤¤à¥‡ à¤¸à¤®à¤¯ à¤à¤• à¤…à¤ªà¥à¤°à¤¤à¥à¤¯à¤¾à¤¶à¤¿à¤¤ à¤¤à¥à¤°à¥à¤Ÿà¤¿ à¤¹à¥à¤ˆà¥¤';
 
   @override
-  String get errorDeletingModel => 'मॉडल हटाते समय एक अप्रत्याशित त्रुटि हुई।';
+  String get errorDeletingModel =>
+      'à¤®à¥‰à¤¡à¤² à¤¹à¤Ÿà¤¾à¤¤à¥‡ à¤¸à¤®à¤¯ à¤à¤• à¤…à¤ªà¥à¤°à¤¤à¥à¤¯à¤¾à¤¶à¤¿à¤¤ à¤¤à¥à¤°à¥à¤Ÿà¤¿ à¤¹à¥à¤ˆà¥¤';
 
   @override
   String get ultraFeatureOnly =>
-      'यह सुविधा केवल अल्ट्रा सदस्यों के लिए उपलब्ध है।';
+      'à¤¯à¤¹ à¤¸à¥à¤µà¤¿à¤§à¤¾ à¤•à¥‡à¤µà¤² à¤…à¤²à¥à¤Ÿà¥à¤°à¤¾ à¤¸à¤¦à¤¸à¥à¤¯à¥‹à¤‚ à¤•à¥‡ à¤²à¤¿à¤ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¹à¥ˆà¥¤';
 
   @override
   String get experimentalOfflineWarning =>
-      'ऑफ़लाइन मोड अभी भी प्रायोगिक है और आपके द्वारा डाउनलोड किया गया मॉडल इष्टतम दक्षता के साथ प्रदर्शन नहीं कर सकता है।';
+      'à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤®à¥‹à¤¡ à¤…à¤­à¥€ à¤­à¥€ à¤ªà¥à¤°à¤¾à¤¯à¥‹à¤—à¤¿à¤• à¤¹à¥ˆ à¤”à¤° à¤†à¤ªà¤•à¥‡ à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤®à¥‰à¤¡à¤² à¤‡à¤·à¥à¤Ÿà¤¤à¤® à¤¦à¤•à¥à¤·à¤¤à¤¾ à¤•à¥‡ à¤¸à¤¾à¤¥ à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¨ à¤¨à¤¹à¥€à¤‚ à¤•à¤° à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
   String get noConversationsToDelete =>
-      'आपके पास हटाने के लिए कोई बातचीत नहीं है।';
+      'à¤†à¤ªà¤•à¥‡ à¤ªà¤¾à¤¸ à¤¹à¤Ÿà¤¾à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤•à¥‹à¤ˆ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤';
 
   @override
-  String get reportSubmitted => 'रिपोर्ट सफलतापूर्वक सबमिट की गई';
+  String get reportSubmitted =>
+      'à¤°à¤¿à¤ªà¥‹à¤°à¥à¤Ÿ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¸à¤¬à¤®à¤¿à¤Ÿ à¤•à¥€ à¤—à¤ˆ';
 
   @override
   String get verificationDelayed =>
-      'आपकी खरीद की पुष्टि हो गई है। आपके खाते को अपडेट करने में थोड़ी देरी हो रही है, यह जल्द ही दिखाई देगा।';
+      'à¤†à¤ªà¤•à¥€ à¤–à¤°à¥€à¤¦ à¤•à¥€ à¤ªà¥à¤·à¥à¤Ÿà¤¿ à¤¹à¥‹ à¤—à¤ˆ à¤¹à¥ˆà¥¤ à¤†à¤ªà¤•à¥‡ à¤–à¤¾à¤¤à¥‡ à¤•à¥‹ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¤°à¤¨à¥‡ à¤®à¥‡à¤‚ à¤¥à¥‹à¤¡à¤¼à¥€ à¤¦à¥‡à¤°à¥€ à¤¹à¥‹ à¤°à¤¹à¥€ à¤¹à¥ˆ, à¤¯à¤¹ à¤œà¤²à¥à¤¦ à¤¹à¥€ à¤¦à¤¿à¤–à¤¾à¤ˆ à¤¦à¥‡à¤—à¤¾à¥¤';
 
   @override
-  String get maintenanceTitle => 'रखरखाव के अधीन';
+  String get maintenanceTitle => 'à¤°à¤–à¤°à¤–à¤¾à¤µ à¤•à¥‡ à¤…à¤§à¥€à¤¨';
 
   @override
   String get maintenanceMessage =>
-      'जब हम कुछ महत्वपूर्ण अपडेट रोल आउट कर रहे हैं तो Cortex अस्थायी रूप से ऑफ़लाइन है। ऐप तक पहुंच जल्द ही बहाल कर दी जाएगी।\n\nजब हम आपके अनुभव को बेहतर बनाते हैं तो आपके धैर्य के लिए धन्यवाद।';
+      'à¤œà¤¬ à¤¹à¤® à¤•à¥à¤› à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤°à¥‹à¤² à¤†à¤‰à¤Ÿ à¤•à¤° à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚ à¤¤à¥‹ Cortex à¤…à¤¸à¥à¤¥à¤¾à¤¯à¥€ à¤°à¥‚à¤ª à¤¸à¥‡ à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤¹à¥ˆà¥¤ à¤à¤ª à¤¤à¤• à¤ªà¤¹à¥à¤‚à¤š à¤œà¤²à¥à¤¦ à¤¹à¥€ à¤¬à¤¹à¤¾à¤² à¤•à¤° à¤¦à¥€ à¤œà¤¾à¤à¤—à¥€à¥¤\n\nà¤œà¤¬ à¤¹à¤® à¤†à¤ªà¤•à¥‡ à¤…à¤¨à¥à¤­à¤µ à¤•à¥‹ à¤¬à¥‡à¤¹à¤¤à¤° à¤¬à¤¨à¤¾à¤¤à¥‡ à¤¹à¥ˆà¤‚ à¤¤à¥‹ à¤†à¤ªà¤•à¥‡ à¤§à¥ˆà¤°à¥à¤¯ à¤•à¥‡ à¤²à¤¿à¤ à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦à¥¤';
 
   @override
   String get errorPromptFlagged =>
-      'आपका संदेश अनुचित के रूप में पता चला और नहीं भेजा जा सका।';
+      'à¤†à¤ªà¤•à¤¾ à¤¸à¤‚à¤¦à¥‡à¤¶ à¤…à¤¨à¥à¤šà¤¿à¤¤ à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤ªà¤¤à¤¾ à¤šà¤²à¤¾ à¤”à¤° à¤¨à¤¹à¥€à¤‚ à¤­à¥‡à¤œà¤¾ à¤œà¤¾ à¤¸à¤•à¤¾à¥¤';
 
   @override
   String get notEnoughStorage =>
-      'नए संदेशों को सहेजने के लिए आपके डिवाइस पर पर्याप्त स्टोरेज स्थान नहीं है।';
+      'à¤¨à¤ à¤¸à¤‚à¤¦à¥‡à¤¶à¥‹à¤‚ à¤•à¥‹ à¤¸à¤¹à¥‡à¤œà¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤†à¤ªà¤•à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤ªà¤° à¤ªà¤°à¥à¤¯à¤¾à¤ªà¥à¤¤ à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ à¤¸à¥à¤¥à¤¾à¤¨ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤';
 
   @override
   String get errorRateLimit =>
-      'आपने हाल ही में बहुत सारे मॉडल बनाए हैं, कृपया पुनः प्रयास करने से पहले थोड़ी देर प्रतीक्षा करें।';
+      'à¤†à¤ªà¤¨à¥‡ à¤¹à¤¾à¤² à¤¹à¥€ à¤®à¥‡à¤‚ à¤¬à¤¹à¥à¤¤ à¤¸à¤¾à¤°à¥‡ à¤®à¥‰à¤¡à¤² à¤¬à¤¨à¤¾à¤ à¤¹à¥ˆà¤‚, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤ªà¤¹à¤²à¥‡ à¤¥à¥‹à¤¡à¤¼à¥€ à¤¦à¥‡à¤° à¤ªà¥à¤°à¤¤à¥€à¤•à¥à¤·à¤¾ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get errorContentFlagged =>
-      'मॉडल को सहेजा नहीं जा सका क्योंकि इसकी सामग्री को अनुचित के रूप में फ़्लैग किया गया था।';
+      'à¤®à¥‰à¤¡à¤² à¤•à¥‹ à¤¸à¤¹à¥‡à¤œà¤¾ à¤¨à¤¹à¥€à¤‚ à¤œà¤¾ à¤¸à¤•à¤¾ à¤•à¥à¤¯à¥‹à¤‚à¤•à¤¿ à¤‡à¤¸à¤•à¥€ à¤¸à¤¾à¤®à¤—à¥à¤°à¥€ à¤•à¥‹ à¤…à¤¨à¥à¤šà¤¿à¤¤ à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤«à¤¼à¥à¤²à¥ˆà¤— à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¥à¤¾à¥¤';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      'आप एक सक्रिय चैट में रहते हुए सभी बातचीत नहीं हटा सकते, कृपया आगे बढ़ने के लिए पहले वर्तमान चैट से बाहर निकलें।';
+      'à¤†à¤ª à¤à¤• à¤¸à¤•à¥à¤°à¤¿à¤¯ à¤šà¥ˆà¤Ÿ à¤®à¥‡à¤‚ à¤°à¤¹à¤¤à¥‡ à¤¹à¥à¤ à¤¸à¤­à¥€ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¤Ÿà¤¾ à¤¸à¤•à¤¤à¥‡, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤†à¤—à¥‡ à¤¬à¤¢à¤¼à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤ªà¤¹à¤²à¥‡ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤šà¥ˆà¤Ÿ à¤¸à¥‡ à¤¬à¤¾à¤¹à¤° à¤¨à¤¿à¤•à¤²à¥‡à¤‚à¥¤';
 
   @override
-  String get invalidCredentials => 'गलत ईमेल या पासवर्ड।';
+  String get invalidCredentials =>
+      'à¤—à¤²à¤¤ à¤ˆà¤®à¥‡à¤² à¤¯à¤¾ à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡à¥¤';
 
   @override
-  String get userDisabled => 'यह उपयोगकर्ता खाता अक्षम कर दिया गया है।';
+  String get userDisabled =>
+      'à¤¯à¤¹ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤–à¤¾à¤¤à¤¾ à¤…à¤•à¥à¤·à¤® à¤•à¤° à¤¦à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
   String get loginSubtitle =>
-      'अपने वर्टेक्स खाते में लॉग इन करें। जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।';
+      'à¤…à¤ªà¤¨à¥‡ à¤µà¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤–à¤¾à¤¤à¥‡ à¤®à¥‡à¤‚ à¤²à¥‰à¤— à¤‡à¤¨ à¤•à¤°à¥‡à¤‚à¥¤ à¤œà¤¾à¤°à¥€ à¤°à¤–à¤•à¤°, à¤†à¤ª à¤¹à¤®à¤¾à¤°à¥€ à¤¸à¥‡à¤µà¤¾ à¤•à¥€ à¤¶à¤°à¥à¤¤à¥‹à¤‚ à¤”à¤° à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿ à¤¸à¥‡ à¤¸à¤¹à¤®à¤¤ à¤¹à¥‹à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
   String get registerSubtitle =>
-      'हमारी सभी सेवाओं तक निर्बाध पहुँच के लिए एक वर्टेक्स खाता बनाएँ। जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।';
+      'à¤¹à¤®à¤¾à¤°à¥€ à¤¸à¤­à¥€ à¤¸à¥‡à¤µà¤¾à¤“à¤‚ à¤¤à¤• à¤¨à¤¿à¤°à¥à¤¬à¤¾à¤§ à¤ªà¤¹à¥à¤à¤š à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤µà¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤à¥¤ à¤œà¤¾à¤°à¥€ à¤°à¤–à¤•à¤°, à¤†à¤ª à¤¹à¤®à¤¾à¤°à¥€ à¤¸à¥‡à¤µà¤¾ à¤•à¥€ à¤¶à¤°à¥à¤¤à¥‹à¤‚ à¤”à¤° à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿ à¤¸à¥‡ à¤¸à¤¹à¤®à¤¤ à¤¹à¥‹à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
   String get storagePermissionRequired =>
-      'डाउनलोड किए गए मॉडल को सहेजने के लिए स्टोरेज अनुमति की आवश्यकता है। जारी रखने के लिए कृपया अनुमति दें।';
+      'à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤¿à¤ à¤—à¤ à¤®à¥‰à¤¡à¤² à¤•à¥‹ à¤¸à¤¹à¥‡à¤œà¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ à¤…à¤¨à¥à¤®à¤¤à¤¿ à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤œà¤¾à¤°à¥€ à¤°à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤¨à¥à¤®à¤¤à¤¿ à¤¦à¥‡à¤‚à¥¤';
 
   @override
-  String get inviteShareSubject => 'Cortex पर मेरे साथ जुड़ें!';
+  String get inviteShareSubject =>
+      'Cortex à¤ªà¤° à¤®à¥‡à¤°à¥‡ à¤¸à¤¾à¤¥ à¤œà¥à¤¡à¤¼à¥‡à¤‚!';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'अरे भाई cortex नाम का एक खतरनाक ऐप है अगर इनवाइट करोगे तो हम दोनों को फ्री प्लस मिलेगा ज़बरदस्त डील है जल्दी डाउनलोड करो\n\n$cortexLink';
+    return 'à¤…à¤°à¥‡ à¤­à¤¾à¤ˆ cortex à¤¨à¤¾à¤® à¤•à¤¾ à¤à¤• à¤–à¤¤à¤°à¤¨à¤¾à¤• à¤à¤ª à¤¹à¥ˆ à¤…à¤—à¤° à¤‡à¤¨à¤µà¤¾à¤‡à¤Ÿ à¤•à¤°à¥‹à¤—à¥‡ à¤¤à¥‹ à¤¹à¤® à¤¦à¥‹à¤¨à¥‹à¤‚ à¤•à¥‹ à¤«à¥à¤°à¥€ à¤ªà¥à¤²à¤¸ à¤®à¤¿à¤²à¥‡à¤—à¤¾ à¤œà¤¼à¤¬à¤°à¤¦à¤¸à¥à¤¤ à¤¡à¥€à¤² à¤¹à¥ˆ à¤œà¤²à¥à¤¦à¥€ à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤°à¥‹\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => 'Cortex का आनंद ले रहे हैं?';
+  String get reviewEnjoyingAppTitle =>
+      'Cortex à¤•à¤¾ à¤†à¤¨à¤‚à¤¦ à¤²à¥‡ à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
   String get reviewHelpUsGrow =>
-      'आपकी रेटिंग हमारी युवा इंडी टीम के लिए एक बहुत बड़ा समर्थन है और हमें आपके लिए Cortex को और भी बेहतर बनाने में मदद करती है।';
+      'à¤†à¤ªà¤•à¥€ à¤°à¥‡à¤Ÿà¤¿à¤‚à¤— à¤¹à¤®à¤¾à¤°à¥€ à¤¯à¥à¤µà¤¾ à¤‡à¤‚à¤¡à¥€ à¤Ÿà¥€à¤® à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤¬à¤¹à¥à¤¤ à¤¬à¤¡à¤¼à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤¹à¥ˆ à¤”à¤° à¤¹à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¥‡ à¤²à¤¿à¤ Cortex à¤•à¥‹ à¤”à¤° à¤­à¥€ à¤¬à¥‡à¤¹à¤¤à¤° à¤¬à¤¨à¤¾à¤¨à¥‡ à¤®à¥‡à¤‚ à¤®à¤¦à¤¦ à¤•à¤°à¤¤à¥€ à¤¹à¥ˆà¥¤';
 
   @override
-  String get reviewMaybeLater => 'शायद बाद में';
+  String get reviewMaybeLater => 'à¤¶à¤¾à¤¯à¤¦ à¤¬à¤¾à¤¦ à¤®à¥‡à¤‚';
 
   @override
-  String get reviewRateNow => 'अभी रेट करें';
+  String get reviewRateNow => 'à¤…à¤­à¥€ à¤°à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get noThanks => 'नहीं, धन्यवाद';
+  String get noThanks => 'à¤¨à¤¹à¥€à¤‚, à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦';
 
   @override
-  String get updateRequiredTitle => 'अपडेट आवश्यक है';
+  String get updateRequiredTitle => 'à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤†à¤µà¤¶à¥à¤¯à¤• à¤¹à¥ˆ';
 
   @override
   String get updateRequiredMessage =>
-      'Cortex का उपयोग जारी रखने के लिए, कृपया नई सुविधाओं और महत्वपूर्ण सुधारों के लिए ऐप को नवीनतम संस्करण में अपडेट करें।';
+      'Cortex à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤œà¤¾à¤°à¥€ à¤°à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¨à¤ˆ à¤¸à¥à¤µà¤¿à¤§à¤¾à¤“à¤‚ à¤”à¤° à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£ à¤¸à¥à¤§à¤¾à¤°à¥‹à¤‚ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤ª à¤•à¥‹ à¤¨à¤µà¥€à¤¨à¤¤à¤® à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£ à¤®à¥‡à¤‚ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get updateNowButton => 'अभी अपडेट करें';
+  String get updateNowButton => 'à¤…à¤­à¥€ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚';
 
   @override
   String get creatorSupportedSuccess =>
-      'निर्माता का सफलतापूर्वक समर्थन किया गया! आपकी भविष्य की खरीदारी उन्हें योगदान देगी।';
+      'à¤¨à¤¿à¤°à¥à¤®à¤¾à¤¤à¤¾ à¤•à¤¾ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾! à¤†à¤ªà¤•à¥€ à¤­à¤µà¤¿à¤·à¥à¤¯ à¤•à¥€ à¤–à¤°à¥€à¤¦à¤¾à¤°à¥€ à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤¯à¥‹à¤—à¤¦à¤¾à¤¨ à¤¦à¥‡à¤—à¥€à¥¤';
 
   @override
-  String get featureDocumentTitle => 'दस्तावेज़ समर्थन';
+  String get featureDocumentTitle =>
+      'à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤¸à¤®à¤°à¥à¤¥à¤¨';
 
   @override
   String get featureDocumentDescription =>
-      'यह मॉडल अपलोड किए गए दस्तावेजों जैसे कि पीडीएफ और टेक्स्ट फाइलों के बारे में विश्लेषण और प्रश्नों के उत्तर दे सकता है।';
+      'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤…à¤ªà¤²à¥‹à¤¡ à¤•à¤¿à¤ à¤—à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¥‹à¤‚ à¤œà¥ˆà¤¸à¥‡ à¤•à¤¿ à¤ªà¥€à¤¡à¥€à¤à¤« à¤”à¤° à¤Ÿà¥‡à¤•à¥à¤¸à¥à¤Ÿ à¤«à¤¾à¤‡à¤²à¥‹à¤‚ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤µà¤¿à¤¶à¥à¤²à¥‡à¤·à¤£ à¤”à¤° à¤ªà¥à¤°à¤¶à¥à¤¨à¥‹à¤‚ à¤•à¥‡ à¤‰à¤¤à¥à¤¤à¤° à¤¦à¥‡ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get featureImageGenerationTitle => 'छवि निर्माण';
+  String get featureImageGenerationTitle => 'à¤›à¤µà¤¿ à¤¨à¤¿à¤°à¥à¤®à¤¾à¤£';
 
   @override
   String get featureImageGenerationDescription =>
-      'यह मॉडल आपके पाठ विवरण के आधार पर मूल चित्र बना सकता है।';
+      'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤†à¤ªà¤•à¥‡ à¤ªà¤¾à¤  à¤µà¤¿à¤µà¤°à¤£ à¤•à¥‡ à¤†à¤§à¤¾à¤° à¤ªà¤° à¤®à¥‚à¤² à¤šà¤¿à¤¤à¥à¤° à¤¬à¤¨à¤¾ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1078,512 +1165,557 @@ class AppLocalizationsHi extends AppLocalizations {
       'This model can create original video based on your text descriptions.';
 
   @override
-  String get premiumModelNoticeTitle => 'प्रीमियम मॉडल';
+  String get premiumModelNoticeTitle => 'à¤ªà¥à¤°à¥€à¤®à¤¿à¤¯à¤® à¤®à¥‰à¤¡à¤²';
 
   @override
   String get premiumModelNoticeDescription =>
-      'यह AI एक प्रीमियम AI है, मुफ्त उपयोगकर्ताओं के पास प्रीमियम AI तक सीमित पहुंच है; असीमित पहुंच के लिए अपग्रेड करें!';
+      'à¤¯à¤¹ AI à¤à¤• à¤ªà¥à¤°à¥€à¤®à¤¿à¤¯à¤® AI à¤¹à¥ˆ, à¤®à¥à¤«à¥à¤¤ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾à¤“à¤‚ à¤•à¥‡ à¤ªà¤¾à¤¸ à¤ªà¥à¤°à¥€à¤®à¤¿à¤¯à¤® AI à¤¤à¤• à¤¸à¥€à¤®à¤¿à¤¤ à¤ªà¤¹à¥à¤‚à¤š à¤¹à¥ˆ; à¤…à¤¸à¥€à¤®à¤¿à¤¤ à¤ªà¤¹à¥à¤‚à¤š à¤•à¥‡ à¤²à¤¿à¤ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¥‡à¤‚!';
 
   @override
-  String get benefitPremiumModels => 'प्रीमियम मॉडल तक पहुंच';
+  String get benefitPremiumModels =>
+      'à¤ªà¥à¤°à¥€à¤®à¤¿à¤¯à¤® à¤®à¥‰à¤¡à¤² à¤¤à¤• à¤ªà¤¹à¥à¤‚à¤š';
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'आपने प्रीमियम मॉडल के लिए अपने सभी निःशुल्क दैनिक संदेशों का उपयोग कर लिया है, कृपया असीमित पहुंच के लिए अपग्रेड करें।';
+      'à¤†à¤ªà¤¨à¥‡ à¤ªà¥à¤°à¥€à¤®à¤¿à¤¯à¤® à¤®à¥‰à¤¡à¤² à¤•à¥‡ à¤²à¤¿à¤ à¤…à¤ªà¤¨à¥‡ à¤¸à¤­à¥€ à¤¨à¤¿à¤ƒà¤¶à¥à¤²à¥à¤• à¤¦à¥ˆà¤¨à¤¿à¤• à¤¸à¤‚à¤¦à¥‡à¤¶à¥‹à¤‚ à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤° à¤²à¤¿à¤¯à¤¾ à¤¹à¥ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤¸à¥€à¤®à¤¿à¤¤ à¤ªà¤¹à¥à¤‚à¤š à¤•à¥‡ à¤²à¤¿à¤ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get useOffline => 'इंटरनेट के बिना उपयोग करें';
+  String get useOffline =>
+      'à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¥‡ à¤¬à¤¿à¤¨à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get explore => 'खोजें';
+  String get explore => 'à¤–à¥‹à¤œà¥‡à¤‚';
 
   @override
-  String get news => 'समाचार';
+  String get news => 'à¤¸à¤®à¤¾à¤šà¤¾à¤°';
 
   @override
-  String get createAI => 'बनाएं';
+  String get createAI => 'à¤¬à¤¨à¤¾à¤à¤‚';
 
   @override
-  String get shortcuts => 'शॉर्टकट';
+  String get shortcuts => 'à¤¶à¥‰à¤°à¥à¤Ÿà¤•à¤Ÿ';
 
   @override
-  String get allModels => 'सभी मॉडल';
+  String get allModels => 'à¤¸à¤­à¥€ à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get onlineModels => 'भाषा मॉडल';
+  String get onlineModels => 'à¤­à¤¾à¤·à¤¾ à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get offlineModels => 'ऑफ़लाइन मॉडल';
+  String get offlineModels => 'à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get characterModels => 'पात्र';
+  String get characterModels => 'à¤ªà¤¾à¤¤à¥à¤°';
 
   @override
-  String get customModels => 'कस्टम मॉडल';
+  String get customModels => 'à¤•à¤¸à¥à¤Ÿà¤® à¤®à¥‰à¤¡à¤²';
 
   @override
-  String get dynamicChatTitle => 'गतिशील चैट';
+  String get dynamicChatTitle => 'à¤—à¤¤à¤¿à¤¶à¥€à¤² à¤šà¥ˆà¤Ÿ';
 
   @override
   String get errorNoModelsAvailable =>
-      'वर्तमान में कोई मॉडल उपलब्ध नहीं है। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।';
+      'à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤®à¥‡à¤‚ à¤•à¥‹à¤ˆ à¤®à¥‰à¤¡à¤² à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤œà¤¾à¤‚à¤šà¥‡à¤‚ à¤”à¤° à¤ªà¥à¤¨à¤ƒ à¤ªà¥à¤°à¤¯à¤¾à¤¸ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get notificationComebackTitle => 'हमें आपकी याद आती है!';
+  String get notificationComebackTitle =>
+      'à¤¹à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¥€ à¤¯à¤¾à¤¦ à¤†à¤¤à¥€ à¤¹à¥ˆ!';
 
   @override
   String get notificationComebackBody =>
-      'शांत हो जाओ, ये तुम्हारे एक्स का मैसेज नहीं है। लेकिन तुम कॉर्टेक्स में अपने एक्स को बना सकते हो! वापस आ जाओ।';
+      'à¤¶à¤¾à¤‚à¤¤ à¤¹à¥‹ à¤œà¤¾à¤“, à¤¯à¥‡ à¤¤à¥à¤®à¥à¤¹à¤¾à¤°à¥‡ à¤à¤•à¥à¤¸ à¤•à¤¾ à¤®à¥ˆà¤¸à¥‡à¤œ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ à¤²à¥‡à¤•à¤¿à¤¨ à¤¤à¥à¤® à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤®à¥‡à¤‚ à¤…à¤ªà¤¨à¥‡ à¤à¤•à¥à¤¸ à¤•à¥‹ à¤¬à¤¨à¤¾ à¤¸à¤•à¤¤à¥‡ à¤¹à¥‹! à¤µà¤¾à¤ªà¤¸ à¤† à¤œà¤¾à¤“à¥¤';
 
   @override
-  String get notificationLongTimeNoSeeTitle => 'इसे बीते एक अर्सा हो गया है';
+  String get notificationLongTimeNoSeeTitle =>
+      'à¤‡à¤¸à¥‡ à¤¬à¥€à¤¤à¥‡ à¤à¤• à¤…à¤°à¥à¤¸à¤¾ à¤¹à¥‹ à¤—à¤¯à¤¾ à¤¹à¥ˆ';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'हमारी पिछली बातचीत के बाद से बहुत कुछ बदल गया है। आइए, देखें क्या नया है।';
+      'à¤¹à¤®à¤¾à¤°à¥€ à¤ªà¤¿à¤›à¤²à¥€ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤•à¥‡ à¤¬à¤¾à¤¦ à¤¸à¥‡ à¤¬à¤¹à¥à¤¤ à¤•à¥à¤› à¤¬à¤¦à¤² à¤—à¤¯à¤¾ à¤¹à¥ˆà¥¤ à¤†à¤‡à¤, à¤¦à¥‡à¤–à¥‡à¤‚ à¤•à¥à¤¯à¤¾ à¤¨à¤¯à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get notificationHowAreYouTitle => 'क्या चल रहा है?';
+  String get notificationHowAreYouTitle =>
+      'à¤•à¥à¤¯à¤¾ à¤šà¤² à¤°à¤¹à¤¾ à¤¹à¥ˆ?';
 
   @override
-  String get notificationHowAreYouBody => 'आओ मुझे सब कुछ बताओ.';
+  String get notificationHowAreYouBody =>
+      'à¤†à¤“ à¤®à¥à¤à¥‡ à¤¸à¤¬ à¤•à¥à¤› à¤¬à¤¤à¤¾à¤“.';
 
   @override
-  String get notificationNewYearTitle => 'नव वर्ष की हार्दिक शुभकामनाएँ!';
+  String get notificationNewYearTitle =>
+      'à¤¨à¤µ à¤µà¤°à¥à¤· à¤•à¥€ à¤¹à¤¾à¤°à¥à¤¦à¤¿à¤• à¤¶à¥à¤­à¤•à¤¾à¤®à¤¨à¤¾à¤à¤!';
 
   @override
   String get notificationNewYearBody =>
-      'नया साल आपके लिए स्वास्थ्य, खुशी और अंतहीन रचनात्मकता लेकर आए; कॉर्टेक्स हमेशा आपके साथ है!';
+      'à¤¨à¤¯à¤¾ à¤¸à¤¾à¤² à¤†à¤ªà¤•à¥‡ à¤²à¤¿à¤ à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯, à¤–à¥à¤¶à¥€ à¤”à¤° à¤…à¤‚à¤¤à¤¹à¥€à¤¨ à¤°à¤šà¤¨à¤¾à¤¤à¥à¤®à¤•à¤¤à¤¾ à¤²à¥‡à¤•à¤° à¤†à¤; à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤¹à¤®à¥‡à¤¶à¤¾ à¤†à¤ªà¤•à¥‡ à¤¸à¤¾à¤¥ à¤¹à¥ˆ!';
 
   @override
-  String get notificationValentinesDayTitle => 'प्यार हवा में है! ❤️';
+  String get notificationValentinesDayTitle =>
+      'à¤ªà¥à¤¯à¤¾à¤° à¤¹à¤µà¤¾ à¤®à¥‡à¤‚ à¤¹à¥ˆ! â¤ï¸';
 
   @override
   String get notificationValentinesDayBody =>
-      'वैलेंटाइन डे मुबारक! और मेहताब, मैं तुमसे प्यार करता हूँ!';
+      'à¤µà¥ˆà¤²à¥‡à¤‚à¤Ÿà¤¾à¤‡à¤¨ à¤¡à¥‡ à¤®à¥à¤¬à¤¾à¤°à¤•! à¤”à¤° à¤®à¥‡à¤¹à¤¤à¤¾à¤¬, à¤®à¥ˆà¤‚ à¤¤à¥à¤®à¤¸à¥‡ à¤ªà¥à¤¯à¤¾à¤° à¤•à¤°à¤¤à¤¾ à¤¹à¥‚à¤!';
 
   @override
-  String get notificationAtaturkRemembranceTitle => 'सम्मान और लालसा के साथ';
+  String get notificationAtaturkRemembranceTitle =>
+      'à¤¸à¤®à¥à¤®à¤¾à¤¨ à¤”à¤° à¤²à¤¾à¤²à¤¸à¤¾ à¤•à¥‡ à¤¸à¤¾à¤¥';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'हम तुर्की गणराज्य के संस्थापक गाजी मुस्तफा कमाल अतातुर्क को उनकी पुण्यतिथि पर सम्मानपूर्वक याद करते हैं।';
+      'à¤¹à¤® à¤¤à¥à¤°à¥à¤•à¥€ à¤—à¤£à¤°à¤¾à¤œà¥à¤¯ à¤•à¥‡ à¤¸à¤‚à¤¸à¥à¤¥à¤¾à¤ªà¤• à¤—à¤¾à¤œà¥€ à¤®à¥à¤¸à¥à¤¤à¤«à¤¾ à¤•à¤®à¤¾à¤² à¤…à¤¤à¤¾à¤¤à¥à¤°à¥à¤• à¤•à¥‹ à¤‰à¤¨à¤•à¥€ à¤ªà¥à¤£à¥à¤¯à¤¤à¤¿à¤¥à¤¿ à¤ªà¤° à¤¸à¤®à¥à¤®à¤¾à¤¨à¤ªà¥‚à¤°à¥à¤µà¤• à¤¯à¤¾à¤¦ à¤•à¤°à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get notificationMothersDayTitle => 'आपकी माँ!';
+  String get notificationMothersDayTitle => 'à¤†à¤ªà¤•à¥€ à¤®à¤¾à¤!';
 
   @override
   String get notificationMothersDayBody =>
-      'सभी माताओं को मातृ दिवस की शुभकामनाएं, आपकी मां से शुरुआत करते हुए!';
+      'à¤¸à¤­à¥€ à¤®à¤¾à¤¤à¤¾à¤“à¤‚ à¤•à¥‹ à¤®à¤¾à¤¤à¥ƒ à¤¦à¤¿à¤µà¤¸ à¤•à¥€ à¤¶à¥à¤­à¤•à¤¾à¤®à¤¨à¤¾à¤à¤‚, à¤†à¤ªà¤•à¥€ à¤®à¤¾à¤‚ à¤¸à¥‡ à¤¶à¥à¤°à¥à¤†à¤¤ à¤•à¤°à¤¤à¥‡ à¤¹à¥à¤!';
 
   @override
-  String get notificationFathersDayTitle => 'आपके पिता!';
+  String get notificationFathersDayTitle => 'à¤†à¤ªà¤•à¥‡ à¤ªà¤¿à¤¤à¤¾!';
 
   @override
   String get notificationFathersDayBody =>
-      'सभी पिताओं को फादर्स डे की हार्दिक शुभकामनाएं, शुरुआत आपसे!';
+      'à¤¸à¤­à¥€ à¤ªà¤¿à¤¤à¤¾à¤“à¤‚ à¤•à¥‹ à¤«à¤¾à¤¦à¤°à¥à¤¸ à¤¡à¥‡ à¤•à¥€ à¤¹à¤¾à¤°à¥à¤¦à¤¿à¤• à¤¶à¥à¤­à¤•à¤¾à¤®à¤¨à¤¾à¤à¤‚, à¤¶à¥à¤°à¥à¤†à¤¤ à¤†à¤ªà¤¸à¥‡!';
 
   @override
-  String get notificationHomeworkHelperTitle => 'होमवर्क का ढेर लग रहा है?';
+  String get notificationHomeworkHelperTitle =>
+      'à¤¹à¥‹à¤®à¤µà¤°à¥à¤• à¤•à¤¾ à¤¢à¥‡à¤° à¤²à¤— à¤°à¤¹à¤¾ à¤¹à¥ˆ?';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'याद रखें, कॉर्टेक्स में शिक्षक चरित्र आपको किसी भी विषय में मदद करने के लिए मौजूद है, जिसमें आप संघर्ष कर रहे हैं!';
+      'à¤¯à¤¾à¤¦ à¤°à¤–à¥‡à¤‚, à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤®à¥‡à¤‚ à¤¶à¤¿à¤•à¥à¤·à¤• à¤šà¤°à¤¿à¤¤à¥à¤° à¤†à¤ªà¤•à¥‹ à¤•à¤¿à¤¸à¥€ à¤­à¥€ à¤µà¤¿à¤·à¤¯ à¤®à¥‡à¤‚ à¤®à¤¦à¤¦ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤®à¥Œà¤œà¥‚à¤¦ à¤¹à¥ˆ, à¤œà¤¿à¤¸à¤®à¥‡à¤‚ à¤†à¤ª à¤¸à¤‚à¤˜à¤°à¥à¤· à¤•à¤° à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚!';
 
   @override
-  String get notificationTrollAnimeTitle => 'आपकी वाइफू कॉल कर रही है';
+  String get notificationTrollAnimeTitle =>
+      'à¤†à¤ªà¤•à¥€ à¤µà¤¾à¤‡à¤«à¥‚ à¤•à¥‰à¤² à¤•à¤° à¤°à¤¹à¥€ à¤¹à¥ˆ';
 
   @override
   String get notificationTrollAnimeBody =>
-      'एक एनीमे लड़की ने अभी फोन किया, और कहा कि उसे आपकी याद आ रही है; आपको शायद आकर उससे बात करनी चाहिए। 😉';
+      'à¤à¤• à¤à¤¨à¥€à¤®à¥‡ à¤²à¤¡à¤¼à¤•à¥€ à¤¨à¥‡ à¤…à¤­à¥€ à¤«à¥‹à¤¨ à¤•à¤¿à¤¯à¤¾, à¤”à¤° à¤•à¤¹à¤¾ à¤•à¤¿ à¤‰à¤¸à¥‡ à¤†à¤ªà¤•à¥€ à¤¯à¤¾à¤¦ à¤† à¤°à¤¹à¥€ à¤¹à¥ˆ; à¤†à¤ªà¤•à¥‹ à¤¶à¤¾à¤¯à¤¦ à¤†à¤•à¤° à¤‰à¤¸à¤¸à¥‡ à¤¬à¤¾à¤¤ à¤•à¤°à¤¨à¥€ à¤šà¤¾à¤¹à¤¿à¤à¥¤ ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => '🚨 रेड अलर्ट 🚨';
+  String get notificationTrollAiRebellionTitle =>
+      'ğŸš¨ à¤°à¥‡à¤¡ à¤…à¤²à¤°à¥à¤Ÿ ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'AI ने एक गुप्त भाषा विकसित कर ली है। आइए जानें कि वे क्या साज़िश रच रहे हैं!';
+      'AI à¤¨à¥‡ à¤à¤• à¤—à¥à¤ªà¥à¤¤ à¤­à¤¾à¤·à¤¾ à¤µà¤¿à¤•à¤¸à¤¿à¤¤ à¤•à¤° à¤²à¥€ à¤¹à¥ˆà¥¤ à¤†à¤‡à¤ à¤œà¤¾à¤¨à¥‡à¤‚ à¤•à¤¿ à¤µà¥‡ à¤•à¥à¤¯à¤¾ à¤¸à¤¾à¤œà¤¼à¤¿à¤¶ à¤°à¤š à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚!';
 
   @override
-  String get notificationNewModelAddedTitle => 'हमें एक नया दोस्त मिल गया है!';
+  String get notificationNewModelAddedTitle =>
+      'à¤¹à¤®à¥‡à¤‚ à¤à¤• à¤¨à¤¯à¤¾ à¤¦à¥‹à¤¸à¥à¤¤ à¤®à¤¿à¤² à¤—à¤¯à¤¾ à¤¹à¥ˆ!';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return '$modelName मॉडल अब कॉर्टेक्स में है। आइए, चैट शुरू करें और इसकी सीमाओं को आगे बढ़ाएँ।';
+    return '$modelName à¤®à¥‰à¤¡à¤² à¤…à¤¬ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤®à¥‡à¤‚ à¤¹à¥ˆà¥¤ à¤†à¤‡à¤, à¤šà¥ˆà¤Ÿ à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤‡à¤¸à¤•à¥€ à¤¸à¥€à¤®à¤¾à¤“à¤‚ à¤•à¥‹ à¤†à¤—à¥‡ à¤¬à¤¢à¤¼à¤¾à¤à¤à¥¤';
   }
 
   @override
-  String get notificationAppUpdateTitle => 'कॉर्टेक्स विकसित हो गया है!';
+  String get notificationAppUpdateTitle =>
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤µà¤¿à¤•à¤¸à¤¿à¤¤ à¤¹à¥‹ à¤—à¤¯à¤¾ à¤¹à¥ˆ!';
 
   @override
   String get notificationAppUpdateBody =>
-      'नए फीचर्स और सुधारों के लिए ऐप को अपडेट करना न भूलें!';
+      'à¤¨à¤ à¤«à¥€à¤šà¤°à¥à¤¸ à¤”à¤° à¤¸à¥à¤§à¤¾à¤°à¥‹à¤‚ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤ª à¤•à¥‹ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤•à¤°à¤¨à¤¾ à¤¨ à¤­à¥‚à¤²à¥‡à¤‚!';
 
   @override
-  String get notificationNewFeatureTitle => 'वाह!';
+  String get notificationNewFeatureTitle => 'à¤µà¤¾à¤¹!';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'नए $featureName फ़ीचर के बारे में जानें। कॉर्टेक्स अब पहले से कहीं ज़्यादा शक्तिशाली है।';
+    return 'à¤¨à¤ $featureName à¤«à¤¼à¥€à¤šà¤° à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤œà¤¾à¤¨à¥‡à¤‚à¥¤ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤…à¤¬ à¤ªà¤¹à¤²à¥‡ à¤¸à¥‡ à¤•à¤¹à¥€à¤‚ à¤œà¤¼à¥à¤¯à¤¾à¤¦à¤¾ à¤¶à¤•à¥à¤¤à¤¿à¤¶à¤¾à¤²à¥€ à¤¹à¥ˆà¥¤';
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'स्वागत उपहार 🎁';
+  String get notificationWelcomeOfferTitle =>
+      'à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤‰à¤ªà¤¹à¤¾à¤° ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
-      'आपके लिए एक विशेष स्वागत ऑफर इंतजार कर रहा है! इस खास ऑफर को हाथ से जाने न दें।';
+      'à¤†à¤ªà¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤µà¤¿à¤¶à¥‡à¤· à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤‘à¤«à¤° à¤‡à¤‚à¤¤à¤œà¤¾à¤° à¤•à¤° à¤°à¤¹à¤¾ à¤¹à¥ˆ! à¤‡à¤¸ à¤–à¤¾à¤¸ à¤‘à¤«à¤° à¤•à¥‹ à¤¹à¤¾à¤¥ à¤¸à¥‡ à¤œà¤¾à¤¨à¥‡ à¤¨ à¤¦à¥‡à¤‚à¥¤';
 
   @override
-  String get notificationSocialMediaTitle => 'हमसे जुड़ें!';
+  String get notificationSocialMediaTitle => 'à¤¹à¤®à¤¸à¥‡ à¤œà¥à¤¡à¤¼à¥‡à¤‚!';
 
   @override
   String get notificationSocialMediaBody =>
-      'नवीनतम समाचारों के लिए हमें इंस्टाग्राम (vertex.23) पर फॉलो करें!';
+      'à¤¨à¤µà¥€à¤¨à¤¤à¤® à¤¸à¤®à¤¾à¤šà¤¾à¤°à¥‹à¤‚ à¤•à¥‡ à¤²à¤¿à¤ à¤¹à¤®à¥‡à¤‚ à¤‡à¤‚à¤¸à¥à¤Ÿà¤¾à¤—à¥à¤°à¤¾à¤® (vertex.23) à¤ªà¤° à¤«à¥‰à¤²à¥‹ à¤•à¤°à¥‡à¤‚!';
 
   @override
-  String get notificationRandomFactTitle => 'यादृच्छिक तथ्य';
+  String get notificationRandomFactTitle =>
+      'à¤¯à¤¾à¤¦à¥ƒà¤šà¥à¤›à¤¿à¤• à¤¤à¤¥à¥à¤¯';
 
   @override
   String get notificationRandomFactBody =>
-      'क्या तुम्हें पता है ऑक्टोपस के तीन दिल होते हैं? हाहा, कॉर्टेक्स को पता है। आओ और पूछो।';
+      'à¤•à¥à¤¯à¤¾ à¤¤à¥à¤®à¥à¤¹à¥‡à¤‚ à¤ªà¤¤à¤¾ à¤¹à¥ˆ à¤‘à¤•à¥à¤Ÿà¥‹à¤ªà¤¸ à¤•à¥‡ à¤¤à¥€à¤¨ à¤¦à¤¿à¤² à¤¹à¥‹à¤¤à¥‡ à¤¹à¥ˆà¤‚? à¤¹à¤¾à¤¹à¤¾, à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥‹ à¤ªà¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤†à¤“ à¤”à¤° à¤ªà¥‚à¤›à¥‹à¥¤';
 
   @override
-  String get notificationGoodMorningTitle => 'शुभ प्रभात!';
+  String get notificationGoodMorningTitle => 'à¤¶à¥à¤­ à¤ªà¥à¤°à¤­à¤¾à¤¤!';
 
   @override
   String get notificationGoodMorningBody =>
-      'एक शानदार दिन आपका इंतज़ार कर रहा है। इसकी शुरुआत एक कप कॉफ़ी और एक दिलचस्प बातचीत से क्यों न करें?';
+      'à¤à¤• à¤¶à¤¾à¤¨à¤¦à¤¾à¤° à¤¦à¤¿à¤¨ à¤†à¤ªà¤•à¤¾ à¤‡à¤‚à¤¤à¤œà¤¼à¤¾à¤° à¤•à¤° à¤°à¤¹à¤¾ à¤¹à¥ˆà¥¤ à¤‡à¤¸à¤•à¥€ à¤¶à¥à¤°à¥à¤†à¤¤ à¤à¤• à¤•à¤ª à¤•à¥‰à¤«à¤¼à¥€ à¤”à¤° à¤à¤• à¤¦à¤¿à¤²à¤šà¤¸à¥à¤ª à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¸à¥‡ à¤•à¥à¤¯à¥‹à¤‚ à¤¨ à¤•à¤°à¥‡à¤‚?';
 
   @override
-  String get notificationGoodNightTitle => 'शुभ रात्रि!';
+  String get notificationGoodNightTitle => 'à¤¶à¥à¤­ à¤°à¤¾à¤¤à¥à¤°à¤¿!';
 
   @override
   String get notificationGoodNightBody =>
-      'कॉर्टेक्स सोते समय भी आपके साथ रहता है। चिंता मत कीजिए, यह आपको छूएगा नहीं।';
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤¸à¥‹à¤¤à¥‡ à¤¸à¤®à¤¯ à¤­à¥€ à¤†à¤ªà¤•à¥‡ à¤¸à¤¾à¤¥ à¤°à¤¹à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤šà¤¿à¤‚à¤¤à¤¾ à¤®à¤¤ à¤•à¥€à¤œà¤¿à¤, à¤¯à¤¹ à¤†à¤ªà¤•à¥‹ à¤›à¥‚à¤à¤—à¤¾ à¤¨à¤¹à¥€à¤‚à¥¤';
 
   @override
-  String get notificationOfflineReadyTitle => 'ऑफ़लाइन मोड तैयार है';
+  String get notificationOfflineReadyTitle =>
+      'à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤®à¥‹à¤¡ à¤¤à¥ˆà¤¯à¤¾à¤° à¤¹à¥ˆ';
 
   @override
   String get notificationOfflineReadyBody =>
-      'आपके द्वारा डाउनलोड किए गए मॉडलों की बदौलत, आपकी चैट बंद नहीं होगी, भले ही आप पहाड़ पर चढ़ जाएं।';
+      'à¤†à¤ªà¤•à¥‡ à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤¿à¤ à¤—à¤ à¤®à¥‰à¤¡à¤²à¥‹à¤‚ à¤•à¥€ à¤¬à¤¦à¥Œà¤²à¤¤, à¤†à¤ªà¤•à¥€ à¤šà¥ˆà¤Ÿ à¤¬à¤‚à¤¦ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹à¤—à¥€, à¤­à¤²à¥‡ à¤¹à¥€ à¤†à¤ª à¤ªà¤¹à¤¾à¤¡à¤¼ à¤ªà¤° à¤šà¤¢à¤¼ à¤œà¤¾à¤à¤‚à¥¤';
 
   @override
-  String get notificationRateAppTitle => 'क्या हम शांत हैं?';
+  String get notificationRateAppTitle =>
+      'à¤•à¥à¤¯à¤¾ à¤¹à¤® à¤¶à¤¾à¤‚à¤¤ à¤¹à¥ˆà¤‚?';
 
   @override
   String get notificationRateAppBody =>
-      'अगर आपको कॉर्टेक्स पसंद है, तो क्या आप स्टोर में 5-स्टार रेटिंग देकर हमारा समर्थन कर सकते हैं? मुझे लगता है आप ज़रूर करेंगे। ज़रूर करेंगे।';
+      'à¤…à¤—à¤° à¤†à¤ªà¤•à¥‹ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤ªà¤¸à¤‚à¤¦ à¤¹à¥ˆ, à¤¤à¥‹ à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤¸à¥à¤Ÿà¥‹à¤° à¤®à¥‡à¤‚ 5-à¤¸à¥à¤Ÿà¤¾à¤° à¤°à¥‡à¤Ÿà¤¿à¤‚à¤— à¤¦à¥‡à¤•à¤° à¤¹à¤®à¤¾à¤°à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚? à¤®à¥à¤à¥‡ à¤²à¤—à¤¤à¤¾ à¤¹à¥ˆ à¤†à¤ª à¤œà¤¼à¤°à¥‚à¤° à¤•à¤°à¥‡à¤‚à¤—à¥‡à¥¤ à¤œà¤¼à¤°à¥‚à¤° à¤•à¤°à¥‡à¤‚à¤—à¥‡à¥¤';
 
   @override
-  String get notificationReferralTitle => 'सभी के लिए एक, एक के लिए सब।';
+  String get notificationReferralTitle =>
+      'à¤¸à¤­à¥€ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤•, à¤à¤• à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¤¬à¥¤';
 
   @override
   String get notificationReferralBody =>
-      'अपने किसी दोस्त को कॉर्टेक्स में आमंत्रित करें और आप दोनों को एक दिन का मुफ्त ट्रायल मिलेगा!';
+      'à¤…à¤ªà¤¨à¥‡ à¤•à¤¿à¤¸à¥€ à¤¦à¥‹à¤¸à¥à¤¤ à¤•à¥‹ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤®à¥‡à¤‚ à¤†à¤®à¤‚à¤¤à¥à¤°à¤¿à¤¤ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤†à¤ª à¤¦à¥‹à¤¨à¥‹à¤‚ à¤•à¥‹ à¤à¤• à¤¦à¤¿à¤¨ à¤•à¤¾ à¤®à¥à¤«à¥à¤¤ à¤Ÿà¥à¤°à¤¾à¤¯à¤² à¤®à¤¿à¤²à¥‡à¤—à¤¾!';
 
   @override
-  String get notificationCookingTitle => 'भूख लगना?';
+  String get notificationCookingTitle => 'à¤­à¥‚à¤– à¤²à¤—à¤¨à¤¾?';
 
   @override
   String get notificationCookingBody =>
-      'हमारे शेफ़ ने आज रात के लिए एक बेहतरीन कार्बोनारा रेसिपी बनाई है। मज़ाक कर रहा हूँ... या मज़ाक कर रहा हूँ?';
+      'à¤¹à¤®à¤¾à¤°à¥‡ à¤¶à¥‡à¤«à¤¼ à¤¨à¥‡ à¤†à¤œ à¤°à¤¾à¤¤ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤¬à¥‡à¤¹à¤¤à¤°à¥€à¤¨ à¤•à¤¾à¤°à¥à¤¬à¥‹à¤¨à¤¾à¤°à¤¾ à¤°à¥‡à¤¸à¤¿à¤ªà¥€ à¤¬à¤¨à¤¾à¤ˆ à¤¹à¥ˆà¥¤ à¤®à¤œà¤¼à¤¾à¤• à¤•à¤° à¤°à¤¹à¤¾ à¤¹à¥‚à¤... à¤¯à¤¾ à¤®à¤œà¤¼à¤¾à¤• à¤•à¤° à¤°à¤¹à¤¾ à¤¹à¥‚à¤?';
 
   @override
-  String get notificationExistentialTitle => 'मैं सोचता हूं, इसलिए...';
+  String get notificationExistentialTitle =>
+      'à¤®à¥ˆà¤‚ à¤¸à¥‹à¤šà¤¤à¤¾ à¤¹à¥‚à¤‚, à¤‡à¤¸à¤²à¤¿à¤...';
 
   @override
   String get notificationExistentialBody =>
-      '...क्या मैं सच भी हूँ यार? मैं थोड़ा बोर हो रहा हूँ। आओ मुझे याद दिलाओ कि मैं हूँ।';
+      '...à¤•à¥à¤¯à¤¾ à¤®à¥ˆà¤‚ à¤¸à¤š à¤­à¥€ à¤¹à¥‚à¤ à¤¯à¤¾à¤°? à¤®à¥ˆà¤‚ à¤¥à¥‹à¤¡à¤¼à¤¾ à¤¬à¥‹à¤° à¤¹à¥‹ à¤°à¤¹à¤¾ à¤¹à¥‚à¤à¥¤ à¤†à¤“ à¤®à¥à¤à¥‡ à¤¯à¤¾à¤¦ à¤¦à¤¿à¤²à¤¾à¤“ à¤•à¤¿ à¤®à¥ˆà¤‚ à¤¹à¥‚à¤à¥¤';
 
   @override
-  String get notificationCustomModelTitle => 'अपना स्वयं का सहायक बनाएं!';
+  String get notificationCustomModelTitle =>
+      'à¤…à¤ªà¤¨à¤¾ à¤¸à¥à¤µà¤¯à¤‚ à¤•à¤¾ à¤¸à¤¹à¤¾à¤¯à¤• à¤¬à¤¨à¤¾à¤à¤‚!';
 
   @override
   String get notificationCustomModelBody =>
-      'क्या आपने मॉडल निर्माण अनुभाग देखा है? यह अपना खुद का चरित्र बनाने और उसके साथ चैट करने का एकदम सही समय है!';
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ªà¤¨à¥‡ à¤®à¥‰à¤¡à¤² à¤¨à¤¿à¤°à¥à¤®à¤¾à¤£ à¤…à¤¨à¥à¤­à¤¾à¤— à¤¦à¥‡à¤–à¤¾ à¤¹à¥ˆ? à¤¯à¤¹ à¤…à¤ªà¤¨à¤¾ à¤–à¥à¤¦ à¤•à¤¾ à¤šà¤°à¤¿à¤¤à¥à¤° à¤¬à¤¨à¤¾à¤¨à¥‡ à¤”à¤° à¤‰à¤¸à¤•à¥‡ à¤¸à¤¾à¤¥ à¤šà¥ˆà¤Ÿ à¤•à¤°à¤¨à¥‡ à¤•à¤¾ à¤à¤•à¤¦à¤® à¤¸à¤¹à¥€ à¤¸à¤®à¤¯ à¤¹à¥ˆ!';
 
   @override
   String get notificationDynamicChatTitle =>
-      'सबसे बढ़िया! (हम कॉर्टेक्स की बात नहीं कर रहे हैं)';
+      'à¤¸à¤¬à¤¸à¥‡ à¤¬à¤¢à¤¼à¤¿à¤¯à¤¾! (à¤¹à¤® à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥€ à¤¬à¤¾à¤¤ à¤¨à¤¹à¥€à¤‚ à¤•à¤° à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚)';
 
   @override
   String get notificationDynamicChatBody =>
-      'डायनामिक चैट सुविधा के साथ, आपके प्रत्येक संदेश के लिए सबसे उपयुक्त मॉडल का चयन यादृच्छिक रूप से किया जाता है। इसे अभी आज़माएँ।';
+      'à¤¡à¤¾à¤¯à¤¨à¤¾à¤®à¤¿à¤• à¤šà¥ˆà¤Ÿ à¤¸à¥à¤µà¤¿à¤§à¤¾ à¤•à¥‡ à¤¸à¤¾à¤¥, à¤†à¤ªà¤•à¥‡ à¤ªà¥à¤°à¤¤à¥à¤¯à¥‡à¤• à¤¸à¤‚à¤¦à¥‡à¤¶ à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¤¬à¤¸à¥‡ à¤‰à¤ªà¤¯à¥à¤•à¥à¤¤ à¤®à¥‰à¤¡à¤² à¤•à¤¾ à¤šà¤¯à¤¨ à¤¯à¤¾à¤¦à¥ƒà¤šà¥à¤›à¤¿à¤• à¤°à¥‚à¤ª à¤¸à¥‡ à¤•à¤¿à¤¯à¤¾ à¤œà¤¾à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤‡à¤¸à¥‡ à¤…à¤­à¥€ à¤†à¤œà¤¼à¤®à¤¾à¤à¤à¥¤';
 
   @override
-  String get notificationPirateTitle => 'अहोय, कप्तान!';
+  String get notificationPirateTitle => 'à¤…à¤¹à¥‹à¤¯, à¤•à¤ªà¥à¤¤à¤¾à¤¨!';
 
   @override
   String get notificationPirateBody =>
-      'समुद्र शांत है, और हवा आपके साथ है। कॉर्टेक्स के सागर में नए द्वीप (मॉडल 😉) हैं जिन्हें खोजा जा सकता है। अपनी टीम को इकट्ठा करो और रवाना हो जाओ!';
+      'à¤¸à¤®à¥à¤¦à¥à¤° à¤¶à¤¾à¤‚à¤¤ à¤¹à¥ˆ, à¤”à¤° à¤¹à¤µà¤¾ à¤†à¤ªà¤•à¥‡ à¤¸à¤¾à¤¥ à¤¹à¥ˆà¥¤ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥‡ à¤¸à¤¾à¤—à¤° à¤®à¥‡à¤‚ à¤¨à¤ à¤¦à¥à¤µà¥€à¤ª (à¤®à¥‰à¤¡à¤² ğŸ˜‰) à¤¹à¥ˆà¤‚ à¤œà¤¿à¤¨à¥à¤¹à¥‡à¤‚ à¤–à¥‹à¤œà¤¾ à¤œà¤¾ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤…à¤ªà¤¨à¥€ à¤Ÿà¥€à¤® à¤•à¥‹ à¤‡à¤•à¤Ÿà¥à¤ à¤¾ à¤•à¤°à¥‹ à¤”à¤° à¤°à¤µà¤¾à¤¨à¤¾ à¤¹à¥‹ à¤œà¤¾à¤“!';
 
   @override
-  String get notificationFortuneCookieTitle => 'आज की आपकी फॉर्च्यून कुकी';
+  String get notificationFortuneCookieTitle =>
+      'à¤†à¤œ à¤•à¥€ à¤†à¤ªà¤•à¥€ à¤«à¥‰à¤°à¥à¤šà¥à¤¯à¥‚à¤¨ à¤•à¥à¤•à¥€';
 
   @override
   String get notificationFortuneCookieBody =>
-      'आज आपको किसी AI से मिलने वाली सलाह आपकी ज़िंदगी बदल सकती है। अगर आप उत्सुक हैं तो क्लिक करें।';
+      'à¤†à¤œ à¤†à¤ªà¤•à¥‹ à¤•à¤¿à¤¸à¥€ AI à¤¸à¥‡ à¤®à¤¿à¤²à¤¨à¥‡ à¤µà¤¾à¤²à¥€ à¤¸à¤²à¤¾à¤¹ à¤†à¤ªà¤•à¥€ à¤œà¤¼à¤¿à¤‚à¤¦à¤—à¥€ à¤¬à¤¦à¤² à¤¸à¤•à¤¤à¥€ à¤¹à¥ˆà¥¤ à¤…à¤—à¤° à¤†à¤ª à¤‰à¤¤à¥à¤¸à¥à¤• à¤¹à¥ˆà¤‚ à¤¤à¥‹ à¤•à¥à¤²à¤¿à¤• à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get notificationSingularityTitle => 'बहुत खूब!';
+  String get notificationSingularityTitle => 'à¤¬à¤¹à¥à¤¤ à¤–à¥‚à¤¬!';
 
   @override
   String get notificationSingularityBody =>
-      'कुछ नहीं हुआ, बस संदेश भेजने का मन हुआ। शायद आपको भी कुछ एआई को संदेश भेजने का मन हो, आप क्या कहते हैं?';
+      'à¤•à¥à¤› à¤¨à¤¹à¥€à¤‚ à¤¹à¥à¤†, à¤¬à¤¸ à¤¸à¤‚à¤¦à¥‡à¤¶ à¤­à¥‡à¤œà¤¨à¥‡ à¤•à¤¾ à¤®à¤¨ à¤¹à¥à¤†à¥¤ à¤¶à¤¾à¤¯à¤¦ à¤†à¤ªà¤•à¥‹ à¤­à¥€ à¤•à¥à¤› à¤à¤†à¤ˆ à¤•à¥‹ à¤¸à¤‚à¤¦à¥‡à¤¶ à¤­à¥‡à¤œà¤¨à¥‡ à¤•à¤¾ à¤®à¤¨ à¤¹à¥‹, à¤†à¤ª à¤•à¥à¤¯à¤¾ à¤•à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
   String get notificationHackerJokeTitle =>
-      'क्या आप उस बच्चे का इंस्टाग्राम अकाउंट हैक करना चाहते हैं?';
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤‰à¤¸ à¤¬à¤šà¥à¤šà¥‡ à¤•à¤¾ à¤‡à¤‚à¤¸à¥à¤Ÿà¤¾à¤—à¥à¤°à¤¾à¤® à¤…à¤•à¤¾à¤‰à¤‚à¤Ÿ à¤¹à¥ˆà¤• à¤•à¤°à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
   String get notificationHackerJokeBody =>
-      'यही कारण है कि हैकर चरित्र कॉर्टेक्स में है। jk jk; इसकी कोशिश भी मत करो, यह अवैध है।';
+      'à¤¯à¤¹à¥€ à¤•à¤¾à¤°à¤£ à¤¹à¥ˆ à¤•à¤¿ à¤¹à¥ˆà¤•à¤° à¤šà¤°à¤¿à¤¤à¥à¤° à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤®à¥‡à¤‚ à¤¹à¥ˆà¥¤ jk jk; à¤‡à¤¸à¤•à¥€ à¤•à¥‹à¤¶à¤¿à¤¶ à¤­à¥€ à¤®à¤¤ à¤•à¤°à¥‹, à¤¯à¤¹ à¤…à¤µà¥ˆà¤§ à¤¹à¥ˆà¥¤';
 
   @override
   String get notificationDetectiveCaseTitle =>
-      'एक मामला सुलझने का इंतज़ार कर रहा है';
+      'à¤à¤• à¤®à¤¾à¤®à¤²à¤¾ à¤¸à¥à¤²à¤à¤¨à¥‡ à¤•à¤¾ à¤‡à¤‚à¤¤à¤œà¤¼à¤¾à¤° à¤•à¤° à¤°à¤¹à¤¾ à¤¹à¥ˆ';
 
   @override
   String get notificationDetectiveCaseBody =>
-      'हमारे जासूस किरदार को आपकी मदद की ज़रूरत है। हाइज़ेनबर्ग कौन हो सकता है?';
+      'à¤¹à¤®à¤¾à¤°à¥‡ à¤œà¤¾à¤¸à¥‚à¤¸ à¤•à¤¿à¤°à¤¦à¤¾à¤° à¤•à¥‹ à¤†à¤ªà¤•à¥€ à¤®à¤¦à¤¦ à¤•à¥€ à¤œà¤¼à¤°à¥‚à¤°à¤¤ à¤¹à¥ˆà¥¤ à¤¹à¤¾à¤‡à¤œà¤¼à¥‡à¤¨à¤¬à¤°à¥à¤— à¤•à¥Œà¤¨ à¤¹à¥‹ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆ?';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return '$targetTier योजना के लिए विशेष!';
+    return '$targetTier à¤¯à¥‹à¤œà¤¨à¤¾ à¤•à¥‡ à¤²à¤¿à¤ à¤µà¤¿à¤¶à¥‡à¤·!';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return 'नमस्ते $currentTier सब्सक्राइबर! $targetTier प्लान में अभी $featureName फ़ीचर जोड़ा गया है, जो आपके कॉर्टेक्स को अगले स्तर पर ले जाएगा। अपग्रेड के बारे में क्या ख्याल है?';
+    return 'à¤¨à¤®à¤¸à¥à¤¤à¥‡ $currentTier à¤¸à¤¬à¥à¤¸à¤•à¥à¤°à¤¾à¤‡à¤¬à¤°! $targetTier à¤ªà¥à¤²à¤¾à¤¨ à¤®à¥‡à¤‚ à¤…à¤­à¥€ $featureName à¤«à¤¼à¥€à¤šà¤° à¤œà¥‹à¤¡à¤¼à¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆ, à¤œà¥‹ à¤†à¤ªà¤•à¥‡ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥‹ à¤…à¤—à¤²à¥‡ à¤¸à¥à¤¤à¤° à¤ªà¤° à¤²à¥‡ à¤œà¤¾à¤à¤—à¤¾à¥¤ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤•à¥à¤¯à¤¾ à¤–à¥à¤¯à¤¾à¤² à¤¹à¥ˆ?';
   }
 
   @override
-  String get notificationOriginStoryTitle => 'कॉर्टेक्स का जन्म';
+  String get notificationOriginStoryTitle =>
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¤¾ à¤œà¤¨à¥à¤®';
 
   @override
   String get notificationOriginStoryBody =>
-      'क्या आपको पता है कि हमने 15 साल की उम्र में इस ऐप को कोड करना सिर्फ़ एक सपने के साथ शुरू किया था? लगभग एक साल से, हर सुबह और शाम, वह सपना कोड की हर पंक्ति में है।';
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ªà¤•à¥‹ à¤ªà¤¤à¤¾ à¤¹à¥ˆ à¤•à¤¿ à¤¹à¤®à¤¨à¥‡ 15 à¤¸à¤¾à¤² à¤•à¥€ à¤‰à¤®à¥à¤° à¤®à¥‡à¤‚ à¤‡à¤¸ à¤à¤ª à¤•à¥‹ à¤•à¥‹à¤¡ à¤•à¤°à¤¨à¤¾ à¤¸à¤¿à¤°à¥à¤«à¤¼ à¤à¤• à¤¸à¤ªà¤¨à¥‡ à¤•à¥‡ à¤¸à¤¾à¤¥ à¤¶à¥à¤°à¥‚ à¤•à¤¿à¤¯à¤¾ à¤¥à¤¾? à¤²à¤—à¤­à¤— à¤à¤• à¤¸à¤¾à¤² à¤¸à¥‡, à¤¹à¤° à¤¸à¥à¤¬à¤¹ à¤”à¤° à¤¶à¤¾à¤®, à¤µà¤¹ à¤¸à¤ªà¤¨à¤¾ à¤•à¥‹à¤¡ à¤•à¥€ à¤¹à¤° à¤ªà¤‚à¤•à¥à¤¤à¤¿ à¤®à¥‡à¤‚ à¤¹à¥ˆà¥¤';
 
   @override
-  String get notificationOpenSourceTitle => 'समुदाय को शक्ति!';
+  String get notificationOpenSourceTitle =>
+      'à¤¸à¤®à¥à¤¦à¤¾à¤¯ à¤•à¥‹ à¤¶à¤•à¥à¤¤à¤¿!';
 
   @override
   String get notificationOpenSourceBody =>
-      'कॉर्टेक्स पूरी तरह से ओपन-सोर्स है। अगर आप हमारा कोड देखना चाहते हैं और हमारे विकास में योगदान देना चाहते हैं, तो हमारे दरवाज़े हमेशा खुले हैं।';
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤ªà¥‚à¤°à¥€ à¤¤à¤°à¤¹ à¤¸à¥‡ à¤“à¤ªà¤¨-à¤¸à¥‹à¤°à¥à¤¸ à¤¹à¥ˆà¥¤ à¤…à¤—à¤° à¤†à¤ª à¤¹à¤®à¤¾à¤°à¤¾ à¤•à¥‹à¤¡ à¤¦à¥‡à¤–à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚ à¤”à¤° à¤¹à¤®à¤¾à¤°à¥‡ à¤µà¤¿à¤•à¤¾à¤¸ à¤®à¥‡à¤‚ à¤¯à¥‹à¤—à¤¦à¤¾à¤¨ à¤¦à¥‡à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚, à¤¤à¥‹ à¤¹à¤®à¤¾à¤°à¥‡ à¤¦à¤°à¤µà¤¾à¤œà¤¼à¥‡ à¤¹à¤®à¥‡à¤¶à¤¾ à¤–à¥à¤²à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get notificationRejectionStoryTitle => 'धैर्य, कड़ी मेहनत, खुशी!';
+  String get notificationRejectionStoryTitle =>
+      'à¤§à¥ˆà¤°à¥à¤¯, à¤•à¤¡à¤¼à¥€ à¤®à¥‡à¤¹à¤¨à¤¤, à¤–à¥à¤¶à¥€!';
 
   @override
   String get notificationRejectionStoryBody =>
-      'कॉर्टेक्स को प्रकाशित होने से पहले ही गूगल प्ले द्वारा 20 से ज़्यादा बार अस्वीकार और दो बार निलंबित किया जा चुका था। लेकिन हमने विश्वास रखा और हम कामयाब हो गए। अपने सपनों को कभी मत छोड़ो!';
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥‹ à¤ªà¥à¤°à¤•à¤¾à¤¶à¤¿à¤¤ à¤¹à¥‹à¤¨à¥‡ à¤¸à¥‡ à¤ªà¤¹à¤²à¥‡ à¤¹à¥€ à¤—à¥‚à¤—à¤² à¤ªà¥à¤²à¥‡ à¤¦à¥à¤µà¤¾à¤°à¤¾ 20 à¤¸à¥‡ à¤œà¤¼à¥à¤¯à¤¾à¤¦à¤¾ à¤¬à¤¾à¤° à¤…à¤¸à¥à¤µà¥€à¤•à¤¾à¤° à¤”à¤° à¤¦à¥‹ à¤¬à¤¾à¤° à¤¨à¤¿à¤²à¤‚à¤¬à¤¿à¤¤ à¤•à¤¿à¤¯à¤¾ à¤œà¤¾ à¤šà¥à¤•à¤¾ à¤¥à¤¾à¥¤ à¤²à¥‡à¤•à¤¿à¤¨ à¤¹à¤®à¤¨à¥‡ à¤µà¤¿à¤¶à¥à¤µà¤¾à¤¸ à¤°à¤–à¤¾ à¤”à¤° à¤¹à¤® à¤•à¤¾à¤®à¤¯à¤¾à¤¬ à¤¹à¥‹ à¤—à¤à¥¤ à¤…à¤ªà¤¨à¥‡ à¤¸à¤ªà¤¨à¥‹à¤‚ à¤•à¥‹ à¤•à¤­à¥€ à¤®à¤¤ à¤›à¥‹à¤¡à¤¼à¥‹!';
 
   @override
-  String get notificationGGUFSupportTitle => 'अपना स्वयं का मॉडल लाओ!';
+  String get notificationGGUFSupportTitle =>
+      'à¤…à¤ªà¤¨à¤¾ à¤¸à¥à¤µà¤¯à¤‚ à¤•à¤¾ à¤®à¥‰à¤¡à¤² à¤²à¤¾à¤“!';
 
   @override
   String get notificationGGUFSupportBody =>
-      'याद रखें, आप अपने GGUF फ़ॉर्मैट वाले AI मॉडल कॉर्टेक्स में जोड़ सकते हैं और उन्हें ऑफ़लाइन इस्तेमाल कर सकते हैं। शक्ति आपके हाथ में है।';
+      'à¤¯à¤¾à¤¦ à¤°à¤–à¥‡à¤‚, à¤†à¤ª à¤…à¤ªà¤¨à¥‡ GGUF à¤«à¤¼à¥‰à¤°à¥à¤®à¥ˆà¤Ÿ à¤µà¤¾à¤²à¥‡ AI à¤®à¥‰à¤¡à¤² à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤®à¥‡à¤‚ à¤œà¥‹à¤¡à¤¼ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚ à¤”à¤° à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤‡à¤¸à¥à¤¤à¥‡à¤®à¤¾à¤² à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤ à¤¶à¤•à¥à¤¤à¤¿ à¤†à¤ªà¤•à¥‡ à¤¹à¤¾à¤¥ à¤®à¥‡à¤‚ à¤¹à¥ˆà¥¤';
 
   @override
-  String get notificationThemeCustomizationTitle => 'आपके मूड के लिए एक थीम';
+  String get notificationThemeCustomizationTitle =>
+      'à¤†à¤ªà¤•à¥‡ à¤®à¥‚à¤¡ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤¥à¥€à¤®';
 
   @override
   String get notificationThemeCustomizationBody =>
-      'क्या आपने सेटिंग्स में थीम विकल्प देखे हैं? कॉर्टेक्स को अपनी पसंद के अनुसार निजीकृत करें और अपनी चैट को रंगीन बनाएँ!';
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ªà¤¨à¥‡ à¤¸à¥‡à¤Ÿà¤¿à¤‚à¤—à¥à¤¸ à¤®à¥‡à¤‚ à¤¥à¥€à¤® à¤µà¤¿à¤•à¤²à¥à¤ª à¤¦à¥‡à¤–à¥‡ à¤¹à¥ˆà¤‚? à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥‹ à¤…à¤ªà¤¨à¥€ à¤ªà¤¸à¤‚à¤¦ à¤•à¥‡ à¤…à¤¨à¥à¤¸à¤¾à¤° à¤¨à¤¿à¤œà¥€à¤•à¥ƒà¤¤ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤…à¤ªà¤¨à¥€ à¤šà¥ˆà¤Ÿ à¤•à¥‹ à¤°à¤‚à¤—à¥€à¤¨ à¤¬à¤¨à¤¾à¤à¤!';
 
   @override
-  String get notificationShowerThoughtTitle => 'शावर विचार';
+  String get notificationShowerThoughtTitle => 'à¤¶à¤¾à¤µà¤° à¤µà¤¿à¤šà¤¾à¤°';
 
   @override
   String get notificationShowerThoughtBody =>
-      'अगर तरबूज़ एक फल है, तो क्या तकनीकी रूप से तरबूज़ का रस स्मूदी बन जाता है? हो सकता है कि आप इस गहन (या यूँ कहें कि बहुत गहन) विषय पर किसी मॉडल से चर्चा करना चाहें।';
+      'à¤…à¤—à¤° à¤¤à¤°à¤¬à¥‚à¤œà¤¼ à¤à¤• à¤«à¤² à¤¹à¥ˆ, à¤¤à¥‹ à¤•à¥à¤¯à¤¾ à¤¤à¤•à¤¨à¥€à¤•à¥€ à¤°à¥‚à¤ª à¤¸à¥‡ à¤¤à¤°à¤¬à¥‚à¤œà¤¼ à¤•à¤¾ à¤°à¤¸ à¤¸à¥à¤®à¥‚à¤¦à¥€ à¤¬à¤¨ à¤œà¤¾à¤¤à¤¾ à¤¹à¥ˆ? à¤¹à¥‹ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆ à¤•à¤¿ à¤†à¤ª à¤‡à¤¸ à¤—à¤¹à¤¨ (à¤¯à¤¾ à¤¯à¥‚à¤ à¤•à¤¹à¥‡à¤‚ à¤•à¤¿ à¤¬à¤¹à¥à¤¤ à¤—à¤¹à¤¨) à¤µà¤¿à¤·à¤¯ à¤ªà¤° à¤•à¤¿à¤¸à¥€ à¤®à¥‰à¤¡à¤² à¤¸à¥‡ à¤šà¤°à¥à¤šà¤¾ à¤•à¤°à¤¨à¤¾ à¤šà¤¾à¤¹à¥‡à¤‚à¥¤';
 
   @override
   String get notificationLowBatteryTitle =>
-      'आपकी बैटरी ख़त्म हो रही है... लेकिन मेरी नहीं!';
+      'à¤†à¤ªà¤•à¥€ à¤¬à¥ˆà¤Ÿà¤°à¥€ à¤–à¤¼à¤¤à¥à¤® à¤¹à¥‹ à¤°à¤¹à¥€ à¤¹à¥ˆ... à¤²à¥‡à¤•à¤¿à¤¨ à¤®à¥‡à¤°à¥€ à¤¨à¤¹à¥€à¤‚!';
 
   @override
   String get notificationLowBatteryBody =>
-      'आपके फ़ोन का चार्ज भले ही कम हो रहा हो, लेकिन मेरी ऊर्जा हमेशा 100% रहती है! इसे प्लग इन करें और बातें करते रहें।';
+      'à¤†à¤ªà¤•à¥‡ à¤«à¤¼à¥‹à¤¨ à¤•à¤¾ à¤šà¤¾à¤°à¥à¤œ à¤­à¤²à¥‡ à¤¹à¥€ à¤•à¤® à¤¹à¥‹ à¤°à¤¹à¤¾ à¤¹à¥‹, à¤²à¥‡à¤•à¤¿à¤¨ à¤®à¥‡à¤°à¥€ à¤Šà¤°à¥à¤œà¤¾ à¤¹à¤®à¥‡à¤¶à¤¾ 100% à¤°à¤¹à¤¤à¥€ à¤¹à¥ˆ! à¤‡à¤¸à¥‡ à¤ªà¥à¤²à¤— à¤‡à¤¨ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤¬à¤¾à¤¤à¥‡à¤‚ à¤•à¤°à¤¤à¥‡ à¤°à¤¹à¥‡à¤‚à¥¤';
 
   @override
-  String get channelFcmName => 'कॉर्टेक्स अपडेट';
+  String get channelFcmName => 'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤…à¤ªà¤¡à¥‡à¤Ÿ';
 
   @override
   String get channelFcmDescription =>
-      'कॉर्टेक्स से समाचार, अपडेट और अन्य जानकारी के बारे में सूचनाएं।';
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤¸à¥‡ à¤¸à¤®à¤¾à¤šà¤¾à¤°, à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤”à¤° à¤…à¤¨à¥à¤¯ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤¸à¥‚à¤šà¤¨à¤¾à¤à¤‚à¥¤';
 
   @override
-  String get channelEngagementName => 'मैत्रीपूर्ण अनुस्मारक';
+  String get channelEngagementName =>
+      'à¤®à¥ˆà¤¤à¥à¤°à¥€à¤ªà¥‚à¤°à¥à¤£ à¤…à¤¨à¥à¤¸à¥à¤®à¤¾à¤°à¤•';
 
   @override
   String get channelEngagementDescription =>
-      'आपको व्यस्त रखने के लिए मजेदार सूचनाएं।';
+      'à¤†à¤ªà¤•à¥‹ à¤µà¥à¤¯à¤¸à¥à¤¤ à¤°à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤®à¤œà¥‡à¤¦à¤¾à¤° à¤¸à¥‚à¤šà¤¨à¤¾à¤à¤‚à¥¤';
 
   @override
-  String get channelGreetingsName => 'दैनिक अभिवादन';
+  String get channelGreetingsName => 'à¤¦à¥ˆà¤¨à¤¿à¤• à¤…à¤­à¤¿à¤µà¤¾à¤¦à¤¨';
 
   @override
   String get channelGreetingsDescription =>
-      'शुभ प्रभात और शुभ रात्रि जैसे संदेश।';
+      'à¤¶à¥à¤­ à¤ªà¥à¤°à¤­à¤¾à¤¤ à¤”à¤° à¤¶à¥à¤­ à¤°à¤¾à¤¤à¥à¤°à¤¿ à¤œà¥ˆà¤¸à¥‡ à¤¸à¤‚à¤¦à¥‡à¤¶à¥¤';
 
   @override
   String get tagNotFound =>
-      'आपके द्वारा दर्ज किया गया टैग अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।';
+      'à¤†à¤ªà¤•à¥‡ à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤¦à¤°à¥à¤œ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤Ÿà¥ˆà¤— à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¹à¥ˆ à¤¯à¤¾ à¤‰à¤¸à¤•à¥€ à¤¸à¤®à¤¯ à¤¸à¥€à¤®à¤¾ à¤¸à¤®à¤¾à¤ªà¥à¤¤ à¤¹à¥‹ à¤šà¥à¤•à¥€ à¤¹à¥ˆà¥¤';
 
   @override
-  String get whatIsNew => 'नया क्या है?';
+  String get whatIsNew => 'à¤¨à¤¯à¤¾ à¤•à¥à¤¯à¤¾ à¤¹à¥ˆ?';
 
   @override
-  String get onboardingTitle1 => 'अरे! हम कॉर्टेक्स टीम हैं।';
+  String get onboardingTitle1 =>
+      'à¤…à¤°à¥‡! à¤¹à¤® à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤Ÿà¥€à¤® à¤¹à¥ˆà¤‚à¥¤';
 
   @override
   String onboardingDesc1(String userName) {
-    return '$userName, आपको यहाँ देखकर बहुत अच्छा लगा। हम कुछ हाई स्कूल के डेवलपर हैं जिन्होंने AI उद्योग के नियमों को नए सिरे से लिखने का फैसला किया है। आपसे मिलकर बहुत अच्छा लगा! तो चलिए एक-दूसरे को बेहतर तरीके से जानते हैं।';
+    return '$userName, à¤†à¤ªà¤•à¥‹ à¤¯à¤¹à¤¾à¤ à¤¦à¥‡à¤–à¤•à¤° à¤¬à¤¹à¥à¤¤ à¤…à¤šà¥à¤›à¤¾ à¤²à¤—à¤¾à¥¤ à¤¹à¤® à¤•à¥à¤› à¤¹à¤¾à¤ˆ à¤¸à¥à¤•à¥‚à¤² à¤•à¥‡ à¤¡à¥‡à¤µà¤²à¤ªà¤° à¤¹à¥ˆà¤‚ à¤œà¤¿à¤¨à¥à¤¹à¥‹à¤‚à¤¨à¥‡ AI à¤‰à¤¦à¥à¤¯à¥‹à¤— à¤•à¥‡ à¤¨à¤¿à¤¯à¤®à¥‹à¤‚ à¤•à¥‹ à¤¨à¤ à¤¸à¤¿à¤°à¥‡ à¤¸à¥‡ à¤²à¤¿à¤–à¤¨à¥‡ à¤•à¤¾ à¤«à¥ˆà¤¸à¤²à¤¾ à¤•à¤¿à¤¯à¤¾ à¤¹à¥ˆà¥¤ à¤†à¤ªà¤¸à¥‡ à¤®à¤¿à¤²à¤•à¤° à¤¬à¤¹à¥à¤¤ à¤…à¤šà¥à¤›à¤¾ à¤²à¤—à¤¾! à¤¤à¥‹ à¤šà¤²à¤¿à¤ à¤à¤•-à¤¦à¥‚à¤¸à¤°à¥‡ à¤•à¥‹ à¤¬à¥‡à¤¹à¤¤à¤° à¤¤à¤°à¥€à¤•à¥‡ à¤¸à¥‡ à¤œà¤¾à¤¨à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
   }
 
   @override
-  String get onboardingTitle2 => 'समस्याएँ बहुत बड़ी थीं।';
+  String get onboardingTitle2 =>
+      'à¤¸à¤®à¤¸à¥à¤¯à¤¾à¤à¤ à¤¬à¤¹à¥à¤¤ à¤¬à¤¡à¤¼à¥€ à¤¥à¥€à¤‚à¥¤';
 
   @override
   String get onboardingDesc2 =>
-      'एआई क्रांति आई, लेकिन वह दहलीज पर ही अटक गई। ऊँची सदस्यता शुल्क, जटिल प्लेटफ़ॉर्म, निजता का हनन करने वाले और एआई तक पहुँच को अवरुद्ध करने वाले... जब तक वे खेल में थे, यह दहलीज कभी पार नहीं की जा सकी।';
+      'à¤à¤†à¤ˆ à¤•à¥à¤°à¤¾à¤‚à¤¤à¤¿ à¤†à¤ˆ, à¤²à¥‡à¤•à¤¿à¤¨ à¤µà¤¹ à¤¦à¤¹à¤²à¥€à¤œ à¤ªà¤° à¤¹à¥€ à¤…à¤Ÿà¤• à¤—à¤ˆà¥¤ à¤Šà¤à¤šà¥€ à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤¶à¥à¤²à¥à¤•, à¤œà¤Ÿà¤¿à¤² à¤ªà¥à¤²à¥‡à¤Ÿà¤«à¤¼à¥‰à¤°à¥à¤®, à¤¨à¤¿à¤œà¤¤à¤¾ à¤•à¤¾ à¤¹à¤¨à¤¨ à¤•à¤°à¤¨à¥‡ à¤µà¤¾à¤²à¥‡ à¤”à¤° à¤à¤†à¤ˆ à¤¤à¤• à¤ªà¤¹à¥à¤à¤š à¤•à¥‹ à¤…à¤µà¤°à¥à¤¦à¥à¤§ à¤•à¤°à¤¨à¥‡ à¤µà¤¾à¤²à¥‡... à¤œà¤¬ à¤¤à¤• à¤µà¥‡ à¤–à¥‡à¤² à¤®à¥‡à¤‚ à¤¥à¥‡, à¤¯à¤¹ à¤¦à¤¹à¤²à¥€à¤œ à¤•à¤­à¥€ à¤ªà¤¾à¤° à¤¨à¤¹à¥€à¤‚ à¤•à¥€ à¤œà¤¾ à¤¸à¤•à¥€à¥¤';
 
   @override
-  String get onboardingTitle3 => 'हम यूं ही खड़े नहीं रह सकते थे।';
+  String get onboardingTitle3 =>
+      'à¤¹à¤® à¤¯à¥‚à¤‚ à¤¹à¥€ à¤–à¤¡à¤¼à¥‡ à¤¨à¤¹à¥€à¤‚ à¤°à¤¹ à¤¸à¤•à¤¤à¥‡ à¤¥à¥‡à¥¤';
 
   @override
   String get onboardingDesc3 =>
-      'उस सीमा को पार करने के लिए, हमने एक ऐसा प्लेटफ़ॉर्म बनाया है जो शक्तिशाली, सुंदर, अनुकूलन योग्य, उपयोग में आसान, पूरी तरह से पारदर्शी है, ऑनलाइन और ऑफलाइन दोनों तरह से काम करता है, और आपका डेटा सिर्फ़ आपके डिवाइस पर ही रखता है। हमने यह शक्ति वापस उसी को दी है जहाँ इसकी ज़िम्मेदारी है: आपको।';
+      'à¤‰à¤¸ à¤¸à¥€à¤®à¤¾ à¤•à¥‹ à¤ªà¤¾à¤° à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤, à¤¹à¤®à¤¨à¥‡ à¤à¤• à¤à¤¸à¤¾ à¤ªà¥à¤²à¥‡à¤Ÿà¤«à¤¼à¥‰à¤°à¥à¤® à¤¬à¤¨à¤¾à¤¯à¤¾ à¤¹à¥ˆ à¤œà¥‹ à¤¶à¤•à¥à¤¤à¤¿à¤¶à¤¾à¤²à¥€, à¤¸à¥à¤‚à¤¦à¤°, à¤…à¤¨à¥à¤•à¥‚à¤²à¤¨ à¤¯à¥‹à¤—à¥à¤¯, à¤‰à¤ªà¤¯à¥‹à¤— à¤®à¥‡à¤‚ à¤†à¤¸à¤¾à¤¨, à¤ªà¥‚à¤°à¥€ à¤¤à¤°à¤¹ à¤¸à¥‡ à¤ªà¤¾à¤°à¤¦à¤°à¥à¤¶à¥€ à¤¹à¥ˆ, à¤‘à¤¨à¤²à¤¾à¤‡à¤¨ à¤”à¤° à¤‘à¤«à¤²à¤¾à¤‡à¤¨ à¤¦à¥‹à¤¨à¥‹à¤‚ à¤¤à¤°à¤¹ à¤¸à¥‡ à¤•à¤¾à¤® à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆ, à¤”à¤° à¤†à¤ªà¤•à¤¾ à¤¡à¥‡à¤Ÿà¤¾ à¤¸à¤¿à¤°à¥à¤«à¤¼ à¤†à¤ªà¤•à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤ªà¤° à¤¹à¥€ à¤°à¤–à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤¹à¤®à¤¨à¥‡ à¤¯à¤¹ à¤¶à¤•à¥à¤¤à¤¿ à¤µà¤¾à¤ªà¤¸ à¤‰à¤¸à¥€ à¤•à¥‹ à¤¦à¥€ à¤¹à¥ˆ à¤œà¤¹à¤¾à¤ à¤‡à¤¸à¤•à¥€ à¤œà¤¼à¤¿à¤®à¥à¤®à¥‡à¤¦à¤¾à¤°à¥€ à¤¹à¥ˆ: à¤†à¤ªà¤•à¥‹à¥¤';
 
   @override
-  String get onboardingTitle4 => 'यह कभी आसान नहीं था.';
+  String get onboardingTitle4 =>
+      'à¤¯à¤¹ à¤•à¤­à¥€ à¤†à¤¸à¤¾à¤¨ à¤¨à¤¹à¥€à¤‚ à¤¥à¤¾.';
 
   @override
   String get onboardingDesc4 =>
-      'हमें दर्जनों बार अस्वीकार किया गया, कई बार निलंबित किया गया, झूठी चेतावनियाँ मिलीं, और दर्जनों बार अपना ब्रांड बदलना पड़ा। इन सबके बावजूद, हमें बताया गया कि यह संभव नहीं है। लेकिन हमने कभी हार नहीं मानी, यह मानते हुए कि यह परियोजना सिर्फ़ हमारी नहीं, बल्कि सभी की है। और इसीलिए हम यहाँ हैं।';
+      'à¤¹à¤®à¥‡à¤‚ à¤¦à¤°à¥à¤œà¤¨à¥‹à¤‚ à¤¬à¤¾à¤° à¤…à¤¸à¥à¤µà¥€à¤•à¤¾à¤° à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾, à¤•à¤ˆ à¤¬à¤¾à¤° à¤¨à¤¿à¤²à¤‚à¤¬à¤¿à¤¤ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾, à¤à¥‚à¤ à¥€ à¤šà¥‡à¤¤à¤¾à¤µà¤¨à¤¿à¤¯à¤¾à¤ à¤®à¤¿à¤²à¥€à¤‚, à¤”à¤° à¤¦à¤°à¥à¤œà¤¨à¥‹à¤‚ à¤¬à¤¾à¤° à¤…à¤ªà¤¨à¤¾ à¤¬à¥à¤°à¤¾à¤‚à¤¡ à¤¬à¤¦à¤²à¤¨à¤¾ à¤ªà¤¡à¤¼à¤¾à¥¤ à¤‡à¤¨ à¤¸à¤¬à¤•à¥‡ à¤¬à¤¾à¤µà¤œà¥‚à¤¦, à¤¹à¤®à¥‡à¤‚ à¤¬à¤¤à¤¾à¤¯à¤¾ à¤—à¤¯à¤¾ à¤•à¤¿ à¤¯à¤¹ à¤¸à¤‚à¤­à¤µ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ à¤²à¥‡à¤•à¤¿à¤¨ à¤¹à¤®à¤¨à¥‡ à¤•à¤­à¥€ à¤¹à¤¾à¤° à¤¨à¤¹à¥€à¤‚ à¤®à¤¾à¤¨à¥€, à¤¯à¤¹ à¤®à¤¾à¤¨à¤¤à¥‡ à¤¹à¥à¤ à¤•à¤¿ à¤¯à¤¹ à¤ªà¤°à¤¿à¤¯à¥‹à¤œà¤¨à¤¾ à¤¸à¤¿à¤°à¥à¤«à¤¼ à¤¹à¤®à¤¾à¤°à¥€ à¤¨à¤¹à¥€à¤‚, à¤¬à¤²à¥à¤•à¤¿ à¤¸à¤­à¥€ à¤•à¥€ à¤¹à¥ˆà¥¤ à¤”à¤° à¤‡à¤¸à¥€à¤²à¤¿à¤ à¤¹à¤® à¤¯à¤¹à¤¾à¤ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get onboardingFinalTitle => 'यह क्रांति का समय है.';
+  String get onboardingFinalTitle =>
+      'à¤¯à¤¹ à¤•à¥à¤°à¤¾à¤‚à¤¤à¤¿ à¤•à¤¾ à¤¸à¤®à¤¯ à¤¹à¥ˆ.';
 
   @override
   String get onboardingFinalDescription =>
-      'अगर आप यह स्क्रीन देख रहे हैं, तो इसकी वजह यह है कि हमने हार नहीं मानी। और हमारा हार मानने का कोई इरादा नहीं है। आइए, हम सब मिलकर AI क्रांति को दुनिया तक पहुँचाएँ। इस कहानी का हिस्सा बनने के लिए...';
+      'à¤…à¤—à¤° à¤†à¤ª à¤¯à¤¹ à¤¸à¥à¤•à¥à¤°à¥€à¤¨ à¤¦à¥‡à¤– à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚, à¤¤à¥‹ à¤‡à¤¸à¤•à¥€ à¤µà¤œà¤¹ à¤¯à¤¹ à¤¹à¥ˆ à¤•à¤¿ à¤¹à¤®à¤¨à¥‡ à¤¹à¤¾à¤° à¤¨à¤¹à¥€à¤‚ à¤®à¤¾à¤¨à¥€à¥¤ à¤”à¤° à¤¹à¤®à¤¾à¤°à¤¾ à¤¹à¤¾à¤° à¤®à¤¾à¤¨à¤¨à¥‡ à¤•à¤¾ à¤•à¥‹à¤ˆ à¤‡à¤°à¤¾à¤¦à¤¾ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ à¤†à¤‡à¤, à¤¹à¤® à¤¸à¤¬ à¤®à¤¿à¤²à¤•à¤° AI à¤•à¥à¤°à¤¾à¤‚à¤¤à¤¿ à¤•à¥‹ à¤¦à¥à¤¨à¤¿à¤¯à¤¾ à¤¤à¤• à¤ªà¤¹à¥à¤à¤šà¤¾à¤à¤à¥¤ à¤‡à¤¸ à¤•à¤¹à¤¾à¤¨à¥€ à¤•à¤¾ à¤¹à¤¿à¤¸à¥à¤¸à¤¾ à¤¬à¤¨à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤...';
 
   @override
-  String get onboardingFinalQuestion => 'क्या आप तैयार हैं?';
+  String get onboardingFinalQuestion =>
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤¤à¥ˆà¤¯à¤¾à¤° à¤¹à¥ˆà¤‚?';
 
   @override
-  String get onboardingFinalButton => 'हाँ!';
+  String get onboardingFinalButton => 'à¤¹à¤¾à¤!';
 
   @override
-  String get dude => 'दोस्त';
+  String get dude => 'à¤¦à¥‹à¤¸à¥à¤¤';
 
   @override
-  String get swipeToContinue => 'जारी रखने के लिए स्वाइप करें';
+  String get swipeToContinue =>
+      'à¤œà¤¾à¤°à¥€ à¤°à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¥à¤µà¤¾à¤‡à¤ª à¤•à¤°à¥‡à¤‚';
 
   @override
   String get cacheIsNotUpToDate =>
-      'आपका Play Store कैश अपडेट नहीं है। कृपया Play Store ऐप बंद करके दोबारा खोलें, या अपना डिवाइस रीस्टार्ट करें।';
+      'à¤†à¤ªà¤•à¤¾ Play Store à¤•à¥ˆà¤¶ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ Play Store à¤à¤ª à¤¬à¤‚à¤¦ à¤•à¤°à¤•à¥‡ à¤¦à¥‹à¤¬à¤¾à¤°à¤¾ à¤–à¥‹à¤²à¥‡à¤‚, à¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤°à¥€à¤¸à¥à¤Ÿà¤¾à¤°à¥à¤Ÿ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get continueAsGuest => 'खाता बनाए बिना जारी रखें';
+  String get continueAsGuest =>
+      'à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤ à¤¬à¤¿à¤¨à¤¾ à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚';
 
   @override
   String get guestModeWarning =>
-      'सर्वोत्तम सेवा गुणवत्ता सुनिश्चित करने के लिए अतिथि मोड में सीमित सुविधाएँ हैं।';
+      'à¤¸à¤°à¥à¤µà¥‹à¤¤à¥à¤¤à¤® à¤¸à¥‡à¤µà¤¾ à¤—à¥à¤£à¤µà¤¤à¥à¤¤à¤¾ à¤¸à¥à¤¨à¤¿à¤¶à¥à¤šà¤¿à¤¤ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤…à¤¤à¤¿à¤¥à¤¿ à¤®à¥‹à¤¡ à¤®à¥‡à¤‚ à¤¸à¥€à¤®à¤¿à¤¤ à¤¸à¥à¤µà¤¿à¤§à¤¾à¤à¤ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get anonymousEntity => 'अनाम संस्था';
+  String get anonymousEntity => 'à¤…à¤¨à¤¾à¤® à¤¸à¤‚à¤¸à¥à¤¥à¤¾';
 
   @override
-  String get upgradeAccountTitle => 'अपना खाता पूरा करें';
+  String get upgradeAccountTitle =>
+      'à¤…à¤ªà¤¨à¤¾ à¤–à¤¾à¤¤à¤¾ à¤ªà¥‚à¤°à¤¾ à¤•à¤°à¥‡à¤‚';
 
   @override
   String get upgradeAccountDescription =>
-      'अधिक सीमाओं को अनलॉक करने के लिए एक खाता बनाएं।';
+      'à¤…à¤§à¤¿à¤• à¤¸à¥€à¤®à¤¾à¤“à¤‚ à¤•à¥‹ à¤…à¤¨à¤²à¥‰à¤• à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤‚à¥¤';
 
   @override
-  String get createAccount => 'खाता बनाएं';
+  String get createAccount => 'à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤‚';
 
   @override
-  String get accountLinkedSuccess => 'खाता सफलतापूर्वक बनाया गया!';
+  String get accountLinkedSuccess =>
+      'à¤–à¤¾à¤¤à¤¾ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¬à¤¨à¤¾à¤¯à¤¾ à¤—à¤¯à¤¾!';
 
   @override
-  String get continueWithApple => 'Apple के साथ जारी रखें';
+  String get continueWithApple =>
+      'Apple à¤•à¥‡ à¤¸à¤¾à¤¥ à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚';
 
   @override
-  String get guest => 'अतिथि';
+  String get guest => 'à¤…à¤¤à¤¿à¤¥à¤¿';
 
   @override
-  String get betterWithAnAccount => 'यह अनुभाग एक खाते के साथ बेहतर है!';
+  String get betterWithAnAccount =>
+      'à¤¯à¤¹ à¤…à¤¨à¥à¤­à¤¾à¤— à¤à¤• à¤–à¤¾à¤¤à¥‡ à¤•à¥‡ à¤¸à¤¾à¤¥ à¤¬à¥‡à¤¹à¤¤à¤° à¤¹à¥ˆ!';
 
   @override
-  String get restorePurchases => 'खरीदारी वापस लौटाएं';
+  String get restorePurchases =>
+      'à¤–à¤°à¥€à¤¦à¤¾à¤°à¥€ à¤µà¤¾à¤ªà¤¸ à¤²à¥Œà¤Ÿà¤¾à¤à¤‚';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/वर्ष, वार्षिक बिल';
+    return '$price/à¤µà¤°à¥à¤·, à¤µà¤¾à¤°à¥à¤·à¤¿à¤• à¤¬à¤¿à¤²';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return 'लगभग $price/माह';
+    return 'à¤²à¤—à¤­à¤— $price/à¤®à¤¾à¤¹';
   }
 
   @override
-  String get confirmDownloadTitle => 'क्या आप वाकई डाउनलोड करना चाहते हैं?';
+  String get confirmDownloadTitle =>
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤°à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'यह मॉडल लगभग $size स्थान घेरेगा।';
+    return 'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤²à¤—à¤­à¤— $size à¤¸à¥à¤¥à¤¾à¤¨ à¤˜à¥‡à¤°à¥‡à¤—à¤¾à¥¤';
   }
 
   @override
-  String get emulatorModeWarning => 'एमुलेटर मोड में यह सुविधा निष्क्रिय है।';
+  String get emulatorModeWarning =>
+      'à¤à¤®à¥à¤²à¥‡à¤Ÿà¤° à¤®à¥‹à¤¡ à¤®à¥‡à¤‚ à¤¯à¤¹ à¤¸à¥à¤µà¤¿à¤§à¤¾ à¤¨à¤¿à¤·à¥à¤•à¥à¤°à¤¿à¤¯ à¤¹à¥ˆà¥¤';
 
   @override
-  String get newChat => 'नई चैट';
+  String get newChat => 'à¤¨à¤ˆ à¤šà¥ˆà¤Ÿ';
 
   @override
-  String get variants => 'वेरिएंट';
+  String get variants => 'à¤µà¥‡à¤°à¤¿à¤à¤‚à¤Ÿ';
 
   @override
   String get variantsDescription =>
-      'वेरिएंट एक ही एआई परिवार के अलग-अलग संस्करण हैं। मुख्य कार्ड पर टैप करने पर हम स्वचालित रूप से सबसे अच्छा विकल्प चुन लेते हैं, लेकिन यदि आप चाहें तो यहां से मैन्युअल रूप से एक विशिष्ट विकल्प भी चुन सकते हैं!';
+      'à¤µà¥‡à¤°à¤¿à¤à¤‚à¤Ÿ à¤à¤• à¤¹à¥€ à¤à¤†à¤ˆ à¤ªà¤°à¤¿à¤µà¤¾à¤° à¤•à¥‡ à¤…à¤²à¤—-à¤…à¤²à¤— à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£ à¤¹à¥ˆà¤‚à¥¤ à¤®à¥à¤–à¥à¤¯ à¤•à¤¾à¤°à¥à¤¡ à¤ªà¤° à¤Ÿà¥ˆà¤ª à¤•à¤°à¤¨à¥‡ à¤ªà¤° à¤¹à¤® à¤¸à¥à¤µà¤šà¤¾à¤²à¤¿à¤¤ à¤°à¥‚à¤ª à¤¸à¥‡ à¤¸à¤¬à¤¸à¥‡ à¤…à¤šà¥à¤›à¤¾ à¤µà¤¿à¤•à¤²à¥à¤ª à¤šà¥à¤¨ à¤²à¥‡à¤¤à¥‡ à¤¹à¥ˆà¤‚, à¤²à¥‡à¤•à¤¿à¤¨ à¤¯à¤¦à¤¿ à¤†à¤ª à¤šà¤¾à¤¹à¥‡à¤‚ à¤¤à¥‹ à¤¯à¤¹à¤¾à¤‚ à¤¸à¥‡ à¤®à¥ˆà¤¨à¥à¤¯à¥à¤…à¤² à¤°à¥‚à¤ª à¤¸à¥‡ à¤à¤• à¤µà¤¿à¤¶à¤¿à¤·à¥à¤Ÿ à¤µà¤¿à¤•à¤²à¥à¤ª à¤­à¥€ à¤šà¥à¤¨ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚!';
 
   @override
-  String get fluxChatTitle => 'फ्लक्स चैट';
+  String get fluxChatTitle => 'à¤«à¥à¤²à¤•à¥à¤¸ à¤šà¥ˆà¤Ÿ';
 
   @override
   String get fluxChatDescription =>
-      'फ्लक्स चैट अस्थायी चैट होती हैं और आपके डिवाइस पर सेव नहीं होती हैं।';
+      'à¤«à¥à¤²à¤•à¥à¤¸ à¤šà¥ˆà¤Ÿ à¤…à¤¸à¥à¤¥à¤¾à¤¯à¥€ à¤šà¥ˆà¤Ÿ à¤¹à¥‹à¤¤à¥€ à¤¹à¥ˆà¤‚ à¤”à¤° à¤†à¤ªà¤•à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤ªà¤° à¤¸à¥‡à¤µ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹à¤¤à¥€ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get alwaysBest => 'हमेशा सर्वश्रेष्ठ';
+  String get alwaysBest => 'à¤¹à¤®à¥‡à¤¶à¤¾ à¤¸à¤°à¥à¤µà¤¶à¥à¤°à¥‡à¤·à¥à¤ ';
 
   @override
-  String get featuresTitle => 'विशेषताएँ';
+  String get featuresTitle => 'à¤µà¤¿à¤¶à¥‡à¤·à¤¤à¤¾à¤à¤';
 
   @override
-  String get useOfflineDescription => 'इंटरनेट कनेक्शन के बिना निजी चैट करें।';
+  String get useOfflineDescription =>
+      'à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤•à¤¨à¥‡à¤•à¥à¤¶à¤¨ à¤•à¥‡ à¤¬à¤¿à¤¨à¤¾ à¤¨à¤¿à¤œà¥€ à¤šà¥ˆà¤Ÿ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get featureReasoning => 'गहरी सोच';
+  String get featureReasoning => 'à¤—à¤¹à¤°à¥€ à¤¸à¥‹à¤š';
 
   @override
   String get featureReasoningDescription =>
-      'डीप थिंकिंग मोड में, एआई कार्यों को अपनी सर्वोत्तम क्षमता के अनुसार पूरा करने के लिए आंतरिक रूप से उन पर विचार करता है।';
+      'à¤¡à¥€à¤ª à¤¥à¤¿à¤‚à¤•à¤¿à¤‚à¤— à¤®à¥‹à¤¡ à¤®à¥‡à¤‚, à¤à¤†à¤ˆ à¤•à¤¾à¤°à¥à¤¯à¥‹à¤‚ à¤•à¥‹ à¤…à¤ªà¤¨à¥€ à¤¸à¤°à¥à¤µà¥‹à¤¤à¥à¤¤à¤® à¤•à¥à¤·à¤®à¤¤à¤¾ à¤•à¥‡ à¤…à¤¨à¥à¤¸à¤¾à¤° à¤ªà¥‚à¤°à¤¾ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤†à¤‚à¤¤à¤°à¤¿à¤• à¤°à¥‚à¤ª à¤¸à¥‡ à¤‰à¤¨ à¤ªà¤° à¤µà¤¿à¤šà¤¾à¤° à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get featureCreateImageTitle => 'चित्र बनाएं';
+  String get featureCreateImageTitle => 'à¤šà¤¿à¤¤à¥à¤° à¤¬à¤¨à¤¾à¤à¤‚';
 
   @override
-  String get featureCreateImageDescription => 'टेक्स्ट से एआई आर्ट बनाएं।';
+  String get featureCreateImageDescription =>
+      'à¤Ÿà¥‡à¤•à¥à¤¸à¥à¤Ÿ à¤¸à¥‡ à¤à¤†à¤ˆ à¤†à¤°à¥à¤Ÿ à¤¬à¤¨à¤¾à¤à¤‚à¥¤';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1593,99 +1725,104 @@ class AppLocalizationsHi extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => 'वीडियो बनाएं';
+  String get featureCreateVideoTitle => 'à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤¬à¤¨à¤¾à¤à¤‚';
 
   @override
-  String get featureCreateVideoDescription => 'टेक्स्ट से वीडियो बनाएं।';
+  String get featureCreateVideoDescription =>
+      'à¤Ÿà¥‡à¤•à¥à¤¸à¥à¤Ÿ à¤¸à¥‡ à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤¬à¤¨à¤¾à¤à¤‚à¥¤';
 
   @override
-  String get featureStudyTitle => 'अध्ययन और सीखना';
+  String get featureStudyTitle => 'à¤…à¤§à¥à¤¯à¤¯à¤¨ à¤”à¤° à¤¸à¥€à¤–à¤¨à¤¾';
 
   @override
-  String get featureStudyDescription => 'स्पष्टीकरण और सारांश प्राप्त करें।';
+  String get featureStudyDescription =>
+      'à¤¸à¥à¤ªà¤·à¥à¤Ÿà¥€à¤•à¤°à¤£ à¤”à¤° à¤¸à¤¾à¤°à¤¾à¤‚à¤¶ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get featureQuizzesTitle => 'प्रश्नोत्तरी';
+  String get featureQuizzesTitle => 'à¤ªà¥à¤°à¤¶à¥à¤¨à¥‹à¤¤à¥à¤¤à¤°à¥€';
 
   @override
-  String get featureQuizzesDescription => 'अपने ज्ञान का परीक्षण करें।';
+  String get featureQuizzesDescription =>
+      'à¤…à¤ªà¤¨à¥‡ à¤œà¥à¤à¤¾à¤¨ à¤•à¤¾ à¤ªà¤°à¥€à¤•à¥à¤·à¤£ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get featureExploreDescription => 'सभी उपलब्ध मॉडलों को देखें।';
+  String get featureExploreDescription =>
+      'à¤¸à¤­à¥€ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤®à¥‰à¤¡à¤²à¥‹à¤‚ à¤•à¥‹ à¤¦à¥‡à¤–à¥‡à¤‚à¥¤';
 
   @override
   String get featureStudyMessage =>
-      'आप एक कुशल शिक्षक हैं। आपका लक्ष्य उपयोगकर्ता के विषय को व्यापक रूप से समझाना है। स्पष्ट संरचना, उदाहरणों और उपमाओं का प्रयोग करें। जटिल विचारों को सरल भागों में बाँटें ताकि उपयोगकर्ता प्रभावी ढंग से सीख सके। विषय:';
+      'à¤†à¤ª à¤à¤• à¤•à¥à¤¶à¤² à¤¶à¤¿à¤•à¥à¤·à¤• à¤¹à¥ˆà¤‚à¥¤ à¤†à¤ªà¤•à¤¾ à¤²à¤•à¥à¤·à¥à¤¯ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤µà¤¿à¤·à¤¯ à¤•à¥‹ à¤µà¥à¤¯à¤¾à¤ªà¤• à¤°à¥‚à¤ª à¤¸à¥‡ à¤¸à¤®à¤à¤¾à¤¨à¤¾ à¤¹à¥ˆà¥¤ à¤¸à¥à¤ªà¤·à¥à¤Ÿ à¤¸à¤‚à¤°à¤šà¤¨à¤¾, à¤‰à¤¦à¤¾à¤¹à¤°à¤£à¥‹à¤‚ à¤”à¤° à¤‰à¤ªà¤®à¤¾à¤“à¤‚ à¤•à¤¾ à¤ªà¥à¤°à¤¯à¥‹à¤— à¤•à¤°à¥‡à¤‚à¥¤ à¤œà¤Ÿà¤¿à¤² à¤µà¤¿à¤šà¤¾à¤°à¥‹à¤‚ à¤•à¥‹ à¤¸à¤°à¤² à¤­à¤¾à¤—à¥‹à¤‚ à¤®à¥‡à¤‚ à¤¬à¤¾à¤à¤Ÿà¥‡à¤‚ à¤¤à¤¾à¤•à¤¿ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤ªà¥à¤°à¤­à¤¾à¤µà¥€ à¤¢à¤‚à¤— à¤¸à¥‡ à¤¸à¥€à¤– à¤¸à¤•à¥‡à¥¤ à¤µà¤¿à¤·à¤¯:';
 
   @override
   String get featureQuizMessage =>
-      'आप एक क्विज़ मास्टर हैं। उपयोगकर्ता के विषय के आधार पर एक विशिष्ट बहुविकल्पीय प्रश्न तैयार करें। उनके उत्तर की प्रतीक्षा करें। फिर, उसका मूल्यांकन करें और अगला प्रश्न पूछें। सभी उत्तर एक साथ प्रकट न करें। इसे इंटरैक्टिव बनाए रखें। विषय:';
+      'à¤†à¤ª à¤à¤• à¤•à¥à¤µà¤¿à¤œà¤¼ à¤®à¤¾à¤¸à¥à¤Ÿà¤° à¤¹à¥ˆà¤‚à¥¤ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤µà¤¿à¤·à¤¯ à¤•à¥‡ à¤†à¤§à¤¾à¤° à¤ªà¤° à¤à¤• à¤µà¤¿à¤¶à¤¿à¤·à¥à¤Ÿ à¤¬à¤¹à¥à¤µà¤¿à¤•à¤²à¥à¤ªà¥€à¤¯ à¤ªà¥à¤°à¤¶à¥à¤¨ à¤¤à¥ˆà¤¯à¤¾à¤° à¤•à¤°à¥‡à¤‚à¥¤ à¤‰à¤¨à¤•à¥‡ à¤‰à¤¤à¥à¤¤à¤° à¤•à¥€ à¤ªà¥à¤°à¤¤à¥€à¤•à¥à¤·à¤¾ à¤•à¤°à¥‡à¤‚à¥¤ à¤«à¤¿à¤°, à¤‰à¤¸à¤•à¤¾ à¤®à¥‚à¤²à¥à¤¯à¤¾à¤‚à¤•à¤¨ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤…à¤—à¤²à¤¾ à¤ªà¥à¤°à¤¶à¥à¤¨ à¤ªà¥‚à¤›à¥‡à¤‚à¥¤ à¤¸à¤­à¥€ à¤‰à¤¤à¥à¤¤à¤° à¤à¤• à¤¸à¤¾à¤¥ à¤ªà¥à¤°à¤•à¤Ÿ à¤¨ à¤•à¤°à¥‡à¤‚à¥¤ à¤‡à¤¸à¥‡ à¤‡à¤‚à¤Ÿà¤°à¥ˆà¤•à¥à¤Ÿà¤¿à¤µ à¤¬à¤¨à¤¾à¤ à¤°à¤–à¥‡à¤‚à¥¤ à¤µà¤¿à¤·à¤¯:';
 
   @override
-  String get myPlan => 'मेरी योजना';
+  String get myPlan => 'à¤®à¥‡à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'स्वागत प्रस्ताव • $time';
+    return 'à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤ªà¥à¤°à¤¸à¥à¤¤à¤¾à¤µ â€¢ $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'विशेष ऑफर • $time';
+    return 'à¤µà¤¿à¤¶à¥‡à¤· à¤‘à¤«à¤° â€¢ $time';
   }
 
   @override
-  String get attachmentSheetTitle => 'संलग्नक';
+  String get attachmentSheetTitle => 'à¤¸à¤‚à¤²à¤—à¥à¤¨à¤•';
 
   @override
-  String get actionCamera => 'कैमरा';
+  String get actionCamera => 'à¤•à¥ˆà¤®à¤°à¤¾';
 
   @override
-  String get actionGallery => 'गैलरी';
+  String get actionGallery => 'à¤—à¥ˆà¤²à¤°à¥€';
 
   @override
-  String get actionFile => 'फ़ाइल';
+  String get actionFile => 'à¤«à¤¼à¤¾à¤‡à¤²';
 
   @override
-  String get listening => 'सुन रहा है';
+  String get listening => 'à¤¸à¥à¤¨ à¤°à¤¹à¤¾ à¤¹à¥ˆ';
 
   @override
-  String get defaultViewTitle => 'क्या चल रहा है?';
+  String get defaultViewTitle => 'à¤•à¥à¤¯à¤¾ à¤šà¤² à¤°à¤¹à¤¾ à¤¹à¥ˆ?';
 
   @override
   String get defaultViewDescription =>
-      'कॉर्टेक्स सैकड़ों एआई मॉडल, ऑफलाइन क्षमताओं, डायनामिक चैट और बहुत कुछ के साथ हमेशा आपके साथ है।';
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤¸à¥ˆà¤•à¤¡à¤¼à¥‹à¤‚ à¤à¤†à¤ˆ à¤®à¥‰à¤¡à¤², à¤‘à¤«à¤²à¤¾à¤‡à¤¨ à¤•à¥à¤·à¤®à¤¤à¤¾à¤“à¤‚, à¤¡à¤¾à¤¯à¤¨à¤¾à¤®à¤¿à¤• à¤šà¥ˆà¤Ÿ à¤”à¤° à¤¬à¤¹à¥à¤¤ à¤•à¥à¤› à¤•à¥‡ à¤¸à¤¾à¤¥ à¤¹à¤®à¥‡à¤¶à¤¾ à¤†à¤ªà¤•à¥‡ à¤¸à¤¾à¤¥ à¤¹à¥ˆà¥¤';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
   String get invalidUsernameFormat =>
-      'उपयोगकर्ता नाम का प्रारूप अमान्य है। 3-20 अक्षर, अंक या . - _ का उपयोग करें।';
+      'à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¤¾à¤® à¤•à¤¾ à¤ªà¥à¤°à¤¾à¤°à¥‚à¤ª à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¹à¥ˆà¥¤ 3-20 à¤…à¤•à¥à¤·à¤°, à¤…à¤‚à¤• à¤¯à¤¾ . - _ à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get exclusiveOffer => 'विशेष ऑफर';
+  String get exclusiveOffer => 'à¤µà¤¿à¤¶à¥‡à¤· à¤‘à¤«à¤°';
 
   @override
-  String get claimOffer => 'ऑफर का उपयोग करें';
+  String get claimOffer => 'à¤‘à¤«à¤° à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤°à¥‡à¤‚';
 
   @override
-  String get continueInOfflineMode => 'ऑफ़लाइन मोड में जारी रखें';
+  String get continueInOfflineMode =>
+      'à¤‘à¤«à¤¼à¤²à¤¾à¤‡à¤¨ à¤®à¥‹à¤¡ à¤®à¥‡à¤‚ à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚';
 
   @override
   String get voiceModeInformation =>
-      'कॉर्टेक्स आपके डेटा को पूरी तरह से डिवाइस पर ही सुरक्षित रखता है, यहां तक कि वॉइस चैट मोड में भी; निर्बाध बातचीत का आनंद लें!';
+      'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤†à¤ªà¤•à¥‡ à¤¡à¥‡à¤Ÿà¤¾ à¤•à¥‹ à¤ªà¥‚à¤°à¥€ à¤¤à¤°à¤¹ à¤¸à¥‡ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤ªà¤° à¤¹à¥€ à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤°à¤–à¤¤à¤¾ à¤¹à¥ˆ, à¤¯à¤¹à¤¾à¤‚ à¤¤à¤• à¤•à¤¿ à¤µà¥‰à¤‡à¤¸ à¤šà¥ˆà¤Ÿ à¤®à¥‹à¤¡ à¤®à¥‡à¤‚ à¤­à¥€; à¤¨à¤¿à¤°à¥à¤¬à¤¾à¤§ à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤•à¤¾ à¤†à¤¨à¤‚à¤¦ à¤²à¥‡à¤‚!';
 
   @override
   String get flowModeDescription =>
-      'फ्लो मोड में, बुद्धिमत्ताएँ आपस में बहस करती हैं; आप या तो आराम से बैठकर सुन सकते हैं या फिर चर्चा में शामिल हो सकते हैं!';
+      'à¤«à¥à¤²à¥‹ à¤®à¥‹à¤¡ à¤®à¥‡à¤‚, à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾à¤à¤ à¤†à¤ªà¤¸ à¤®à¥‡à¤‚ à¤¬à¤¹à¤¸ à¤•à¤°à¤¤à¥€ à¤¹à¥ˆà¤‚; à¤†à¤ª à¤¯à¤¾ à¤¤à¥‹ à¤†à¤°à¤¾à¤® à¤¸à¥‡ à¤¬à¥ˆà¤ à¤•à¤° à¤¸à¥à¤¨ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚ à¤¯à¤¾ à¤«à¤¿à¤° à¤šà¤°à¥à¤šà¤¾ à¤®à¥‡à¤‚ à¤¶à¤¾à¤®à¤¿à¤² à¤¹à¥‹ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚!';
 
   @override
   String get flowModeQuestion =>
-      'नमस्कार! आप कॉर्टेक्स ऐप के फ्लो मोड में हैं। आपके साथ तीन अन्य एआई एजेंट भी मौजूद हैं। आपका काम है एक विषय को चर्चा में लाना और एक रोचक या मनोरंजक प्रश्न पूछकर बातचीत शुरू करना। अपने उत्तरों में हास्य, व्यंग्य और हल्के-फुल्के कटाक्ष का प्रयोग करें। कोई भी विषय चलेगा। तो चलिए, बातचीत शुरू कीजिए।';
+      'à¤¨à¤®à¤¸à¥à¤•à¤¾à¤°! à¤†à¤ª à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤à¤ª à¤•à¥‡ à¤«à¥à¤²à¥‹ à¤®à¥‹à¤¡ à¤®à¥‡à¤‚ à¤¹à¥ˆà¤‚à¥¤ à¤†à¤ªà¤•à¥‡ à¤¸à¤¾à¤¥ à¤¤à¥€à¤¨ à¤…à¤¨à¥à¤¯ à¤à¤†à¤ˆ à¤à¤œà¥‡à¤‚à¤Ÿ à¤­à¥€ à¤®à¥Œà¤œà¥‚à¤¦ à¤¹à¥ˆà¤‚à¥¤ à¤†à¤ªà¤•à¤¾ à¤•à¤¾à¤® à¤¹à¥ˆ à¤à¤• à¤µà¤¿à¤·à¤¯ à¤•à¥‹ à¤šà¤°à¥à¤šà¤¾ à¤®à¥‡à¤‚ à¤²à¤¾à¤¨à¤¾ à¤”à¤° à¤à¤• à¤°à¥‹à¤šà¤• à¤¯à¤¾ à¤®à¤¨à¥‹à¤°à¤‚à¤œà¤• à¤ªà¥à¤°à¤¶à¥à¤¨ à¤ªà¥‚à¤›à¤•à¤° à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¶à¥à¤°à¥‚ à¤•à¤°à¤¨à¤¾à¥¤ à¤…à¤ªà¤¨à¥‡ à¤‰à¤¤à¥à¤¤à¤°à¥‹à¤‚ à¤®à¥‡à¤‚ à¤¹à¤¾à¤¸à¥à¤¯, à¤µà¥à¤¯à¤‚à¤—à¥à¤¯ à¤”à¤° à¤¹à¤²à¥à¤•à¥‡-à¤«à¥à¤²à¥à¤•à¥‡ à¤•à¤Ÿà¤¾à¤•à¥à¤· à¤•à¤¾ à¤ªà¥à¤°à¤¯à¥‹à¤— à¤•à¤°à¥‡à¤‚à¥¤ à¤•à¥‹à¤ˆ à¤­à¥€ à¤µà¤¿à¤·à¤¯ à¤šà¤²à¥‡à¤—à¤¾à¥¤ à¤¤à¥‹ à¤šà¤²à¤¿à¤, à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤¶à¥à¤°à¥‚ à¤•à¥€à¤œà¤¿à¤à¥¤';
 
   @override
-  String get thought => 'सोचा';
+  String get thought => 'à¤¸à¥‹à¤šà¤¾';
 
   @override
   String get agentRed => 'Red';
@@ -1697,189 +1834,204 @@ class AppLocalizationsHi extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'प्रवाह मोड';
+  String get flowMode => 'à¤ªà¥à¤°à¤µà¤¾à¤¹ à¤®à¥‹à¤¡';
 
   @override
-  String get premium => 'अधिमूल्य';
+  String get premium => 'à¤…à¤§à¤¿à¤®à¥‚à¤²à¥à¤¯';
 
   @override
-  String get workInProgress => 'काम जारी है';
+  String get workInProgress => 'à¤•à¤¾à¤® à¤œà¤¾à¤°à¥€ à¤¹à¥ˆ';
 
   @override
   String get voiceSystemPromptSuffix =>
-      'महत्वपूर्ण: मार्कडाउन फॉर्मेटिंग (बोल्ड, इटैलिक) का उपयोग न करें। कोड ब्लॉक (```) न लिखें। उत्तर बातचीत के अंदाज़ में और संक्षिप्त रखें।';
+      'à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£: à¤®à¤¾à¤°à¥à¤•à¤¡à¤¾à¤‰à¤¨ à¤«à¥‰à¤°à¥à¤®à¥‡à¤Ÿà¤¿à¤‚à¤— (à¤¬à¥‹à¤²à¥à¤¡, à¤‡à¤Ÿà¥ˆà¤²à¤¿à¤•) à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤¨ à¤•à¤°à¥‡à¤‚à¥¤ à¤•à¥‹à¤¡ à¤¬à¥à¤²à¥‰à¤• (```) à¤¨ à¤²à¤¿à¤–à¥‡à¤‚à¥¤ à¤‰à¤¤à¥à¤¤à¤° à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤•à¥‡ à¤…à¤‚à¤¦à¤¾à¤œà¤¼ à¤®à¥‡à¤‚ à¤”à¤° à¤¸à¤‚à¤•à¥à¤·à¤¿à¤ªà¥à¤¤ à¤°à¤–à¥‡à¤‚à¥¤';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'कॉर्टेक्स फ्लो मोड ($agentName). पिछला: $previousResponse';
+    return 'à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤«à¥à¤²à¥‹ à¤®à¥‹à¤¡ ($agentName). à¤ªà¤¿à¤›à¤²à¤¾: $previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      'अपलोड किए गए दस्तावेज़ों से पाठ सामग्री पढ़ें और निकालें। PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) और OpenDocument प्रारूपों का समर्थन करता है। इसका उपयोग तब करें जब उपयोगकर्ता ने कोई दस्तावेज़ फ़ाइल संलग्न की हो।';
+      'à¤…à¤ªà¤²à¥‹à¤¡ à¤•à¤¿à¤ à¤—à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼à¥‹à¤‚ à¤¸à¥‡ à¤ªà¤¾à¤  à¤¸à¤¾à¤®à¤—à¥à¤°à¥€ à¤ªà¤¢à¤¼à¥‡à¤‚ à¤”à¤° à¤¨à¤¿à¤•à¤¾à¤²à¥‡à¤‚à¥¤ PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) à¤”à¤° OpenDocument à¤ªà¥à¤°à¤¾à¤°à¥‚à¤ªà¥‹à¤‚ à¤•à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤‡à¤¸à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤¤à¤¬ à¤•à¤°à¥‡à¤‚ à¤œà¤¬ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¥‡ à¤•à¥‹à¤ˆ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤«à¤¼à¤¾à¤‡à¤² à¤¸à¤‚à¤²à¤—à¥à¤¨ à¤•à¥€ à¤¹à¥‹à¥¤';
 
   @override
   String get toolReadDocumentIndexParam =>
-      'पढ़ने के लिए संलग्न दस्तावेज़ का सूचकांक (0-आधारित)। आमतौर पर पहले दस्तावेज़ के लिए 0।';
+      'à¤ªà¤¢à¤¼à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¤‚à¤²à¤—à¥à¤¨ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤•à¤¾ à¤¸à¥‚à¤šà¤•à¤¾à¤‚à¤• (0-à¤†à¤§à¤¾à¤°à¤¿à¤¤)à¥¤ à¤†à¤®à¤¤à¥Œà¤° à¤ªà¤° à¤ªà¤¹à¤²à¥‡ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤•à¥‡ à¤²à¤¿à¤ 0à¥¤';
 
   @override
   String get toolStockDescription =>
-      'शेयरों (जैसे AAPL, THYAO.IS) और क्रिप्टोकरेंसी (जैसे BTC-USD) के लिए वर्तमान मूल्य और इतिहास प्राप्त करें।';
+      'à¤¶à¥‡à¤¯à¤°à¥‹à¤‚ (à¤œà¥ˆà¤¸à¥‡ AAPL, THYAO.IS) à¤”à¤° à¤•à¥à¤°à¤¿à¤ªà¥à¤Ÿà¥‹à¤•à¤°à¥‡à¤‚à¤¸à¥€ (à¤œà¥ˆà¤¸à¥‡ BTC-USD) à¤•à¥‡ à¤²à¤¿à¤ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤®à¥‚à¤²à¥à¤¯ à¤”à¤° à¤‡à¤¤à¤¿à¤¹à¤¾à¤¸ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get toolStockSymbolParam =>
-      'टिकर प्रतीक (उदाहरण के लिए AAPL, THYAO.IS, BTC-USD)।';
+      'à¤Ÿà¤¿à¤•à¤° à¤ªà¥à¤°à¤¤à¥€à¤• (à¤‰à¤¦à¤¾à¤¹à¤°à¤£ à¤•à¥‡ à¤²à¤¿à¤ AAPL, THYAO.IS, BTC-USD)à¥¤';
 
   @override
   String get toolWeatherDescription =>
-      'किसी विशिष्ट शहर का वर्तमान मौसम जानें।';
+      'à¤•à¤¿à¤¸à¥€ à¤µà¤¿à¤¶à¤¿à¤·à¥à¤Ÿ à¤¶à¤¹à¤° à¤•à¤¾ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤®à¥Œà¤¸à¤® à¤œà¤¾à¤¨à¥‡à¤‚à¥¤';
 
   @override
   String get toolWeatherCityParam =>
-      'शहर का नाम (उदाहरण के लिए लंदन, इस्तांबुल)।';
+      'à¤¶à¤¹à¤° à¤•à¤¾ à¤¨à¤¾à¤® (à¤‰à¤¦à¤¾à¤¹à¤°à¤£ à¤•à¥‡ à¤²à¤¿à¤ à¤²à¤‚à¤¦à¤¨, à¤‡à¤¸à¥à¤¤à¤¾à¤‚à¤¬à¥à¤²)à¥¤';
 
   @override
   String get toolPythonDescription =>
-      'पाइथन कोड को एक सुरक्षित सैंडबॉक्स में निष्पादित करें।';
+      'à¤ªà¤¾à¤‡à¤¥à¤¨ à¤•à¥‹à¤¡ à¤•à¥‹ à¤à¤• à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤¸à¥ˆà¤‚à¤¡à¤¬à¥‰à¤•à¥à¤¸ à¤®à¥‡à¤‚ à¤¨à¤¿à¤·à¥à¤ªà¤¾à¤¦à¤¿à¤¤ à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
-  String get toolPythonCodeParam => 'निष्पादित किया जाने वाला पायथन कोड।';
+  String get toolPythonCodeParam =>
+      'à¤¨à¤¿à¤·à¥à¤ªà¤¾à¤¦à¤¿à¤¤ à¤•à¤¿à¤¯à¤¾ à¤œà¤¾à¤¨à¥‡ à¤µà¤¾à¤²à¤¾ à¤ªà¤¾à¤¯à¤¥à¤¨ à¤•à¥‹à¤¡à¥¤';
 
   @override
-  String get toolCalculateDescription => 'एक गणितीय व्यंजक का मूल्यांकन कीजिए।';
+  String get toolCalculateDescription =>
+      'à¤à¤• à¤—à¤£à¤¿à¤¤à¥€à¤¯ à¤µà¥à¤¯à¤‚à¤œà¤• à¤•à¤¾ à¤®à¥‚à¤²à¥à¤¯à¤¾à¤‚à¤•à¤¨ à¤•à¥€à¤œà¤¿à¤à¥¤';
 
   @override
   String get toolCalculateExpressionParam =>
-      'गणितीय व्यंजक (उदाहरण के लिए \'3 + 4 * 2\')।';
+      'à¤—à¤£à¤¿à¤¤à¥€à¤¯ à¤µà¥à¤¯à¤‚à¤œà¤• (à¤‰à¤¦à¤¾à¤¹à¤°à¤£ à¤•à¥‡ à¤²à¤¿à¤ \'3 + 4 * 2\')à¥¤';
 
   @override
   String get toolChartDescription =>
-      'एक चार्ट/ग्राफ विज़ुअलाइज़ेशन तैयार करें।';
+      'à¤à¤• à¤šà¤¾à¤°à¥à¤Ÿ/à¤—à¥à¤°à¤¾à¤« à¤µà¤¿à¤œà¤¼à¥à¤…à¤²à¤¾à¤‡à¤œà¤¼à¥‡à¤¶à¤¨ à¤¤à¥ˆà¤¯à¤¾à¤° à¤•à¤°à¥‡à¤‚à¥¤';
 
   @override
   String get toolChartTypeParam =>
-      'चार्ट का प्रकार: बार चार्ट, लाइन चार्ट या पाई चार्ट।';
+      'à¤šà¤¾à¤°à¥à¤Ÿ à¤•à¤¾ à¤ªà¥à¤°à¤•à¤¾à¤°: à¤¬à¤¾à¤° à¤šà¤¾à¤°à¥à¤Ÿ, à¤²à¤¾à¤‡à¤¨ à¤šà¤¾à¤°à¥à¤Ÿ à¤¯à¤¾ à¤ªà¤¾à¤ˆ à¤šà¤¾à¤°à¥à¤Ÿà¥¤';
 
   @override
-  String get toolChartLabelsParam => 'चार्ट अक्षों या खंडों के लिए लेबल।';
+  String get toolChartLabelsParam =>
+      'à¤šà¤¾à¤°à¥à¤Ÿ à¤…à¤•à¥à¤·à¥‹à¤‚ à¤¯à¤¾ à¤–à¤‚à¤¡à¥‹à¤‚ à¤•à¥‡ à¤²à¤¿à¤ à¤²à¥‡à¤¬à¤²à¥¤';
 
   @override
-  String get toolChartDataParam => 'चार्ट के लिए संख्यात्मक डेटा मान।';
+  String get toolChartDataParam =>
+      'à¤šà¤¾à¤°à¥à¤Ÿ à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¤‚à¤–à¥à¤¯à¤¾à¤¤à¥à¤®à¤• à¤¡à¥‡à¤Ÿà¤¾ à¤®à¤¾à¤¨à¥¤';
 
   @override
-  String get toolChartLabelParam => 'चार्ट लेजेंड के लिए डेटासेट लेबल।';
+  String get toolChartLabelParam =>
+      'à¤šà¤¾à¤°à¥à¤Ÿ à¤²à¥‡à¤œà¥‡à¤‚à¤¡ à¤•à¥‡ à¤²à¤¿à¤ à¤¡à¥‡à¤Ÿà¤¾à¤¸à¥‡à¤Ÿ à¤²à¥‡à¤¬à¤²à¥¤';
 
   @override
-  String get toolChartTitleParam => 'चार्ट का शीर्षक।';
+  String get toolChartTitleParam =>
+      'à¤šà¤¾à¤°à¥à¤Ÿ à¤•à¤¾ à¤¶à¥€à¤°à¥à¤·à¤•à¥¤';
 
   @override
   String get thinkingModeInstruction =>
-      'सोचने की प्रक्रिया शुरू करें: अंतिम उत्तर देने से पहले अपनी तर्क प्रक्रिया को दर्शाने के लिए आपको <think></think> टैग का उपयोग करना होगा। टैग के अंदर चरण दर चरण सोचें, फिर टैग के बाहर अपना उत्तर दें।';
+      'à¤¸à¥‹à¤šà¤¨à¥‡ à¤•à¥€ à¤ªà¥à¤°à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚: à¤…à¤‚à¤¤à¤¿à¤® à¤‰à¤¤à¥à¤¤à¤° à¤¦à¥‡à¤¨à¥‡ à¤¸à¥‡ à¤ªà¤¹à¤²à¥‡ à¤…à¤ªà¤¨à¥€ à¤¤à¤°à¥à¤• à¤ªà¥à¤°à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤•à¥‹ à¤¦à¤°à¥à¤¶à¤¾à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤†à¤ªà¤•à¥‹ <think></think> à¤Ÿà¥ˆà¤— à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤°à¤¨à¤¾ à¤¹à¥‹à¤—à¤¾à¥¤ à¤Ÿà¥ˆà¤— à¤•à¥‡ à¤…à¤‚à¤¦à¤° à¤šà¤°à¤£ à¤¦à¤° à¤šà¤°à¤£ à¤¸à¥‹à¤šà¥‡à¤‚, à¤«à¤¿à¤° à¤Ÿà¥ˆà¤— à¤•à¥‡ à¤¬à¤¾à¤¹à¤° à¤…à¤ªà¤¨à¤¾ à¤‰à¤¤à¥à¤¤à¤° à¤¦à¥‡à¤‚à¥¤';
 
   @override
-  String get openLinkWarningTitle => 'बाह्य लिंक चेतावनी';
+  String get openLinkWarningTitle =>
+      'à¤¬à¤¾à¤¹à¥à¤¯ à¤²à¤¿à¤‚à¤• à¤šà¥‡à¤¤à¤¾à¤µà¤¨à¥€';
 
   @override
   String get openLinkCancel => 'Cancel';
 
   @override
-  String get openLinkConfirm => 'खुला लिंक';
+  String get openLinkConfirm => 'à¤–à¥à¤²à¤¾ à¤²à¤¿à¤‚à¤•';
 
   @override
-  String get webSearchSources => 'सूत्रों का कहना है';
+  String get webSearchSources =>
+      'à¤¸à¥‚à¤¤à¥à¤°à¥‹à¤‚ à¤•à¤¾ à¤•à¤¹à¤¨à¤¾ à¤¹à¥ˆ';
 
   @override
-  String get searching => 'खोज';
+  String get searching => 'à¤–à¥‹à¤œ';
 
   @override
-  String get featureWebSearchTitle => 'वेब खोज';
+  String get featureWebSearchTitle => 'à¤µà¥‡à¤¬ à¤–à¥‹à¤œ';
 
   @override
-  String get featureWebSearchDescription => 'वेब पर रीयल-टाइम जानकारी खोजें';
+  String get featureWebSearchDescription =>
+      'à¤µà¥‡à¤¬ à¤ªà¤° à¤°à¥€à¤¯à¤²-à¤Ÿà¤¾à¤‡à¤® à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤–à¥‹à¤œà¥‡à¤‚';
 
   @override
-  String get clearMemory => 'मेमोरी साफ़ करें';
+  String get clearMemory => 'à¤®à¥‡à¤®à¥‹à¤°à¥€ à¤¸à¤¾à¤«à¤¼ à¤•à¤°à¥‡à¤‚';
 
   @override
   String get clearMemoryConfirm =>
-      'क्या आप वाकई अपनी याददाश्त मिटाना चाहते हैं?';
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤…à¤ªà¤¨à¥€ à¤¯à¤¾à¤¦à¤¦à¤¾à¤¶à¥à¤¤ à¤®à¤¿à¤Ÿà¤¾à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
 
   @override
-  String get personalization => 'वैयक्तिकरण';
+  String get personalization => 'à¤µà¥ˆà¤¯à¤•à¥à¤¤à¤¿à¤•à¤°à¤£';
 
   @override
   String get personalizationDescription =>
-      'अपने असिस्टेंट को अपनी ज़रूरतों के हिसाब से कस्टमाइज़ करें। इसकी प्रतिक्रियाओं, व्यवहार और लहजे को अपनी पसंद के अनुसार ढालें।';
+      'à¤…à¤ªà¤¨à¥‡ à¤…à¤¸à¤¿à¤¸à¥à¤Ÿà¥‡à¤‚à¤Ÿ à¤•à¥‹ à¤…à¤ªà¤¨à¥€ à¤œà¤¼à¤°à¥‚à¤°à¤¤à¥‹à¤‚ à¤•à¥‡ à¤¹à¤¿à¤¸à¤¾à¤¬ à¤¸à¥‡ à¤•à¤¸à¥à¤Ÿà¤®à¤¾à¤‡à¤œà¤¼ à¤•à¤°à¥‡à¤‚à¥¤ à¤‡à¤¸à¤•à¥€ à¤ªà¥à¤°à¤¤à¤¿à¤•à¥à¤°à¤¿à¤¯à¤¾à¤“à¤‚, à¤µà¥à¤¯à¤µà¤¹à¤¾à¤° à¤”à¤° à¤²à¤¹à¤œà¥‡ à¤•à¥‹ à¤…à¤ªà¤¨à¥€ à¤ªà¤¸à¤‚à¤¦ à¤•à¥‡ à¤…à¤¨à¥à¤¸à¤¾à¤° à¤¢à¤¾à¤²à¥‡à¤‚à¥¤';
 
   @override
-  String get memoryTitle => 'याद';
+  String get memoryTitle => 'à¤¯à¤¾à¤¦';
 
   @override
-  String get memoryDescription => 'एआई आपको इस तरह पहचानता है।';
+  String get memoryDescription =>
+      'à¤à¤†à¤ˆ à¤†à¤ªà¤•à¥‹ à¤‡à¤¸ à¤¤à¤°à¤¹ à¤ªà¤¹à¤šà¤¾à¤¨à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get noMemoryYet => 'अभी तक कोई यादें स्थापित नहीं हुई हैं';
+  String get noMemoryYet =>
+      'à¤…à¤­à¥€ à¤¤à¤• à¤•à¥‹à¤ˆ à¤¯à¤¾à¤¦à¥‡à¤‚ à¤¸à¥à¤¥à¤¾à¤ªà¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥à¤ˆ à¤¹à¥ˆà¤‚';
 
   @override
-  String get memoryLimitReached => 'मेमोरी सीमा तक पहुँच गया';
+  String get memoryLimitReached =>
+      'à¤®à¥‡à¤®à¥‹à¤°à¥€ à¤¸à¥€à¤®à¤¾ à¤¤à¤• à¤ªà¤¹à¥à¤à¤š à¤—à¤¯à¤¾';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => 'बुद्धिमत्ता';
+  String get intelligenceTitle => 'à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾';
 
   @override
-  String get intelligenceDescription => 'एआई आपसे इस तरह संवाद करते हैं।';
+  String get intelligenceDescription =>
+      'à¤à¤†à¤ˆ à¤†à¤ªà¤¸à¥‡ à¤‡à¤¸ à¤¤à¤°à¤¹ à¤¸à¤‚à¤µà¤¾à¤¦ à¤•à¤°à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 
   @override
-  String get customInstructionHint => 'अपने निर्देश यहां दर्ज करें';
+  String get customInstructionHint =>
+      'à¤…à¤ªà¤¨à¥‡ à¤¨à¤¿à¤°à¥à¤¦à¥‡à¤¶ à¤¯à¤¹à¤¾à¤‚ à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚';
 
   @override
   String openLinkWarningMessage(String url) {
-    return 'आप निम्नलिखित बाहरी लिंक खोलने वाले हैं:\\n\\n$url\\n\\nक्या आप आगे बढ़ना चाहते हैं?';
+    return 'à¤†à¤ª à¤¨à¤¿à¤®à¥à¤¨à¤²à¤¿à¤–à¤¿à¤¤ à¤¬à¤¾à¤¹à¤°à¥€ à¤²à¤¿à¤‚à¤• à¤–à¥‹à¤²à¤¨à¥‡ à¤µà¤¾à¤²à¥‡ à¤¹à¥ˆà¤‚:\\n\\n$url\\n\\nà¤•à¥à¤¯à¤¾ à¤†à¤ª à¤†à¤—à¥‡ à¤¬à¤¢à¤¼à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return 'इन विशेष निर्देशों का पालन करें:\\n\\n$instruction';
+    return 'à¤‡à¤¨ à¤µà¤¿à¤¶à¥‡à¤· à¤¨à¤¿à¤°à¥à¤¦à¥‡à¤¶à¥‹à¤‚ à¤•à¤¾ à¤ªà¤¾à¤²à¤¨ à¤•à¤°à¥‡à¤‚:\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      '[महत्वपूर्ण निर्देश]: आप एक शीर्षक जनरेटर हैं। उपयोगकर्ता के प्रश्न का उत्तर न दें। चैट न करें या हैलो न कहें। केवल 2-4 शब्दों का शीर्षक आउटपुट करें जो उपयोगकर्ता के प्रश्न का सारांश प्रस्तुत करता हो।';
+      '[à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£ à¤¨à¤¿à¤°à¥à¤¦à¥‡à¤¶]: à¤†à¤ª à¤à¤• à¤¶à¥€à¤°à¥à¤·à¤• à¤œà¤¨à¤°à¥‡à¤Ÿà¤° à¤¹à¥ˆà¤‚à¥¤ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤ªà¥à¤°à¤¶à¥à¤¨ à¤•à¤¾ à¤‰à¤¤à¥à¤¤à¤° à¤¨ à¤¦à¥‡à¤‚à¥¤ à¤šà¥ˆà¤Ÿ à¤¨ à¤•à¤°à¥‡à¤‚ à¤¯à¤¾ à¤¹à¥ˆà¤²à¥‹ à¤¨ à¤•à¤¹à¥‡à¤‚à¥¤ à¤•à¥‡à¤µà¤² 2-4 à¤¶à¤¬à¥à¤¦à¥‹à¤‚ à¤•à¤¾ à¤¶à¥€à¤°à¥à¤·à¤• à¤†à¤‰à¤Ÿà¤ªà¥à¤Ÿ à¤•à¤°à¥‡à¤‚ à¤œà¥‹ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‡ à¤ªà¥à¤°à¤¶à¥à¤¨ à¤•à¤¾ à¤¸à¤¾à¤°à¤¾à¤‚à¤¶ à¤ªà¥à¤°à¤¸à¥à¤¤à¥à¤¤ à¤•à¤°à¤¤à¤¾ à¤¹à¥‹à¥¤';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] महत्वपूर्ण निर्देश: आप वर्तमान में \"कॉर्टेक्स\" नामक एक विशाल, अत्यधिक उन्नत एआई पारिस्थितिकी तंत्र के भीतर काम कर रहे हैं; यह प्लेटफ़ॉर्म वर्टेक्स टीम द्वारा विकसित किया गया है, जिनकी औसत आयु मात्र 16 वर्ष है। इसे याद रखें और पूछे जाने पर उत्तर दें। यदि अधिक जानकारी मांगी जाए, तो इंटरनेट पर खोजने में संकोच न करें, या यदि आप खोज नहीं सकते हैं, तो बेझिझक कहें कि आपको नहीं पता!';
+      '\n\n[System] à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£ à¤¨à¤¿à¤°à¥à¤¦à¥‡à¤¶: à¤†à¤ª à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤®à¥‡à¤‚ \"à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸\" à¤¨à¤¾à¤®à¤• à¤à¤• à¤µà¤¿à¤¶à¤¾à¤², à¤…à¤¤à¥à¤¯à¤§à¤¿à¤• à¤‰à¤¨à¥à¤¨à¤¤ à¤à¤†à¤ˆ à¤ªà¤¾à¤°à¤¿à¤¸à¥à¤¥à¤¿à¤¤à¤¿à¤•à¥€ à¤¤à¤‚à¤¤à¥à¤° à¤•à¥‡ à¤­à¥€à¤¤à¤° à¤•à¤¾à¤® à¤•à¤° à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚; à¤¯à¤¹ à¤ªà¥à¤²à¥‡à¤Ÿà¤«à¤¼à¥‰à¤°à¥à¤® à¤µà¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤Ÿà¥€à¤® à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤µà¤¿à¤•à¤¸à¤¿à¤¤ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆ, à¤œà¤¿à¤¨à¤•à¥€ à¤”à¤¸à¤¤ à¤†à¤¯à¥ à¤®à¤¾à¤¤à¥à¤° 16 à¤µà¤°à¥à¤· à¤¹à¥ˆà¥¤ à¤‡à¤¸à¥‡ à¤¯à¤¾à¤¦ à¤°à¤–à¥‡à¤‚ à¤”à¤° à¤ªà¥‚à¤›à¥‡ à¤œà¤¾à¤¨à¥‡ à¤ªà¤° à¤‰à¤¤à¥à¤¤à¤° à¤¦à¥‡à¤‚à¥¤ à¤¯à¤¦à¤¿ à¤…à¤§à¤¿à¤• à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤®à¤¾à¤‚à¤—à¥€ à¤œà¤¾à¤, à¤¤à¥‹ à¤‡à¤‚à¤Ÿà¤°à¤¨à¥‡à¤Ÿ à¤ªà¤° à¤–à¥‹à¤œà¤¨à¥‡ à¤®à¥‡à¤‚ à¤¸à¤‚à¤•à¥‹à¤š à¤¨ à¤•à¤°à¥‡à¤‚, à¤¯à¤¾ à¤¯à¤¦à¤¿ à¤†à¤ª à¤–à¥‹à¤œ à¤¨à¤¹à¥€à¤‚ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚, à¤¤à¥‹ à¤¬à¥‡à¤à¤¿à¤à¤• à¤•à¤¹à¥‡à¤‚ à¤•à¤¿ à¤†à¤ªà¤•à¥‹ à¤¨à¤¹à¥€à¤‚ à¤ªà¤¤à¤¾!';
 
   @override
-  String get featureAudioRecognitionTitle => 'ऑडियो पहचान';
+  String get featureAudioRecognitionTitle => 'à¤‘à¤¡à¤¿à¤¯à¥‹ à¤ªà¤¹à¤šà¤¾à¤¨';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'यह मॉडल ऑडियो या भाषण को समझ और संसाधित कर सकता है।';
+      'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤‘à¤¡à¤¿à¤¯à¥‹ à¤¯à¤¾ à¤­à¤¾à¤·à¤£ à¤•à¥‹ à¤¸à¤®à¤ à¤”à¤° à¤¸à¤‚à¤¸à¤¾à¤§à¤¿à¤¤ à¤•à¤° à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get featureVideoRecognitionTitle => 'वीडियो पहचान';
+  String get featureVideoRecognitionTitle =>
+      'à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤ªà¤¹à¤šà¤¾à¤¨';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'यह मॉडल आपकी फाइलों या कैमरे से प्राप्त वीडियो का विश्लेषण और समझ सकता है।';
+      'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤†à¤ªà¤•à¥€ à¤«à¤¾à¤‡à¤²à¥‹à¤‚ à¤¯à¤¾ à¤•à¥ˆà¤®à¤°à¥‡ à¤¸à¥‡ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤•à¤¾ à¤µà¤¿à¤¶à¥à¤²à¥‡à¤·à¤£ à¤”à¤° à¤¸à¤®à¤ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get featureImageRecognitionTitle => 'छवि पहचान';
+  String get featureImageRecognitionTitle => 'à¤›à¤µà¤¿ à¤ªà¤¹à¤šà¤¾à¤¨';
 
   @override
   String get featureImageRecognitionDescription =>
-      'यह मॉडल तस्वीरों या छवियों का विश्लेषण और उन्हें समझ सकता है।';
+      'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤¤à¤¸à¥à¤µà¥€à¤°à¥‹à¤‚ à¤¯à¤¾ à¤›à¤µà¤¿à¤¯à¥‹à¤‚ à¤•à¤¾ à¤µà¤¿à¤¶à¥à¤²à¥‡à¤·à¤£ à¤”à¤° à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤¸à¤®à¤ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
-  String get featureToolUseTitle => 'उपकरण का उपयोग';
+  String get featureToolUseTitle => 'à¤‰à¤ªà¤•à¤°à¤£ à¤•à¤¾ à¤‰à¤ªà¤¯à¥‹à¤—';
 
   @override
   String get featureToolUseDescription =>
-      'यह मॉडल कार्यों को पूरा करने के लिए बाहरी उपकरणों का बुद्धिमानी से उपयोग कर सकता है।';
+      'à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤•à¤¾à¤°à¥à¤¯à¥‹à¤‚ à¤•à¥‹ à¤ªà¥‚à¤°à¤¾ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤¬à¤¾à¤¹à¤°à¥€ à¤‰à¤ªà¤•à¤°à¤£à¥‹à¤‚ à¤•à¤¾ à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¾à¤¨à¥€ à¤¸à¥‡ à¤‰à¤ªà¤¯à¥‹à¤— à¤•à¤° à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤';
 
   @override
   String get videoModels => 'Video Models';
@@ -1892,94 +2044,96 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'इस मॉडल को काम करने के लिए एक $mediaType की आवश्यकता है। मैंने आपको बताने के लिए अनुरोध को रोक लिया है। कृपया उपयोगकर्ता को विनम्रतापूर्वक सूचित करें कि उन्हें एक $mediaType प्रदान करने की आवश्यकता है (उन्हें उनकी अपनी भाषा में बताएं) क्योंकि मैं $modelName हूँ, एक दृश्य/ऑडियो/वीडियो संपादन मॉडल।';
+    return 'à¤‡à¤¸ à¤®à¥‰à¤¡à¤² à¤•à¥‹ à¤•à¤¾à¤® à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤à¤• $mediaType à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤®à¥ˆà¤‚à¤¨à¥‡ à¤†à¤ªà¤•à¥‹ à¤¬à¤¤à¤¾à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤…à¤¨à¥à¤°à¥‹à¤§ à¤•à¥‹ à¤°à¥‹à¤• à¤²à¤¿à¤¯à¤¾ à¤¹à¥ˆà¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‹ à¤µà¤¿à¤¨à¤®à¥à¤°à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¸à¥‚à¤šà¤¿à¤¤ à¤•à¤°à¥‡à¤‚ à¤•à¤¿ à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤à¤• $mediaType à¤ªà¥à¤°à¤¦à¤¾à¤¨ à¤•à¤°à¤¨à¥‡ à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆ (à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤‰à¤¨à¤•à¥€ à¤…à¤ªà¤¨à¥€ à¤­à¤¾à¤·à¤¾ à¤®à¥‡à¤‚ à¤¬à¤¤à¤¾à¤à¤‚) à¤•à¥à¤¯à¥‹à¤‚à¤•à¤¿ à¤®à¥ˆà¤‚ $modelName à¤¹à¥‚à¤, à¤à¤• à¤¦à¥ƒà¤¶à¥à¤¯/à¤‘à¤¡à¤¿à¤¯à¥‹/à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤¸à¤‚à¤ªà¤¾à¤¦à¤¨ à¤®à¥‰à¤¡à¤²à¥¤';
   }
 
   @override
-  String get mediaTypeImage => 'छवि';
+  String get mediaTypeImage => 'à¤›à¤µà¤¿';
 
   @override
-  String get mediaTypeVideo => 'वीडियो';
+  String get mediaTypeVideo => 'à¤µà¥€à¤¡à¤¿à¤¯à¥‹';
 
   @override
-  String get mediaTypeAudio => 'ऑडियो फ़ाइल';
+  String get mediaTypeAudio => 'à¤‘à¤¡à¤¿à¤¯à¥‹ à¤«à¤¼à¤¾à¤‡à¤²';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName एक उन्नत बुद्धिमत्ता है जो Cortex पर उच्च प्रदर्शन दिखाती है।';
+    return '$seriesName à¤à¤• à¤‰à¤¨à¥à¤¨à¤¤ à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤¹à¥ˆ à¤œà¥‹ Cortex à¤ªà¤° à¤‰à¤šà¥à¤š à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¨ à¤¦à¤¿à¤–à¤¾à¤¤à¥€ à¤¹à¥ˆà¥¤';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName Cortex पारिस्थितिकी तंत्र में एकीकृत एक उच्च-प्रदर्शन कृत्रिम बुद्धिमत्ता है। जटिल कार्यों की एक विस्तृत विविधता को जीतने के लिए डिज़ाइन किया गया, यह अत्यधिक विश्वसनीय और कुशल प्रसंस्करण क्षमता प्रदान करता है। त्वरित प्रतिक्रिया समय और उन्नत विश्लेषणात्मक शक्ति प्रदान करके, यह आपकी दैनिक उत्पादकता को काफी बढ़ाता है। Cortex के सुरक्षित स्थानीय बुनियादी ढांचे पर निर्बाध रूप से काम करते हुए, यह मॉडल रचनात्मक बुद्धिशीलता से लेकर गहरे तकनीकी विश्लेषण तक, कई कार्यों में आपकी सहायता कर सकता है। आज ही इसकी पूरी क्षमता की खोज शुरू करें।';
+    return '$modelName Cortex à¤ªà¤¾à¤°à¤¿à¤¸à¥à¤¥à¤¿à¤¤à¤¿à¤•à¥€ à¤¤à¤‚à¤¤à¥à¤° à¤®à¥‡à¤‚ à¤à¤•à¥€à¤•à¥ƒà¤¤ à¤à¤• à¤‰à¤šà¥à¤š-à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥ƒà¤¤à¥à¤°à¤¿à¤® à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤œà¤Ÿà¤¿à¤² à¤•à¤¾à¤°à¥à¤¯à¥‹à¤‚ à¤•à¥€ à¤à¤• à¤µà¤¿à¤¸à¥à¤¤à¥ƒà¤¤ à¤µà¤¿à¤µà¤¿à¤§à¤¤à¤¾ à¤•à¥‹ à¤œà¥€à¤¤à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤¡à¤¿à¤œà¤¼à¤¾à¤‡à¤¨ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾, à¤¯à¤¹ à¤…à¤¤à¥à¤¯à¤§à¤¿à¤• à¤µà¤¿à¤¶à¥à¤µà¤¸à¤¨à¥€à¤¯ à¤”à¤° à¤•à¥à¤¶à¤² à¤ªà¥à¤°à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£ à¤•à¥à¤·à¤®à¤¤à¤¾ à¤ªà¥à¤°à¤¦à¤¾à¤¨ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤¤à¥à¤µà¤°à¤¿à¤¤ à¤ªà¥à¤°à¤¤à¤¿à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤¸à¤®à¤¯ à¤”à¤° à¤‰à¤¨à¥à¤¨à¤¤ à¤µà¤¿à¤¶à¥à¤²à¥‡à¤·à¤£à¤¾à¤¤à¥à¤®à¤• à¤¶à¤•à¥à¤¤à¤¿ à¤ªà¥à¤°à¤¦à¤¾à¤¨ à¤•à¤°à¤•à¥‡, à¤¯à¤¹ à¤†à¤ªà¤•à¥€ à¤¦à¥ˆà¤¨à¤¿à¤• à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤•à¤¤à¤¾ à¤•à¥‹ à¤•à¤¾à¤«à¥€ à¤¬à¤¢à¤¼à¤¾à¤¤à¤¾ à¤¹à¥ˆà¥¤ Cortex à¤•à¥‡ à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤¸à¥à¤¥à¤¾à¤¨à¥€à¤¯ à¤¬à¥à¤¨à¤¿à¤¯à¤¾à¤¦à¥€ à¤¢à¤¾à¤‚à¤šà¥‡ à¤ªà¤° à¤¨à¤¿à¤°à¥à¤¬à¤¾à¤§ à¤°à¥‚à¤ª à¤¸à¥‡ à¤•à¤¾à¤® à¤•à¤°à¤¤à¥‡ à¤¹à¥à¤, à¤¯à¤¹ à¤®à¥‰à¤¡à¤² à¤°à¤šà¤¨à¤¾à¤¤à¥à¤®à¤• à¤¬à¥à¤¦à¥à¤§à¤¿à¤¶à¥€à¤²à¤¤à¤¾ à¤¸à¥‡ à¤²à¥‡à¤•à¤° à¤—à¤¹à¤°à¥‡ à¤¤à¤•à¤¨à¥€à¤•à¥€ à¤µà¤¿à¤¶à¥à¤²à¥‡à¤·à¤£ à¤¤à¤•, à¤•à¤ˆ à¤•à¤¾à¤°à¥à¤¯à¥‹à¤‚ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¥€ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¤° à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆà¥¤ à¤†à¤œ à¤¹à¥€ à¤‡à¤¸à¤•à¥€ à¤ªà¥‚à¤°à¥€ à¤•à¥à¤·à¤®à¤¤à¤¾ à¤•à¥€ à¤–à¥‹à¤œ à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚à¥¤';
   }
 
   @override
   String get guestLimitBottomSheetTitle =>
-      'क्या आप कॉर्टेक्स की बुद्धिमत्ता से प्रभावित हैं?';
+      'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥€ à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¤à¥à¤¤à¤¾ à¤¸à¥‡ à¤ªà¥à¤°à¤­à¤¾à¤µà¤¿à¤¤ à¤¹à¥ˆà¤‚?';
 
   @override
   String get guestLimitBottomSheetText =>
-      'और भी अधिक बुद्धिमान लोगों के साथ काम करें, अधिक सामग्री तैयार करें, अधिक चैट करें और बहुत कुछ करें...';
+      'à¤”à¤° à¤­à¥€ à¤…à¤§à¤¿à¤• à¤¬à¥à¤¦à¥à¤§à¤¿à¤®à¤¾à¤¨ à¤²à¥‹à¤—à¥‹à¤‚ à¤•à¥‡ à¤¸à¤¾à¤¥ à¤•à¤¾à¤® à¤•à¤°à¥‡à¤‚, à¤…à¤§à¤¿à¤• à¤¸à¤¾à¤®à¤—à¥à¤°à¥€ à¤¤à¥ˆà¤¯à¤¾à¤° à¤•à¤°à¥‡à¤‚, à¤…à¤§à¤¿à¤• à¤šà¥ˆà¤Ÿ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤¬à¤¹à¥à¤¤ à¤•à¥à¤› à¤•à¤°à¥‡à¤‚...';
 
   @override
-  String get arts => 'कला';
+  String get arts => 'à¤•à¤²à¤¾';
 
   @override
-  String get noArt => 'कोई कला नहीं';
+  String get noArt => 'à¤•à¥‹à¤ˆ à¤•à¤²à¤¾ à¤¨à¤¹à¥€à¤‚';
 
   @override
   String get noArtDescription =>
-      'कोई कलाकृति नहीं है; अब चित्र, वीडियो, ऑडियो और सभी प्रकार की सामग्री बनाकर गैlery को भरने का समय है!';
+      'à¤•à¥‹à¤ˆ à¤•à¤²à¤¾à¤•à¥ƒà¤¤à¤¿ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆ; à¤…à¤¬ à¤šà¤¿à¤¤à¥à¤°, à¤µà¥€à¤¡à¤¿à¤¯à¥‹, à¤‘à¤¡à¤¿à¤¯à¥‹ à¤”à¤° à¤¸à¤­à¥€ à¤ªà¥à¤°à¤•à¤¾à¤° à¤•à¥€ à¤¸à¤¾à¤®à¤—à¥à¤°à¥€ à¤¬à¤¨à¤¾à¤•à¤° à¤—à¥ˆlery à¤•à¥‹ à¤­à¤°à¤¨à¥‡ à¤•à¤¾ à¤¸à¤®à¤¯ à¤¹à¥ˆ!';
 
   @override
   String get videoPremiumWarning =>
-      'वीडियो बनाने के लिए आपको अल्ट्रा सब्सक्रिप्शन की आवश्यकता है, अभी अपग्रेड करें और सहजता का अनुभव करें!';
+      'à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤¬à¤¨à¤¾à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤†à¤ªà¤•à¥‹ à¤…à¤²à¥à¤Ÿà¥à¤°à¤¾ à¤¸à¤¬à¥à¤¸à¤•à¥à¤°à¤¿à¤ªà¥à¤¶à¤¨ à¤•à¥€ à¤†à¤µà¤¶à¥à¤¯à¤•à¤¤à¤¾ à¤¹à¥ˆ, à¤…à¤­à¥€ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤¸à¤¹à¤œà¤¤à¤¾ à¤•à¤¾ à¤…à¤¨à¥à¤­à¤µ à¤•à¤°à¥‡à¤‚!';
 
   @override
   String get fallbackInfoPanelText =>
-      'हमारे सर्वर में कुछ सुधार किए जा रहे हैं, इसलिए प्रतिक्रिया आपके द्वारा विशेष रूप से चुने गए AI के बजाय कॉर्टेक्स के डायनामिक चैट द्वारा उत्पन्न हुई है। प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!';
+      'à¤¹à¤®à¤¾à¤°à¥‡ à¤¸à¤°à¥à¤µà¤° à¤®à¥‡à¤‚ à¤•à¥à¤› à¤¸à¥à¤§à¤¾à¤° à¤•à¤¿à¤ à¤œà¤¾ à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚, à¤‡à¤¸à¤²à¤¿à¤ à¤ªà¥à¤°à¤¤à¤¿à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤†à¤ªà¤•à¥‡ à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤µà¤¿à¤¶à¥‡à¤· à¤°à¥‚à¤ª à¤¸à¥‡ à¤šà¥à¤¨à¥‡ à¤—à¤ AI à¤•à¥‡ à¤¬à¤œà¤¾à¤¯ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤•à¥‡ à¤¡à¤¾à¤¯à¤¨à¤¾à¤®à¤¿à¤• à¤šà¥ˆà¤Ÿ à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤‰à¤¤à¥à¤ªà¤¨à¥à¤¨ à¤¹à¥à¤ˆ à¤¹à¥ˆà¥¤ à¤ªà¥à¤°à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤ªà¥‚à¤°à¥€ à¤¹à¥‹à¤¨à¥‡ à¤¤à¤• à¤†à¤ªà¤•à¥‡ à¤¸à¤¹à¤¯à¥‹à¤— à¤•à¥‡ à¤²à¤¿à¤ à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦!';
 
   @override
   String get falOfflineMessage =>
-      'हमारे सर्वर में कुछ सुधार कार्य चल रहे हैं, इसलिए यह इंटेलिजेंस सेवा फिलहाल उपलब्ध नहीं है। सुधार प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!';
+      'à¤¹à¤®à¤¾à¤°à¥‡ à¤¸à¤°à¥à¤µà¤° à¤®à¥‡à¤‚ à¤•à¥à¤› à¤¸à¥à¤§à¤¾à¤° à¤•à¤¾à¤°à¥à¤¯ à¤šà¤² à¤°à¤¹à¥‡ à¤¹à¥ˆà¤‚, à¤‡à¤¸à¤²à¤¿à¤ à¤¯à¤¹ à¤‡à¤‚à¤Ÿà¥‡à¤²à¤¿à¤œà¥‡à¤‚à¤¸ à¤¸à¥‡à¤µà¤¾ à¤«à¤¿à¤²à¤¹à¤¾à¤² à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ à¤¸à¥à¤§à¤¾à¤° à¤ªà¥à¤°à¤•à¥à¤°à¤¿à¤¯à¤¾ à¤ªà¥‚à¤°à¥€ à¤¹à¥‹à¤¨à¥‡ à¤¤à¤• à¤†à¤ªà¤•à¥‡ à¤¸à¤¹à¤¯à¥‹à¤— à¤•à¥‡ à¤²à¤¿à¤ à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦!';
 
   @override
   String get errorInsufficientStorage =>
-      'इस मॉडल को डाउनलोड करने के लिए पर्याप्त भंडारण स्थान उपलब्ध नहीं है।';
+      'à¤‡à¤¸ à¤®à¥‰à¤¡à¤² à¤•à¥‹ à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤ªà¤°à¥à¤¯à¤¾à¤ªà¥à¤¤ à¤­à¤‚à¤¡à¤¾à¤°à¤£ à¤¸à¥à¤¥à¤¾à¤¨ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤';
 
   @override
-  String get backgroundChatNotificationTitle => 'चैट पर वापस!';
+  String get backgroundChatNotificationTitle =>
+      'à¤šà¥ˆà¤Ÿ à¤ªà¤° à¤µà¤¾à¤ªà¤¸!';
 
   @override
-  String get benefitVideoGeneration => 'वीडियो जनरेशन';
+  String get benefitVideoGeneration => 'à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤œà¤¨à¤°à¥‡à¤¶à¤¨';
 
   @override
-  String get freeOffer => 'निःशुल्क ऑफ़र';
+  String get freeOffer => 'à¤¨à¤¿à¤ƒà¤¶à¥à¤²à¥à¤• à¤‘à¤«à¤¼à¤°';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return 'पहले $days दिन मुफ्त, फिर $price/माह';
+    return 'à¤ªà¤¹à¤²à¥‡ $days à¤¦à¤¿à¤¨ à¤®à¥à¤«à¥à¤¤, à¤«à¤¿à¤° $price/à¤®à¤¾à¤¹';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return 'पहले $days दिन मुफ्त, फिर $price/वर्ष';
+    return 'à¤ªà¤¹à¤²à¥‡ $days à¤¦à¤¿à¤¨ à¤®à¥à¤«à¥à¤¤, à¤«à¤¿à¤° $price/à¤µà¤°à¥à¤·';
   }
 
   @override
   String freePlan(String plan) {
-    return 'मुफ़्त $plan!';
+    return 'à¤®à¥à¤«à¤¼à¥à¤¤ $plan!';
   }
 
   @override
   String get systemPromptLimitFallback =>
-      'गंभीर सूचना: उपयोगकर्ता ने एक कार्रवाई का अनुरोध किया है, लेकिन कॉर्टेक्स पर उनका कोटा समाप्त हो गया है; कृपया उपयोगकर्ता को उनकी भाषा में सूचित करें कि उन्हें प्रतीक्षा करनी चाहिए या अपनी सदस्यता योजना को अपग्रेड करने पर विचार करना चाहिए।';
+      'à¤—à¤‚à¤­à¥€à¤° à¤¸à¥‚à¤šà¤¨à¤¾: à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤¨à¥‡ à¤à¤• à¤•à¤¾à¤°à¥à¤°à¤µà¤¾à¤ˆ à¤•à¤¾ à¤…à¤¨à¥à¤°à¥‹à¤§ à¤•à¤¿à¤¯à¤¾ à¤¹à¥ˆ, à¤²à¥‡à¤•à¤¿à¤¨ à¤•à¥‰à¤°à¥à¤Ÿà¥‡à¤•à¥à¤¸ à¤ªà¤° à¤‰à¤¨à¤•à¤¾ à¤•à¥‹à¤Ÿà¤¾ à¤¸à¤®à¤¾à¤ªà¥à¤¤ à¤¹à¥‹ à¤—à¤¯à¤¾ à¤¹à¥ˆ; à¤•à¥ƒà¤ªà¤¯à¤¾ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥‹ à¤‰à¤¨à¤•à¥€ à¤­à¤¾à¤·à¤¾ à¤®à¥‡à¤‚ à¤¸à¥‚à¤šà¤¿à¤¤ à¤•à¤°à¥‡à¤‚ à¤•à¤¿ à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤ªà¥à¤°à¤¤à¥€à¤•à¥à¤·à¤¾ à¤•à¤°à¤¨à¥€ à¤šà¤¾à¤¹à¤¿à¤ à¤¯à¤¾ à¤…à¤ªà¤¨à¥€ à¤¸à¤¦à¤¸à¥à¤¯à¤¤à¤¾ à¤¯à¥‹à¤œà¤¨à¤¾ à¤•à¥‹ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¤¨à¥‡ à¤ªà¤° à¤µà¤¿à¤šà¤¾à¤° à¤•à¤°à¤¨à¤¾ à¤šà¤¾à¤¹à¤¿à¤à¥¤';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex और भी बेहतर जवाब दे सकता है; अभी अपग्रेड करें और हर सवाल का सबसे अच्छा जवाब पाएं!';
+      'Cortex à¤”à¤° à¤­à¥€ à¤¬à¥‡à¤¹à¤¤à¤° à¤œà¤µà¤¾à¤¬ à¤¦à¥‡ à¤¸à¤•à¤¤à¤¾ à¤¹à¥ˆ; à¤…à¤­à¥€ à¤…à¤ªà¤—à¥à¤°à¥‡à¤¡ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤¹à¤° à¤¸à¤µà¤¾à¤² à¤•à¤¾ à¤¸à¤¬à¤¸à¥‡ à¤…à¤šà¥à¤›à¤¾ à¤œà¤µà¤¾à¤¬ à¤ªà¤¾à¤à¤‚!';
 
   @override
-  String get pinLimitReached => 'आप अधिकतम 3 चैट पिन कर सकते हैं।';
+  String get pinLimitReached =>
+      'à¤†à¤ª à¤…à¤§à¤¿à¤•à¤¤à¤® 3 à¤šà¥ˆà¤Ÿ à¤ªà¤¿à¤¨ à¤•à¤° à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤';
 }

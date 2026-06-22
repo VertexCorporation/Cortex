@@ -226,6 +226,43 @@ class ModelDefaults {
     }
   };
 
+  // This map acts as a local hardcoded entry for the virtual Cortex roleplay model.
+  static const Map<String, dynamic> cortexRoleplayData = {
+    'id': 'cortex/roleplay',
+    'title': 'Cortex',
+    'producer': 'Vertex',
+    'type': 'online',
+    'category': 'roleplay',
+    'tier': 'free',
+    'imagePath': 'assets/cortex.svg',
+    'modalities': {'text': true, 'image': true},
+    'outputs': {'text': true},
+    'isFullyLocalized': true,
+    'context': '128000',
+    'role': 'Sen her şeyi bilen zeki ve yardımsever bir asistansın.',
+    'summary': {
+      'en': 'Advanced AI Assistant',
+      'tr': 'Gelişmiş Yapay Zekâ Asistanı',
+      'ku': 'Asîstanê AI yê Pêşketî',
+      'es': 'Asistente de IA Avanzado',
+      'fr': 'Assistant IA Avancé',
+      'de': 'Fortschrittlicher KI-Assistent',
+      'it': 'Assistente AI Avanzato',
+      'pt': 'Assistente de IA Avançado',
+      'ru': 'Продвинутый ИИ-ассистент',
+      'zh': '高级AI助手',
+      'ja': '高度なAIアシスタント',
+      'ko': '고급 AI 어시스턴트',
+      'ar': 'مساعد ذكاء اصطناعي متقدم',
+      'hi': 'उन्नत एआई सहायक',
+      'id': 'Asisten AI Tingkat Lanjut',
+    },
+    'description': {
+      'en': 'Cortex is a helpful and intelligent AI assistant designed to answer your questions and assist with tasks.',
+      'tr': 'Cortex, sorularınızı yanıtlamak ve görevlerinize yardımcı olmak için tasarlanmış zeki ve yardımsever bir yapay zekâ asistanıdır.',
+    }
+  };
+
   // --- CHAT FORMAT TEMPLATES ---
 
   static const Map<String, dynamic> _chatmlFormat = {

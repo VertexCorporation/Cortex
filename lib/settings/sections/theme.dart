@@ -30,6 +30,10 @@ class AppThemeSection extends StatelessWidget {
       'grayscale': localizations.grayscale,
       'ocean': localizations.ocean,
       'scarletSnow': localizations.scarletSnow,
+      'cyberpunk': localizations.cyberpunk,
+      'sunset': localizations.sunset,
+      'coffee': localizations.coffee,
+      'deepSpace': localizations.deepSpace,
     };
     return mapping[themeCode] ?? themeCode;
   }
@@ -46,6 +50,10 @@ class AppThemeSection extends StatelessWidget {
       case 'behindTheSlaughter':
       case 'scarletSnow':
       case 'love':
+      case 'cyberpunk':
+      case 'sunset':
+      case 'coffee':
+      case 'deepSpace':
         return 1; // Requires at least Plus
       default:
         return 99; // Unknown themes are locked by default
@@ -184,95 +192,147 @@ class AppThemeSection extends StatelessWidget {
                         ConstrainedBox(
                           constraints:
                           BoxConstraints(maxHeight: screenHeight * 0.4),
-                          child: ListView.builder(
+                          child: GridView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.symmetric(
                                 vertical: 10 * scale, horizontal: 10 * scale),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: screenWidth > 600 ? 3 : 2,
+                              crossAxisSpacing: 12 * scale,
+                              mainAxisSpacing: 12 * scale,
+                              childAspectRatio: 0.9,
+                            ),
                             itemCount: themesList.length,
                             itemBuilder: (context, index) {
                               final theme = themesList[index];
                               final bool isEnabled = theme['enabled'] as bool;
                               final String themeCode = theme['code'] as String;
-                              final bool isSelected =
-                              (tempSelectedTheme == themeCode);
+                              final bool isSelected = (tempSelectedTheme == themeCode);
+                              
+                              final themeColors = AppColors.getThemeColors(themeCode);
 
-                              return AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeInOut,
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? AppColors.primaryColor.inverted
-                                      .withValues(alpha: 0.02)
-                                      : Colors.transparent,
-                                  borderRadius:
-                                  BorderRadius.circular(8 * scale),
-                                ),
-                                child: ListTile(
-                                  leading: isEnabled
-                                      ? AnimatedSwitcher(
-                                    duration:
-                                    const Duration(milliseconds: 200),
-                                    transitionBuilder:
-                                        (child, animation) =>
-                                        FadeTransition(
-                                            opacity: animation,
-                                            child: child),
-                                    child: Icon(
-                                      isSelected
-                                          ? Icons.radio_button_checked
-                                          : Icons.radio_button_unchecked,
-                                      key: ValueKey<bool>(isSelected),
-                                      color:
-                                      AppColors.primaryColor.inverted,
-                                      size: 24 * scale,
-                                    ),
-                                  )
-                                      : SizedBox(
-                                    width: 24 * scale,
-                                    height: 24 * scale,
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/lock.svg',
-                                        width: 20 * scale,
-                                        height: 20 * scale,
-                                        colorFilter: ColorFilter.mode(
-                                            AppColors
-                                                .primaryColor.inverted
-                                                .withValues(alpha: 0.5),
-                                            BlendMode.srcIn),
-                                      ),
-                                    ),
-                                  ),
-                                  title: Text(
-                                    theme['name'] as String,
-                                    style: TextStyle(
-                                      fontSize: 15 * scale,
-                                      color: isEnabled
-                                          ? AppColors.primaryColor.inverted
-                                          : AppColors.primaryColor.inverted
-                                          .withValues(alpha: 0.5),
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    if (isEnabled) {
-                                      if (!isSelected) {
-                                        HapticFeedback.lightImpact();
-                                        setStateDialog(() =>
-                                        tempSelectedTheme = themeCode);
-                                      }
-                                    } else {
+                              return GestureDetector(
+                                onTap: () {
+                                  if (isEnabled) {
+                                    if (!isSelected) {
                                       HapticFeedback.lightImpact();
-                                      notificationService.showNotification(
-                                          message: appLocalizations.themeLocked,
-                                          type: NotificationType.error);
+                                      setStateDialog(() => tempSelectedTheme = themeCode);
                                     }
-                                  },
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(8 * scale),
+                                  } else {
+                                    HapticFeedback.lightImpact();
+                                    notificationService.showNotification(
+                                        message: appLocalizations.themeLocked,
+                                        type: NotificationType.error);
+                                  }
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeInOut,
+                                  decoration: BoxDecoration(
+                                    color: themeColors.background,
+                                    borderRadius: BorderRadius.circular(12 * scale),
+                                    border: Border.all(
+                                      color: isSelected 
+                                          ? AppColors.primaryColor.inverted
+                                          : AppColors.quinaryColor.withValues(alpha: 0.2),
+                                      width: isSelected ? 3 * scale : 1 * scale,
+                                    ),
+                                    boxShadow: isSelected 
+                                        ? [BoxShadow(color: AppColors.primaryColor.inverted.withValues(alpha: 0.3), blurRadius: 8 * scale)]
+                                        : [],
                                   ),
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 10 * scale),
+                                  child: Stack(
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            height: 24 * scale,
+                                            decoration: BoxDecoration(
+                                              color: themeColors.secondaryColor,
+                                              borderRadius: BorderRadius.vertical(top: Radius.circular(11 * scale)),
+                                            ),
+                                          ),
+                                          SizedBox(height: 8 * scale),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                width: 40 * scale,
+                                                height: 12 * scale,
+                                                decoration: BoxDecoration(
+                                                  color: themeColors.quaternaryColor,
+                                                  borderRadius: BorderRadius.circular(4 * scale),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 6 * scale),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Container(
+                                                width: 50 * scale,
+                                                height: 12 * scale,
+                                                decoration: BoxDecoration(
+                                                  color: themeColors.senaryColor,
+                                                  borderRadius: BorderRadius.circular(4 * scale),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(vertical: 6 * scale),
+                                            decoration: BoxDecoration(
+                                              color: themeColors.secondaryColor.withValues(alpha: 0.9),
+                                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(11 * scale)),
+                                            ),
+                                            child: Text(
+                                              theme['name'] as String,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 13 * scale,
+                                                fontWeight: FontWeight.bold,
+                                                color: themeColors.primaryColor.inverted,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (isSelected)
+                                        Positioned(
+                                          top: 4 * scale,
+                                          right: 4 * scale,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primaryColor.inverted,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(Icons.check_circle, color: themeColors.secondaryColor, size: 20 * scale),
+                                          ),
+                                        ),
+                                      if (!isEnabled)
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withValues(alpha: 0.6),
+                                            borderRadius: BorderRadius.circular(11 * scale),
+                                          ),
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              'assets/icons/lock.svg',
+                                              width: 24 * scale,
+                                              height: 24 * scale,
+                                              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               );
                             },

@@ -364,14 +364,29 @@ class ModelEntity {
 
   // --- Getters for convenience ---
 
-  bool get isCustomModel => id.startsWith('self_') || id.startsWith('local_');
+  bool get isCustomModel => source == 'user' || id.startsWith('self_') || id.startsWith('local_');
 
   bool get isServerSide => type != 'offline';
 
-  bool get isPremium => 
-      tier == 'premium' ||
-      (isServerSide && !isCustomModel && id != 'cortex/auto') ||
-      (category == 'roleplay' && !isCustomModel);
+  bool get isPremium {
+    // Explicit list of premium models as requested by the user.
+    final premiumKeywords = [
+      'claude', 'codex', 'elevenlabs', 'flux', 'gemini', 'grok', 'kimi',
+      'kling video', 'ling', 'nano banana', 'see dance', 'seedans',
+      'seedream', 'sonar', 'sora', 'stable', 'veo', 'z image'
+    ];
+
+    final titleLower = displayTitle.toLowerCase();
+    final idLower = id.toLowerCase();
+
+    for (final keyword in premiumKeywords) {
+      if (titleLower.contains(keyword) || idLower.contains(keyword)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 
   @override
   String toString() =>
