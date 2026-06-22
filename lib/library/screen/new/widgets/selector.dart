@@ -12,9 +12,8 @@ import '../../../backend/data/entity.dart';
 import '../../../backend/data/service.dart';
 import '../../../utils.dart';
 import '../../../../../server/user.dart';
-import '../../../../../navigation.dart';
 import '../../../../../login/upgrade.dart';
-import '../../../../../funds/funds.dart';
+import '../../../../../navigation.dart';
 
 /// A widget for selecting a base model, used in the 'Create' (roleplay) screen.
 class BaseModelSelector extends StatefulWidget {

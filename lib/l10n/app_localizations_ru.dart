@@ -1841,6 +1841,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get memoryLimitReached => 'Достигнут лимит памяти.';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => 'Интеллект';
 
   @override

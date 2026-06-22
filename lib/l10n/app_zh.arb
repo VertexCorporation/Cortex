@@ -678,5 +678,6 @@
   "systemTimeInfo": "\n\n当前日期和时间：{formattedTime}。",
   "systemPromptLimitFallback": "紧急：用户请求执行某项操作，但其在 Cortex 上的额度已用完；请用用户的语言告知他们应该等待或考虑升级订阅计划。",
   "systemNotePreviousMedia": "【系统提示：以下为之前生成的媒体文件，您可以参考或编辑。】",
-  "pinLimitReached": "您最多可以固定 3 个聊天。"
+  "pinLimitReached": "您最多可以固定 3 个聊天。",
+  "memoryUpdated": "Memory updated"
 }

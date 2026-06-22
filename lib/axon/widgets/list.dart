@@ -13,6 +13,9 @@ import 'package:cortex/l10n/app_localizations.dart';
 // Components
 import 'package:cortex/axon/inbox/empty.dart';
 import 'package:cortex/axon/inbox/tile/view.dart';
+import 'package:cortex/axon/widgets/search_hit_tile.dart';
+import 'package:cortex/axon/inbox/logic/search_hit.dart';
+import '../../main.dart';
 
 import 'package:shimmer/shimmer.dart';
 import '../../app.dart';
@@ -189,12 +192,17 @@ class _AxonConversationListState extends State<AxonConversationList> {
 
   Widget _buildListContent(AppLocalizations localizations,
       InboxViewModel inboxViewModel, double horizontalPadding) {
-    final List<String> currentIds = inboxViewModel.conversations;
-    // We rely on the _checkForUpdates / initState logic to populate _displayedIds.
-    // Ensure we don't modify state directly during build.
-
-    final bool isEmpty = currentIds.isEmpty && _displayedIds.isEmpty;
+    
     final bool hasSearchText = widget.searchController.text.trim().isNotEmpty;
+    final bool isDeepSearch = widget.isSearchActive && hasSearchText && widget.searchController.text.trim().length >= 2;
+    
+    final List<String> currentIds = inboxViewModel.conversations;
+    final List<SearchHit> searchHits = inboxViewModel.searchHits;
+    
+    final bool isEmpty = isDeepSearch 
+        ? searchHits.isEmpty 
+        : (currentIds.isEmpty && _displayedIds.isEmpty);
+        
     final bool showNoResults =
         widget.isSearchActive && hasSearchText && isEmpty;
 
@@ -222,9 +230,27 @@ class _AxonConversationListState extends State<AxonConversationList> {
             bottomFogHeight: 30,
             showTop: true,
             showBottom: true,
-            child: ListView.builder(
+            child: isDeepSearch 
+            ? ListView.builder(
+                controller: widget.scrollController,
+                padding: EdgeInsets.fromLTRB(horizontalPadding * 0.5, 0, horizontalPadding * 0.5, 0),
+                itemCount: searchHits.length,
+                itemBuilder: (context, index) {
+                  final hit = searchHits[index];
+                  return SearchHitTile(
+                    hit: hit,
+                    onTap: () {
+                      mainScreenKey.currentState?.closeAxon();
+                      final manager = inboxViewModel.conversationManagers[hit.conversationId];
+                      if (manager != null) {
+                        mainScreenKey.currentState?.openConversation(manager);
+                      }
+                    },
+                  );
+                },
+              )
+            : ListView.builder(
               controller: widget.scrollController,
-              cacheExtent: 500,
               addAutomaticKeepAlives: false,
               addRepaintBoundaries: true,
               padding: EdgeInsets.fromLTRB(

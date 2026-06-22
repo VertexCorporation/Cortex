@@ -3363,6 +3363,12 @@ abstract class AppLocalizations {
   /// **'Memory limit reached'**
   String get memoryLimitReached;
 
+  /// No description provided for @memoryUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory updated'**
+  String get memoryUpdated;
+
   /// No description provided for @intelligenceTitle.
   ///
   /// In en, this message translates to:

@@ -1835,6 +1835,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get memoryLimitReached => 'Batas memori tercapai';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => 'Intelijen';
 
   @override

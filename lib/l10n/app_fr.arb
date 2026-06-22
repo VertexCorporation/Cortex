@@ -637,5 +637,6 @@
   "systemTimeInfo": "\n\nDate et heure actuelles : {formattedTime}.",
   "systemPromptLimitFallback": "CRITIQUE : L’utilisateur a demandé une action, mais son forfait Cortex est épuisé ; veuillez informer l’utilisateur dans sa langue qu’il doit patienter ou envisager de passer à un forfait supérieur.",
   "systemNotePreviousMedia": "[Note système : Voici le média généré précédemment. Vous pouvez vous y référer ou le modifier.]",
-  "pinLimitReached": "Vous pouvez épingler jusqu'à 3 discussions."
+  "pinLimitReached": "Vous pouvez épingler jusqu'à 3 discussions.",
+  "memoryUpdated": "Memory updated"
 }

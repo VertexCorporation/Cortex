@@ -1813,6 +1813,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get memoryLimitReached => 'تم الوصول إلى الحد الأقصى للذاكرة';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => 'ذكاء';
 
   @override

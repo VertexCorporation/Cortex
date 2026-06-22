@@ -22,8 +22,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
   late final TextEditingController _instructionController;
   final FocusNode _instructionFocusNode = FocusNode();
 
-  late final TextEditingController _memoryController;
-  final FocusNode _memoryFocusNode = FocusNode();
+
 
   @override
   void initState() {
@@ -33,8 +32,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
         TextEditingController(text: memoryProvider.customInstruction);
     _instructionFocusNode.addListener(_onInstructionFocusLost);
 
-    _memoryController = TextEditingController(text: memoryProvider.memory);
-    _memoryFocusNode.addListener(_onMemoryFocusLost);
   }
 
   @override
@@ -43,9 +40,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     _instructionFocusNode.dispose();
     _instructionController.dispose();
 
-    _memoryFocusNode.removeListener(_onMemoryFocusLost);
-    _memoryFocusNode.dispose();
-    _memoryController.dispose();
+
     super.dispose();
   }
 
@@ -56,12 +51,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     }
   }
 
-  void _onMemoryFocusLost() {
-    if (!_memoryFocusNode.hasFocus) {
-      final newText = _memoryController.text.trim();
-      context.read<UserMemoryProvider>().updateMemory(newText);
-    }
-  }
 
   void _showClearMemoryDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -162,7 +151,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                                 onTap: () {
                                   HapticFeedback.lightImpact();
                                   memoryProvider.clearMemory();
-                                  _memoryController.clear();
                                   Navigator.of(ctx).pop();
                                 },
                                 child: Container(
@@ -204,10 +192,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     final double scale = screenWidth / 400.0;
     final memoryProvider = context.watch<UserMemoryProvider>();
 
-    if (!_memoryFocusNode.hasFocus &&
-        _memoryController.text != memoryProvider.memory) {
-      _memoryController.text = memoryProvider.memory;
-    }
+
     if (!_instructionFocusNode.hasFocus &&
         _instructionController.text != memoryProvider.customInstruction) {
       _instructionController.text = memoryProvider.customInstruction;
@@ -224,11 +209,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
             fontSize: 18 * scale,
             fontWeight: FontWeight.w600,
           ),
-        ),
-        SizedBox(height: 8 * scale),
-        Text(
-          l10n.personalizationDescription,
-          style: TextStyle(color: AppColors.quinaryColor, fontSize: 14 * scale),
         ),
         SizedBox(height: 16 * scale),
 
@@ -248,70 +228,15 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                controller: _memoryController,
-                focusNode: _memoryFocusNode,
-                maxLength: 2048,
-                buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) => null,
-                maxLines: 10,
-                minLines: 7,
-                style: TextStyle(
-                  color: AppColors.primaryColor.inverted,
-                  fontSize: 13 * scale,
-                  height: 1.5,
-                ),
-                decoration: InputDecoration(
-                  hintText: l10n.noMemoryYet,
-                  hintStyle: TextStyle(
-                    color: AppColors.quinaryColor,
-                    fontSize: 14 * scale,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.background,
-                  contentPadding: EdgeInsets.all(12 * scale),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(8 * scale),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: AppColors.primaryColor.inverted, width: 0.5),
-                    borderRadius: BorderRadius.circular(8 * scale),
-                  ),
-                ),
-                onChanged: (val) {
-                  // Keep provider in sync for length check or UI updates if any,
-                  // but we mainly write on focus lost or submit.
-                  context.read<UserMemoryProvider>().updateMemory(val);
-                },
-                onSubmitted: (value) {
-                  context.read<UserMemoryProvider>().updateMemory(value.trim());
-                },
-              ),
-              if (memoryProvider.isMemoryLimitReached)
-                Padding(
-                  padding: EdgeInsets.only(top: 8 * scale),
-                  child: Text(
-                    l10n.memoryLimitReached,
-                    style: TextStyle(
-                      color: AppColors.septenaryColor,
-                      fontSize: 11 * scale,
-                    ),
-                  ),
-                ),
-              AnimatedCrossFade(
-                duration: const Duration(milliseconds: 300),
-                crossFadeState: memoryProvider.memory.isNotEmpty
-                    ? CrossFadeState.showFirst
-                    : CrossFadeState.showSecond,
-                firstChild: Padding(
-                  padding: EdgeInsets.only(top: 10 * scale),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () {
-                        _showClearMemoryDialog(context);
-                      },
+              if (memoryProvider.memoryList.isNotEmpty)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      _showClearMemoryDialog(context);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 8 * scale),
                       child: Text(
                         l10n.clearMemory,
                         style: TextStyle(
@@ -323,111 +248,52 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                     ),
                   ),
                 ),
- secondChild: const SizedBox(width: double.infinity, height: 0),
- ),
- Container(
-  margin: EdgeInsets.only(top: 14 * scale),
-  padding: EdgeInsets.all(12 * scale),
-  decoration: BoxDecoration(
-   color: AppColors.background.withValues(alpha: 0.5),
-   borderRadius: BorderRadius.circular(8 * scale),
-   border: Border.all(
-    color: AppColors.quinaryColor.withValues(alpha: 0.2),
-    width: 0.5,
-   ),
-  ),
-  child: Column(
-   crossAxisAlignment: CrossAxisAlignment.start,
-   children: [
-    Row(
-     children: [
-      Icon(
-       Icons.memory_outlined,
-       color: AppColors.septenaryColor,
-       size: 16 * scale,
-      ),
-      SizedBox(width: 8 * scale),
-      Expanded(
-       child: Text(
-        "Hiyerarşik Semantik Bellek (MemGPT)",
-        style: TextStyle(
-         color: AppColors.primaryColor.inverted,
-         fontSize: 12 * scale,
-         fontWeight: FontWeight.bold,
-        ),
-       ),
-      ),
-     ],
-    ),
-    SizedBox(height: 8 * scale),
-    Text(
-     "Sohbet geçmişinin tamamı gönderilmez. Sistem; Kısa Süreli Bellek (aktif bağlam), Epizodik Bellek (son olaylar) ve Semantik Bellek (kalıcı bilgi tabanı - Vector DB) olarak üçe ayrılır. Yapay zeka, bilgiye ihtiyaç duyduğunda yerel bir veritabanından sadece ilgili semantik vektörleri çeker.",
-     style: TextStyle(
-      color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
-      fontSize: 11.5 * scale,
-      height: 1.4,
-     ),
-    ),
-    SizedBox(height: 12 * scale),
-    Row(
-     crossAxisAlignment: CrossAxisAlignment.start,
-     children: [
-      Expanded(
-       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-         Text(
-          "Token & Maliyet Tasarrufu",
-          style: TextStyle(
-           color: AppColors.quinaryColor,
-           fontSize: 10 * scale,
-           fontWeight: FontWeight.w600,
+              if (memoryProvider.memoryList.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(12 * scale),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(8 * scale),
+                  ),
+                  child: Text(
+                    l10n.noMemoryYet,
+                    style: TextStyle(
+                      color: AppColors.quinaryColor,
+                      fontSize: 14 * scale,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              else
+                Column(
+                  children: List.generate(memoryProvider.memoryList.length, (index) {
+                    final memory = memoryProvider.memoryList[index];
+                    return _MemoryListItem(
+                      initialMemory: memory,
+                      scale: scale,
+                      onChanged: (newVal) {
+                        memoryProvider.editMemory(index, newVal);
+                      },
+                      onDelete: () {
+                        memoryProvider.removeMemory(index);
+                      },
+                    );
+                  }),
+                ),
+              if (memoryProvider.isMemoryLimitReached)
+                Padding(
+                  padding: EdgeInsets.only(top: 8 * scale),
+                  child: Text(
+                    l10n.memoryLimitReached,
+                    style: TextStyle(
+                      color: AppColors.septenaryColor,
+                      fontSize: 11 * scale,
+                    ),
+                  ),
+                ),
+            ],
           ),
-         ),
-         SizedBox(height: 4 * scale),
-         Text(
-          "%70 - %90 Tasarruf. 100 sayfalık sohbet geçmişi yerine sadece o anki konuyu ilgilendiren 2-3 paragraf gönderilir.",
-          style: TextStyle(
-           color: AppColors.primaryColor.inverted.withValues(alpha: 0.75),
-           fontSize: 10.5 * scale,
-           height: 1.35,
-          ),
-         ),
-        ],
-       ),
-      ),
-      SizedBox(width: 12 * scale),
-      Expanded(
-       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-         Text(
-          "Düşünme & Hız Avantajı",
-          style: TextStyle(
-           color: AppColors.quinaryColor,
-           fontSize: 10 * scale,
-           fontWeight: FontWeight.w600,
-          ),
-         ),
-         SizedBox(height: 4 * scale),
-         Text(
-          "Modelin bağlamı şişmediği için dikkati dağılmaz, aylar önceki konuşmaları dahi tutarlı bir şekilde hatırlar.",
-          style: TextStyle(
-           color: AppColors.primaryColor.inverted.withValues(alpha: 0.75),
-           fontSize: 10.5 * scale,
-           height: 1.35,
-          ),
-         ),
-        ],
-       ),
-      ),
-     ],
-    ),
-   ],
-  ),
- ),
- ],
- ),
  ),
 
  SizedBox(height: 12 * scale),
@@ -533,6 +399,95 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
           ),
           SizedBox(height: 12 * scale),
           child,
+        ],
+      ),
+    );
+  }
+}
+
+class _MemoryListItem extends StatefulWidget {
+  final String initialMemory;
+  final double scale;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onDelete;
+
+  const _MemoryListItem({
+    required this.initialMemory,
+    required this.scale,
+    required this.onChanged,
+    required this.onDelete,
+  });
+
+  @override
+  State<_MemoryListItem> createState() => _MemoryListItemState();
+}
+
+class _MemoryListItemState extends State<_MemoryListItem> {
+  late final TextEditingController _controller;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialMemory);
+    _focusNode.addListener(_onFocusChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant _MemoryListItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_focusNode.hasFocus && _controller.text != widget.initialMemory) {
+      _controller.text = widget.initialMemory;
+    }
+  }
+
+  void _onFocusChanged() {
+    if (!_focusNode.hasFocus) {
+      widget.onChanged(_controller.text);
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChanged);
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 8 * widget.scale),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(8 * widget.scale),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              focusNode: _focusNode,
+              maxLines: null,
+              style: TextStyle(
+                color: AppColors.primaryColor.inverted,
+                fontSize: 13 * widget.scale,
+                height: 1.5,
+              ),
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(12 * widget.scale),
+                border: InputBorder.none,
+                isDense: true,
+              ),
+              onSubmitted: widget.onChanged,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.close,
+                size: 16 * widget.scale, color: AppColors.quinaryColor),
+            onPressed: widget.onDelete,
+          ),
         ],
       ),
     );

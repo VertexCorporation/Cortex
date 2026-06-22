@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -21,7 +22,6 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/notifications/extrovert.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     hide Message;
@@ -129,6 +129,29 @@ class SendService {
       aiMessageIndex,
       message.copyWith(pendingMediaType: MediaGenerationType.none),
     );
+  }
+
+  bool _isMemoryWorthy(String text) {
+    if (text.length < 4 || text.length > 500) return false;
+    final lower = text.toLowerCase();
+    
+    // English indicators
+    if (lower.contains("i am") || lower.contains("i'm") || lower.contains("i like") || 
+        lower.contains("i love") || lower.contains("i hate") || lower.contains("my name") || 
+        lower.contains("my favorite") || lower.contains("call me") || lower.contains("i prefer") ||
+        lower.contains("i have") || lower.contains("my ") || lower.contains("about me")) {
+      return true;
+    }
+    
+    // Turkish indicators
+    if (lower.contains("benim") || lower.contains(" adım") || lower.contains("bana ") || 
+        lower.contains("severim") || lower.contains("nefret") || lower.contains("favori") || 
+        lower.contains("yaşındayım") || lower.contains("hoşlanırım") || lower.contains("ben ") ||
+        lower.contains("yapmayı") || lower.contains("olmayı")) {
+      return true;
+    }
+    
+    return false;
   }
 
   bool _isCharacterModel(ModelEntity model, String modelId) {
@@ -426,6 +449,11 @@ class SendService {
       if (apiModelIdForSend == null) {
         throw ApiException(errorMessage);
       }
+      
+      if (apiModelIdForSend == 'dynamic') {
+        apiModelIdForSend = 'cortex/auto';
+      }
+      
       targetModelIdForSend = apiModelIdForSend;
 
       final isAutoRouter = apiModelIdForSend == 'cortex/auto';
@@ -551,6 +579,43 @@ class SendService {
       }
 
       _inputProvider.clearAttachments();
+
+      // 🚀 ASYNC AI MEMORY EXTRACTION
+      if (isServerSide && text.isNotEmpty && !isHidden && _isMemoryWorthy(text)) {
+        debugPrint("🚀 Triggering Memory Extraction...");
+        _apiService.extractUserMemory(text, langCode).then((facts) async {
+          if (facts != null && facts.isNotEmpty) {
+            bool memoryAdded = false;
+            for (final fact in facts) {
+              if (!_userMemoryProvider.memoryList.contains(fact)) {
+                await _userMemoryProvider.addMemory(fact);
+                memoryAdded = true;
+              }
+            }
+            if (memoryAdded && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    langCode == 'tr' ? "Hafıza güncellendi" : "Memory updated",
+                    style: TextStyle(
+                      color: Color(0xFF131314).withValues(alpha: 0.9),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  backgroundColor: Color(0xFFF1F3F4),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          }
+        }).catchError((e) {
+          debugPrint("MemoryExtraction error: $e");
+        });
+      }
 
       // -----------------------------------------------------------------------
       // 5. EXECUTION ROUTING
@@ -1405,7 +1470,10 @@ class SendService {
   if (memoryMatch != null) {
     final newMemory = memoryMatch.group(1)?.trim();
     if (newMemory != null && newMemory.isNotEmpty) {
-      _userMemoryProvider.updateMemory(newMemory);
+      final lines = newMemory.split('\n').where((s) => s.trim().isNotEmpty);
+      for (final line in lines) {
+        await _userMemoryProvider.addMemory(line);
+      }
       try {
         final semanticMemService = SemanticMemoryService();
         await semanticMemService.saveFromMemoryBlock(newMemory);
