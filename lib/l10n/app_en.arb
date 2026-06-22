@@ -728,6 +728,7 @@
   "memoryDescription": "AIs recognize you like this.",
   "noMemoryYet": "No memories established yet",
   "memoryLimitReached": "Memory limit reached",
+  "memoryUpdated": "Memory updated",
   "intelligenceTitle": "Intelligence",
   "intelligenceDescription": "AIs communicate with you like this.",
   "customInstructionHint": "Enter your custom instructions here",

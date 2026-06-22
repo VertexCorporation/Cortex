@@ -1,5 +1,7 @@
 import 'package:cortex/app.dart';
 import 'package:audioplayers/audioplayers.dart';
+
+import 'package:cortex/scaled_bottom_sheet.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -94,9 +96,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+        return ScaledBottomSheet(
+          child: Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.primaryColor,
             borderRadius: BorderRadius.circular(20),
@@ -118,7 +121,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               ),
             ],
           ),
-        );
+        ));
       },
     );
   }

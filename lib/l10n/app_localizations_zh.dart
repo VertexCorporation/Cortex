@@ -1727,6 +1727,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get memoryLimitReached => '内存已达上限';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => '智力';
 
   @override

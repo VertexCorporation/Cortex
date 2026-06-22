@@ -10,6 +10,7 @@ import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import 'database.dart';
 import '../messages/messages.dart';
+import 'package:cortex/axon/inbox/logic/search_hit.dart';
 
 class ChatStorageService {
   /* ---------- conversation ---------- */
@@ -84,6 +85,42 @@ class ChatStorageService {
       return results.map((row) => row['conversationId'] as String).toList();
     } catch (e) {
       debugPrint("[Storage] Error searching conversations: $e");
+      return [];
+    }
+  }
+
+  /// Deep search for messages that match the query
+  static Future<List<SearchHit>> searchMessagesDeep(String query) async {
+    if (query.trim().isEmpty) {
+      return [];
+    }
+
+    try {
+      final db = await DbHelper().db;
+      final results = await db.rawQuery('''
+        SELECT 
+          m.conversationId, 
+          m.text AS snippet, 
+          m.ts AS timestamp, 
+          c.title 
+        FROM messages m 
+        JOIN conversations c ON m.conversationId = c.id 
+        WHERE m.text LIKE ? AND m.text IS NOT NULL AND m.text != ''
+        ORDER BY m.ts DESC 
+        LIMIT 50
+      ''', ['%$query%']);
+
+      return results.map((row) {
+        return SearchHit(
+          conversationId: row['conversationId'] as String,
+          title: (row['title'] as String?) ?? 'Sohbet',
+          snippet: row['snippet'] as String,
+          timestamp: DateTime.fromMillisecondsSinceEpoch(row['timestamp'] as int? ?? 0),
+          query: query,
+        );
+      }).toList();
+    } catch (e) {
+      debugPrint("[Storage] Error deep searching messages: $e");
       return [];
     }
   }

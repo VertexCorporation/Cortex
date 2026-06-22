@@ -90,8 +90,8 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
           rawLevel = 0.2 + (sine * 0.4) + (noise * 0.2);
         }
       } else {
-        // [FIX] Ensure we handle low levels gracefully
-        rawLevel = (speechService.soundLevel * 15.0).clamp(0.0, 1.0);
+        // [FIX] Ensure we handle low levels gracefully without clamping it to max instantly
+        rawLevel = (speechService.soundLevel * 1.2).clamp(0.0, 1.0);
       }
     }
 
@@ -107,7 +107,6 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
       height: 50,
       width: double.infinity,
       child: CustomPaint(
-        repaint: _notifier,
         painter: _ModernWavePainter(
           history: _history,
           animationValue: _animationValue,

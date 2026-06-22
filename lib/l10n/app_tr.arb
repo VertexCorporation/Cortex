@@ -604,6 +604,7 @@
   "memoryDescription": "Yapay zekâlar sizi bu şekilde tanıyor.",
   "noMemoryYet": "Henüz hafıza oluşturulmadı",
   "memoryLimitReached": "Hafıza sınırına ulaşıldı",
+  "memoryUpdated": "Hafıza güncellendi",
   "intelligenceTitle": "Zekâ",
   "intelligenceDescription": "Yapay zekâlar sizinle bu şekilde iletişim kuruyor.",
   "customInstructionHint": "Özel talimatlarınızı buraya girin",

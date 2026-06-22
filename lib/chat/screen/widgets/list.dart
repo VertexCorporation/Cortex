@@ -12,6 +12,8 @@ import 'package:cortex/chat/services/stop.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/screen/widgets/tiles.dart';
 import 'package:cortex/chat/messages/options/report.dart';
+import 'package:cortex/fog.dart';
+import 'package:cortex/chat/services/scroll.dart';
 
 class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;
@@ -86,26 +88,38 @@ class _ChatMessageListState extends State<ChatMessageList> {
     // This is the cleanest way to ensure "open new chat -> scroll to bottom".
     // We assume conversationProvider.conversationID changes.
 
-    return Tiles.buildMessagesList(
-      context: context,
-      messages: messages,
-      scrollController: widget.scrollController,
-      modelId: sessionProvider.modelId ?? '',
-      isEditingMode: inputProvider.isEditingMode,
-      editingMessageIndex: inputProvider.editingMessageIndex,
-      bottomPadding: widget.bottomPadding,
-      onStop: context.read<StopService>().stopResponse,
-      onEdit: (index) => widget.editService.startEditingMessage(index),
-      onFadeOutComplete: (index) => context
-          .read<ConversationProvider>()
-          .removeMessageAtIndex(index),
-      onRegenerate: (int index, {String? newModelId}) {
-        _handleRegenerate(
-            context, index, newModelId, sessionProvider.isDynamicChat);
+    return NotificationListener<ScrollMetricsNotification>(
+      onNotification: (notification) {
+        // Trigger scroll visibility update when scroll metrics (like maxScrollExtent) change
+        context.read<ScrollService>().updateButtonVisibility();
+        return false; // let the notification bubble up
       },
-      onReport: (index) {
-        _handleReport(context, index, conversationProvider);
-      },
+      child: ScrollFog(
+        scrollController: widget.scrollController,
+        showBottom: true,
+        showTop: false,
+        child: Tiles.buildMessagesList(
+          context: context,
+          messages: messages,
+          scrollController: widget.scrollController,
+          modelId: sessionProvider.modelId ?? '',
+          isEditingMode: inputProvider.isEditingMode,
+          editingMessageIndex: inputProvider.editingMessageIndex,
+          bottomPadding: widget.bottomPadding,
+          onStop: context.read<StopService>().stopResponse,
+          onEdit: (index) => widget.editService.startEditingMessage(index),
+          onFadeOutComplete: (index) => context
+              .read<ConversationProvider>()
+              .removeMessageAtIndex(index),
+          onRegenerate: (int index, {String? newModelId}) {
+            _handleRegenerate(
+                context, index, newModelId, sessionProvider.isDynamicChat);
+          },
+          onReport: (index) {
+            _handleReport(context, index, conversationProvider);
+          },
+        ),
+      ),
     );
   }
 

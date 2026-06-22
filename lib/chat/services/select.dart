@@ -99,7 +99,9 @@ class SelectionService {
 
     // 4. Update the session provider directly with the final ModelEntity.
     // IMPORTANT: savePreference is true by default, so this choice becomes the default for new chats.
-    _sessionProvider.selectModel(finalModelEntity);
+    // However, roleplay and self (custom) models should not become the default for standard new chats.
+    final bool shouldSavePref = finalModelEntity.category != 'roleplay' && finalModelEntity.category != 'self';
+    _sessionProvider.selectModel(finalModelEntity, savePreference: shouldSavePref);
 
     // Log model selected event
     AnalyticsService().logModelSelected(

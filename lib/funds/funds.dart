@@ -924,7 +924,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       transitionBuilder: (child, animation) {
         return SizeTransition(
           sizeFactor: animation,
-          axisAlignment: -1.0,
+          alignment: Alignment.center,
           child: FadeTransition(
             opacity: animation,
             child: child,

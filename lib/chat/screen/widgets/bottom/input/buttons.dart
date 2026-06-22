@@ -28,13 +28,11 @@ import '../panels/selection/sheet.dart';
 class _ToolCircleButton extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget child;
-  final bool disabled;
   final double size;
 
   const _ToolCircleButton({
     required this.onTap,
     required this.child,
-    this.disabled = false,
     this.size = 36.0,
   });
 
@@ -44,7 +42,7 @@ class _ToolCircleButton extends StatelessWidget {
       width: size,
       height: size,
       child: Opacity(
-        opacity: disabled ? 0.5 : 1.0,
+        opacity: 1.0,
         child: Material(
           color: AppColors.background,
           shape: const CircleBorder(),
@@ -58,14 +56,10 @@ class _ToolCircleButton extends StatelessWidget {
             ),
             child: InkWell(
               customBorder: const CircleBorder(),
-              onTap: disabled
-                  ? () {
-                      HapticFeedback.heavyImpact();
-                    }
-                  : () {
-                      HapticFeedback.lightImpact();
-                      onTap?.call();
-                    },
+              onTap: () {
+                HapticFeedback.lightImpact();
+                onTap?.call();
+              },
               child: Center(child: child),
             ),
           ),
@@ -474,8 +468,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         ),
         child: Center(
           child: AnimatedRotation(
-            turns: _isOpened ? 1.375 : 0.0, // Cooler animation with extra rotation
-            duration: const Duration(milliseconds: 350), // slightly longer for the extra spin
+            turns: _isOpened ? 1.375 : 0.0,
+            duration: const Duration(milliseconds: 350),
             curve: Curves.easeInOutCubic,
             child: TweenAnimationBuilder<Color?>(
               duration: const Duration(milliseconds: 200),
@@ -553,6 +547,7 @@ class ModelSelectButton extends StatelessWidget {
                     context: context,
                     localizations: localizations,
                     currentModelId: sessionProvider.modelId ?? '',
+                    initialModels: sessionProvider.allModels,
                     onModelSelected: (String id) {
                       // 2. Fetch Model Data
                       final model = modelService.getPreciseModelData(id,
@@ -598,7 +593,7 @@ class ModelSelectButton extends StatelessWidget {
                                 child: SizeTransition(
                                     sizeFactor: animation,
                                     axis: Axis.horizontal,
-                                    axisAlignment: -1.0,
+                                    alignment: Alignment.center,
                                     child: child));
                           },
                           child: Text(

@@ -5,6 +5,7 @@ import 'package:cortex/chat/screen/widgets/bottom/panels/briefing.dart';
 import 'package:cortex/chat/screen/widgets/list.dart';
 import 'package:cortex/chat/screen/widgets/player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -452,18 +453,24 @@ class ChatViewState extends State<ChatView>
       ],
     );
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      resizeToAvoidBottomInset: false,
-      body: Builder(builder: (context) {
-        final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-        return AnimatedPadding(
-          duration: const Duration(milliseconds: 260),
-          curve: Curves.easeOutCubic,
-          padding: EdgeInsets.only(bottom: bottomInset),
-          child: mainStack,
-        );
-      }),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
+        body: Builder(builder: (context) {
+          final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+          return AnimatedPadding(
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutCubic,
+            padding: EdgeInsets.only(bottom: bottomInset),
+            child: mainStack,
+          );
+        }),
+      ),
     );
   }
 }

@@ -18,6 +18,7 @@ class ModelCard extends StatelessWidget {
   final VoidCallback onBodyTap;
   final VoidCallback? onArrowTap;
   final Gradient? backgroundGradient;
+  final bool isLocked;
 
   const ModelCard({
     super.key,
@@ -29,6 +30,7 @@ class ModelCard extends StatelessWidget {
     this.showExpansionArrow = false,
     this.onArrowTap,
     this.backgroundGradient,
+    this.isLocked = false,
   });
 
   @override
@@ -204,6 +206,20 @@ class ModelCard extends StatelessWidget {
                               ],
                             ),
                           ),
+
+                          if (isLocked)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: SvgPicture.asset(
+                                'assets/icons/lock_reset.svg',
+                                width: iconBoxSize * 0.45,
+                                height: iconBoxSize * 0.45,
+                                colorFilter: ColorFilter.mode(
+                                  AppColors.premium,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),

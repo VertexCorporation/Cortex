@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../cache.dart';
+import 'package:cortex/axon/inbox/logic/search_hit.dart';
 import '../../../chat/providers/conversation.dart';
 
 import '../../../chat/services/storage.dart';
@@ -23,6 +24,7 @@ class InboxViewModel extends ChangeNotifier {
   final Map<String, ConversationManager> _conversationManagers = {};
   List<String> _allConversationIDs = [];
   List<String> _filteredConversationIDs = [];
+  List<SearchHit> searchHits = []; // [NEW] Advanced search hits
 
   bool _isLoading = true;
   String _currentSearchQuery = "";
@@ -31,6 +33,108 @@ class InboxViewModel extends ChangeNotifier {
   StreamSubscription<void>? _conversationResetSubscription;
   String _currentLangCode = 'en';
   Timer? _searchDebounce;
+
+  // Selection Mode Features
+  bool _isSelectionMode = false;
+  final Set<String> _selectedIDs = {};
+
+  bool get isSelectionMode => _isSelectionMode;
+  Set<String> get selectedIDs => _selectedIDs;
+
+  void toggleSelectionMode() {
+    _isSelectionMode = !_isSelectionMode;
+    if (!_isSelectionMode) {
+      _selectedIDs.clear();
+    }
+    notifyListeners();
+  }
+
+  void setSelectionMode(bool value) {
+    if (_isSelectionMode == value) return;
+    _isSelectionMode = value;
+    if (!_isSelectionMode) {
+      _selectedIDs.clear();
+    }
+    notifyListeners();
+  }
+
+  void toggleSelectConversation(String id) {
+    if (_selectedIDs.contains(id)) {
+      _selectedIDs.remove(id);
+    } else {
+      _selectedIDs.add(id);
+    }
+    notifyListeners();
+  }
+
+  void selectAllConversations() {
+    _selectedIDs.addAll(_filteredConversationIDs);
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    _selectedIDs.clear();
+    notifyListeners();
+  }
+
+  Future<void> deleteSelectedConversations() async {
+    if (_selectedIDs.isEmpty) return;
+
+    final idsToDelete = List<String>.from(_selectedIDs);
+
+    _isSelectionMode = false;
+    _selectedIDs.clear();
+    notifyListeners();
+
+    final BuildContext? context = mainScreenKey.currentContext;
+    String? activeId;
+    if (context != null) {
+      activeId = Provider.of<ConversationProvider>(context, listen: false).conversationID;
+    }
+
+    bool activeDeleted = false;
+
+    for (final id in idsToDelete) {
+      final manager = _conversationManagers[id];
+      if (manager == null) continue;
+
+      if (activeId == id) {
+        activeDeleted = true;
+      }
+
+      _allConversationIDs.remove(id);
+      _filteredConversationIDs.remove(id);
+      manager.setDeleted(true);
+    }
+
+    notifyListeners();
+
+    if (activeDeleted) {
+      mainScreenKey.currentState?.startNewConversation(closeSidebar: false);
+    }
+
+    await Future.delayed(const Duration(milliseconds: 350));
+
+    for (final id in idsToDelete) {
+      final manager = _conversationManagers.remove(id);
+      manager?.dispose();
+      _cleanupMediaFiles(id);
+      await ChatStorageService.deleteConversation(id);
+    }
+
+    _updateConversationCache();
+
+    try {
+      final ctx = mainScreenKey.currentContext;
+      if (ctx != null && ctx.mounted) {
+        Provider.of<ArtsProvider>(ctx, listen: false).refresh();
+      }
+    } catch (e) {
+      debugPrint('[InboxViewModel] Arts refresh after bulk delete failed: $e');
+    }
+
+    notifyListeners();
+  }
 
   bool get isLoading => _isLoading;
 
@@ -78,26 +182,23 @@ class InboxViewModel extends ChangeNotifier {
   Future<void> _applyFilter() async {
     if (_currentSearchQuery.isEmpty) {
       _filteredConversationIDs = List.from(_allConversationIDs);
+      searchHits = [];
     } else {
-      // For very short queries (1 char), skip expensive DB deep search
-      // and only filter by title in memory
-      List<String> deepSearchResults = const [];
+      // For short queries, we still only filter titles to avoid DB spam
       if (_currentSearchQuery.length >= 2) {
-        deepSearchResults = await ChatStorageService.searchConversations(
-            query: _currentSearchQuery);
+        searchHits = await ChatStorageService.searchMessagesDeep(_currentSearchQuery);
+      } else {
+        searchHits = [];
       }
 
-      // Filter in memory (Title matches or ID is in deep search results)
+      // We also keep the title match functionality for the normal filtered list
       _filteredConversationIDs = _allConversationIDs.where((id) {
         final manager = _conversationManagers[id];
         if (manager == null) return false;
 
-        final matchesTitle = manager.conversationTitle
+        return manager.conversationTitle
             .toLowerCase()
             .contains(_currentSearchQuery);
-        final isDeepMatch = deepSearchResults.contains(id);
-
-        return matchesTitle || isDeepMatch;
       }).toList();
     }
     notifyListeners();

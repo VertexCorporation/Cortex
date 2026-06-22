@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
+import 'package:cortex/scaled_bottom_sheet.dart';
+
 void showGuestLimitSheet(BuildContext context, AppLocalizations localizations) {
   FocusScope.of(context).unfocus();
 
@@ -25,7 +27,9 @@ void showGuestLimitSheet(BuildContext context, AppLocalizations localizations) {
           .width,
     ),
     builder: (BuildContext modalContext) {
-      return _GuestLimitSheetContent(localizations: localizations);
+      return ScaledBottomSheet(
+        child: _GuestLimitSheetContent(localizations: localizations),
+      );
     },
   );
 }

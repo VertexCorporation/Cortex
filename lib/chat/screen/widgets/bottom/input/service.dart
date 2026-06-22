@@ -213,6 +213,7 @@ class InputService {
       context: context,
       localizations: localizations,
       currentModelId: currentId,
+      initialModels: sessionProvider.allModels,
       onModelSelected: (String newModelId) {
         _handleModelSwitch(context, sessionProvider, newModelId);
       },

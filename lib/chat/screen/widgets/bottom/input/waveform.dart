@@ -13,7 +13,7 @@ class _WaveformSection extends StatelessWidget {
     final double rightPadding = buttonPadding + (buttonSize / 2);
 
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(12.0, 24.0, rightPadding, 16.0),
+      padding: EdgeInsetsDirectional.fromSTEB(16.0, 24.0, rightPadding, 16.0),
       child: const WaveformVisualizer(origin: WaveOrigin.right),
     );
   }

@@ -578,6 +578,7 @@ class Tiles {
       controller: scrollController,
       padding: EdgeInsets.only(
           top: totalTopPadding, bottom: bottomPadding + (screenHeight * 0.01)),
+      // ignore: deprecated_member_use
       cacheExtent:
           2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
       addAutomaticKeepAlives:

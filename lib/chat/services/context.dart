@@ -56,9 +56,7 @@ class ContextService {
     if (isServerSide && userMemory != null && userMemory
         .trim()
         .isNotEmpty) {
-      final memoryPrompt = localizations != null
-          ? localizations.systemMemoryReminder(userMemory)
-          : "\n\nAlways remember this about the user:\n$userMemory";
+      final memoryPrompt = "\n\n[USER MEMORY - BACKGROUND CONTEXT ONLY]\nHere are some facts about the user from previous conversations:\n$userMemory\n\nCRITICAL: These facts are for background context only. Do not explicitly mention them or act on them unless they are directly relevant to the user's CURRENT message. If the user just says a greeting, do NOT bring up these facts.";
       systemRole = (systemRole ?? fallbackRole) + memoryPrompt;
     }
 
@@ -133,11 +131,9 @@ class ContextService {
 
     // Context-Linking Threading Directive for non-character models
     if (!isCharacterModel) {
-      final threadingDirective = "
-
-[CONTEXT-LINKING DIRECTIVE]
-This is a continuous multi-turn chat. Previous assistant responses may show the model that generated them, prefixed with [Model: ...]. Treat the conversation as a single cohesive thread regardless of which model responded.";
-      systemRole = (systemRole ?? fallbackRole) + threadingDirective;
+      final threadingDirective = "\n\n[CONTEXT-LINKING DIRECTIVE]\nThis is a continuous multi-turn chat. Previous assistant responses may show the model that generated them, prefixed with [Model: ...]. Treat the conversation as a single cohesive thread regardless of which model responded.";
+      final toneDirective = "\n\n[TONE & STYLE DIRECTIVE]\nKeep your responses completely natural, conversational, and direct. DO NOT use overly poetic, dramatic, or cheesy language unless explicitly requested by the user. Be concise and human-like.";
+      systemRole = (systemRole ?? fallbackRole) + threadingDirective + toneDirective;
     }
 
     // Retrieve and inject SQLite-based Hierarchical Semantic Memory (Vector DB - MemGPT)
@@ -152,19 +148,11 @@ This is a continuous multi-turn chat. Previous assistant responses may show the 
       if (relevantMemories.isNotEmpty) {
         // Dynamic scaling: limit context memories on low-end models
         final limitedMemories = relevantMemories.take(isLowEnd ? 1 : 3).toList();
-        final memoryLines = limitedMemories.map((m) => "- ${m['content']}").join("
-");
+        final memoryLines = limitedMemories.map((m) => "- ${m['content']}").join("\n");
         // Non-technical prompt prefix for roleplay/character models to maintain immersion
         final String semanticMemoryPrompt = isCharacterModel
-            ? "
-
-[Remembered context from past conversations]:
-$memoryLines"
-            : "
-
-[HIYERARŞİK SEMANTİK BELLEK (Vector DB - MemGPT)]
-İlgili geçmiş bilgiler:
-$memoryLines";
+            ? "\n\n[Remembered context from past conversations]:\n$memoryLines"
+            : "\n\n[HIYERARŞİK SEMANTİK BELLEK (Vector DB - MemGPT)]\nİlgili geçmiş bilgiler:\n$memoryLines";
         systemRole = (systemRole ?? fallbackRole) + semanticMemoryPrompt;
       }
     }

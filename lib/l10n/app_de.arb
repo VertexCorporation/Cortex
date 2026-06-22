@@ -678,5 +678,6 @@
   "systemTimeInfo": "\n\nAktuelles Datum und Uhrzeit: {formattedTime}.",
   "systemPromptLimitFallback": "KRITISCH: Der Benutzer hat eine Aktion angefordert, aber sein Datenvolumen bei Cortex ist aufgebraucht. Bitte informieren Sie den Benutzer in seiner Sprache, dass er warten oder ein Upgrade seines Abonnements in Betracht ziehen sollte.",
   "systemNotePreviousMedia": "[Systemhinweis: Unten sehen Sie die zuvor generierten Medien. Sie können diese referenzieren oder bearbeiten.]",
-  "pinLimitReached": "Sie können bis zu 3 Chats anheften."
+  "pinLimitReached": "Sie können bis zu 3 Chats anheften.",
+  "memoryUpdated": "Memory updated"
 }

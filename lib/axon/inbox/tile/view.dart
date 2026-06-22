@@ -17,6 +17,7 @@ import 'package:cortex/chat/services/voice.dart'; // [NEW]
 import 'package:cortex/chat/services/background.dart';
 import '../../../overflow.dart';
 import '../logic/manager.dart';
+import '../logic/general.dart';
 
 // Ensure this path matches where you placed the edit.dart file
 import '../panel/actions/edit.dart';
@@ -121,6 +122,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     final manager = widget.manager;
     final onEdit = widget.onEdit;
 
+    final inboxViewModel = context.read<InboxViewModel>();
+
     _panelController = showActionPanel(
       context: context,
       touchPosition: position,
@@ -171,7 +174,23 @@ class _AxonConversationTileState extends State<AxonConversationTile>
             widget.onTogglePin();
           },
         ),
-        // --- 3. Delete Button ---
+        // --- 3. Select Button ---
+        ActionPanelButton(
+          customIcon: Icon(
+            Icons.check_box_outlined,
+            color: AppColors.primaryColor.inverted,
+            size: 20.0,
+          ),
+          iconColor: AppColors.primaryColor.inverted,
+          text: localizations.localeName == 'tr' ? 'Seç' : 'Select',
+          textColor: AppColors.primaryColor.inverted,
+          onPressed: () {
+            _panelController?.close();
+            inboxViewModel.setSelectionMode(true);
+            inboxViewModel.toggleSelectConversation(manager.conversationID);
+          },
+        ),
+        // --- 4. Delete Button ---
         ActionPanelButton(
           iconAsset: 'assets/icons/delete.svg',
           iconColor: Colors.redAccent,
@@ -188,6 +207,12 @@ class _AxonConversationTileState extends State<AxonConversationTile>
   void _onTapDown(TapDownDetails details) {
     _tapPosition = details.globalPosition;
     _holdTimer?.cancel();
+    
+    final inboxViewModel = context.read<InboxViewModel>();
+    if (inboxViewModel.isSelectionMode) {
+      return;
+    }
+
     // 350ms threshold for "Long Press"
     _holdTimer = Timer(const Duration(milliseconds: 350), () {
       HapticFeedback.lightImpact();
@@ -196,6 +221,13 @@ class _AxonConversationTileState extends State<AxonConversationTile>
   }
 
   void _onTapUp(TapUpDetails details) {
+    final inboxViewModel = context.read<InboxViewModel>();
+    if (inboxViewModel.isSelectionMode) {
+      HapticFeedback.lightImpact();
+      inboxViewModel.toggleSelectConversation(widget.manager.conversationID);
+      return;
+    }
+
     if (_holdTimer?.isActive ?? false) {
       _holdTimer?.cancel();
       HapticFeedback.lightImpact();
@@ -233,7 +265,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     // Wrap the entire tile content in animations for deletion
     return SizeTransition(
       sizeFactor: _sizeAnimation,
-      axisAlignment: -1.0,
+      alignment: Alignment.centerLeft,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: _buildTileContent(),
@@ -290,16 +322,24 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     // [FIX] Check if we are actually on the Chat tab (index 0).
     // If user is in Library (1) or News (2), the tile should NOT be highlighted
     // even if it matches the currentConversationId.
+    final inboxViewModel = context.watch<InboxViewModel>();
+    final isSelectionMode = inboxViewModel.isSelectionMode;
+    final isSelected = inboxViewModel.selectedIDs.contains(widget.manager.conversationID);
+
     final selectedTab =
         context.select<TabProvider, int>((p) => p.selectedIndex);
     final isActive = (selectedTab == 0) &&
         (currentConversationId == widget.manager.conversationID);
     final Color textColor = AppColors.primaryColor.inverted;
 
-    // The animated background color target (Transparent vs Highlighted)
-    final Color targetBackgroundColor = isActive
-        ? AppColors.primaryColor.inverted.withValues(alpha: 0.05)
-        : Colors.transparent;
+    // In selection mode, we highlight selected tiles
+    final Color targetBackgroundColor = isSelectionMode
+        ? (isSelected
+            ? AppColors.primaryColor.inverted.withValues(alpha: 0.08)
+            : Colors.transparent)
+        : (isActive
+            ? AppColors.primaryColor.inverted.withValues(alpha: 0.05)
+            : Colors.transparent);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -311,6 +351,12 @@ class _AxonConversationTileState extends State<AxonConversationTile>
         decoration: BoxDecoration(
           color: targetBackgroundColor,
           borderRadius: BorderRadius.circular(borderRadius),
+          border: isSelectionMode && isSelected
+              ? Border.all(
+                  color: AppColors.senaryColor.withValues(alpha: 0.5),
+                  width: 1.0,
+                )
+              : null,
         ),
         // Material is transparent to allow AnimatedContainer color to show,
         // but keeps InkWell functionality for ripples.
@@ -331,6 +377,29 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                   horizontal: innerPaddingH, vertical: innerPaddingV),
               child: Row(
                 children: [
+                  if (isSelectionMode) ...[
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: EdgeInsets.only(right: gapAvatarText),
+                      width: 20.0,
+                      height: 20.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected ? AppColors.senaryColor : Colors.transparent,
+                        border: Border.all(
+                          color: isSelected ? AppColors.senaryColor : AppColors.border.withValues(alpha: 0.5),
+                          width: 2.0,
+                        ),
+                      ),
+                      child: isSelected
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 13.0,
+                            )
+                          : null,
+                    ),
+                  ],
                   // Dynamic Avatar
                   TileAvatar(
                     imagePath: widget.manager.modelImagePath,

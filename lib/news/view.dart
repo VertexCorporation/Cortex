@@ -138,6 +138,7 @@ class _NewsScreenState extends State<NewsScreen>
             bottomFogHeight: screenHeight * 0.05,
             child: CustomScrollView(
               controller: _scrollController,
+              // ignore: deprecated_member_use
               cacheExtent: screenHeight * 0.8,
               slivers: [
                 // --- TOP SPACER ---

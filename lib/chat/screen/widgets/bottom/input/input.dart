@@ -373,11 +373,12 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Padding(
                                         padding: EdgeInsetsDirectional.only(
-                                          start: isTablet ? screenWidth * 0.02 : 12.0,
+                                          start: isTablet ? screenWidth * 0.02 : 16.0,
+                                          bottom: 4.0, // align with text field
                                         ),
                                         child: AddPhotoButton(
                                           isLimitExceeded: widget.isLimitExceeded,
@@ -442,18 +443,15 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
                         // 3. MAIN ACTION BUTTON (PERSISTENT)
                         Positioned(
-                          top: 0,
-                          bottom: 0,
+                          bottom: 4.0, // Anchor to bottom instead of stretching vertically
                           right: 0,
-                          child: Center(
-                            child: _SendButtonSection(
-                              screenWidth: screenWidth,
-                              isTablet: isTablet,
-                              widget: widget,
-                              isEnabled: isSendButtonEnabled,
-                              isActionPermitted: isActionPermitted,
-                              controller: widget.controller,
-                            ),
+                          child: _SendButtonSection(
+                            screenWidth: screenWidth,
+                            isTablet: isTablet,
+                            widget: widget,
+                            isEnabled: isSendButtonEnabled,
+                            isActionPermitted: isActionPermitted,
+                            controller: widget.controller,
                           ),
                         ),
                       ],

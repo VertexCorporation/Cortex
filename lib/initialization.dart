@@ -947,7 +947,8 @@ class AppInitializer with ChangeNotifier {
         FirebaseCrashlytics.instance
             .recordError(e, s, reason: "AuthFlow_SystemError");
         await signOut();
-      }
+      } // end else
+    } // end catch (e, s)
     } finally {
       _isDeterminingFlow = false;
     }

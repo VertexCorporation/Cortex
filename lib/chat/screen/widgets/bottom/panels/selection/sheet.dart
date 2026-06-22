@@ -12,15 +12,19 @@ import 'package:provider/provider.dart';
 
 import '../../../../../../app.dart';
 import '../../../../../../library/providers/local.dart';
+import '../../../../../../server/user.dart';
 import '../../../../../../fog.dart';
 import 'cards/main.dart';
 import 'cards/variant.dart';
+
+import 'package:cortex/scaled_bottom_sheet.dart';
 
 Future<bool?> showModelSelectionSheet({
   required BuildContext context,
   required AppLocalizations localizations,
   required String currentModelId,
   required ValueChanged<String> onModelSelected,
+  required List<ModelEntity> initialModels,
 }) {
   FocusScope.of(context).unfocus();
 
@@ -28,7 +32,9 @@ Future<bool?> showModelSelectionSheet({
   final localStateProvider = context.read<ModelLocalStateProvider>();
 
   // Sync access for instant load check
-  final cachedModels = modelService.getCachedModelsSync();
+  final cachedModels = initialModels.isNotEmpty 
+      ? initialModels 
+      : modelService.getCachedModelsSync();
   final downloadMap = localStateProvider.downloadCompleted;
 
   return showModalBottomSheet<bool>(
@@ -42,12 +48,14 @@ Future<bool?> showModelSelectionSheet({
       maxWidth: MediaQuery.sizeOf(context).width,
     ),
     builder: (BuildContext modalContext) {
-      return _ModelSheetContent(
-        localizations: localizations,
-        currentModelId: currentModelId,
-        onModelSelected: onModelSelected,
-        initialModels: cachedModels,
-        downloadMap: downloadMap,
+      return ScaledBottomSheet(
+        child: _ModelSheetContent(
+          localizations: localizations,
+          currentModelId: currentModelId,
+          onModelSelected: onModelSelected,
+          initialModels: cachedModels,
+          downloadMap: downloadMap,
+        ),
       );
     },
   );
@@ -295,10 +303,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     return widget.currentModelId.startsWith('${series.id}-');
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   // Internal controller for the list content
   final ScrollController _internalScrollController = ScrollController();
@@ -308,15 +312,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     final double topRadius = sw * 0.07;
 
     final bool cortexVisible = true;
-
-    final bool hasAnyResult = cortexVisible ||
-        _selfModels.isNotEmpty ||
-        _offlineModels.isNotEmpty ||
-        _onlineSeries.isNotEmpty ||
-        _videoSeries.isNotEmpty ||
-        _imageSeries.isNotEmpty ||
-        _audioSeries.isNotEmpty ||
-        _characterModels.isNotEmpty;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
@@ -385,22 +380,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                   },
                   child: _isLoading
                       ? const ModelSelectionSkeleton(key: ValueKey('skeleton'))
-                      : !hasAnyResult
-                          ? Center(
-                              key: const ValueKey('empty'),
-                              child: Padding(
-                                padding: EdgeInsets.all(sp16 * 2),
-                                child: Text(
-                                  widget.localizations.noMatchingModels,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppColors.tertiaryColor,
-                                    fontSize: sw * 0.04,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : ScrollFog(
+                      : ScrollFog(
                               key: const ValueKey('content'),
                               scrollController: _internalScrollController,
                               topFogHeight: 20,
@@ -753,6 +733,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                             isSelected: isItem1Active,
                             isExpanded: isItem1Expanded,
                             showExpansionArrow: true,
+                            isLocked: !context.read<UserProvider>().isSubscriptionActive && item1.isPremium,
                             onBodyTap: () => _handleSelection(item1.id),
                             onArrowTap: () => _handleSeriesExpansion(item1.id),
                           ),
@@ -766,6 +747,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                                   isSelected: isItem2Active,
                                   isExpanded: isItem2Expanded,
                                   showExpansionArrow: true,
+                                  isLocked: !context.read<UserProvider>().isSubscriptionActive && item2.isPremium,
                                   onBodyTap: () => _handleSelection(item2.id),
                                   onArrowTap: () =>
                                       _handleSeriesExpansion(item2.id),
@@ -939,9 +921,8 @@ class _VariantsPanel extends StatelessWidget {
               final String id = variant['id'];
               final String title = variant['title'] ?? id;
               final bool isPremium = variant['tier'] == 'premium';
-              // Never show individual variant as selected — the user sees
-              // only the series as active; specific variant choice is internal.
-              final bool isSelected = false;
+              // Show the variant as selected if it matches the current model.
+              final bool isSelected = currentModelId == id;
 
               return ModelVariantCard(
                 title: title,

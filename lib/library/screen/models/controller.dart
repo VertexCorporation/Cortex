@@ -11,6 +11,8 @@ import 'widgets/search.dart';
 import '../../providers/catalog.dart';
 import '../../providers/local.dart';
 import '../../../theme.dart';
+import 'package:cortex/app.dart';
+import 'package:cortex/scaled_bottom_sheet.dart';
 import 'widgets/body.dart';
 import 'widgets/appbar.dart';
 import '../../../server/user.dart';
@@ -181,16 +183,104 @@ class LibraryScreenState extends State<LibraryScreen>
   Future<void> _handleChatPress(String id) async {
     try {
       final model = _catalogProvider!.allModels.firstWhere((m) => m.id == id);
-      final bool isPremiumModel = (model.isServerSide && !model.isCustomModel && id != 'cortex/auto') ||
-                                  (model.category == 'roleplay' && !model.isCustomModel);
-                                  
-      if (isPremiumModel) {
+      if (model.isPremium) {
         final userProvider = context.read<UserProvider>();
         if (!userProvider.isSubscriptionActive) {
           HapticFeedback.lightImpact();
           navigateToScreen(const FundsScreen(), direction: const Offset(0.0, 1.0));
           return;
         }
+      }
+
+      if (model.variants != null && model.variants!.isNotEmpty) {
+        final variants = model.variants!.values.toList();
+        
+        await showModalBottomSheet(
+          context: context,
+          backgroundColor: Colors.transparent,
+          isScrollControlled: true,
+          builder: (context) {
+            final w = MediaQuery.of(context).size.width;
+            return ScaledBottomSheet(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
+                ),
+                padding: EdgeInsets.symmetric(vertical: w * 0.06),
+                child: SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: w * 0.1,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiaryColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      SizedBox(height: w * 0.06),
+                      Text(
+                        model.displayTitle,
+                        style: TextStyle(
+                          color: AppColors.primaryColor.inverted,
+                          fontSize: w * 0.05,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: w * 0.04),
+                      Flexible(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.5,
+                          ),
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: variants.length,
+                            separatorBuilder: (context, index) => Divider(
+                              color: AppColors.secondaryColor,
+                              height: 1,
+                            ),
+                            itemBuilder: (context, index) {
+                              final variant = variants[index];
+                              return ListTile(
+                                contentPadding: EdgeInsets.symmetric(horizontal: w * 0.06, vertical: 4),
+                                title: Text(
+                                  variant['title'] ?? variant['id'],
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor.inverted,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  variant['id'],
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                trailing: Icon(
+                                  Icons.chevron_right_rounded,
+                                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.3),
+                                ),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _catalogProvider!.startChatWithModel(variant['id']);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+        return;
       }
     } catch (_) {}
     await _catalogProvider!.startChatWithModel(id);

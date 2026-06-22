@@ -1840,6 +1840,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get memoryLimitReached => 'Geheugenlimiet bereikt';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => 'Intelligentie';
 
   @override

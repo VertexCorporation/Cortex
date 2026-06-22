@@ -279,6 +279,11 @@ void main() async {
   // Initialize Tools
   ToolRegistry.initialize();
 
+  // PERFORMANCE: Highly restrictive image caching for 1GB RAM devices.
+  // We limit the cache to 50 images or 30MB, whichever comes first, to prevent OOM errors.
+  PaintingBinding.instance.imageCache.maximumSize = 50;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 30 * 1024 * 1024;
+
   runApp(const AppGatekeeper());
 }
 

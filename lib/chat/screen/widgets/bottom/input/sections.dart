@@ -575,7 +575,7 @@ class _SequencedToolsTransitionState extends State<SequencedToolsTransition>
         return SizeTransition(
           sizeFactor: _sizeAnimation,
           axis: Axis.vertical,
-          axisAlignment: -1.0,
+          alignment: Alignment.bottomCenter,
           child: FadeTransition(
             opacity: _opacityAnimation,
             child: widget.child,

@@ -46,12 +46,12 @@ class ScrollService {
     }
   }
 
-  bool isUserAtBottom({double threshold = 100.0}) {
+  bool isUserAtBottom({double threshold = 20.0}) {
     final position = _getSafePosition();
     if (position == null) {
       return true;
     }
-    if (position.maxScrollExtent == 0.0) return true;
+    if (position.maxScrollExtent <= 0.0) return true;
     return (position.maxScrollExtent - position.pixels) <= threshold;
   }
 
