@@ -585,9 +585,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get japanese => 'JaponÃªs';
 
   @override
-  String get kurdish => 'Curdo';
-
-  @override
   String get dutch => 'HolandÃªs';
 
   @override

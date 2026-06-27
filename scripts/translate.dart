@@ -256,7 +256,7 @@ Future<void> main(List<String> rawArgs) async {
   final templateArbFileName = 'app_en.arb';
   final sourceLocale = 'en';
   final targetLocales = [
-    'tr', 'zh', 'fr', 'hi', 'pt', 'id', 'az', 'de', 'es', 'it', 'ja', 'ko', 'ku', 'ru', 'ar', 'nl'
+    'tr', 'zh', 'fr', 'hi', 'pt', 'id', 'az', 'de', 'es', 'it', 'ja', 'ko', 'ru', 'ar', 'nl'
   ];
 
   stdout.writeln('--- Cortex Translation using Google API v2 ---');

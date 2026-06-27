@@ -126,4 +126,4 @@ extension InvertedColor on Color {
 }
 
 // List of locales with incomplete Material translations.
-const List<String> kUnsupportedMaterialLocales = <String>['ku'];
+const List<String> kUnsupportedMaterialLocales = <String>['az'];

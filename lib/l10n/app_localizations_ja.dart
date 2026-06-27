@@ -594,9 +594,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get japanese => 'æ—¥æœ¬èª';
 
   @override
-  String get kurdish => 'ã‚¯ãƒ«ãƒ‰';
-
-  @override
   String get dutch => 'ã‚ªãƒ©ãƒ³ãƒ€èª';
 
   @override

@@ -584,9 +584,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String get japanese => 'Yapon dili';
 
   @override
-  String get kurdish => 'KÃ¼rd dili';
-
-  @override
   String get dutch => 'Holland dili';
 
   @override

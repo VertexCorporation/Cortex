@@ -16,7 +16,6 @@ import 'app_localizations_id.dart';
 import 'app_localizations_it.dart';
 import 'app_localizations_ja.dart';
 import 'app_localizations_ko.dart';
-import 'app_localizations_ku.dart';
 import 'app_localizations_nl.dart';
 import 'app_localizations_pt.dart';
 import 'app_localizations_ru.dart';
@@ -121,7 +120,6 @@ abstract class AppLocalizations {
     Locale('it'),
     Locale('ja'),
     Locale('ko'),
-    Locale('ku'),
     Locale('nl'),
     Locale('pt'),
     Locale('ru'),
@@ -1183,12 +1181,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Japanese'**
   String get japanese;
-
-  /// No description provided for @kurdish.
-  ///
-  /// In en, this message translates to:
-  /// **'Kurdish'**
-  String get kurdish;
 
   /// No description provided for @dutch.
   ///
@@ -3722,7 +3714,6 @@ class _AppLocalizationsDelegate
         'it',
         'ja',
         'ko',
-        'ku',
         'nl',
         'pt',
         'ru',
@@ -3759,8 +3750,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsJa();
     case 'ko':
       return AppLocalizationsKo();
-    case 'ku':
-      return AppLocalizationsKu();
     case 'nl':
       return AppLocalizationsNl();
     case 'pt':

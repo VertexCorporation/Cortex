@@ -587,9 +587,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get japanese => 'Japonais';
 
   @override
-  String get kurdish => 'Kurde';
-
-  @override
   String get dutch => 'NÃ©erlandais';
 
   @override

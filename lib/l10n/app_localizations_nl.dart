@@ -581,9 +581,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get japanese => 'Japans';
 
   @override
-  String get kurdish => 'Koerdisch';
-
-  @override
   String get dutch => 'Nederlands';
 
   @override
