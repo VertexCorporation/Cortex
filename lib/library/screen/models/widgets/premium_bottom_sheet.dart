@@ -324,24 +324,14 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/sparkle.svg',
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.premium,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: w * 0.055,
-                                  height: w * 0.055,
-                                ),
-                                SizedBox(width: w * 0.025),
                                 Flexible(
                                   child: Text(
-                                    "Cortex Premium",
+                                    "Premium'a Katıl",
                                     style: TextStyle(
                                       color: AppColors.premium,
                                       fontSize: w * 0.045,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.2,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
