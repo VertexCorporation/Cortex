@@ -880,9 +880,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     final Color contentColor = AppColors.primaryColor.inverted;
 
     final double logoSize =
-        isDesktop ? 120.0 : (isTablet ? screenWidth * 0.2 : screenWidth * 0.16);
+        isDesktop ? 96.0 : (isTablet ? screenWidth * 0.15 : screenWidth * 0.125);
 
-    final double verticalSpacing = screenHeight * 0.025;
+    final double verticalSpacing = screenHeight * 0.022;
 
     final double titleSize =
         isDesktop ? 36.0 : (isTablet ? screenWidth * 0.04 : screenWidth * 0.06);
@@ -1010,7 +1010,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                               ),
 
                               // Fixed gap
-                              SizedBox(height: verticalSpacing * 0.8),
+                              SizedBox(height: verticalSpacing * 0.5),
 
                               // --- 2. CONTENT AREA (Sliding & Fading) ---
                               Stack(
@@ -1058,8 +1058,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                 ],
               )
                                             ),
-                                            SizedBox(
-                                                height: verticalSpacing * 0.5),
+                                            SizedBox(height: verticalSpacing * 0.3),
 
                                             // Description <-> Buttons (Timed, smooth crossfade, same position)
                                             SizedBox(
