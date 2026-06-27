@@ -170,7 +170,7 @@ class _NewsScreenState extends State<NewsScreen>
                   horizontalPadding,
                 ),
 
-                SliverToBoxAdapter(child: SizedBox(height: screenHeight * 0.1)),
+                SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 24.0)),
               ],
             ),
           ),
