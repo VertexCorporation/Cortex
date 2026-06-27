@@ -599,7 +599,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         if (hour >= 5 && hour < 12) {
           greeting = 'Günaydın';
         } else if (hour >= 12 && hour < 17) {
-          greeting = 'Tünaydın';
+          greeting = 'İyi günler';
         } else if (hour >= 17 && hour < 22) {
           greeting = 'İyi akşamlar';
         } else {
@@ -608,13 +608,13 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         break;
       case 'az':
         if (hour >= 5 && hour < 12) {
-          greeting = 'Sabahınız xeyir';
+          greeting = 'Sabahın xeyir';
         } else if (hour >= 12 && hour < 17) {
-          greeting = 'Hər vaxtınız xeyir';
+          greeting = 'Hər vaxtın xeyir';
         } else if (hour >= 17 && hour < 22) {
-          greeting = 'Axşamınız xeyir';
+          greeting = 'Axşamın xeyir';
         } else {
-          greeting = 'Gecəniz xeyrə qalsın';
+          greeting = 'Gecən xeyirə';
         }
         break;
       case 'de':
@@ -643,7 +643,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         if (hour >= 5 && hour < 12) {
           greeting = 'Bonjour';
         } else if (hour >= 12 && hour < 17) {
-          greeting = 'Bon après-midi';
+          greeting = 'Bonjour';
         } else if (hour >= 17 && hour < 22) {
           greeting = 'Bonsoir';
         } else {
@@ -652,31 +652,31 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         break;
       case 'hi':
         if (hour >= 5 && hour < 12) {
-          greeting = 'शुभ प्रभात';
+          greeting = 'नमस्ते';
         } else if (hour >= 12 && hour < 17) {
-          greeting = 'नमस्कार';
+          greeting = 'नमस्ते';
         } else if (hour >= 17 && hour < 22) {
-          greeting = 'शुभ संध्या';
+          greeting = 'नमस्ते';
         } else {
           greeting = 'शुभ रात्रि';
         }
         break;
       case 'id':
         if (hour >= 5 && hour < 12) {
-          greeting = 'Selamat pagi';
+          greeting = 'Pagi';
         } else if (hour >= 12 && hour < 17) {
-          greeting = 'Selamat siang';
+          greeting = 'Siang';
         } else if (hour >= 17 && hour < 22) {
-          greeting = 'Selamat sore';
+          greeting = 'Sore';
         } else {
-          greeting = 'Selamat malam';
+          greeting = 'Malam';
         }
         break;
       case 'it':
         if (hour >= 5 && hour < 12) {
           greeting = 'Buongiorno';
         } else if (hour >= 12 && hour < 17) {
-          greeting = 'Buon pomeriggio';
+          greeting = 'Buongiorno';
         } else if (hour >= 17 && hour < 22) {
           greeting = 'Buonasera';
         } else {
@@ -685,24 +685,24 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         break;
       case 'ja':
         if (hour >= 5 && hour < 12) {
-          greeting = 'おはようございます';
+          greeting = 'おはよう';
         } else if (hour >= 12 && hour < 17) {
           greeting = 'こんにちは';
         } else if (hour >= 17 && hour < 22) {
           greeting = 'こんばんは';
         } else {
-          greeting = 'おやすみなさい';
+          greeting = 'おやすみ';
         }
         break;
       case 'ko':
         if (hour >= 5 && hour < 12) {
-          greeting = '좋은 아침입니다';
+          greeting = '좋은 아침';
         } else if (hour >= 12 && hour < 17) {
           greeting = '안녕하세요';
         } else if (hour >= 17 && hour < 22) {
-          greeting = '좋은 저녁입니다';
+          greeting = '좋은 저녁';
         } else {
-          greeting = '안녕히 주무세요';
+          greeting = '잘 자요';
         }
         break;
       case 'ku':
@@ -751,9 +751,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         break;
       case 'zh':
         if (hour >= 5 && hour < 12) {
-          greeting = '早上好';
+          greeting = '早安';
         } else if (hour >= 12 && hour < 17) {
-          greeting = '下午好';
+          greeting = '你好';
         } else if (hour >= 17 && hour < 22) {
           greeting = '晚上好';
         } else {
@@ -773,23 +773,23 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         break;
       default:
         if (hour >= 5 && hour < 12) {
-          greeting = 'Good morning';
+          greeting = 'Morning';
         } else if (hour >= 12 && hour < 17) {
-          greeting = 'Good afternoon';
+          greeting = 'Afternoon';
         } else if (hour >= 17 && hour < 22) {
-          greeting = 'Good evening';
+          greeting = 'Evening';
         } else {
-          greeting = 'Good night';
+          greeting = 'Night';
         }
     }
 
     if (username.isNotEmpty && username.toLowerCase() != 'guest') {
       if (lang == 'ar') {
-        return '$greeting، $username';
+        return '$greeting، $username!';
       }
-      return '$greeting, $username';
+      return '$greeting, $username!';
     }
-    return greeting;
+    return '$greeting!';
   }
 
   @override
