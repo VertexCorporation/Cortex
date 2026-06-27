@@ -1,0 +1,8 @@
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g id="background" stroke-width="0"></g>
+  <g id="racer" stroke-linecap="round" stroke-linejoin="round"></g>
+  <g id="icon">
+    <path d="M6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8V13C18 16.3137 15.3137 19 12 19C8.68629 19 6 16.3137 6 13V8Z" fill="#000000" stroke="none"></path>
+    <path d="M21 11V13C21 17.9706 16.9706 22 12 22C7.02944 22 3 17.9706 3 13V11" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path>
+  </g>
+</svg>

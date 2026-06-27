@@ -1,0 +1,231 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "C:/Users/theay/Desktop/Projeler/Cortex/build/llama/intermediates/cxx/Release/6916n5s4/obj/x86_64/libllama-android.so"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_options",
+			"target_link_libraries"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 46,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 51,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 57,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-pthread"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 3,
+					"define" : "GGML_BACKEND_SHARED"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "GGML_SHARED"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "GGML_USE_CPU"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "LLAMA_SHARED"
+				},
+				{
+					"define" : "llama_android_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/theay/Desktop/Projeler/Cortex/vendor/llama.cpp/src/../include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/theay/Desktop/Projeler/Cortex/vendor/llama.cpp/ggml/src/../include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/theay/Desktop/Projeler/Cortex/vendor/llama.cpp/common/."
+				},
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/theay/Desktop/Projeler/Cortex/vendor/llama.cpp/common/../vendor"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				0
+			],
+			"sysroot" : 
+			{
+				"path" : "C:/Users/theay/AppData/Local/Android/Sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/windows-x86_64/sysroot"
+			}
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "ggml::@23533c6d68a59d54598d"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "ggml-base::@23533c6d68a59d54598d"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "llama::@b791850eb95f38641ccb"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "ggml-cpu::@23533c6d68a59d54598d"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "build_info::@8bf2afb4d8037c7b7d92"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "common::@8bf2afb4d8037c7b7d92"
+		}
+	],
+	"id" : "llama-android::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,-z,max-page-size=16384 -Wl,--gc-sections",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-Wl,-z,max-page-size=16384",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-static-openmp",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "build-llama\\common\\libcommon.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "-landroid",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "-llog",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "bin\\libllama.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "bin\\libggml.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "bin\\libggml-cpu.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "bin\\libggml-base.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-pthread",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-latomic -lm",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX",
+		"sysroot" : 
+		{
+			"path" : "C:/Users/theay/AppData/Local/Android/Sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/windows-x86_64/sysroot"
+		}
+	},
+	"name" : "llama-android",
+	"nameOnDisk" : "libllama-android.so",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "llama-android.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

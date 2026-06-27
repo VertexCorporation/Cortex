@@ -1,0 +1,11 @@
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <mask id="self-mask">
+            <rect width="24" height="24" fill="white" />
+            <ellipse cx="8.5" cy="10.5" rx="1.8" ry="1.8" fill="black" />
+            <ellipse cx="15.5" cy="10.5" rx="1.8" ry="1.8" fill="black" />
+            <path d="M9.8 15.5Q10.8 17 12 17Q13.2 17 14.2 15.5" stroke="black" stroke-width="0.9" stroke-linecap="round" fill="none" />
+        </mask>
+    </defs>
+    <rect x="2" y="3" width="20" height="18" rx="5" fill="black" mask="url(#self-mask)" />
+</svg>

@@ -1,0 +1,104 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 324,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 325,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 393,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"bin/libggml.so"
+			],
+			"targetId" : "ggml::@23533c6d68a59d54598d",
+			"targetIndex" : 2,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cpu.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-alloc.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-backend.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-blas.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cann.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cpp.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cuda.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-opt.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-metal.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-rpc.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-sycl.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-vulkan.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-webgpu.h",
+				"/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml/include/gguf.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"bin/libggml-base.so"
+			],
+			"targetId" : "ggml-base::@23533c6d68a59d54598d",
+			"targetIndex" : 3,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/ggml",
+			"paths" : 
+			[
+				"/Users/BABA/Documents/cortex/android/llama/.cxx/Release/4r1a395q/armeabi-v7a/build-llama/ggml/ggml-config.cmake",
+				"/Users/BABA/Documents/cortex/android/llama/.cxx/Release/4r1a395q/armeabi-v7a/build-llama/ggml/ggml-version.cmake"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "build-llama/ggml",
+		"source" : "/Users/BABA/Documents/cortex/vendor/llama.cpp/ggml"
+	}
+}

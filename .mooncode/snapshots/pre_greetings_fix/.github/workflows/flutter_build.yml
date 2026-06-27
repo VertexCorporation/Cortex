@@ -1,0 +1,158 @@
+name: Flutter Build & Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  build-android:
+    name: Build Android (APK & AAB)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Decode Android Keystore
+        env:
+          CORTEX_JKS_BASE64: ${{ secrets.CORTEX_JKS }}
+        run: |
+          echo "$CORTEX_JKS_BASE64" | base64 --decode > android/app/Cortex.jks
+
+      - name: Create key.properties
+        env:
+          KEY_PASS: ${{ secrets.JKS_PASSWORD }}
+        run: |
+          echo "storePassword=$KEY_PASS" > android/key.properties
+          echo "keyPassword=$KEY_PASS" >> android/key.properties
+          echo "keyAlias=ai" >> android/key.properties
+          echo "storeFile=Cortex.jks" >> android/key.properties
+
+      - name: Build APK (Release)
+        run: flutter build apk --release
+
+      - name: Build AppBundle (Release)
+        run: flutter build appbundle --release
+
+      - name: Upload Android Release Assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-artifacts
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+
+  build-ios:
+    name: Build iOS (IPA)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Setup Xcode Version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: |
+          flutter clean
+          flutter pub get
+          rm -rf ios/Pods ios/Podfile.lock
+          cd ios
+          pod install --repo-update
+
+      - name: Install Apple Certificate and Provisioning Profile
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASS }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create temporary variables for paths
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Decode certificates and profiles from base64
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+          # Create a temporary keychain for signing
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security default-keychain -s $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate into keychain
+          security import $CERTIFICATE_PATH -k $KEYCHAIN_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Extract UUID from the provisioning profile and rename it correctly
+          UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+
+          # Extract Team ID and Profile Name to create a robust ExportOptions.plist
+          TEAM_ID=$(/usr/libexec/PlistBuddy -c "Print TeamIdentifier:0" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          
+          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ios/ExportOptions.plist
+          echo "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" >> ios/ExportOptions.plist
+          echo "<plist version=\"1.0\">" >> ios/ExportOptions.plist
+          echo "<dict>" >> ios/ExportOptions.plist
+          echo "    <key>method</key>" >> ios/ExportOptions.plist
+          echo "    <string>app-store</string>" >> ios/ExportOptions.plist
+          echo "    <key>uploadBitcode</key>" >> ios/ExportOptions.plist
+          echo "    <false/>" >> ios/ExportOptions.plist
+          echo "    <key>uploadSymbols</key>" >> ios/ExportOptions.plist
+          echo "    <true/>" >> ios/ExportOptions.plist
+          echo "    <key>compileBitcode</key>" >> ios/ExportOptions.plist
+          echo "    <false/>" >> ios/ExportOptions.plist
+          echo "    <key>teamID</key>" >> ios/ExportOptions.plist
+          echo "    <string>$TEAM_ID</string>" >> ios/ExportOptions.plist
+          echo "    <key>provisioningProfiles</key>" >> ios/ExportOptions.plist
+          echo "    <dict>" >> ios/ExportOptions.plist
+          echo "        <key>com.vertex.cortex</key>" >> ios/ExportOptions.plist
+          echo "        <string>$PROFILE_NAME</string>" >> ios/ExportOptions.plist
+          echo "    </dict>" >> ios/ExportOptions.plist
+          echo "</dict>" >> ios/ExportOptions.plist
+          echo "</plist>" >> ios/ExportOptions.plist
+
+      - name: Build IPA (Release)
+        run: |
+          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+
+      - name: Upload iOS Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release-artifacts
+          path: build/ios/ipa/*.ipa

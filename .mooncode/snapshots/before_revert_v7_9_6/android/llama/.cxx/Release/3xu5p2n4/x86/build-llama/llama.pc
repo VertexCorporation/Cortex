@@ -1,0 +1,10 @@
+prefix=C:/Program Files (x86)/llama-android
+exec_prefix=C:/Program Files (x86)/llama-android
+libdir=C:/Program Files (x86)/llama-android/lib
+includedir=C:/Program Files (x86)/llama-android/include
+
+Name: llama
+Description: Port of Facebook's LLaMA model in C/C++
+Version: 0.0.6740
+Libs: -L${libdir} -lggml -lggml-base -lllama
+Cflags: -I${includedir}

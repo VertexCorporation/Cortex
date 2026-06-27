@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "build-llama/ggml/src/ggml-cpu",
+		"source" : "C:/Users/theay/Desktop/Projeler/Cortex/vendor/llama.cpp/ggml/src/ggml-cpu"
+	}
+}

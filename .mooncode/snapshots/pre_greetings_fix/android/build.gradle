@@ -1,0 +1,54 @@
+// android/build.gradle
+
+plugins {
+    id 'com.google.gms.google-services' version '4.4.2' apply false
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
+
+    project.configurations.all {
+        resolutionStrategy {
+            eachDependency { details ->
+                if (details.requested.group == 'androidx.activity') {
+                    details.useVersion "1.9.3"
+                }
+                if (details.requested.group == 'androidx.core') {
+                    details.useVersion "1.15.0"
+                }
+                if (details.requested.group == 'androidx.browser') {
+                    details.useVersion "1.8.0"
+                }
+            }
+        }
+    }
+
+    plugins.withId("com.android.library") {
+        project.android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_21
+                targetCompatibility JavaVersion.VERSION_21
+            }
+        }
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << "-Xlint:-unchecked" << "-Xlint:-deprecation" << "-Xlint:-options"
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

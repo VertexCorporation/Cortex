@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Cortex kameraya we bikar tîne da ku wêneyên ku dikarin bi modelên AI-ê re ji bo analîza dîtbarî werin parve kirin bigire. Wêneyên we tenê dema ku hûn parvekirinê hilbijêrin têne şandin.";
+"NSPhotoLibraryUsageDescription" = "Cortex digihîje galeriya wêneyên we da ku hûn wêneyan hilbijêrin û bi modelên AI-ê re ji bo sohbetên dîtbarî parve bikin. Wêne tenê dema ku hûn şandinê hilbijêrin têne parve kirin.";
+"NSPhotoLibraryAddUsageDescription" = "Cortex wêneyên ku ji hêla AI-ê ve hatine çêkirin û hinardekirinên sohbetê li galeriya we tomar dike dema ku hûn dakêşanê hilbijêrin.";
+"NSMicrophoneUsageDescription" = "Cortex mîkrofona we ji bo sohbetên dengî bi AI-ê re bikar tîne. Dengê we tê pêvajo kirin da ku pirsên we fam bike û bersivên demkî peyda bike.";
+"NSSpeechRecognitionUsageDescription" = "Cortex naskirina axaftinê bikar tîne da ku gotinên we veguherîne nivîsê, ku sohbetên bê dest bi AI-ê re çêdike. Daneyên deng bi ewlehî têne pêvajo kirin.";

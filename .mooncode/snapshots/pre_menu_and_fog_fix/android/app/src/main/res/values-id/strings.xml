@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flutter_downloader_notification_started">Unduhan dimulai</string>
+    <string name="flutter_downloader_notification_in_progress">Sedang mengunduh</string>
+    <string name="flutter_downloader_notification_canceled">Unduhan dibatalkan</string>
+    <string name="flutter_downloader_notification_failed">Unduhan gagal</string>
+    <string name="flutter_downloader_notification_complete">Unduhan selesai</string>
+    <string name="flutter_downloader_notification_paused">Unduhan dijeda</string>
+</resources>
