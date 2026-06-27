@@ -227,18 +227,20 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _startStandardDefaultSequence(targetAsButtons);
   }
 
-  Widget _buildFeatureButtons(BuildContext context, AppLocalizations l10n) {
+  Widget _buildFeatureButtons(
+    BuildContext context,
+    AppLocalizations l10n, {
+    required double buttonHeight,
+    required double buttonSpacing,
+    required double rowSpacing,
+    required double iconSize,
+    required double fontSize,
+    required double borderRadius,
+  }) {
     context.watch<ThemeProvider>();
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final screenHeight = MediaQuery.sizeOf(context).height;
 
     final horizontalPadding = screenWidth * 0.02;
-    final buttonSpacing = screenWidth * 0.04;
-    final rowSpacing = screenHeight * 0.012;
-    final buttonHeight = screenHeight * 0.05;
-    final iconSize = screenWidth * 0.052;
-    final fontSize = screenWidth * 0.03;
-    final borderRadius = screenWidth * 0.12;
 
     final catalog = context.watch<ModelCatalogProvider>();
 
@@ -588,6 +590,75 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     );
   }
 
+  String _getSubtitleText(BuildContext context) {
+    final int hour = DateTime.now().hour;
+    final locale = Localizations.localeOf(context);
+    final String lang = locale.languageCode;
+
+    switch (lang) {
+      case 'tr':
+        if (hour >= 5 && hour < 12) {
+          return 'Bugün harika şeyler yapmaya hazır mısın? ☕';
+        } else if (hour >= 12 && hour < 17) {
+          return 'Günün nasıl geçiyor? Yardımcı olabilirim. 🚀';
+        } else if (hour >= 17 && hour < 22) {
+          return 'Bugünü nasıl tamamladık? Planlarımız neler? 🌟';
+        } else {
+          return 'Uykudan önce son bir soru? 🥱';
+        }
+      case 'az':
+        if (hour >= 5 && hour < 12) {
+          return 'Bu gün gözəl işlər görməyə hazırsınız? ☕';
+        } else if (hour >= 12 && hour < 17) {
+          return 'Gününüz necə keçir? Kömək edə bilərəm. 🚀';
+        } else if (hour >= 17 && hour < 22) {
+          return 'Günü necə tamamladıq? 🌟';
+        } else {
+          return 'Yatmazdan əvvəl son bir sual? 🥱';
+        }
+      case 'de':
+        if (hour >= 5 && hour < 12) {
+          return 'Bereit, heute Großes zu tun? ☕';
+        } else if (hour >= 12 && hour < 17) {
+          return 'Wie läuft dein Tag? Kann ich helfen? 🚀';
+        } else if (hour >= 17 && hour < 22) {
+          return 'Wie war dein Tag? Was steht an? 🌟';
+        } else {
+          return 'Eine letzte Frage vor dem Schlafen? 🥱';
+        }
+      case 'es':
+        if (hour >= 5 && hour < 12) {
+          return '¿Listo para hacer grandes cosas hoy? ☕';
+        } else if (hour >= 12 && hour < 17) {
+          return '¿Cómo va tu día? Puedo ayudarte. 🚀';
+        } else if (hour >= 17 && hour < 22) {
+          return '¿Cómo terminamos el día hoy? 🌟';
+        } else {
+          return '¿Una última pregunta antes de dormir? 🥱';
+        }
+      case 'fr':
+        if (hour >= 5 && hour < 12) {
+          return 'Prêt à accomplir de belles choses aujourd\'hui ? ☕';
+        } else if (hour >= 12 && hour < 17) {
+          return 'Comment se passe votre journée ? Je peux aider. 🚀';
+        } else if (hour >= 17 && hour < 22) {
+          return 'Comment s\'est passée votre journée ? 🌟';
+        } else {
+          return 'Une dernière question avant de dormir ? 🥱';
+        }
+      default:
+        if (hour >= 5 && hour < 12) {
+          return 'Ready to do great things today? ☕';
+        } else if (hour >= 12 && hour < 17) {
+          return 'How is your day going? I can help. 🚀';
+        } else if (hour >= 17 && hour < 22) {
+          return 'How did we wrap up today? What\'s the plan? 🌟';
+        } else {
+          return 'One last question before sleep? 🥱';
+        }
+    }
+  }
+
   String _getGreetingText(BuildContext context, String username) {
     final int hour = DateTime.now().hour;
     final locale = Localizations.localeOf(context);
@@ -819,6 +890,15 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         ? 16.0
         : (isTablet ? screenWidth * 0.025 : screenWidth * 0.04);
 
+    final double buttonHeight = isDesktop ? 44.0 : (isTablet ? screenHeight * 0.045 : screenHeight * 0.042);
+    final double buttonSpacing = isDesktop ? 16.0 : (isTablet ? screenWidth * 0.03 : screenWidth * 0.03);
+    final double rowSpacing = isDesktop ? 12.0 : (isTablet ? screenHeight * 0.01 : screenHeight * 0.008);
+    final double iconSize = isDesktop ? 20.0 : (isTablet ? screenWidth * 0.045 : screenWidth * 0.045);
+    final double fontSize = isDesktop ? 14.0 : (isTablet ? screenWidth * 0.026 : screenWidth * 0.028);
+    final double borderRadius = isDesktop ? 22.0 : (isTablet ? screenWidth * 0.08 : screenWidth * 0.1);
+    
+    final double buttonsAreaHeight = buttonHeight * 2 + rowSpacing + (buttonHeight * 0.15) + 16.0;
+
     final double contentMaxWidth =
         isDesktop ? 600.0 : (isTablet ? screenWidth * 0.6 : screenWidth);
     final double horizontalPadding =
@@ -952,26 +1032,38 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                             _buildEntranceItem(
                                               startTime: 0.0,
                                               endTime: 0.5,
-                                              child: Text(
-                                                _getGreetingText(context, username),
-                                                style: TextStyle(
-                                                  fontSize: titleSize,
-                                                  letterSpacing: 0.5,
-                                                  color: contentColor,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
+                                              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _getGreetingText(context, username),
+                    style: TextStyle(
+                      fontSize: titleSize,
+                      letterSpacing: 0.5,
+                      color: contentColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: verticalSpacing * 0.25),
+                  Text(
+                    _getSubtitleText(context),
+                    style: TextStyle(
+                      fontSize: titleSize * 0.55,
+                      color: contentColor.withValues(alpha: 0.65),
+                      fontWeight: FontWeight.normal,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              )
                                             ),
                                             SizedBox(
                                                 height: verticalSpacing * 0.5),
 
                                             // Description <-> Buttons (Timed, smooth crossfade, same position)
                                             SizedBox(
-                                              height:
-                                                  (screenHeight * 0.05) * 2 +
-                                                      (screenHeight * 0.018) +
-                                                      (screenHeight * 0.03),
+                                              height: buttonsAreaHeight,
                                               child: AnimatedBuilder(
                                                 animation: _swapController,
                                                 builder: (context, _) {
@@ -1055,9 +1147,15 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                                 ),
                                                                 child:
                                                                     _buildFeatureButtons(
-                                                                  context,
-                                                                  l10n,
-                                                                ),
+                                  context,
+                                  l10n,
+                                  buttonHeight: buttonHeight,
+                                  buttonSpacing: buttonSpacing,
+                                  rowSpacing: rowSpacing,
+                                  iconSize: iconSize,
+                                  fontSize: fontSize,
+                                  borderRadius: borderRadius,
+                                ),
                                                               ),
                                                             ),
                                                           ),
