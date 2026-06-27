@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="none">
+    <defs>
+        <mask id="check-mask">
+            <rect x="0" y="-960" width="960" height="960" fill="white" />
+            <path d="M421-298L714-591Q728-605 728-623Q728-641 714-655Q700-669 682-669Q664-669 650-655L396-401L278-519Q264-533 246-533Q228-533 214-519Q200-505 200-487Q200-469 214-455L371-298Q385-284 396-284Q410-284 421-298Z" fill="black" />
+        </mask>
+    </defs>
+    <circle cx="480" cy="-480" r="400" fill="black" mask="url(#check-mask)" />
+</svg>

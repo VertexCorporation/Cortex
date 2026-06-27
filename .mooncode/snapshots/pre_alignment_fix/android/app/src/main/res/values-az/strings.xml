@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flutter_downloader_notification_started">Yükləməyə başlandı</string>
+    <string name="flutter_downloader_notification_in_progress">Yükləmə davam edir</string>
+    <string name="flutter_downloader_notification_canceled">Yükləmə ləğv edildi</string>
+    <string name="flutter_downloader_notification_failed">Yükləmə uğursuz oldu</string>
+    <string name="flutter_downloader_notification_complete">Yükləmə tamamlandı</string>
+    <string name="flutter_downloader_notification_paused">Yükləmə dayandırıldı</string>
+</resources>
