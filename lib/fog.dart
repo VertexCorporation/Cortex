@@ -12,6 +12,7 @@ class ScrollFog extends StatefulWidget {
   final double scrollThreshold;
   final bool showTop;
   final bool showBottom;
+  final Color? color;
 
   const ScrollFog({
     super.key,
@@ -22,6 +23,7 @@ class ScrollFog extends StatefulWidget {
     this.scrollThreshold = 10.0,
     this.showTop = true,
     this.showBottom = true,
+    this.color,
   });
 
   @override
@@ -133,6 +135,7 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+       final fogColor = widget.color ?? AppColors.background;
     return Stack(
       children: [
         // 1. Content defines the stack size
@@ -164,9 +167,9 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
                       // Non-linear gradient for smoother "fog" feel
                       stops: const [0.0, 0.4, 1.0],
                       colors: [
-                        AppColors.background,
-                        AppColors.background.withValues(alpha: 0.8),
-                        AppColors.background.withValues(alpha: 0),
+                        fogColor,
+                        fogColor.withValues(alpha: 0.8),
+                        fogColor.withValues(alpha: 0),
                       ],
                     ),
                   ),
@@ -201,9 +204,9 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
                       end: Alignment.topCenter,
                       stops: const [0.0, 0.4, 1.0],
                       colors: [
-                        AppColors.background,
-                        AppColors.background.withValues(alpha: 0.8),
-                        AppColors.background.withValues(alpha: 0),
+                        fogColor,
+                        fogColor.withValues(alpha: 0.8),
+                        fogColor.withValues(alpha: 0),
                       ],
                     ),
                   ),
