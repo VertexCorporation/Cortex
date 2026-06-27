@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../navigation.dart';
 import '../../../../funds/funds.dart';
 import '../../../../app.dart';
+import 'dart:async';
 import 'package:cortex/scaled_bottom_sheet.dart';
 
 void showPremiumBottomSheet(BuildContext context) {
@@ -41,6 +42,9 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
   late final AnimationController _glowController;
   late final Animation<double> _glowScaleAnimation;
   late final Animation<double> _glowOpacityAnimation;
+  late final AnimationController _shineController;
+  late final Animation<double> _shineAnimation;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -72,6 +76,25 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
       ),
     );
 
+    _shineController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(
+      CurvedAnimation(parent: _shineController, curve: Curves.easeInOut),
+    );
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) _shineController.forward(from: 0.0);
+    });
+
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        _shineController.forward(from: 0.0);
+      }
+    });
+
     _entranceController.forward();
     _glowController.repeat(reverse: true);
   }
@@ -80,6 +103,8 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
   void dispose() {
     _entranceController.dispose();
     _glowController.dispose();
+    _shineController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -262,44 +287,102 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
             ),
             SizedBox(height: w * 0.08),
 
-            // Primary Button (Premium'u İncele)
+                        // Primary Button (Premium'u İncele)
             _buildAnimatedItem(
               start: 0.4,
               end: 0.9,
-              child: Container(
-                width: double.infinity,
-                height: w * 0.135,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(w * 0.035),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.premium.withValues(alpha: 0.25),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.premium,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(w * 0.035),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: () {
-                    HapticFeedback.mediumImpact();
-                    Navigator.pop(context);
-                    final target = const FundsScreen();
-                    navigateToScreen(target, direction: const Offset(0.0, 1.0));
-                  },
-                  child: Text(
-                    "Premium'u İncele",
-                    style: TextStyle(
-                      color: buttonTextColor,
-                      fontSize: w * 0.045,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.2,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(w * 0.035),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      Navigator.pop(context);
+                      final target = const FundsScreen();
+                      navigateToScreen(target, direction: const Offset(0.0, 1.0));
+                    },
+                    borderRadius: BorderRadius.circular(w * 0.035),
+                    splashColor: AppColors.premium.withValues(alpha: 0.1),
+                    highlightColor: AppColors.premium.withValues(alpha: 0.05),
+                    child: Stack(
+                      children: [
+                        // 1. Base Content
+                        Ink(
+                          decoration: BoxDecoration(
+                            color: Color.alphaBlend(AppColors.premium.withValues(alpha: 0.15), AppColors.background),
+                            borderRadius: BorderRadius.circular(w * 0.035),
+                            border: Border.all(
+                              color: AppColors.premium.withValues(alpha: 0.25),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Container(
+                            height: w * 0.135,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/sparkle.svg',
+                                  colorFilter: ColorFilter.mode(
+                                    AppColors.premium,
+                                    BlendMode.srcIn,
+                                  ),
+                                  width: w * 0.055,
+                                  height: w * 0.055,
+                                ),
+                                SizedBox(width: w * 0.025),
+                                Flexible(
+                                  child: Text(
+                                    "Cortex Premium",
+                                    style: TextStyle(
+                                      color: AppColors.premium,
+                                      fontSize: w * 0.045,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // 2. Shine Overlay
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(w * 0.035),
+                            child: AnimatedBuilder(
+                              animation: _shineAnimation,
+                              builder: (context, child) {
+                                return Transform.translate(
+                                  offset: Offset(w * 1.5 * _shineAnimation.value, 0.0),
+                                  child: child,
+                                );
+                              },
+                              child: Container(
+                                width: w * 0.4,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Colors.white.withValues(alpha: 0.0),
+                                      Colors.white.withValues(alpha: 0.3),
+                                      Colors.white.withValues(alpha: 0.5),
+                                      Colors.white.withValues(alpha: 0.3),
+                                      Colors.white.withValues(alpha: 0.0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
