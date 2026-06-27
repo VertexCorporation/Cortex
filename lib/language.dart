@@ -19,7 +19,6 @@ class LocaleProvider extends ChangeNotifier {
     'it', // Italian
     'ja', // Japanese
     'ar', // Arabic
-    'ku', // Kurdish
     'nl', // Dutch
     'ru', // Russian
     'ko', // Korean

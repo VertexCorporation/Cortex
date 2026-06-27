@@ -580,9 +580,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get japanese => 'Jepang';
 
   @override
-  String get kurdish => 'Kurdi';
-
-  @override
   String get dutch => 'Belanda';
 
   @override

@@ -177,7 +177,6 @@ class ModelDefaults {
     'summary': {
       'en': 'Advanced AI Intelligence',
       'tr': 'Gelişmiş Yapay Zekâ',
-      'ku': 'Zekâya Hunerî ya Pêşketî',
       'es': 'Inteligencia Artificial Avanzada',
       'fr': 'Intelligence Artificielle Avancée',
       'de': 'Fortschrittliche KI-Intelligenz',
@@ -200,8 +199,6 @@ class ModelDefaults {
           'Cortex intelligently analyzes your request and activates the most capable AI model available to provide the best possible answer.',
       'tr':
           'Cortex, isteğinizi analiz eder ve en iyi cevabı sunmak için mevcut en yetenekli yapay zekâ modelini devreye sokar.',
-      'ku':
-          'Cortex daxwaza we bi awayekî aqilmend analîz dike û modela AI ya herî jêhatî çalak dike da ku bersiva herî baş bide.',
       'es':
           'Cortex analiza inteligentemente tu solicitud y activa el modelo de IA más capaz disponible para dar la mejor respuesta.',
       'fr':
@@ -243,7 +240,6 @@ class ModelDefaults {
     'summary': {
       'en': 'Advanced AI Assistant',
       'tr': 'Gelişmiş Yapay Zekâ Asistanı',
-      'ku': 'Asîstanê AI yê Pêşketî',
       'es': 'Asistente de IA Avanzado',
       'fr': 'Assistant IA Avancé',
       'de': 'Fortschrittlicher KI-Assistent',

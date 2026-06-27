@@ -588,9 +588,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get japanese => 'ì¼ë³¸ì–´';
 
   @override
-  String get kurdish => 'ì¿ ë¥´ë“œì–´';
-
-  @override
   String get dutch => 'ë„¤ëœë€ë“œ ì‚¬ëŒ';
 
   @override

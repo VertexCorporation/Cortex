@@ -575,9 +575,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get japanese => 'æ—¥è¯­';
 
   @override
-  String get kurdish => 'åº“å°”å¾·';
-
-  @override
   String get dutch => 'è·å…°è¯­';
 
   @override

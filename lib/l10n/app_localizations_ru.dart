@@ -598,9 +598,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get japanese => 'Ğ¯Ğ¿Ğ¾Ğ½ÑĞºĞ¸Ğ¹';
 
   @override
-  String get kurdish => 'ĞºÑƒÑ€Ğ´ÑĞºĞ¸Ğ¹';
-
-  @override
   String get dutch => 'Ğ“Ğ¾Ğ»Ğ»Ğ°Ğ½Ğ´ÑĞºĞ¸Ğ¹';
 
   @override
