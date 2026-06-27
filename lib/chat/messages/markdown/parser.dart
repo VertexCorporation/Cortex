@@ -251,6 +251,9 @@ String mergeFragmentedThinkingBlocks(String text) {
   cleanedText = cleanedText.replaceAll(closedThinkPattern, '');
   cleanedText = cleanedText.replaceAll(unclosedThinkPattern, '');
 
+  // Clean up leading colons and whitespace that might leak from model outputs after thinking
+  cleanedText = cleanedText.replaceFirst(RegExp(r'^[\s:]+'), '');
+
   final mergedThinking = thinkingContents.join('\n\n');
 
   final thinkTag = hasUnclosedBlock

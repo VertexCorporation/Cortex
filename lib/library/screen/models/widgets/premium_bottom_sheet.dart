@@ -148,7 +148,6 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
     // Use contrast colors
     final Color textColor = AppColors.primaryColor.inverted;
     final Color subTextColor = textColor.withValues(alpha: 0.65);
-    final Color buttonTextColor = Colors.white;
 
     return Container(
       decoration: BoxDecoration(
