@@ -510,8 +510,8 @@ class VoiceService with ChangeNotifier {
       String text = _incomingTextBuffer.toString();
       
       // Clean remaining block tags
-      text = text.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>'), '');
-      text = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
+      text = text.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
+      text = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
       // If broken/unclosed tags remain, cut them off
       if (text.contains('<memory>')) text = text.substring(0, text.indexOf('<memory>'));
       if (text.contains('<think>')) text = text.substring(0, text.indexOf('<think>'));
@@ -528,8 +528,8 @@ class VoiceService with ChangeNotifier {
     String currentText = _incomingTextBuffer.toString();
 
     // First strip out any fully formed <memory>...</memory> and <think>...</think> blocks
-    currentText = currentText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>'), '');
-    currentText = currentText.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
+    currentText = currentText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
+    currentText = currentText.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
 
     // If there is an open tag that hasn't closed yet, wait for more chunks.
     if (currentText.contains('<memory>') || currentText.contains('<think>')) {
