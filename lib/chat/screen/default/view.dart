@@ -588,10 +588,216 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     );
   }
 
+  String _getGreetingText(BuildContext context, String username) {
+    final int hour = DateTime.now().hour;
+    final locale = Localizations.localeOf(context);
+    final String lang = locale.languageCode;
+
+    String greeting;
+    switch (lang) {
+      case 'tr':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Günaydın';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Tünaydın';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'İyi akşamlar';
+        } else {
+          greeting = 'İyi geceler';
+        }
+        break;
+      case 'az':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Sabahınız xeyir';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Hər vaxtınız xeyir';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Axşamınız xeyir';
+        } else {
+          greeting = 'Gecəniz xeyrə qalsın';
+        }
+        break;
+      case 'de':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Guten Morgen';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Guten Tag';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Guten Abend';
+        } else {
+          greeting = 'Gute Nacht';
+        }
+        break;
+      case 'es':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Buenos días';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Buenas tardes';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Buenas noches';
+        } else {
+          greeting = 'Buenas noches';
+        }
+        break;
+      case 'fr':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Bonjour';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Bon après-midi';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Bonsoir';
+        } else {
+          greeting = 'Bonne nuit';
+        }
+        break;
+      case 'hi':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'शुभ प्रभात';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'नमस्कार';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'शुभ संध्या';
+        } else {
+          greeting = 'शुभ रात्रि';
+        }
+        break;
+      case 'id':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Selamat pagi';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Selamat siang';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Selamat sore';
+        } else {
+          greeting = 'Selamat malam';
+        }
+        break;
+      case 'it':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Buongiorno';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Buon pomeriggio';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Buonasera';
+        } else {
+          greeting = 'Buonanotte';
+        }
+        break;
+      case 'ja':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'おはようございます';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'こんにちは';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'こんばんは';
+        } else {
+          greeting = 'おやすみなさい';
+        }
+        break;
+      case 'ko':
+        if (hour >= 5 && hour < 12) {
+          greeting = '좋은 아침입니다';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = '안녕하세요';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = '좋은 저녁입니다';
+        } else {
+          greeting = '안녕히 주무세요';
+        }
+        break;
+      case 'ku':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Beyanî baş';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Roj baş';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Êvar baş';
+        } else {
+          greeting = 'Şev baş';
+        }
+        break;
+      case 'nl':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Goedemorgen';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Goedemiddag';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Goedenavond';
+        } else {
+          greeting = 'Welterusten';
+        }
+        break;
+      case 'pt':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Bom dia';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Boa tarde';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Boa noite';
+        } else {
+          greeting = 'Boa noite';
+        }
+        break;
+      case 'ru':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Доброе утро';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Добрый день';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Добрый вечер';
+        } else {
+          greeting = 'Спокойной ночи';
+        }
+        break;
+      case 'zh':
+        if (hour >= 5 && hour < 12) {
+          greeting = '早上好';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = '下午好';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = '晚上好';
+        } else {
+          greeting = '晚安';
+        }
+        break;
+      case 'ar':
+        if (hour >= 5 && hour < 12) {
+          greeting = 'صباح الخير';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'مساء الخير';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'مساء الخير';
+        } else {
+          greeting = 'تصبح على خير';
+        }
+        break;
+      default:
+        if (hour >= 5 && hour < 12) {
+          greeting = 'Good morning';
+        } else if (hour >= 12 && hour < 17) {
+          greeting = 'Good afternoon';
+        } else if (hour >= 17 && hour < 22) {
+          greeting = 'Good evening';
+        } else {
+          greeting = 'Good night';
+        }
+    }
+
+    if (username.isNotEmpty && username.toLowerCase() != 'guest') {
+      if (lang == 'ar') {
+        return '$greeting، $username';
+      }
+      return '$greeting, $username';
+    }
+    return greeting;
+  }
+
   @override
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
     context.watch<ChatSessionProvider>();
+    final userProvider = context.watch<UserProvider>();
+    final String username = userProvider.username;
 
     final screenWidth = MediaQuery.sizeOf(context).width;
     final screenHeight = MediaQuery.sizeOf(context).height;
@@ -747,7 +953,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                               startTime: 0.0,
                                               endTime: 0.5,
                                               child: Text(
-                                                l10n.defaultViewTitle,
+                                                _getGreetingText(context, username),
                                                 style: TextStyle(
                                                   fontSize: titleSize,
                                                   letterSpacing: 0.5,
