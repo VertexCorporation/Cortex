@@ -776,17 +776,6 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
           greeting = '잘 자요';
         }
         break;
-      case 'ku':
-        if (hour >= 5 && hour < 12) {
-          greeting = 'Beyanî baş';
-        } else if (hour >= 12 && hour < 17) {
-          greeting = 'Roj baş';
-        } else if (hour >= 17 && hour < 22) {
-          greeting = 'Êvar baş';
-        } else {
-          greeting = 'Şev baş';
-        }
-        break;
       case 'nl':
         if (hour >= 5 && hour < 12) {
           greeting = 'Goedemorgen';

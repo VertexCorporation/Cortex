@@ -47,8 +47,6 @@ class AppLanguageSection extends StatelessWidget {
         return localizations.italian;
       case 'ja':
         return localizations.japanese;
-      case 'ku':
-        return localizations.kurdish;
       case 'nl':
         return localizations.dutch;
       case 'ru':
@@ -103,7 +101,6 @@ class AppLanguageSection extends StatelessWidget {
       {'code': 'es', 'name': appLocalizations.spanish, 'native': 'Español'},
       {'code': 'it', 'name': appLocalizations.italian, 'native': 'Italiano'},
       {'code': 'ja', 'name': appLocalizations.japanese, 'native': '日本語'},
-      {'code': 'ku', 'name': appLocalizations.kurdish, 'native': 'Kurdî'},
       {'code': 'nl', 'name': appLocalizations.dutch, 'native': 'Nederlands'},
       {'code': 'ru', 'name': appLocalizations.russian, 'native': 'Русский'},
       {'code': 'ko', 'name': appLocalizations.korean, 'native': '한국어'},

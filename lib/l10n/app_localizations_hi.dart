@@ -620,9 +620,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get japanese => 'à¤œà¤¾à¤ªà¤¾à¤¨à¥€';
 
   @override
-  String get kurdish => 'à¤•à¥à¤°à¥à¤¦';
-
-  @override
   String get dutch => 'à¤¡à¤š';
 
   @override
