@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "fr",
   "cancel": "Annuler",
   "remove": "Retirer",
@@ -643,5 +643,13 @@
   "systemPromptLimitFallback": "CRITIQUEÂ : Lâ€™utilisateur a demandÃ© une action, mais son forfait Cortex est Ã©puisÃ©Â ; veuillez informer lâ€™utilisateur dans sa langue quâ€™il doit patienter ou envisager de passer Ã  un forfait supÃ©rieur.",
   "systemNotePreviousMedia": "[Note systÃ¨me : Voici le mÃ©dia gÃ©nÃ©rÃ© prÃ©cÃ©demment. Vous pouvez vous y rÃ©fÃ©rer ou le modifier.]",
   "pinLimitReached": "Vous pouvez Ã©pingler jusqu'Ã  3 discussions.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

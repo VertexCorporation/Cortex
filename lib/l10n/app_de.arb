@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "de",
   "cancel": "Abbrechen",
   "remove": "Entfernen",
@@ -684,5 +684,13 @@
   "systemPromptLimitFallback": "KRITISCH: Der Benutzer hat eine Aktion angefordert, aber sein Datenvolumen bei Cortex ist aufgebraucht. Bitte informieren Sie den Benutzer in seiner Sprache, dass er warten oder ein Upgrade seines Abonnements in Betracht ziehen sollte.",
   "systemNotePreviousMedia": "[Systemhinweis: Unten sehen Sie die zuvor generierten Medien. Sie kÃ¶nnen diese referenzieren oder bearbeiten.]",
   "pinLimitReached": "Sie kÃ¶nnen bis zu 3 Chats anheften.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

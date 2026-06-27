@@ -32,15 +32,15 @@ class SystemInfoChartState extends State<SystemInfoChart> with SingleTickerProvi
     super.initState();
 
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
 
     _storageAnimation = Tween<double>(begin: 0, end: widget.usedStorage.toDouble())
-        .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
+        .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
 
     _memoryAnimation = Tween<double>(begin: 0, end: widget.usedMemory.toDouble())
-        .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
+        .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
 
     _animationController.forward();
   }
@@ -51,230 +51,186 @@ class SystemInfoChartState extends State<SystemInfoChart> with SingleTickerProvi
     super.dispose();
   }
 
-  String _formatSize(double megabytes) {
-    if (megabytes >= 1024) {
-      return '${(megabytes / 1024).toStringAsFixed(1)} GB';
-    }
-    return '${megabytes.toStringAsFixed(0)} MB';
-  }
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     final themeProvider = Provider.of<ThemeProvider>(context);
     AppColors.currentTheme = themeProvider.currentTheme;
 
-    // Soft gradient choices based on theme
-    final isDark = AppColors.currentTheme == 'dark';
-    
-    // Gradient definitions
-    final List<Color> storageGradient = [
-      AppColors.senaryColor,
-      AppColors.senaryColor.withValues(alpha: 0.7),
-    ];
-    
-    final List<Color> memoryGradient = [
-      AppColors.premium,
-      AppColors.premium.withValues(alpha: 0.7),
-    ];
+    final usedColor = AppColors.senaryColor;
+    final totalColor = AppColors.quaternaryColor;
+    final dividerColor = AppColors.quinaryColor;
+
+    final labelColor = AppColors.primaryColor.inverted;
+    final barHeight = screenHeight * 0.03;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8.0),
-        // Storage Card
-        AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, child) {
-            double animatedUsedStorage = _storageAnimation.value;
-            double progress = widget.totalStorage > 0
-                ? animatedUsedStorage / widget.totalStorage
-                : 0.0;
+        SizedBox(height: screenHeight * 0.02),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Transform.translate(
+                    offset: const Offset(0, -8),
+                    child: Text(
+                      localizations.usedStorage.split(' ').join('\n'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: labelColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.03),
+                  Transform.translate(
+                    offset: const Offset(0, -8),
+                    child: Text(
+                      localizations.usedMemory.split(' ').join('\n'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: labelColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: screenWidth * 0.015),
+              VerticalDivider(
+                width: screenWidth * 0.012,
+                thickness: 1,
+                color: dividerColor,
+              ),
+              SizedBox(width: screenWidth * 0.02),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Depolama çubuğu animasyonu
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        double animatedUsedStorage = _storageAnimation.value;
+                        double usedWidthFactor = widget.totalStorage > 0
+                            ? animatedUsedStorage / widget.totalStorage
+                            : 0;
 
-            return _buildSystemCard(
-              title: localizations.usedStorage,
-              icon: Icons.storage_rounded,
-              usedValue: animatedUsedStorage,
-              totalValue: widget.totalStorage.toDouble(),
-              progress: progress,
-              gradient: storageGradient,
-              accentColor: AppColors.senaryColor,
-              screenWidth: screenWidth,
-              isDark: isDark,
-            );
-          },
-        ),
-        const SizedBox(height: 16.0),
-        // Memory Card
-        AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, child) {
-            double animatedUsedMemory = _memoryAnimation.value;
-            double progress = widget.totalMemory > 0
-                ? animatedUsedMemory / widget.totalMemory
-                : 0.0;
+                        return _buildAnimatedHorizontalBar(
+                          usedValue: animatedUsedStorage,
+                          totalValue: widget.totalStorage.toDouble(),
+                          maxValue: widget.totalStorage.toDouble(),
+                          colorUsed: usedColor,
+                          colorTotal: totalColor,
+                          height: barHeight,
+                          usedWidthFactor: usedWidthFactor,
+                        );
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.015),
+                    // Bellek çubuğu animasyonu
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        double animatedUsedMemory = _memoryAnimation.value;
+                        double usedWidthFactor = widget.totalMemory > 0
+                            ? animatedUsedMemory / widget.totalMemory
+                            : 0;
 
-            return _buildSystemCard(
-              title: localizations.usedMemory,
-              icon: Icons.memory_rounded,
-              usedValue: animatedUsedMemory,
-              totalValue: widget.totalMemory.toDouble(),
-              progress: progress,
-              gradient: memoryGradient,
-              accentColor: AppColors.premium,
-              screenWidth: screenWidth,
-              isDark: isDark,
-            );
-          },
+                        return _buildAnimatedHorizontalBar(
+                          usedValue: animatedUsedMemory,
+                          totalValue: widget.totalMemory.toDouble(),
+                          maxValue: widget.totalMemory.toDouble(),
+                          colorUsed: usedColor,
+                          colorTotal: totalColor,
+                          height: barHeight,
+                          usedWidthFactor: usedWidthFactor,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
+        SizedBox(height: screenHeight * 0.02),
       ],
     );
   }
 
-  Widget _buildSystemCard({
-    required String title,
-    required IconData icon,
+  Widget _buildAnimatedHorizontalBar({
     required double usedValue,
     required double totalValue,
-    required double progress,
-    required List<Color> gradient,
-    required Color accentColor,
-    required double screenWidth,
-    required bool isDark,
+    required double maxValue,
+    required Color colorUsed,
+    required Color colorTotal,
+    required double height,
+    required double usedWidthFactor,
   }) {
-    final percentage = (progress * 100).clamp(0.0, 100.0);
-    final cardBg = AppColors.secondaryColor;
-    final progressTrackColor = AppColors.quaternaryColor;
+    double percentage = maxValue > 0 ? (usedValue / maxValue) * 100 : 0;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18.0),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(
-          color: AppColors.border.withValues(alpha: 0.3),
-          width: 1.0,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Animasyonlu çubuk
+        Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              height: height,
+              decoration: BoxDecoration(
+                color: colorTotal,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            FractionallySizedBox(
+              widthFactor: usedWidthFactor.clamp(0.0, 1.0),
+              child: Container(
+                height: height,
+                decoration: BoxDecoration(
+                  color: colorUsed,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Row 1: Icon, Title, and Percentage Tag
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  color: accentColor,
-                  size: 20.0,
-                ),
+        SizedBox(height: height * 0.166),
+        // Değer ve yüzde bilgisi
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${usedValue.toInt()} | ${totalValue.toInt()} MB',
+              style: TextStyle(
+                fontSize: height * 0.416,
+                color: AppColors.primaryColor.inverted,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(width: 12.0),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
-                  ),
-                ),
+            ),
+            Text(
+              '${percentage.toStringAsFixed(1)}%',
+              style: TextStyle(
+                fontSize: height * 0.416,
+                fontWeight: FontWeight.w500,
+                color: AppColors.tertiaryColor,
               ),
-              // Percentage Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(100.0),
-                ),
-                child: Text(
-                  '${percentage.toStringAsFixed(1)}%',
-                  style: TextStyle(
-                    color: accentColor,
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18.0),
-          
-          // Row 2: Progress Bar
-          Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 10.0,
-                decoration: BoxDecoration(
-                  color: progressTrackColor,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-              ),
-              FractionallySizedBox(
-                widthFactor: progress.clamp(0.0, 1.0),
-                child: Container(
-                  height: 10.0,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: gradient,
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(10.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: accentColor.withValues(alpha: 0.25),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12.0),
-          
-          // Row 3: Used | Total Text
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${_formatSize(usedValue)} / ${_formatSize(totalValue)}',
-                style: TextStyle(
-                  fontSize: 12.0,
-                  color: AppColors.tertiaryColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                percentage > 85 ? 'Yüksek Kullanım' : 'Kararlı',
-                style: TextStyle(
-                  fontSize: 11.0,
-                  color: percentage > 85 ? Colors.orange : AppColors.tertiaryColor.withValues(alpha: 0.6),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

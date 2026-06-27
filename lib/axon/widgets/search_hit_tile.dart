@@ -1,3 +1,4 @@
+import "package:cortex/app.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/theme.dart';
@@ -63,7 +64,7 @@ class SearchHitTile extends StatelessWidget {
                   child: Text(
                     hit.title,
                     style: TextStyle(
-                      color: AppColors.primaryColor,
+                      color: AppColors.primaryColor.inverted,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
@@ -74,7 +75,7 @@ class SearchHitTile extends StatelessWidget {
                 Text(
                   _formatTimestamp(hit.timestamp),
                   style: TextStyle(
-                    color: AppColors.secondaryColor,
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
                     fontSize: 12,
                   ),
                 ),
@@ -86,7 +87,7 @@ class SearchHitTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
                 style: TextStyle(
-                  color: AppColors.secondaryColor,
+                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
                   fontSize: 13,
                   height: 1.4,
                 ),
@@ -115,7 +116,7 @@ class SearchHitTile extends StatelessWidget {
       spans.add(TextSpan(
         text: text.substring(match.start, match.end),
         style: TextStyle(
-          color: AppColors.primaryColor,
+          color: AppColors.primaryColor.inverted,
           fontWeight: FontWeight.bold,
         ),
       ));

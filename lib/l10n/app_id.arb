@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "id",
   "cancel": "Batal",
   "remove": "Menghapus",
@@ -684,5 +684,13 @@
   "systemPromptLimitFallback": "PENTING: Pengguna meminta suatu tindakan, tetapi kuota mereka di Cortex telah habis; mohon informasikan kepada pengguna dalam bahasa mereka bahwa mereka harus menunggu atau mempertimbangkan untuk meningkatkan paket langganan mereka.",
   "systemNotePreviousMedia": "[Catatan Sistem: Berikut adalah media yang dihasilkan sebelumnya. Anda dapat merujuk atau mengeditnya.]",
   "pinLimitReached": "Anda dapat menyematkan hingga 3 obrolan.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

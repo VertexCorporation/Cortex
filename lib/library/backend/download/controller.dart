@@ -90,6 +90,12 @@ class ModelDownloadController {
       }
     }
 
+    if (!context.mounted) {
+      debugPrint(
+          "[DownloadController] Download for '$id' aborted: context no longer mounted.");
+      return;
+    }
+
     final mutex = _modelMutexes.putIfAbsent(id, () => Mutex());
     if (mutex.isLocked) {
       debugPrint(
@@ -433,7 +439,12 @@ class ModelDownloadController {
     required String title,
     required bool showSystemNotification,
   }) async {
-    final manager = managers[id]!;
+    final manager = managers[id];
+    if (manager == null) {
+      debugPrint(
+          "[DownloadController] Download for '$id' aborted: manager not found.");
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
     final filePath = getFilePathById(id);
 

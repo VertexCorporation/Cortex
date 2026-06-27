@@ -297,6 +297,12 @@ class ModelLocalStateProvider extends ChangeNotifier
         }
       }
 
+      if (!context.mounted) {
+        debugPrint(
+            "[ModelLocalStateProvider] Context no longer mounted after permission request. Aborting download.");
+        return false;
+      }
+
       final canShowSystemNotifications = notificationStatus.isGranted;
 
       // Resolve size: for variant downloads, find size from variant data.

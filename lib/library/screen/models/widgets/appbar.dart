@@ -27,6 +27,7 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     // Icon size matches the rest of the app
     final double iconSize = isTablet ? 18.0 : 15.0;
+    final double buttonSize = isTablet ? 48.0 : 42.0;
 
 
 
@@ -41,7 +42,8 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
       // [IMPROVED] Prominent "Create" pill button with icon + label
       // Previously was just a small icon — now clearly communicates its purpose
       actionButton: AppBarButton(
-        isTitle: true,
+        size: buttonSize,
+        isTitle: false,
         onTap: onOpenCreateScreen,
         child: SvgPicture.asset(
           'assets/icons/add.svg',

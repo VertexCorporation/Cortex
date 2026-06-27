@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ar",
   "cancel": "Ø¥Ù„ØºØ§Ø¡",
   "remove": "ÙŠØ²ÙŠÙ„",
@@ -686,5 +686,13 @@
   "systemPromptLimitFallback": "Ù‡Ø§Ù…: Ø·Ù„Ø¨ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¥Ø¬Ø±Ø§Ø¡Ù‹ Ù…Ø§ØŒ ÙˆÙ„ÙƒÙ† Ø±ØµÙŠØ¯Ù‡ Ø¹Ù„Ù‰ Ù…Ù†ØµØ© ÙƒÙˆØ±ØªÙƒØ³ Ù‚Ø¯ Ù†ÙØ¯Ø› ÙŠØ±Ø¬Ù‰ Ø¥Ø¨Ù„Ø§Øº Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ù„ØºØªÙ‡ Ø£Ù†Ù‡ ÙŠØ¬Ø¨ Ø¹Ù„ÙŠÙ‡ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø± Ø£Ùˆ Ø§Ù„ØªÙÙƒÙŠØ± ÙÙŠ ØªØ±Ù‚ÙŠØ© Ø®Ø·Ø© Ø§Ø´ØªØ±Ø§ÙƒÙ‡.",
   "systemNotePreviousMedia": "[Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ù†Ø¸Ø§Ù…: Ø£Ø¯Ù†Ø§Ù‡ Ù‡ÙŠ Ø§Ù„ÙˆØ³Ø§Ø¦Ø· Ø§Ù„ØªÙŠ ØªÙ… Ø¥Ù†Ø´Ø§Ø¤Ù‡Ø§ Ù…Ø³Ø¨Ù‚Ù‹Ø§. ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„Ø¥Ø´Ø§Ø±Ø© Ø¥Ù„ÙŠÙ‡Ø§ Ø£Ùˆ ØªØ¹Ø¯ÙŠÙ„Ù‡Ø§.]",
   "pinLimitReached": "ÙŠÙ…ÙƒÙ†Ùƒ ØªØ«Ø¨ÙŠØª Ù…Ø§ ÙŠØµÙ„ Ø¥Ù„Ù‰ 3 Ù…Ø­Ø§Ø¯Ø«Ø§Øª.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

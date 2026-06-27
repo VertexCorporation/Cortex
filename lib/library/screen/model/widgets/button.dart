@@ -33,7 +33,8 @@ class BottomActionButtons extends StatelessWidget {
         : provider.mainModel!.id;
 
     // Enforce Premium Restriction
-    if (provider.mainModel!.isPremium && !isSubscribed) {
+    final isOnlineOrRP = provider.mainModel!.isServerSide || provider.mainModel!.category == 'roleplay';
+    if ((provider.mainModel!.isPremium || isOnlineOrRP) && !isSubscribed) {
       showPremiumBottomSheet(context);
       return;
     }
@@ -134,10 +135,6 @@ class BottomActionButtons extends StatelessWidget {
     AppLocalizations localizations,
   ) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final userProvider = context.read<UserProvider>();
-    final bool isSubscribed = userProvider.isSubscriptionActive;
-    final bool isPremiumLocked = provider.mainModel!.isPremium && !isSubscribed;
-
     return Container(
       key: const ValueKey('removeAndChat'),
       decoration: BoxDecoration(
@@ -198,43 +195,20 @@ class BottomActionButtons extends StatelessWidget {
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  // Soft red for locked premium, soft blue for normal/subscribed
-                  color: isPremiumLocked
-                      ? const Color(0xFFEF5350)
-                      : const Color(0xFF1E88E5),
+                  color: const Color(0xFF1E88E5),
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(screenWidth * 0.03),
                     bottomRight: Radius.circular(screenWidth * 0.03),
                   ),
                 ),
-                child: isPremiumLocked
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.lock_outline_rounded,
-                          color: Colors.white,
-                          size: screenWidth * 0.045,
-                        ),
-                        SizedBox(width: screenWidth * 0.015),
-                        Text(
-                          localizations.locked,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: screenWidth * 0.04,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Text(
-                      localizations.chat,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: screenWidth * 0.04,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                child: Text(
+                  localizations.chat,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ),
@@ -342,9 +316,6 @@ class BottomActionButtons extends StatelessWidget {
     AppLocalizations localizations,
   ) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final userProvider = context.read<UserProvider>();
-    final bool isSubscribed = userProvider.isSubscriptionActive;
-    final bool isPremiumLocked = provider.mainModel!.isPremium && !isSubscribed;
 
     return Container(
       key: const ValueKey('chatOnly'),
@@ -361,38 +332,16 @@ class BottomActionButtons extends StatelessWidget {
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            // Soft red for locked premium, soft blue for normal/subscribed
-            color: isPremiumLocked
-                ? const Color(0xFFEF5350)
-                : const Color(0xFF1E88E5),
+            color: const Color(0xFF1E88E5),
             borderRadius: BorderRadius.circular(screenWidth * 0.03),
           ),
-          child: isPremiumLocked
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.lock_outline_rounded,
-                      color: Colors.white,
-                      size: screenWidth * 0.05,
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Text(
-                      localizations.locked,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: screenWidth * 0.04,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )
-              : Text(
-                  localizations.chat,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.bold),
-                ),
+          child: Text(
+            localizations.chat,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: screenWidth * 0.04,
+                fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );

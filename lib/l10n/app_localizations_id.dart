@@ -2008,4 +2008,28 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get pinLimitReached => 'Anda dapat menyematkan hingga 3 obrolan.';
+
+  @override
+  String get categoryAll => 'All';
+
+  @override
+  String get categoryFree => 'Free';
+
+  @override
+  String get categoryPremium => 'Premium';
+
+  @override
+  String get categoryVideo => 'Video';
+
+  @override
+  String get categoryPhoto => 'Photo';
+
+  @override
+  String get categoryMasculine => 'Masculine';
+
+  @override
+  String get categoryFeminine => 'Feminine';
+
+  @override
+  String get categoryInanimate => 'Inanimate';
 }

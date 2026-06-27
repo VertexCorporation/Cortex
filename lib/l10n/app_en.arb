@@ -872,5 +872,13 @@
   },
   "systemPromptLimitFallback": "CRITICAL: The user requested an action, but their allowance on Cortex has depleted; kindly inform the user in their language that they should wait or consider upgrading their subscription plan.",
   "dynamicPreditsUpgradeMessage": "Cortex can give even better answers; upgrade now and get the best answer for every question!",
-  "pinLimitReached": "You can pin up to 3 chats."
+  "pinLimitReached": "You can pin up to 3 chats.",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

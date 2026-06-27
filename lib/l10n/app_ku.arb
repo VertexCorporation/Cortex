@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ku",
   "cancel": "Betal bike",
   "remove": "DÃ»rxistin",
@@ -686,5 +686,13 @@
   "freePlan": "{plan} belaÅŸ!",
   "systemPromptLimitFallback": "KRÃTÃK: BikarhÃªner Ã§alakiyek xwest, lÃª mafÃª bikaranÃ®nÃª yÃª li ser CortexÃª qediya; ji kerema xwe bi zimanÃª bikarhÃªner bi nermÃ® agahdar bike ku divÃª li bendÃª bimÃ®ne an jÃ® plana abonetiya xwe bilind bike.",
   "pinLimitReached": "HÃ»n dikarin heta 3 sohbetan sabÃ®t bikin.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

@@ -2020,4 +2020,28 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get pinLimitReached => 'Maksimum 3 sÃ¶hbÉ™ti sancaqlaya bilÉ™rsiniz.';
+
+  @override
+  String get categoryAll => 'Tümü';
+
+  @override
+  String get categoryFree => 'Ücretsiz';
+
+  @override
+  String get categoryPremium => 'Premium';
+
+  @override
+  String get categoryVideo => 'Video';
+
+  @override
+  String get categoryPhoto => 'Fotoğraf';
+
+  @override
+  String get categoryMasculine => 'Eril';
+
+  @override
+  String get categoryFeminine => 'Dişil';
+
+  @override
+  String get categoryInanimate => 'Cansız';
 }

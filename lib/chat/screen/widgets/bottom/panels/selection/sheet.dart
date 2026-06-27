@@ -18,6 +18,7 @@ import 'cards/main.dart';
 import 'cards/variant.dart';
 
 import 'package:cortex/scaled_bottom_sheet.dart';
+import 'package:cortex/library/screen/models/widgets/premium_bottom_sheet.dart';
 
 Future<bool?> showModelSelectionSheet({
   required BuildContext context,
@@ -288,11 +289,38 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
   }
 
   Future<void> _handleSelection(String modelId) async {
+    final model = _findModelById(modelId);
+    if (model != null && model.isPremium && mounted) {
+      final userProvider = context.read<UserProvider>();
+      if (!userProvider.isSubscriptionActive) {
+        showPremiumBottomSheet(context);
+        return;
+      }
+    }
     final resolvedModelId = await _resolveSeriesSelection(modelId);
     widget.onModelSelected(resolvedModelId);
     if (mounted) {
       Navigator.pop(context, true);
     }
+  }
+
+  ModelEntity? _findModelById(String modelId) {
+    final allSeries = <ModelEntity>[
+      ..._selfModels,
+      ..._offlineModels,
+      ..._onlineSeries,
+      ..._videoSeries,
+      ..._imageSeries,
+      ..._audioSeries,
+      ..._characterModels,
+    ];
+    for (final model in allSeries) {
+      if (model.id == modelId) return model;
+      if (model.variants != null && model.variants!.containsKey(modelId)) {
+        return model;
+      }
+    }
+    return null;
   }
 
   bool _isSeriesActive(ModelEntity series) {
@@ -733,7 +761,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                             isSelected: isItem1Active,
                             isExpanded: isItem1Expanded,
                             showExpansionArrow: true,
-                            isLocked: !context.read<UserProvider>().isSubscriptionActive && item1.isPremium,
                             onBodyTap: () => _handleSelection(item1.id),
                             onArrowTap: () => _handleSeriesExpansion(item1.id),
                           ),
@@ -747,7 +774,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                                   isSelected: isItem2Active,
                                   isExpanded: isItem2Expanded,
                                   showExpansionArrow: true,
-                                  isLocked: !context.read<UserProvider>().isSubscriptionActive && item2.isPremium,
                                   onBodyTap: () => _handleSelection(item2.id),
                                   onArrowTap: () =>
                                       _handleSeriesExpansion(item2.id),

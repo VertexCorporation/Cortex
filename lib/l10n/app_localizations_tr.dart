@@ -1997,4 +1997,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get pinLimitReached => 'En fazla 3 sohbeti sabitleyebilirsiniz.';
+
+  @override
+  String get categoryAll => 'Tümü';
+
+  @override
+  String get categoryFree => 'Ücretsiz';
+
+  @override
+  String get categoryPremium => 'Premium';
+
+  @override
+  String get categoryVideo => 'Video';
+
+  @override
+  String get categoryPhoto => 'Fotoğraf';
+
+  @override
+  String get categoryMasculine => 'Eril';
+
+  @override
+  String get categoryFeminine => 'Dişil';
+
+  @override
+  String get categoryInanimate => 'Cansız';
 }

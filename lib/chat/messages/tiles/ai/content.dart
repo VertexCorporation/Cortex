@@ -310,68 +310,32 @@ class ThoughtProcessWidget extends StatefulWidget {
 }
 
 class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget> {
-  bool _isExpanded = false;
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () => setState(() => _isExpanded = !_isExpanded),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.psychology_outlined,
-                size: 16 * widget.scale,
-                color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-              ),
-              SizedBox(width: 6 * widget.scale),
-              Text(
-                "Thought process",
-                style: TextStyle(
-                  fontSize: 14 * widget.scale,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-                ),
-              ),
-              SizedBox(width: 4 * widget.scale),
-              Icon(
-                _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                size: 16 * widget.scale,
-                color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-              ),
-            ],
+    if (widget.thinkContent.trim().isEmpty) return const SizedBox.shrink();
+    
+    return Container(
+      margin: EdgeInsets.only(bottom: 12 * widget.scale),
+      padding: EdgeInsets.only(left: 12 * widget.scale, top: 4 * widget.scale, bottom: 4 * widget.scale),
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: AppColors.primaryColor.inverted.withValues(alpha: 0.3),
+            width: 3 * widget.scale,
           ),
         ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          alignment: Alignment.topCenter,
-          child: _isExpanded
-              ? Container(
-                  margin: EdgeInsets.only(top: 8 * widget.scale, bottom: 8 * widget.scale),
-                  padding: EdgeInsets.all(12 * widget.scale),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(8 * widget.scale),
-                    border: Border.all(color: AppColors.border.withValues(alpha: 0.1)),
-                  ),
-                  child: SelectionArea(
-                    child: Text(
-                      widget.thinkContent,
-                      style: TextStyle(
-                        fontSize: 14 * widget.scale,
-                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(),
+      ),
+      child: SelectionArea(
+        child: Text(
+          widget.thinkContent,
+          style: TextStyle(
+            fontSize: 14 * widget.scale,
+            color: AppColors.primaryColor.inverted.withValues(alpha: 0.6),
+            fontStyle: FontStyle.italic,
+            height: 1.5,
+          ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cortex/chat/screen/widgets/bottom/panels/edit.dart';
 import 'package:flutter/material.dart';
+import '../ambient_glow.dart';
+
 import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/providers/conversation.dart';
@@ -205,6 +207,13 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       alignment: Alignment.bottomCenter,
       clipBehavior: Clip.none,
       children: [
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 300,
+          child: const IgnorePointer(child: AmbientGlow()),
+        ),
         // Standard Input Panel (Slides Down)
         AnimatedSlide(
           duration: const Duration(milliseconds: 250),

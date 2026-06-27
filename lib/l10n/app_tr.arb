@@ -698,5 +698,13 @@
   "systemTimeInfo": "\n\nŞu anki tarih ve saat: {formattedTime}.",
   "systemPromptLimitFallback": "[SİSTEM NOTU: Kullanıcı bir işlem istedi, ancak Cortex'teki mevcut hakları bitti. Lütfen kullanıcıya kendi dilinde kibarca bu durumu açıkla. Beklemelerini veya planını yükseltmesi gerektiğini söyle.]",
   "dynamicPreditsUpgradeMessage": "Cortex çok daha iyi yanıtlar verebilir; şimdi hesabını yükselt ve her sorun için en iyi yanıtı al!",
-  "pinLimitReached": "En fazla 3 sohbeti sabitleyebilirsiniz."
+  "pinLimitReached": "En fazla 3 sohbeti sabitleyebilirsiniz.",
+  "categoryAll": "Tümü",
+  "categoryFree": "Ücretsiz",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Fotoğraf",
+  "categoryMasculine": "Eril",
+  "categoryFeminine": "Dişil",
+  "categoryInanimate": "Cansız"
 }

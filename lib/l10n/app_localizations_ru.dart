@@ -2101,4 +2101,28 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pinLimitReached =>
       'Ğ’Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ·Ğ°ĞºÑ€ĞµĞ¿Ğ¸Ñ‚ÑŒ Ğ´Ğ¾ 3 Ñ‡Ğ°Ñ‚Ğ¾Ğ².';
+
+  @override
+  String get categoryAll => 'All';
+
+  @override
+  String get categoryFree => 'Free';
+
+  @override
+  String get categoryPremium => 'Premium';
+
+  @override
+  String get categoryVideo => 'Video';
+
+  @override
+  String get categoryPhoto => 'Photo';
+
+  @override
+  String get categoryMasculine => 'Masculine';
+
+  @override
+  String get categoryFeminine => 'Feminine';
+
+  @override
+  String get categoryInanimate => 'Inanimate';
 }

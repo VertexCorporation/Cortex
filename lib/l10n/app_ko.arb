@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ko",
   "cancel": "ì·¨ì†Œ",
   "remove": "ì œê±°í•˜ë‹¤",
@@ -684,5 +684,13 @@
   "systemPromptLimitFallback": "ì¤‘ìš”: ì‚¬ìš©ìê°€ ì‘ì—…ì„ ìš”ì²­í–ˆì§€ë§Œ Cortex ì‚¬ìš©ëŸ‰ì´ ì†Œì§„ë˜ì—ˆìŠµë‹ˆë‹¤. í•´ë‹¹ ì‚¬ìš©ìì—ê²Œ ëª¨êµ­ì–´ë¡œ ê¸°ë‹¤ë¦¬ê±°ë‚˜ êµ¬ë… í”Œëœ ì—…ê·¸ë ˆì´ë“œë¥¼ ê³ ë ¤í•˜ë„ë¡ ì•ˆë‚´í•´ ì£¼ì„¸ìš”.",
   "systemNotePreviousMedia": "[ì‹œìŠ¤í…œ ì°¸ê³ : ì•„ë˜ëŠ” ì´ì „ì— ìƒì„±ëœ ë¯¸ë””ì–´ì…ë‹ˆë‹¤. ì°¸ê³ í•˜ê±°ë‚˜ í¸ì§‘í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.]",
   "pinLimitReached": "ìµœëŒ€ 3ê°œì˜ ì±„íŒ…ì„ ê³ ì •í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

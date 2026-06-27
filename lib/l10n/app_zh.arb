@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "zh",
   "cancel": "å–æ¶ˆ",
   "remove": "æ¶ˆé™¤",
@@ -684,5 +684,13 @@
   "systemPromptLimitFallback": "ç´§æ€¥ï¼šç”¨æˆ·è¯·æ±‚æ‰§è¡ŒæŸé¡¹æ“ä½œï¼Œä½†å…¶åœ¨ Cortex ä¸Šçš„é¢åº¦å·²ç”¨å®Œï¼›è¯·ç”¨ç”¨æˆ·çš„è¯­è¨€å‘ŠçŸ¥ä»–ä»¬åº”è¯¥ç­‰å¾…æˆ–è€ƒè™‘å‡çº§è®¢é˜…è®¡åˆ’ã€‚",
   "systemNotePreviousMedia": "ã€ç³»ç»Ÿæç¤ºï¼šä»¥ä¸‹ä¸ºä¹‹å‰ç”Ÿæˆçš„åª’ä½“æ–‡ä»¶ï¼Œæ‚¨å¯ä»¥å‚è€ƒæˆ–ç¼–è¾‘ã€‚ã€‘",
   "pinLimitReached": "æ‚¨æœ€å¤šå¯ä»¥å›ºå®š 3 ä¸ªèŠå¤©ã€‚",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

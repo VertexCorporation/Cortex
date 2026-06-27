@@ -229,7 +229,7 @@ class FileDownloadHelper extends ChangeNotifier {
           savedDir: savedDir,
           fileName: fileName,
           showNotification: showNotification,
-          openFileFromNotification: true,
+          openFileFromNotification: false,
         );
       } catch (e) {
         debugPrint(

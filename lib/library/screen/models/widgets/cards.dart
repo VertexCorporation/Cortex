@@ -17,7 +17,6 @@ import '../../../backend/data/entity.dart';
 import '../../../backend/download/download.dart';
 import '../../../backend/utils.dart';
 import 'cancel.dart';
-import 'premium_badge.dart';
 import 'premium_bottom_sheet.dart';
 import '../../../../server/user.dart';
 
@@ -199,7 +198,7 @@ class _ModelTileState extends State<ModelTile> {
             widget.onResumeDownload();
           },
           style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.senaryColor,
+              backgroundColor: const Color(0xFF3B82F6),
               shape: RoundedRectangleBorder(borderRadius: br),
               padding: EdgeInsets.zero),
           child:
@@ -218,7 +217,8 @@ class _ModelTileState extends State<ModelTile> {
         onPressed: () {
           HapticFeedback.lightImpact();
           // Check Premium Access
-          if (widget.model.isPremium) {
+          final isOnlineOrRP = widget.model.isServerSide || widget.model.category == 'roleplay';
+                          if (widget.model.isPremium || isOnlineOrRP) {
             final userProvider = Provider.of<UserProvider>(context, listen: false);
             if (!userProvider.isSubscriptionActive) {
               showPremiumBottomSheet(context);
@@ -228,25 +228,11 @@ class _ModelTileState extends State<ModelTile> {
           widget.onChatPressed();
         },
         style: ElevatedButton.styleFrom(
-            backgroundColor: widget.model.isPremium ? const Color(0xFFE57373) : AppColors.senaryColor,
+            backgroundColor: const Color(0xFF3B82F6),
             shape: RoundedRectangleBorder(borderRadius: br),
             padding: EdgeInsets.zero),
         child: FittedBox(
-          child: widget.model.isPremium
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/lock_reset.svg',
-                      width: w * .035,
-                      height: w * .035,
-                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                    ),
-                    SizedBox(width: w * .015),
-                    Text(loc.chat, style: _boldWhite(context, w)),
-                  ],
-                )
-              : Text(loc.chat, style: _boldWhite(context, w)),
+          child: Text(loc.chat, style: _boldWhite(context, w)),
         ),
       );
 
@@ -375,19 +361,6 @@ class _ModelTileState extends State<ModelTile> {
           child: imageContent);
     }
 
-    if (widget.model.isPremium) {
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          imageContent,
-          Positioned(
-            top: -w * .01,
-            right: -w * .01,
-            child: PremiumBadge(size: w * .06),
-          ),
-        ],
-      );
-    }
     
     return imageContent;
   }

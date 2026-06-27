@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "es",
   "cancel": "Cancelar",
   "remove": "Eliminar",
@@ -694,5 +694,13 @@
   "systemPromptLimitFallback": "CRÃTICO: El usuario solicitÃ³ una acciÃ³n, pero su saldo en Cortex se ha agotado; por favor, infÃ³rmele en su idioma que debe esperar o considerar actualizar su plan de suscripciÃ³n.",
   "systemNotePreviousMedia": "[Nota del sistema: A continuaciÃ³n se muestran los medios generados anteriormente. Puede hacer referencia a ellos o editarlos.]",
   "pinLimitReached": "Puedes fijar hasta 3 chats.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

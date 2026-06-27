@@ -3650,6 +3650,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can pin up to 3 chats.'**
   String get pinLimitReached;
+
+  /// No description provided for @categoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get categoryAll;
+
+  /// No description provided for @categoryFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get categoryFree;
+
+  /// No description provided for @categoryPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get categoryPremium;
+
+  /// No description provided for @categoryVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get categoryVideo;
+
+  /// No description provided for @categoryPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get categoryPhoto;
+
+  /// No description provided for @categoryMasculine.
+  ///
+  /// In en, this message translates to:
+  /// **'Masculine'**
+  String get categoryMasculine;
+
+  /// No description provided for @categoryFeminine.
+  ///
+  /// In en, this message translates to:
+  /// **'Feminine'**
+  String get categoryFeminine;
+
+  /// No description provided for @categoryInanimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Inanimate'**
+  String get categoryInanimate;
 }
 
 class _AppLocalizationsDelegate

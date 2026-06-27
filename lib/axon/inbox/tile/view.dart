@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:provider/provider.dart';
-import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../main.dart';
 import '../../../../theme.dart';
 import '../../../app.dart';
@@ -19,9 +18,6 @@ import '../../../overflow.dart';
 import '../logic/manager.dart';
 import '../logic/general.dart';
 
-// Ensure this path matches where you placed the edit.dart file
-import '../panel/actions/edit.dart';
-import '../panel/buttons.dart';
 import 'avatar.dart';
 
 class AxonConversationTile extends StatefulWidget {
@@ -48,9 +44,6 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
   // Custom Timer for faster "Long Press" detection
   Timer? _holdTimer;
-
-  // Store touch position for panel positioning
-  Offset? _tapPosition;
 
   // Animation controller for the delete slide effect
   late AnimationController _deleteController;
@@ -101,111 +94,9 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     super.dispose();
   }
 
-  void _handleDelete() {
-    _panelController?.close();
-    _deleteController.reverse().then((_) {
-      if (mounted) {
-        widget.onDelete();
-      }
-    });
-  }
-
-  void _showActionPanel() {
-    if (_panelController != null) {
-      _panelController!.close();
-      _panelController = null;
-      return;
-    }
-
-    final Offset position = _tapPosition ?? Offset.zero;
-    final localizations = AppLocalizations.of(context)!;
-    final manager = widget.manager;
-    final onEdit = widget.onEdit;
-
-    final inboxViewModel = context.read<InboxViewModel>();
-
-    _panelController = showActionPanel(
-      context: context,
-      touchPosition: position,
-      onClosed: () => _panelController = null,
-      buttons: [
-        // --- 1. Edit Button ---
-        ActionPanelButton(
-          iconAsset: 'assets/icons/edit.svg',
-          iconColor: AppColors.primaryColor.inverted,
-          text: localizations.editConversationTitle,
-          textColor: AppColors.primaryColor.inverted,
-          onPressed: () async {
-            final controller = _panelController;
-            _panelController = null;
-            await controller?.close();
-            if (!mounted) return;
-            // Call the dialog to get the new title
-            final newTitle = await showEditTitleDialog(
-              context: context,
-              initialTitle: manager.conversationTitle,
-            );
-            debugPrint(
-                "[AxonRename.Tile] dialog returned hasTitle=${newTitle != null} mounted=$mounted id=${manager.conversationID}");
-            // The tile can unmount while the dialog is open because Axon/list
-            // overlays rebuild aggressively. Rename belongs to the conversation,
-            // so forward the captured callback even if this tile instance died.
-            if (newTitle != null) {
-              debugPrint(
-                  "[AxonRename.Tile] forwarding rename id=${manager.conversationID}");
-              await onEdit(newTitle);
-            }
-          },
-        ),
-        // --- 2. Star/Pin Button ---
-        ActionPanelButton(
-          iconAsset: manager.isStarred
-              ? 'assets/icons/on/star.svg'
-              : 'assets/icons/off/star.svg',
-          iconColor: manager.isStarred
-              ? Colors.amber
-              : AppColors.primaryColor.inverted,
-          text: manager.isStarred
-              ? localizations.unstarConversation
-              : localizations.starConversation,
-          textColor: AppColors.primaryColor.inverted,
-          onPressed: () {
-            _panelController?.close();
-            widget.onTogglePin();
-          },
-        ),
-        // --- 3. Select Button ---
-        ActionPanelButton(
-          customIcon: Icon(
-            Icons.check_box_outlined,
-            color: AppColors.primaryColor.inverted,
-            size: 20.0,
-          ),
-          iconColor: AppColors.primaryColor.inverted,
-          text: localizations.localeName == 'tr' ? 'Seç' : 'Select',
-          textColor: AppColors.primaryColor.inverted,
-          onPressed: () {
-            _panelController?.close();
-            inboxViewModel.setSelectionMode(true);
-            inboxViewModel.toggleSelectConversation(manager.conversationID);
-          },
-        ),
-        // --- 4. Delete Button ---
-        ActionPanelButton(
-          iconAsset: 'assets/icons/delete.svg',
-          iconColor: Colors.redAccent,
-          text: localizations.remove,
-          textColor: Colors.redAccent,
-          onPressed: _handleDelete,
-        ),
-      ],
-    );
-  }
-
   // --- CUSTOM GESTURE LOGIC ---
 
   void _onTapDown(TapDownDetails details) {
-    _tapPosition = details.globalPosition;
     _holdTimer?.cancel();
     
     final inboxViewModel = context.read<InboxViewModel>();
@@ -216,7 +107,11 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     // 350ms threshold for "Long Press"
     _holdTimer = Timer(const Duration(milliseconds: 350), () {
       HapticFeedback.lightImpact();
-      _showActionPanel();
+      final inboxViewModel = context.read<InboxViewModel>();
+      inboxViewModel.setSelectionMode(true);
+      if (!inboxViewModel.selectedIDs.contains(widget.manager.conversationID)) {
+        inboxViewModel.toggleSelectConversation(widget.manager.conversationID);
+      }
     });
   }
 

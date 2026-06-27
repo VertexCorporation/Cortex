@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "it",
   "cancel": "Annulla",
   "remove": "Rimuovere",
@@ -684,5 +684,13 @@
   "systemPromptLimitFallback": "CRITICO: L'utente ha richiesto un'azione, ma la sua quota su Cortex Ã¨ esaurita; si prega di informare l'utente, nella sua lingua, che dovrebbe attendere o valutare l'aggiornamento del proprio piano di abbonamento.",
   "systemNotePreviousMedia": "[Nota di sistema: Di seguito sono riportati i media generati in precedenza. Puoi farvi riferimento o modificarli.]",
   "pinLimitReached": "Puoi fissare fino a 3 chat.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

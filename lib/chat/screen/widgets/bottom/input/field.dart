@@ -35,10 +35,9 @@ class _TextFieldSection extends StatelessWidget {
         cursorColor: AppColors.primaryColor.inverted,
         controller: controller,
         maxLength: 4000,
-        minLines: 1,
-        maxLines: 6,
-        keyboardType: TextInputType.multiline,
-        textInputAction: TextInputAction.newline,
+        maxLines: 1,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.send,
         decoration: InputDecoration(
           isDense: true,
           contentPadding: EdgeInsets.symmetric(

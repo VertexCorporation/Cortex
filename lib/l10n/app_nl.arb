@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "nl",
   "cancel": "Annuleren",
   "remove": "Verwijderen",
@@ -686,5 +686,13 @@
   "systemPromptLimitFallback": "KRITISCH: De gebruiker heeft een actie aangevraagd, maar zijn/haar Cortex-tegoed is op. Informeer de gebruiker in zijn/haar eigen taal dat hij/zij moet wachten of een upgrade van het abonnement moet overwegen.",
   "systemNotePreviousMedia": "[Systeemnotitie: Hieronder staat de eerder gegenereerde media. U kunt hiernaar verwijzen of deze bewerken.]",
   "pinLimitReached": "Je kunt maximaal 3 chats vastzetten.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "All",
+  "categoryFree": "Free",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Photo",
+  "categoryMasculine": "Masculine",
+  "categoryFeminine": "Feminine",
+  "categoryInanimate": "Inanimate"
 }

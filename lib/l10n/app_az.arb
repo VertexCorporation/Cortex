@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "az",
   "cancel": "LÉ™ÄŸv et",
   "remove": "Sil",
@@ -628,5 +628,13 @@
   "systemPromptLimitFallback": "TÆNÄ°DLÄ°: Ä°stifadÉ™Ã§i É™mÉ™liyyat tÉ™lÉ™b etdi, lakin Cortex-dÉ™ limitlÉ™ri tÃ¼kÉ™nib; xahiÅŸ edirik istifadÉ™Ã§iyÉ™ onlarÄ±n dilindÉ™ gÃ¶zlÉ™mÉ™li olduqlarÄ±nÄ± vÉ™ ya abunÉ™ planlarÄ±nÄ± tÉ™kmillÉ™ÅŸdirmÉ™yi dÃ¼ÅŸÃ¼nmÉ™li olduqlarÄ±nÄ± bildirin.",
   "systemNotePreviousMedia": "[Sistem Qeydi: AÅŸaÄŸÄ±da É™vvÉ™llÉ™r yaradÄ±lmÄ±ÅŸ media verilmiÅŸdir. Ona istinad edÉ™ bilÉ™r vÉ™ ya onu redaktÉ™ edÉ™ bilÉ™rsiniz.]",
   "pinLimitReached": "Maksimum 3 sÃ¶hbÉ™ti sancaqlaya bilÉ™rsiniz.",
-  "memoryUpdated": "Memory updated"
+  "memoryUpdated": "Memory updated",
+  "categoryAll": "Tümü",
+  "categoryFree": "Ücretsiz",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "categoryPhoto": "Fotoğraf",
+  "categoryMasculine": "Eril",
+  "categoryFeminine": "Dişil",
+  "categoryInanimate": "Cansız"
 }

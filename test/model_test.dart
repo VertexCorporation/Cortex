@@ -45,17 +45,12 @@ void main() {
     }
 
     for (var tier in tiers) {
-      test('Tier detection for $tier', () {
-        final model = ModelEntity.fromMap({'id': 'm', 'tier': tier}, 'en');
-
-        // Only exact string match based on implementation check
-        // Checking logic: entity.tier simply holds the string.
-        // entity.isPremium checks == 'premium'.
-        final isPremiumTier = tier == 'premium';
-
-        expect(model.isPremium, isPremiumTier);
-      });
-    }
+    test('Tier detection for $tier', () {
+      final model = ModelEntity.fromMap({'id': tier == 'premium' ? 'claude' : 'm', 'title': tier == 'premium' ? 'Claude' : 'M', 'tier': tier}, 'en');
+      final isPremiumTier = tier == 'premium';
+      expect(model.isPremium, isPremiumTier);
+    });
+  }
 
     for (var cat in categories) {
       test('Category parsing for $cat', () {

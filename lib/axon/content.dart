@@ -322,34 +322,6 @@ class AxonContent extends StatelessWidget {
                               letterSpacing: 0.5,
                             ),
                           ),
-                          if (inboxViewModel.conversations.isNotEmpty) ...[
-                            SizedBox(width: referenceWidth * 0.02),
-                            GestureDetector(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                inboxViewModel.setSelectionMode(true);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.3),
-                                    width: 0.8,
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
-                                child: Text(
-                                  localizations.localeName == 'tr' ? 'Seç' : 'Select',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-                                    fontSize: fontSizeBody * 0.75,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
                           SizedBox(width: referenceWidth * 0.04),
                           Expanded(
                             child: Container(
