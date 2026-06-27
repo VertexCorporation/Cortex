@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 7.9.6+796
+version: 7.9.7+797
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
@@ -113,8 +113,8 @@ flutter_launcher_icons:
   ios: true
   remove_alpha_ios: true
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icons/app_logo.jpeg"
-  image_path: "assets/icons/app_logo.jpeg"
+  adaptive_icon_foreground: "assets/cortexlogo.png"
+  image_path: "assets/cortexlogo.png"
 
 flutter_native_splash:
   # —─────────── Global light-mode splash (required) ───────────—
