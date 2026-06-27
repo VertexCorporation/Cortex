@@ -1,3 +1,4 @@
+import 'package:cortex/l10n/app_localizations.dart';
 // lib/library/screen/models/widgets/category.dart
 
 import 'dart:async';
@@ -67,7 +68,8 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
   bool _canTriggerEdgeAction = true;
   
   // Category state
-  String _selectedCategory = 'Tümü';
+  String _selectedCategory = 'categoryAll';
+  bool _isMenuOpen = false;
 
   @override
   void initState() {
@@ -219,6 +221,19 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
     return columns;
   }
 
+
+  String _getLocalizedCategory(String cat, AppLocalizations loc) {
+    if (cat == 'categoryAll') return loc.categoryAll;
+    if (cat == 'categoryFree') return loc.categoryFree;
+    if (cat == 'categoryPremium') return loc.categoryPremium;
+    if (cat == 'categoryVideo') return loc.categoryVideo;
+    if (cat == 'categoryPhoto') return loc.categoryPhoto;
+    if (cat == 'categoryMasculine') return loc.categoryMasculine;
+    if (cat == 'categoryFeminine') return loc.categoryFeminine;
+    if (cat == 'categoryInanimate') return loc.categoryInanimate;
+    return cat;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.models.isEmpty) {
@@ -227,27 +242,27 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
 
     // Apply filtering based on selected category
     List<ModelEntity> filteredModels = widget.models;
-    if (_selectedCategory != 'Tümü') {
+    if (_selectedCategory != 'categoryAll') {
       filteredModels = widget.models.where((m) {
-        if (_selectedCategory == 'Ücretsiz') return !m.isPremium;
-        if (_selectedCategory == 'Premium') return m.isPremium;
-        if (_selectedCategory == 'Video') {
+        if (_selectedCategory == 'categoryFree') return !m.isPremium;
+        if (_selectedCategory == 'categoryPremium') return m.isPremium;
+        if (_selectedCategory == 'categoryVideo') {
            final t = m.displayTitle.toLowerCase();
            final id = m.id.toLowerCase();
            return t.contains('video') || id.contains('video') || t.contains('sora') || t.contains('kling') || t.contains('veo');
         }
-        if (_selectedCategory == 'Fotoğraf') {
+        if (_selectedCategory == 'categoryPhoto') {
            final t = m.displayTitle.toLowerCase();
            final id = m.id.toLowerCase();
            return t.contains('image') || id.contains('image') || t.contains('flux') || t.contains('stable') || t.contains('dall');
         }
-        if (_selectedCategory == 'Eril') {
+        if (_selectedCategory == 'categoryMasculine') {
            return m.role?.toLowerCase().contains('erkek') == true || m.role?.toLowerCase().contains('male') == true;
         }
-        if (_selectedCategory == 'Dişil') {
+        if (_selectedCategory == 'categoryFeminine') {
            return m.role?.toLowerCase().contains('kadın') == true || m.role?.toLowerCase().contains('kız') == true || m.role?.toLowerCase().contains('female') == true;
         }
-        if (_selectedCategory == 'Cansız') {
+        if (_selectedCategory == 'categoryInanimate') {
            return m.role?.toLowerCase().contains('nesne') == true || m.role?.toLowerCase().contains('robot') == true;
         }
         return true;
@@ -372,66 +387,87 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
 
   Widget _buildHeader(double screenWidth) {
     return Padding(
-      padding:
-      EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.01),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.03),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.title,
-                style: TextStyle(
-                  color: AppColors.primaryColor.inverted,
-                  fontSize: screenWidth * 0.05,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          Text(
+            widget.title,
+            style: TextStyle(
+              color: AppColors.primaryColor.inverted,
+              fontSize: screenWidth * 0.05,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           if (widget.subCategories != null && widget.subCategories!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 12.0, bottom: 4.0),
-              child: SizedBox(
-                height: 32,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
-                  itemCount: widget.subCategories!.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    final cat = widget.subCategories![index];
+            Theme(
+              data: Theme.of(context).copyWith(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
+              child: PopupMenuButton<String>(
+                color: AppColors.background,
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: AppColors.border.withValues(alpha: 0.2)),
+                ),
+                offset: const Offset(0, 30),
+                          onOpened: () { setState(() { _isMenuOpen = true; }); },
+                          onCanceled: () { setState(() { _isMenuOpen = false; }); },
+                          onSelected: (String cat) {
+                            setState(() { _isMenuOpen = false; });
+                  setState(() {
+                    _selectedCategory = cat;
+                  });
+                  HapticFeedback.lightImpact();
+                },
+                itemBuilder: (BuildContext context) {
+                  final loc = AppLocalizations.of(context)!;
+                  return widget.subCategories!.map((String cat) {
                     final isSelected = _selectedCategory == cat;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedCategory = cat;
-                        });
-                        HapticFeedback.lightImpact();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppColors.secondaryColor : Colors.transparent,
-                          border: Border.all(
-                            color: isSelected ? AppColors.secondaryColor : AppColors.border.withValues(alpha: 0.5),
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Center(
-                          child: Text(
-                            cat,
+                    return PopupMenuItem<String>(
+                      value: cat,
+                      child: Row(
+                        children: [
+                          Text(
+                            _getLocalizedCategory(cat, loc),
                             style: TextStyle(
-                              color: isSelected ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.6),
-                              fontSize: 13,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                              color: isSelected ? AppColors.senaryColor : AppColors.primaryColor.inverted,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontSize: 14,
                             ),
                           ),
-                        ),
+                          if (isSelected) const Spacer(),
+                          if (isSelected)
+                            Icon(Icons.check_rounded, color: AppColors.senaryColor, size: 18),
+                        ],
                       ),
                     );
-                  },
+                  }).toList();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getLocalizedCategory(_selectedCategory, AppLocalizations.of(context)!),
+                        style: TextStyle(
+                          color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        _isMenuOpen ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                        size: 20,
+                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
