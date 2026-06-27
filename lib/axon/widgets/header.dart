@@ -114,6 +114,42 @@ class AxonHeader extends StatelessWidget {
                               alignment: Alignment.centerLeft,
                               child: GestureDetector(
                                 onTap: onCloseAxon,
+                                onLongPress: () {
+                                  HapticFeedback.heavyImpact();
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      backgroundColor: AppColors.background,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16.0),
+                                        side: BorderSide(color: AppColors.border, width: 1.0),
+                                      ),
+                                      title: Row(
+                                        children: [
+                                          Icon(Icons.auto_awesome, color: AppColors.primaryColor.inverted),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Cortex Protocol',
+                                            style: TextStyle(color: AppColors.primaryColor.inverted),
+                                          ),
+                                        ],
+                                      ),
+                                      content: Text(
+                                        'Astro 8 PRO: Developer Mode Activated.\n\nVertexCorporation — 2026',
+                                        style: TextStyle(color: AppColors.primaryColor.inverted.withValues(alpha: 0.8)),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(),
+                                          child: Text(
+                                            'OK',
+                                            style: TextStyle(color: AppColors.primaryColor.inverted),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                                 behavior: HitTestBehavior.opaque,
                                 child: SvgPicture.asset(
                                   'assets/cortext.svg',
