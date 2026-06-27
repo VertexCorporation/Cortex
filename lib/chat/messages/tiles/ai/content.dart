@@ -55,6 +55,12 @@ class _AiBodyContent extends StatelessWidget {
          mainStable = mainStable.replaceAll(thinkRegex, '').trimLeft();
          mainAnimating = mainAnimating.replaceAll(thinkRegex, '');
       }
+
+      // Strip leading colons and whitespace that might leak from model outputs after thinking
+      mainStable = mainStable.replaceFirst(RegExp(r'^[\s:]+'), '');
+      if (mainStable.isEmpty) {
+        mainAnimating = mainAnimating.replaceFirst(RegExp(r'^[\s:]+'), '');
+      }
     }
 
     final bool hasMainText = mainStable.isNotEmpty || mainAnimating.isNotEmpty;
