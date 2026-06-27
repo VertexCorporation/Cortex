@@ -98,6 +98,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
         scrollController: widget.scrollController,
         showBottom: true,
         showTop: false,
+      color: AppColors.senaryColor,
         child: Tiles.buildMessagesList(
           context: context,
           messages: messages,

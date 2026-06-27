@@ -99,7 +99,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
 
     return Container(
       constraints: BoxConstraints(
-        maxHeight: screenHeight * 0.72,
+        maxHeight: screenHeight * 0.55,
       ),
       decoration: BoxDecoration(
         color: AppColors.background,
@@ -135,7 +135,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     bottom: MediaQuery
                         .of(context)
                         .padding
-                        .bottom + 80),
+                        .bottom + 16.0),
                 child: Column(
                   children: [
                      // --- ATTACHMENTS SECTION (Camera, Gallery, File) ---
