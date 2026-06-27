@@ -13,8 +13,6 @@ import 'buttons.dart';
 import 'service.dart';
 import '../../../../../../fog.dart';
 import 'package:cortex/chat/providers/session.dart';
-import 'package:cortex/chat/screen/widgets/bottom/panels/selection/sheet.dart';
-import 'package:cortex/library/backend/data/service.dart';
 
 part 'waveform.dart';
 
@@ -380,82 +378,40 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: isTablet ? screenWidth * 0.02 : 8.0),
-                                        child: _TextFieldSection(
-                                          key: const ValueKey('textfield'),
-                                          controller: widget.controller,
-                                          focusNode: widget.textFieldFocusNode,
-                                          localizations: widget.localizations,
-                                          screenWidth: screenWidth,
-                                          isTablet: isTablet,
-                                          showHintText: true,
-                                          onEnterPressed: () {
-                                            if (isSendButtonEnabled) {
-                                              widget.onSend();
-                                            }
-                                          },
-                                        ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.only(
+                                      start: isTablet ? screenWidth * 0.02 : 12.0,
+                                    ),
+                                    child: AddPhotoButton(
+                                      isLimitExceeded: widget.isLimitExceeded,
+                                      isPhotoLoading: widget.isPhotoLoading,
+                                      localizations: widget.localizations,
+                                      controller: widget.controller,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: isTablet ? screenWidth * 0.02 : 8.0),
+                                      child: _TextFieldSection(
+                                        key: const ValueKey('textfield'),
+                                        controller: widget.controller,
+                                        focusNode: widget.textFieldFocusNode,
+                                        localizations: widget.localizations,
+                                        screenWidth: screenWidth,
+                                        isTablet: isTablet,
+                                        showHintText: true,
+                                        onEnterPressed: () {
+                                          if (isSendButtonEnabled) {
+                                            widget.onSend();
+                                          }
+                                        },
                                       ),
-                                      const SizedBox(height: 4.0),
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsetsDirectional.only(
-                                              start: isTablet ? screenWidth * 0.02 : 12.0,
-                                              bottom: 4.0,
-                                            ),
-                                            child: AddPhotoButton(
-                                              isLimitExceeded: widget.isLimitExceeded,
-                                              isPhotoLoading: widget.isPhotoLoading,
-                                              localizations: widget.localizations,
-                                              controller: widget.controller,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          if (context.watch<ChatSessionProvider>().selectedModel != null)
-                                            GestureDetector(
-                                              onTap: () {
-                                                final currentModelId = context.read<ChatSessionProvider>().selectedModel?.id ?? '';
-                                                showModelSelectionSheet(
-                                                  context: context,
-                                                  localizations: widget.localizations,
-                                                  currentModelId: currentModelId,
-                                                  onModelSelected: (String modelId) {
-                                                    final modelService = context.read<ModelService>();
-                                                    final models = modelService.getCachedModelsSync();
-                                                    try {
-                                                      final selectedEntity = models.firstWhere((m) => m.id == modelId);
-                                                      context.read<ChatSessionProvider>().selectModel(selectedEntity);
-                                                    } catch (e) {
-                                                      // Fallback or ignore if not found
-                                                    }
-                                                  },
-                                                  initialModels: const [],
-                                                );
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                margin: const EdgeInsets.only(bottom: 4.0),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-                                                ),
-                                                child: Text(
-                                                  context.watch<ChatSessionProvider>().selectedModel!.displayTitle,
-                                                  style: TextStyle(
-                                                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ),
-                                          const Spacer(),
+                                    ),
+                                  ),
+
                                           Visibility(
                                             visible: false,
                                             maintainSize: true,
@@ -496,15 +452,18 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
                         // 3. MAIN ACTION BUTTON (PERSISTENT)
                         Positioned(
-                          bottom: 4.0, // Anchor to bottom instead of stretching vertically
+                          top: 0,
+                          bottom: 0,
                           right: 0,
-                          child: _SendButtonSection(
-                            screenWidth: screenWidth,
-                            isTablet: isTablet,
-                            widget: widget,
-                            isEnabled: isSendButtonEnabled,
-                            isActionPermitted: isActionPermitted,
-                            controller: widget.controller,
+                          child: Center(
+                            child: _SendButtonSection(
+                              screenWidth: screenWidth,
+                              isTablet: isTablet,
+                              widget: widget,
+                              isEnabled: isSendButtonEnabled,
+                              isActionPermitted: isActionPermitted,
+                              controller: widget.controller,
+                            ),
                           ),
                         ),
                       ],
