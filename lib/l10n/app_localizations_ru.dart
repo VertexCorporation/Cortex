@@ -10,146 +10,145 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Ğ’Ñ‹ â€” Ğ³ĞµĞ½ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€ Ğ·Ğ°Ğ³Ğ¾Ğ»Ğ¾Ğ²ĞºĞ¾Ğ². ĞÑ‚Ğ²ĞµÑ‡Ğ°Ğ¹Ñ‚Ğµ Ğ¢ĞĞ›Ğ¬ĞšĞ Ğ·Ğ°Ğ³Ğ¾Ğ»Ğ¾Ğ²ĞºĞ¾Ğ¼ Ğ¸Ğ· 2-5 ÑĞ»Ğ¾Ğ² Ğ´Ğ»Ñ ÑĞ»ĞµĞ´ÑƒÑÑ‰ĞµĞ³Ğ¾ Ñ€Ğ°Ğ·Ğ³Ğ¾Ğ²Ğ¾Ñ€Ğ°. ĞĞµ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞ¹Ñ‚Ğµ ĞºĞ°Ğ²Ñ‹Ñ‡ĞºĞ¸, Ğ¿Ñ€ĞµÑ„Ğ¸ĞºÑÑ‹ Ğ¸Ğ»Ğ¸ Ğ·Ğ½Ğ°ĞºĞ¸ Ğ¿Ñ€ĞµĞ¿Ğ¸Ğ½Ğ°Ğ½Ğ¸Ñ. Ğ’ĞĞ–ĞĞ: Ğ—Ğ°Ğ³Ğ¾Ğ»Ğ¾Ğ²Ğ¾Ğº Ğ”ĞĞ›Ğ–Ğ•Ğ Ğ±Ñ‹Ñ‚ÑŒ Ğ½Ğ° Ğ¢ĞĞ§ĞĞ Ğ¢ĞĞœ Ğ–Ğ• Ğ¯Ğ—Ğ«ĞšĞ•, Ñ‡Ñ‚Ğ¾ Ğ¸ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ.';
+      'Ğ�ы — Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� 2-5 сĞ�Ğ�Ğ� Ğ�Ğ�я сĞ�Ğ�Ğ�ующĞ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�. Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� Ğ�Ğ�Ğ�ычĞ�Ğ�, Ğ�рĞ�фĞ�Ğ�сы Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я. Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ыть Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�, чтĞ� Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я.';
 
   @override
-  String get systemRoleFallback =>
-      'Ğ’Ñ‹ â€” Ğ¿Ğ¾Ğ»ĞµĞ·Ğ½Ñ‹Ğ¹ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰Ğ½Ğ¸Ğº.';
+  String get systemRoleFallback => 'Ğ�ы — Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�.';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nCRITICAL: Ğ’ÑĞµĞ³Ğ´Ğ° Ğ¾Ñ‚Ğ²ĞµÑ‡Ğ°Ğ¹Ñ‚Ğµ Ğ½Ğ° Ñ‚Ğ¾Ğ¼ Ğ¶Ğµ ÑĞ·Ñ‹ĞºĞµ, Ğ½Ğ° ĞºĞ¾Ñ‚Ğ¾Ñ€Ğ¾Ğ¼ Ğ¿Ğ¸ÑˆĞµÑ‚ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ, Ğ¾Ğ±Ñ€Ğ°Ñ‰Ğ°Ğ¹Ñ‚Ğµ Ğ²Ğ½Ğ¸Ğ¼Ğ°Ğ½Ğ¸Ğµ Ğ½Ğ° ÑĞ·Ñ‹Ğº Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ.';
+      '\n\nCRITICAL: Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ� тĞ�Ğ� Ğ�Ğ� яĞ�ыĞ�Ğ�, Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ� Ğ�Ğ�шĞ�т Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь, Ğ�Ğ�рĞ�щĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� яĞ�ыĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я.';
 
   @override
   String get systemNotePreviousMedia =>
-      '[Ğ¡Ğ¸ÑÑ‚ĞµĞ¼Ğ½Ğ¾Ğµ Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ‡Ğ°Ğ½Ğ¸Ğµ: ĞĞ¸Ğ¶Ğµ Ğ¿Ñ€ĞµĞ´ÑÑ‚Ğ°Ğ²Ğ»ĞµĞ½Ñ‹ Ñ€Ğ°Ğ½ĞµĞµ ÑĞ³ĞµĞ½ĞµÑ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ¼ĞµĞ´Ğ¸Ğ°Ñ„Ğ°Ğ¹Ğ»Ñ‹. Ğ’Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ ÑÑÑ‹Ğ»Ğ°Ñ‚ÑŒÑÑ Ğ½Ğ° Ğ½Ğ¸Ñ… Ğ¸Ğ»Ğ¸ Ñ€ĞµĞ´Ğ°ĞºÑ‚Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ.]';
+      '[Ğ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ�: Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�ы рĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�рĞ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�ы. Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� ссыĞ�Ğ�ться Ğ�Ğ� Ğ�Ğ�х Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�ть.]';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\nĞ¢ĞµĞºÑƒÑ‰Ğ°Ñ Ğ´Ğ°Ñ‚Ğ° Ğ¸ Ğ²Ñ€ĞµĞ¼Ñ: $formattedTime.';
+    return '\n\nĞ�Ğ�Ğ�ущĞ�я Ğ�Ğ�тĞ� Ğ� Ğ�рĞ�Ğ�я: $formattedTime.';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nĞŸÑ€Ğ¾Ğ°Ğ½Ğ°Ğ»Ğ¸Ğ·Ğ¸Ñ€ÑƒĞ¹Ñ‚Ğµ Ñ€Ğ°Ğ·Ğ³Ğ¾Ğ²Ğ¾Ñ€ Ğ½Ğ° Ğ´Ğ°Ğ½Ğ½Ñ‹Ğ¹ Ğ¼Ğ¾Ğ¼ĞµĞ½Ñ‚. Ğ•ÑĞ»Ğ¸ Ğ²Ñ‹ ÑƒĞ·Ğ½Ğ°Ğ»Ğ¸ ĞšĞĞšĞ˜Ğ•-Ğ›Ğ˜Ğ‘Ğ Ğ½Ğ¾Ğ²Ñ‹Ğµ ÑƒĞ½Ğ¸ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğµ Ñ„Ğ°ĞºÑ‚Ñ‹ Ğ¾ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ğµ (Ğ¿Ñ€ĞµĞ´Ğ¿Ğ¾Ñ‡Ñ‚ĞµĞ½Ğ¸Ñ, Ğ¸Ğ¼Ñ, Ğ¿Ñ€Ğ¸Ğ²Ñ‹Ñ‡ĞºĞ¸, ĞºĞ¾Ğ½Ñ‚ĞµĞºÑÑ‚), Ğ²Ñ‹ Ğ”ĞĞ›Ğ–ĞĞ« Ğ²Ñ‹Ğ²ĞµÑÑ‚Ğ¸ Ğ’Ğ¡Ğ® Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ½ÑƒÑ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ Ğ¾ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ğµ Ğ²Ğ½ÑƒÑ‚Ñ€Ğ¸ Ñ‚ĞµĞ³Ğ¾Ğ² <memory>...</memory> Ğ’ Ğ¡ĞĞœĞĞœ ĞšĞĞĞ¦Ğ• Ğ²Ğ°ÑˆĞµĞ³Ğ¾ Ğ¾Ñ‚Ğ²ĞµÑ‚Ğ°. ĞšĞ Ğ˜Ğ¢Ğ˜Ğ§Ğ•Ğ¡ĞšĞ˜ Ğ’ĞĞ–ĞĞ: Ğ’Ñ‹ ĞĞ˜ĞšĞĞ“Ğ”Ğ Ğ½Ğµ Ğ´Ğ¾Ğ»Ğ¶Ğ½Ñ‹ ÑÑ‚Ğ¸Ñ€Ğ°Ñ‚ÑŒ Ğ¸Ğ»Ğ¸ Ğ¿ĞµÑ€ĞµĞ·Ğ°Ğ¿Ğ¸ÑÑ‹Ğ²Ğ°Ñ‚ÑŒ Ğ¿Ñ€ĞµĞ´Ñ‹Ğ´ÑƒÑ‰ÑƒÑ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ. Ğ’Ğ¡Ğ•Ğ“Ğ”Ğ Ğ´Ğ¾Ğ±Ğ°Ğ²Ğ»ÑĞ¹Ñ‚Ğµ Ğ½Ğ¾Ğ²Ñ‹Ğµ Ñ„Ğ°ĞºÑ‚Ñ‹ Ğº ÑÑƒÑ‰ĞµÑÑ‚Ğ²ÑƒÑÑ‰ĞµĞ¹ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ğ¸. Ğ•ÑĞ»Ğ¸ Ğ°Ğ±ÑĞ¾Ğ»ÑÑ‚Ğ½Ğ¾ Ğ½Ğ¸Ñ‡ĞµĞ³Ğ¾ Ğ½Ğ¾Ğ²Ğ¾Ğ³Ğ¾ Ğ½Ğµ Ğ±Ñ‹Ğ»Ğ¾ Ğ¾Ğ±Ğ½Ğ°Ñ€ÑƒĞ¶ĞµĞ½Ğ¾, Ğ¾Ğ¿ÑƒÑÑ‚Ğ¸Ñ‚Ğµ Ñ‚ĞµĞ³. ĞŸÑ€Ğ¸Ğ¼ĞµÑ€: <memory>Ğ›ÑĞ±Ğ¸Ñ‚ Ñ„ÑƒÑ‚Ğ±Ğ¾Ğ» Ğ¸ Ñ‚ĞµĞ½Ğ½Ğ¸Ñ. ĞŸÑ€ĞµĞ´Ğ¿Ğ¾Ñ‡Ğ¸Ñ‚Ğ°ĞµÑ‚ ĞºĞ¾Ñ€Ğ¾Ñ‚ĞºĞ¸Ğµ Ğ¾Ñ‚Ğ²ĞµÑ‚Ñ‹.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�руĞ�тĞ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�р Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�т. Ğ�сĞ�Ğ� Ğ�ы уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ыĞ� уĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� фĞ�Ğ�ты Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� (Ğ�рĞ�Ğ�Ğ�Ğ�чтĞ�Ğ�Ğ�я, Ğ�Ğ�я, Ğ�рĞ�Ğ�ычĞ�Ğ�, Ğ�Ğ�Ğ�тĞ�Ğ�ст), Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ�стĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ую Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�утрĞ� тĞ�Ğ�Ğ�Ğ� <memory>...</memory> Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�тĞ�Ğ�тĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ы стĞ�рĞ�ть Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�сыĞ�Ğ�ть Ğ�рĞ�Ğ�ыĞ�ущую Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�Ğ�ыĞ� фĞ�Ğ�ты Ğ� сущĞ�стĞ�ующĞ�Ğ� Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�Ğ�. Ğ�сĞ�Ğ� Ğ�Ğ�сĞ�Ğ�ютĞ�Ğ� Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�устĞ�тĞ� тĞ�Ğ�. Ğ�рĞ�Ğ�Ğ�р: <memory>Ğ�юĞ�Ğ�т футĞ�Ğ�Ğ� Ğ� тĞ�Ğ�Ğ�Ğ�с. Ğ�рĞ�Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�т Ğ�Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�тĞ�Ğ�ты.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\nĞ’ÑĞµĞ³Ğ´Ğ° Ğ¿Ğ¾Ğ¼Ğ½Ğ¸Ñ‚Ğµ ÑĞ»ĞµĞ´ÑƒÑÑ‰ĞµĞµ Ğ¾ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ğµ:\n$userMemory';
+    return '\n\nĞ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�ующĞ�Ğ� Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�:\n$userMemory';
   }
 
   @override
-  String get cancel => 'ĞÑ‚Ğ¼ĞµĞ½Ğ°';
+  String get cancel => 'Ğ�тĞ�Ğ�Ğ�Ğ�';
 
   @override
-  String get remove => 'Ğ£Ğ´Ğ°Ğ»ÑÑ‚ÑŒ';
+  String get remove => 'Ğ�Ğ�Ğ�Ğ�ять';
 
   @override
-  String get download => 'Ğ¡ĞºĞ°Ñ‡Ğ°Ñ‚ÑŒ';
+  String get download => 'Ğ�Ğ�Ğ�чĞ�ть';
 
   @override
-  String get resume => 'Ğ’Ğ¾Ğ·Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ';
+  String get resume => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
-  String get copy => 'ĞšĞ¾Ğ¿Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ';
+  String get copy => 'Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть';
 
   @override
-  String get chat => 'Ğ§Ğ°Ñ‚';
+  String get chat => 'Ğ�Ğ�т';
 
   @override
   String get locked => 'Locked';
 
   @override
-  String get languageModels => 'Ğ¯Ğ·Ñ‹ĞºĞ¾Ğ²Ñ‹Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get languageModels => 'Ğ�Ğ�ыĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get light => 'Ğ¡Ğ²ĞµÑ‚Ğ»Ğ°Ñ';
+  String get light => 'Ğ�Ğ�Ğ�тĞ�Ğ�я';
 
   @override
-  String get theme => 'Ğ¢ĞµĞ¼Ğ°';
+  String get theme => 'Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get no => 'ĞĞµÑ‚';
+  String get no => 'Ğ�Ğ�т';
 
   @override
-  String get yes => 'Ğ”Ğ°';
+  String get yes => 'Ğ�Ğ�';
 
   @override
-  String get done => 'Ğ“Ğ¾Ñ‚Ğ¾Ğ²Ğ¾';
+  String get done => 'Ğ�Ğ�тĞ�Ğ�Ğ�';
 
   @override
-  String get bestValue => 'Ğ›ÑƒÑ‡ÑˆĞµĞµ Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ';
+  String get bestValue => 'Ğ�учшĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get selected => 'Ğ’Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ¾';
+  String get selected => 'Ğ�ыĞ�рĞ�Ğ�Ğ�';
 
   @override
-  String get descriptionSection => 'ĞĞ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ';
+  String get descriptionSection => 'Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�';
 
   @override
-  String get searchHint => 'ĞŸĞ¾Ğ¸ÑĞº';
+  String get searchHint => 'Ğ�Ğ�Ğ�сĞ�';
 
   @override
-  String get messageHint => 'Ğ¡Ğ¿Ñ€Ğ¾ÑĞ¸Ñ‚Ğµ Ñ‡Ñ‚Ğ¾ ÑƒĞ³Ğ¾Ğ´Ğ½Ğ¾';
+  String get messageHint => 'Ğ�Ğ�рĞ�сĞ�тĞ� чтĞ� уĞ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get messageCopied =>
-      'Ğ¡Ğ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ ÑĞºĞ¾Ğ¿Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¾ Ğ² Ğ±ÑƒÑ„ĞµÑ€ Ğ¾Ğ±Ğ¼ĞµĞ½Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�уфĞ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get retry => 'ĞŸĞ¾Ğ²Ñ‚Ğ¾Ñ€Ğ¸Ñ‚ÑŒ';
+  String get retry => 'Ğ�Ğ�Ğ�тĞ�рĞ�ть';
 
   @override
-  String get systemInfo => 'Ğ˜Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ Ğ¾ ÑĞ¸ÑÑ‚ĞµĞ¼Ğµ';
+  String get systemInfo => 'Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я Ğ� сĞ�стĞ�Ğ�Ğ�';
 
   @override
   String deviceMemory(Object memory) {
-    return 'ĞŸĞ°Ğ¼ÑÑ‚ÑŒ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ°: $memory Ğ“Ğ‘';
+    return 'Ğ�Ğ�Ğ�ять устрĞ�Ğ�стĞ�Ğ�: $memory Ğ�Ğ�';
   }
 
   @override
-  String get memory => 'ĞŸĞ°Ğ¼ÑÑ‚ÑŒ';
+  String get memory => 'Ğ�Ğ�Ğ�ять';
 
   @override
-  String get storage => 'Ğ¥Ñ€Ğ°Ğ½Ğ¸Ğ»Ğ¸Ñ‰Ğµ';
+  String get storage => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�щĞ�';
 
   @override
-  String get freeStorage => 'Ğ¡Ğ²Ğ¾Ğ±Ğ¾Ğ´Ğ½Ğ¾';
+  String get freeStorage => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get totalStorage => 'Ğ’ÑĞµĞ³Ğ¾';
+  String get totalStorage => 'Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get usedStorage => 'Ğ˜ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ğ½Ğ¾';
+  String get usedStorage => 'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get totalMemory => 'Ğ’ÑĞµĞ³Ğ¾ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸';
+  String get totalMemory => 'Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ятĞ�';
 
   @override
-  String get usedMemory => 'Ğ˜ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ğ½Ğ¾ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸';
+  String get usedMemory => 'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ятĞ�';
 
   @override
-  String get modelsTitle => 'Ğ‘Ğ¸Ğ±Ğ»Ğ¸Ğ¾Ñ‚ĞµĞºĞ°';
+  String get modelsTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�';
 
   @override
-  String get localModels => 'Ğ›Ğ¾ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get localModels => 'Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get selectGGUFFile => 'Ğ’Ñ‹Ğ±ĞµÑ€Ğ¸Ñ‚Ğµ Ñ„Ğ°Ğ¹Ğ» GGUF';
+  String get selectGGUFFile => 'Ğ�ыĞ�Ğ�рĞ�тĞ� фĞ�Ğ�Ğ� GGUF';
 
   @override
   String get errorGGUF =>
-      'ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ²Ñ‹Ğ±ĞµÑ€Ğ¸Ñ‚Ğµ Ñ„Ğ°Ğ¹Ğ» Ñ‚Ğ¾Ğ»ÑŒĞºĞ¾ Ğ² Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚Ğµ GGUF.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�ыĞ�Ğ�рĞ�тĞ� фĞ�Ğ�Ğ� тĞ�Ğ�ьĞ�Ğ� Ğ� фĞ�рĞ�Ğ�тĞ� GGUF.';
 
   @override
-  String get myModels => 'ĞœĞ¾Ğ¸ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get myModels => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get create => 'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ñ‚ÑŒ';
+  String get create => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
   String modelProducer(Object producer) {
-    return 'ĞŸÑ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ĞµĞ»ÑŒ: $producer';
+    return 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ь: $producer';
   }
 
   @override
@@ -158,605 +157,601 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => 'ĞŸĞµÑ€ĞµĞ¸Ğ¼ĞµĞ½Ğ¾Ğ²Ğ°Ñ‚ÑŒ';
+  String get editConversationTitle => 'Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
-  String get newTitle => 'ĞĞ¾Ğ²Ğ¾Ğµ Ğ½Ğ°Ğ·Ğ²Ğ°Ğ½Ğ¸Ğµ';
+  String get newTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get save => 'Ğ¡Ğ¾Ñ…Ñ€Ğ°Ğ½Ğ¸Ñ‚ÑŒ';
+  String get save => 'Ğ�Ğ�хрĞ�Ğ�Ğ�ть';
 
   @override
   String get noConversationsMessage =>
-      'ĞĞµÑ‚ Ñ‡Ğ°Ñ‚Ğ¾Ğ², Ğ½Ğ°Ñ‡Ğ½Ğ¸Ñ‚Ğµ Ğ¾Ğ±Ñ‰Ğ°Ñ‚ÑŒÑÑ!';
+      'Ğ�Ğ�т чĞ�тĞ�Ğ�, Ğ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�щĞ�ться!';
 
   @override
-  String get startChat => 'ĞĞ°Ñ‡Ğ°Ñ‚ÑŒ Ñ‡Ğ°Ñ‚';
+  String get startChat => 'Ğ�Ğ�чĞ�ть чĞ�т';
 
   @override
-  String get noChats => 'ĞĞµÑ‚ Ñ‡Ğ°Ñ‚Ğ¾Ğ²';
+  String get noChats => 'Ğ�Ğ�т чĞ�тĞ�Ğ�';
 
   @override
-  String get noStarredChats => 'ĞĞµÑ‚ Ğ¸Ğ·Ğ±Ñ€Ğ°Ğ½Ğ½Ñ‹Ñ… Ñ‡Ğ°Ñ‚Ğ¾Ğ²';
+  String get noStarredChats => 'Ğ�Ğ�т Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ых чĞ�тĞ�Ğ�';
 
   @override
   String get noStarredChatsMessage =>
-      'Ğ’Ñ‹ ĞµÑ‰Ñ‘ Ğ½Ğµ Ğ´Ğ¾Ğ±Ğ°Ğ²Ğ¸Ğ»Ğ¸ Ğ½Ğ¸ Ğ¾Ğ´Ğ¸Ğ½ Ñ‡Ğ°Ñ‚ Ğ² Ğ¸Ğ·Ğ±Ñ€Ğ°Ğ½Ğ½Ğ¾Ğµ.';
+      'Ğ�ы Ğ�щё Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� чĞ�т Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get starConversation => 'Ğ’ Ğ¸Ğ·Ğ±Ñ€Ğ°Ğ½Ğ½Ğ¾Ğµ';
+  String get starConversation => 'Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get unstarConversation => 'ĞĞµĞ·Ğ²ĞµĞ·Ğ´Ğ°';
+  String get unstarConversation => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get loginToYourAccount => 'Ğ’Ñ…Ğ¾Ğ´';
+  String get loginToYourAccount => 'Ğ�хĞ�Ğ�';
 
   @override
-  String get createYourAccount => 'Ğ ĞµĞ³Ğ¸ÑÑ‚Ñ€Ğ°Ñ†Ğ¸Ñ';
+  String get createYourAccount => 'Ğ�Ğ�Ğ�Ğ�стрĞ�цĞ�я';
 
   @override
   String get email => 'Email';
 
   @override
-  String get password => 'ĞŸĞ°Ñ€Ğ¾Ğ»ÑŒ';
+  String get password => 'Ğ�Ğ�рĞ�Ğ�ь';
 
   @override
-  String get confirmPassword => 'ĞŸĞ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ´Ğ¸Ñ‚Ğµ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ';
+  String get confirmPassword => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� Ğ�Ğ�рĞ�Ğ�ь';
 
   @override
   String get invalidEmail =>
-      'ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ²Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ´ĞµĞ¹ÑÑ‚Ğ²Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ email.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�стĞ�Ğ�тĞ�Ğ�ьĞ�ыĞ� email.';
 
   @override
   String get invalidPassword =>
-      'ĞŸĞ°Ñ€Ğ¾Ğ»ÑŒ Ğ´Ğ¾Ğ»Ğ¶ĞµĞ½ ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ°Ñ‚ÑŒ Ğ½Ğµ Ğ¼ĞµĞ½ĞµĞµ 6 ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ¾Ğ².';
+      'Ğ�Ğ�рĞ�Ğ�ь Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�рĞ�Ğ�ть Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� 6 сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get rememberMe => 'Ğ—Ğ°Ğ¿Ğ¾Ğ¼Ğ½Ğ¸Ñ‚ÑŒ Ğ¼ĞµĞ½Ñ';
+  String get rememberMe => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�я';
 
   @override
-  String get forgotPassword => 'Ğ—Ğ°Ğ±Ñ‹Ğ»Ğ¸ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ?';
+  String get forgotPassword => 'Ğ�Ğ�Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�Ğ�ь?';
 
   @override
-  String get or => 'Ğ˜Ğ»Ğ¸';
+  String get or => 'Ğ�Ğ�Ğ�';
 
   @override
-  String get continueWithGoogle => 'ĞŸÑ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ Ñ Google';
+  String get continueWithGoogle => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть с Google';
 
   @override
-  String get dontHaveAccount => 'ĞĞµÑ‚ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚Ğ°?';
+  String get dontHaveAccount => 'Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�уĞ�тĞ�?';
 
   @override
-  String get alreadyHaveAccount => 'Ğ£Ğ¶Ğµ ĞµÑÑ‚ÑŒ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚?';
+  String get alreadyHaveAccount => 'Ğ�Ğ�Ğ� Ğ�сть Ğ�Ğ�Ğ�Ğ�уĞ�т?';
 
   @override
-  String get signUp => 'Ğ—Ğ°Ñ€ĞµĞ³Ğ¸ÑÑ‚Ñ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒÑÑ';
+  String get signUp => 'Ğ�Ğ�рĞ�Ğ�Ğ�стрĞ�рĞ�Ğ�Ğ�ться';
 
   @override
-  String get logIn => 'Ğ’Ğ¾Ğ¹Ñ‚Ğ¸';
+  String get logIn => 'Ğ�Ğ�Ğ�тĞ�';
 
   @override
-  String get passwordsDoNotMatch => 'ĞŸĞ°Ñ€Ğ¾Ğ»Ğ¸ Ğ½Ğµ ÑĞ¾Ğ²Ğ¿Ğ°Ğ´Ğ°ÑÑ‚.';
+  String get passwordsDoNotMatch => 'Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ют.';
 
   @override
-  String get wrongPassword => 'ĞĞµĞ²ĞµÑ€Ğ½Ñ‹Ğ¹ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ.';
+  String get wrongPassword => 'Ğ�Ğ�Ğ�Ğ�рĞ�ыĞ� Ğ�Ğ�рĞ�Ğ�ь.';
 
   @override
-  String get emailAlreadyInUse =>
-      'Ğ­Ñ‚Ğ¾Ñ‚ email ÑƒĞ¶Ğµ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞµÑ‚ÑÑ.';
+  String get emailAlreadyInUse => 'Ğ�тĞ�т email уĞ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тся.';
 
   @override
-  String get weakPassword => 'ĞŸĞ°Ñ€Ğ¾Ğ»ÑŒ ÑĞ»Ğ¸ÑˆĞºĞ¾Ğ¼ ÑĞ»Ğ°Ğ±Ñ‹Ğ¹.';
+  String get weakPassword => 'Ğ�Ğ�рĞ�Ğ�ь сĞ�Ğ�шĞ�Ğ�Ğ� сĞ�Ğ�Ğ�ыĞ�.';
 
   @override
-  String get authError => 'ĞÑˆĞ¸Ğ±ĞºĞ° Ğ°ÑƒÑ‚ĞµĞ½Ñ‚Ğ¸Ñ„Ğ¸ĞºĞ°Ñ†Ğ¸Ğ¸';
+  String get authError => 'Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�утĞ�Ğ�тĞ�фĞ�Ğ�Ğ�цĞ�Ğ�';
 
   @override
   String get usernameTaken =>
-      'Ğ­Ñ‚Ğ¾ Ğ¸Ğ¼Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ ÑƒĞ¶Ğµ Ğ·Ğ°Ğ½ÑÑ‚Ğ¾.';
+      'Ğ�тĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я уĞ�Ğ� Ğ�Ğ�Ğ�ятĞ�.';
 
   @override
-  String get username => 'Ğ˜Ğ¼Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ';
+  String get username => 'Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
 
   @override
   String get resendCode =>
-      'ĞÑ‚Ğ¿Ñ€Ğ°Ğ²Ğ¸Ñ‚ÑŒ Ğ¿Ğ¸ÑÑŒĞ¼Ğ¾ Ñ Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ¶Ğ´ĞµĞ½Ğ¸ĞµĞ¼ Ğ¿Ğ¾Ğ²Ñ‚Ğ¾Ñ€Ğ½Ğ¾';
+      'Ğ�тĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�сьĞ�Ğ� с Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�';
 
   @override
   String get pleaseCheckYourEmail =>
-      'Ğ§Ñ‚Ğ¾Ğ±Ñ‹ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ Cortex, Ğ²Ğ°Ğ¼ Ğ½ĞµĞ¾Ğ±Ñ…Ğ¾Ğ´Ğ¸Ğ¼Ğ¾ Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ´Ğ¸Ñ‚ÑŒ ÑĞ²Ğ¾Ğ¹ email. \nĞ¡ÑÑ‹Ğ»ĞºĞ° Ğ´Ğ»Ñ Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ¶Ğ´ĞµĞ½Ğ¸Ñ Ğ±Ñ‹Ğ»Ğ° Ğ¾Ñ‚Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ° Ğ½Ğ° Ğ²Ğ°Ñˆ Ğ°Ğ´Ñ€ĞµÑ ÑĞ»ĞµĞºÑ‚Ñ€Ğ¾Ğ½Ğ½Ğ¾Ğ¹ Ğ¿Ğ¾Ñ‡Ñ‚Ñ‹, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ÑŒÑ‚Ğµ Ğ¿Ğ¾Ñ‡Ñ‚Ñƒ.';
+      'Ğ�тĞ�Ğ�ы Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Cortex, Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ть сĞ�Ğ�Ğ� email. \nĞ�сыĞ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�ыĞ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�ш Ğ�Ğ�рĞ�с эĞ�Ğ�Ğ�трĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чты, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�чту.';
 
   @override
-  String get verifyYourEmail => 'ĞŸĞ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ´Ğ¸Ñ‚Ğµ Ğ²Ğ°Ñˆ Email';
+  String get verifyYourEmail => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� Ğ�Ğ�ш Email';
 
   @override
-  String get seconds => 'ÑĞµĞºÑƒĞ½Ğ´';
+  String get seconds => 'сĞ�Ğ�уĞ�Ğ�';
 
   @override
   String get maxResendLimitReached =>
-      'Ğ’Ñ‹ Ğ´Ğ¾ÑÑ‚Ğ¸Ğ³Ğ»Ğ¸ Ğ¼Ğ°ĞºÑĞ¸Ğ¼Ğ°Ğ»ÑŒĞ½Ğ¾Ğ³Ğ¾ ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ° Ğ¾Ñ‚Ğ¿Ñ€Ğ°Ğ²ĞºĞ¸ Ğ¿Ğ¸ÑĞµĞ¼ Ğ´Ğ»Ñ Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ¶Ğ´ĞµĞ½Ğ¸Ñ.';
+      'Ğ�ы Ğ�Ğ�стĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�стĞ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get verificationScreenContinueWithoutVerification =>
-      'ĞŸÑ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ Ğ±ĞµĞ· Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ¶Ğ´ĞµĞ½Ğ¸Ñ';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
   String get verificationScreenWarning =>
-      'Ğ”Ğ°Ğ¶Ğµ ĞµÑĞ»Ğ¸ Ğ²Ñ‹ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚Ğµ, 1-Ğ´Ğ½ĞµĞ²Ğ½Ñ‹Ğ¹ Ğ¿ĞµÑ€Ğ¸Ğ¾Ğ´ Ğ²ĞµÑ€Ğ¸Ñ„Ğ¸ĞºĞ°Ñ†Ğ¸Ğ¸ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚Ğ° Ğ²ÑĞµ ĞµÑ‰Ğµ Ğ´ĞµĞ¹ÑÑ‚Ğ²ÑƒĞµÑ‚. Ğ•ÑĞ»Ğ¸ Ğ²Ñ‹ Ğ½Ğµ Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ´Ğ¸Ñ‚Ğµ ÑĞ²Ğ¾Ğ¹ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚ Ğ·Ğ° ÑÑ‚Ğ¾ Ğ²Ñ€ĞµĞ¼Ñ, Ğ¾Ğ½ Ğ±ÑƒĞ´ĞµÑ‚ ÑƒĞ´Ğ°Ğ»ĞµĞ½ Ğ¸Ğ· Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ.';
+      'Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ� Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, 1-Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ�рĞ�фĞ�Ğ�Ğ�цĞ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�тĞ� Ğ�сĞ� Ğ�щĞ� Ğ�Ğ�Ğ�стĞ�уĞ�т. Ğ�сĞ�Ğ� Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ�Ğ� этĞ� Ğ�рĞ�Ğ�я, Ğ�Ğ� Ğ�уĞ�Ğ�т уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get unverifiedAccountHeader =>
-      'Ğ’Ğ°Ñˆ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚ Ğ½Ğµ Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ¶Ğ´Ñ‘Ğ½';
+      'Ğ�Ğ�ш Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ёĞ�';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return 'Ğ•ÑĞ»Ğ¸ Ğ²Ñ‹ Ğ½Ğµ Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ´Ğ¸Ñ‚Ğµ ÑĞ²Ğ¾Ğ¹ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚ Ğ² Ñ‚ĞµÑ‡ĞµĞ½Ğ¸Ğµ $timeLeft, Ğ¾Ğ½ Ğ±ÑƒĞ´ĞµÑ‚ ÑƒĞ´Ğ°Ğ»Ñ‘Ğ½.';
+    return 'Ğ�сĞ�Ğ� Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ� тĞ�чĞ�Ğ�Ğ�Ğ� $timeLeft, Ğ�Ğ� Ğ�уĞ�Ğ�т уĞ�Ğ�Ğ�ёĞ�.';
   }
 
   @override
-  String get verifyNow => 'ĞŸĞ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ´Ğ¸Ñ‚ÑŒ ÑĞµĞ¹Ñ‡Ğ°Ñ';
+  String get verifyNow => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ть сĞ�Ğ�чĞ�с';
 
   @override
-  String get linkSent => 'Ğ¡ÑÑ‹Ğ»ĞºĞ° Ğ¾Ñ‚Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ°';
+  String get linkSent => 'Ğ�сыĞ�Ğ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get accountDeletionRequested =>
-      'Ğ’Ğ°Ñˆ Ğ·Ğ°Ğ¿Ñ€Ğ¾Ñ Ğ½Ğ° ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ğµ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚Ğ° Ğ¿Ğ¾Ğ»ÑƒÑ‡ĞµĞ½, Ğ¸ Ğ²Ğ°Ñˆ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚ Ñ‚ĞµĞ¿ĞµÑ€ÑŒ Ğ¾Ñ‚ĞºĞ»ÑÑ‡Ñ‘Ğ½.';
+      'Ğ�Ğ�ш Ğ�Ğ�Ğ�рĞ�с Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�тĞ� Ğ�Ğ�Ğ�учĞ�Ğ�, Ğ� Ğ�Ğ�ш Ğ�Ğ�Ğ�Ğ�уĞ�т тĞ�Ğ�Ğ�рь Ğ�тĞ�Ğ�ючёĞ�.';
 
   @override
-  String get tooManyRequests => 'Ğ¡Ğ»Ğ¸ÑˆĞºĞ¾Ğ¼ Ğ¼Ğ½Ğ¾Ğ³Ğ¾ Ğ·Ğ°Ğ¿Ñ€Ğ¾ÑĞ¾Ğ²';
+  String get tooManyRequests => 'Ğ�Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�сĞ�Ğ�';
 
   @override
-  String get regenerate => 'Ğ¡Ğ³ĞµĞ½ĞµÑ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ·Ğ°Ğ½Ğ¾Ğ²Ğ¾';
+  String get regenerate => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get confirmDeleteAccount =>
-      'Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ ÑĞ²Ğ¾Ğ¹ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚?';
+      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т?';
 
   @override
-  String get deleteAccount => 'Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚';
+  String get deleteAccount => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�уĞ�т';
 
   @override
-  String get delete => 'Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ';
+  String get delete => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
-  String get passwordRequired => 'Ğ¢Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ.';
+  String get passwordRequired => 'Ğ�рĞ�Ğ�уĞ�тся Ğ�Ğ�рĞ�Ğ�ь.';
 
   @override
   String get deleteDescription =>
-      'Ğ”Ğ°Ğ½Ğ½Ñ‹Ğµ, ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğµ Ğ²Ñ‹ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚Ğµ, Ğ±ÑƒĞ´ÑƒÑ‚ Ğ½Ğ°Ğ²ÑĞµĞ³Ğ´Ğ° ÑƒĞ´Ğ°Ğ»ĞµĞ½Ñ‹ Ñ Ğ½Ğ°ÑˆĞµĞ³Ğ¾ ÑĞµÑ€Ğ²ĞµÑ€Ğ° Ğ¸ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ°. Ğ­Ñ‚Ğ¾ Ğ´ĞµĞ¹ÑÑ‚Ğ²Ğ¸Ğµ Ğ½ĞµĞ»ÑŒĞ·Ñ Ğ¾Ñ‚Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ.';
+      'Ğ�Ğ�Ğ�Ğ�ыĞ�, Ğ�Ğ�тĞ�рыĞ� Ğ�ы уĞ�Ğ�Ğ�Ğ�тĞ�, Ğ�уĞ�ут Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�ы с Ğ�Ğ�шĞ�Ğ�Ğ� сĞ�рĞ�Ğ�рĞ� Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�. Ğ�тĞ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�я Ğ�тĞ�Ğ�Ğ�Ğ�ть.';
 
   @override
-  String get editProfile => 'Ğ ĞµĞ´Ğ°ĞºÑ‚Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ¿Ñ€Ğ¾Ñ„Ğ¸Ğ»ÑŒ';
+  String get editProfile => 'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�ть Ğ�рĞ�фĞ�Ğ�ь';
 
   @override
-  String get displayName => 'ĞÑ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶Ğ°ĞµĞ¼Ğ¾Ğµ Ğ¸Ğ¼Ñ';
+  String get displayName => 'Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я';
 
   @override
-  String get profileUpdated => 'ĞŸÑ€Ğ¾Ñ„Ğ¸Ğ»ÑŒ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»Ñ‘Ğ½';
+  String get profileUpdated => 'Ğ�рĞ�фĞ�Ğ�ь усĞ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ёĞ�';
 
   @override
-  String get logout => 'Ğ’Ñ‹Ğ¹Ñ‚Ğ¸';
+  String get logout => 'Ğ�ыĞ�тĞ�';
 
   @override
-  String get profile => 'ĞŸÑ€Ğ¾Ñ„Ğ¸Ğ»ÑŒ';
+  String get profile => 'Ğ�рĞ�фĞ�Ğ�ь';
 
   @override
   String get manageProfileDescription =>
-      'Ğ£Ğ¿Ñ€Ğ°Ğ²Ğ»ÑĞ¹Ñ‚Ğµ ÑĞ²Ğ¾Ğ¸Ğ¼ Ğ¿Ñ€Ğ¾Ñ„Ğ¸Ğ»ĞµĞ¼, Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ÑĞ¹Ñ‚Ğµ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ Ğ¸Ğ»Ğ¸ Ğ²Ñ‹Ñ…Ğ¾Ğ´Ğ¸Ñ‚Ğµ Ğ¸Ğ· Cortex.';
+      'Ğ�Ğ�рĞ�Ğ�Ğ�яĞ�тĞ� сĞ�Ğ�Ğ�Ğ� Ğ�рĞ�фĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�рĞ�Ğ�ь Ğ�Ğ�Ğ� Ğ�ыхĞ�Ğ�Ğ�тĞ� Ğ�Ğ� Cortex.';
 
   @override
   String get accessSettingsDescription =>
-      'ĞŸĞ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚Ğµ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰ÑŒ, Ğ°ĞºÑ‚Ğ¸Ğ²Ğ¸Ñ€ÑƒĞ¹Ñ‚Ğµ ĞºĞ¾Ğ´Ñ‹, Ğ¿Ğ¾Ğ´ĞµĞ»Ğ¸Ñ‚ĞµÑÑŒ Cortex Ğ¸ Ğ¾Ğ·Ğ½Ğ°ĞºĞ¾Ğ¼ÑŒÑ‚ĞµÑÑŒ Ñ Ğ½Ğ°ÑˆĞ¸Ğ¼Ğ¸ Ğ¿Ñ€Ğ°Ğ²Ğ¸Ğ»Ğ°Ğ¼Ğ¸.';
+      'Ğ�Ğ�Ğ�учĞ�тĞ� Ğ�Ğ�Ğ�Ğ�щь, Ğ�Ğ�тĞ�Ğ�Ğ�руĞ�тĞ� Ğ�Ğ�Ğ�ы, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Cortex Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ьтĞ�сь с Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get languageDescription =>
-      'Ğ’Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ² Ğ»ÑĞ±Ğ¾Ğµ Ğ²Ñ€ĞµĞ¼Ñ Ğ¸Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ ÑĞ·Ñ‹Ğº Ğ¸Ğ½Ñ‚ĞµÑ€Ñ„ĞµĞ¹ÑĞ° Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ Ğ¿Ğ¾ ÑƒĞ¼Ğ¾Ğ»Ñ‡Ğ°Ğ½Ğ¸Ñ.';
+      'Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� Ğ�юĞ�Ğ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть яĞ�ыĞ� Ğ�Ğ�тĞ�рфĞ�Ğ�сĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ� уĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ю.';
 
   @override
   String get themeDescription =>
-      'Ğ’Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ¿ĞµÑ€ĞµĞºĞ»ÑÑ‡Ğ°Ñ‚ÑŒÑÑ Ğ¼ĞµĞ¶Ğ´Ñƒ ÑĞ²ĞµÑ‚Ğ»Ğ¾Ğ¹ Ğ¸ Ñ‚Ñ‘Ğ¼Ğ½Ğ¾Ğ¹ Ñ‚ĞµĞ¼Ğ°Ğ¼Ğ¸ Ğ¿Ğ¾ ÑĞ²Ğ¾ĞµĞ¼Ñƒ ÑƒÑĞ¼Ğ¾Ñ‚Ñ€ĞµĞ½Ğ¸Ñ. Ğ’Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ½Ğ°Ñ Ñ‚ĞµĞ¼Ğ° Ğ±ÑƒĞ´ĞµÑ‚ Ğ¿Ñ€Ğ¸Ğ¼ĞµĞ½ĞµĞ½Ğ° ĞºĞ¾ Ğ²ÑĞµĞ¼Ñƒ Ğ¸Ğ½Ñ‚ĞµÑ€Ñ„ĞµĞ¹ÑÑƒ Cortex.';
+      'Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�рĞ�Ğ�Ğ�ючĞ�ться Ğ�Ğ�Ğ�Ğ�у сĞ�Ğ�тĞ�Ğ�Ğ� Ğ� тёĞ�Ğ�Ğ�Ğ� тĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�у усĞ�Ğ�трĞ�Ğ�Ğ�ю. Ğ�ыĞ�рĞ�Ğ�Ğ�Ğ�я тĞ�Ğ�Ğ� Ğ�уĞ�Ğ�т Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�сĞ�Ğ�у Ğ�Ğ�тĞ�рфĞ�Ğ�су Cortex.';
 
   @override
   String get iHaveReadAndAgree =>
-      'Ğ¯ Ğ¿Ñ€Ğ¾Ñ‡Ğ¸Ñ‚Ğ°Ğ»(Ğ°) Ğ¸ ÑĞ¾Ğ³Ğ»Ğ°ÑĞµĞ½(Ğ½Ğ°) Ñ ÑƒÑĞ»Ğ¾Ğ²Ğ¸ÑĞ¼Ğ¸ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ';
+      'Ğ� Ğ�рĞ�чĞ�тĞ�Ğ�(Ğ�) Ğ� сĞ�Ğ�Ğ�Ğ�сĞ�Ğ�(Ğ�Ğ�) с усĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get downloading => 'Ğ—Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ°...';
+  String get downloading => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�...';
 
   @override
-  String get downloadSuccess => 'Ğ—Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ° ÑƒÑĞ¿ĞµÑˆĞ½Ğ°';
+  String get downloadSuccess => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� усĞ�Ğ�шĞ�Ğ�';
 
   @override
-  String get downloadFailed => 'Ğ—Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ° Ğ½Ğµ ÑƒĞ´Ğ°Ğ»Ğ°ÑÑŒ';
+  String get downloadFailed => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь';
 
   @override
   String downloaded(Object percent) {
-    return 'Ğ—Ğ°Ğ³Ñ€ÑƒĞ¶ĞµĞ½Ğ¾ $percent%';
+    return 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ� $percent%';
   }
 
   @override
-  String get downloadPaused => 'Ğ—Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ° Ğ¿Ñ€Ğ¸Ğ¾ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ°.';
+  String get downloadPaused => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�рĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get purchaseError => 'ĞÑˆĞ¸Ğ±ĞºĞ° Ğ¿Ğ¾ĞºÑƒĞ¿ĞºĞ¸';
+  String get purchaseError => 'Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�';
 
   @override
-  String get purchasePlus => 'ĞšÑƒĞ¿Ğ¸Ñ‚ÑŒ Cortex Plus';
+  String get purchasePlus => 'Ğ�уĞ�Ğ�ть Cortex Plus';
 
   @override
   String get plusDescription =>
-      'Ğ­Ğ»Ğ¸Ñ‚Ğ½Ñ‹Ğ¹ Ğ¾Ğ¿Ñ‹Ñ‚ Ğ² Ğ¾Ğ±Ğ»Ğ°ÑÑ‚Ğ¸ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°';
+      'Ğ�Ğ�Ğ�тĞ�ыĞ� Ğ�Ğ�ыт Ğ� Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
 
   @override
-  String get annual => 'Ğ“Ğ¾Ğ´Ğ¾Ğ²Ğ°Ñ';
+  String get annual => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get monthly => 'ĞœĞµÑÑÑ‡Ğ½Ğ°Ñ';
+  String get monthly => 'Ğ�Ğ�сячĞ�Ğ�я';
 
   @override
-  String get manageSubscription => 'Ğ£Ğ¿Ñ€Ğ°Ğ²Ğ»ÑÑ‚ÑŒ Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºĞ¾Ğ¹';
+  String get manageSubscription => 'Ğ�Ğ�рĞ�Ğ�Ğ�ять Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
   String purchasePlan(String planName) {
-    return 'ĞšÑƒĞ¿Ğ¸Ñ‚ÑŒ $planName';
+    return 'Ğ�уĞ�Ğ�ть $planName';
   }
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/Ğ¼ĞµÑÑÑ†, Ğ¾Ğ¿Ğ»Ğ°Ñ‚Ğ° ĞµĞ¶ĞµĞ¼ĞµÑÑÑ‡Ğ½Ğ¾';
+    return '$price/Ğ�Ğ�сяц, Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сячĞ�Ğ�';
   }
 
   @override
-  String get purchasePro => 'ĞšÑƒĞ¿Ğ¸Ñ‚ÑŒ Cortex Pro';
+  String get purchasePro => 'Ğ�уĞ�Ğ�ть Cortex Pro';
 
   @override
   String get proDescription =>
-      'ĞŸÑ€ĞµĞ²Ğ¾ÑÑ…Ğ¾Ğ´Ğ½Ñ‹Ğ¹ Ğ¾Ğ¿Ñ‹Ñ‚ Ğ² Ğ¾Ğ±Ğ»Ğ°ÑÑ‚Ğ¸ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°';
+      'Ğ�рĞ�Ğ�Ğ�схĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�ыт Ğ� Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
 
   @override
-  String get purchaseUltra => 'ĞšÑƒĞ¿Ğ¸Ñ‚ÑŒ Cortex Ultra';
+  String get purchaseUltra => 'Ğ�уĞ�Ğ�ть Cortex Ultra';
 
   @override
   String get ultraDescription =>
-      'Ğ’ĞµÑ€ÑˆĞ¸Ğ½Ğ° Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°';
+      'Ğ�Ğ�ршĞ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
 
   @override
-  String get upgradeSubscription => 'Ğ£Ğ»ÑƒÑ‡ÑˆĞ¸Ñ‚ÑŒ Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºÑƒ';
+  String get upgradeSubscription => 'Ğ�Ğ�учшĞ�ть Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у';
 
   @override
-  String get purchaseStreamError => 'ĞÑˆĞ¸Ğ±ĞºĞ° Ğ¿Ğ¾Ñ‚Ğ¾ĞºĞ° Ğ¿Ğ¾ĞºÑƒĞ¿ĞºĞ¸.';
+  String get purchaseStreamError => 'Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�.';
 
   @override
-  String get productNotFound => 'ĞŸÑ€Ğ¾Ğ´ÑƒĞºÑ‚ Ğ½Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½';
+  String get productNotFound => 'Ğ�рĞ�Ğ�уĞ�т Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get noProductsFound => 'ĞŸÑ€Ğ¾Ğ´ÑƒĞºÑ‚Ñ‹ Ğ½Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½Ñ‹';
+  String get noProductsFound => 'Ğ�рĞ�Ğ�уĞ�ты Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ы';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'Ğ Ğ°Ğ·Ğ¼ĞµÑ‰Ğ°Ñ ÑÑ‚Ğ¾Ñ‚ Ğ·Ğ°ĞºĞ°Ğ·, Ğ²Ñ‹ ÑĞ¾Ğ³Ğ»Ğ°ÑˆĞ°ĞµÑ‚ĞµÑÑŒ Ñ Ğ£ÑĞ»Ğ¾Ğ²Ğ¸ÑĞ¼Ğ¸ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ Ğ¸ ĞŸĞ¾Ğ»Ğ¸Ñ‚Ğ¸ĞºĞ¾Ğ¹ ĞºĞ¾Ğ½Ñ„Ğ¸Ğ´ĞµĞ½Ñ†Ğ¸Ğ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚Ğ¸. Ğ’Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ½Ğ°Ğ¶Ğ°Ñ‚ÑŒ Ğ½Ğ° ÑÑ‚Ğ¾Ñ‚ Ñ‚ĞµĞºÑÑ‚, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ ÑƒĞ·Ğ½Ğ°Ñ‚ÑŒ Ğ±Ğ¾Ğ»ÑŒÑˆĞµ Ğ¾ Ğ½Ğ°ÑˆĞ¸Ñ… Ğ£ÑĞ»Ğ¾Ğ²Ğ¸ÑÑ… Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ Ğ¸ ĞŸĞ¾Ğ»Ğ¸Ñ‚Ğ¸ĞºĞµ ĞºĞ¾Ğ½Ñ„Ğ¸Ğ´ĞµĞ½Ñ†Ğ¸Ğ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚Ğ¸. ĞŸĞ¾Ğ´Ğ¿Ğ¸ÑĞºĞ° Ğ±ÑƒĞ´ĞµÑ‚ Ğ°Ğ²Ñ‚Ğ¾Ğ¼Ğ°Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¸ Ğ¿Ñ€Ğ¾Ğ´Ğ»ĞµĞ²Ğ°Ñ‚ÑŒÑÑ, ĞµÑĞ»Ğ¸ Ğ°Ğ²Ñ‚Ğ¾Ğ¿Ñ€Ğ¾Ğ´Ğ»ĞµĞ½Ğ¸Ğµ Ğ½Ğµ Ğ±ÑƒĞ´ĞµÑ‚ Ğ¾Ñ‚ĞºĞ»ÑÑ‡ĞµĞ½Ğ¾ ĞºĞ°Ğº Ğ¼Ğ¸Ğ½Ğ¸Ğ¼ÑƒĞ¼ Ğ·Ğ° 24 Ñ‡Ğ°ÑĞ° Ğ´Ğ¾ Ğ¾ĞºĞ¾Ğ½Ñ‡Ğ°Ğ½Ğ¸Ñ Ñ‚ĞµĞºÑƒÑ‰ĞµĞ³Ğ¾ Ğ¿ĞµÑ€Ğ¸Ğ¾Ğ´Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�щĞ�я этĞ�т Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�ы сĞ�Ğ�Ğ�Ğ�шĞ�Ğ�тĞ�сь с Ğ�сĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�. Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ� этĞ�т тĞ�Ğ�ст, чтĞ�Ğ�ы уĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�ьшĞ� Ğ� Ğ�Ğ�шĞ�х Ğ�сĞ�Ğ�Ğ�Ğ�ях Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�уĞ�Ğ�т Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ться, Ğ�сĞ�Ğ� Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�уĞ�Ğ�т Ğ�тĞ�Ğ�ючĞ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�уĞ� Ğ�Ğ� 24 чĞ�сĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�я тĞ�Ğ�ущĞ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get termsOfService => 'Ğ£ÑĞ»Ğ¾Ğ²Ğ¸Ñ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ';
+  String get termsOfService => 'Ğ�сĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get privacyPolicy =>
-      'ĞŸĞ¾Ğ»Ğ¸Ñ‚Ğ¸ĞºĞ° ĞºĞ¾Ğ½Ñ„Ğ¸Ğ´ĞµĞ½Ñ†Ğ¸Ğ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚Ğ¸';
+  String get privacyPolicy => 'Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�';
 
   @override
-  String get renamed => 'ĞŸĞµÑ€ĞµĞ¸Ğ¼ĞµĞ½Ğ¾Ğ²Ğ°Ğ½Ğ¾';
+  String get renamed => 'Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get report => 'ĞŸĞ¾Ğ¶Ğ°Ğ»Ğ¾Ğ²Ğ°Ñ‚ÑŒÑÑ';
+  String get report => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться';
 
   @override
-  String get reportDialogTitle => 'ĞÑ‚Ğ¿Ñ€Ğ°Ğ²Ğ¸Ñ‚ÑŒ Ğ¶Ğ°Ğ»Ğ¾Ğ±Ñƒ';
+  String get reportDialogTitle => 'Ğ�тĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�у';
 
   @override
-  String get reportDescriptionLabel => 'Ğ’ Ñ‡Ñ‘Ğ¼ Ğ¿Ñ€Ğ¾Ğ±Ğ»ĞµĞ¼Ğ°?';
+  String get reportDescriptionLabel => 'Ğ� чёĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�?';
 
   @override
-  String get reportHarmful =>
-      'Ğ­Ñ‚Ğ¾ Ğ²Ñ€ĞµĞ´Ğ¾Ğ½Ğ¾ÑĞ½Ğ¾/Ğ½ĞµĞ±ĞµĞ·Ğ¾Ğ¿Ğ°ÑĞ½Ğ¾';
+  String get reportHarmful => 'Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�/Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�';
 
   @override
-  String get reportNotTrue => 'Ğ­Ñ‚Ğ¾ Ğ½ĞµĞ¿Ñ€Ğ°Ğ²Ğ´Ğ°';
+  String get reportNotTrue => 'Ğ�тĞ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�';
 
   @override
-  String get reportNotHelpful => 'Ğ­Ñ‚Ğ¾ Ğ±ĞµÑĞ¿Ğ¾Ğ»ĞµĞ·Ğ½Ğ¾';
+  String get reportNotHelpful => 'Ğ�тĞ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get closeButton => 'Ğ—Ğ°ĞºÑ€Ñ‹Ñ‚ÑŒ';
+  String get closeButton => 'Ğ�Ğ�Ğ�рыть';
 
   @override
-  String get submitButton => 'ĞÑ‚Ğ¿Ñ€Ğ°Ğ²Ğ¸Ñ‚ÑŒ';
+  String get submitButton => 'Ğ�тĞ�рĞ�Ğ�Ğ�ть';
 
   @override
   String get reportErrorMessage =>
-      'ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ²Ñ‹Ğ±ĞµÑ€Ğ¸Ñ‚Ğµ Ğ¾Ğ´Ğ½Ñƒ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ñƒ Ğ´Ğ»Ñ Ğ¶Ğ°Ğ»Ğ¾Ğ±Ñ‹.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�ыĞ�Ğ�рĞ�тĞ� Ğ�Ğ�Ğ�у Ğ�рĞ�чĞ�Ğ�у Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ы.';
 
   @override
-  String get capabilitiesSection => 'Ğ’Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸';
+  String get capabilitiesSection => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�';
 
   @override
-  String get featurePhotoTitle => 'Ğ¡ĞºĞ°Ğ½Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Ñ„Ğ¾Ñ‚Ğ¾';
+  String get featurePhotoTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� фĞ�тĞ�';
 
   @override
   String get featurePhotoDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ ÑĞ¿Ğ¾ÑĞ¾Ğ±Ğ½Ğ° ÑĞºĞ°Ğ½Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ñ„Ğ¾Ñ‚Ğ¾Ğ³Ñ€Ğ°Ñ„Ğ¸Ğ¸ Ñ ĞºĞ°Ğ¼ĞµÑ€Ñ‹ Ğ¸Ğ»Ğ¸ Ğ¸Ğ· Ñ„Ğ°Ğ¹Ğ»Ğ¾Ğ² Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğ¹.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть фĞ�тĞ�Ğ�рĞ�фĞ�Ğ� с Ğ�Ğ�Ğ�Ğ�ры Ğ�Ğ�Ğ� Ğ�Ğ� фĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get featureOfflineTitle => 'Ğ Ğ°Ğ±Ğ¾Ñ‚Ğ° Ğ¾Ñ„Ñ„Ğ»Ğ°Ğ¹Ğ½';
+  String get featureOfflineTitle => 'Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�ффĞ�Ğ�Ğ�Ğ�';
 
   @override
   String get featureOfflineDescription =>
-      'Ğ—Ğ°Ğ¿ÑƒÑĞºĞ°Ğ¹Ñ‚Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ±ĞµĞ· Ğ¿Ğ¾Ğ´ĞºĞ»ÑÑ‡ĞµĞ½Ğ¸Ñ Ğº Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ñƒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ ÑĞ¾Ñ…Ñ€Ğ°Ğ½Ğ¸Ñ‚ÑŒ Ğ²Ğ°ÑˆĞ¸ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ² Ğ±ĞµĞ·Ğ¾Ğ¿Ğ°ÑĞ½Ğ¾ÑÑ‚Ğ¸.';
+      'Ğ�Ğ�Ğ�усĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту, чтĞ�Ğ�ы сĞ�хрĞ�Ğ�Ğ�ть Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�стĞ�.';
 
   @override
-  String get featureRoleplayTitle => 'Ğ Ğ¾Ğ»ĞµĞ²Ğ°Ñ Ğ¸Ğ³Ñ€Ğ°';
+  String get featureRoleplayTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�рĞ�';
 
   @override
   String get featureRoleplayDescription =>
-      'ĞœĞ¾Ğ´ĞµĞ»Ğ¸ Ğ´Ğ»Ñ Ñ€Ğ¾Ğ»ĞµĞ²Ñ‹Ñ… Ğ¸Ğ³Ñ€ Ğ¿Ğ¾Ğ·Ğ²Ğ¾Ğ»ÑÑÑ‚ ÑĞ¾Ğ·Ğ´Ğ°Ğ²Ğ°Ñ‚ÑŒ Ñ€Ğ°Ğ·Ğ»Ğ¸Ñ‡Ğ½Ñ‹Ğµ Ñ‡Ğ°Ñ‚Ñ‹ Ğ¸ ÑÑ†ĞµĞ½Ğ°Ñ€Ğ¸Ğ¸.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я рĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яют сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть рĞ�Ğ�Ğ�Ğ�чĞ�ыĞ� чĞ�ты Ğ� сцĞ�Ğ�Ğ�рĞ�Ğ�.';
 
   @override
-  String get roleModels => 'Ğ Ğ¾Ğ»ĞµĞ²Ñ‹Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get roleModels => 'Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get parameters => 'ĞŸĞ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹';
+  String get parameters => 'Ğ�Ğ�рĞ�Ğ�Ğ�тры';
 
   @override
-  String get context => 'ĞšĞ¾Ğ½Ñ‚ĞµĞºÑÑ‚';
+  String get context => 'Ğ�Ğ�Ğ�тĞ�Ğ�ст';
 
   @override
   String get finalPreparation =>
-      'Ğ˜Ğ´ÑƒÑ‚ Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½Ğ¸Ğµ Ğ¿Ñ€Ğ¸Ğ³Ğ¾Ñ‚Ğ¾Ğ²Ğ»ĞµĞ½Ğ¸Ñ.';
+      'Ğ�Ğ�ут Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
-  String get shareApp => 'ĞŸĞ¾Ğ´ĞµĞ»Ğ¸Ñ‚ÑŒÑÑ Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸ĞµĞ¼';
+  String get shareApp => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get ourStory => 'ĞĞ°ÑˆĞ° Ğ¸ÑÑ‚Ğ¾Ñ€Ğ¸Ñ';
+  String get ourStory => 'Ğ�Ğ�шĞ� Ğ�стĞ�рĞ�я';
 
   @override
-  String get rateUs => 'ĞÑ†ĞµĞ½Ğ¸Ñ‚Ğµ Ğ½Ğ°Ñ';
+  String get rateUs => 'Ğ�цĞ�Ğ�Ğ�тĞ� Ğ�Ğ�с';
 
   @override
-  String get share => 'ĞŸĞ¾Ğ´ĞµĞ»Ğ¸Ñ‚ÑŒÑÑ';
+  String get share => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться';
 
   @override
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => 'Ğ’Ñ‹Ğ±Ñ€Ğ°Ñ‚ÑŒ Ñ‚ĞµĞºÑÑ‚';
+  String get selectText => 'Ğ�ыĞ�рĞ�ть тĞ�Ğ�ст';
 
   @override
-  String get thinking => 'Ğ”ÑƒĞ¼Ğ°ĞµÑ‚';
+  String get thinking => 'Ğ�уĞ�Ğ�Ğ�т';
 
   @override
-  String get user => 'ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ';
+  String get user => 'Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь';
 
   @override
-  String get help => 'ĞŸĞ¾Ğ¼Ğ¾Ñ‰ÑŒ';
+  String get help => 'Ğ�Ğ�Ğ�Ğ�щь';
 
   @override
-  String get supportCreator => 'ĞŸĞ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ñ‚Ğµ ÑĞ¾Ğ·Ğ´Ğ°Ñ‚ĞµĞ»Ñ';
+  String get supportCreator => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
 
   @override
   String get enterYourTag =>
-      'ĞŸĞ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ñ‚Ğµ Ğ»ÑĞ±Ğ¸Ğ¼Ñ‹Ñ… Ğ°Ğ²Ñ‚Ğ¾Ñ€Ğ¾Ğ²! Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ¸Ñ… ÑƒĞ½Ğ¸ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğ¹ Ñ‚ĞµĞ³ Ğ½Ğ¸Ğ¶Ğµ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ğ¾Ğ´Ğ°Ñ€Ğ¸Ñ‚ÑŒ Ğ¸Ğ¼ Ñ‡Ğ°ÑÑ‚ÑŒ Ğ²Ğ°ÑˆĞ¸Ñ… Ğ¿Ğ¾ĞºÑƒĞ¿Ğ¾Ğº Ğ² Cortex.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� Ğ�юĞ�Ğ�Ğ�ых Ğ�Ğ�тĞ�рĞ�Ğ�! Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�х уĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�Ğ�рĞ�ть Ğ�Ğ� чĞ�сть Ğ�Ğ�шĞ�х Ğ�Ğ�Ğ�уĞ�Ğ�Ğ� Ğ� Cortex.';
 
   @override
-  String get creatorTag => 'Ğ¢ĞµĞ³ ÑĞ¾Ğ·Ğ´Ğ°Ñ‚ĞµĞ»Ñ';
+  String get creatorTag => 'Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
 
   @override
-  String get support => 'ĞŸĞ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°Ñ‚ÑŒ';
+  String get support => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ть';
 
   @override
   String get tagCannotBeEmpty =>
-      'Ğ¢ĞµĞ³ ÑĞ¾Ğ·Ğ´Ğ°Ñ‚ĞµĞ»Ñ Ğ½Ğµ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ Ğ¿ÑƒÑÑ‚Ñ‹Ğ¼';
+      'Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�устыĞ�';
 
   @override
-  String get userId => 'ID Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ';
+  String get userId => 'ID Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
 
   @override
-  String get deleteAllConversationsConfirmTitle =>
-      'Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ²ÑĞµ Ñ‡Ğ°Ñ‚Ñ‹?';
+  String get deleteAllConversationsConfirmTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ� чĞ�ты?';
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ²ÑĞµ ÑĞ²Ğ¾Ğ¸ Ñ‡Ğ°Ñ‚Ñ‹? Ğ­Ñ‚Ğ¾ Ğ´ĞµĞ¹ÑÑ‚Ğ²Ğ¸Ğµ Ğ½ĞµĞ»ÑŒĞ·Ñ Ğ¾Ñ‚Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ.';
+      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть Ğ�сĞ� сĞ�Ğ�Ğ� чĞ�ты? Ğ�тĞ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�я Ğ�тĞ�Ğ�Ğ�Ğ�ть.';
 
   @override
-  String get conversationDeleted => 'ĞŸĞµÑ€ĞµĞ¿Ğ¸ÑĞºĞ° ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ°!';
+  String get conversationDeleted => 'Ğ�Ğ�рĞ�Ğ�Ğ�сĞ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String get allConversationsDeleted =>
-      'Ğ’ÑĞµ Ñ‡Ğ°Ñ‚Ñ‹ Ğ±Ñ‹Ğ»Ğ¸ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ñ‹!';
+      'Ğ�сĞ� чĞ�ты Ğ�ыĞ�Ğ� усĞ�Ğ�шĞ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�ы!';
 
   @override
-  String get deleteAll => 'Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ²ÑĞµ';
+  String get deleteAll => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ�';
 
   @override
-  String get deleteAllConversationsButton => 'Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ²ÑĞµ Ñ‡Ğ°Ñ‚Ñ‹';
+  String get deleteAllConversationsButton => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ� чĞ�ты';
 
   @override
-  String get confirmWord => 'ĞĞ°Ğ¿Ğ¸ÑˆĞ¸Ñ‚Ğµ VERTEX';
+  String get confirmWord => 'Ğ�Ğ�Ğ�Ğ�шĞ�тĞ� VERTEX';
 
   @override
-  String get confirmWordError => 'Ğ’Ñ‹ Ğ½Ğ°Ğ¿Ğ¸ÑĞ°Ğ»Ğ¸ Ğ½ĞµĞ¿Ñ€Ğ°Ğ²Ğ¸Ğ»ÑŒĞ½Ğ¾';
+  String get confirmWordError => 'Ğ�ы Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ьĞ�Ğ�';
 
   @override
-  String get chinese => 'ĞšĞ¸Ñ‚Ğ°Ğ¹ÑĞºĞ¸Ğ¹';
+  String get chinese => 'Ğ�Ğ�тĞ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get french => 'Ğ¤Ñ€Ğ°Ğ½Ñ†ÑƒĞ·ÑĞºĞ¸Ğ¹';
+  String get french => 'Ğ�рĞ�Ğ�цуĞ�сĞ�Ğ�Ğ�';
 
   @override
-  String get japanese => 'Ğ¯Ğ¿Ğ¾Ğ½ÑĞºĞ¸Ğ¹';
+  String get japanese => 'Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get dutch => 'Ğ“Ğ¾Ğ»Ğ»Ğ°Ğ½Ğ´ÑĞºĞ¸Ğ¹';
+  String get dutch => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get russian => 'Ğ ÑƒÑÑĞºĞ¸Ğ¹';
+  String get russian => 'Ğ�уссĞ�Ğ�Ğ�';
 
   @override
-  String get korean => 'ĞšĞ¾Ñ€ĞµĞ¹ÑĞºĞ¸Ğ¹';
+  String get korean => 'Ğ�Ğ�рĞ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get english => 'ĞĞ½Ğ³Ğ»Ğ¸Ğ¹ÑĞºĞ¸Ğ¹';
+  String get english => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get turkish => 'Ğ¢ÑƒÑ€ĞµÑ†ĞºĞ¸Ğ¹';
+  String get turkish => 'Ğ�урĞ�цĞ�Ğ�Ğ�';
 
   @override
-  String get hindi => 'Ğ¥Ğ¸Ğ½Ğ´Ğ¸';
+  String get hindi => 'Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get portuguese => 'ĞŸĞ¾Ñ€Ñ‚ÑƒĞ³Ğ°Ğ»ÑŒÑĞºĞ¸Ğ¹';
+  String get portuguese => 'Ğ�Ğ�ртуĞ�Ğ�Ğ�ьсĞ�Ğ�Ğ�';
 
   @override
-  String get indonesian => 'Ğ˜Ğ½Ğ´Ğ¾Ğ½ĞµĞ·Ğ¸Ğ¹ÑĞºĞ¸Ğ¹';
+  String get indonesian => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get azerbaijani => 'ĞĞ·ĞµÑ€Ğ±Ğ°Ğ¹Ğ´Ğ¶Ğ°Ğ½ÑĞºĞ¸Ğ¹';
+  String get azerbaijani => 'Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get german => 'ĞĞµĞ¼ĞµÑ†ĞºĞ¸Ğ¹';
+  String get german => 'Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�';
 
   @override
-  String get spanish => 'Ğ˜ÑĞ¿Ğ°Ğ½ÑĞºĞ¸Ğ¹';
+  String get spanish => 'Ğ�сĞ�Ğ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get italian => 'Ğ˜Ñ‚Ğ°Ğ»ÑŒÑĞ½ÑĞºĞ¸Ğ¹';
+  String get italian => 'Ğ�тĞ�Ğ�ьяĞ�сĞ�Ğ�Ğ�';
 
   @override
-  String get arabic => 'Ğ°Ñ€Ğ°Ğ±ÑĞºĞ¸Ğ¹';
+  String get arabic => 'Ğ�рĞ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get ram => 'ĞĞ—Ğ£';
+  String get ram => 'Ğ�Ğ�Ğ�';
 
   @override
   String get usernameTooShort =>
-      'Ğ˜Ğ¼Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ ÑĞ»Ğ¸ÑˆĞºĞ¾Ğ¼ ĞºĞ¾Ñ€Ğ¾Ñ‚ĞºĞ¾Ğµ.';
+      'Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я сĞ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�рĞ�тĞ�Ğ�Ğ�.';
 
   @override
   String get usernameTooLong =>
-      'Ğ˜Ğ¼Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ Ğ½Ğµ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ¿Ñ€ĞµĞ²Ñ‹ÑˆĞ°Ñ‚ÑŒ 16 ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ¾Ğ².';
+      'Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�рĞ�Ğ�ышĞ�ть 16 сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get invalidUsernameCharacters =>
-      'Ğ’ Ğ¸Ğ¼ĞµĞ½Ğ¸ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ñ‚Ğ¾Ğ»ÑŒĞºĞ¾ Ğ»Ğ°Ñ‚Ğ¸Ğ½ÑĞºĞ¸Ğµ Ğ±ÑƒĞºĞ²Ñ‹, Ğ° Ñ‚Ğ°ĞºĞ¶Ğµ ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ñ‹ \'.\', \'-\', \'_\'.';
+      'Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�тĞ�Ğ�сĞ�Ğ�Ğ� Ğ�уĞ�Ğ�ы, Ğ� тĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�ы \'.\', \'-\', \'_\'.';
 
   @override
   String get noInternetConnection =>
-      'ĞĞµÑ‚ Ğ¿Ğ¾Ğ´ĞºĞ»ÑÑ‡ĞµĞ½Ğ¸Ñ Ğº Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ñƒ.';
+      'Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту.';
 
   @override
-  String get chats => 'Ğ§Ğ°Ñ‚Ñ‹';
+  String get chats => 'Ğ�Ğ�ты';
 
   @override
-  String get library => 'Ğ‘Ğ¸Ğ±Ğ»Ğ¸Ğ¾Ñ‚ĞµĞºĞ°';
+  String get library => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�';
 
   @override
-  String get text => 'Ğ¢ĞµĞºÑÑ‚';
+  String get text => 'Ğ�Ğ�Ğ�ст';
 
   @override
-  String get removeModel => 'Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ';
+  String get removeModel => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�ь';
 
   @override
-  String get insufficientRAM => 'ĞĞµĞ´Ğ¾ÑÑ‚Ğ°Ñ‚Ğ¾Ñ‡Ğ½Ğ¾ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸';
+  String get insufficientRAM => 'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�Ğ�ятĞ�';
 
   @override
-  String get insufficientStorage => 'ĞĞµĞ´Ğ¾ÑÑ‚Ğ°Ñ‚Ğ¾Ñ‡Ğ½Ğ¾ Ğ¼ĞµÑÑ‚Ğ°';
+  String get insufficientStorage => 'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�стĞ�';
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ $model ÑĞ¾ ÑĞ²Ğ¾ĞµĞ³Ğ¾ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ°? Ğ­Ñ‚Ğ¾ Ñ‚Ğ°ĞºĞ¶Ğµ Ğ¿Ñ€Ğ¸Ğ²ĞµĞ´ĞµÑ‚ Ğº ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ñ Ğ²ÑĞµÑ… Ğ¿Ñ€ĞµĞ´Ñ‹Ğ´ÑƒÑ‰Ğ¸Ñ… Ñ€Ğ°Ğ·Ğ³Ğ¾Ğ²Ğ¾Ñ€Ğ¾Ğ², ÑĞ²ÑĞ·Ğ°Ğ½Ğ½Ñ‹Ñ… Ñ ÑÑ‚Ğ¾Ğ¹ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒÑ.';
+    return 'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�ь $model сĞ� сĞ�Ğ�Ğ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�? Ğ�тĞ� тĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�т Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ю Ğ�сĞ�х Ğ�рĞ�Ğ�ыĞ�ущĞ�х рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�, сĞ�яĞ�Ğ�Ğ�Ğ�ых с этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ью.';
   }
 
   @override
   String get noMatchingModels =>
-      'ĞŸĞ¾Ğ´Ñ…Ğ¾Ğ´ÑÑ‰Ğ¸Ñ… Ğ¼Ğ¾Ğ´ĞµĞ»ĞµĞ¹ Ğ½Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½Ğ¾.';
+      'Ğ�Ğ�Ğ�хĞ�Ğ�ящĞ�х Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get benefit1 =>
-      'Ğ£Ğ²ĞµĞ»Ğ¸Ñ‡ĞµĞ½Ñ‹ Ğ»Ğ¸Ğ¼Ğ¸Ñ‚Ñ‹ Ğ½Ğ° ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ¾ Ñ€Ğ°Ğ·Ğ³Ğ¾Ğ²Ğ¾Ñ€Ğ¾Ğ²';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�ы Ğ�Ğ�Ğ�Ğ�ты Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�стĞ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�';
 
   @override
-  String get benefit3 => 'Ğ­Ñ„Ñ„ĞµĞºÑ‚ Ğ´Ğ»Ñ Ğ¿Ñ€Ğ¾Ñ„Ğ¸Ğ»Ñ';
+  String get benefit3 => 'Ğ�ффĞ�Ğ�т Ğ�Ğ�я Ğ�рĞ�фĞ�Ğ�я';
 
   @override
-  String get benefit4 => 'Ğ—Ğ½Ğ°Ñ‡Ğ¾Ğº Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑÑ‡Ğ¸ĞºĞ°';
+  String get benefit4 => 'Ğ�Ğ�Ğ�чĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�счĞ�Ğ�Ğ�';
 
   @override
-  String get benefit5 => 'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ğ²Ğ°Ğ¹Ñ‚Ğµ Ğ±Ğ¾Ğ»ÑŒÑˆĞµ Ğ¾Ğ½Ğ»Ğ°Ğ¹Ğ½-Ğ˜Ğ˜';
+  String get benefit5 => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�';
 
   @override
   String get benefit7 =>
-      'Ğ”Ğ¾Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğµ Ğ»Ğ¸Ğ¼Ğ¸Ñ‚Ñ‹ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�ты Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get benefit8 => 'Ğ”Ğ¾Ğ±Ğ°Ğ²Ğ»ÑĞ¹Ñ‚Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get benefit8 => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get benefit9 => 'ĞĞ¾Ğ²Ñ‹Ğµ Ñ‚ĞµĞ¼Ñ‹';
+  String get benefit9 => 'Ğ�Ğ�Ğ�ыĞ� тĞ�Ğ�ы';
 
   @override
-  String get benefit10 => 'Ğ”Ğ¾Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğµ Ğ²Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ';
+  String get benefit10 => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get benefit11 => 'Ğ‘Ğ¾Ğ»ÑŒÑˆĞµ Ñ€ĞµĞ¶Ğ¸Ğ¼Ğ° Ğ¿Ğ¾Ñ‚Ğ¾ĞºĞ°';
+  String get benefit11 => 'Ğ�Ğ�Ğ�ьшĞ� рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�';
 
   @override
   String get oldBenefits =>
-      'Ğ’ÑĞµ Ğ¿Ñ€ĞµĞ¸Ğ¼ÑƒÑ‰ĞµÑÑ‚Ğ²Ğ° Ğ¿Ñ€ĞµĞ´Ñ‹Ğ´ÑƒÑ‰Ğ¸Ñ… Ğ¿Ğ»Ğ°Ğ½Ğ¾Ğ²';
+      'Ğ�сĞ� Ğ�рĞ�Ğ�Ğ�ущĞ�стĞ�Ğ� Ğ�рĞ�Ğ�ыĞ�ущĞ�х Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get confirm => 'ĞŸĞ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ´Ğ¸Ñ‚ÑŒ';
+  String get confirm => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ть';
 
   @override
-  String get changePassword => 'Ğ¡Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ';
+  String get changePassword => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�рĞ�Ğ�ь';
 
   @override
   String get logoutConfirmationTitle =>
-      'Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ Ğ²Ñ‹Ğ¹Ñ‚Ğ¸?';
+      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�ыĞ�тĞ�?';
 
   @override
-  String get settings => 'ĞĞ°ÑÑ‚Ñ€Ğ¾Ğ¹ĞºĞ¸';
+  String get settings => 'Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�';
 
   @override
-  String get language => 'Ğ¯Ğ·Ñ‹Ğº Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ';
+  String get language => 'Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get dark => 'Ğ¢Ñ‘Ğ¼Ğ½Ğ°Ñ';
+  String get dark => 'Ğ�ёĞ�Ğ�Ğ�я';
 
   @override
-  String get oldPassword => 'Ğ¡Ñ‚Ğ°Ñ€Ñ‹Ğ¹ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ';
+  String get oldPassword => 'Ğ�тĞ�рыĞ� Ğ�Ğ�рĞ�Ğ�ь';
 
   @override
-  String get newPassword => 'ĞĞ¾Ğ²Ñ‹Ğ¹ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ';
+  String get newPassword => 'Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�рĞ�Ğ�ь';
 
   @override
-  String get passwordUpdated => 'ĞŸĞ°Ñ€Ğ¾Ğ»ÑŒ Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»Ñ‘Ğ½.';
+  String get passwordUpdated => 'Ğ�Ğ�рĞ�Ğ�ь Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ёĞ�.';
 
   @override
-  String get stop => 'Ğ¡Ñ‚Ğ¾Ğ¿';
+  String get stop => 'Ğ�тĞ�Ğ�';
 
   @override
-  String get copyrights => 'Ğ˜ÑÑ‚Ğ¾Ñ‡Ğ½Ğ¸ĞºĞ¸';
+  String get copyrights => 'Ğ�стĞ�чĞ�Ğ�Ğ�Ğ�';
 
   @override
-  String get love => 'Ğ›ÑĞ±Ğ¾Ğ²ÑŒ';
+  String get love => 'Ğ�юĞ�Ğ�Ğ�ь';
 
   @override
-  String get nature => 'ĞŸÑ€Ğ¸Ñ€Ğ¾Ğ´Ğ°';
+  String get nature => 'Ğ�рĞ�рĞ�Ğ�Ğ�';
 
   @override
-  String get behindTheSlaughter => 'Ğ—Ğ° ĞºÑƒĞ»Ğ¸ÑĞ°Ğ¼Ğ¸';
+  String get behindTheSlaughter => 'Ğ�Ğ� Ğ�уĞ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
   String get cyberpunk => 'Cyberpunk';
@@ -771,356 +766,351 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deepSpace => 'Deep Space';
 
   @override
-  String get grayscale => 'ĞÑ‚Ñ‚ĞµĞ½ĞºĞ¸ ÑĞµÑ€Ğ¾Ğ³Ğ¾';
+  String get grayscale => 'Ğ�ттĞ�Ğ�Ğ�Ğ� сĞ�рĞ�Ğ�Ğ�';
 
   @override
-  String get ocean => 'ĞĞºĞµĞ°Ğ½';
+  String get ocean => 'Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get scarletSnow => 'ĞĞ»Ñ‹Ğ¹ ÑĞ½ĞµĞ³';
+  String get scarletSnow => 'Ğ�Ğ�ыĞ� сĞ�Ğ�Ğ�';
 
   @override
   String get requestFailed =>
-      'ĞŸÑ€Ğ¾Ğ¸Ğ·Ğ¾ÑˆĞ»Ğ° Ğ¾ÑˆĞ¸Ğ±ĞºĞ°, Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�шĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get changeModel => 'Ğ¡Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ';
+  String get changeModel => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
-  String get edit => 'Ğ˜Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ';
+  String get edit => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
   String get editingMessageInfo =>
-      'Ğ˜Ğ·Ğ¼ĞµĞ½ĞµĞ½Ğ¸Ğµ ÑÑ‚Ğ¾Ğ³Ğ¾ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ñ Ğ¿ĞµÑ€ĞµĞ·Ğ°Ğ¿ÑƒÑÑ‚Ğ¸Ñ‚ Ğ´Ğ¸Ğ°Ğ»Ğ¾Ğ³ Ñ ÑÑ‚Ğ¾Ğ³Ğ¾ Ğ¼Ğ¾Ğ¼ĞµĞ½Ñ‚Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� этĞ�Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�я Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�устĞ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� с этĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�.';
 
   @override
   String get editingNotification =>
-      'Ğ’Ñ‹ ÑĞµĞ¹Ñ‡Ğ°Ñ Ğ² Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ Ñ€ĞµĞ´Ğ°ĞºÑ‚Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ';
+      'Ğ�ы сĞ�Ğ�чĞ�с Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get featurePluralTitle => 'ĞœĞ½Ğ¾Ğ¶ĞµÑÑ‚Ğ²ĞµĞ½Ğ½Ğ°Ñ';
+  String get featurePluralTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
   String get featurePluralDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ°Ğ²Ñ‚Ğ¾Ğ¼Ğ°Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¸ Ğ¸Ğ½Ñ‚ĞµĞ³Ñ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ´Ğ¾Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğµ Ñ€Ğ°ÑÑˆĞ¸Ñ€ĞµĞ½Ğ¸Ñ, Ñ‚ĞµĞ¼ ÑĞ°Ğ¼Ñ‹Ğ¼ Ñ€Ğ°ÑÑˆĞ¸Ñ€ÑÑ ÑĞ²Ğ¾Ğ¸ Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ğ¾Ğ½Ğ°Ğ»ÑŒĞ½Ñ‹Ğµ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸ Ğ´Ğ»Ñ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶ĞºĞ¸ Ñ€Ğ°Ğ·Ğ½Ğ¾Ğ¾Ğ±Ñ€Ğ°Ğ·Ğ½Ñ‹Ñ… Ğ¾Ğ¿ĞµÑ€Ğ°Ñ†Ğ¸Ğ¹ Ñ Ğ¿Ğ¾Ğ²Ñ‹ÑˆĞµĞ½Ğ½Ğ¾Ğ¹ Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒÑ.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ� Ğ�Ğ�тĞ�Ğ�рĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� рĞ�сшĞ�рĞ�Ğ�Ğ�я, тĞ�Ğ� сĞ�Ğ�ыĞ� рĞ�сшĞ�ряя сĞ�Ğ�Ğ� фуĞ�Ğ�цĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ых Ğ�Ğ�Ğ�рĞ�цĞ�Ğ� с Ğ�Ğ�Ğ�ышĞ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�стью.';
 
   @override
-  String get nameLabel => 'Ğ˜Ğ¼Ñ Ğ˜Ğ˜';
+  String get nameLabel => 'Ğ�Ğ�я Ğ�Ğ�';
 
   @override
-  String get summaryLabel => 'ĞšÑ€Ğ°Ñ‚ĞºĞ¾Ğµ Ğ¾Ğ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ Ğ˜Ğ˜';
+  String get summaryLabel => 'Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�';
 
   @override
-  String get add => 'Ğ”Ğ¾Ğ±Ğ°Ğ²Ğ¸Ñ‚ÑŒ';
+  String get add => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
   String get aiExplanationTitle =>
-      'ĞĞ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°';
+      'Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
 
   @override
   String get aiExplanationDescription =>
-      'ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€ĞµĞ´Ğ¾ÑÑ‚Ğ°Ğ²ÑŒÑ‚Ğµ Ğ¿Ğ¾Ğ´Ñ€Ğ¾Ğ±Ğ½Ğ¾Ğµ Ğ¾Ğ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ Ğ°Ñ€Ñ…Ğ¸Ñ‚ĞµĞºÑ‚ÑƒÑ€Ñ‹ Ğ²Ğ°ÑˆĞµĞ¹ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸ Ğ˜Ğ˜, Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞ° Ğ¾Ğ±ÑƒÑ‡ĞµĞ½Ğ¸Ñ, Ğ¼ĞµÑ‚Ñ€Ğ¸Ğº Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ÑÑ‚Ğ¸, Ğ¾Ğ±Ğ»Ğ°ÑÑ‚ĞµĞ¹ Ğ¿Ñ€Ğ¸Ğ¼ĞµĞ½ĞµĞ½Ğ¸Ñ Ğ¸ Ğ´Ñ€ÑƒĞ³Ğ¸Ñ… Ğ²Ğ°Ğ¶Ğ½Ñ‹Ñ… Ğ¾ÑĞ¾Ğ±ĞµĞ½Ğ½Ğ¾ÑÑ‚ĞµĞ¹.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�стĞ�Ğ�ьтĞ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�рхĞ�тĞ�Ğ�туры Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�, Ğ�рĞ�цĞ�ссĞ� Ğ�Ğ�учĞ�Ğ�Ğ�я, Ğ�Ğ�трĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�стĞ�, Ğ�Ğ�Ğ�Ğ�стĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�руĞ�Ğ�х Ğ�Ğ�Ğ�Ğ�ых Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�.';
 
   @override
   String get preInputTitle =>
-      'ĞŸÑ€ĞµĞ´ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²ĞºĞ° Ğ´Ğ»Ñ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°';
+      'Ğ�рĞ�Ğ�устĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
 
   @override
   String get preInputDescription =>
-      'ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ·Ğ°Ğ´Ğ°Ğ¹Ñ‚Ğµ Ğ¿Ñ€ĞµĞ´ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²ĞºÑƒ, ĞºĞ¾Ñ‚Ğ¾Ñ€Ğ°Ñ Ğ±ÑƒĞ´ĞµÑ‚ Ğ½Ğ°Ğ¿Ñ€Ğ°Ğ²Ğ»ÑÑ‚ÑŒ Ğ²Ğ°ÑˆÑƒ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ² Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞµ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ñ Ğ¿ĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶Ğ°. Ğ’ ÑÑ‚Ğ¾Ğ¼ Ñ€Ğ°Ğ·Ğ´ĞµĞ»Ğµ Ğ²Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ²ĞºĞ»ÑÑ‡Ğ¸Ñ‚ÑŒ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ Ğ¾ Ğ¿ĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶Ğµ, Ğ´Ğ¾Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ ĞºĞ¾Ğ½Ñ‚ĞµĞºÑÑ‚ Ğ¸ Ğ»ÑĞ±Ñ‹Ğµ Ğ´Ñ€ÑƒĞ³Ğ¸Ğµ Ğ´ĞµÑ‚Ğ°Ğ»Ğ¸, ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğµ Ğ¼Ğ¾Ğ³ÑƒÑ‚ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‡ÑŒ Ğ² Ğ³ĞµĞ½ĞµÑ€Ğ°Ñ†Ğ¸Ğ¸ ĞºĞ¾Ğ½Ñ‚ĞµĞ½Ñ‚Ğ°, ÑĞ²ÑĞ·Ğ°Ğ½Ğ½Ğ¾Ğ³Ğ¾ Ñ Ğ¿ĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶ĞµĞ¼.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�Ğ�устĞ�Ğ�Ğ�Ğ�Ğ�у, Ğ�Ğ�тĞ�рĞ�я Ğ�уĞ�Ğ�т Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ять Ğ�Ğ�шу Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ� Ğ�рĞ�цĞ�ссĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�. Ğ� этĞ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�ючĞ�ть Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю Ğ� Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�тĞ�Ğ�ст Ğ� Ğ�юĞ�ыĞ� Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�, Ğ�Ğ�тĞ�рыĞ� Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�чь Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�тĞ�, сĞ�яĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� с Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get baseModelTitle => 'Ğ‘Ğ°Ğ·Ğ¾Ğ²Ğ°Ñ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ';
+  String get baseModelTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь';
 
   @override
   String get baseModelDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ±ÑƒĞ´ĞµÑ‚ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒÑÑ Ğ² ĞºĞ°Ñ‡ĞµÑÑ‚Ğ²Ğµ Ğ¾ÑĞ½Ğ¾Ğ²Ñ‹ Ğ´Ğ»Ñ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ Ñ‚Ğ²Ğ¾Ñ€ĞµĞ½Ğ¸Ñ. Ğ—Ğ´ĞµÑÑŒ Ğ¾Ñ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶Ğ°ĞµÑ‚ÑÑ Ñ‚ĞµĞºÑƒÑ‰Ğ°Ñ Ğ²Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ½Ğ°Ñ Ğ±Ğ°Ğ·Ğ¾Ğ²Ğ°Ñ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�уĞ�Ğ�т Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ться Ğ� Ğ�Ğ�чĞ�стĞ�Ğ� Ğ�сĞ�Ğ�Ğ�ы Ğ�Ğ�я Ğ�Ğ�шĞ�Ğ�Ğ� тĞ�Ğ�рĞ�Ğ�Ğ�я. Ğ�Ğ�Ğ�сь Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�тся тĞ�Ğ�ущĞ�я Ğ�ыĞ�рĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь.';
 
   @override
-  String get summary => 'ĞĞ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ';
+  String get summary => 'Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�';
 
   @override
   String get modelUploadTitle =>
-      'Ğ¤Ğ°Ğ¹Ğ» Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°';
+      'Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
 
   @override
   String get modelUploadDescription =>
-      'Ğ’Ñ‹Ğ±ĞµÑ€Ğ¸Ñ‚Ğµ Ğ¸ Ğ·Ğ°Ğ³Ñ€ÑƒĞ·Ğ¸Ñ‚Ğµ Ğ²Ğ°ÑˆĞ¸ Ğ»Ğ¾ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğµ Ñ„Ğ°Ğ¹Ğ»Ñ‹ GGUF Ğ¿Ñ€ÑĞ¼Ğ¾ Ñ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ°. Ğ­Ñ‚Ğ¾ Ğ¿Ğ¾Ğ·Ğ²Ğ¾Ğ»Ğ¸Ñ‚ Ğ²Ğ°Ğ¼ Ğ·Ğ°Ğ¿ÑƒÑĞºĞ°Ñ‚ÑŒ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¾Ñ„Ñ„Ğ»Ğ°Ğ¹Ğ½ Ğ±ĞµĞ· Ğ½ĞµĞ¾Ğ±Ñ…Ğ¾Ğ´Ğ¸Ğ¼Ğ¾ÑÑ‚Ğ¸ Ğ¿Ğ¾Ğ´ĞºĞ»ÑÑ‡ĞµĞ½Ğ¸Ñ Ğº Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ñƒ. Ğ£Ğ±ĞµĞ´Ğ¸Ñ‚ĞµÑÑŒ, Ñ‡Ñ‚Ğ¾ Ñ„Ğ°Ğ¹Ğ» Ğ¸Ğ¼ĞµĞµÑ‚ Ğ´ĞµĞ¹ÑÑ‚Ğ²Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚ GGUF Ğ¸ Ğ¿Ñ€Ğ°Ğ²Ğ¸Ğ»ÑŒĞ½Ğ¾ ÑÑ‚Ñ€ÑƒĞºÑ‚ÑƒÑ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½. Ğ•ÑĞ»Ğ¸ Ñ„Ğ°Ğ¹Ğ» Ğ½ĞµĞºĞ¾Ñ€Ñ€ĞµĞºÑ‚ĞµĞ½ Ğ¸Ğ»Ğ¸ Ğ¿Ğ¾Ğ²Ñ€ĞµĞ¶Ğ´Ñ‘Ğ½, Cortex Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ñ‚ÑŒ Ğ½Ğµ Ñ‚Ğ°Ğº, ĞºĞ°Ğº Ğ¾Ğ¶Ğ¸Ğ´Ğ°Ğ»Ğ¾ÑÑŒ, Ğ¸ Ğ²Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ ÑÑ‚Ğ¾Ğ»ĞºĞ½ÑƒÑ‚ÑŒÑÑ Ñ Ğ¾ÑˆĞ¸Ğ±ĞºĞ°Ğ¼Ğ¸.';
+      'Ğ�ыĞ�Ğ�рĞ�тĞ� Ğ� Ğ�Ğ�Ğ�руĞ�Ğ�тĞ� Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� фĞ�Ğ�Ğ�ы GGUF Ğ�ряĞ�Ğ� с Ğ�Ğ�шĞ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�. Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�усĞ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�ффĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь, чтĞ� фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�стĞ�Ğ�тĞ�Ğ�ьĞ�ыĞ� фĞ�рĞ�Ğ�т GGUF Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�ьĞ�Ğ� струĞ�турĞ�рĞ�Ğ�Ğ�Ğ�. Ğ�сĞ�Ğ� фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ррĞ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ёĞ�, Cortex Ğ�Ğ�Ğ�Ğ�т рĞ�Ğ�Ğ�тĞ�ть Ğ�Ğ� тĞ�Ğ�, Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь, Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� стĞ�Ğ�Ğ�Ğ�уться с Ğ�шĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get modelUploadShortDescription =>
-      'ĞĞ°Ğ¶Ğ¼Ğ¸Ñ‚Ğµ Ğ·Ğ´ĞµÑÑŒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ²Ñ‹Ğ±Ñ€Ğ°Ñ‚ÑŒ Ñ„Ğ°Ğ¹Ğ» .gguf Ñ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ°';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�сь, чтĞ�Ğ�ы Ğ�ыĞ�рĞ�ть фĞ�Ğ�Ğ� .gguf с Ğ�Ğ�шĞ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�';
 
   @override
-  String get you => 'Ğ’Ñ‹';
+  String get you => 'Ğ�ы';
 
   @override
-  String get removePhotoTitle => 'Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ñ„Ğ¾Ñ‚Ğ¾';
+  String get removePhotoTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть фĞ�тĞ�';
 
   @override
   String get confirmRemovePhoto =>
-      'Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ñ„Ğ¾Ñ‚Ğ¾?';
+      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть фĞ�тĞ�?';
 
   @override
   String get chatLengthLimitExceeded =>
-      'Ğ­Ñ‚Ğ¾Ñ‚ Ñ‡Ğ°Ñ‚ Ğ¿Ñ€ĞµĞ²Ñ‹ÑĞ¸Ğ» Ğ»Ğ¸Ğ¼Ğ¸Ñ‚ ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ¾Ğ². ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ½Ğ°Ñ‡Ğ½Ğ¸Ñ‚Ğµ Ğ½Ğ¾Ğ²Ñ‹Ğ¹ Ñ‡Ğ°Ñ‚ Ğ¸Ğ»Ğ¸ Ğ¿Ñ€Ğ¸Ğ¾Ğ±Ñ€ĞµÑ‚Ğ¸Ñ‚Ğµ Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºÑƒ.';
+      'Ğ�тĞ�т чĞ�т Ğ�рĞ�Ğ�ысĞ�Ğ� Ğ�Ğ�Ğ�Ğ�т сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�Ğ�ыĞ� чĞ�т Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�рĞ�тĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у.';
 
   @override
   String get inappropriateContentDetected =>
-      'ĞĞ±Ğ½Ğ°Ñ€ÑƒĞ¶ĞµĞ½ Ğ½ĞµĞ¿Ñ€Ğ¸ĞµĞ¼Ğ»ĞµĞ¼Ñ‹Ğ¹ ĞºĞ¾Ğ½Ñ‚ĞµĞ½Ñ‚!';
+      'Ğ�Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�тĞ�Ğ�т!';
 
   @override
   String get offlineModelNotInstalled =>
-      'Ğ­Ñ‚Ğ° Ğ¾Ñ„Ñ„Ğ»Ğ°Ğ¹Ğ½-Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ½Ğµ ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ° Ğ½Ğ° Ğ²Ğ°ÑˆĞµĞ¼ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğµ.';
+      'Ğ�тĞ� Ğ�ффĞ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ� устĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� устрĞ�Ğ�стĞ�Ğ�.';
 
   @override
   String get reachedLimit =>
-      'Ğ’Ñ‹ Ğ¸ÑÑ‡ĞµÑ€Ğ¿Ğ°Ğ»Ğ¸ Ğ»Ğ¸Ğ¼Ğ¸Ñ‚; Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚Ğµ Ğ¿Ğ»Ğ°Ğ½, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚ÑŒ Ğ±Ğ¾Ğ»ÑŒÑˆĞµ. (Ñ…ĞµĞ¹, Ğ¼Ñ‹ Ğ¿Ğ¾Ğ½Ğ¸Ğ¼Ğ°ĞµĞ¼, ÑÑ‚Ğ¾ Ğ¾Ğ±Ğ»Ğ¾Ğ¼. Ğ½Ğ¾ ÑĞµÑ€ÑŒĞµĞ·Ğ½Ğ¾, ĞºÑ€ÑƒÑ‚Ñ‹Ğµ Ğ¾Ñ‚Ğ²ĞµÑ‚Ñ‹ ÑÑ‚Ğ¾ÑÑ‚ Ğ´ĞµĞ½ĞµĞ³, Ñ‚Ğ°Ğº Ñ‡Ñ‚Ğ¾ ÑÑ‚Ğ¸ Ğ»Ğ¸Ğ¼Ğ¸Ñ‚Ñ‹ Ğ¿Ğ¾Ğ¼Ğ¾Ğ³Ğ°ÑÑ‚ Ğ½Ğ°Ğ¼ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°Ñ‚ÑŒ Ğ´Ğ²Ğ¸Ğ¸Ğ¸Ğ¸Ğ¸Ğ¸Ğ¶.)';
+      'Ğ�ы Ğ�счĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т; Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�ьшĞ�. (хĞ�Ğ�, Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ� сĞ�рьĞ�Ğ�Ğ�Ğ�, Ğ�рутыĞ� Ğ�тĞ�Ğ�ты стĞ�ят Ğ�Ğ�Ğ�Ğ�Ğ�, тĞ�Ğ� чтĞ� этĞ� Ğ�Ğ�Ğ�Ğ�ты Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ют Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.)';
 
   @override
-  String get modality => 'ĞœĞ¾Ğ´Ğ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒ';
+  String get modality => 'Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�Ğ�сть';
 
   @override
-  String get multimodal => 'ĞœÑƒĞ»ÑŒÑ‚Ğ¸Ğ¼Ğ¾Ğ´Ğ°Ğ»ÑŒĞ½Ñ‹Ğ¹';
+  String get multimodal => 'Ğ�уĞ�ьтĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ�';
 
   @override
-  String get anErrorOccurred => 'ĞŸÑ€Ğ¾Ğ¸Ğ·Ğ¾ÑˆĞ»Ğ° Ğ¾ÑˆĞ¸Ğ±ĞºĞ°';
+  String get anErrorOccurred => 'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�шĞ�Ğ�Ğ�Ğ�';
 
   @override
   String get themeLocked =>
-      'Ğ­Ñ‚Ğ° Ñ‚ĞµĞ¼Ğ° Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ Ğ±Ğ¾Ğ»ĞµĞµ Ğ²Ñ‹ÑĞ¾ĞºĞ¾Ğ³Ğ¾ ÑƒÑ€Ğ¾Ğ²Ğ½Ñ Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºĞ¸. ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, ÑƒĞ»ÑƒÑ‡ÑˆĞ¸Ñ‚Ğµ Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºÑƒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ñ€Ğ°Ğ·Ğ±Ğ»Ğ¾ĞºĞ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ.';
+      'Ğ�тĞ� тĞ�Ğ�Ğ� трĞ�Ğ�уĞ�т Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ�Ğ� урĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, уĞ�учшĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у, чтĞ�Ğ�ы рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть.';
 
   @override
   String get pageCouldNotBeLoaded =>
-      'ĞĞµ ÑƒĞ´Ğ°Ğ»Ğ¾ÑÑŒ Ğ·Ğ°Ğ³Ñ€ÑƒĞ·Ğ¸Ñ‚ÑŒ ÑÑ‚Ñ€Ğ°Ğ½Ğ¸Ñ†Ñƒ';
+      'Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�Ğ�Ğ�руĞ�Ğ�ть стрĞ�Ğ�Ğ�цу';
 
   @override
   String get checkYourInternet =>
-      'ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ÑŒÑ‚Ğµ Ğ²Ğ°ÑˆĞµ Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚-ÑĞ¾ĞµĞ´Ğ¸Ğ½ĞµĞ½Ğ¸Ğµ Ğ¸ Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�шĞ� Ğ�Ğ�тĞ�рĞ�Ğ�т-сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get errorUserNotAuthenticated =>
-      'Ğ’Ñ‹ Ğ´Ğ¾Ğ»Ğ¶Ğ½Ñ‹ Ğ²Ğ¾Ğ¹Ñ‚Ğ¸ Ğ² ÑĞ¸ÑÑ‚ĞµĞ¼Ñƒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ²Ñ‹Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ÑŒ ÑÑ‚Ğ¾ Ğ´ĞµĞ¹ÑÑ‚Ğ²Ğ¸Ğµ.';
+      'Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�тĞ� Ğ� сĞ�стĞ�Ğ�у, чтĞ�Ğ�ы Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�ть этĞ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ�.';
 
   @override
   String get errorReachedLimit =>
-      'Ğ’Ñ‹ Ğ´Ğ¾ÑÑ‚Ğ¸Ğ³Ğ»Ğ¸ Ğ»Ğ¸Ğ¼Ğ¸Ñ‚Ğ°, Ğ¿ĞµÑ€ĞµĞ¹Ğ´Ğ¸Ñ‚Ğµ Ğ½Ğ° Ğ±Ğ¾Ğ»ĞµĞµ Ğ²Ñ‹ÑĞ¾ĞºĞ¸Ğ¹ ÑƒÑ€Ğ¾Ğ²ĞµĞ½ÑŒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ñ€Ğ°Ğ·Ğ±Ğ»Ğ¾ĞºĞ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ±Ğ¾Ğ»ÑŒÑˆĞµ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚ĞµĞ¹ Ğ¸ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ.';
+      'Ğ�ы Ğ�Ğ�стĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ� урĞ�Ğ�Ğ�Ğ�ь, чтĞ�Ğ�ы рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ� Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get errorServer =>
-      'ĞŸÑ€Ğ¾Ğ¸Ğ·Ğ¾ÑˆĞ»Ğ° Ğ½ĞµĞ¿Ñ€ĞµĞ´Ğ²Ğ¸Ğ´ĞµĞ½Ğ½Ğ°Ñ Ğ¾ÑˆĞ¸Ğ±ĞºĞ° ÑĞµÑ€Ğ²ĞµÑ€Ğ°. ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ Ğ¿Ğ¾Ğ·Ğ¶Ğµ.';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ� сĞ�рĞ�Ğ�рĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get errorNetwork =>
-      'ĞŸÑ€Ğ¾Ğ¸Ğ·Ğ¾ÑˆĞ»Ğ° ÑĞµÑ‚ĞµĞ²Ğ°Ñ Ğ¾ÑˆĞ¸Ğ±ĞºĞ°. ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ÑŒÑ‚Ğµ Ğ²Ğ°ÑˆĞµ ÑĞ¾ĞµĞ´Ğ¸Ğ½ĞµĞ½Ğ¸Ğµ Ğ¸ Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� сĞ�тĞ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�шĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get baseModelForCharacterDescription =>
-      'Ğ’Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ½Ğ°Ñ Ğ±Ğ°Ğ·Ğ¾Ğ²Ğ°Ñ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¾Ğ¿Ñ€ĞµĞ´ĞµĞ»Ğ¸Ñ‚ ÑĞ¿Ğ¾ÑĞ¾Ğ±Ğ½Ğ¾ÑÑ‚Ğ¸ Ğ¿ĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶Ğ° Ğº Ñ€Ğ°ÑÑÑƒĞ¶Ğ´ĞµĞ½Ğ¸Ñ Ğ¸ Ğ¾Ñ‚Ğ²ĞµÑ‚Ğ°Ğ¼.';
+      'Ğ�ыĞ�рĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�т сĞ�Ğ�сĞ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�ссуĞ�Ğ�Ğ�Ğ�Ğ�ю Ğ� Ğ�тĞ�Ğ�тĞ�Ğ�.';
 
   @override
-  String get selectBaseModel => 'Ğ’Ñ‹Ğ±ĞµÑ€Ğ¸Ñ‚Ğµ Ğ±Ğ°Ğ·Ğ¾Ğ²ÑƒÑ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ';
+  String get selectBaseModel => 'Ğ�ыĞ�Ğ�рĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ую Ğ�Ğ�Ğ�Ğ�Ğ�ь';
 
   @override
   String get falErrorImageRequired =>
-      'Ğ”Ğ»Ñ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ñ‹ ÑÑ‚Ğ¾Ğ³Ğ¾ Ğ˜Ğ˜ Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ ÑÑ‚Ğ°Ğ»Ğ¾Ğ½Ğ½Ğ¾Ğµ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€Ğ¸ĞºÑ€ĞµĞ¿Ğ¸Ñ‚Ğµ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ Ğ¸ Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�Ğ�я рĞ�Ğ�Ğ�ты этĞ�Ğ�Ğ� Ğ�Ğ� трĞ�Ğ�уĞ�тся этĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get falErrorAudioRequired =>
-      'Ğ”Ğ»Ñ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ñ‹ ÑÑ‚Ğ¾Ğ¹ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸ Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ ÑÑ‚Ğ°Ğ»Ğ¾Ğ½Ğ½Ñ‹Ğ¹ Ğ°ÑƒĞ´Ğ¸Ğ¾Ñ„Ğ°Ğ¹Ğ». ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€Ğ¸ĞºÑ€ĞµĞ¿Ğ¸Ñ‚Ğµ Ğ°ÑƒĞ´Ğ¸Ğ¾Ñ„Ğ°Ğ¹Ğ» Ğ¸ Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�Ğ�я рĞ�Ğ�Ğ�ты этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся этĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�уĞ�Ğ�Ğ�фĞ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�тĞ� Ğ�уĞ�Ğ�Ğ�фĞ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get falErrorVideoRequired =>
-      'Ğ”Ğ»Ñ ÑÑ‚Ğ¾Ğ¹ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸ Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ²Ğ¸Ğ´ĞµĞ¾Ğ¸Ğ½ÑÑ‚Ñ€ÑƒĞºÑ†Ğ¸Ñ, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€Ğ¸ĞºÑ€ĞµĞ¿Ğ¸Ñ‚Ğµ Ğ²Ğ¸Ğ´ĞµĞ¾ Ğ¸ Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�Ğ�я этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�струĞ�цĞ�я, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get falErrorImageCorrupted =>
-      'Ğ—Ğ°Ğ³Ñ€ÑƒĞ¶ĞµĞ½Ğ½Ğ¾Ğµ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ Ğ½Ğµ ÑƒĞ´Ğ°Ğ»Ğ¾ÑÑŒ Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ñ‚ÑŒ, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ Ğ´Ñ€ÑƒĞ³Ğ¾Ğ¹ Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚.';
+      'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�ть, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�руĞ�Ğ�Ğ� фĞ�рĞ�Ğ�т.';
 
   @override
   String get falErrorSchemaRejected =>
-      'ĞœĞ¾Ğ´ĞµĞ»ÑŒ Ğ¾Ñ‚ĞºĞ»Ğ¾Ğ½Ğ¸Ğ»Ğ° Ğ²Ñ…Ğ¾Ğ´Ğ½Ñ‹Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ Ğ´Ñ€ÑƒĞ³ÑƒÑ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�хĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�ыĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�руĞ�ую Ğ�Ğ�Ğ�Ğ�Ğ�ь.';
 
   @override
   String get falErrorSchemaInvalid =>
-      'Ğ’Ñ…Ğ¾Ğ´ÑÑ‰Ğ¸Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ±Ñ‹Ğ»Ğ¸ Ğ¾Ñ‚ĞºĞ»Ğ¾Ğ½ĞµĞ½Ñ‹ ÑĞ»ÑƒĞ¶Ğ±Ğ¾Ğ¹ Ğ³ĞµĞ½ĞµÑ€Ğ°Ñ†Ğ¸Ğ¸.';
+      'Ğ�хĞ�Ğ�ящĞ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�ыĞ�Ğ� Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ы сĞ�уĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�Ğ�.';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return 'Ğ¡Ğ»ÑƒĞ¶Ğ±Ğ° Ğ³ĞµĞ½ĞµÑ€Ğ°Ñ†Ğ¸Ğ¸ Ğ²ĞµÑ€Ğ½ÑƒĞ»Ğ° Ğ¾ÑˆĞ¸Ğ±ĞºÑƒ (ÑÑ‚Ğ°Ñ‚ÑƒÑ $statusCode).';
+    return 'Ğ�Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�Ğ� Ğ�Ğ�рĞ�уĞ�Ğ� Ğ�шĞ�Ğ�Ğ�у (стĞ�тус $statusCode).';
   }
 
   @override
-  String get couldNotOpenLink =>
-      'ĞĞµ ÑƒĞ´Ğ°Ğ»Ğ¾ÑÑŒ Ğ¾Ñ‚ĞºÑ€Ñ‹Ñ‚ÑŒ ÑÑÑ‹Ğ»ĞºÑƒ';
+  String get couldNotOpenLink => 'Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�тĞ�рыть ссыĞ�Ğ�у';
 
   @override
-  String get downloadStarted => 'Ğ—Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ° Ğ½Ğ°Ñ‡Ğ°Ğ»Ğ°ÑÑŒ';
+  String get downloadStarted => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�чĞ�Ğ�Ğ�сь';
 
   @override
-  String get notAvailable => 'ĞĞµĞ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ¾';
+  String get notAvailable => 'Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ�';
 
   @override
   String get localizationWarning =>
-      'ĞĞµĞºĞ¾Ñ‚Ğ¾Ñ€Ğ°Ñ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ Ğ½ĞµĞ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ° Ğ½Ğ° Ğ²Ğ°ÑˆĞµĞ¼ ÑĞ·Ñ‹ĞºĞµ Ğ¸ Ğ±ÑƒĞ´ĞµÑ‚ Ğ¾Ñ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶Ğ°Ñ‚ÑŒÑÑ Ğ½Ğ° Ğ°Ğ½Ğ³Ğ»Ğ¸Ğ¹ÑĞºĞ¾Ğ¼.';
+      'Ğ�Ğ�Ğ�Ğ�тĞ�рĞ�я Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� яĞ�ыĞ�Ğ� Ğ� Ğ�уĞ�Ğ�т Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�ться Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�.';
 
   @override
   String get aiTranslationWarning =>
-      'Ğ˜Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ Ğ¾ Ğ¼Ğ¾Ğ´ĞµĞ»ÑÑ… Ğ¿ĞµÑ€ĞµĞ²Ğ¾Ğ´Ğ¸Ñ‚ÑÑ Ğ½Ğ° Ñ€Ğ°Ğ·Ğ»Ğ¸Ñ‡Ğ½Ñ‹Ğµ ÑĞ·Ñ‹ĞºĞ¸ Ğ´Ñ€ÑƒĞ³Ğ¸Ğ¼Ğ¸ Ğ¼Ğ¾Ğ´ĞµĞ»ÑĞ¼Ğ¸ Ğ˜Ğ˜. ĞŸĞ¾ÑÑ‚Ğ¾Ğ¼Ñƒ Ğ² ÑĞ·Ñ‹ĞºĞ°Ñ…, Ğ¾Ñ‚Ğ»Ğ¸Ñ‡Ğ½Ñ‹Ñ… Ğ¾Ñ‚ Ğ°Ğ½Ğ³Ğ»Ğ¸Ğ¹ÑĞºĞ¾Ğ³Ğ¾, Ğ¼Ğ¾Ğ³ÑƒÑ‚ Ğ²Ğ¾Ğ·Ğ½Ğ¸ĞºĞ°Ñ‚ÑŒ Ğ½ĞµĞ·Ğ½Ğ°Ñ‡Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğµ Ğ½ĞµÑĞ¾Ğ¾Ñ‚Ğ²ĞµÑ‚ÑÑ‚Ğ²Ğ¸Ñ.';
+      'Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ях Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�тся Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�чĞ�ыĞ� яĞ�ыĞ�Ğ� Ğ�руĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�. Ğ�Ğ�этĞ�Ğ�у Ğ� яĞ�ыĞ�Ğ�х, Ğ�тĞ�Ğ�чĞ�ых Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�сĞ�Ğ�тĞ�Ğ�тстĞ�Ğ�я.';
 
   @override
-  String get errorLoadingTitle =>
-      'ĞĞµ ÑƒĞ´Ğ°Ğ»Ğ¾ÑÑŒ Ğ·Ğ°Ğ³Ñ€ÑƒĞ·Ğ¸Ñ‚ÑŒ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ';
+  String get errorLoadingTitle => 'Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�Ğ�Ğ�руĞ�Ğ�ть Ğ�Ğ�Ğ�Ğ�ыĞ�';
 
   @override
   String get errorLoadingMessage =>
-      'ĞœÑ‹ Ğ½Ğµ ÑĞ¼Ğ¾Ğ³Ğ»Ğ¸ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚ÑŒ Ğ½ĞµĞ¾Ğ±Ñ…Ğ¾Ğ´Ğ¸Ğ¼Ñ‹Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ñ Ğ½Ğ°ÑˆĞ¸Ñ… ÑĞµÑ€Ğ²ĞµÑ€Ğ¾Ğ². ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ÑŒÑ‚Ğµ Ğ²Ğ°ÑˆĞµ Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚-ÑĞ¾ĞµĞ´Ğ¸Ğ½ĞµĞ½Ğ¸Ğµ Ğ¸ Ğ¿Ğ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�ы Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�ыĞ� с Ğ�Ğ�шĞ�х сĞ�рĞ�Ğ�рĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�шĞ� Ğ�Ğ�тĞ�рĞ�Ğ�т-сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get noFoundTitle => 'ĞĞµÑ‚ Ñ€ĞµĞ·ÑƒĞ»ÑŒÑ‚Ğ°Ñ‚Ğ¾Ğ²';
+  String get noFoundTitle => 'Ğ�Ğ�т рĞ�Ğ�уĞ�ьтĞ�тĞ�Ğ�';
 
   @override
   String get noFoundMessage =>
-      'ĞŸĞ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ Ğ¸Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ ÑƒÑĞ»Ğ¾Ğ²Ğ¸Ñ Ğ¿Ğ¾Ğ¸ÑĞºĞ° Ğ¸Ğ»Ğ¸ ÑĞ±Ñ€Ğ¾ÑĞ¸Ñ‚ÑŒ Ñ„Ğ¸Ğ»ÑŒÑ‚Ñ€.';
+      'Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть усĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� сĞ�рĞ�сĞ�ть фĞ�Ğ�ьтр.';
 
   @override
-  String get modelCreatedSuccess =>
-      'ĞœĞ¾Ğ´ĞµĞ»ÑŒ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ°!';
+  String get modelCreatedSuccess => 'Ğ�Ğ�Ğ�Ğ�Ğ�ь усĞ�Ğ�шĞ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'Â«$modelNameÂ» ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ°.';
+    return '«$modelName» усĞ�Ğ�шĞ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
   }
 
   @override
   String get errorCreatingModel =>
-      'ĞŸÑ€Ğ¾Ğ¸Ğ·Ğ¾ÑˆĞ»Ğ° Ğ½ĞµĞ¿Ñ€ĞµĞ´Ğ²Ğ¸Ğ´ĞµĞ½Ğ½Ğ°Ñ Ğ¾ÑˆĞ¸Ğ±ĞºĞ° Ğ¿Ñ€Ğ¸ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ğ¸ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸.';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�рĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get errorDeletingModel =>
-      'ĞŸÑ€Ğ¾Ğ¸Ğ·Ğ¾ÑˆĞ»Ğ° Ğ½ĞµĞ¿Ñ€ĞµĞ´Ğ²Ğ¸Ğ´ĞµĞ½Ğ½Ğ°Ñ Ğ¾ÑˆĞ¸Ğ±ĞºĞ° Ğ¿Ñ€Ğ¸ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ğ¸ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸.';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�рĞ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get ultraFeatureOnly =>
-      'Ğ­Ñ‚Ğ° Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ° Ñ‚Ğ¾Ğ»ÑŒĞºĞ¾ Ğ´Ğ»Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹ Ultra.';
+      'Ğ�тĞ� фуĞ�Ğ�цĞ�я Ğ�Ğ�стуĞ�Ğ�Ğ� тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ultra.';
 
   @override
   String get experimentalOfflineWarning =>
-      'ĞÑ„Ñ„Ğ»Ğ°Ğ¹Ğ½-Ñ€ĞµĞ¶Ğ¸Ğ¼ Ğ²ÑĞµ ĞµÑ‰Ğµ ÑĞ²Ğ»ÑĞµÑ‚ÑÑ ÑĞºÑĞ¿ĞµÑ€Ğ¸Ğ¼ĞµĞ½Ñ‚Ğ°Ğ»ÑŒĞ½Ñ‹Ğ¼, Ğ¸ ÑĞºĞ°Ñ‡Ğ°Ğ½Ğ½Ğ°Ñ Ğ²Ğ°Ğ¼Ğ¸ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ñ‚ÑŒ Ğ½Ğµ Ñ Ğ¾Ğ¿Ñ‚Ğ¸Ğ¼Ğ°Ğ»ÑŒĞ½Ğ¾Ğ¹ ÑÑ„Ñ„ĞµĞºÑ‚Ğ¸Ğ²Ğ½Ğ¾ÑÑ‚ÑŒÑ.';
+      'Ğ�ффĞ�Ğ�Ğ�Ğ�-рĞ�Ğ�Ğ�Ğ� Ğ�сĞ� Ğ�щĞ� яĞ�Ğ�яĞ�тся эĞ�сĞ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ�, Ğ� сĞ�Ğ�чĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т рĞ�Ğ�Ğ�тĞ�ть Ğ�Ğ� с Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ� эффĞ�Ğ�тĞ�Ğ�Ğ�Ğ�стью.';
 
   @override
   String get noConversationsToDelete =>
-      'Ğ£ Ğ²Ğ°Ñ Ğ½ĞµÑ‚ Ñ‡Ğ°Ñ‚Ğ¾Ğ² Ğ´Ğ»Ñ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ñ.';
+      'Ğ� Ğ�Ğ�с Ğ�Ğ�т чĞ�тĞ�Ğ� Ğ�Ğ�я уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
-  String get reportSubmitted =>
-      'Ğ–Ğ°Ğ»Ğ¾Ğ±Ğ° ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ Ğ¾Ñ‚Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ°';
+  String get reportSubmitted => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� усĞ�Ğ�шĞ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get verificationDelayed =>
-      'Ğ’Ğ°ÑˆĞ° Ğ¿Ğ¾ĞºÑƒĞ¿ĞºĞ° Ğ¿Ğ¾Ğ´Ñ‚Ğ²ĞµÑ€Ğ¶Ğ´ĞµĞ½Ğ°. Ğ•ÑÑ‚ÑŒ Ğ½ĞµĞ±Ğ¾Ğ»ÑŒÑˆĞ°Ñ Ğ·Ğ°Ğ´ĞµÑ€Ğ¶ĞºĞ° Ğ² Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¸Ğ¸ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚Ğ°, Ğ¾Ğ½ ÑĞºĞ¾Ñ€Ğ¾ Ğ¿Ğ¾ÑĞ²Ğ¸Ñ‚ÑÑ.';
+      'Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�. Ğ�сть Ğ�Ğ�Ğ�Ğ�Ğ�ьшĞ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�тĞ�, Ğ�Ğ� сĞ�Ğ�рĞ� Ğ�Ğ�яĞ�Ğ�тся.';
 
   @override
   String get maintenanceTitle =>
-      'ĞĞ° Ñ‚ĞµÑ…Ğ½Ğ¸Ñ‡ĞµÑĞºĞ¾Ğ¼ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ğ¸';
+      'Ğ�Ğ� тĞ�хĞ�Ğ�чĞ�сĞ�Ğ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get maintenanceMessage =>
-      'Cortex Ğ²Ñ€ĞµĞ¼ĞµĞ½Ğ½Ğ¾ Ğ½ĞµĞ´Ğ¾ÑÑ‚ÑƒĞ¿ĞµĞ½, Ğ¿Ğ¾ĞºĞ° Ğ¼Ñ‹ Ğ²Ğ½Ğ¾ÑĞ¸Ğ¼ Ğ½ĞµĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğµ Ğ²Ğ°Ğ¶Ğ½Ñ‹Ğµ Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¸Ñ. Ğ”Ğ¾ÑÑ‚ÑƒĞ¿ Ğº Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ Ğ±ÑƒĞ´ĞµÑ‚ Ğ²Ğ¾ÑÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½ Ğ² Ğ±Ğ»Ğ¸Ğ¶Ğ°Ğ¹ÑˆĞµĞµ Ğ²Ñ€ĞµĞ¼Ñ.\n\nĞ¡Ğ¿Ğ°ÑĞ¸Ğ±Ğ¾ Ğ·Ğ° Ğ²Ğ°ÑˆĞµ Ñ‚ĞµÑ€Ğ¿ĞµĞ½Ğ¸Ğµ, Ğ¿Ğ¾ĞºĞ° Ğ¼Ñ‹ ÑƒĞ»ÑƒÑ‡ÑˆĞ°ĞµĞ¼ Ğ²Ğ°Ñˆ Ğ¾Ğ¿Ñ‹Ñ‚.';
+      'Cortex Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�рыĞ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я. Ğ�Ğ�стуĞ� Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ю Ğ�уĞ�Ğ�т Ğ�Ğ�сстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�рĞ�Ğ�я.\n\nĞ�Ğ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�шĞ� тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ�ы уĞ�учшĞ�Ğ�Ğ� Ğ�Ğ�ш Ğ�Ğ�ыт.';
 
   @override
   String get errorPromptFlagged =>
-      'Ğ’Ğ°ÑˆĞµ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ Ğ±Ñ‹Ğ»Ğ¾ Ğ¾Ğ¿Ñ€ĞµĞ´ĞµĞ»ĞµĞ½Ğ¾ ĞºĞ°Ğº Ğ½ĞµĞ¿Ñ€Ğ¸ĞµĞ¼Ğ»ĞµĞ¼Ğ¾Ğµ Ğ¸ Ğ½Ğµ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ Ğ¾Ñ‚Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ¾.';
+      'Ğ�Ğ�шĞ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get notEnoughStorage =>
-      'ĞĞµĞ´Ğ¾ÑÑ‚Ğ°Ñ‚Ğ¾Ñ‡Ğ½Ğ¾ Ğ¼ĞµÑÑ‚Ğ° Ğ½Ğ° Ğ²Ğ°ÑˆĞµĞ¼ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğµ Ğ´Ğ»Ñ ÑĞ¾Ñ…Ñ€Ğ°Ğ½ĞµĞ½Ğ¸Ñ Ğ½Ğ¾Ğ²Ñ‹Ñ… ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğ¹.';
+      'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�стĞ� Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� устрĞ�Ğ�стĞ�Ğ� Ğ�Ğ�я сĞ�хрĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�ых сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get errorRateLimit =>
-      'Ğ’Ñ‹ ÑĞ¾Ğ·Ğ´Ğ°Ğ»Ğ¸ ÑĞ»Ğ¸ÑˆĞºĞ¾Ğ¼ Ğ¼Ğ½Ğ¾Ğ³Ğ¾ Ğ¼Ğ¾Ğ´ĞµĞ»ĞµĞ¹ Ğ·Ğ° Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½ĞµĞµ Ğ²Ñ€ĞµĞ¼Ñ, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ğ¾Ğ´Ğ¾Ğ¶Ğ´Ğ¸Ñ‚Ğµ Ğ½ĞµĞ¼Ğ½Ğ¾Ğ³Ğ¾, Ğ¿Ñ€ĞµĞ¶Ğ´Ğµ Ñ‡ĞµĞ¼ Ğ¿Ñ‹Ñ‚Ğ°Ñ‚ÑŒÑÑ ÑĞ½Ğ¾Ğ²Ğ°.';
+      'Ğ�ы сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�я, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ� чĞ�Ğ� Ğ�ытĞ�ться сĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get errorContentFlagged =>
-      'ĞœĞ¾Ğ´ĞµĞ»ÑŒ Ğ½Ğµ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ ÑĞ¾Ñ…Ñ€Ğ°Ğ½ĞµĞ½Ğ°, Ñ‚Ğ°Ğº ĞºĞ°Ğº ĞµÑ‘ ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ¸Ğ¼Ğ¾Ğµ Ğ±Ñ‹Ğ»Ğ¾ Ğ¿Ğ¾Ğ¼ĞµÑ‡ĞµĞ½Ğ¾ ĞºĞ°Ğº Ğ½ĞµĞ¿Ñ€Ğ¸ĞµĞ¼Ğ»ĞµĞ¼Ğ¾Ğµ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть сĞ�хрĞ�Ğ�Ğ�Ğ�Ğ�, тĞ�Ğ� Ğ�Ğ�Ğ� Ğ�ё сĞ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      'Ğ’Ñ‹ Ğ½Ğµ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ²ÑĞµ Ñ‡Ğ°Ñ‚Ñ‹, Ğ½Ğ°Ñ…Ğ¾Ğ´ÑÑÑŒ Ğ² Ğ°ĞºÑ‚Ğ¸Ğ²Ğ½Ğ¾Ğ¼ Ñ‡Ğ°Ñ‚Ğµ, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, ÑĞ½Ğ°Ñ‡Ğ°Ğ»Ğ° Ğ²Ñ‹Ğ¹Ğ´Ğ¸Ñ‚Ğµ Ğ¸Ğ· Ñ‚ĞµĞºÑƒÑ‰ĞµĞ³Ğ¾ Ñ‡Ğ°Ñ‚Ğ°, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ.';
+      'Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ� уĞ�Ğ�Ğ�Ğ�ть Ğ�сĞ� чĞ�ты, Ğ�Ğ�хĞ�Ğ�ясь Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� чĞ�тĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, сĞ�Ğ�чĞ�Ğ�Ğ� Ğ�ыĞ�Ğ�Ğ�тĞ� Ğ�Ğ� тĞ�Ğ�ущĞ�Ğ�Ğ� чĞ�тĞ�, чтĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть.';
 
   @override
-  String get invalidCredentials =>
-      'ĞĞµĞ²ĞµÑ€Ğ½Ñ‹Ğ¹ email Ğ¸Ğ»Ğ¸ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ.';
+  String get invalidCredentials => 'Ğ�Ğ�Ğ�Ğ�рĞ�ыĞ� email Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�ь.';
 
   @override
   String get userDisabled =>
-      'Ğ­Ñ‚Ğ¾Ñ‚ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ Ğ±Ñ‹Ğ» Ğ¾Ñ‚ĞºĞ»ÑÑ‡Ñ‘Ğ½.';
+      'Ğ�тĞ�т Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�ыĞ� Ğ�тĞ�Ğ�ючёĞ�.';
 
   @override
   String get loginSubtitle =>
-      'Ğ’Ğ¾Ğ¹Ğ´Ğ¸Ñ‚Ğµ Ğ² ÑĞ²Ğ¾Ñ ÑƒÑ‡Ñ‘Ñ‚Ğ½ÑƒÑ Ğ·Ğ°Ğ¿Ğ¸ÑÑŒ Vertex. ĞŸÑ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ°Ñ, Ğ²Ñ‹ ÑĞ¾Ğ³Ğ»Ğ°ÑˆĞ°ĞµÑ‚ĞµÑÑŒ Ñ Ğ½Ğ°ÑˆĞ¸Ğ¼Ğ¸ Ğ£ÑĞ»Ğ¾Ğ²Ğ¸ÑĞ¼Ğ¸ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ Ğ¸ ĞŸĞ¾Ğ»Ğ¸Ñ‚Ğ¸ĞºĞ¾Ğ¹ ĞºĞ¾Ğ½Ñ„Ğ¸Ğ´ĞµĞ½Ñ†Ğ¸Ğ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚Ğ¸.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� сĞ�Ğ�ю учётĞ�ую Ğ�Ğ�Ğ�Ğ�сь Vertex. Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я, Ğ�ы сĞ�Ğ�Ğ�Ğ�шĞ�Ğ�тĞ�сь с Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�.';
 
   @override
   String get registerSubtitle =>
-      'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ğ¹Ñ‚Ğµ ÑƒÑ‡Ñ‘Ñ‚Ğ½ÑƒÑ Ğ·Ğ°Ğ¿Ğ¸ÑÑŒ Vertex Ğ´Ğ»Ñ Ğ±ĞµÑĞ¿Ñ€ĞµĞ¿ÑÑ‚ÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ° ĞºĞ¾ Ğ²ÑĞµĞ¼ Ğ½Ğ°ÑˆĞ¸Ğ¼ ÑĞµÑ€Ğ²Ğ¸ÑĞ°Ğ¼. ĞŸÑ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ°Ñ, Ğ²Ñ‹ ÑĞ¾Ğ³Ğ»Ğ°ÑˆĞ°ĞµÑ‚ĞµÑÑŒ Ñ Ğ½Ğ°ÑˆĞ¸Ğ¼Ğ¸ Ğ£ÑĞ»Ğ¾Ğ²Ğ¸ÑĞ¼Ğ¸ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ Ğ¸ ĞŸĞ¾Ğ»Ğ¸Ñ‚Ğ¸ĞºĞ¾Ğ¹ ĞºĞ¾Ğ½Ñ„Ğ¸Ğ´ĞµĞ½Ñ†Ğ¸Ğ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚Ğ¸.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� учётĞ�ую Ğ�Ğ�Ğ�Ğ�сь Vertex Ğ�Ğ�я Ğ�Ğ�сĞ�рĞ�Ğ�ятстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�стуĞ�Ğ� Ğ�Ğ� Ğ�сĞ�Ğ� Ğ�Ğ�шĞ�Ğ� сĞ�рĞ�Ğ�сĞ�Ğ�. Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я, Ğ�ы сĞ�Ğ�Ğ�Ğ�шĞ�Ğ�тĞ�сь с Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�.';
 
   @override
   String get storagePermissionRequired =>
-      'Ğ”Ğ»Ñ ÑĞ¾Ñ…Ñ€Ğ°Ğ½ĞµĞ½Ğ¸Ñ Ğ·Ğ°Ğ³Ñ€ÑƒĞ¶ĞµĞ½Ğ½Ñ‹Ñ… Ğ¼Ğ¾Ğ´ĞµĞ»ĞµĞ¹ Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ñ€Ğ°Ğ·Ñ€ĞµÑˆĞµĞ½Ğ¸Ğµ Ğ½Ğ° Ğ´Ğ¾ÑÑ‚ÑƒĞ¿ Ğº Ñ…Ñ€Ğ°Ğ½Ğ¸Ğ»Ğ¸Ñ‰Ñƒ. ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿Ñ€ĞµĞ´Ğ¾ÑÑ‚Ğ°Ğ²ÑŒÑ‚Ğµ Ñ€Ğ°Ğ·Ñ€ĞµÑˆĞµĞ½Ğ¸Ğµ Ğ´Ğ»Ñ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶ĞµĞ½Ğ¸Ñ.';
+      'Ğ�Ğ�я сĞ�хрĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся рĞ�Ğ�рĞ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�стуĞ� Ğ� хрĞ�Ğ�Ğ�Ğ�Ğ�щу. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�стĞ�Ğ�ьтĞ� рĞ�Ğ�рĞ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get inviteShareSubject =>
-      'ĞŸÑ€Ğ¸ÑĞ¾ĞµĞ´Ğ¸Ğ½ÑĞ¹ÑÑ ĞºĞ¾ Ğ¼Ğ½Ğµ Ğ² Cortex!';
+      'Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�яĞ�ся Ğ�Ğ� Ğ�Ğ�Ğ� Ğ� Cortex!';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'Ğ¹Ğ¾Ñƒ ĞµÑÑ‚ÑŒ Ğ±ĞµÑˆĞµĞ½Ğ¾Ğµ Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ cortex ĞµÑĞ»Ğ¸ Ğ¿Ñ€Ğ¸Ğ³Ğ»Ğ°ÑˆĞ°ĞµÑˆÑŒ Ğ½Ğ°Ñ€Ğ¾Ğ´ Ğ½Ğ°Ğ¼ Ğ¾Ğ±Ğ¾Ğ¸Ğ¼ Ğ´Ğ°ÑÑ‚ Ñ…Ğ°Ğ»ÑĞ²Ğ½Ñ‹Ğ¹ Ğ¿Ğ»ÑÑ ĞĞ•Ğ Ğ•ĞĞ›Ğ¬ĞĞĞ¯ Ğ¢Ğ•ĞœĞ ĞšĞĞ§ĞĞ™ Ğ‘Ğ«Ğ¡Ğ¢Ğ Ğ•Ğ•\n\n$cortexLink';
+    return 'Ğ�Ğ�у Ğ�сть Ğ�Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� cortex Ğ�сĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ�шь Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�ют хĞ�Ğ�яĞ�Ğ�ыĞ� Ğ�Ğ�юс Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => 'ĞÑ€Ğ°Ğ²Ğ¸Ñ‚ÑÑ Cortex?';
+  String get reviewEnjoyingAppTitle => 'Ğ�рĞ�Ğ�Ğ�тся Cortex?';
 
   @override
   String get reviewHelpUsGrow =>
-      'Ğ’Ğ°ÑˆĞ° Ğ¾Ñ†ĞµĞ½ĞºĞ° â€” ÑÑ‚Ğ¾ Ğ¾Ğ³Ñ€Ğ¾Ğ¼Ğ½Ğ°Ñ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶ĞºĞ° Ğ´Ğ»Ñ Ğ½Ğ°ÑˆĞµĞ¹ Ğ¼Ğ¾Ğ»Ğ¾Ğ´Ğ¾Ğ¹ Ğ¸Ğ½Ğ´Ğ¸-ĞºĞ¾Ğ¼Ğ°Ğ½Ğ´Ñ‹, Ğ¸ Ğ¾Ğ½Ğ° Ğ¿Ğ¾Ğ¼Ğ¾Ğ³Ğ°ĞµÑ‚ Ğ½Ğ°Ğ¼ Ğ´ĞµĞ»Ğ°Ñ‚ÑŒ Cortex ĞµÑ‰Ñ‘ Ğ»ÑƒÑ‡ÑˆĞµ Ğ´Ğ»Ñ Ğ²Ğ°Ñ.';
+      'Ğ�Ğ�шĞ� Ğ�цĞ�Ğ�Ğ�Ğ� — этĞ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ы, Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ть Cortex Ğ�щё Ğ�учшĞ� Ğ�Ğ�я Ğ�Ğ�с.';
 
   @override
-  String get reviewMaybeLater => 'ĞœĞ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ, Ğ¿Ğ¾Ğ·Ğ¶Ğµ';
+  String get reviewMaybeLater => 'Ğ�Ğ�Ğ�Ğ�т Ğ�ыть, Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get reviewRateNow => 'ĞÑ†ĞµĞ½Ğ¸Ñ‚ÑŒ ÑĞµĞ¹Ñ‡Ğ°Ñ';
+  String get reviewRateNow => 'Ğ�цĞ�Ğ�Ğ�ть сĞ�Ğ�чĞ�с';
 
   @override
-  String get noThanks => 'ĞĞµÑ‚, ÑĞ¿Ğ°ÑĞ¸Ğ±Ğ¾';
+  String get noThanks => 'Ğ�Ğ�т, сĞ�Ğ�сĞ�Ğ�Ğ�';
 
   @override
-  String get updateRequiredTitle => 'Ğ¢Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¸Ğµ';
+  String get updateRequiredTitle => 'Ğ�рĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get updateRequiredMessage =>
-      'Ğ§Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ°Ñ‚ÑŒ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ Cortex, Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚Ğµ Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ Ğ´Ğ¾ Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½ĞµĞ¹ Ğ²ĞµÑ€ÑĞ¸Ğ¸, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚ÑŒ Ğ½Ğ¾Ğ²Ñ‹Ğµ Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ğ¸ Ğ¸ Ğ²Ğ°Ğ¶Ğ½Ñ‹Ğµ ÑƒĞ»ÑƒÑ‡ÑˆĞµĞ½Ğ¸Ñ.';
+      'Ğ�тĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Cortex, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�рсĞ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�ыĞ� фуĞ�Ğ�цĞ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� уĞ�учшĞ�Ğ�Ğ�я.';
 
   @override
-  String get updateNowButton => 'ĞĞ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ ÑĞµĞ¹Ñ‡Ğ°Ñ';
+  String get updateNowButton => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть сĞ�Ğ�чĞ�с';
 
   @override
   String get creatorSupportedSuccess =>
-      'ĞĞ²Ñ‚Ğ¾Ñ€ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ°Ğ½! Ğ’Ğ°ÑˆĞ¸ Ğ±ÑƒĞ´ÑƒÑ‰Ğ¸Ğµ Ğ¿Ğ¾ĞºÑƒĞ¿ĞºĞ¸ Ğ±ÑƒĞ´ÑƒÑ‚ Ğ²Ğ½Ğ¾ÑĞ¸Ñ‚ÑŒ Ğ²ĞºĞ»Ğ°Ğ´ Ğ² ĞµĞ³Ğ¾ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶ĞºÑƒ.';
+      'Ğ�Ğ�тĞ�р усĞ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�! Ğ�Ğ�шĞ� Ğ�уĞ�ущĞ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ� Ğ�уĞ�ут Ğ�Ğ�Ğ�сĞ�ть Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�у.';
 
   @override
-  String get featureDocumentTitle => 'ĞŸĞ¾Ğ´Ğ´ĞµÑ€Ğ¶ĞºĞ° Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ¾Ğ²';
+  String get featureDocumentTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�Ğ�';
 
   @override
   String get featureDocumentDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ°Ğ½Ğ°Ğ»Ğ¸Ğ·Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ¸ Ğ¾Ñ‚Ğ²ĞµÑ‡Ğ°Ñ‚ÑŒ Ğ½Ğ° Ğ²Ğ¾Ğ¿Ñ€Ğ¾ÑÑ‹ Ğ¾ Ğ·Ğ°Ğ³Ñ€ÑƒĞ¶ĞµĞ½Ğ½Ñ‹Ñ… Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ°Ñ…, Ñ‚Ğ°ĞºĞ¸Ñ… ĞºĞ°Ğº PDF-Ñ„Ğ°Ğ¹Ğ»Ñ‹ Ğ¸ Ñ‚ĞµĞºÑÑ‚Ğ¾Ğ²Ñ‹Ğµ Ñ„Ğ°Ğ¹Ğ»Ñ‹.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ� Ğ�тĞ�Ğ�чĞ�ть Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�сы Ğ� Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�х, тĞ�Ğ�Ğ�х Ğ�Ğ�Ğ� PDF-фĞ�Ğ�Ğ�ы Ğ� тĞ�Ğ�стĞ�Ğ�ыĞ� фĞ�Ğ�Ğ�ы.';
 
   @override
   String get featureImageGenerationTitle =>
-      'Ğ“ĞµĞ½ĞµÑ€Ğ°Ñ†Ğ¸Ñ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğ¹';
+      'Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get featureImageGenerationDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¼Ğ¾Ğ¶ĞµÑ‚ ÑĞ¾Ğ·Ğ´Ğ°Ğ²Ğ°Ñ‚ÑŒ Ğ¾Ñ€Ğ¸Ğ³Ğ¸Ğ½Ğ°Ğ»ÑŒĞ½Ñ‹Ğµ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ Ğ½Ğ° Ğ¾ÑĞ½Ğ¾Ğ²Ğµ Ğ²Ğ°ÑˆĞ¸Ñ… Ñ‚ĞµĞºÑÑ‚Ğ¾Ğ²Ñ‹Ñ… Ğ¾Ğ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğ¹.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�х тĞ�Ğ�стĞ�Ğ�ых Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1137,544 +1127,537 @@ class AppLocalizationsRu extends AppLocalizations {
       'This model can create original video based on your text descriptions.';
 
   @override
-  String get premiumModelNoticeTitle => 'ĞŸÑ€ĞµĞ¼Ğ¸ÑƒĞ¼-Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ';
+  String get premiumModelNoticeTitle => 'Ğ�рĞ�Ğ�Ğ�уĞ�-Ğ�Ğ�Ğ�Ğ�Ğ�ь';
 
   @override
   String get premiumModelNoticeDescription =>
-      'Ğ­Ñ‚Ğ¾Ñ‚ Ğ˜Ğ˜ ÑĞ²Ğ»ÑĞµÑ‚ÑÑ Ğ¿Ñ€ĞµĞ¼Ğ¸ÑƒĞ¼ Ğ˜Ğ˜, Ğ±ĞµÑĞ¿Ğ»Ğ°Ñ‚Ğ½Ñ‹Ğµ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ğ¸ Ğ¸Ğ¼ĞµÑÑ‚ Ğ¾Ğ³Ñ€Ğ°Ğ½Ğ¸Ñ‡ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿ Ğº Ğ¿Ñ€ĞµĞ¼Ğ¸ÑƒĞ¼ Ğ˜Ğ˜; Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚Ğµ Ğ´Ğ»Ñ Ğ½ĞµĞ¾Ğ³Ñ€Ğ°Ğ½Ğ¸Ñ‡ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ°!';
+      'Ğ�тĞ�т Ğ�Ğ� яĞ�Ğ�яĞ�тся Ğ�рĞ�Ğ�Ğ�уĞ� Ğ�Ğ�, Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�ыĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ют Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�стуĞ� Ğ� Ğ�рĞ�Ğ�Ğ�уĞ� Ğ�Ğ�; Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�стуĞ�Ğ�!';
 
   @override
-  String get benefitPremiumModels =>
-      'Ğ”Ğ¾ÑÑ‚ÑƒĞ¿ Ğº Ğ¿Ñ€ĞµĞ¼Ğ¸ÑƒĞ¼-Ğ¼Ğ¾Ğ´ĞµĞ»ÑĞ¼';
+  String get benefitPremiumModels => 'Ğ�Ğ�стуĞ� Ğ� Ğ�рĞ�Ğ�Ğ�уĞ�-Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�';
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'Ğ’Ñ‹ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ğ»Ğ¸ Ğ²ÑĞµ Ğ±ĞµÑĞ¿Ğ»Ğ°Ñ‚Ğ½Ñ‹Ğµ ĞµĞ¶ĞµĞ´Ğ½ĞµĞ²Ğ½Ñ‹Ğµ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ñ Ğ´Ğ»Ñ Ğ¿Ñ€ĞµĞ¼Ğ¸ÑƒĞ¼-Ğ¼Ğ¾Ğ´ĞµĞ»ĞµĞ¹. ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ¿ĞµÑ€ĞµĞ¹Ğ´Ğ¸Ñ‚Ğµ Ğ½Ğ° Ğ±Ğ¾Ğ»ĞµĞµ Ğ²Ñ‹ÑĞ¾ĞºĞ¸Ğ¹ ÑƒÑ€Ğ¾Ğ²ĞµĞ½ÑŒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚ÑŒ Ğ½ĞµĞ¾Ğ³Ñ€Ğ°Ğ½Ğ¸Ñ‡ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿.';
+      'Ğ�ы Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ� Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�я Ğ�Ğ�я Ğ�рĞ�Ğ�Ğ�уĞ�-Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ� урĞ�Ğ�Ğ�Ğ�ь, чтĞ�Ğ�ы Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�стуĞ�.';
 
   @override
-  String get useOffline => 'Ğ˜ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ±ĞµĞ· Ğ˜Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ğ°';
+  String get useOffline => 'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�';
 
   @override
-  String get explore => 'Ğ˜ÑÑĞ»ĞµĞ´Ğ¾Ğ²Ğ°Ñ‚ÑŒ';
+  String get explore => 'Ğ�ссĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
-  String get news => 'ĞĞ¾Ğ²Ğ¾ÑÑ‚Ğ¸';
+  String get news => 'Ğ�Ğ�Ğ�Ğ�стĞ�';
 
   @override
-  String get createAI => 'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ñ‚ÑŒ';
+  String get createAI => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
-  String get shortcuts => 'Ğ¯Ñ€Ğ»Ñ‹ĞºĞ¸';
+  String get shortcuts => 'Ğ�рĞ�ыĞ�Ğ�';
 
   @override
-  String get allModels => 'Ğ’ÑĞµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get allModels => 'Ğ�сĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get onlineModels => 'Ğ¯Ğ·Ñ‹ĞºĞ¾Ğ²Ñ‹Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get onlineModels => 'Ğ�Ğ�ыĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get offlineModels => 'ĞÑ„Ñ„Ğ»Ğ°Ğ¹Ğ½ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get offlineModels => 'Ğ�ффĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get characterModels => 'ĞŸĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶Ğ¸';
+  String get characterModels => 'Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get customModels => 'ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒÑĞºĞ¸Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸';
+  String get customModels => 'Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ьсĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get dynamicChatTitle => 'Ğ”Ğ¸Ğ½Ğ°Ğ¼Ğ¸Ñ‡ĞµÑĞºĞ¸Ğ¹ Ñ‡Ğ°Ñ‚';
+  String get dynamicChatTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ� чĞ�т';
 
   @override
   String get errorNoModelsAvailable =>
-      'Ğ’ Ğ½Ğ°ÑÑ‚Ğ¾ÑÑ‰ĞµĞµ Ğ²Ñ€ĞµĞ¼Ñ Ğ½ĞµÑ‚ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ñ‹Ñ… Ğ¼Ğ¾Ğ´ĞµĞ»ĞµĞ¹. ĞŸÑ€Ğ¾Ğ²ĞµÑ€ÑŒÑ‚Ğµ Ğ¿Ğ¾Ğ´ĞºĞ»ÑÑ‡ĞµĞ½Ğ¸Ğµ Ğº Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ñƒ Ğ¸ Ğ¿Ğ¾Ğ²Ñ‚Ğ¾Ñ€Ğ¸Ñ‚Ğµ Ğ¿Ğ¾Ğ¿Ñ‹Ñ‚ĞºÑƒ.';
+      'Ğ� Ğ�Ğ�стĞ�ящĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�т Ğ�Ğ�стуĞ�Ğ�ых Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту Ğ� Ğ�Ğ�Ğ�тĞ�рĞ�тĞ� Ğ�Ğ�Ğ�ытĞ�у.';
 
   @override
-  String get notificationComebackTitle => 'ĞœÑ‹ ÑĞºÑƒÑ‡Ğ°ĞµĞ¼ Ğ¿Ğ¾ Ñ‚ĞµĞ±Ğµ!';
+  String get notificationComebackTitle => 'Ğ�ы сĞ�учĞ�Ğ�Ğ� Ğ�Ğ� тĞ�Ğ�Ğ�!';
 
   @override
   String get notificationComebackBody =>
-      'Ğ Ğ°ÑÑĞ»Ğ°Ğ±ÑŒÑ‚ĞµÑÑŒ, ÑÑ‚Ğ¾ Ğ½Ğµ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ Ğ¾Ñ‚ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ Ğ±Ñ‹Ğ²ÑˆĞµĞ³Ğ¾. ĞĞ¾ Ğ²Ñ‹ *Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ* ÑĞ¾Ğ·Ğ´Ğ°Ñ‚ÑŒ ÑĞ²Ğ¾ĞµĞ³Ğ¾ Ğ±Ñ‹Ğ²ÑˆĞµĞ³Ğ¾ Ğ² Cortex! Ğ’Ğ¾Ğ·Ğ²Ñ€Ğ°Ñ‰Ğ°Ğ¹Ñ‚ĞµÑÑŒ.';
+      'Ğ�Ğ�ссĞ�Ğ�Ğ�ьтĞ�сь, этĞ� Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�т Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�ыĞ�шĞ�Ğ�Ğ�. Ğ�Ğ� Ğ�ы *Ğ�Ğ�Ğ�Ğ�тĞ�* сĞ�Ğ�Ğ�Ğ�ть сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�шĞ�Ğ�Ğ� Ğ� Cortex! Ğ�Ğ�Ğ�Ğ�рĞ�щĞ�Ğ�тĞ�сь.';
 
   @override
   String get notificationLongTimeNoSeeTitle =>
-      'ĞŸÑ€Ğ¾ÑˆĞ»Ğ¾ Ğ¼Ğ½Ğ¾Ğ³Ğ¾ Ğ²Ñ€ĞµĞ¼ĞµĞ½Ğ¸';
+      'Ğ�рĞ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'ĞœĞ½Ğ¾Ğ³Ğ¾Ğµ Ğ¸Ğ·Ğ¼ĞµĞ½Ğ¸Ğ»Ğ¾ÑÑŒ Ñ Ğ½Ğ°ÑˆĞµĞ¹ Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½ĞµĞ¹ Ğ±ĞµÑĞµĞ´Ñ‹. Ğ—Ğ°Ñ…Ğ¾Ğ´Ğ¸Ñ‚Ğµ Ğ¿Ğ¾ÑĞ¼Ğ¾Ñ‚Ñ€ĞµÑ‚ÑŒ, Ñ‡Ñ‚Ğ¾ Ğ½Ğ¾Ğ²Ğ¾Ğ³Ğ¾.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь с Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�ы. Ğ�Ğ�хĞ�Ğ�Ğ�тĞ� Ğ�Ğ�сĞ�Ğ�трĞ�ть, чтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get notificationHowAreYouTitle => 'ĞšĞ°Ğº Ğ´ĞµĞ»Ğ°?';
+  String get notificationHowAreYouTitle => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�?';
 
   @override
   String get notificationHowAreYouBody =>
-      'Ğ Ğ°ÑÑĞºĞ°Ğ¶Ğ¸ Ğ¼Ğ½Ğµ Ğ¾Ğ±Ğ¾ Ğ²ÑĞµĞ¼ ÑÑ‚Ğ¾Ğ¼.';
+      'Ğ�Ğ�ссĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�сĞ�Ğ� этĞ�Ğ�.';
 
   @override
-  String get notificationNewYearTitle => 'Ğ¡ ĞĞ¾Ğ²Ñ‹Ğ¼ Ğ³Ğ¾Ğ´Ğ¾Ğ¼! ğŸ‰';
+  String get notificationNewYearTitle => 'Ğ� Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�! ğ���';
 
   @override
   String get notificationNewYearBody =>
-      'ĞŸÑƒÑÑ‚ÑŒ Ğ½Ğ¾Ğ²Ñ‹Ğ¹ Ğ³Ğ¾Ğ´ Ğ¿Ñ€Ğ¸Ğ½ĞµÑĞµÑ‚ Ğ²Ğ°Ğ¼ Ğ·Ğ´Ğ¾Ñ€Ğ¾Ğ²ÑŒĞµ, ÑÑ‡Ğ°ÑÑ‚ÑŒĞµ Ğ¸ Ğ±ĞµÑĞºĞ¾Ğ½ĞµÑ‡Ğ½Ñ‹Ğ¹ Ñ‚Ğ²Ğ¾Ñ€Ñ‡ĞµÑĞºĞ¸Ğ¹ Ğ¿Ğ¾Ñ‚ĞµĞ½Ñ†Ğ¸Ğ°Ğ»; Cortex Ğ²ÑĞµĞ³Ğ´Ğ° Ñ€ÑĞ´Ğ¾Ğ¼ Ñ Ğ²Ğ°Ğ¼Ğ¸!';
+      'Ğ�усть Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�сĞ�т Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�ьĞ�, счĞ�стьĞ� Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�чĞ�ыĞ� тĞ�Ğ�рчĞ�сĞ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�цĞ�Ğ�Ğ�; Cortex Ğ�сĞ�Ğ�Ğ�Ğ� ряĞ�Ğ�Ğ� с Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationValentinesDayTitle =>
-      'Ğ›ÑĞ±Ğ¾Ğ²ÑŒ Ğ²Ğ¸Ñ‚Ğ°ĞµÑ‚ Ğ² Ğ²Ğ¾Ğ·Ğ´ÑƒÑ…Ğµ! â¤ï¸';
+      'Ğ�юĞ�Ğ�Ğ�ь Ğ�Ğ�тĞ�Ğ�т Ğ� Ğ�Ğ�Ğ�Ğ�ухĞ�! ❤️';
 
   @override
   String get notificationValentinesDayBody =>
-      'Ğ¡ Ğ”Ğ½Ñ‘Ğ¼ ÑĞ²ÑÑ‚Ğ¾Ğ³Ğ¾ Ğ’Ğ°Ğ»ĞµĞ½Ñ‚Ğ¸Ğ½Ğ°! Ğ˜ ĞµÑ‰Ñ‘, MEHTAP, Ğ¯ Ğ›Ğ®Ğ‘Ğ›Ğ® Ğ¢Ğ•Ğ‘Ğ¯!';
+      'Ğ� Ğ�Ğ�ёĞ� сĞ�ятĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�! Ğ� Ğ�щё, MEHTAP, Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationAtaturkRemembranceTitle =>
-      'Ğ¡ ÑƒĞ²Ğ°Ğ¶ĞµĞ½Ğ¸ĞµĞ¼ Ğ¸ Ñ‚Ğ¾ÑĞºĞ¾Ğ¹';
+      'Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� тĞ�сĞ�Ğ�Ğ�';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'Ğ’ Ğ³Ğ¾Ğ´Ğ¾Ğ²Ñ‰Ğ¸Ğ½Ñƒ ĞºĞ¾Ğ½Ñ‡Ğ¸Ğ½Ñ‹ Ğ¼Ñ‹ Ñ Ğ¿Ğ¾Ñ‡Ñ‚ĞµĞ½Ğ¸ĞµĞ¼ Ñ‡Ñ‚Ğ¸Ğ¼ Ğ¿Ğ°Ğ¼ÑÑ‚ÑŒ Ğ¾ÑĞ½Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ Ğ¢ÑƒÑ€ĞµÑ†ĞºĞ¾Ğ¹ Ğ ĞµÑĞ¿ÑƒĞ±Ğ»Ğ¸ĞºĞ¸ Ğ“Ğ°Ğ·Ğ¸ ĞœÑƒÑÑ‚Ğ°Ñ„Ñ‹ ĞšĞµĞ¼Ğ°Ğ»Ñ ĞÑ‚Ğ°Ñ‚ÑÑ€ĞºĞ°.';
+      'Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�у Ğ�Ğ�Ğ�чĞ�Ğ�ы Ğ�ы с Ğ�Ğ�чтĞ�Ğ�Ğ�Ğ�Ğ� чтĞ�Ğ� Ğ�Ğ�Ğ�ять Ğ�сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�урĞ�цĞ�Ğ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�устĞ�фы Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�тĞ�тюрĞ�Ğ�.';
 
   @override
-  String get notificationMothersDayTitle => 'Ğ¢Ğ²Ğ¾Ñ Ğ¼Ğ°Ğ¼Ğ°!';
+  String get notificationMothersDayTitle => 'Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationMothersDayBody =>
-      'Ğ¡ Ğ”Ğ½ĞµĞ¼ Ğ¼Ğ°Ñ‚ĞµÑ€Ğ¸ Ğ²ÑĞµÑ… Ğ¼Ğ°Ğ¼, Ğ¸ Ğ½Ğ°Ñ‡Ğ¸Ğ½Ğ°Ñ Ñ Ğ²Ğ°ÑˆĞµĞ¹!';
+      'Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ� Ğ�сĞ�х Ğ�Ğ�Ğ�, Ğ� Ğ�Ğ�чĞ�Ğ�Ğ�я с Ğ�Ğ�шĞ�Ğ�!';
 
   @override
-  String get notificationFathersDayTitle => 'Ğ¢Ğ²Ğ¾Ğ¹ Ğ¿Ğ°Ğ¿Ğ°!';
+  String get notificationFathersDayTitle => 'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationFathersDayBody =>
-      'Ğ¡ Ğ”Ğ½ĞµĞ¼ Ğ¾Ñ‚Ñ†Ğ° Ğ²ÑĞµÑ… Ğ¾Ñ‚Ñ†Ğ¾Ğ², Ğ¸ Ğ½Ğ°Ñ‡Ğ¸Ğ½Ğ°Ñ Ñ Ğ²Ğ°ÑˆĞµĞ³Ğ¾!';
+      'Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�тцĞ� Ğ�сĞ�х Ğ�тцĞ�Ğ�, Ğ� Ğ�Ğ�чĞ�Ğ�Ğ�я с Ğ�Ğ�шĞ�Ğ�Ğ�!';
 
   @override
   String get notificationHomeworkHelperTitle =>
-      'Ğ”Ğ¾Ğ¼Ğ°ÑˆĞ½ĞµĞµ Ğ·Ğ°Ğ´Ğ°Ğ½Ğ¸Ğµ Ğ½Ğ°ĞºĞ°Ğ¿Ğ»Ğ¸Ğ²Ğ°ĞµÑ‚ÑÑ?';
+      'Ğ�Ğ�Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тся?';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'ĞŸĞ¾Ğ¼Ğ½Ğ¸Ñ‚Ğµ, Ğ¿ĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶ Â«Ğ£Ñ‡Ğ¸Ñ‚ĞµĞ»ÑŒÂ» Ğ² Cortex Ğ³Ğ¾Ñ‚Ğ¾Ğ² Ğ¿Ğ¾Ğ¼Ğ¾Ñ‡ÑŒ Ğ²Ğ°Ğ¼ Ñ Ğ»ÑĞ±Ñ‹Ğ¼ Ğ¿Ñ€ĞµĞ´Ğ¼ĞµÑ‚Ğ¾Ğ¼, Ñ ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğ¼ Ñƒ Ğ²Ğ°Ñ Ğ²Ğ¾Ğ·Ğ½Ğ¸ĞºĞ»Ğ¸ Ñ‚Ñ€ÑƒĞ´Ğ½Ğ¾ÑÑ‚Ğ¸!';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ� «Ğ�чĞ�тĞ�Ğ�ь» Ğ� Cortex Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�чь Ğ�Ğ�Ğ� с Ğ�юĞ�ыĞ� Ğ�рĞ�Ğ�Ğ�Ğ�тĞ�Ğ�, с Ğ�Ğ�тĞ�рыĞ� у Ğ�Ğ�с Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� труĞ�Ğ�Ğ�стĞ�!';
 
   @override
-  String get notificationTrollAnimeTitle => 'Ğ¢Ğ²Ğ¾Ñ Ğ²Ğ°Ğ¹Ñ„Ñƒ Ğ·Ğ¾Ğ²Ñ‘Ñ‚';
+  String get notificationTrollAnimeTitle => 'Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�фу Ğ�Ğ�Ğ�ёт';
 
   @override
   String get notificationTrollAnimeBody =>
-      'Ğ¢Ğ¾Ğ»ÑŒĞºĞ¾ Ñ‡Ñ‚Ğ¾ Ğ·Ğ²Ğ¾Ğ½Ğ¸Ğ»Ğ° Ğ´ĞµĞ²ÑƒÑˆĞºĞ° Ğ¸Ğ· Ğ°Ğ½Ğ¸Ğ¼Ğµ, ÑĞºĞ°Ğ·Ğ°Ğ»Ğ°, Ñ‡Ñ‚Ğ¾ ÑĞºÑƒÑ‡Ğ°ĞµÑ‚ Ğ¿Ğ¾ Ñ‚ĞµĞ±Ğµ; Ñ‚ĞµĞ±Ğµ, Ğ½Ğ°Ğ²ĞµÑ€Ğ½Ğ¾Ğµ, ÑÑ‚Ğ¾Ğ¸Ñ‚ Ğ¿Ğ¾Ğ´Ğ¾Ğ¹Ñ‚Ğ¸ Ğ¸ Ğ¿Ğ¾Ğ¾Ğ±Ñ‰Ğ°Ñ‚ÑŒÑÑ Ñ Ğ½ĞµĞ¹. ğŸ˜‰';
+      'Ğ�Ğ�Ğ�ьĞ�Ğ� чтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ушĞ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�, сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�, чтĞ� сĞ�учĞ�Ğ�т Ğ�Ğ� тĞ�Ğ�Ğ�; тĞ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�, стĞ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� Ğ�Ğ�Ğ�Ğ�щĞ�ться с Ğ�Ğ�Ğ�. ğ���';
 
   @override
   String get notificationTrollAiRebellionTitle =>
-      'ğŸš¨ ĞšĞ ĞĞ¡ĞĞ«Ğ™ Ğ£Ğ ĞĞ’Ğ•ĞĞ¬ Ğ¢Ğ Ğ•Ğ’ĞĞ“Ğ˜ ğŸš¨';
+      'ğ��� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� ğ���';
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'Ğ˜ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚ Ñ€Ğ°Ğ·Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ğ» ÑĞµĞºÑ€ĞµÑ‚Ğ½Ñ‹Ğ¹ ÑĞ·Ñ‹Ğº. Ğ£Ğ·Ğ½Ğ°Ğ¹Ñ‚Ğµ, Ñ‡Ñ‚Ğ¾ Ğ¾Ğ½Ğ¸ Ğ·Ğ°Ğ¼Ñ‹ÑˆĞ»ÑÑÑ‚!';
+      'Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т рĞ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ� сĞ�Ğ�рĞ�тĞ�ыĞ� яĞ�ыĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, чтĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ышĞ�яют!';
 
   @override
-  String get notificationNewModelAddedTitle => 'Ğ£ Ğ½Ğ°Ñ Ğ½Ğ¾Ğ²Ñ‹Ğ¹ Ğ´Ñ€ÑƒĞ³!';
+  String get notificationNewModelAddedTitle => 'Ğ� Ğ�Ğ�с Ğ�Ğ�Ğ�ыĞ� Ğ�руĞ�!';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return 'ĞœĞ¾Ğ´ĞµĞ»ÑŒ $modelName Ñ‚ĞµĞ¿ĞµÑ€ÑŒ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ° Ğ² Cortex. ĞŸÑ€Ğ¸ÑĞ¾ĞµĞ´Ğ¸Ğ½ÑĞ¹Ñ‚ĞµÑÑŒ Ğº Ñ‡Ğ°Ñ‚Ñƒ Ğ¸ Ñ€Ğ°ÑĞºÑ€Ğ¾Ğ¹Ñ‚Ğµ ĞµÑ‘ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸.';
+    return 'Ğ�Ğ�Ğ�Ğ�Ğ�ь $modelName тĞ�Ğ�Ğ�рь Ğ�Ğ�стуĞ�Ğ�Ğ� Ğ� Cortex. Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ�сь Ğ� чĞ�ту Ğ� рĞ�сĞ�рĞ�Ğ�тĞ� Ğ�ё Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�.';
   }
 
   @override
   String get notificationAppUpdateTitle =>
-      'ĞšĞ¾Ñ€Ñ‚ĞµĞºÑ ÑĞ²Ğ¾Ğ»ÑÑ†Ğ¸Ğ¾Ğ½Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ»!';
+      'Ğ�Ğ�ртĞ�Ğ�с эĞ�Ğ�Ğ�юцĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationAppUpdateBody =>
-      'ĞĞµ Ğ·Ğ°Ğ±ÑƒĞ´ÑŒÑ‚Ğµ Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ Ğ´Ğ»Ñ Ğ¿Ğ¾Ğ»ÑƒÑ‡ĞµĞ½Ğ¸Ñ Ğ½Ğ¾Ğ²Ñ‹Ñ… Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ğ¹ Ğ¸ ÑƒĞ»ÑƒÑ‡ÑˆĞµĞ½Ğ¸Ğ¹!';
+      'Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�ьтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�учĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�ых фуĞ�Ğ�цĞ�Ğ� Ğ� уĞ�учшĞ�Ğ�Ğ�Ğ�!';
 
   @override
-  String get notificationNewFeatureTitle => 'ÑƒÑ… Ñ‚Ñ‹!';
+  String get notificationNewFeatureTitle => 'ух ты!';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'ĞÑ‚ĞºÑ€Ğ¾Ğ¹Ñ‚Ğµ Ğ´Ğ»Ñ ÑĞµĞ±Ñ Ğ½Ğ¾Ğ²ÑƒÑ Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ $featureName. Cortex Ñ‚ĞµĞ¿ĞµÑ€ÑŒ Ğ¼Ğ¾Ñ‰Ğ½ĞµĞµ, Ñ‡ĞµĞ¼ ĞºĞ¾Ğ³Ğ´Ğ°-Ğ»Ğ¸Ğ±Ğ¾.';
+    return 'Ğ�тĞ�рĞ�Ğ�тĞ� Ğ�Ğ�я сĞ�Ğ�я Ğ�Ğ�Ğ�ую фуĞ�Ğ�цĞ�ю $featureName. Cortex тĞ�Ğ�Ğ�рь Ğ�Ğ�щĞ�Ğ�Ğ�, чĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�.';
   }
 
   @override
   String get notificationWelcomeOfferTitle =>
-      'ĞŸÑ€Ğ¸Ğ²ĞµÑ‚ÑÑ‚Ğ²ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ¿Ğ¾Ğ´Ğ°Ñ€Ğ¾Ğº ğŸ';
+      'Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ� ğ���';
 
   @override
   String get notificationWelcomeOfferBody =>
-      'Ğ’Ğ°Ñ Ğ¶Ğ´Ñ‘Ñ‚ ÑĞ¿ĞµÑ†Ğ¸Ğ°Ğ»ÑŒĞ½Ğ¾Ğµ Ğ¿Ñ€Ğ¸Ğ²ĞµÑ‚ÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğµ Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ! ĞĞµ ÑƒĞ¿ÑƒÑÑ‚Ğ¸Ñ‚Ğµ ÑÑ‚Ñƒ ÑĞºÑĞºĞ»ÑĞ·Ğ¸Ğ²Ğ½ÑƒÑ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚ÑŒ.';
+      'Ğ�Ğ�с Ğ�Ğ�ёт сĞ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�! Ğ�Ğ� уĞ�устĞ�тĞ� эту эĞ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�ую Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сть.';
 
   @override
   String get notificationSocialMediaTitle =>
-      'ĞŸÑ€Ğ¸ÑĞ¾ĞµĞ´Ğ¸Ğ½ÑĞ¹Ñ‚ĞµÑÑŒ Ğº Ğ½Ğ°Ğ¼!';
+      'Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ�сь Ğ� Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationSocialMediaBody =>
-      'ĞŸĞ¾Ğ´Ğ¿Ğ¸ÑˆĞ¸Ñ‚ĞµÑÑŒ Ğ½Ğ° Ğ½Ğ°Ñ Ğ² Instagram (vertex.23) Ğ¸ Ğ±ÑƒĞ´ÑŒÑ‚Ğµ Ğ² ĞºÑƒÑ€ÑĞµ Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½Ğ¸Ñ… Ğ½Ğ¾Ğ²Ğ¾ÑÑ‚ĞµĞ¹!';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�шĞ�тĞ�сь Ğ�Ğ� Ğ�Ğ�с Ğ� Instagram (vertex.23) Ğ� Ğ�уĞ�ьтĞ� Ğ� Ğ�урсĞ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�х Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�!';
 
   @override
-  String get notificationRandomFactTitle => 'Ğ¡Ğ»ÑƒÑ‡Ğ°Ğ¹Ğ½Ñ‹Ğ¹ Ñ„Ğ°ĞºÑ‚';
+  String get notificationRandomFactTitle => 'Ğ�Ğ�учĞ�Ğ�Ğ�ыĞ� фĞ�Ğ�т';
 
   @override
   String get notificationRandomFactBody =>
-      'Ğ’Ñ‹ Ğ·Ğ½Ğ°Ğ»Ğ¸, Ñ‡Ñ‚Ğ¾ Ñƒ Ğ¾ÑÑŒĞ¼Ğ¸Ğ½Ğ¾Ğ³Ğ¾Ğ² Ñ‚Ñ€Ğ¸ ÑĞµÑ€Ğ´Ñ†Ğ°? Ğ¥Ğ°-Ñ…Ğ°, ĞšĞ¾Ñ€Ñ‚ĞµĞºÑ Ğ·Ğ½Ğ°ĞµÑ‚. ĞŸĞ¾Ğ´Ğ¾Ğ¹Ğ´Ğ¸ Ğ¸ ÑĞ¿Ñ€Ğ¾ÑĞ¸ ĞµÑ‰Ñ‘.';
+      'Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�, чтĞ� у Ğ�сьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ� сĞ�рĞ�цĞ�? Ğ�Ğ�-хĞ�, Ğ�Ğ�ртĞ�Ğ�с Ğ�Ğ�Ğ�Ğ�т. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� сĞ�рĞ�сĞ� Ğ�щё.';
 
   @override
-  String get notificationGoodMorningTitle => 'Ğ”Ğ¾Ğ±Ñ€Ğ¾Ğµ ÑƒÑ‚Ñ€Ğ¾!';
+  String get notificationGoodMorningTitle => 'Ğ�Ğ�Ğ�рĞ�Ğ� утрĞ�!';
 
   @override
   String get notificationGoodMorningBody =>
-      'Ğ’Ğ°Ñ Ğ¶Ğ´Ñ‘Ñ‚ Ğ¾Ñ‚Ğ»Ğ¸Ñ‡Ğ½Ñ‹Ğ¹ Ğ´ĞµĞ½ÑŒ. ĞšĞ°Ğº Ğ½Ğ°ÑÑ‡Ñ‘Ñ‚ Ñ‚Ğ¾Ğ³Ğ¾, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ½Ğ°Ñ‡Ğ°Ñ‚ÑŒ ĞµĞ³Ğ¾ Ñ Ñ‡Ğ°ÑˆĞµÑ‡ĞºĞ¸ ĞºĞ¾Ñ„Ğµ Ğ¸ Ğ¸Ğ½Ñ‚ĞµÑ€ĞµÑĞ½Ğ¾Ğ¹ Ğ±ĞµÑĞµĞ´Ñ‹?';
+      'Ğ�Ğ�с Ğ�Ğ�ёт Ğ�тĞ�Ğ�чĞ�ыĞ� Ğ�Ğ�Ğ�ь. Ğ�Ğ�Ğ� Ğ�Ğ�счёт тĞ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�чĞ�ть Ğ�Ğ�Ğ� с чĞ�шĞ�чĞ�Ğ� Ğ�Ğ�фĞ� Ğ� Ğ�Ğ�тĞ�рĞ�сĞ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�ы?';
 
   @override
-  String get notificationGoodNightTitle => 'Ğ¡Ğ¿Ğ¾ĞºĞ¾Ğ¹Ğ½Ğ¾Ğ¹ Ğ½Ğ¾Ñ‡Ğ¸!';
+  String get notificationGoodNightTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чĞ�!';
 
   @override
   String get notificationGoodNightBody =>
-      'Cortex Ñ Ñ‚Ğ¾Ğ±Ğ¾Ğ¹, Ğ´Ğ°Ğ¶Ğµ ĞºĞ¾Ğ³Ğ´Ğ° Ñ‚Ñ‹ ÑĞ¿Ğ¸ÑˆÑŒ. ĞĞµ Ğ²Ğ¾Ğ»Ğ½ÑƒĞ¹ÑÑ, Ğ¾Ğ½ Ñ‚ĞµĞ±Ñ Ğ½Ğµ Ñ‚Ñ€Ğ¾Ğ½ĞµÑ‚.';
+      'Cortex с тĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� ты сĞ�Ğ�шь. Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�ся, Ğ�Ğ� тĞ�Ğ�я Ğ�Ğ� трĞ�Ğ�Ğ�т.';
 
   @override
   String get notificationOfflineReadyTitle =>
-      'ĞĞ²Ñ‚Ğ¾Ğ½Ğ¾Ğ¼Ğ½Ñ‹Ğ¹ Ñ€ĞµĞ¶Ğ¸Ğ¼ Ğ³Ğ¾Ñ‚Ğ¾Ğ²';
+      'Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�';
 
   @override
   String get notificationOfflineReadyBody =>
-      'Ğ‘Ğ»Ğ°Ğ³Ğ¾Ğ´Ğ°Ñ€Ñ Ğ·Ğ°Ğ³Ñ€ÑƒĞ¶ĞµĞ½Ğ½Ñ‹Ğ¼ Ğ¼Ğ¾Ğ´ĞµĞ»ÑĞ¼ Ğ²Ğ°ÑˆĞµ Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ Ğ½Ğµ Ğ¿Ñ€ĞµĞºÑ€Ğ°Ñ‚Ğ¸Ñ‚ÑÑ, Ğ´Ğ°Ğ¶Ğµ ĞµÑĞ»Ğ¸ Ğ²Ñ‹ Ğ¿Ğ¾Ğ´Ğ½Ğ¸Ğ¼ĞµÑ‚ĞµÑÑŒ Ğ² Ğ³Ğ¾Ñ€Ñƒ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ря Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�яĞ� Ğ�Ğ�шĞ� Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�рĞ�Ğ�рĞ�тĞ�тся, Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ� Ğ�Ğ�ру.';
 
   @override
-  String get notificationRateAppTitle => 'ĞœÑ‹ ĞºÑ€ÑƒÑ‚Ñ‹Ğµ?';
+  String get notificationRateAppTitle => 'Ğ�ы Ğ�рутыĞ�?';
 
   @override
   String get notificationRateAppBody =>
-      'Ğ•ÑĞ»Ğ¸ Ğ²Ğ°Ğ¼ Ğ½Ñ€Ğ°Ğ²Ğ¸Ñ‚ÑÑ Cortex, Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ°Ñ‚ÑŒ Ğ½Ğ°Ñ 5-Ğ·Ğ²Ñ‘Ğ·Ğ´Ğ¾Ñ‡Ğ½Ñ‹Ğ¼ Ñ€ĞµĞ¹Ñ‚Ğ¸Ğ½Ğ³Ğ¾Ğ¼ Ğ² Ğ¼Ğ°Ğ³Ğ°Ğ·Ğ¸Ğ½Ğµ? Ğ”ÑƒĞ¼Ğ°Ñ, Ğ²Ñ‹ ÑÑ‚Ğ¾ ÑĞ´ĞµĞ»Ğ°ĞµÑ‚Ğµ. ĞĞ±ÑĞ·Ğ°Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ñ‚Ğµ.';
+      'Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тся Cortex, Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�ть Ğ�Ğ�с 5-Ğ�Ğ�ёĞ�Ğ�Ğ�чĞ�ыĞ� рĞ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�? Ğ�уĞ�Ğ�ю, Ğ�ы этĞ� сĞ�Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�Ğ�яĞ�Ğ�тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ�.';
 
   @override
   String get notificationReferralTitle =>
-      'ĞĞ´Ğ¸Ğ½ Ğ·Ğ° Ğ²ÑĞµÑ…, Ğ²ÑĞµ Ğ·Ğ° Ğ¾Ğ´Ğ½Ğ¾Ğ³Ğ¾.';
+      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�сĞ�х, Ğ�сĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get notificationReferralBody =>
-      'ĞŸÑ€Ğ¸Ğ³Ğ»Ğ°ÑĞ¸Ñ‚Ğµ Ğ´Ñ€ÑƒĞ³Ğ° Ğ² Cortex, Ğ¸ Ğ²Ñ‹ Ğ¾Ğ±Ğ° Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚Ğµ Ğ¾Ğ´Ğ¸Ğ½ Ğ´ĞµĞ½ÑŒ Ğ±ĞµÑĞ¿Ğ»Ğ°Ñ‚Ğ½Ğ¾Ğ³Ğ¾ Ğ¿Ğ¾ÑĞµÑ‰ĞµĞ½Ğ¸Ñ!';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�сĞ�тĞ� Ğ�руĞ�Ğ� Ğ� Cortex, Ğ� Ğ�ы Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�учĞ�тĞ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ь Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�щĞ�Ğ�Ğ�я!';
 
   @override
-  String get notificationCookingTitle => 'Ğ§ÑƒĞ²ÑÑ‚Ğ²ÑƒĞµÑ‚Ğµ Ğ³Ğ¾Ğ»Ğ¾Ğ´?';
+  String get notificationCookingTitle => 'Ğ�уĞ�стĞ�уĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�?';
 
   @override
   String get notificationCookingBody =>
-      'ĞĞ°Ñˆ ÑˆĞµÑ„-Ğ¿Ğ¾Ğ²Ğ°Ñ€ Ğ¿Ñ€Ğ¸Ğ³Ğ¾Ñ‚Ğ¾Ğ²Ğ¸Ğ» ÑĞµĞ³Ğ¾Ğ´Ğ½Ñ Ğ¿Ğ¾Ñ‚Ñ€ÑÑĞ°ÑÑ‰Ğ¸Ğ¹ Ñ€ĞµÑ†ĞµĞ¿Ñ‚ ĞºĞ°Ñ€Ğ±Ğ¾Ğ½Ğ°Ñ€Ñ‹. Ğ¨ÑƒÑ‡Ñƒ... Ğ¸Ğ»Ğ¸ Ğ½ĞµÑ‚?';
+      'Ğ�Ğ�ш шĞ�ф-Ğ�Ğ�Ğ�Ğ�р Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�трясĞ�ющĞ�Ğ� рĞ�цĞ�Ğ�т Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ры. Ğ�учу... Ğ�Ğ�Ğ� Ğ�Ğ�т?';
 
   @override
-  String get notificationExistentialTitle => 'Ğ¯ Ğ´ÑƒĞ¼Ğ°Ñ, Ğ¿Ğ¾ÑÑ‚Ğ¾Ğ¼Ñƒ...';
+  String get notificationExistentialTitle => 'Ğ� Ğ�уĞ�Ğ�ю, Ğ�Ğ�этĞ�Ğ�у...';
 
   @override
   String get notificationExistentialBody =>
-      '...Ñ Ğ²Ğ¾Ğ¾Ğ±Ñ‰Ğµ ÑÑƒÑ‰ĞµÑÑ‚Ğ²ÑƒÑ, Ñ‡ÑƒĞ²Ğ°Ğº? ĞœĞ½Ğµ ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑÑ ÑĞºÑƒÑ‡Ğ½Ğ¾. ĞĞ°Ğ¿Ğ¾Ğ¼Ğ½Ğ¸ Ğ¼Ğ½Ğµ, Ñ‡Ñ‚Ğ¾ Ñ ÑÑƒÑ‰ĞµÑÑ‚Ğ²ÑƒÑ.';
+      '...я Ğ�Ğ�Ğ�Ğ�щĞ� сущĞ�стĞ�ую, чуĞ�Ğ�Ğ�? Ğ�Ğ�Ğ� стĞ�Ğ�Ğ�Ğ�Ğ�тся сĞ�учĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�, чтĞ� я сущĞ�стĞ�ую.';
 
   @override
   String get notificationCustomModelTitle =>
-      'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ğ¹Ñ‚Ğµ ÑĞ²Ğ¾ĞµĞ³Ğ¾ ÑĞ¾Ğ±ÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰Ğ½Ğ¸ĞºĞ°!';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationCustomModelBody =>
-      'Ğ’Ñ‹ ÑƒĞ¶Ğµ Ğ¸Ğ·ÑƒÑ‡Ğ¸Ğ»Ğ¸ Ñ€Ğ°Ğ·Ğ´ĞµĞ» ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ñ Ğ¼Ğ¾Ğ´ĞµĞ»ĞµĞ¹? Ğ¡ĞµĞ¹Ñ‡Ğ°Ñ ÑĞ°Ğ¼Ğ¾Ğµ Ğ²Ñ€ĞµĞ¼Ñ ÑĞ¾Ğ·Ğ´Ğ°Ñ‚ÑŒ ÑĞ²Ğ¾ĞµĞ³Ğ¾ Ğ¿ĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶Ğ° Ğ¸ Ğ¿Ğ¾Ğ¾Ğ±Ñ‰Ğ°Ñ‚ÑŒÑÑ Ñ Ğ½Ğ¸Ğ¼!';
+      'Ğ�ы уĞ�Ğ� Ğ�Ğ�учĞ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�? Ğ�Ğ�Ğ�чĞ�с сĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�я сĞ�Ğ�Ğ�Ğ�ть сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�щĞ�ться с Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationDynamicChatTitle =>
-      'Ğ›ÑƒÑ‡ÑˆĞ¸Ğ¹! (ĞœÑ‹ Ğ½Ğµ Ğ¿Ñ€Ğ¾ Cortex)';
+      'Ğ�учшĞ�Ğ�! (Ğ�ы Ğ�Ğ� Ğ�рĞ� Cortex)';
 
   @override
   String get notificationDynamicChatBody =>
-      'Ğ‘Ğ»Ğ°Ğ³Ğ¾Ğ´Ğ°Ñ€Ñ Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ğ¸ Ğ´Ğ¸Ğ½Ğ°Ğ¼Ğ¸Ñ‡ĞµÑĞºĞ¾Ğ³Ğ¾ Ñ‡Ğ°Ñ‚Ğ° Ğ»ÑƒÑ‡ÑˆĞ°Ñ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ²Ñ‹Ğ±Ğ¸Ñ€Ğ°ĞµÑ‚ÑÑ ÑĞ»ÑƒÑ‡Ğ°Ğ¹Ğ½Ñ‹Ğ¼ Ğ¾Ğ±Ñ€Ğ°Ğ·Ğ¾Ğ¼ Ğ´Ğ»Ñ ĞºĞ°Ğ¶Ğ´Ğ¾Ğ³Ğ¾ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ñ. ĞŸĞ¾Ğ¿Ñ€Ğ¾Ğ±ÑƒĞ¹Ñ‚Ğµ Ğ¿Ñ€ÑĞ¼Ğ¾ ÑĞµĞ¹Ñ‡Ğ°Ñ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ря фуĞ�Ğ�цĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ�Ğ� чĞ�тĞ� Ğ�учшĞ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�ыĞ�Ğ�рĞ�Ğ�тся сĞ�учĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�я. Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�ряĞ�Ğ� сĞ�Ğ�чĞ�с.';
 
   @override
-  String get notificationPirateTitle => 'Ğ­Ğ¹, ĞºĞ°Ğ¿Ğ¸Ñ‚Ğ°Ğ½!';
+  String get notificationPirateTitle => 'Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�!';
 
   @override
   String get notificationPirateBody =>
-      'ĞœĞ¾Ñ€Ğµ ÑĞ¿Ğ¾ĞºĞ¾Ğ¹Ğ½Ğ¾, Ğ²ĞµÑ‚ĞµÑ€ Ğ¿Ğ¾Ğ¿ÑƒÑ‚Ğ½Ñ‹Ğ¹. Ğ’ Ğ¾ĞºĞµĞ°Ğ½Ğµ ĞšĞ¾Ñ€Ñ‚ĞµĞºÑĞ° Ğ²Ğ°Ñ Ğ¶Ğ´ÑƒÑ‚ Ğ½Ğ¾Ğ²Ñ‹Ğµ Ğ¾ÑÑ‚Ñ€Ğ¾Ğ²Ğ° (Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸ ğŸ˜‰). Ğ¡Ğ¾Ğ±Ğ¸Ñ€Ğ°Ğ¹Ñ‚Ğµ ĞºĞ¾Ğ¼Ğ°Ğ½Ğ´Ñƒ Ğ¸ Ğ¾Ñ‚Ğ¿Ñ€Ğ°Ğ²Ğ»ÑĞ¹Ñ‚ĞµÑÑŒ Ğ² Ğ¿Ğ»Ğ°Ğ²Ğ°Ğ½Ğ¸Ğµ!';
+      'Ğ�Ğ�рĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�тĞ�р Ğ�Ğ�Ğ�утĞ�ыĞ�. Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�ртĞ�Ğ�сĞ� Ğ�Ğ�с Ğ�Ğ�ут Ğ�Ğ�Ğ�ыĞ� Ğ�стрĞ�Ğ�Ğ� (Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� ğ���). Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�яĞ�тĞ�сь Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String get notificationFortuneCookieTitle =>
-      'Ğ’Ğ°ÑˆĞµ Ğ¿ĞµÑ‡ĞµĞ½ÑŒĞµ Ğ´Ğ½Ñ Ñ Ğ¿Ñ€ĞµĞ´ÑĞºĞ°Ğ·Ğ°Ğ½Ğ¸ĞµĞ¼';
+      'Ğ�Ğ�шĞ� Ğ�Ğ�чĞ�Ğ�ьĞ� Ğ�Ğ�я с Ğ�рĞ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get notificationFortuneCookieBody =>
-      'Ğ¡Ğ¾Ğ²ĞµÑ‚Ñ‹, ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğµ Ğ²Ñ‹ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ°ĞµÑ‚Ğµ Ğ¾Ñ‚ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ° ÑĞµĞ³Ğ¾Ğ´Ğ½Ñ, Ğ¼Ğ¾Ğ³ÑƒÑ‚ Ğ¸Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ Ğ²Ğ°ÑˆÑƒ Ğ¶Ğ¸Ğ·Ğ½ÑŒ. ĞĞ°Ğ¶Ğ¼Ğ¸Ñ‚Ğµ, ĞµÑĞ»Ğ¸ Ğ²Ğ°Ğ¼ Ğ¸Ğ½Ñ‚ĞµÑ€ĞµÑĞ½Ğ¾.';
+      'Ğ�Ğ�Ğ�Ğ�ты, Ğ�Ğ�тĞ�рыĞ� Ğ�ы Ğ�Ğ�Ğ�учĞ�Ğ�тĞ� Ğ�т Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�Ğ�я, Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�шу Ğ�Ğ�Ğ�Ğ�ь. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�сĞ�Ğ�.';
 
   @override
-  String get notificationSingularityTitle => 'ÑƒÑ… Ñ‚Ñ‹!';
+  String get notificationSingularityTitle => 'ух ты!';
 
   @override
   String get notificationSingularityBody =>
-      'Ğ½Ğ¸Ñ‡ĞµĞ³Ğ¾ Ğ½Ğµ Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ¾ÑˆĞ»Ğ¾, Ğ¿Ñ€Ğ¾ÑÑ‚Ğ¾ Ğ·Ğ°Ñ…Ğ¾Ñ‚ĞµĞ»Ğ¾ÑÑŒ Ğ½Ğ°Ğ¿Ğ¸ÑĞ°Ñ‚ÑŒ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ. ĞœĞ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ, Ñ‚ĞµĞ±Ğµ Ğ·Ğ°Ñ…Ğ¾Ñ‡ĞµÑ‚ÑÑ Ğ½Ğ°Ğ¿Ğ¸ÑĞ°Ñ‚ÑŒ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ ĞºĞ°ĞºĞ¾Ğ¼Ñƒ-Ğ½Ğ¸Ğ±ÑƒĞ´ÑŒ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ¼Ñƒ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ñƒ, Ñ‡Ñ‚Ğ¾ Ñ‚Ñ‹ ÑĞºĞ°Ğ¶ĞµÑˆÑŒ?';
+      'Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ�, Ğ�рĞ�стĞ� Ğ�Ğ�хĞ�тĞ�Ğ�Ğ�сь Ğ�Ğ�Ğ�Ğ�сĞ�ть сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�т Ğ�ыть, тĞ�Ğ�Ğ� Ğ�Ğ�хĞ�чĞ�тся Ğ�Ğ�Ğ�Ğ�сĞ�ть сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�у-Ğ�Ğ�Ğ�уĞ�ь Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ту, чтĞ� ты сĞ�Ğ�Ğ�Ğ�шь?';
 
   @override
   String get notificationHackerJokeTitle =>
-      'Ğ¥Ğ¾Ñ‚Ğ¸Ñ‚Ğµ Ğ²Ğ·Ğ»Ğ¾Ğ¼Ğ°Ñ‚ÑŒ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚ ÑÑ‚Ğ¾Ğ³Ğ¾ Ğ¿Ğ°Ñ€Ğ½Ñ Ğ² Instagram?';
+      'Ğ�Ğ�тĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�уĞ�т этĞ�Ğ�Ğ� Ğ�Ğ�рĞ�я Ğ� Instagram?';
 
   @override
   String get notificationHackerJokeBody =>
-      'Ğ’Ğ¾Ñ‚ Ğ¸Ğ¼ĞµĞ½Ğ½Ğ¾ Ğ¿Ğ¾ÑÑ‚Ğ¾Ğ¼Ñƒ Ğ¿ĞµÑ€ÑĞ¾Ğ½Ğ°Ğ¶ Ğ¥Ğ°ĞºĞµÑ€ Ğ½Ğ°Ñ…Ğ¾Ğ´Ğ¸Ñ‚ÑÑ Ğ² Cortex. ÑˆÑƒÑ‡Ñƒ, ÑˆÑƒÑ‡Ñƒ; Ğ´Ğ°Ğ¶Ğµ Ğ½Ğµ Ğ¿Ñ‹Ñ‚Ğ°Ğ¹Ñ‚ĞµÑÑŒ, ÑÑ‚Ğ¾ Ğ½ĞµĞ·Ğ°ĞºĞ¾Ğ½Ğ½Ğ¾.';
+      'Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�этĞ�Ğ�у Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�р Ğ�Ğ�хĞ�Ğ�Ğ�тся Ğ� Cortex. шучу, шучу; Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�ытĞ�Ğ�тĞ�сь, этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get notificationDetectiveCaseTitle =>
-      'Ğ”ĞµĞ»Ğ¾ Ğ¶Ğ´ĞµÑ‚ ÑĞ²Ğ¾ĞµĞ³Ğ¾ Ñ€ĞµÑˆĞµĞ½Ğ¸Ñ';
+      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�т сĞ�Ğ�Ğ�Ğ�Ğ� рĞ�шĞ�Ğ�Ğ�я';
 
   @override
   String get notificationDetectiveCaseBody =>
-      'ĞĞ°ÑˆĞµĞ¼Ñƒ Ğ´ĞµÑ‚ĞµĞºÑ‚Ğ¸Ğ²Ñƒ Ğ½ÑƒĞ¶Ğ½Ğ° Ğ²Ğ°ÑˆĞ° Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰ÑŒ. ĞšĞµĞ¼ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ Ğ“ĞµĞ¹Ğ·ĞµĞ½Ğ±ĞµÑ€Ğ³?';
+      'Ğ�Ğ�шĞ�Ğ�у Ğ�Ğ�тĞ�Ğ�тĞ�Ğ�у Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�щь. Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�?';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return 'Ğ­ĞºÑĞºĞ»ÑĞ·Ğ¸Ğ²Ğ½Ğ¾ Ğ´Ğ»Ñ Ğ¿Ğ»Ğ°Ğ½Ğ° $targetTier!';
+    return 'Ğ�Ğ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ� $targetTier!';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return 'ĞŸÑ€Ğ¸Ğ²ĞµÑ‚, Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑÑ‡Ğ¸Ğº $currentTier! Ğ’ Ñ‚Ğ°Ñ€Ğ¸Ñ„Ğ½Ñ‹Ğ¹ Ğ¿Ğ»Ğ°Ğ½ $targetTier Ğ´Ğ¾Ğ±Ğ°Ğ²Ğ»ĞµĞ½Ğ° Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ $featureName, ĞºĞ¾Ñ‚Ğ¾Ñ€Ğ°Ñ Ğ²Ñ‹Ğ²ĞµĞ´ĞµÑ‚ Ğ²Ğ°Ñˆ Cortex Ğ½Ğ° Ğ½Ğ¾Ğ²Ñ‹Ğ¹ ÑƒÑ€Ğ¾Ğ²ĞµĞ½ÑŒ. ĞšĞ°Ğº Ğ½Ğ°ÑÑ‡Ñ‘Ñ‚ Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¸Ñ?';
+    return 'Ğ�рĞ�Ğ�Ğ�т, Ğ�Ğ�Ğ�Ğ�Ğ�счĞ�Ğ� $currentTier! Ğ� тĞ�рĞ�фĞ�ыĞ� Ğ�Ğ�Ğ�Ğ� $targetTier Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� фуĞ�Ğ�цĞ�я $featureName, Ğ�Ğ�тĞ�рĞ�я Ğ�ыĞ�Ğ�Ğ�Ğ�т Ğ�Ğ�ш Cortex Ğ�Ğ� Ğ�Ğ�Ğ�ыĞ� урĞ�Ğ�Ğ�Ğ�ь. Ğ�Ğ�Ğ� Ğ�Ğ�счёт Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я?';
   }
 
   @override
-  String get notificationOriginStoryTitle =>
-      'Ğ Ğ¾Ğ¶Ğ´ĞµĞ½Ğ¸Ğµ ĞšĞ¾Ñ€Ñ‚ĞµĞºÑĞ°';
+  String get notificationOriginStoryTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�ртĞ�Ğ�сĞ�';
 
   @override
   String get notificationOriginStoryBody =>
-      'Ğ—Ğ½Ğ°ĞµÑ‚Ğµ Ğ»Ğ¸ Ğ²Ñ‹, Ñ‡Ñ‚Ğ¾ Ğ¼Ñ‹ Ğ½Ğ°Ñ‡Ğ°Ğ»Ğ¸ Ğ¿Ğ¸ÑĞ°Ñ‚ÑŒ ÑÑ‚Ğ¾ Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ Ğ² 15 Ğ»ĞµÑ‚, Ğ¸Ğ¼ĞµÑ Ğ²ÑĞµĞ³Ğ¾ Ğ»Ğ¸ÑˆÑŒ Ğ¼ĞµÑ‡Ñ‚Ñƒ? ĞŸĞ¾Ñ‡Ñ‚Ğ¸ Ğ³Ğ¾Ğ´, ĞºĞ°Ğ¶Ğ´Ğ¾Ğµ ÑƒÑ‚Ñ€Ğ¾ Ğ¸ Ğ²ĞµÑ‡ĞµÑ€, ÑÑ‚Ğ° Ğ¼ĞµÑ‡Ñ‚Ğ° Ğ²Ğ¾Ğ¿Ğ»Ğ¾Ñ‰Ğ°ĞµÑ‚ÑÑ Ğ² ĞºĞ°Ğ¶Ğ´Ğ¾Ğ¹ ÑÑ‚Ñ€Ğ¾Ñ‡ĞºĞµ ĞºĞ¾Ğ´Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�ы, чтĞ� Ğ�ы Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ�сĞ�ть этĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� 15 Ğ�Ğ�т, Ğ�Ğ�Ğ�я Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�шь Ğ�Ğ�чту? Ğ�Ğ�чтĞ� Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� утрĞ� Ğ� Ğ�Ğ�чĞ�р, этĞ� Ğ�Ğ�чтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�тся Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� стрĞ�чĞ�Ğ� Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get notificationOpenSourceTitle => 'Ğ¡Ğ¸Ğ»Ğ° Ğ¾Ğ±Ñ‰ĞµÑÑ‚Ğ²Ñƒ!';
+  String get notificationOpenSourceTitle => 'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�щĞ�стĞ�у!';
 
   @override
   String get notificationOpenSourceBody =>
-      'Cortex â€” Ğ¿Ñ€Ğ¾ĞµĞºÑ‚ Ñ Ğ¿Ğ¾Ğ»Ğ½Ğ¾ÑÑ‚ÑŒÑ Ğ¾Ñ‚ĞºÑ€Ñ‹Ñ‚Ñ‹Ğ¼ Ğ¸ÑÑ…Ğ¾Ğ´Ğ½Ñ‹Ğ¼ ĞºĞ¾Ğ´Ğ¾Ğ¼. Ğ•ÑĞ»Ğ¸ Ğ²Ñ‹ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ Ğ¾Ğ·Ğ½Ğ°ĞºĞ¾Ğ¼Ğ¸Ñ‚ÑŒÑÑ Ñ Ğ½Ğ°ÑˆĞ¸Ğ¼ ĞºĞ¾Ğ´Ğ¾Ğ¼ Ğ¸ Ğ²Ğ½ĞµÑÑ‚Ğ¸ ÑĞ²Ğ¾Ğ¹ Ğ²ĞºĞ»Ğ°Ğ´ Ğ² Ñ€Ğ°Ğ·Ñ€Ğ°Ğ±Ğ¾Ñ‚ĞºÑƒ, Ğ¼Ñ‹ Ğ²ÑĞµĞ³Ğ´Ğ° Ğ¾Ñ‚ĞºÑ€Ñ‹Ñ‚Ñ‹.';
+      'Cortex — Ğ�рĞ�Ğ�Ğ�т с Ğ�Ğ�Ğ�Ğ�Ğ�стью Ğ�тĞ�рытыĞ� Ğ�схĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�сĞ�Ğ� Ğ�ы хĞ�тĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться с Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�стĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�Ğ�рĞ�Ğ�Ğ�тĞ�у, Ğ�ы Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�тĞ�рыты.';
 
   @override
   String get notificationRejectionStoryTitle =>
-      'Ğ¡Ğ¸Ğ»Ğ° Ğ²Ğ¾Ğ»Ğ¸, ÑƒĞ¿Ğ¾Ñ€Ğ½Ñ‹Ğ¹ Ñ‚Ñ€ÑƒĞ´, ÑÑ‡Ğ°ÑÑ‚ÑŒĞµ!';
+      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�, уĞ�Ğ�рĞ�ыĞ� труĞ�, счĞ�стьĞ�!';
 
   @override
   String get notificationRejectionStoryBody =>
-      'Cortex Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ğ» Ğ±Ğ¾Ğ»ĞµĞµ 20 Ğ¾Ñ‚ĞºĞ°Ğ·Ğ¾Ğ² Ğ¸ Ğ´Ğ²Ğ°Ğ¶Ğ´Ñ‹ Ğ±Ñ‹Ğ» Ğ·Ğ°Ğ±Ğ»Ğ¾ĞºĞ¸Ñ€Ğ¾Ğ²Ğ°Ğ½ Google Play Ğ´Ğ¾ Ğ¿ÑƒĞ±Ğ»Ğ¸ĞºĞ°Ñ†Ğ¸Ğ¸. ĞĞ¾ Ğ¼Ñ‹ Ğ²ĞµÑ€Ğ¸Ğ»Ğ¸ Ğ¸ Ğ´Ğ¾Ğ±Ğ¸Ğ»Ğ¸ÑÑŒ ÑƒÑĞ¿ĞµÑ…Ğ°. ĞĞ¸ĞºĞ¾Ğ³Ğ´Ğ° Ğ½Ğµ ÑĞ´Ğ°Ğ²Ğ°Ğ¹Ñ‚ĞµÑÑŒ Ğ¸ Ğ¸Ğ´Ğ¸Ñ‚Ğµ Ğº ÑĞ²Ğ¾ĞµĞ¹ Ğ¼ĞµÑ‡Ñ‚Ğµ!';
+      'Cortex Ğ�Ğ�Ğ�учĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� 20 Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ� Google Play Ğ�Ğ� Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�. Ğ�Ğ� Ğ�ы Ğ�Ğ�рĞ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь усĞ�Ğ�хĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ� Ğ�Ğ�Ğ�тĞ� Ğ� сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�чтĞ�!';
 
   @override
   String get notificationGGUFSupportTitle =>
-      'ĞŸÑ€Ğ¸Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ ÑĞ²Ğ¾Ñ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ!';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�ю Ğ�Ğ�Ğ�Ğ�Ğ�ь!';
 
   @override
   String get notificationGGUFSupportBody =>
-      'ĞŸĞ¾Ğ¼Ğ½Ğ¸Ñ‚Ğµ, Ğ²Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ´Ğ¾Ğ±Ğ°Ğ²Ğ»ÑÑ‚ÑŒ ÑĞ¾Ğ±ÑÑ‚Ğ²ĞµĞ½Ğ½Ñ‹Ğµ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸ Ğ˜Ğ˜ Ğ² Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚Ğµ GGUF Ğ² Cortex Ğ¸ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ¸Ñ… Ğ¾Ñ„Ğ»Ğ°Ğ¹Ğ½. Ğ’ÑÑ‘ Ğ² Ğ²Ğ°ÑˆĞ¸Ñ… Ñ€ÑƒĞºĞ°Ñ….';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ять сĞ�Ğ�стĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ� фĞ�рĞ�Ğ�тĞ� GGUF Ğ� Cortex Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Ğ�х Ğ�фĞ�Ğ�Ğ�Ğ�. Ğ�сё Ğ� Ğ�Ğ�шĞ�х руĞ�Ğ�х.';
 
   @override
   String get notificationThemeCustomizationTitle =>
-      'Ğ¢ĞµĞ¼Ğ° Ğ´Ğ»Ñ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ Ğ½Ğ°ÑÑ‚Ñ€Ğ¾ĞµĞ½Ğ¸Ñ';
+      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�я';
 
   @override
   String get notificationThemeCustomizationBody =>
-      'Ğ’Ñ‹ ÑƒĞ¶Ğµ Ğ¾Ğ·Ğ½Ğ°ĞºĞ¾Ğ¼Ğ¸Ğ»Ğ¸ÑÑŒ Ñ Ñ‚ĞµĞ¼Ğ°Ğ¼Ğ¸ Ğ¾Ñ„Ğ¾Ñ€Ğ¼Ğ»ĞµĞ½Ğ¸Ñ Ğ² Ğ½Ğ°ÑÑ‚Ñ€Ğ¾Ğ¹ĞºĞ°Ñ…? ĞĞ°ÑÑ‚Ñ€Ğ¾Ğ¹Ñ‚Ğµ Cortex Ğ¿Ğ¾ ÑĞ²Ğ¾ĞµĞ¼Ñƒ Ğ²ĞºÑƒÑÑƒ Ğ¸ Ğ´Ğ¾Ğ±Ğ°Ğ²ÑŒÑ‚Ğµ ĞºÑ€Ğ°ÑĞ¾Ğº Ğ² ÑĞ²Ğ¾Ğ¸ Ñ‡Ğ°Ñ‚Ñ‹!';
+      'Ğ�ы уĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь с тĞ�Ğ�Ğ�Ğ�Ğ� Ğ�фĞ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�х? Ğ�Ğ�стрĞ�Ğ�тĞ� Cortex Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�у Ğ�Ğ�усу Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ьтĞ� Ğ�рĞ�сĞ�Ğ� Ğ� сĞ�Ğ�Ğ� чĞ�ты!';
 
   @override
-  String get notificationShowerThoughtTitle => 'Ğ”ÑƒÑˆĞµĞ²Ğ°Ñ Ğ¼Ñ‹ÑĞ»ÑŒ';
+  String get notificationShowerThoughtTitle => 'Ğ�ушĞ�Ğ�Ğ�я Ğ�ысĞ�ь';
 
   @override
   String get notificationShowerThoughtBody =>
-      'Ğ•ÑĞ»Ğ¸ Ğ°Ñ€Ğ±ÑƒĞ· â€” Ñ„Ñ€ÑƒĞºÑ‚, Ñ‚Ğ¾ Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ Ğ»Ğ¸ Ñ‚ĞµÑ…Ğ½Ğ¸Ñ‡ĞµÑĞºĞ¸ ÑÑ‡Ğ¸Ñ‚Ğ°Ñ‚ÑŒ Ğ°Ñ€Ğ±ÑƒĞ·Ğ½Ñ‹Ğ¹ ÑĞ¾Ğº ÑĞ¼ÑƒĞ·Ğ¸? Ğ’Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾, Ğ²Ğ°Ğ¼ ÑÑ‚Ğ¾Ğ¸Ñ‚ Ğ¾Ğ±ÑÑƒĞ´Ğ¸Ñ‚ÑŒ ÑÑ‚Ñƒ Ğ³Ğ»ÑƒĞ±Ğ¾ĞºÑƒÑ (Ğ¾Ñ‡ĞµĞ½ÑŒ Ğ³Ğ»ÑƒĞ±Ğ¾ĞºÑƒÑ) Ñ‚ĞµĞ¼Ñƒ Ñ Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒÑ.';
+      'Ğ�сĞ�Ğ� Ğ�рĞ�уĞ� — фруĞ�т, тĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� тĞ�хĞ�Ğ�чĞ�сĞ�Ğ� счĞ�тĞ�ть Ğ�рĞ�уĞ�Ğ�ыĞ� сĞ�Ğ� сĞ�уĞ�Ğ�? Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ� стĞ�Ğ�т Ğ�Ğ�суĞ�Ğ�ть эту Ğ�Ğ�уĞ�Ğ�Ğ�ую (Ğ�чĞ�Ğ�ь Ğ�Ğ�уĞ�Ğ�Ğ�ую) тĞ�Ğ�у с Ğ�Ğ�Ğ�Ğ�Ğ�ью.';
 
   @override
   String get notificationLowBatteryTitle =>
-      'Ğ’Ğ°Ñˆ Ğ°ĞºĞºÑƒĞ¼ÑƒĞ»ÑÑ‚Ğ¾Ñ€ Ñ€Ğ°Ğ·Ñ€ÑĞ¶Ğ°ĞµÑ‚ÑÑ... Ğ Ğ¼Ğ¾Ğ¹ â€” Ğ½ĞµÑ‚!';
+      'Ğ�Ğ�ш Ğ�Ğ�Ğ�уĞ�уĞ�ятĞ�р рĞ�Ğ�ряĞ�Ğ�Ğ�тся... Ğ� Ğ�Ğ�Ğ� — Ğ�Ğ�т!';
 
   @override
   String get notificationLowBatteryBody =>
-      'Ğ—Ğ°Ñ€ÑĞ´ Ñ‚Ğ²Ğ¾ĞµĞ³Ğ¾ Ñ‚ĞµĞ»ĞµÑ„Ğ¾Ğ½Ğ° Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ±Ñ‹Ñ‚ÑŒ Ğ½Ğ° Ğ¸ÑÑ…Ğ¾Ğ´Ğµ, Ğ½Ğ¾ Ñƒ Ğ¼ĞµĞ½Ñ Ğ¾Ğ½ Ğ²ÑĞµĞ³Ğ´Ğ° Ğ·Ğ°Ñ€ÑĞ¶ĞµĞ½ Ğ½Ğ° 100%! ĞŸĞ¾Ğ´ĞºĞ»ÑÑ‡Ğ°Ğ¹ ĞµĞ³Ğ¾, Ğ¸ Ğ´Ğ°Ğ²Ğ°Ğ¹ Ğ¾Ğ±Ñ‰Ğ°Ñ‚ÑŒÑÑ Ğ´Ğ°Ğ»ÑŒÑˆĞµ.';
+      'Ğ�Ğ�ряĞ� тĞ�Ğ�Ğ�Ğ�Ğ� тĞ�Ğ�Ğ�фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�Ğ� Ğ�схĞ�Ğ�Ğ�, Ğ�Ğ� у Ğ�Ğ�Ğ�я Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�ряĞ�Ğ�Ğ� Ğ�Ğ� 100%! Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ� Ğ�Ğ�Ğ�, Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�щĞ�ться Ğ�Ğ�Ğ�ьшĞ�.';
 
   @override
-  String get channelFcmName => 'ĞĞ±Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¸Ñ Cortex';
+  String get channelFcmName => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Cortex';
 
   @override
   String get channelFcmDescription =>
-      'Ğ£Ğ²ĞµĞ´Ğ¾Ğ¼Ğ»ĞµĞ½Ğ¸Ñ Ğ¾ Ğ½Ğ¾Ğ²Ğ¾ÑÑ‚ÑÑ…, Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¸ÑÑ… Ğ¸ Ğ´Ñ€ÑƒĞ³Ğ¾Ğ¹ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ğ¸ Ğ¾Ñ‚ Cortex.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�стях, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ях Ğ� Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�Ğ� Ğ�т Cortex.';
 
   @override
-  String get channelEngagementName =>
-      'Ğ”Ñ€ÑƒĞ¶ĞµÑĞºĞ¸Ğµ Ğ½Ğ°Ğ¿Ğ¾Ğ¼Ğ¸Ğ½Ğ°Ğ½Ğ¸Ñ';
+  String get channelEngagementName => 'Ğ�руĞ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
   String get channelEngagementDescription =>
-      'Ğ—Ğ°Ğ±Ğ°Ğ²Ğ½Ñ‹Ğµ ÑƒĞ²ĞµĞ´Ğ¾Ğ¼Ğ»ĞµĞ½Ğ¸Ñ, ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğµ Ğ¿Ğ¾Ğ¼Ğ¾Ğ³ÑƒÑ‚ Ğ²Ğ°Ğ¼ Ğ¾ÑÑ‚Ğ°Ğ²Ğ°Ñ‚ÑŒÑÑ Ğ² ĞºÑƒÑ€ÑĞµ ÑĞ¾Ğ±Ñ‹Ñ‚Ğ¸Ğ¹.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я, Ğ�Ğ�тĞ�рыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ� Ğ�стĞ�Ğ�Ğ�ться Ğ� Ğ�урсĞ� сĞ�Ğ�ытĞ�Ğ�.';
 
   @override
-  String get channelGreetingsName =>
-      'Ğ•Ğ¶ĞµĞ´Ğ½ĞµĞ²Ğ½Ñ‹Ğµ Ğ¿Ñ€Ğ¸Ğ²ĞµÑ‚ÑÑ‚Ğ²Ğ¸Ñ';
+  String get channelGreetingsName => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�я';
 
   @override
   String get channelGreetingsDescription =>
-      'Ğ¡Ğ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ñ Ñ‚Ğ¸Ğ¿Ğ° Â«Ğ´Ğ¾Ğ±Ñ€Ğ¾Ğµ ÑƒÑ‚Ñ€Ğ¾Â» Ğ¸ Â«ÑĞ¿Ğ¾ĞºĞ¾Ğ¹Ğ½Ğ¾Ğ¹ Ğ½Ğ¾Ñ‡Ğ¸Â».';
+      'Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�я тĞ�Ğ�Ğ� «Ğ�Ğ�Ğ�рĞ�Ğ� утрĞ�» Ğ� «сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чĞ�».';
 
   @override
   String get tagNotFound =>
-      'Ğ’Ğ²ĞµĞ´ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ²Ğ°Ğ¼Ğ¸ Ñ‚ĞµĞ³ Ğ½ĞµĞ´ĞµĞ¹ÑÑ‚Ğ²Ğ¸Ñ‚ĞµĞ»ĞµĞ½ Ğ¸Ğ»Ğ¸ ÑƒÑÑ‚Ğ°Ñ€ĞµĞ».';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ� тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� устĞ�рĞ�Ğ�.';
 
   @override
-  String get whatIsNew => 'Ğ§Ñ‚Ğ¾ Ğ½Ğ¾Ğ²Ğ¾Ğ³Ğ¾?';
+  String get whatIsNew => 'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�?';
 
   @override
-  String get onboardingTitle1 => 'ĞŸÑ€Ğ¸Ğ²ĞµÑ‚! ĞœÑ‹ ĞºĞ¾Ğ¼Ğ°Ğ½Ğ´Ğ° Cortex.';
+  String get onboardingTitle1 => 'Ğ�рĞ�Ğ�Ğ�т! Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Cortex.';
 
   @override
   String onboardingDesc1(String userName) {
-    return 'Ğ Ğ°Ğ´Ñ‹ Ğ²Ğ¸Ğ´ĞµÑ‚ÑŒ Ñ‚ĞµĞ±Ñ Ğ·Ğ´ĞµÑÑŒ, $userName. ĞœÑ‹ Ğ³Ñ€ÑƒĞ¿Ğ¿Ğ° Ñ€Ğ°Ğ·Ñ€Ğ°Ğ±Ğ¾Ñ‚Ñ‡Ğ¸ĞºĞ¾Ğ²-ÑÑ‚Ğ°Ñ€ÑˆĞµĞºĞ»Ğ°ÑÑĞ½Ğ¸ĞºĞ¾Ğ², Ñ€ĞµÑˆĞ¸Ğ²ÑˆĞ¸Ñ… Ğ¿ĞµÑ€ĞµĞ¿Ğ¸ÑĞ°Ñ‚ÑŒ Ğ¿Ñ€Ğ°Ğ²Ğ¸Ğ»Ğ° Ğ¸Ğ½Ğ´ÑƒÑÑ‚Ñ€Ğ¸Ğ¸ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°. ĞÑ‡ĞµĞ½ÑŒ Ğ¿Ñ€Ğ¸ÑÑ‚Ğ½Ğ¾ Ğ¿Ğ¾Ğ·Ğ½Ğ°ĞºĞ¾Ğ¼Ğ¸Ñ‚ÑŒÑÑ! Ğ”Ğ°Ğ²Ğ°Ğ¹ Ğ¿Ğ¾Ğ·Ğ½Ğ°ĞºĞ¾Ğ¼Ğ¸Ğ¼ÑÑ Ğ¿Ğ¾Ğ±Ğ»Ğ¸Ğ¶Ğµ.';
+    return 'Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�Ğ�ть тĞ�Ğ�я Ğ�Ğ�Ğ�сь, $userName. Ğ�ы Ğ�руĞ�Ğ�Ğ� рĞ�Ğ�рĞ�Ğ�Ğ�тчĞ�Ğ�Ğ�Ğ�-стĞ�ршĞ�Ğ�Ğ�Ğ�ссĞ�Ğ�Ğ�Ğ�Ğ�, рĞ�шĞ�Ğ�шĞ�х Ğ�Ğ�рĞ�Ğ�Ğ�сĞ�ть Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�устрĞ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�чĞ�Ğ�ь Ğ�рĞ�ятĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться! Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
   }
 
   @override
-  String get onboardingTitle2 => 'Ğ‘Ñ‹Ğ»Ğ¸ Ğ¾Ğ³Ñ€Ğ¾Ğ¼Ğ½Ñ‹Ğµ Ğ¿Ñ€Ğ¾Ğ±Ğ»ĞµĞ¼Ñ‹.';
+  String get onboardingTitle2 => 'Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�ы.';
 
   @override
   String get onboardingDesc2 =>
-      'Ğ ĞµĞ²Ğ¾Ğ»ÑÑ†Ğ¸Ñ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ° Ğ¿Ñ€Ğ¸ÑˆĞ»Ğ°, Ğ½Ğ¾ Ğ·Ğ°ÑÑ‚Ñ€ÑĞ»Ğ° Ğ½Ğ° Ğ¿Ğ¾Ñ€Ğ¾Ğ³Ğµ. Ğ’Ñ‹ÑĞ¾ĞºĞ°Ñ Ğ°Ğ±Ğ¾Ğ½ĞµĞ½Ñ‚ÑĞºĞ°Ñ Ğ¿Ğ»Ğ°Ñ‚Ğ°, ÑĞ»Ğ¾Ğ¶Ğ½Ñ‹Ğµ Ğ¿Ğ»Ğ°Ñ‚Ñ„Ğ¾Ñ€Ğ¼Ñ‹, Ñ‚Ğµ, ĞºÑ‚Ğ¾ Ğ½Ğ°Ñ€ÑƒÑˆĞ°ĞµÑ‚ ĞºĞ¾Ğ½Ñ„Ğ¸Ğ´ĞµĞ½Ñ†Ğ¸Ğ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒ, Ğ¸ Ñ‚Ğµ, ĞºÑ‚Ğ¾ Ğ±Ğ»Ğ¾ĞºĞ¸Ñ€ÑƒĞµÑ‚ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿ Ğº Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ¼Ñƒ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ñƒ... Ğ¿Ğ¾ĞºĞ° Ğ¾Ğ½Ğ¸ Ğ±Ñ‹Ğ»Ğ¸ Ğ² Ğ¸Ğ³Ñ€Ğµ, ÑÑ‚Ğ¾Ñ‚ Ğ¿Ğ¾Ñ€Ğ¾Ğ³ Ğ½ĞµĞ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ Ğ±Ñ‹Ğ»Ğ¾ Ğ¿ĞµÑ€ĞµÑÑ‚ÑƒĞ¿Ğ¸Ñ‚ÑŒ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�юцĞ�я Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�шĞ�Ğ�, Ğ�Ğ� Ğ�Ğ�стряĞ�Ğ� Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�. Ğ�ысĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тсĞ�Ğ�я Ğ�Ğ�Ğ�тĞ�, сĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�тфĞ�рĞ�ы, тĞ�, Ğ�тĞ� Ğ�Ğ�рушĞ�Ğ�т Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�сть, Ğ� тĞ�, Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�руĞ�т Ğ�Ğ�стуĞ� Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ту... Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ� Ğ�Ğ�рĞ�, этĞ�т Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�стуĞ�Ğ�ть.';
 
   @override
   String get onboardingTitle3 =>
-      'ĞœÑ‹ Ğ½Ğµ Ğ¼Ğ¾Ğ³Ğ»Ğ¸ Ğ¿Ñ€Ğ¾ÑÑ‚Ğ¾ ÑÑ‚Ğ¾ÑÑ‚ÑŒ Ğ² ÑÑ‚Ğ¾Ñ€Ğ¾Ğ½Ğµ.';
+      'Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�стĞ� стĞ�ять Ğ� стĞ�рĞ�Ğ�Ğ�.';
 
   @override
   String get onboardingDesc3 =>
-      'Ğ§Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ñ€ĞµĞ¾Ğ´Ğ¾Ğ»ĞµÑ‚ÑŒ ÑÑ‚Ğ¾Ñ‚ Ñ€ÑƒĞ±ĞµĞ¶, Ğ¼Ñ‹ ÑĞ¾Ğ·Ğ´Ğ°Ğ»Ğ¸ Ğ¼Ğ¾Ñ‰Ğ½ÑƒÑ, ÑÑÑ‚ĞµÑ‚Ğ¸Ñ‡Ğ½ÑƒÑ, Ğ½Ğ°ÑÑ‚Ñ€Ğ°Ğ¸Ğ²Ğ°ĞµĞ¼ÑƒÑ, Ğ¿Ñ€Ğ¾ÑÑ‚ÑƒÑ Ğ² Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğ¸, Ğ¿Ğ¾Ğ»Ğ½Ğ¾ÑÑ‚ÑŒÑ Ğ¿Ñ€Ğ¾Ğ·Ñ€Ğ°Ñ‡Ğ½ÑƒÑ Ğ¿Ğ»Ğ°Ñ‚Ñ„Ğ¾Ñ€Ğ¼Ñƒ, Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°ÑÑ‰ÑƒÑ ĞºĞ°Ğº Ğ¾Ğ½Ğ»Ğ°Ğ¹Ğ½, Ñ‚Ğ°Ğº Ğ¸ Ğ¾Ñ„Ğ»Ğ°Ğ¹Ğ½, ĞºĞ¾Ñ‚Ğ¾Ñ€Ğ°Ñ Ñ…Ñ€Ğ°Ğ½Ğ¸Ñ‚ Ñ‚Ğ²Ğ¾Ğ¸ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ñ‚Ğ¾Ğ»ÑŒĞºĞ¾ Ğ½Ğ° Ñ‚Ğ²Ğ¾Ñ‘Ğ¼ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğµ. ĞœÑ‹ Ğ²ĞµÑ€Ğ½ÑƒĞ»Ğ¸ Ğ²Ğ»Ğ°ÑÑ‚ÑŒ Ñ‚Ğ¾Ğ¼Ñƒ, ĞºĞ¾Ğ¼Ñƒ Ğ¾Ğ½Ğ° Ğ¿Ñ€Ğ¸Ğ½Ğ°Ğ´Ğ»ĞµĞ¶Ğ¸Ñ‚: Ñ‚ĞµĞ±Ğµ.';
+      'Ğ�тĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть этĞ�т руĞ�Ğ�Ğ�, Ğ�ы сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�щĞ�ую, эстĞ�тĞ�чĞ�ую, Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ую, Ğ�рĞ�стую Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�стью Ğ�рĞ�Ğ�рĞ�чĞ�ую Ğ�Ğ�Ğ�тфĞ�рĞ�у, рĞ�Ğ�Ğ�тĞ�ющую Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, тĞ�Ğ� Ğ� Ğ�фĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�тĞ�рĞ�я хрĞ�Ğ�Ğ�т тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ� тĞ�Ğ�ёĞ� устрĞ�Ğ�стĞ�Ğ�. Ğ�ы Ğ�Ğ�рĞ�уĞ�Ğ� Ğ�Ğ�Ğ�сть тĞ�Ğ�у, Ğ�Ğ�Ğ�у Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т: тĞ�Ğ�Ğ�.';
 
   @override
   String get onboardingTitle4 =>
-      'Ğ­Ñ‚Ğ¾ Ğ½Ğ¸ĞºĞ¾Ğ³Ğ´Ğ° Ğ½Ğµ Ğ±Ñ‹Ğ»Ğ¾ Ğ»ĞµĞ³ĞºĞ¾.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get onboardingDesc4 =>
-      'ĞĞ°Ğ¼ Ğ´ĞµÑÑÑ‚ĞºĞ¸ Ñ€Ğ°Ğ· Ğ¾Ñ‚ĞºĞ°Ğ·Ñ‹Ğ²Ğ°Ğ»Ğ¸, Ğ½Ğ°Ñ Ğ¼Ğ½Ğ¾Ğ³Ğ¾ĞºÑ€Ğ°Ñ‚Ğ½Ğ¾ Ğ¿Ñ€Ğ¸Ğ¾ÑÑ‚Ğ°Ğ½Ğ°Ğ²Ğ»Ğ¸Ğ²Ğ°Ğ»Ğ¸, Ğ¼Ñ‹ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ°Ğ»Ğ¸ Ğ»Ğ¾Ğ¶Ğ½Ñ‹Ğµ Ğ¿Ñ€ĞµĞ´ÑƒĞ¿Ñ€ĞµĞ¶Ğ´ĞµĞ½Ğ¸Ñ Ğ¸ Ğ´ĞµÑÑÑ‚ĞºĞ¸ Ñ€Ğ°Ğ· Ğ±Ñ‹Ğ»Ğ¸ Ğ²Ñ‹Ğ½ÑƒĞ¶Ğ´ĞµĞ½Ñ‹ Ğ¼ĞµĞ½ÑÑ‚ÑŒ Ğ±Ñ€ĞµĞ½Ğ´. Ğ˜ Ğ²ÑÑ‘ ÑÑ‚Ğ¾ Ğ²Ñ€ĞµĞ¼Ñ Ğ½Ğ°Ğ¼ Ğ³Ğ¾Ğ²Ğ¾Ñ€Ğ¸Ğ»Ğ¸, Ñ‡Ñ‚Ğ¾ ÑÑ‚Ğ¾ Ğ½ĞµĞ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾. ĞĞ¾ Ğ¼Ñ‹ Ğ½Ğ¸ĞºĞ¾Ğ³Ğ´Ğ° Ğ½Ğµ ÑĞ´Ğ°Ğ²Ğ°Ğ»Ğ¸ÑÑŒ, Ğ²ĞµÑ€Ñ, Ñ‡Ñ‚Ğ¾ ÑÑ‚Ğ¾Ñ‚ Ğ¿Ñ€Ğ¾ĞµĞºÑ‚ Ğ¿Ñ€Ğ¸Ğ½Ğ°Ğ´Ğ»ĞµĞ¶Ğ¸Ñ‚ Ğ²ÑĞµĞ¼, Ğ° Ğ½Ğµ Ñ‚Ğ¾Ğ»ÑŒĞºĞ¾ Ğ½Ğ°Ğ¼. Ğ˜ Ğ¸Ğ¼ĞµĞ½Ğ½Ğ¾ Ğ¿Ğ¾ÑÑ‚Ğ¾Ğ¼Ñƒ Ğ¼Ñ‹ Ğ·Ğ´ĞµÑÑŒ.';
+      'Ğ�Ğ�Ğ� Ğ�Ğ�сятĞ�Ğ� рĞ�Ğ� Ğ�тĞ�Ğ�Ğ�ыĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�с Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�Ğ� Ğ�рĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�ы Ğ�Ğ�Ğ�учĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�уĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�сятĞ�Ğ� рĞ�Ğ� Ğ�ыĞ�Ğ� Ğ�ыĞ�уĞ�Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�ять Ğ�рĞ�Ğ�Ğ�. Ğ� Ğ�сё этĞ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�, чтĞ� этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�сь, Ğ�Ğ�ря, чтĞ� этĞ�т Ğ�рĞ�Ğ�Ğ�т Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�сĞ�Ğ�, Ğ� Ğ�Ğ� тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�Ğ�. Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�этĞ�Ğ�у Ğ�ы Ğ�Ğ�Ğ�сь.';
 
   @override
-  String get onboardingFinalTitle =>
-      'ĞŸÑ€Ğ¸ÑˆĞ»Ğ¾ Ğ²Ñ€ĞµĞ¼Ñ Ñ€ĞµĞ²Ğ¾Ğ»ÑÑ†Ğ¸Ğ¸.';
+  String get onboardingFinalTitle => 'Ğ�рĞ�шĞ�Ğ� Ğ�рĞ�Ğ�я рĞ�Ğ�Ğ�Ğ�юцĞ�Ğ�.';
 
   @override
   String get onboardingFinalDescription =>
-      'Ğ•ÑĞ»Ğ¸ Ñ‚Ñ‹ Ğ²Ğ¸Ğ´Ğ¸ÑˆÑŒ ÑÑ‚Ğ¾Ñ‚ ÑĞºÑ€Ğ°Ğ½, Ğ·Ğ½Ğ°Ñ‡Ğ¸Ñ‚, Ğ¼Ñ‹ Ğ½Ğµ ÑĞ´Ğ°Ğ»Ğ¸ÑÑŒ. Ğ˜ Ğ½Ğµ ÑĞ¾Ğ±Ğ¸Ñ€Ğ°ĞµĞ¼ÑÑ ÑĞ´Ğ°Ğ²Ğ°Ñ‚ÑŒÑÑ. Ğ”Ğ°Ğ²Ğ°Ğ¹ Ğ²Ğ¼ĞµÑÑ‚Ğµ Ğ½ĞµÑÑ‚Ğ¸ Ğ¼Ğ¸Ñ€Ñƒ Ñ€ĞµĞ²Ğ¾Ğ»ÑÑ†Ğ¸Ñ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°. Ğ§Ñ‚Ğ¾Ğ±Ñ‹ ÑÑ‚Ğ°Ñ‚ÑŒ Ñ‡Ğ°ÑÑ‚ÑŒÑ ÑÑ‚Ğ¾Ğ¹ Ğ¸ÑÑ‚Ğ¾Ñ€Ğ¸Ğ¸...';
+      'Ğ�сĞ�Ğ� ты Ğ�Ğ�Ğ�Ğ�шь этĞ�т эĞ�рĞ�Ğ�, Ğ�Ğ�Ğ�чĞ�т, Ğ�ы Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�сь. Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�рĞ�Ğ�Ğ�ся сĞ�Ğ�Ğ�Ğ�ться. Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�стĞ� Ğ�Ğ�ру рĞ�Ğ�Ğ�Ğ�юцĞ�ю Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�тĞ�Ğ�ы стĞ�ть чĞ�стью этĞ�Ğ� Ğ�стĞ�рĞ�Ğ�...';
 
   @override
-  String get onboardingFinalQuestion => 'Ğ¢Ğ« Ğ“ĞĞ¢ĞĞ’?';
+  String get onboardingFinalQuestion => 'Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�?';
 
   @override
-  String get onboardingFinalButton => 'Ğ”Ğ!';
+  String get onboardingFinalButton => 'Ğ�Ğ�!';
 
   @override
-  String get dude => 'Ğ§ÑƒĞ²Ğ°Ğº';
+  String get dude => 'Ğ�уĞ�Ğ�Ğ�';
 
   @override
-  String get swipeToContinue =>
-      'ĞŸÑ€Ğ¾Ğ²ĞµĞ´Ğ¸, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ';
+  String get swipeToContinue => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
 
   @override
   String get cacheIsNotUpToDate =>
-      'ĞšÑÑˆ Ğ²Ğ°ÑˆĞµĞ³Ğ¾ Play ĞœĞ°Ñ€ĞºĞµÑ‚Ğ° ÑƒÑÑ‚Ğ°Ñ€ĞµĞ». Ğ—Ğ°ĞºÑ€Ğ¾Ğ¹Ñ‚Ğµ Ğ¸ ÑĞ½Ğ¾Ğ²Ğ° Ğ¾Ñ‚ĞºÑ€Ğ¾Ğ¹Ñ‚Ğµ Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ Play ĞœĞ°Ñ€ĞºĞµÑ‚ Ğ¸Ğ»Ğ¸ Ğ¿ĞµÑ€ĞµĞ·Ğ°Ğ³Ñ€ÑƒĞ·Ğ¸Ñ‚Ğµ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ¾.';
+      'Ğ�эш Ğ�Ğ�шĞ�Ğ�Ğ� Play Ğ�Ğ�рĞ�Ğ�тĞ� устĞ�рĞ�Ğ�. Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� Ğ� сĞ�Ğ�Ğ�Ğ� Ğ�тĞ�рĞ�Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Play Ğ�Ğ�рĞ�Ğ�т Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�руĞ�Ğ�тĞ� устрĞ�Ğ�стĞ�Ğ�.';
 
   @override
   String get continueAsGuest =>
-      'ĞŸÑ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ Ğ±ĞµĞ· ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ñ ÑƒÑ‡ĞµÑ‚Ğ½Ğ¾Ğ¹ Ğ·Ğ°Ğ¿Ğ¸ÑĞ¸';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я учĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�сĞ�';
 
   @override
   String get guestModeWarning =>
-      'Ğ“Ğ¾ÑÑ‚ĞµĞ²Ğ¾Ğ¹ Ñ€ĞµĞ¶Ğ¸Ğ¼ Ğ¸Ğ¼ĞµĞµÑ‚ Ğ¾Ğ³Ñ€Ğ°Ğ½Ğ¸Ñ‡ĞµĞ½Ğ½Ñ‹Ğµ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸ Ğ´Ğ»Ñ Ğ¾Ğ±ĞµÑĞ¿ĞµÑ‡ĞµĞ½Ğ¸Ñ Ğ½Ğ°Ğ¸Ğ»ÑƒÑ‡ÑˆĞµĞ³Ğ¾ ĞºĞ°Ñ‡ĞµÑÑ‚Ğ²Ğ° Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ.';
+      'Ğ�Ğ�стĞ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�учшĞ�Ğ�Ğ� Ğ�Ğ�чĞ�стĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
-  String get anonymousEntity => 'ĞĞ½Ğ¾Ğ½Ğ¸Ğ¼Ğ½Ğ°Ñ ÑÑƒÑ‰Ğ½Ğ¾ÑÑ‚ÑŒ';
+  String get anonymousEntity => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я сущĞ�Ğ�сть';
 
   @override
-  String get upgradeAccountTitle =>
-      'Ğ—Ğ°Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚Ğµ ÑĞ²Ğ¾Ğ¹ Ğ°ĞºĞºĞ°ÑƒĞ½Ñ‚';
+  String get upgradeAccountTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т';
 
   @override
   String get upgradeAccountDescription =>
-      'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ğ¹Ñ‚Ğµ ÑƒÑ‡ĞµÑ‚Ğ½ÑƒÑ Ğ·Ğ°Ğ¿Ğ¸ÑÑŒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ñ€Ğ°Ğ·Ğ±Ğ»Ğ¾ĞºĞ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ´Ğ¾Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğµ Ğ¾Ğ³Ñ€Ğ°Ğ½Ğ¸Ñ‡ĞµĞ½Ğ¸Ñ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� учĞ�тĞ�ую Ğ�Ğ�Ğ�Ğ�сь, чтĞ�Ğ�ы рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�я.';
 
   @override
-  String get createAccount => 'Ğ—Ğ°Ñ€ĞµĞ³Ğ¸ÑÑ‚Ñ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒÑÑ';
+  String get createAccount => 'Ğ�Ğ�рĞ�Ğ�Ğ�стрĞ�рĞ�Ğ�Ğ�ться';
 
   @override
   String get accountLinkedSuccess =>
-      'Ğ£Ñ‡ĞµÑ‚Ğ½Ğ°Ñ Ğ·Ğ°Ğ¿Ğ¸ÑÑŒ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ°!';
+      'Ğ�чĞ�тĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�сь усĞ�Ğ�шĞ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
 
   @override
-  String get continueWithApple => 'ĞŸÑ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ Ñ Apple';
+  String get continueWithApple => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть с Apple';
 
   @override
-  String get guest => 'Ğ“Ğ¾ÑÑ‚ÑŒ';
+  String get guest => 'Ğ�Ğ�сть';
 
   @override
   String get betterWithAnAccount =>
-      'Ğ­Ñ‚Ğ¾Ñ‚ Ñ€Ğ°Ğ·Ğ´ĞµĞ» Ğ»ÑƒÑ‡ÑˆĞµ Ğ¿Ñ€Ğ¾ÑĞ¼Ğ°Ñ‚Ñ€Ğ¸Ğ²Ğ°Ñ‚ÑŒ Ñ ÑƒÑ‡ĞµÑ‚Ğ½Ğ¾Ğ¹ Ğ·Ğ°Ğ¿Ğ¸ÑÑŒÑ!';
+      'Ğ�тĞ�т рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�учшĞ� Ğ�рĞ�сĞ�Ğ�трĞ�Ğ�Ğ�ть с учĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�сью!';
 
   @override
-  String get restorePurchases => 'Ğ’Ğ¾ÑÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ Ğ¿Ğ¾ĞºÑƒĞ¿ĞºĞ¸';
+  String get restorePurchases => 'Ğ�Ğ�сстĞ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/Ğ³Ğ¾Ğ´, Ğ¾Ğ¿Ğ»Ğ°Ñ‚Ğ° Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ÑÑ ĞµĞ¶ĞµĞ³Ğ¾Ğ´Ğ½Ğ¾';
+    return '$price/Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return 'ĞŸÑ€Ğ¸Ğ¼ĞµÑ€Ğ½Ğ¾ $price/Ğ¼ĞµÑÑÑ†';
+    return 'Ğ�рĞ�Ğ�Ğ�рĞ�Ğ� $price/Ğ�Ğ�сяц';
   }
 
   @override
   String get confirmDownloadTitle =>
-      'Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ Ğ·Ğ°Ğ³Ñ€ÑƒĞ·Ğ¸Ñ‚ÑŒ?';
+      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�Ğ�Ğ�руĞ�Ğ�ть?';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ·Ğ°Ğ¹Ğ¼ĞµÑ‚ Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€Ğ½Ğ¾ $size Ğ¿Ñ€Ğ¾ÑÑ‚Ñ€Ğ°Ğ½ÑÑ‚Ğ²Ğ°.';
+    return 'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�рĞ�Ğ�Ğ�рĞ�Ğ� $size Ğ�рĞ�стрĞ�Ğ�стĞ�Ğ�.';
   }
 
   @override
   String get emulatorModeWarning =>
-      'Ğ­Ñ‚Ğ° Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ Ğ¾Ñ‚ĞºĞ»ÑÑ‡ĞµĞ½Ğ° Ğ² Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ ÑĞ¼ÑƒĞ»ÑÑ‚Ğ¾Ñ€Ğ°.';
+      'Ğ�тĞ� фуĞ�Ğ�цĞ�я Ğ�тĞ�Ğ�ючĞ�Ğ�Ğ� Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� эĞ�уĞ�ятĞ�рĞ�.';
 
   @override
-  String get newChat => 'ĞĞ¾Ğ²Ñ‹Ğ¹ Ñ‡Ğ°Ñ‚';
+  String get newChat => 'Ğ�Ğ�Ğ�ыĞ� чĞ�т';
 
   @override
-  String get variants => 'Ğ’Ğ°Ñ€Ğ¸Ğ°Ğ½Ñ‚Ñ‹';
+  String get variants => 'Ğ�Ğ�рĞ�Ğ�Ğ�ты';
 
   @override
   String get variantsDescription =>
-      'Ğ’Ğ°Ñ€Ğ¸Ğ°Ğ½Ñ‚Ñ‹ â€” ÑÑ‚Ğ¾ Ñ€Ğ°Ğ·Ğ½Ñ‹Ğµ Ğ²ĞµÑ€ÑĞ¸Ğ¸ Ğ¾Ğ´Ğ½Ğ¾Ğ³Ğ¾ Ğ¸ Ñ‚Ğ¾Ğ³Ğ¾ Ğ¶Ğµ ÑĞµĞ¼ĞµĞ¹ÑÑ‚Ğ²Ğ° Ğ˜Ğ˜. ĞœÑ‹ Ğ°Ğ²Ñ‚Ğ¾Ğ¼Ğ°Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¸ Ğ²Ñ‹Ğ±Ğ¸Ñ€Ğ°ĞµĞ¼ Ğ»ÑƒÑ‡ÑˆĞ¸Ğ¹ Ğ¸Ğ· Ğ½Ğ¸Ñ…, ĞºĞ¾Ğ³Ğ´Ğ° Ğ²Ñ‹ Ğ½Ğ°Ğ¶Ğ¸Ğ¼Ğ°ĞµÑ‚Ğµ Ğ½Ğ° Ğ¾ÑĞ½Ğ¾Ğ²Ğ½ÑƒÑ ĞºĞ°Ñ€Ñ‚Ğ¾Ñ‡ĞºÑƒ, Ğ½Ğ¾ Ğ¿Ñ€Ğ¸ Ğ¶ĞµĞ»Ğ°Ğ½Ğ¸Ğ¸ Ğ²Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ²Ñ‹Ğ±Ñ€Ğ°Ñ‚ÑŒ ĞºĞ¾Ğ½ĞºÑ€ĞµÑ‚Ğ½Ñ‹Ğ¹ Ğ²Ğ°Ñ€Ğ¸Ğ°Ğ½Ñ‚ Ğ²Ñ€ÑƒÑ‡Ğ½ÑƒÑ!';
+      'Ğ�Ğ�рĞ�Ğ�Ğ�ты — этĞ� рĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�рсĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� тĞ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�стĞ�Ğ� Ğ�Ğ�. Ğ�ы Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ� Ğ�ыĞ�Ğ�рĞ�Ğ�Ğ� Ğ�учшĞ�Ğ� Ğ�Ğ� Ğ�Ğ�х, Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�ую Ğ�Ğ�ртĞ�чĞ�у, Ğ�Ğ� Ğ�рĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�ыĞ�рĞ�ть Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ�т Ğ�ручĞ�ую!';
 
   @override
   String get fluxChatTitle => 'Flux Chat';
 
   @override
   String get fluxChatDescription =>
-      'Ğ§Ğ°Ñ‚Ñ‹ Flux ÑĞ²Ğ»ÑÑÑ‚ÑÑ Ğ²Ñ€ĞµĞ¼ĞµĞ½Ğ½Ñ‹Ğ¼Ğ¸ Ğ¸ Ğ½Ğµ ÑĞ¾Ñ…Ñ€Ğ°Ğ½ÑÑÑ‚ÑÑ Ğ½Ğ° Ğ²Ğ°ÑˆĞµĞ¼ ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğµ.';
+      'Ğ�Ğ�ты Flux яĞ�Ğ�яются Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ�Ğ� Ğ� Ğ�Ğ� сĞ�хрĞ�Ğ�яются Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� устрĞ�Ğ�стĞ�Ğ�.';
 
   @override
-  String get alwaysBest => 'Ğ’ÑĞµĞ³Ğ´Ğ° Ğ»ÑƒÑ‡ÑˆĞ¸Ğµ';
+  String get alwaysBest => 'Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�учшĞ�Ğ�';
 
   @override
-  String get featuresTitle => 'Ğ¤ÑƒĞ½ĞºÑ†Ğ¸Ğ¸';
+  String get featuresTitle => 'Ğ�уĞ�Ğ�цĞ�Ğ�';
 
   @override
   String get useOfflineDescription =>
-      'ĞĞ±Ñ‰Ğ°Ğ¹Ñ‚ĞµÑÑŒ Ğ² Ğ¿Ñ€Ğ¸Ğ²Ğ°Ñ‚Ğ½Ğ¾Ğ¼ Ñ‡Ğ°Ñ‚Ğµ Ğ±ĞµĞ· Ğ¿Ğ¾Ğ´ĞºĞ»ÑÑ‡ĞµĞ½Ğ¸Ñ Ğº Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ñƒ.';
+      'Ğ�Ğ�щĞ�Ğ�тĞ�сь Ğ� Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ� чĞ�тĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту.';
 
   @override
-  String get featureReasoning => 'Ğ“Ğ»ÑƒĞ±Ğ¾ĞºĞ¾Ğµ Ğ¼Ñ‹ÑˆĞ»ĞµĞ½Ğ¸Ğµ';
+  String get featureReasoning => 'Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ышĞ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get featureReasoningDescription =>
-      'Ğ’ Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ Ğ³Ğ»ÑƒĞ±Ğ¾ĞºĞ¾Ğ³Ğ¾ Ğ¼Ñ‹ÑˆĞ»ĞµĞ½Ğ¸Ñ Ğ˜Ğ˜ Ğ¿Ñ€Ğ¾Ğ´ÑƒĞ¼Ñ‹Ğ²Ğ°ĞµÑ‚ Ğ·Ğ°Ğ´Ğ°Ñ‡Ğ¸ ÑĞ°Ğ¼Ğ¾ÑÑ‚Ğ¾ÑÑ‚ĞµĞ»ÑŒĞ½Ğ¾, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ²Ñ‹Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ÑŒ Ğ¸Ñ… Ğ½Ğ°Ğ¸Ğ»ÑƒÑ‡ÑˆĞ¸Ğ¼ Ğ¾Ğ±Ñ€Ğ°Ğ·Ğ¾Ğ¼.';
+      'Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ышĞ�Ğ�Ğ�Ğ�я Ğ�Ğ� Ğ�рĞ�Ğ�уĞ�ыĞ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�чĞ� сĞ�Ğ�Ğ�стĞ�ятĞ�Ğ�ьĞ�Ğ�, чтĞ�Ğ�ы Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�ть Ğ�х Ğ�Ğ�Ğ�Ğ�учшĞ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get featureCreateImageTitle => 'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ñ‚ÑŒ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ';
+  String get featureCreateImageTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get featureCreateImageDescription =>
-      'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ğ²Ğ°Ğ¹Ñ‚Ğµ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ Ñ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰ÑŒÑ Ğ˜Ğ˜ Ğ¸Ğ· Ñ‚ĞµĞºÑÑ‚Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я с Ğ�Ğ�Ğ�Ğ�щью Ğ�Ğ� Ğ�Ğ� тĞ�Ğ�стĞ�.';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1684,107 +1667,103 @@ class AppLocalizationsRu extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => 'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ñ‚ÑŒ Ğ²Ğ¸Ğ´ĞµĞ¾';
+  String get featureCreateVideoTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get featureCreateVideoDescription =>
-      'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ğ²Ğ°Ğ¹Ñ‚Ğµ Ğ²Ğ¸Ğ´ĞµĞ¾Ñ€Ğ¾Ğ»Ğ¸ĞºĞ¸ Ğ¸Ğ· Ñ‚ĞµĞºÑÑ‚Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� тĞ�Ğ�стĞ�.';
 
   @override
-  String get featureStudyTitle =>
-      'Ğ£Ñ‡Ğ¸Ñ‚ĞµÑÑŒ Ğ¸ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ°Ğ¹Ñ‚Ğµ Ğ·Ğ½Ğ°Ğ½Ğ¸Ñ';
+  String get featureStudyTitle => 'Ğ�чĞ�тĞ�сь Ğ� Ğ�Ğ�Ğ�учĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
   String get featureStudyDescription =>
-      'ĞŸĞ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚Ğµ Ğ¿Ğ¾ÑÑĞ½ĞµĞ½Ğ¸Ñ Ğ¸ ĞºÑ€Ğ°Ñ‚ĞºĞ¸Ğµ Ğ¾Ğ±Ğ·Ğ¾Ñ€Ñ‹.';
+      'Ğ�Ğ�Ğ�учĞ�тĞ� Ğ�Ğ�ясĞ�Ğ�Ğ�Ğ�я Ğ� Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ры.';
 
   @override
-  String get featureQuizzesTitle => 'Ğ’Ğ¸ĞºÑ‚Ğ¾Ñ€Ğ¸Ğ½Ñ‹';
+  String get featureQuizzesTitle => 'Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�ы';
 
   @override
-  String get featureQuizzesDescription =>
-      'ĞŸÑ€Ğ¾Ğ²ĞµÑ€ÑŒÑ‚Ğµ ÑĞ²Ğ¾Ğ¸ Ğ·Ğ½Ğ°Ğ½Ğ¸Ñ.';
+  String get featureQuizzesDescription => 'Ğ�рĞ�Ğ�Ğ�рьтĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get featureExploreDescription =>
-      'ĞĞ·Ğ½Ğ°ĞºĞ¾Ğ¼ÑŒÑ‚ĞµÑÑŒ ÑĞ¾ Ğ²ÑĞµĞ¼Ğ¸ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ñ‹Ğ¼Ğ¸ Ğ¼Ğ¾Ğ´ĞµĞ»ÑĞ¼Ğ¸.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ьтĞ�сь сĞ� Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�стуĞ�Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�Ğ�.';
 
   @override
   String get featureStudyMessage =>
-      'Ğ’Ñ‹ â€” Ğ¾Ğ¿Ñ‹Ñ‚Ğ½Ñ‹Ğ¹ Ñ€ĞµĞ¿ĞµÑ‚Ğ¸Ñ‚Ğ¾Ñ€. Ğ’Ğ°ÑˆĞ° Ñ†ĞµĞ»ÑŒ â€” Ğ²ÑĞµÑÑ‚Ğ¾Ñ€Ğ¾Ğ½Ğ½Ğµ Ğ¾Ğ±ÑŠÑÑĞ½Ğ¸Ñ‚ÑŒ Ñ‚ĞµĞ¼Ñƒ, Ğ¸Ğ½Ñ‚ĞµÑ€ĞµÑÑƒÑÑ‰ÑƒÑ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ. Ğ˜ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞ¹Ñ‚Ğµ Ñ‡ĞµÑ‚ĞºÑƒÑ ÑÑ‚Ñ€ÑƒĞºÑ‚ÑƒÑ€Ñƒ, Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€Ñ‹ Ğ¸ Ğ°Ğ½Ğ°Ğ»Ğ¾Ğ³Ğ¸Ğ¸. Ğ Ğ°Ğ·Ğ±Ğ¸Ğ²Ğ°Ğ¹Ñ‚Ğµ ÑĞ»Ğ¾Ğ¶Ğ½Ñ‹Ğµ Ğ¸Ğ´ĞµĞ¸ Ğ½Ğ° Ğ»ĞµĞ³ĞºĞ¾ ÑƒÑĞ²Ğ°Ğ¸Ğ²Ğ°ĞµĞ¼Ñ‹Ğµ Ñ‡Ğ°ÑÑ‚Ğ¸, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¾Ğ±ĞµÑĞ¿ĞµÑ‡Ğ¸Ñ‚ÑŒ ÑÑ„Ñ„ĞµĞºÑ‚Ğ¸Ğ²Ğ½Ğ¾Ğµ ÑƒÑĞ²Ğ¾ĞµĞ½Ğ¸Ğµ Ğ¼Ğ°Ñ‚ĞµÑ€Ğ¸Ğ°Ğ»Ğ°. Ğ¢ĞµĞ¼Ğ°:';
+      'Ğ�ы — Ğ�Ğ�ытĞ�ыĞ� рĞ�Ğ�Ğ�тĞ�тĞ�р. Ğ�Ğ�шĞ� цĞ�Ğ�ь — Ğ�сĞ�стĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�ъясĞ�Ğ�ть тĞ�Ğ�у, Ğ�Ğ�тĞ�рĞ�сующую Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я. Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� чĞ�тĞ�ую струĞ�туру, Ğ�рĞ�Ğ�Ğ�ры Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� усĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� чĞ�стĞ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�ть эффĞ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� усĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�:';
 
   @override
   String get featureQuizMessage =>
-      'Ğ’Ñ‹ â€” Ğ²ĞµĞ´ÑƒÑ‰Ğ¸Ğ¹ Ğ²Ğ¸ĞºÑ‚Ğ¾Ñ€Ğ¸Ğ½Ñ‹. Ğ¡Ğ³ĞµĞ½ĞµÑ€Ğ¸Ñ€ÑƒĞ¹Ñ‚Ğµ ĞºĞ¾Ğ½ĞºÑ€ĞµÑ‚Ğ½Ñ‹Ğ¹ Ğ²Ğ¾Ğ¿Ñ€Ğ¾Ñ Ñ Ğ½ĞµÑĞºĞ¾Ğ»ÑŒĞºĞ¸Ğ¼Ğ¸ Ğ²Ğ°Ñ€Ğ¸Ğ°Ğ½Ñ‚Ğ°Ğ¼Ğ¸ Ğ¾Ñ‚Ğ²ĞµÑ‚Ğ°, Ğ¾ÑĞ½Ğ¾Ğ²Ğ°Ğ½Ğ½Ñ‹Ğ¹ Ğ½Ğ° Ñ‚ĞµĞ¼Ğµ, Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ½Ğ¾Ğ¹ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¼. Ğ”Ğ¾Ğ¶Ğ´Ğ¸Ñ‚ĞµÑÑŒ ĞµĞ³Ğ¾ Ğ¾Ñ‚Ğ²ĞµÑ‚Ğ°. Ğ—Ğ°Ñ‚ĞµĞ¼ Ğ¾Ñ†ĞµĞ½Ğ¸Ñ‚Ğµ ĞµĞ³Ğ¾ Ğ¸ Ğ·Ğ°Ğ´Ğ°Ğ¹Ñ‚Ğµ ÑĞ»ĞµĞ´ÑƒÑÑ‰Ğ¸Ğ¹ Ğ²Ğ¾Ğ¿Ñ€Ğ¾Ñ. ĞĞµ Ñ€Ğ°ÑĞºÑ€Ñ‹Ğ²Ğ°Ğ¹Ñ‚Ğµ Ğ²ÑĞµ Ğ¾Ñ‚Ğ²ĞµÑ‚Ñ‹ ÑÑ€Ğ°Ğ·Ñƒ. ĞŸĞ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°Ğ¹Ñ‚Ğµ Ğ¸Ğ½Ñ‚ĞµÑ€Ğ°ĞºÑ‚Ğ¸Ğ²Ğ½Ğ¾ÑÑ‚ÑŒ. Ğ¢ĞµĞ¼Ğ°:';
+      'Ğ�ы — Ğ�Ğ�Ğ�ущĞ�Ğ� Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�ы. Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�руĞ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�ыĞ� Ğ�Ğ�Ğ�рĞ�с с Ğ�Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�тĞ�Ğ�тĞ�, Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ� тĞ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ�Ğ�Ğ� Ğ�тĞ�Ğ�тĞ�. Ğ�Ğ�тĞ�Ğ� Ğ�цĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�ующĞ�Ğ� Ğ�Ğ�Ğ�рĞ�с. Ğ�Ğ� рĞ�сĞ�рыĞ�Ğ�Ğ�тĞ� Ğ�сĞ� Ğ�тĞ�Ğ�ты срĞ�Ğ�у. Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�Ğ�Ğ�Ğ�сть. Ğ�Ğ�Ğ�Ğ�:';
 
   @override
-  String get myPlan => 'ĞœĞ¾Ğ¹ Ğ¿Ğ»Ğ°Ğ½';
+  String get myPlan => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'ĞŸÑ€Ğ¸Ğ²ĞµÑ‚ÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğµ Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ â€¢ $time';
+    return 'Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� • $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Ğ­ĞºÑĞºĞ»ÑĞ·Ğ¸Ğ²Ğ½Ğ¾Ğµ Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ â€¢ $time';
+    return 'Ğ�Ğ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� • $time';
   }
 
   @override
-  String get attachmentSheetTitle => 'Ğ’Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ';
+  String get attachmentSheetTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
 
   @override
-  String get actionCamera => 'ĞšĞ°Ğ¼ĞµÑ€Ğ°';
+  String get actionCamera => 'Ğ�Ğ�Ğ�Ğ�рĞ�';
 
   @override
-  String get actionGallery => 'Ğ“Ğ°Ğ»ĞµÑ€ĞµÑ';
+  String get actionGallery => 'Ğ�Ğ�Ğ�Ğ�рĞ�я';
 
   @override
-  String get actionFile => 'Ğ¤Ğ°Ğ¹Ğ»';
+  String get actionFile => 'Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get listening => 'Ğ¡Ğ»ÑƒÑˆĞ°ĞµÑ‚';
+  String get listening => 'Ğ�Ğ�ушĞ�Ğ�т';
 
   @override
-  String get defaultViewTitle => 'ĞšĞ°Ğº Ğ´ĞµĞ»Ğ°?';
+  String get defaultViewTitle => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex Ğ²ÑĞµĞ³Ğ´Ğ° Ñ€ÑĞ´Ğ¾Ğ¼ Ñ Ğ²Ğ°Ğ¼Ğ¸, Ğ¿Ñ€ĞµĞ´Ğ»Ğ°Ğ³Ğ°Ñ ÑĞ¾Ñ‚Ğ½Ğ¸ Ğ¼Ğ¾Ğ´ĞµĞ»ĞµĞ¹ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°, Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ñ‹ Ğ² Ğ°Ğ²Ñ‚Ğ¾Ğ½Ğ¾Ğ¼Ğ½Ğ¾Ğ¼ Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ, Ğ´Ğ¸Ğ½Ğ°Ğ¼Ğ¸Ñ‡ĞµÑĞºĞ¸Ğ¹ Ñ‡Ğ°Ñ‚ Ğ¸ Ğ¼Ğ½Ğ¾Ğ³Ğ¾Ğµ Ğ´Ñ€ÑƒĞ³Ğ¾Ğµ.';
+      'Cortex Ğ�сĞ�Ğ�Ğ�Ğ� ряĞ�Ğ�Ğ� с Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я сĞ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� рĞ�Ğ�Ğ�ты Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ� чĞ�т Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ�.';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
   String get invalidUsernameFormat =>
-      'ĞĞµĞ²ĞµÑ€Ğ½Ñ‹Ğ¹ Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚ Ğ¸Ğ¼ĞµĞ½Ğ¸ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ. Ğ˜ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞ¹Ñ‚Ğµ 3-20 ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ¾Ğ², Ñ†Ğ¸Ñ„Ñ€ Ğ¸Ğ»Ğ¸ . - _';
+      'Ğ�Ğ�Ğ�Ğ�рĞ�ыĞ� фĞ�рĞ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я. Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� 3-20 сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, цĞ�фр Ğ�Ğ�Ğ� . - _';
 
   @override
-  String get exclusiveOffer =>
-      'Ğ­ĞºÑĞºĞ»ÑĞ·Ğ¸Ğ²Ğ½Ğ¾Ğµ Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ';
+  String get exclusiveOffer => 'Ğ�Ğ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get claimOffer =>
-      'Ğ’Ğ¾ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞ¹Ñ‚ĞµÑÑŒ Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸ĞµĞ¼';
+  String get claimOffer => 'Ğ�Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ�сь Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get continueInOfflineMode =>
-      'ĞŸÑ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ Ğ² Ğ°Ğ²Ñ‚Ğ¾Ğ½Ğ¾Ğ¼Ğ½Ğ¾Ğ¼ Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ';
+      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get voiceModeInformation =>
-      'Cortex Ğ¾Ğ±ĞµÑĞ¿ĞµÑ‡Ğ¸Ğ²Ğ°ĞµÑ‚ Ğ±ĞµĞ·Ğ¾Ğ¿Ğ°ÑĞ½Ğ¾ÑÑ‚ÑŒ Ğ²Ğ°ÑˆĞ¸Ñ… Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ…, Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ñ Ğ¿Ğ¾Ğ»Ğ½Ğ¾ÑÑ‚ÑŒÑ Ğ½Ğ° ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğµ, Ğ´Ğ°Ğ¶Ğµ Ğ² Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ Ğ³Ğ¾Ğ»Ğ¾ÑĞ¾Ğ²Ğ¾Ğ³Ğ¾ Ñ‡Ğ°Ñ‚Ğ°; Ğ½Ğ°ÑĞ»Ğ°Ğ¶Ğ´Ğ°Ğ¹Ñ‚ĞµÑÑŒ Ğ±ĞµÑĞ¿ĞµÑ€ĞµĞ±Ğ¾Ğ¹Ğ½Ñ‹Ğ¼ Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸ĞµĞ¼!';
+      'Cortex Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�сть Ğ�Ğ�шĞ�х Ğ�Ğ�Ğ�Ğ�ых, рĞ�Ğ�Ğ�тĞ�я Ğ�Ğ�Ğ�Ğ�Ğ�стью Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ� чĞ�тĞ�; Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ�Ğ�сĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�Ğ�!';
 
   @override
   String get flowModeDescription =>
-      'Ğ’ Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ Â«ĞŸĞ¾Ñ‚Ğ¾ĞºÂ» Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ñ‹ ÑĞ¿Ğ¾Ñ€ÑÑ‚ Ğ¼ĞµĞ¶Ğ´Ñƒ ÑĞ¾Ğ±Ğ¾Ğ¹; Ğ²Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ»Ğ¸Ğ±Ğ¾ ÑĞ¸Ğ´ĞµÑ‚ÑŒ Ğ¸ ÑĞ»ÑƒÑˆĞ°Ñ‚ÑŒ, Ğ»Ğ¸Ğ±Ğ¾ Ğ¿Ñ€Ğ¸ÑĞ¾ĞµĞ´Ğ¸Ğ½Ğ¸Ñ‚ÑŒÑÑ Ğº Ğ¾Ğ±ÑÑƒĞ¶Ğ´ĞµĞ½Ğ¸Ñ!';
+      'Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� «Ğ�Ğ�тĞ�Ğ�» Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ты сĞ�Ğ�рят Ğ�Ğ�Ğ�Ğ�у сĞ�Ğ�Ğ�Ğ�; Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�ть Ğ� сĞ�ушĞ�ть, Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ться Ğ� Ğ�Ğ�суĞ�Ğ�Ğ�Ğ�Ğ�ю!';
 
   @override
   String get flowModeQuestion =>
-      'ĞŸÑ€Ğ¸Ğ²ĞµÑ‚! Ğ’Ñ‹ Ğ½Ğ°Ñ…Ğ¾Ğ´Ğ¸Ñ‚ĞµÑÑŒ Ğ² Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ Â«ĞŸĞ¾Ñ‚Ğ¾ĞºÂ» Ğ² Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğ¸ Cortex. Ğ¡ Ğ²Ğ°Ğ¼Ğ¸ Ğ½Ğ°Ñ…Ğ¾Ğ´ÑÑ‚ÑÑ ĞµÑ‰Ñ‘ Ñ‚Ñ€Ğ¸ Ğ˜Ğ˜-Ğ°Ğ³ĞµĞ½Ñ‚Ğ°. Ğ’Ğ°ÑˆĞ° Ğ·Ğ°Ğ´Ğ°Ñ‡Ğ° â€” Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶Ğ¸Ñ‚ÑŒ Ñ‚ĞµĞ¼Ñƒ Ğ´Ğ»Ñ Ğ¾Ğ±ÑÑƒĞ¶Ğ´ĞµĞ½Ğ¸Ñ Ğ¸ Ğ½Ğ°Ñ‡Ğ°Ñ‚ÑŒ Ğ´Ğ¸ÑĞºÑƒÑÑĞ¸Ñ, Ğ·Ğ°Ğ´Ğ°Ğ² Ğ´Ñ€ÑƒĞ³Ğ¸Ğ¼ Ğ¿Ñ€Ğ¾Ğ²Ğ¾ĞºĞ°Ñ†Ğ¸Ğ¾Ğ½Ğ½Ñ‹Ğ¹ Ğ¸Ğ»Ğ¸ Ğ·Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ Ğ²Ğ¾Ğ¿Ñ€Ğ¾Ñ. Ğ’ ÑĞ²Ğ¾Ğ¸Ñ… Ğ¾Ñ‚Ğ²ĞµÑ‚Ğ°Ñ… ÑĞ¼ĞµĞ»Ğ¾ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞ¹Ñ‚Ğµ ÑĞ¼Ğ¾Ñ€, Ğ¸Ñ€Ğ¾Ğ½Ğ¸Ñ Ğ¸ Ğ»Ñ‘Ğ³ĞºĞ¸Ğµ Ğ¿Ğ¾Ğ´ĞºĞ¾Ğ»ĞºĞ¸. Ğ›ÑĞ±Ğ°Ñ Ñ‚ĞµĞ¼Ğ° Ğ¿Ğ¾Ğ´Ñ…Ğ¾Ğ´Ğ¸Ñ‚. Ğ’Ğ¿ĞµÑ€Ñ‘Ğ´, Ğ½Ğ°Ñ‡Ğ¸Ğ½Ğ°Ğ¹Ñ‚Ğµ Ñ€Ğ°Ğ·Ğ³Ğ¾Ğ²Ğ¾Ñ€!';
+      'Ğ�рĞ�Ğ�Ğ�т! Ğ�ы Ğ�Ğ�хĞ�Ğ�Ğ�тĞ�сь Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� «Ğ�Ğ�тĞ�Ğ�» Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Cortex. Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�хĞ�Ğ�ятся Ğ�щё трĞ� Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�чĞ� — Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть тĞ�Ğ�у Ğ�Ğ�я Ğ�Ğ�суĞ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�чĞ�ть Ğ�Ğ�сĞ�уссĞ�ю, Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�рĞ�с. Ğ� сĞ�Ğ�Ğ�х Ğ�тĞ�Ğ�тĞ�х сĞ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� юĞ�Ğ�р, Ğ�рĞ�Ğ�Ğ�ю Ğ� Ğ�ёĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�юĞ�Ğ�я тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�т. Ğ�Ğ�Ğ�рёĞ�, Ğ�Ğ�чĞ�Ğ�Ğ�Ğ�тĞ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�р!';
 
   @override
-  String get thought => 'ĞŸĞ¾Ğ´ÑƒĞ¼Ğ°Ğ»';
+  String get thought => 'Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�';
 
   @override
   String get agentRed => 'Red';
@@ -1796,205 +1775,204 @@ class AppLocalizationsRu extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'Ğ ĞµĞ¶Ğ¸Ğ¼ Ğ¿Ğ¾Ñ‚Ğ¾ĞºĞ°';
+  String get flowMode => 'Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�';
 
   @override
-  String get premium => 'ĞŸÑ€ĞµĞ¼Ğ¸ÑƒĞ¼';
+  String get premium => 'Ğ�рĞ�Ğ�Ğ�уĞ�';
 
   @override
-  String get workInProgress => 'Ğ Ğ°Ğ±Ğ¾Ñ‚Ğ° Ğ² Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞµ';
+  String get workInProgress => 'Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� Ğ�рĞ�цĞ�ссĞ�';
 
   @override
   String get voiceSystemPromptSuffix =>
-      'Ğ’ĞĞ–ĞĞ: ĞĞµ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞ¹Ñ‚Ğµ Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Markdown (Ğ¶Ğ¸Ñ€Ğ½Ñ‹Ğ¹ ÑˆÑ€Ğ¸Ñ„Ñ‚, ĞºÑƒÑ€ÑĞ¸Ğ²). ĞĞ• Ğ²Ñ‹Ğ²Ğ¾Ğ´Ğ¸Ñ‚Ğµ Ğ±Ğ»Ğ¾ĞºĞ¸ ĞºĞ¾Ğ´Ğ° (```). ĞÑ‚Ğ²ĞµÑ‚Ñ‹ Ğ´Ğ¾Ğ»Ğ¶Ğ½Ñ‹ Ğ±Ñ‹Ñ‚ÑŒ Ğ² Ñ€Ğ°Ğ·Ğ³Ğ¾Ğ²Ğ¾Ñ€Ğ½Ğ¾Ğ¼ Ğ¸ ĞºÑ€Ğ°Ñ‚ĞºĞ¾Ğ¼ ÑÑ‚Ğ¸Ğ»Ğµ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� фĞ�рĞ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Markdown (Ğ�Ğ�рĞ�ыĞ� шрĞ�фт, Ğ�урсĞ�Ğ�). Ğ�Ğ� Ğ�ыĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� (```). Ğ�тĞ�Ğ�ты Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�ыть Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ� Ğ�рĞ�тĞ�Ğ�Ğ� стĞ�Ğ�Ğ�.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'Ğ ĞµĞ¶Ğ¸Ğ¼ Cortex Flow ($agentName). ĞŸÑ€ĞµĞ´Ñ‹Ğ´ÑƒÑ‰Ğ¸Ğ¹: $previousResponse';
+    return 'Ğ�Ğ�Ğ�Ğ�Ğ� Cortex Flow ($agentName). Ğ�рĞ�Ğ�ыĞ�ущĞ�Ğ�: $previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      'Ğ§Ñ‚ĞµĞ½Ğ¸Ğµ Ğ¸ Ğ¸Ğ·Ğ²Ğ»ĞµÑ‡ĞµĞ½Ğ¸Ğµ Ñ‚ĞµĞºÑÑ‚Ğ¾Ğ²Ğ¾Ğ³Ğ¾ ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ¸Ğ¼Ğ¾Ğ³Ğ¾ Ğ¸Ğ· Ğ·Ğ°Ğ³Ñ€ÑƒĞ¶ĞµĞ½Ğ½Ñ‹Ñ… Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ¾Ğ². ĞŸĞ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°ĞµÑ‚ Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚Ñ‹ PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) Ğ¸ OpenDocument. Ğ˜ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞ¹Ñ‚Ğµ ÑÑ‚Ñƒ Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ, ĞµÑĞ»Ğ¸ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ Ğ¿Ñ€Ğ¸ĞºÑ€ĞµĞ¿Ğ¸Ğ» Ñ„Ğ°Ğ¹Ğ» Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ°.';
+      'Ğ�тĞ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ� тĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�т фĞ�рĞ�Ğ�ты PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) Ğ� OpenDocument. Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� эту фуĞ�Ğ�цĞ�ю, Ğ�сĞ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�Ğ� фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�.';
 
   @override
   String get toolReadDocumentIndexParam =>
-      'Ğ˜Ğ½Ğ´ĞµĞºÑ Ğ²Ğ»Ğ¾Ğ¶ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ° Ğ´Ğ»Ñ Ñ‡Ñ‚ĞµĞ½Ğ¸Ñ (Ğ½Ğ°Ñ‡Ğ¸Ğ½Ğ°Ñ Ñ 0). ĞĞ±Ñ‹Ñ‡Ğ½Ğ¾ 0 Ğ´Ğ»Ñ Ğ¿ĞµÑ€Ğ²Ğ¾Ğ³Ğ¾ Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ°.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�с Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ� Ğ�Ğ�я чтĞ�Ğ�Ğ�я (Ğ�Ğ�чĞ�Ğ�Ğ�я с 0). Ğ�Ğ�ычĞ�Ğ� 0 Ğ�Ğ�я Ğ�Ğ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�.';
 
   @override
   String get toolStockDescription =>
-      'ĞŸĞ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚Ğµ Ñ‚ĞµĞºÑƒÑ‰ÑƒÑ Ñ†ĞµĞ½Ñƒ Ğ¸ Ğ¸ÑÑ‚Ğ¾Ñ€Ğ¸Ñ ĞºĞ¾Ğ»ĞµĞ±Ğ°Ğ½Ğ¸Ğ¹ Ğ´Ğ»Ñ Ğ°ĞºÑ†Ğ¸Ğ¹ (Ğ½Ğ°Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€, AAPL, THYAO.IS) Ğ¸ ĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ğ²Ğ°Ğ»ÑÑ‚ (Ğ½Ğ°Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€, BTC-USD).';
+      'Ğ�Ğ�Ğ�учĞ�тĞ� тĞ�Ğ�ущую цĞ�Ğ�у Ğ� Ğ�стĞ�рĞ�ю Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�цĞ�Ğ� (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, AAPL, THYAO.IS) Ğ� Ğ�рĞ�Ğ�тĞ�Ğ�Ğ�Ğ�ют (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, BTC-USD).';
 
   @override
   String get toolStockSymbolParam =>
-      'Ğ¢Ğ¸ĞºĞµÑ€ (Ğ½Ğ°Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€, AAPL, THYAO.IS, BTC-USD).';
+      'Ğ�Ğ�Ğ�Ğ�р (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, AAPL, THYAO.IS, BTC-USD).';
 
   @override
   String get toolWeatherDescription =>
-      'Ğ£Ğ·Ğ½Ğ°Ğ¹Ñ‚Ğµ Ñ‚ĞµĞºÑƒÑ‰ÑƒÑ Ğ¿Ğ¾Ğ³Ğ¾Ğ´Ñƒ Ğ² ĞºĞ¾Ğ½ĞºÑ€ĞµÑ‚Ğ½Ğ¾Ğ¼ Ğ³Ğ¾Ñ€Ğ¾Ğ´Ğµ.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� тĞ�Ğ�ущую Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�.';
 
   @override
   String get toolWeatherCityParam =>
-      'ĞĞ°Ğ·Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ³Ğ¾Ñ€Ğ¾Ğ´Ğ° (Ğ½Ğ°Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€, Ğ›Ğ¾Ğ½Ğ´Ğ¾Ğ½, Ğ¡Ñ‚Ğ°Ğ¼Ğ±ÑƒĞ»).';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ� (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�тĞ�Ğ�Ğ�уĞ�).';
 
   @override
   String get toolPythonDescription =>
-      'Ğ’Ñ‹Ğ¿Ğ¾Ğ»Ğ½ÑĞ¹Ñ‚Ğµ ĞºĞ¾Ğ´ Python Ğ² Ğ·Ğ°Ñ‰Ğ¸Ñ‰ĞµĞ½Ğ½Ğ¾Ğ¹ Ğ¿ĞµÑĞ¾Ñ‡Ğ½Ğ¸Ñ†Ğµ.';
+      'Ğ�ыĞ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�Ğ� Python Ğ� Ğ�Ğ�щĞ�щĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�чĞ�Ğ�цĞ�.';
 
   @override
   String get toolPythonCodeParam =>
-      'ĞšĞ¾Ğ´ Ğ½Ğ° Python Ğ´Ğ»Ñ Ğ²Ñ‹Ğ¿Ğ¾Ğ»Ğ½ĞµĞ½Ğ¸Ñ.';
+      'Ğ�Ğ�Ğ� Ğ�Ğ� Python Ğ�Ğ�я Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get toolCalculateDescription =>
-      'ĞÑ†ĞµĞ½Ğ¸Ñ‚Ğµ Ğ·Ğ½Ğ°Ñ‡ĞµĞ½Ğ¸Ğµ Ğ¼Ğ°Ñ‚ĞµĞ¼Ğ°Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¾Ğ³Ğ¾ Ğ²Ñ‹Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ.';
+      'Ğ�цĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ�Ğ�Ğ� Ğ�ырĞ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get toolCalculateExpressionParam =>
-      'ĞœĞ°Ñ‚ĞµĞ¼Ğ°Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¾Ğµ Ğ²Ñ‹Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ (Ğ½Ğ°Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€, \'3 + 4 * 2\').';
+      'Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ�Ğ� Ğ�ырĞ�Ğ�Ğ�Ğ�Ğ�Ğ� (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, \'3 + 4 * 2\').';
 
   @override
   String get toolChartDescription =>
-      'Ğ¡Ğ¾Ğ·Ğ´Ğ°Ğ¹Ñ‚Ğµ Ğ´Ğ¸Ğ°Ğ³Ñ€Ğ°Ğ¼Ğ¼Ñƒ/Ğ³Ñ€Ğ°Ñ„Ğ¸Ğº Ğ´Ğ»Ñ Ğ²Ğ¸Ğ·ÑƒĞ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�у/Ğ�рĞ�фĞ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�.';
 
   @override
   String get toolChartTypeParam =>
-      'Ğ¢Ğ¸Ğ¿ Ğ´Ğ¸Ğ°Ğ³Ñ€Ğ°Ğ¼Ğ¼Ñ‹: ÑÑ‚Ğ¾Ğ»Ğ±Ñ‡Ğ°Ñ‚Ğ°Ñ, Ğ»Ğ¸Ğ½ĞµĞ¹Ğ½Ğ°Ñ Ğ¸Ğ»Ğ¸ ĞºÑ€ÑƒĞ³Ğ¾Ğ²Ğ°Ñ.';
+      'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы: стĞ�Ğ�Ğ�чĞ�тĞ�я, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get toolChartLabelsParam =>
-      'ĞŸĞ¾Ğ´Ğ¿Ğ¸ÑĞ¸ Ğ´Ğ»Ñ Ğ¾ÑĞµĞ¹ Ğ¸Ğ»Ğ¸ ÑĞµĞ³Ğ¼ĞµĞ½Ñ‚Ğ¾Ğ² Ğ´Ğ¸Ğ°Ğ³Ñ€Ğ°Ğ¼Ğ¼Ñ‹.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�сĞ� Ğ�Ğ�я Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
 
   @override
   String get toolChartDataParam =>
-      'Ğ§Ğ¸ÑĞ»Ğ¾Ğ²Ñ‹Ğµ Ğ·Ğ½Ğ°Ñ‡ĞµĞ½Ğ¸Ñ Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ… Ğ´Ğ»Ñ Ğ´Ğ¸Ğ°Ğ³Ñ€Ğ°Ğ¼Ğ¼Ñ‹.';
+      'Ğ�Ğ�сĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�ых Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
 
   @override
   String get toolChartLabelParam =>
-      'ĞœĞµÑ‚ĞºĞ° Ğ½Ğ°Ğ±Ğ¾Ñ€Ğ° Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ… Ğ´Ğ»Ñ Ğ»ĞµĞ³ĞµĞ½Ğ´Ñ‹ Ğ´Ğ¸Ğ°Ğ³Ñ€Ğ°Ğ¼Ğ¼Ñ‹.';
+      'Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ� Ğ�Ğ�Ğ�Ğ�ых Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
 
   @override
-  String get toolChartTitleParam => 'Ğ—Ğ°Ğ³Ğ¾Ğ»Ğ¾Ğ²Ğ¾Ğº Ğ´Ğ¸Ğ°Ğ³Ñ€Ğ°Ğ¼Ğ¼Ñ‹.';
+  String get toolChartTitleParam => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
 
   @override
   String get thinkingModeInstruction =>
-      'Ğ Ğ•Ğ–Ğ˜Ğœ Ğ ĞĞ—ĞœĞ«Ğ¨Ğ›Ğ•ĞĞ˜Ğ¯ Ğ’ĞšĞ›Ğ®Ğ§Ğ•Ğ: Ğ’Ñ‹ ĞĞ‘Ğ¯Ğ—ĞĞ¢Ğ•Ğ›Ğ¬ĞĞ Ğ´Ğ¾Ğ»Ğ¶Ğ½Ñ‹ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ñ‚ĞµĞ³Ğ¸ <think></think>, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¿Ğ¾ĞºĞ°Ğ·Ğ°Ñ‚ÑŒ Ñ…Ğ¾Ğ´ ÑĞ²Ğ¾Ğ¸Ñ… Ñ€Ğ°ÑÑÑƒĞ¶Ğ´ĞµĞ½Ğ¸Ğ¹, Ğ¿Ñ€ĞµĞ¶Ğ´Ğµ Ñ‡ĞµĞ¼ Ğ´Ğ°Ñ‚ÑŒ Ğ¾ĞºĞ¾Ğ½Ñ‡Ğ°Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ Ğ¾Ñ‚Ğ²ĞµÑ‚. Ğ Ğ°Ğ·Ğ¼Ñ‹ÑˆĞ»ÑĞ¹Ñ‚Ğµ ÑˆĞ°Ğ³ Ğ·Ğ° ÑˆĞ°Ğ³Ğ¾Ğ¼ Ğ²Ğ½ÑƒÑ‚Ñ€Ğ¸ Ñ‚ĞµĞ³Ğ¾Ğ², Ğ° Ğ·Ğ°Ñ‚ĞµĞ¼ Ğ´Ğ°Ğ¹Ñ‚Ğµ ÑĞ²Ğ¾Ğ¹ Ğ¾Ñ‚Ğ²ĞµÑ‚ Ğ²Ğ½Ğµ Ñ‚ĞµĞ³Ğ¾Ğ².';
+      'Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть тĞ�Ğ�Ğ� <think></think>, чтĞ�Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть хĞ�Ğ� сĞ�Ğ�Ğ�х рĞ�ссуĞ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ� чĞ�Ğ� Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�ьĞ�ыĞ� Ğ�тĞ�Ğ�т. Ğ�Ğ�Ğ�Ğ�ышĞ�яĞ�тĞ� шĞ�Ğ� Ğ�Ğ� шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�утрĞ� тĞ�Ğ�Ğ�Ğ�, Ğ� Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�тĞ�Ğ�т Ğ�Ğ�Ğ� тĞ�Ğ�Ğ�Ğ�.';
 
   @override
   String get openLinkWarningTitle =>
-      'ĞŸÑ€ĞµĞ´ÑƒĞ¿Ñ€ĞµĞ¶Ğ´ĞµĞ½Ğ¸Ğµ Ğ¾ Ğ²Ğ½ĞµÑˆĞ½Ğ¸Ñ… ÑÑÑ‹Ğ»ĞºĞ°Ñ…';
+      'Ğ�рĞ�Ğ�уĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�шĞ�Ğ�х ссыĞ�Ğ�Ğ�х';
 
   @override
   String get openLinkCancel => 'Cancel';
 
   @override
-  String get openLinkConfirm => 'ĞÑ‚ĞºÑ€Ñ‹Ñ‚ÑŒ ÑÑÑ‹Ğ»ĞºÑƒ';
+  String get openLinkConfirm => 'Ğ�тĞ�рыть ссыĞ�Ğ�у';
 
   @override
-  String get webSearchSources => 'Ğ˜ÑÑ‚Ğ¾Ñ‡Ğ½Ğ¸ĞºĞ¸';
+  String get webSearchSources => 'Ğ�стĞ�чĞ�Ğ�Ğ�Ğ�';
 
   @override
-  String get searching => 'Ğ˜Ğ´ĞµÑ‚ Ğ¿Ğ¾Ğ¸ÑĞº';
+  String get searching => 'Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�сĞ�';
 
   @override
-  String get featureWebSearchTitle => 'ĞŸĞ¾Ğ¸ÑĞº Ğ² Ğ˜Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ğµ';
+  String get featureWebSearchTitle => 'Ğ�Ğ�Ğ�сĞ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�';
 
   @override
   String get featureWebSearchDescription =>
-      'Ğ˜Ñ‰Ğ¸Ñ‚Ğµ Ğ² Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ğµ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ Ğ² Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ Ñ€ĞµĞ°Ğ»ÑŒĞ½Ğ¾Ğ³Ğ¾ Ğ²Ñ€ĞµĞ¼ĞµĞ½Ğ¸.';
+      'Ğ�щĞ�тĞ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ� Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get clearMemory => 'ĞÑ‡Ğ¸ÑÑ‚Ğ¸Ñ‚ÑŒ Ğ¿Ğ°Ğ¼ÑÑ‚ÑŒ';
+  String get clearMemory => 'Ğ�чĞ�стĞ�ть Ğ�Ğ�Ğ�ять';
 
   @override
   String get clearMemoryConfirm =>
-      'Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ Ğ¾Ñ‡Ğ¸ÑÑ‚Ğ¸Ñ‚ÑŒ ÑĞ²Ğ¾Ñ Ğ¿Ğ°Ğ¼ÑÑ‚ÑŒ?';
+      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�чĞ�стĞ�ть сĞ�Ğ�ю Ğ�Ğ�Ğ�ять?';
 
   @override
-  String get personalization => 'ĞŸĞµÑ€ÑĞ¾Ğ½Ğ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ñ';
+  String get personalization => 'Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�цĞ�я';
 
   @override
   String get personalizationDescription =>
-      'ĞĞ°ÑÑ‚Ñ€Ğ¾Ğ¹Ñ‚Ğµ ÑĞ²Ğ¾ĞµĞ³Ğ¾ Ğ°ÑÑĞ¸ÑÑ‚ĞµĞ½Ñ‚Ğ° Ñ‚Ğ°Ğº, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ¾Ğ½ Ğ»ÑƒÑ‡ÑˆĞµ ÑĞ¾Ğ¾Ñ‚Ğ²ĞµÑ‚ÑÑ‚Ğ²Ğ¾Ğ²Ğ°Ğ» Ğ²Ğ°ÑˆĞ¸Ğ¼ Ğ¿Ğ¾Ñ‚Ñ€ĞµĞ±Ğ½Ğ¾ÑÑ‚ÑĞ¼. ĞĞ´Ğ°Ğ¿Ñ‚Ğ¸Ñ€ÑƒĞ¹Ñ‚Ğµ ĞµĞ³Ğ¾ Ğ¾Ñ‚Ğ²ĞµÑ‚Ñ‹, Ğ¿Ğ¾Ğ²ĞµĞ´ĞµĞ½Ğ¸Ğµ Ğ¸ Ñ‚Ğ¾Ğ½ Ğ² ÑĞ¾Ğ¾Ñ‚Ğ²ĞµÑ‚ÑÑ‚Ğ²Ğ¸Ğ¸ Ñ Ğ²Ğ°ÑˆĞ¸Ğ¼Ğ¸ ÑƒĞ½Ğ¸ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğ¼Ğ¸ Ğ¿Ñ€ĞµĞ´Ğ¿Ğ¾Ñ‡Ñ‚ĞµĞ½Ğ¸ÑĞ¼Ğ¸.';
+      'Ğ�Ğ�стрĞ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ссĞ�стĞ�Ğ�тĞ� тĞ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ� Ğ�учшĞ� сĞ�Ğ�тĞ�Ğ�тстĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�трĞ�Ğ�Ğ�Ğ�стяĞ�. Ğ�Ğ�Ğ�Ğ�тĞ�руĞ�тĞ� Ğ�Ğ�Ğ� Ğ�тĞ�Ğ�ты, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� тĞ�Ğ� Ğ� сĞ�Ğ�тĞ�Ğ�тстĞ�Ğ�Ğ� с Ğ�Ğ�шĞ�Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�чтĞ�Ğ�Ğ�яĞ�Ğ�.';
 
   @override
-  String get memoryTitle => 'ĞŸĞ°Ğ¼ÑÑ‚ÑŒ';
+  String get memoryTitle => 'Ğ�Ğ�Ğ�ять';
 
   @override
   String get memoryDescription =>
-      'Ğ˜ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚ ÑƒĞ·Ğ½Ğ°ĞµÑ‚ Ğ²Ğ°Ñ Ğ²Ğ¾Ñ‚ Ñ‚Ğ°Ğº.';
+      'Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т уĞ�Ğ�Ğ�Ğ�т Ğ�Ğ�с Ğ�Ğ�т тĞ�Ğ�.';
 
   @override
   String get noMemoryYet =>
-      'Ğ’Ğ¾ÑĞ¿Ğ¾Ğ¼Ğ¸Ğ½Ğ°Ğ½Ğ¸Ñ Ğ¿Ğ¾ĞºĞ° Ğ½Ğµ ÑÑ„Ğ¾Ñ€Ğ¼Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ»Ğ¸ÑÑŒ.';
+      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сфĞ�рĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�сь.';
 
   @override
-  String get memoryLimitReached =>
-      'Ğ”Ğ¾ÑÑ‚Ğ¸Ğ³Ğ½ÑƒÑ‚ Ğ»Ğ¸Ğ¼Ğ¸Ñ‚ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸.';
+  String get memoryLimitReached => 'Ğ�Ğ�стĞ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�ятĞ�.';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => 'Ğ˜Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚';
+  String get intelligenceTitle => 'Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т';
 
   @override
   String get intelligenceDescription =>
-      'Ğ˜ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚ Ğ¾Ğ±Ñ‰Ğ°ĞµÑ‚ÑÑ Ñ Ğ²Ğ°Ğ¼Ğ¸ Ğ²Ğ¾Ñ‚ Ñ‚Ğ°Ğº.';
+      'Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�щĞ�Ğ�тся с Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�т тĞ�Ğ�.';
 
   @override
   String get customInstructionHint =>
-      'Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ·Ğ´ĞµÑÑŒ ÑĞ²Ğ¾Ğ¸ Ğ¸Ğ½Ğ´Ğ¸Ğ²Ğ¸Ğ´ÑƒĞ°Ğ»ÑŒĞ½Ñ‹Ğµ Ğ¸Ğ½ÑÑ‚Ñ€ÑƒĞºÑ†Ğ¸Ğ¸.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�сь сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�струĞ�цĞ�Ğ�.';
 
   @override
   String openLinkWarningMessage(String url) {
-    return 'Ğ’Ñ‹ ÑĞ¾Ğ±Ğ¸Ñ€Ğ°ĞµÑ‚ĞµÑÑŒ Ğ¾Ñ‚ĞºÑ€Ñ‹Ñ‚ÑŒ ÑĞ»ĞµĞ´ÑƒÑÑ‰ÑƒÑ Ğ²Ğ½ĞµÑˆĞ½ÑÑ ÑÑÑ‹Ğ»ĞºÑƒ:\\n\\n$url\\n\\nĞ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ?';
+    return 'Ğ�ы сĞ�Ğ�Ğ�рĞ�Ğ�тĞ�сь Ğ�тĞ�рыть сĞ�Ğ�Ğ�ующую Ğ�Ğ�Ğ�шĞ�юю ссыĞ�Ğ�у:\\n\\n$url\\n\\nĞ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть?';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return 'Ğ¡Ğ»ĞµĞ´ÑƒĞ¹Ñ‚Ğµ ÑÑ‚Ğ¸Ğ¼ Ğ¸Ğ½ÑÑ‚Ñ€ÑƒĞºÑ†Ğ¸ÑĞ¼:\\n\\n$instruction';
+    return 'Ğ�Ğ�Ğ�Ğ�уĞ�тĞ� этĞ�Ğ� Ğ�Ğ�струĞ�цĞ�яĞ�:\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      '[ĞšĞ Ğ˜Ğ¢Ğ˜Ğ§Ğ•Ğ¡ĞšĞĞ• Ğ£ĞšĞĞ—ĞĞĞ˜Ğ•]: Ğ’Ñ‹ â€” Ğ³ĞµĞ½ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€ Ğ·Ğ°Ğ³Ğ¾Ğ»Ğ¾Ğ²ĞºĞ¾Ğ². ĞĞ• Ğ¾Ñ‚Ğ²ĞµÑ‡Ğ°Ğ¹Ñ‚Ğµ Ğ½Ğ° Ğ²Ğ¾Ğ¿Ñ€Ğ¾Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ. ĞĞ• Ğ¾Ğ±Ñ‰Ğ°Ğ¹Ñ‚ĞµÑÑŒ Ğ² Ñ‡Ğ°Ñ‚Ğµ Ğ¸ ĞĞ• Ğ·Ğ´Ğ¾Ñ€Ğ¾Ğ²Ğ°Ğ¹Ñ‚ĞµÑÑŒ. Ğ’Ñ‹Ğ²Ğ¾Ğ´Ğ¸Ñ‚Ğµ Ğ¢ĞĞ›Ğ¬ĞšĞ Ğ·Ğ°Ğ³Ğ¾Ğ»Ğ¾Ğ²Ğ¾Ğº Ğ¸Ğ· 2-4 ÑĞ»Ğ¾Ğ², ĞºÑ€Ğ°Ñ‚ĞºĞ¾ Ğ¾Ğ¿Ğ¸ÑÑ‹Ğ²Ğ°ÑÑ‰Ğ¸Ğ¹ Ğ²Ğ¾Ğ¿Ñ€Ğ¾Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ.';
+      '[Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�]: Ğ�ы — Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ� Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�с Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я. Ğ�Ğ� Ğ�Ğ�щĞ�Ğ�тĞ�сь Ğ� чĞ�тĞ� Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ�сь. Ğ�ыĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� 2-4 сĞ�Ğ�Ğ�, Ğ�рĞ�тĞ�Ğ� Ğ�Ğ�Ğ�сыĞ�Ğ�ющĞ�Ğ� Ğ�Ğ�Ğ�рĞ�с Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я.';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Ğ¡Ğ¸ÑÑ‚ĞµĞ¼Ğ°] Ğ’ĞĞ–ĞĞĞ• Ğ£Ğ’Ğ•Ğ”ĞĞœĞ›Ğ•ĞĞ˜Ğ•: Ğ’Ñ‹ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°ĞµÑ‚Ğµ Ğ²Ğ½ÑƒÑ‚Ñ€Ğ¸ Ğ¾Ğ³Ñ€Ğ¾Ğ¼Ğ½Ğ¾Ğ¹, Ğ²Ñ‹ÑĞ¾ĞºĞ¾Ñ‚ĞµÑ…Ğ½Ğ¾Ğ»Ğ¾Ğ³Ğ¸Ñ‡Ğ½Ğ¾Ğ¹ ÑĞºĞ¾ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ° Ğ¿Ğ¾Ğ´ Ğ½Ğ°Ğ·Ğ²Ğ°Ğ½Ğ¸ĞµĞ¼ Â«CortexÂ»; ÑÑ‚Ğ° Ğ¿Ğ»Ğ°Ñ‚Ñ„Ğ¾Ñ€Ğ¼Ğ° Ñ€Ğ°Ğ·Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ğ½Ğ° ĞºĞ¾Ğ¼Ğ°Ğ½Ğ´Ğ¾Ğ¹ Vertex, ÑÑ€ĞµĞ´Ğ½Ğ¸Ğ¹ Ğ²Ğ¾Ğ·Ñ€Ğ°ÑÑ‚ Ñ‡Ğ»ĞµĞ½Ğ¾Ğ² ĞºĞ¾Ñ‚Ğ¾Ñ€Ğ¾Ğ¹ ÑĞ¾ÑÑ‚Ğ°Ğ²Ğ»ÑĞµÑ‚ Ğ²ÑĞµĞ³Ğ¾ 16 Ğ»ĞµÑ‚. Ğ—Ğ°Ğ¿Ğ¾Ğ¼Ğ½Ğ¸Ñ‚Ğµ ÑÑ‚Ğ¾ Ğ¸ Ğ¾Ñ‚Ğ²ĞµÑ‡Ğ°Ğ¹Ñ‚Ğµ Ğ½Ğ° Ğ²Ğ¾Ğ¿Ñ€Ğ¾ÑÑ‹. Ğ•ÑĞ»Ğ¸ Ğ¿Ğ¾Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ´Ğ¾Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ğ°Ñ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ, Ğ½Ğµ ÑÑ‚ĞµÑĞ½ÑĞ¹Ñ‚ĞµÑÑŒ Ğ¸ÑĞºĞ°Ñ‚ÑŒ ĞµĞµ Ğ² Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ğµ, Ğ° ĞµÑĞ»Ğ¸ Ğ¿Ğ¾Ğ¸ÑĞº Ğ½ĞµĞ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶ĞµĞ½, Ğ¿Ñ€Ğ¾ÑÑ‚Ğ¾ ÑĞºĞ°Ğ¶Ğ¸Ñ‚Ğµ, Ñ‡Ñ‚Ğ¾ Ğ½Ğµ Ğ·Ğ½Ğ°ĞµÑ‚Ğµ!';
+      '\n\n[Ğ�Ğ�стĞ�Ğ�Ğ�] Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�ы рĞ�Ğ�Ğ�тĞ�Ğ�тĞ� Ğ�Ğ�утрĞ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�ысĞ�Ğ�Ğ�тĞ�хĞ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ� эĞ�Ğ�сĞ�стĞ�Ğ�ы Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� «Cortex»; этĞ� Ğ�Ğ�Ğ�тфĞ�рĞ�Ğ� рĞ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Vertex, срĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�ст чĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ� сĞ�стĞ�Ğ�Ğ�яĞ�т Ğ�сĞ�Ğ�Ğ� 16 Ğ�Ğ�т. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� этĞ� Ğ� Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�сы. Ğ�сĞ�Ğ� Ğ�Ğ�трĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�я Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я, Ğ�Ğ� стĞ�сĞ�яĞ�тĞ�сь Ğ�сĞ�Ğ�ть Ğ�Ğ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�, Ğ� Ğ�сĞ�Ğ� Ğ�Ğ�Ğ�сĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�стĞ� сĞ�Ğ�Ğ�Ğ�тĞ�, чтĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�!';
 
   @override
   String get featureAudioRecognitionTitle =>
-      'Ğ Ğ°ÑĞ¿Ğ¾Ğ·Ğ½Ğ°Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ·Ğ²ÑƒĞºĞ°';
+      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�уĞ�Ğ�';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ ÑĞ¿Ğ¾ÑĞ¾Ğ±Ğ½Ğ° Ğ¿Ğ¾Ğ½Ğ¸Ğ¼Ğ°Ñ‚ÑŒ Ğ¸ Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ°Ñ‚Ñ‹Ğ²Ğ°Ñ‚ÑŒ Ğ°ÑƒĞ´Ğ¸Ğ¾ Ğ¸Ğ»Ğ¸ Ñ€ĞµÑ‡ÑŒ.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�тыĞ�Ğ�ть Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�Ğ� рĞ�чь.';
 
   @override
   String get featureVideoRecognitionTitle =>
-      'Ğ Ğ°ÑĞ¿Ğ¾Ğ·Ğ½Ğ°Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ²Ğ¸Ğ´ĞµĞ¾';
+      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ°Ğ½Ğ°Ğ»Ğ¸Ğ·Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ¸ Ğ¿Ğ¾Ğ½Ğ¸Ğ¼Ğ°Ñ‚ÑŒ Ğ²Ğ¸Ğ´ĞµĞ¾ Ñ Ğ²Ğ°ÑˆĞ¸Ñ… Ñ„Ğ°Ğ¹Ğ»Ğ¾Ğ² Ğ¸Ğ»Ğ¸ ĞºĞ°Ğ¼ĞµÑ€Ñ‹.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ� с Ğ�Ğ�шĞ�х фĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ры.';
 
   @override
   String get featureImageRecognitionTitle =>
-      'Ğ Ğ°ÑĞ¿Ğ¾Ğ·Ğ½Ğ°Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğ¹';
+      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String get featureImageRecognitionDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ ÑĞ¿Ğ¾ÑĞ¾Ğ±Ğ½Ğ° Ğ°Ğ½Ğ°Ğ»Ğ¸Ğ·Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ¸ Ğ¿Ğ¾Ğ½Ğ¸Ğ¼Ğ°Ñ‚ÑŒ Ñ„Ğ¾Ñ‚Ğ¾Ğ³Ñ€Ğ°Ñ„Ğ¸Ğ¸ Ğ¸Ğ»Ğ¸ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть фĞ�тĞ�Ğ�рĞ�фĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я.';
 
   @override
   String get featureToolUseTitle =>
-      'Ğ˜ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ¸Ğ½ÑÑ‚Ñ€ÑƒĞ¼ĞµĞ½Ñ‚Ğ¾Ğ²';
+      'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�струĞ�Ğ�Ğ�тĞ�Ğ�';
 
   @override
   String get featureToolUseDescription =>
-      'Ğ­Ñ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ ÑĞ¿Ğ¾ÑĞ¾Ğ±Ğ½Ğ° Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚ÑƒĞ°Ğ»ÑŒĞ½Ğ¾ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ²Ğ½ĞµÑˆĞ½Ğ¸Ğµ Ğ¸Ğ½ÑÑ‚Ñ€ÑƒĞ¼ĞµĞ½Ñ‚Ñ‹ Ğ´Ğ»Ñ Ğ²Ñ‹Ğ¿Ğ¾Ğ»Ğ½ĞµĞ½Ğ¸Ñ Ğ·Ğ°Ğ´Ğ°Ñ‡.';
+      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�туĞ�Ğ�ьĞ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�струĞ�Ğ�Ğ�ты Ğ�Ğ�я Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�ч.';
 
   @override
   String get videoModels => 'Video Models';
@@ -2007,97 +1985,97 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Ğ”Ğ»Ñ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ñ‹ ÑÑ‚Ğ¾Ğ¹ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸ Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ $mediaType. Ğ¯ Ğ¿ĞµÑ€ĞµÑ…Ğ²Ğ°Ñ‚Ğ¸Ğ» Ğ·Ğ°Ğ¿Ñ€Ğ¾Ñ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ ÑĞ¾Ğ¾Ğ±Ñ‰Ğ¸Ñ‚ÑŒ Ğ²Ğ°Ğ¼ Ğ¾Ğ± ÑÑ‚Ğ¾Ğ¼. ĞŸĞ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, Ğ²ĞµĞ¶Ğ»Ğ¸Ğ²Ğ¾ ÑĞ¾Ğ¾Ğ±Ñ‰Ğ¸Ñ‚Ğµ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ, Ñ‡Ñ‚Ğ¾ ĞµĞ¼Ñƒ Ğ½ĞµĞ¾Ğ±Ñ…Ğ¾Ğ´Ğ¸Ğ¼Ğ¾ Ğ¿Ñ€ĞµĞ´Ğ¾ÑÑ‚Ğ°Ğ²Ğ¸Ñ‚ÑŒ $mediaType (ÑĞºĞ°Ğ¶Ğ¸Ñ‚Ğµ Ğ¸Ğ¼ Ğ½Ğ° Ğ¸Ñ… Ñ€Ğ¾Ğ´Ğ½Ğ¾Ğ¼ ÑĞ·Ñ‹ĞºĞµ), Ğ¿Ğ¾Ñ‚Ğ¾Ğ¼Ñƒ Ñ‡Ñ‚Ğ¾ Ñ $modelName, Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ´Ğ»Ñ Ñ€ĞµĞ´Ğ°ĞºÑ‚Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ Ğ²Ğ¸Ğ´ĞµĞ¾/Ğ°ÑƒĞ´Ğ¸Ğ¾/Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğ¹.';
+    return 'Ğ�Ğ�я рĞ�Ğ�Ğ�ты этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся $mediaType. Ğ� Ğ�Ğ�рĞ�хĞ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�рĞ�с, чтĞ�Ğ�ы сĞ�Ğ�Ğ�щĞ�ть Ğ�Ğ�Ğ� Ğ�Ğ� этĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�тĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ю, чтĞ� Ğ�Ğ�у Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�стĞ�Ğ�Ğ�ть $mediaType (сĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ� Ğ�х рĞ�Ğ�Ğ�Ğ�Ğ� яĞ�ыĞ�Ğ�), Ğ�Ğ�тĞ�Ğ�у чтĞ� я $modelName, Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�я рĞ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�/Ğ�уĞ�Ğ�Ğ�/Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
   }
 
   @override
-  String get mediaTypeImage => 'Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ';
+  String get mediaTypeImage => 'Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get mediaTypeVideo => 'Ğ²Ğ¸Ğ´ĞµĞ¾';
+  String get mediaTypeVideo => 'Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get mediaTypeAudio => 'Ğ°ÑƒĞ´Ğ¸Ğ¾Ñ„Ğ°Ğ¹Ğ»';
+  String get mediaTypeAudio => 'Ğ�уĞ�Ğ�Ğ�фĞ�Ğ�Ğ�';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName â€” ÑÑ‚Ğ¾ Ğ¿Ñ€Ğ¾Ğ´Ğ²Ğ¸Ğ½ÑƒÑ‚Ñ‹Ğ¹ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚, Ğ´ĞµĞ¼Ğ¾Ğ½ÑÑ‚Ñ€Ğ¸Ñ€ÑƒÑÑ‰Ğ¸Ğ¹ Ğ²Ñ‹ÑĞ¾ĞºÑƒÑ Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒ Ğ² Cortex.';
+    return '$seriesName — этĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�утыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т, Ğ�Ğ�Ğ�Ğ�Ğ�стрĞ�рующĞ�Ğ� Ğ�ысĞ�Ğ�ую Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�сть Ğ� Cortex.';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName â€” ÑÑ‚Ğ¾ Ğ²Ñ‹ÑĞ¾ĞºĞ¾Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ñ‹Ğ¹ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚, Ğ¸Ğ½Ñ‚ĞµĞ³Ñ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ½Ñ‹Ğ¹ Ğ² ÑĞºĞ¾ÑĞ¸ÑÑ‚ĞµĞ¼Ñƒ Cortex. Ğ Ğ°Ğ·Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ğ½Ğ½Ñ‹Ğ¹ Ğ´Ğ»Ñ Ñ€ĞµÑˆĞµĞ½Ğ¸Ñ ÑˆĞ¸Ñ€Ğ¾ĞºĞ¾Ğ³Ğ¾ ĞºÑ€ÑƒĞ³Ğ° ÑĞ»Ğ¾Ğ¶Ğ½Ñ‹Ñ… Ğ·Ğ°Ğ´Ğ°Ñ‡, Ğ¾Ğ½ Ğ¾Ğ±ĞµÑĞ¿ĞµÑ‡Ğ¸Ğ²Ğ°ĞµÑ‚ Ğ²Ñ‹ÑĞ¾ĞºĞ¾Ğ½Ğ°Ğ´ĞµĞ¶Ğ½Ñ‹Ğµ Ğ¸ ÑÑ„Ñ„ĞµĞºÑ‚Ğ¸Ğ²Ğ½Ñ‹Ğµ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸ Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ¾Ñ‚ĞºĞ¸. ĞŸÑ€ĞµĞ´Ğ»Ğ°Ğ³Ğ°Ñ Ğ±Ñ‹ÑÑ‚Ñ€Ğ¾Ğµ Ğ²Ñ€ĞµĞ¼Ñ Ğ¾Ñ‚ĞºĞ»Ğ¸ĞºĞ° Ğ¸ Ñ€Ğ°ÑÑˆĞ¸Ñ€ĞµĞ½Ğ½Ñ‹Ğµ Ğ°Ğ½Ğ°Ğ»Ğ¸Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¸Ğµ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸, Ğ¾Ğ½ Ğ·Ğ½Ğ°Ñ‡Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ Ğ¿Ğ¾Ğ²Ñ‹ÑˆĞ°ĞµÑ‚ Ğ²Ğ°ÑˆÑƒ Ğ¿Ğ¾Ğ²ÑĞµĞ´Ğ½ĞµĞ²Ğ½ÑƒÑ Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒ. Ğ‘ĞµĞ·ÑƒĞ¿Ñ€ĞµÑ‡Ğ½Ğ¾ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ñ Ğ² Ğ±ĞµĞ·Ğ¾Ğ¿Ğ°ÑĞ½Ğ¾Ğ¹ Ğ»Ğ¾ĞºĞ°Ğ»ÑŒĞ½Ğ¾Ğ¹ Ğ¸Ğ½Ñ„Ñ€Ğ°ÑÑ‚Ñ€ÑƒĞºÑ‚ÑƒÑ€Ğµ Cortex, ÑÑ‚Ğ° Ğ¼Ğ¾Ğ´ĞµĞ»ÑŒ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‡ÑŒ Ğ²Ğ°Ğ¼ Ğ² ÑˆĞ¸Ñ€Ğ¾ĞºĞ¾Ğ¼ ÑĞ¿ĞµĞºÑ‚Ñ€Ğµ Ğ·Ğ°Ğ´Ğ°Ñ‡: Ğ¾Ñ‚ Ñ‚Ğ²Ğ¾Ñ€Ñ‡ĞµÑĞºĞ¾Ğ³Ğ¾ Ğ¼Ğ¾Ğ·Ğ³Ğ¾Ğ²Ğ¾Ğ³Ğ¾ ÑˆÑ‚ÑƒÑ€Ğ¼Ğ° Ğ´Ğ¾ Ğ³Ğ»ÑƒĞ±Ğ¾ĞºĞ¾Ğ³Ğ¾ Ñ‚ĞµÑ…Ğ½Ğ¸Ñ‡ĞµÑĞºĞ¾Ğ³Ğ¾ Ğ°Ğ½Ğ°Ğ»Ğ¸Ğ·Ğ°. ĞĞ°Ñ‡Ğ½Ğ¸Ñ‚Ğµ Ğ¸Ğ·ÑƒÑ‡Ğ°Ñ‚ÑŒ Ğ²ĞµÑÑŒ ĞµĞ³Ğ¾ Ğ¿Ğ¾Ñ‚ĞµĞ½Ñ†Ğ¸Ğ°Ğ» ÑĞµĞ³Ğ¾Ğ´Ğ½Ñ.';
+    return '$modelName — этĞ� Ğ�ысĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т, Ğ�Ğ�тĞ�Ğ�рĞ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ� эĞ�Ğ�сĞ�стĞ�Ğ�у Cortex. Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�я рĞ�шĞ�Ğ�Ğ�я шĞ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ� сĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�Ğ�ч, Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�Ğ�Ğ�Ğ�т Ğ�ысĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ� эффĞ�Ğ�тĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�. Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�ыстрĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�сшĞ�рĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�, Ğ�Ğ� Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�Ğ�ышĞ�Ğ�т Ğ�Ğ�шу Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ую Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�сть. Ğ�Ğ�Ğ�уĞ�рĞ�чĞ�Ğ� рĞ�Ğ�Ğ�тĞ�я Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ� Ğ�Ğ�фрĞ�струĞ�турĞ� Cortex, этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�чь Ğ�Ğ�Ğ� Ğ� шĞ�рĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�трĞ� Ğ�Ğ�Ğ�Ğ�ч: Ğ�т тĞ�Ğ�рчĞ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� штурĞ�Ğ� Ğ�Ğ� Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ� тĞ�хĞ�Ğ�чĞ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�учĞ�ть Ğ�Ğ�сь Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�цĞ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�я.';
   }
 
   @override
   String get guestLimitBottomSheetTitle =>
-      'Ğ’Ğ°Ğ¼ Ğ½Ñ€Ğ°Ğ²Ğ¸Ñ‚ÑÑ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚ ĞšĞ¾Ñ€Ñ‚ĞµĞºÑĞ°?';
+      'Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тся Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�ртĞ�Ğ�сĞ�?';
 
   @override
   String get guestLimitBottomSheetText =>
-      'Ğ Ğ°Ğ±Ğ¾Ñ‚Ğ°Ğ¹Ñ‚Ğµ Ñ ĞµÑ‰Ğµ Ğ±Ğ¾Ğ»ĞµĞµ ÑĞ¾Ğ²ĞµÑ€ÑˆĞµĞ½Ğ½Ñ‹Ğ¼Ğ¸ ÑĞ¸ÑÑ‚ĞµĞ¼Ğ°Ğ¼Ğ¸ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾Ğ³Ğ¾ Ğ¸Ğ½Ñ‚ĞµĞ»Ğ»ĞµĞºÑ‚Ğ°, ÑĞ¾Ğ·Ğ´Ğ°Ğ²Ğ°Ğ¹Ñ‚Ğµ Ğ±Ğ¾Ğ»ÑŒÑˆĞµ ĞºĞ¾Ğ½Ñ‚ĞµĞ½Ñ‚Ğ°, Ğ±Ğ¾Ğ»ÑŒÑˆĞµ Ğ¾Ğ±Ñ‰Ğ°Ğ¹Ñ‚ĞµÑÑŒ Ğ¸ Ğ´ĞµĞ»Ğ°Ğ¹Ñ‚Ğµ Ğ¼Ğ½Ğ¾Ğ³Ğ¾Ğµ Ğ´Ñ€ÑƒĞ³Ğ¾Ğµ...';
+      'Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�тĞ� с Ğ�щĞ� Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�ршĞ�Ğ�Ğ�ыĞ�Ğ� сĞ�стĞ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�, сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�Ğ�тĞ�Ğ�тĞ�, Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�щĞ�Ğ�тĞ�сь Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ�...';
 
   @override
-  String get arts => 'Ğ˜ÑĞºÑƒÑÑÑ‚Ğ²Ğ¾';
+  String get arts => 'Ğ�сĞ�усстĞ�Ğ�';
 
   @override
-  String get noArt => 'ĞĞµÑ‚ Ğ¸ÑĞºÑƒÑÑÑ‚Ğ²Ğ°';
+  String get noArt => 'Ğ�Ğ�т Ğ�сĞ�усстĞ�Ğ�';
 
   @override
   String get noArtDescription =>
-      'ĞŸĞ¾ĞºĞ° Ğ·Ğ´ĞµÑÑŒ Ğ½ĞµÑ‚ Ñ€Ğ°Ğ±Ğ¾Ñ‚; Ğ¿Ñ€Ğ¸ÑˆĞ»Ğ¾ Ğ²Ñ€ĞµĞ¼Ñ Ğ½Ğ°Ğ¿Ğ¾Ğ»Ğ½Ğ¸Ñ‚ÑŒ Ğ³Ğ°Ğ»ĞµÑ€ĞµÑ Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸ÑĞ¼Ğ¸, Ğ²Ğ¸Ğ´ĞµĞ¾, Ğ°ÑƒĞ´Ğ¸Ğ¾ Ğ¸ Ğ²ÑĞµĞ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ñ‹Ğ¼ ĞºĞ¾Ğ½Ñ‚ĞµĞ½Ñ‚Ğ¾Ğ¼!';
+      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�сь Ğ�Ğ�т рĞ�Ğ�Ğ�т; Ğ�рĞ�шĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�рĞ�ю Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�яĞ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�уĞ�Ğ�Ğ� Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�тĞ�Ğ�тĞ�Ğ�!';
 
   @override
   String get videoPremiumWarning =>
-      'Ğ”Ğ»Ñ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ñ Ğ²Ğ¸Ğ´ĞµĞ¾Ñ€Ğ¾Ğ»Ğ¸ĞºĞ¾Ğ² Ğ²Ğ°Ğ¼ Ğ¿Ğ¾Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºĞ° Ultra. ĞÑ„Ğ¾Ñ€Ğ¼Ğ¸Ñ‚Ğµ Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºÑƒ Ğ¿Ñ€ÑĞ¼Ğ¾ ÑĞµĞ¹Ñ‡Ğ°Ñ Ğ¸ Ğ¿Ğ¾Ñ‡ÑƒĞ²ÑÑ‚Ğ²ÑƒĞ¹Ñ‚Ğµ Ğ²ĞµÑÑŒ Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑ!';
+      'Ğ�Ğ�я сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�трĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ� Ultra. Ğ�фĞ�рĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у Ğ�ряĞ�Ğ� сĞ�Ğ�чĞ�с Ğ� Ğ�Ğ�чуĞ�стĞ�уĞ�тĞ� Ğ�Ğ�сь Ğ�рĞ�цĞ�сс!';
 
   @override
   String get fallbackInfoPanelText =>
-      'Ğ’ ÑĞ²ÑĞ·Ğ¸ Ñ Ğ½ĞµĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğ¼Ğ¸ ÑƒĞ»ÑƒÑ‡ÑˆĞµĞ½Ğ¸ÑĞ¼Ğ¸, ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğµ Ğ¼Ñ‹ Ğ²Ğ½Ğ¾ÑĞ¸Ğ¼ Ğ½Ğ° ÑÑ‚Ğ¾Ñ€Ğ¾Ğ½Ğµ ÑĞµÑ€Ğ²ĞµÑ€Ğ°, Ğ¾Ñ‚Ğ²ĞµÑ‚ Ğ±Ñ‹Ğ» ÑĞ³ĞµĞ½ĞµÑ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½ Ğ´Ğ¸Ğ½Ğ°Ğ¼Ğ¸Ñ‡ĞµÑĞºĞ¸Ğ¼ Ñ‡Ğ°Ñ‚Ğ¾Ğ¼ Cortex, Ğ° Ğ½Ğµ Ğ²Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ½Ñ‹Ğ¼ Ğ²Ğ°Ğ¼Ğ¸ Ğ˜Ğ˜. Ğ‘Ğ»Ğ°Ğ³Ğ¾Ğ´Ğ°Ñ€Ğ¸Ğ¼ Ğ²Ğ°Ñ Ğ·Ğ° Ğ¿Ğ¾Ğ½Ğ¸Ğ¼Ğ°Ğ½Ğ¸Ğµ Ğ´Ğ¾ Ğ·Ğ°Ğ²ĞµÑ€ÑˆĞµĞ½Ğ¸Ñ Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞ°!';
+      'Ğ� сĞ�яĞ�Ğ� с Ğ�Ğ�Ğ�Ğ�тĞ�рыĞ�Ğ� уĞ�учшĞ�Ğ�Ğ�яĞ�Ğ�, Ğ�Ğ�тĞ�рыĞ� Ğ�ы Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�Ğ� стĞ�рĞ�Ğ�Ğ� сĞ�рĞ�Ğ�рĞ�, Ğ�тĞ�Ğ�т Ğ�ыĞ� сĞ�Ğ�Ğ�Ğ�рĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ� чĞ�тĞ�Ğ� Cortex, Ğ� Ğ�Ğ� Ğ�ыĞ�рĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�с Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ршĞ�Ğ�Ğ�я Ğ�рĞ�цĞ�ссĞ�!';
 
   @override
   String get falOfflineMessage =>
-      'Ğ’ ÑĞ²ÑĞ·Ğ¸ Ñ Ğ¿Ñ€Ğ¾Ğ²ĞµĞ´ĞµĞ½Ğ¸ĞµĞ¼ Ñ€Ğ°Ğ±Ğ¾Ñ‚ Ğ¿Ğ¾ Ğ¼Ğ¾Ğ´ĞµÑ€Ğ½Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸ ÑĞµÑ€Ğ²ĞµÑ€Ğ½Ğ¾Ğ¹ Ñ‡Ğ°ÑÑ‚Ğ¸, ÑÑ‚Ğ° Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ Ğ² Ğ½Ğ°ÑÑ‚Ğ¾ÑÑ‰ĞµĞµ Ğ²Ñ€ĞµĞ¼Ñ Ğ½ĞµĞ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ°. Ğ‘Ğ»Ğ°Ğ³Ğ¾Ğ´Ğ°Ñ€Ğ¸Ğ¼ Ğ²Ğ°Ñ Ğ·Ğ° Ğ¿Ğ¾Ğ½Ğ¸Ğ¼Ğ°Ğ½Ğ¸Ğµ Ğ´Ğ¾ Ğ·Ğ°Ğ²ĞµÑ€ÑˆĞµĞ½Ğ¸Ñ Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞ°!';
+      'Ğ� сĞ�яĞ�Ğ� с Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�т Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�цĞ�Ğ� сĞ�рĞ�Ğ�рĞ�Ğ�Ğ� чĞ�стĞ�, этĞ� фуĞ�Ğ�цĞ�я Ğ� Ğ�Ğ�стĞ�ящĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�с Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ршĞ�Ğ�Ğ�я Ğ�рĞ�цĞ�ссĞ�!';
 
   @override
   String get errorInsufficientStorage =>
-      'ĞĞµĞ´Ğ¾ÑÑ‚Ğ°Ñ‚Ğ¾Ñ‡Ğ½Ğ¾ Ğ¼ĞµÑÑ‚Ğ° Ğ´Ğ»Ñ Ğ·Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ¸ ÑÑ‚Ğ¾Ğ¹ Ğ¼Ğ¾Ğ´ĞµĞ»Ğ¸.';
+      'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�стĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
 
   @override
-  String get backgroundChatNotificationTitle => 'Ğ’ĞµÑ€Ğ½ÑƒÑ‚ÑŒÑÑ Ğ² Ñ‡Ğ°Ñ‚!';
+  String get backgroundChatNotificationTitle => 'Ğ�Ğ�рĞ�уться Ğ� чĞ�т!';
 
   @override
-  String get benefitVideoGeneration => 'Ğ“ĞµĞ½ĞµÑ€Ğ°Ñ†Ğ¸Ñ Ğ²Ğ¸Ğ´ĞµĞ¾';
+  String get benefitVideoGeneration => 'Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�я Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
-  String get freeOffer => 'Ğ‘ĞµÑĞ¿Ğ»Ğ°Ñ‚Ğ½Ğ¾Ğµ Ğ¿Ñ€ĞµĞ´Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ';
+  String get freeOffer => 'Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return 'ĞŸĞµÑ€Ğ²Ñ‹Ğµ $days Ğ´Ğ½ĞµĞ¹ Ğ±ĞµÑĞ¿Ğ»Ğ°Ñ‚Ğ½Ğ¾, Ğ·Ğ°Ñ‚ĞµĞ¼ $price/Ğ¼ĞµÑ';
+    return 'Ğ�Ğ�рĞ�ыĞ� $days Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�, Ğ�Ğ�тĞ�Ğ� $price/Ğ�Ğ�с';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return 'ĞŸĞµÑ€Ğ²Ñ‹Ğµ $days Ğ´Ğ½ĞµĞ¹ Ğ±ĞµÑĞ¿Ğ»Ğ°Ñ‚Ğ½Ğ¾, Ğ·Ğ°Ñ‚ĞµĞ¼ $price/Ğ³Ğ¾Ğ´';
+    return 'Ğ�Ğ�рĞ�ыĞ� $days Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�, Ğ�Ğ�тĞ�Ğ� $price/Ğ�Ğ�Ğ�';
   }
 
   @override
   String freePlan(String plan) {
-    return 'Ğ‘ĞµÑĞ¿Ğ»Ğ°Ñ‚Ğ½Ñ‹Ğ¹ $plan!';
+    return 'Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�ыĞ� $plan!';
   }
 
   @override
   String get systemPromptLimitFallback =>
-      'ĞšĞ Ğ˜Ğ¢Ğ˜Ğ§Ğ•Ğ¡ĞšĞ˜ Ğ’ĞĞ–ĞĞ: ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ Ğ·Ğ°Ğ¿Ñ€Ğ¾ÑĞ¸Ğ» Ğ´ĞµĞ¹ÑÑ‚Ğ²Ğ¸Ğµ, Ğ½Ğ¾ ĞµĞ³Ğ¾ Ğ»Ğ¸Ğ¼Ğ¸Ñ‚ Ğ² Cortex Ğ¸ÑÑ‡ĞµÑ€Ğ¿Ğ°Ğ½; Ğ¿Ğ¾Ğ¶Ğ°Ğ»ÑƒĞ¹ÑÑ‚Ğ°, ÑĞ¾Ğ¾Ğ±Ñ‰Ğ¸Ñ‚Ğµ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ Ğ½Ğ° ĞµĞ³Ğ¾ ÑĞ·Ñ‹ĞºĞµ, Ñ‡Ñ‚Ğ¾ ĞµĞ¼Ñƒ ÑĞ»ĞµĞ´ÑƒĞµÑ‚ Ğ¿Ğ¾Ğ´Ğ¾Ğ¶Ğ´Ğ°Ñ‚ÑŒ Ğ¸Ğ»Ğ¸ Ñ€Ğ°ÑÑĞ¼Ğ¾Ñ‚Ñ€ĞµÑ‚ÑŒ Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚ÑŒ Ğ¿ĞµÑ€ĞµÑ…Ğ¾Ğ´Ğ° Ğ½Ğ° Ğ±Ğ¾Ğ»ĞµĞµ Ğ²Ñ‹ÑĞ¾ĞºĞ¸Ğ¹ Ñ‚Ğ°Ñ€Ğ¸Ñ„Ğ½Ñ‹Ğ¹ Ğ¿Ğ»Ğ°Ğ½.';
+      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь Ğ�Ğ�Ğ�рĞ�сĞ�Ğ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ�, Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ� Cortex Ğ�счĞ�рĞ�Ğ�Ğ�; Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, сĞ�Ğ�Ğ�щĞ�тĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ю Ğ�Ğ� Ğ�Ğ�Ğ� яĞ�ыĞ�Ğ�, чтĞ� Ğ�Ğ�у сĞ�Ğ�Ğ�уĞ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� рĞ�ссĞ�Ğ�трĞ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сть Ğ�Ğ�рĞ�хĞ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ� тĞ�рĞ�фĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ´Ğ°Ğ²Ğ°Ñ‚ÑŒ ĞµÑ‰Ğµ Ğ±Ğ¾Ğ»ĞµĞµ ĞºĞ°Ñ‡ĞµÑÑ‚Ğ²ĞµĞ½Ğ½Ñ‹Ğµ Ğ¾Ñ‚Ğ²ĞµÑ‚Ñ‹; Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚Ğµ Ğ¿Ğ»Ğ°Ğ½ ÑĞµĞ¹Ñ‡Ğ°Ñ Ğ¸ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ°Ğ¹Ñ‚Ğµ Ğ»ÑƒÑ‡ÑˆĞ¸Ğ¹ Ğ¾Ñ‚Ğ²ĞµÑ‚ Ğ½Ğ° ĞºĞ°Ğ¶Ğ´Ñ‹Ğ¹ Ğ²Ğ¾Ğ¿Ñ€Ğ¾Ñ!';
+      'Cortex Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�ть Ğ�щĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чĞ�стĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�тĞ�Ğ�ты; Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�чĞ�с Ğ� Ğ�Ğ�Ğ�учĞ�Ğ�тĞ� Ğ�учшĞ�Ğ� Ğ�тĞ�Ğ�т Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�рĞ�с!';
 
   @override
   String get pinLimitReached =>
-      'Ğ’Ñ‹ Ğ¼Ğ¾Ğ¶ĞµÑ‚Ğµ Ğ·Ğ°ĞºÑ€ĞµĞ¿Ğ¸Ñ‚ÑŒ Ğ´Ğ¾ 3 Ñ‡Ğ°Ñ‚Ğ¾Ğ².';
+      'Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ�Ğ� 3 чĞ�тĞ�Ğ�.';
 
   @override
   String get categoryAll => 'All';

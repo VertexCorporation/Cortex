@@ -265,6 +265,16 @@ Future<void> main(List<String> rawArgs) async {
     stdout.writeln('🟢 Force update mode activated for specific keys: "$keysToUpdate"');
   } else {
     stdout.writeln('-> Running standard synchronization for all keys...');
+    final result = await Process.run(
+      'python',
+      [p.join(projectRoot, 'scripts', 'translate_batch.py')],
+      stdoutEncoding: utf8,
+      stderrEncoding: utf8,
+    );
+    stdout.write(result.stdout);
+    stderr.write(result.stderr);
+    stdout.writeln('\n--- Translation Process Finished ---');
+    return;
   }
 
   final templateArbFile = p.join(arbDir, templateArbFileName);
@@ -361,6 +371,8 @@ Future<void> main(List<String> rawArgs) async {
             locale,
             textToSend,
           ],
+          stdoutEncoding: utf8,
+          stderrEncoding: utf8,
         );
 
         if (result.exitCode == 0) {

@@ -10,41 +10,41 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Siz baÅŸlÄ±q generatorusunuz. NÃ¶vbÉ™ti sÃ¶hbÉ™t Ã¼Ã§Ã¼n YALNIZ 2-5 sÃ¶zdÉ™n ibarÉ™t baÅŸlÄ±qla cavab verin. Sitat, Ã¶n sÃ¶z vÉ™ ya durÄŸu iÅŸarÉ™lÉ™rindÉ™n istifadÉ™ etmÉ™yin. VACÄ°B: BaÅŸlÄ±q istifadÉ™Ã§inin mesajÄ± ilÉ™ TAM EYNÄ° dildÉ™ olmalÄ±dÄ±r.';
+      'Siz başlıq generatorusunuz. Növbəti söhbət üçün YALNIZ 2-5 sözdən ibarət başlıqla cavab verin. Sitat, ön söz və ya durğu işarələrindən istifadə etməyin. VACİB: Başlıq istifadəçinin mesajı ilə TAM EYNİ dildə olmalıdır.';
 
   @override
-  String get systemRoleFallback => 'Siz faydalÄ± kÃ¶mÉ™kÃ§isiniz.';
+  String get systemRoleFallback => 'Siz faydalı köməkçisiniz.';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nMÃœHÃœM: HÉ™miÅŸÉ™ istifadÉ™Ã§inin yazdÄ±ÄŸÄ± dildÉ™ cavab verin, istifadÉ™Ã§inin dilinÉ™ diqqÉ™t yetirin.';
+      '\n\nMÜHÜM: Həmişə istifadəçinin yazdığı dildə cavab verin, istifadəçinin dilinə diqqət yetirin.';
 
   @override
   String get systemNotePreviousMedia =>
-      '[Sistem Qeydi: AÅŸaÄŸÄ±da É™vvÉ™llÉ™r yaradÄ±lmÄ±ÅŸ media verilmiÅŸdir. Ona istinad edÉ™ bilÉ™r vÉ™ ya onu redaktÉ™ edÉ™ bilÉ™rsiniz.]';
+      '[Sistem Qeydi: Aşağıda əvvəllər yaradılmış media verilmişdir. Ona istinad edə bilər və ya onu redaktə edə bilərsiniz.]';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\nHazÄ±rkÄ± tarix vÉ™ vaxt: $formattedTime.';
+    return '\n\nHazırkı tarix və vaxt: $formattedTime.';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nÄ°ndiyÉ™ qÉ™dÉ™rki sÃ¶hbÉ™ti tÉ™hlil edin. Ä°stifadÉ™Ã§i haqqÄ±nda hÉ™r hansÄ± yeni fÉ™rqli faktlar (Ã¼stÃ¼nlÃ¼klÉ™r, ad, vÉ™rdiÅŸlÉ™r, kontekst) Ã¶yrÉ™nmisinizsÉ™, cavabÄ±nÄ±zÄ±n ÆN SONUNDA istifadÉ™Ã§i haqqÄ±nda BÃœTÃœN yenilÉ™nmiÅŸ yaddaÅŸÄ±nÄ±zÄ± <memory>...</memory> etiketlÉ™ri daxilindÉ™ Ã§Ä±xarmalÄ±sÄ±nÄ±z. TÆNQÄ°D: ÆvvÉ™lki yaddaÅŸÄ± HEÃ‡ VAXT silmÉ™mÉ™li vÉ™ ya Ã¼zÉ™rindÉ™n yazmamalÄ±sÄ±nÄ±z. MÃ¶vcud yaddaÅŸa HÆMÄ°ÅÆ yeni faktlar É™lavÉ™ etmÉ™lisiniz. ÆgÉ™r tamamilÉ™ yeni bir ÅŸey Ã¶yrÉ™nilmÉ™yibsÉ™, etiketi buraxÄ±n. Misal: <memory>Futbol vÉ™ tennisi sevir. QÄ±sa cavablara Ã¼stÃ¼nlÃ¼k verir.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nİndiyə qədərki söhbəti təhlil edin. İstifadəçi haqqında hər hansı yeni fərqli faktlar (üstünlüklər, ad, vərdişlər, kontekst) öyrənmisinizsə, cavabınızın ƏN SONUNDA istifadəçi haqqında BÜTÜN yenilənmiş yaddaşınızı <memory>...</memory> etiketləri daxilində çıxarmalısınız. TƏNQİD: Əvvəlki yaddaşı HEÇ VAXT silməməli və ya üzərindən yazmamalısınız. Mövcud yaddaşa HƏMİŞƏ yeni faktlar əlavə etməlisiniz. Əgər tamamilə yeni bir şey öyrənilməyibsə, etiketi buraxın. Misal: <memory>Futbol və tennisi sevir. Qısa cavablara üstünlük verir.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\nÄ°stifadÉ™Ã§i haqqÄ±nda hÉ™miÅŸÉ™ bunu xatÄ±rlayÄ±n:\n$userMemory';
+    return '\n\nİstifadəçi haqqında həmişə bunu xatırlayın:\n$userMemory';
   }
 
   @override
-  String get cancel => 'LÉ™ÄŸv et';
+  String get cancel => 'Ləğv et';
 
   @override
   String get remove => 'Sil';
 
   @override
-  String get download => 'YÃ¼klÉ™';
+  String get download => 'Yüklə';
 
   @override
   String get resume => 'Davam etdir';
@@ -53,101 +53,101 @@ class AppLocalizationsAz extends AppLocalizations {
   String get copy => 'Kopyala';
 
   @override
-  String get chat => 'SÃ¶hbÉ™t';
+  String get chat => 'Söhbət';
 
   @override
   String get locked => 'Locked';
 
   @override
-  String get languageModels => 'Dil ModellÉ™ri';
+  String get languageModels => 'Dil Modelləri';
 
   @override
-  String get light => 'Ä°ÅŸÄ±qlÄ±';
+  String get light => 'İşıqlı';
 
   @override
-  String get theme => 'MÃ¶vzu';
+  String get theme => 'Mövzu';
 
   @override
   String get no => 'Xeyr';
 
   @override
-  String get yes => 'BÉ™li';
+  String get yes => 'Bəli';
 
   @override
-  String get done => 'HazÄ±rdÄ±r';
+  String get done => 'Hazırdır';
 
   @override
-  String get bestValue => 'Æn YaxÅŸÄ± DÉ™yÉ™r';
+  String get bestValue => 'Ən Yaxşı Dəyər';
 
   @override
-  String get selected => 'SeÃ§ildi';
+  String get selected => 'Seçildi';
 
   @override
-  String get descriptionSection => 'TÉ™svir';
+  String get descriptionSection => 'Təsvir';
 
   @override
-  String get searchHint => 'AxtarÄ±ÅŸ';
+  String get searchHint => 'Axtarış';
 
   @override
-  String get messageHint => 'HÉ™r ÅŸeyi soruÅŸ';
+  String get messageHint => 'Hər şeyi soruş';
 
   @override
-  String get messageCopied => 'Mesaj mÃ¼badilÉ™ buferinÉ™ kopyalandÄ±.';
+  String get messageCopied => 'Mesaj mübadilə buferinə kopyalandı.';
 
   @override
-  String get retry => 'YenidÉ™n cÉ™hd et';
+  String get retry => 'Yenidən cəhd et';
 
   @override
-  String get systemInfo => 'Sistem MÉ™lumatÄ±';
+  String get systemInfo => 'Sistem Məlumatı';
 
   @override
   String deviceMemory(Object memory) {
-    return 'Cihaz YaddaÅŸÄ±: $memory GB';
+    return 'Cihaz Yaddaşı: $memory GB';
   }
 
   @override
-  String get memory => 'YaddaÅŸ';
+  String get memory => 'Yaddaş';
 
   @override
   String get storage => 'Depolama';
 
   @override
-  String get freeStorage => 'BoÅŸ SahÉ™';
+  String get freeStorage => 'Boş Sahə';
 
   @override
-  String get totalStorage => 'Ãœmumi SahÉ™';
+  String get totalStorage => 'Ümumi Sahə';
 
   @override
-  String get usedStorage => 'Ä°stifadÉ™ EdilÉ™n SahÉ™';
+  String get usedStorage => 'İstifadə Edilən Sahə';
 
   @override
-  String get totalMemory => 'Ãœmumi YaddaÅŸ';
+  String get totalMemory => 'Ümumi Yaddaş';
 
   @override
-  String get usedMemory => 'Ä°stifadÉ™ EdilÉ™n YaddaÅŸ';
+  String get usedMemory => 'İstifadə Edilən Yaddaş';
 
   @override
   String get modelsTitle => 'Kitabxana';
 
   @override
-  String get localModels => 'Lokal ModellÉ™r';
+  String get localModels => 'Lokal Modellər';
 
   @override
-  String get selectGGUFFile => 'GGUF FaylÄ± seÃ§in';
+  String get selectGGUFFile => 'GGUF Faylı seçin';
 
   @override
   String get errorGGUF =>
-      'ZÉ™hmÉ™t olmasa, yalnÄ±z GGUF formatÄ±nda bir fayl seÃ§in.';
+      'Zəhmət olmasa, yalnız GGUF formatında bir fayl seçin.';
 
   @override
-  String get myModels => 'ModellÉ™rim';
+  String get myModels => 'Modellərim';
 
   @override
   String get create => 'Yarat';
 
   @override
   String modelProducer(Object producer) {
-    return 'Ä°stehsalÃ§Ä±: $producer';
+    return 'İstehsalçı: $producer';
   }
 
   @override
@@ -156,30 +156,28 @@ class AppLocalizationsAz extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => 'AdÄ±nÄ± dÉ™yiÅŸ';
+  String get editConversationTitle => 'Adını dəyiş';
 
   @override
-  String get newTitle => 'Yeni BaÅŸlÄ±q';
+  String get newTitle => 'Yeni Başlıq';
 
   @override
   String get save => 'Yadda saxla';
 
   @override
-  String get noConversationsMessage =>
-      'SÃ¶hbÉ™t yoxdur, sÃ¶hbÉ™tÉ™ baÅŸlayÄ±n!';
+  String get noConversationsMessage => 'Söhbət yoxdur, söhbətə başlayın!';
 
   @override
-  String get startChat => 'SÃ¶hbÉ™tÉ™ baÅŸla';
+  String get startChat => 'Söhbətə başla';
 
   @override
-  String get noChats => 'SÃ¶hbÉ™t Yoxdur';
+  String get noChats => 'Söhbət Yoxdur';
 
   @override
-  String get noStarredChats => 'Ulduzlu SÃ¶hbÉ™t Yoxdur';
+  String get noStarredChats => 'Ulduzlu Söhbət Yoxdur';
 
   @override
-  String get noStarredChatsMessage =>
-      'HÉ™lÉ™ heÃ§ bir sÃ¶hbÉ™ti ulduzlamamÄ±sÄ±nÄ±z.';
+  String get noStarredChatsMessage => 'Hələ heç bir söhbəti ulduzlamamısınız.';
 
   @override
   String get starConversation => 'Ulduzla';
@@ -191,205 +189,202 @@ class AppLocalizationsAz extends AppLocalizations {
   String get loginToYourAccount => 'Daxil ol';
 
   @override
-  String get createYourAccount => 'Qeydiyyatdan keÃ§';
+  String get createYourAccount => 'Qeydiyyatdan keç';
 
   @override
-  String get email => 'E-poÃ§t';
+  String get email => 'E-poçt';
 
   @override
-  String get password => 'ÅifrÉ™';
+  String get password => 'Şifrə';
 
   @override
-  String get confirmPassword => 'ÅifrÉ™ni tÉ™sdiqlÉ™';
+  String get confirmPassword => 'Şifrəni təsdiqlə';
 
   @override
   String get invalidEmail =>
-      'ZÉ™hmÉ™t olmasa, etibarlÄ± bir e-poÃ§t Ã¼nvanÄ± daxil edin.';
+      'Zəhmət olmasa, etibarlı bir e-poçt ünvanı daxil edin.';
 
   @override
-  String get invalidPassword =>
-      'ÅifrÉ™ É™n azÄ± 6 simvoldan ibarÉ™t olmalÄ±dÄ±r.';
+  String get invalidPassword => 'Şifrə ən azı 6 simvoldan ibarət olmalıdır.';
 
   @override
-  String get rememberMe => 'MÉ™ni xatÄ±rla';
+  String get rememberMe => 'Məni xatırla';
 
   @override
-  String get forgotPassword => 'ÅifrÉ™ni unutmusunuz?';
+  String get forgotPassword => 'Şifrəni unutmusunuz?';
 
   @override
-  String get or => 'VÉ™ ya';
+  String get or => 'Və ya';
 
   @override
-  String get continueWithGoogle => 'Google ilÉ™ davam et';
+  String get continueWithGoogle => 'Google ilə davam et';
 
   @override
-  String get dontHaveAccount => 'HesabÄ±nÄ±z yoxdur?';
+  String get dontHaveAccount => 'Hesabınız yoxdur?';
 
   @override
-  String get alreadyHaveAccount => 'ArtÄ±q hesabÄ±nÄ±z var?';
+  String get alreadyHaveAccount => 'Artıq hesabınız var?';
 
   @override
-  String get signUp => 'Qeydiyyatdan keÃ§';
+  String get signUp => 'Qeydiyyatdan keç';
 
   @override
   String get logIn => 'Daxil ol';
 
   @override
-  String get passwordsDoNotMatch => 'ÅifrÉ™lÉ™r uyÄŸun deyil.';
+  String get passwordsDoNotMatch => 'Şifrələr uyğun deyil.';
 
   @override
-  String get wrongPassword => 'YanlÄ±ÅŸ ÅŸifrÉ™.';
+  String get wrongPassword => 'Yanlış şifrə.';
 
   @override
-  String get emailAlreadyInUse => 'Bu e-poÃ§t artÄ±q istifadÉ™ olunur.';
+  String get emailAlreadyInUse => 'Bu e-poçt artıq istifadə olunur.';
 
   @override
-  String get weakPassword => 'ÅifrÉ™ Ã§ox zÉ™ifdir.';
+  String get weakPassword => 'Şifrə çox zəifdir.';
 
   @override
-  String get authError => 'DoÄŸrulama XÉ™tasÄ±';
+  String get authError => 'Doğrulama Xətası';
 
   @override
-  String get usernameTaken => 'Bu istifadÉ™Ã§i adÄ± artÄ±q tutulub.';
+  String get usernameTaken => 'Bu istifadəçi adı artıq tutulub.';
 
   @override
-  String get username => 'Ä°stifadÉ™Ã§i adÄ±';
+  String get username => 'İstifadəçi adı';
 
   @override
-  String get resendCode => 'TÉ™sdiq e-poÃ§tunu yenidÉ™n gÃ¶ndÉ™r';
+  String get resendCode => 'Təsdiq e-poçtunu yenidən göndər';
 
   @override
   String get pleaseCheckYourEmail =>
-      'Cortex-dÉ™n istifadÉ™ etmÉ™k Ã¼Ã§Ã¼n e-poÃ§tunuzu tÉ™sdiqlÉ™mÉ™lisiniz. \nE-poÃ§t Ã¼nvanÄ±nÄ±za bir tÉ™sdiq linki gÃ¶ndÉ™rildi, zÉ™hmÉ™t olmasa e-poÃ§tunuzu yoxlayÄ±n.';
+      'Cortex-dən istifadə etmək üçün e-poçtunuzu təsdiqləməlisiniz. \nE-poçt ünvanınıza bir təsdiq linki göndərildi, zəhmət olmasa e-poçtunuzu yoxlayın.';
 
   @override
-  String get verifyYourEmail => 'E-poÃ§tunuzu tÉ™sdiqlÉ™yin';
+  String get verifyYourEmail => 'E-poçtunuzu təsdiqləyin';
 
   @override
-  String get seconds => 'saniyÉ™';
+  String get seconds => 'saniyə';
 
   @override
-  String get maxResendLimitReached =>
-      'Maksimum tÉ™sdiq e-poÃ§tu sayÄ±na Ã§atdÄ±nÄ±z';
+  String get maxResendLimitReached => 'Maksimum təsdiq e-poçtu sayına çatdınız';
 
   @override
   String get verificationScreenContinueWithoutVerification =>
-      'TÉ™sdiq etmÉ™dÉ™n davam et';
+      'Təsdiq etmədən davam et';
 
   @override
   String get verificationScreenWarning =>
-      'Davam etsÉ™niz belÉ™, 1 gÃ¼nlÃ¼k hesab tÉ™sdiqlÉ™mÉ™ mÃ¼ddÉ™ti hesabÄ±nÄ±z Ã¼Ã§Ã¼n hÉ™lÉ™ dÉ™ qÃ¼vvÉ™dÉ™dir. O vaxta qÉ™dÉ™r hesabÄ±nÄ±zÄ± tÉ™sdiqlÉ™mÉ™sÉ™niz, tÉ™tbiqdÉ™n silinÉ™cÉ™k.';
+      'Davam etsəniz belə, 1 günlük hesab təsdiqləmə müddəti hesabınız üçün hələ də qüvvədədir. O vaxta qədər hesabınızı təsdiqləməsəniz, tətbiqdən silinəcək.';
 
   @override
-  String get unverifiedAccountHeader => 'HesabÄ±nÄ±z tÉ™sdiqlÉ™nmÉ™yib';
+  String get unverifiedAccountHeader => 'Hesabınız təsdiqlənməyib';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return 'HesabÄ±nÄ±zÄ± $timeLeft É™rzindÉ™ tÉ™sdiqlÉ™mÉ™sÉ™niz, silinÉ™cÉ™k';
+    return 'Hesabınızı $timeLeft ərzində təsdiqləməsəniz, silinəcək';
   }
 
   @override
-  String get verifyNow => 'Ä°ndi tÉ™sdiqlÉ™';
+  String get verifyNow => 'İndi təsdiqlə';
 
   @override
-  String get linkSent => 'Link gÃ¶ndÉ™rildi';
+  String get linkSent => 'Link göndərildi';
 
   @override
   String get accountDeletionRequested =>
-      'HesabÄ±nÄ±zÄ±n silinmÉ™si tÉ™lÉ™bi qÉ™bul edildi vÉ™ hesabÄ±nÄ±z indi deaktiv edilib.';
+      'Hesabınızın silinməsi tələbi qəbul edildi və hesabınız indi deaktiv edilib.';
 
   @override
-  String get tooManyRequests => 'HÉ™ddindÉ™n artÄ±q sorÄŸu';
+  String get tooManyRequests => 'Həddindən artıq sorğu';
 
   @override
-  String get regenerate => 'YenidÉ™n yarat';
+  String get regenerate => 'Yenidən yarat';
 
   @override
   String get confirmDeleteAccount =>
-      'HesabÄ±nÄ±zÄ± silmÉ™k istÉ™diyinizÉ™ É™minsinizmi?';
+      'Hesabınızı silmək istədiyinizə əminsinizmi?';
 
   @override
-  String get deleteAccount => 'HesabÄ± Sil';
+  String get deleteAccount => 'Hesabı Sil';
 
   @override
   String get delete => 'Sil';
 
   @override
-  String get passwordRequired => 'ÅifrÉ™ tÉ™lÉ™b olunur.';
+  String get passwordRequired => 'Şifrə tələb olunur.';
 
   @override
   String get deleteDescription =>
-      'Sildiyiniz mÉ™lumatlar serverimizdÉ™n vÉ™ cihazÄ±nÄ±zdan qalÄ±cÄ± olaraq silinÉ™cÉ™k. Bu É™mÉ™liyyatlar geri qaytarÄ±la bilmÉ™z.';
+      'Sildiyiniz məlumatlar serverimizdən və cihazınızdan qalıcı olaraq silinəcək. Bu əməliyyatlar geri qaytarıla bilməz.';
 
   @override
-  String get editProfile => 'Profili RedaktÉ™ et';
+  String get editProfile => 'Profili Redaktə et';
 
   @override
-  String get displayName => 'GÃ¶rÃ¼nÉ™n Ad';
+  String get displayName => 'Görünən Ad';
 
   @override
-  String get profileUpdated => 'Profil uÄŸurla yenilÉ™ndi';
+  String get profileUpdated => 'Profil uğurla yeniləndi';
 
   @override
-  String get logout => 'Ã‡Ä±xÄ±ÅŸ';
+  String get logout => 'Çıxış';
 
   @override
   String get profile => 'Profil';
 
   @override
   String get manageProfileDescription =>
-      'Profilinizi idarÉ™ edin, ÅŸifrÉ™nizi yenilÉ™yin vÉ™ ya Cortex-dÉ™n Ã§Ä±xÄ±ÅŸ edin.';
+      'Profilinizi idarə edin, şifrənizi yeniləyin və ya Cortex-dən çıxış edin.';
 
   @override
   String get accessSettingsDescription =>
-      'YardÄ±ma daxil olun, kodlarÄ± aktivlÉ™ÅŸdirin, Cortex-i paylaÅŸÄ±n vÉ™ siyasÉ™tlÉ™rimizÉ™ baxÄ±n.';
+      'Yardıma daxil olun, kodları aktivləşdirin, Cortex-i paylaşın və siyasətlərimizə baxın.';
 
   @override
   String get languageDescription =>
-      'Ä°stÉ™nilÉ™n vaxt standart tÉ™tbiq interfeys dilinizi dÉ™yiÅŸÉ™ bilÉ™rsiniz.';
+      'İstənilən vaxt standart tətbiq interfeys dilinizi dəyişə bilərsiniz.';
 
   @override
   String get themeDescription =>
-      'Ä°stÉ™yinizÉ™ uyÄŸun olaraq iÅŸÄ±qlÄ± vÉ™ qaranlÄ±q mÃ¶vzular arasÄ±nda keÃ§id edÉ™ bilÉ™rsiniz. SeÃ§ilmiÅŸ mÃ¶vzu bÃ¼tÃ¼n Cortex interfeysindÉ™ tÉ™tbiq olunacaq.';
+      'İstəyinizə uyğun olaraq işıqlı və qaranlıq mövzular arasında keçid edə bilərsiniz. Seçilmiş mövzu bütün Cortex interfeysində tətbiq olunacaq.';
 
   @override
-  String get iHaveReadAndAgree =>
-      'XidmÉ™t ÅŸÉ™rtlÉ™rini oxudum vÉ™ qÉ™bul edirÉ™m';
+  String get iHaveReadAndAgree => 'Xidmət şərtlərini oxudum və qəbul edirəm';
 
   @override
-  String get downloading => 'YÃ¼klÉ™nir...';
+  String get downloading => 'Yüklənir...';
 
   @override
-  String get downloadSuccess => 'YÃ¼klÉ™mÉ™ uÄŸurlu oldu';
+  String get downloadSuccess => 'Yükləmə uğurlu oldu';
 
   @override
-  String get downloadFailed => 'YÃ¼klÉ™mÉ™ uÄŸursuz oldu';
+  String get downloadFailed => 'Yükləmə uğursuz oldu';
 
   @override
   String downloaded(Object percent) {
-    return '$percent% yÃ¼klÉ™ndi';
+    return '$percent% yükləndi';
   }
 
   @override
-  String get downloadPaused => 'YÃ¼klÉ™mÉ™ dayandÄ±rÄ±ldÄ±.';
+  String get downloadPaused => 'Yükləmə dayandırıldı.';
 
   @override
-  String get purchaseError => 'AlÄ±ÅŸ xÉ™tasÄ±';
+  String get purchaseError => 'Alış xətası';
 
   @override
   String get purchasePlus => 'Cortex Plus al';
 
   @override
-  String get plusDescription => 'Elit SÃ¼ni Ä°ntellekt TÉ™crÃ¼bÉ™si';
+  String get plusDescription => 'Elit Süni İntellekt Təcrübəsi';
 
   @override
-  String get annual => 'Ä°llik';
+  String get annual => 'İllik';
 
   @override
-  String get monthly => 'AylÄ±q';
+  String get monthly => 'Aylıq';
 
   @override
-  String get manageSubscription => 'AbunÉ™liyi Ä°darÉ™ et';
+  String get manageSubscription => 'Abunəliyi İdarə et';
 
   @override
   String purchasePlan(String planName) {
@@ -398,187 +393,186 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/ay, aylÄ±q Ã¶dÉ™niÅŸ edilir';
+    return '$price/ay, aylıq ödəniş edilir';
   }
 
   @override
   String get purchasePro => 'Cortex Pro al';
 
   @override
-  String get proDescription => 'Premyer SÃ¼ni Ä°ntellekt TÉ™crÃ¼bÉ™si';
+  String get proDescription => 'Premyer Süni İntellekt Təcrübəsi';
 
   @override
   String get purchaseUltra => 'Cortex Ultra al';
 
   @override
-  String get ultraDescription => 'SÃ¼ni intellektin zirvÉ™si';
+  String get ultraDescription => 'Süni intellektin zirvəsi';
 
   @override
-  String get upgradeSubscription => 'AbunÉ™liyi YÃ¼ksÉ™lt';
+  String get upgradeSubscription => 'Abunəliyi Yüksəlt';
 
   @override
-  String get purchaseStreamError => 'AlÄ±ÅŸ axÄ±nÄ± xÉ™tasÄ±.';
+  String get purchaseStreamError => 'Alış axını xətası.';
 
   @override
-  String get productNotFound => 'MÉ™hsul tapÄ±lmadÄ±';
+  String get productNotFound => 'Məhsul tapılmadı';
 
   @override
-  String get noProductsFound => 'HeÃ§ bir mÉ™hsul tapÄ±lmadÄ±';
+  String get noProductsFound => 'Heç bir məhsul tapılmadı';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'Bu sifariÅŸi yerlÉ™ÅŸdirmÉ™klÉ™, XidmÉ™t ÅÉ™rtlÉ™ri vÉ™ MÉ™xfilik SiyasÉ™ti ilÉ™ razÄ±laÅŸÄ±rsÄ±nÄ±z. XidmÉ™t ÅÉ™rtlÉ™rimiz vÉ™ MÉ™xfilik SiyasÉ™timiz haqqÄ±nda daha Ã§ox mÉ™lumat É™ldÉ™ etmÉ™k Ã¼Ã§Ã¼n bu mÉ™tnÉ™ kliklÉ™yÉ™ bilÉ™rsiniz. Cari dÃ¶vrÃ¼n bitmÉ™sindÉ™n É™n azÄ± 24 saat É™vvÉ™l avtomatik yenilÉ™mÉ™ sÃ¶ndÃ¼rÃ¼lmÉ™dikcÉ™, abunÉ™lik avtomatik olaraq yenilÉ™nÉ™cÉ™k.';
+      'Bu sifarişi yerləşdirməklə, Xidmət Şərtləri və Məxfilik Siyasəti ilə razılaşırsınız. Xidmət Şərtlərimiz və Məxfilik Siyasətimiz haqqında daha çox məlumat əldə etmək üçün bu mətnə klikləyə bilərsiniz. Cari dövrün bitməsindən ən azı 24 saat əvvəl avtomatik yeniləmə söndürülmədikcə, abunəlik avtomatik olaraq yenilənəcək.';
 
   @override
-  String get termsOfService => 'XidmÉ™t ÅÉ™rtlÉ™ri';
+  String get termsOfService => 'Xidmət Şərtləri';
 
   @override
-  String get privacyPolicy => 'MÉ™xfilik SiyasÉ™ti';
+  String get privacyPolicy => 'Məxfilik Siyasəti';
 
   @override
-  String get renamed => 'YenidÉ™n adlandÄ±rÄ±ldÄ±';
+  String get renamed => 'Yenidən adlandırıldı';
 
   @override
-  String get report => 'ÅikayÉ™t et';
+  String get report => 'Şikayət et';
 
   @override
-  String get reportDialogTitle => 'ÅikayÉ™t GÃ¶ndÉ™r';
+  String get reportDialogTitle => 'Şikayət Göndər';
 
   @override
-  String get reportDescriptionLabel => 'Problem nÉ™dir?';
+  String get reportDescriptionLabel => 'Problem nədir?';
 
   @override
-  String get reportHarmful => 'Bu zÉ™rÉ™rli/tÉ™hlÃ¼kÉ™lidir';
+  String get reportHarmful => 'Bu zərərli/təhlükəlidir';
 
   @override
-  String get reportNotTrue => 'Bu doÄŸru deyil';
+  String get reportNotTrue => 'Bu doğru deyil';
 
   @override
-  String get reportNotHelpful => 'Bu faydalÄ± deyil';
+  String get reportNotHelpful => 'Bu faydalı deyil';
 
   @override
-  String get closeButton => 'BaÄŸla';
+  String get closeButton => 'Bağla';
 
   @override
-  String get submitButton => 'GÃ¶ndÉ™r';
+  String get submitButton => 'Göndər';
 
   @override
   String get reportErrorMessage =>
-      'ZÉ™hmÉ™t olmasa, ÅŸikayÉ™t Ã¼Ã§Ã¼n bir sÉ™bÉ™b seÃ§in.';
+      'Zəhmət olmasa, şikayət üçün bir səbəb seçin.';
 
   @override
-  String get capabilitiesSection => 'BacarÄ±qlar';
+  String get capabilitiesSection => 'Bacarıqlar';
 
   @override
   String get featurePhotoTitle => 'Foto Skan';
 
   @override
   String get featurePhotoDescription =>
-      'Bu model kamera vÉ™ ya ÅŸÉ™kil fayllarÄ± vasitÉ™silÉ™ fotolarÄ± skan etmÉ™k qabiliyyÉ™tinÉ™ malikdir.';
+      'Bu model kamera və ya şəkil faylları vasitəsilə fotoları skan etmək qabiliyyətinə malikdir.';
 
   @override
-  String get featureOfflineTitle => 'Oflayn ÆmÉ™liyyat';
+  String get featureOfflineTitle => 'Oflayn Əməliyyat';
 
   @override
   String get featureOfflineDescription =>
-      'MÉ™lumatlarÄ±nÄ±zÄ± tÉ™hlÃ¼kÉ™siz saxlamaq Ã¼Ã§Ã¼n modeli internet baÄŸlantÄ±sÄ± olmadan iÅŸlÉ™din.';
+      'Məlumatlarınızı təhlükəsiz saxlamaq üçün modeli internet bağlantısı olmadan işlədin.';
 
   @override
   String get featureRoleplayTitle => 'Rol Oyunu';
 
   @override
   String get featureRoleplayDescription =>
-      'Rol oyunu modellÉ™ri mÃ¼xtÉ™lif sÃ¶hbÉ™tlÉ™r vÉ™ ssenarilÉ™r yaratmaÄŸÄ±nÄ±za imkan verir.';
+      'Rol oyunu modelləri müxtəlif söhbətlər və ssenarilər yaratmağınıza imkan verir.';
 
   @override
-  String get roleModels => 'Rol Oyunu ModellÉ™ri';
+  String get roleModels => 'Rol Oyunu Modelləri';
 
   @override
-  String get parameters => 'ParametrlÉ™r';
+  String get parameters => 'Parametrlər';
 
   @override
   String get context => 'Kontekst';
 
   @override
-  String get finalPreparation => 'Son hazÄ±rlÄ±qlar gÃ¶rÃ¼lÃ¼r.';
+  String get finalPreparation => 'Son hazırlıqlar görülür.';
 
   @override
-  String get shareApp => 'TÉ™tbiqi PaylaÅŸ';
+  String get shareApp => 'Tətbiqi Paylaş';
 
   @override
-  String get ourStory => 'Bizim HekayÉ™miz';
+  String get ourStory => 'Bizim Hekayəmiz';
 
   @override
-  String get rateUs => 'Bizi QiymÉ™tlÉ™ndir';
+  String get rateUs => 'Bizi Qiymətləndir';
 
   @override
-  String get share => 'PaylaÅŸ';
+  String get share => 'Paylaş';
 
   @override
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => 'MÉ™tni SeÃ§';
+  String get selectText => 'Mətni Seç';
 
   @override
-  String get thinking => 'DÃ¼ÅŸÃ¼nÃ¼r';
+  String get thinking => 'Düşünür';
 
   @override
-  String get user => 'Ä°stifadÉ™Ã§i';
+  String get user => 'İstifadəçi';
 
   @override
-  String get help => 'YardÄ±m';
+  String get help => 'Yardım';
 
   @override
-  String get supportCreator => 'YaradanÄ± dÉ™stÉ™klÉ™yin';
+  String get supportCreator => 'Yaradanı dəstəkləyin';
 
   @override
   String get enterYourTag =>
-      'Sevimli yaradÄ±cÄ±larÄ±nÄ±zÄ± dÉ™stÉ™klÉ™yin! Cortex alÄ±ÅŸlarÄ±nÄ±zdan onlara pay vermÉ™k Ã¼Ã§Ã¼n aÅŸaÄŸÄ±ya onlarÄ±n unikal etiketini daxil edin.';
+      'Sevimli yaradıcılarınızı dəstəkləyin! Cortex alışlarınızdan onlara pay vermək üçün aşağıya onların unikal etiketini daxil edin.';
 
   @override
-  String get creatorTag => 'YaradÄ±cÄ± etiketi';
+  String get creatorTag => 'Yaradıcı etiketi';
 
   @override
-  String get support => 'DÉ™stÉ™klÉ™';
+  String get support => 'Dəstəklə';
 
   @override
-  String get tagCannotBeEmpty => 'YaradÄ±cÄ± teqi boÅŸ ola bilmÉ™z';
+  String get tagCannotBeEmpty => 'Yaradıcı teqi boş ola bilməz';
 
   @override
-  String get userId => 'Ä°stifadÉ™Ã§i ID';
+  String get userId => 'İstifadəçi ID';
 
   @override
-  String get deleteAllConversationsConfirmTitle =>
-      'BÃ¼tÃ¼n SÃ¶hbÉ™tlÉ™r Silinsin?';
+  String get deleteAllConversationsConfirmTitle => 'Bütün Söhbətlər Silinsin?';
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'BÃ¼tÃ¼n sÃ¶hbÉ™tlÉ™rinizi silmÉ™k istÉ™diyinizÉ™ É™minsinizmi? Bu É™mÉ™liyyat geri qaytarÄ±la bilmÉ™z.';
+      'Bütün söhbətlərinizi silmək istədiyinizə əminsinizmi? Bu əməliyyat geri qaytarıla bilməz.';
 
   @override
-  String get conversationDeleted => 'SÃ¶hbÉ™t silindi!';
+  String get conversationDeleted => 'Söhbət silindi!';
 
   @override
-  String get allConversationsDeleted => 'BÃ¼tÃ¼n sÃ¶hbÉ™tlÉ™r uÄŸurla silindi!';
+  String get allConversationsDeleted => 'Bütün söhbətlər uğurla silindi!';
 
   @override
-  String get deleteAll => 'HamÄ±sÄ±nÄ± Sil';
+  String get deleteAll => 'Hamısını Sil';
 
   @override
-  String get deleteAllConversationsButton => 'BÃ¼tÃ¼n SÃ¶hbÉ™tlÉ™ri Sil';
+  String get deleteAllConversationsButton => 'Bütün Söhbətləri Sil';
 
   @override
-  String get confirmWord => 'VERTEX yazÄ±n';
+  String get confirmWord => 'VERTEX yazın';
 
   @override
-  String get confirmWordError => 'SÉ™hv yazdÄ±nÄ±z';
+  String get confirmWordError => 'Səhv yazdınız';
 
   @override
-  String get chinese => 'Ã‡in dili';
+  String get chinese => 'Çin dili';
 
   @override
-  String get french => 'FransÄ±z dili';
+  String get french => 'Fransız dili';
 
   @override
   String get japanese => 'Yapon dili';
@@ -593,10 +587,10 @@ class AppLocalizationsAz extends AppLocalizations {
   String get korean => 'Koreya dili';
 
   @override
-  String get english => 'Ä°ngilis dili';
+  String get english => 'İngilis dili';
 
   @override
-  String get turkish => 'TÃ¼rk dili';
+  String get turkish => 'Türk dili';
 
   @override
   String get hindi => 'Hind dili';
@@ -605,137 +599,136 @@ class AppLocalizationsAz extends AppLocalizations {
   String get portuguese => 'Portuqal dili';
 
   @override
-  String get indonesian => 'Ä°ndoneziya dili';
+  String get indonesian => 'İndoneziya dili';
 
   @override
-  String get azerbaijani => 'AzÉ™rbaycan dili';
+  String get azerbaijani => 'Azərbaycan dili';
 
   @override
   String get german => 'Alman dili';
 
   @override
-  String get spanish => 'Ä°span dili';
+  String get spanish => 'İspan dili';
 
   @override
-  String get italian => 'Ä°talyan dili';
+  String get italian => 'İtalyan dili';
 
   @override
-  String get arabic => 'ÆrÉ™b';
+  String get arabic => 'Ərəb';
 
   @override
   String get ram => 'RAM';
 
   @override
-  String get usernameTooShort => 'Ä°stifadÉ™Ã§i adÄ± Ã§ox qÄ±sadÄ±r.';
+  String get usernameTooShort => 'İstifadəçi adı çox qısadır.';
 
   @override
-  String get usernameTooLong => 'Ä°stifadÉ™Ã§i adÄ± 16 simvolu keÃ§É™ bilmÉ™z.';
+  String get usernameTooLong => 'İstifadəçi adı 16 simvolu keçə bilməz.';
 
   @override
   String get invalidUsernameCharacters =>
-      'Ä°stifadÉ™Ã§i adÄ±nda yalnÄ±z bu hÉ™rflÉ™r: \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' vÉ™ \'.\', \'-\', \'_\' simvollarÄ± istifadÉ™ edilÉ™ bilÉ™r.';
+      'İstifadəçi adında yalnız bu hərflər: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' və \'.\', \'-\', \'_\' simvolları istifadə edilə bilər.';
 
   @override
-  String get noInternetConnection => 'Ä°nternet baÄŸlantÄ±sÄ± yoxdur.';
+  String get noInternetConnection => 'İnternet bağlantısı yoxdur.';
 
   @override
-  String get chats => 'GÉ™lÉ™nlÉ™r';
+  String get chats => 'Gələnlər';
 
   @override
   String get library => 'Kitabxana';
 
   @override
-  String get text => 'MÉ™tn';
+  String get text => 'Mətn';
 
   @override
   String get removeModel => 'Modeli Sil';
 
   @override
-  String get insufficientRAM => 'AÅŸaÄŸÄ± YaddaÅŸ';
+  String get insufficientRAM => 'Aşağı Yaddaş';
 
   @override
-  String get insufficientStorage => 'AÅŸaÄŸÄ± Depolama';
+  String get insufficientStorage => 'Aşağı Depolama';
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'CihazÄ±nÄ±zdan $model modelini silmÉ™k istÉ™diyinizÉ™ É™minsiniz? Bunu etmÉ™k hÉ™min modellÉ™ É™vvÉ™lki sÃ¶hbÉ™tlÉ™ri dÉ™ silÉ™cÉ™k.';
+    return 'Cihazınızdan $model modelini silmək istədiyinizə əminsiniz? Bunu etmək həmin modellə əvvəlki söhbətləri də siləcək.';
   }
 
   @override
-  String get noMatchingModels => 'UyÄŸun model tapÄ±lmadÄ±.';
+  String get noMatchingModels => 'Uyğun model tapılmadı.';
 
   @override
-  String get benefit1 => 'Artan sÃ¶hbÉ™t limitlÉ™ri';
+  String get benefit1 => 'Artan söhbət limitləri';
 
   @override
   String get benefit3 => 'Profil effekti';
 
   @override
-  String get benefit4 => 'ÃœzvlÃ¼k niÅŸanÄ±';
+  String get benefit4 => 'Üzvlük nişanı';
 
   @override
-  String get benefit5 => 'Daha Ã§ox onlayn sÃ¼ni intellekt yaradÄ±n';
+  String get benefit5 => 'Daha çox onlayn süni intellekt yaradın';
 
   @override
-  String get benefit7 => 'Daha Ã§ox istifadÉ™ limitlÉ™ri';
+  String get benefit7 => 'Daha çox istifadə limitləri';
 
   @override
-  String get benefit8 => 'ModellÉ™r É™lavÉ™ edin';
+  String get benefit8 => 'Modellər əlavə edin';
 
   @override
-  String get benefit9 => 'Yeni mÃ¶vzular';
+  String get benefit9 => 'Yeni mövzular';
 
   @override
-  String get benefit10 => 'Daha Ã§ox É™lavÉ™';
+  String get benefit10 => 'Daha çox əlavə';
 
   @override
-  String get benefit11 => 'Daha Ã§ox AxÄ±n Rejimi';
+  String get benefit11 => 'Daha çox Axın Rejimi';
 
   @override
-  String get oldBenefits => 'AÅŸaÄŸÄ± planlarÄ±n bÃ¼tÃ¼n Ã¼stÃ¼nlÃ¼klÉ™ri';
+  String get oldBenefits => 'Aşağı planların bütün üstünlükləri';
 
   @override
-  String get confirm => 'TÉ™sdiqlÉ™';
+  String get confirm => 'Təsdiqlə';
 
   @override
-  String get changePassword => 'ÅifrÉ™ni dÉ™yiÅŸ';
+  String get changePassword => 'Şifrəni dəyiş';
 
   @override
-  String get logoutConfirmationTitle =>
-      'Ã‡Ä±xÄ±ÅŸ etmÉ™k istÉ™diyinizÉ™ É™minsinizmi?';
+  String get logoutConfirmationTitle => 'Çıxış etmək istədiyinizə əminsinizmi?';
 
   @override
   String get settings => 'Ayarlar';
 
   @override
-  String get language => 'TÉ™tbiq Dili';
+  String get language => 'Tətbiq Dili';
 
   @override
-  String get dark => 'QaranlÄ±q';
+  String get dark => 'Qaranlıq';
 
   @override
-  String get oldPassword => 'KÃ¶hnÉ™ ÅifrÉ™';
+  String get oldPassword => 'Köhnə Şifrə';
 
   @override
-  String get newPassword => 'Yeni ÅifrÉ™';
+  String get newPassword => 'Yeni Şifrə';
 
   @override
-  String get passwordUpdated => 'ÅifrÉ™ yenilÉ™ndi.';
+  String get passwordUpdated => 'Şifrə yeniləndi.';
 
   @override
-  String get stop => 'DayandÄ±r';
+  String get stop => 'Dayandır';
 
   @override
-  String get copyrights => 'Ä°stinadlar';
+  String get copyrights => 'İstinadlar';
 
   @override
   String get love => 'Sevgi';
 
   @override
-  String get nature => 'TÉ™biÉ™t';
+  String get nature => 'Təbiət';
 
   @override
-  String get behindTheSlaughter => 'QÉ™tlin PÉ™rdÉ™ ArxasÄ±';
+  String get behindTheSlaughter => 'Qətlin Pərdə Arxası';
 
   @override
   String get cyberpunk => 'Cyberpunk';
@@ -756,335 +749,333 @@ class AppLocalizationsAz extends AppLocalizations {
   String get ocean => 'Okean';
 
   @override
-  String get scarletSnow => 'Al QÄ±rmÄ±zÄ± Qar';
+  String get scarletSnow => 'Al Qırmızı Qar';
 
   @override
   String get requestFailed =>
-      'XÉ™ta baÅŸ verdi, zÉ™hmÉ™t olmasa yenidÉ™n cÉ™hd edin.';
+      'Xəta baş verdi, zəhmət olmasa yenidən cəhd edin.';
 
   @override
-  String get changeModel => 'DÉ™yiÅŸdir';
+  String get changeModel => 'Dəyişdir';
 
   @override
-  String get edit => 'RedaktÉ™ et';
+  String get edit => 'Redaktə et';
 
   @override
   String get editingMessageInfo =>
-      'Bu mesajÄ± redaktÉ™ etmÉ™k sÃ¶hbÉ™ti buradan yenidÉ™n baÅŸladacaq.';
+      'Bu mesajı redaktə etmək söhbəti buradan yenidən başladacaq.';
 
   @override
-  String get editingNotification => 'Siz indi redaktÉ™ rejimindÉ™siniz';
+  String get editingNotification => 'Siz indi redaktə rejimindəsiniz';
 
   @override
-  String get featurePluralTitle => 'Ã‡oxÅŸaxÉ™li';
+  String get featurePluralTitle => 'Çoxşaxəli';
 
   @override
   String get featurePluralDescription =>
-      'Bu model avtomatik olaraq É™lavÉ™ geniÅŸlÉ™ndirmÉ™lÉ™ri inteqrasiya edÉ™ bilir, bununla da funksional imkanlarÄ±nÄ± artÄ±raraq mÃ¼xtÉ™lif É™mÉ™liyyatlarÄ± daha yÃ¼ksÉ™k performansla dÉ™stÉ™klÉ™yir.';
+      'Bu model avtomatik olaraq əlavə genişləndirmələri inteqrasiya edə bilir, bununla da funksional imkanlarını artıraraq müxtəlif əməliyyatları daha yüksək performansla dəstəkləyir.';
 
   @override
-  String get nameLabel => 'SÄ° adÄ±';
+  String get nameLabel => 'Sİ adı';
 
   @override
-  String get summaryLabel => 'SÄ° XÃ¼lasÉ™si';
+  String get summaryLabel => 'Sİ Xülasəsi';
 
   @override
-  String get add => 'ÆlavÉ™ et';
+  String get add => 'Əlavə et';
 
   @override
-  String get aiExplanationTitle => 'SÃ¼ni Ä°ntellekt TÉ™sviri';
+  String get aiExplanationTitle => 'Süni İntellekt Təsviri';
 
   @override
   String get aiExplanationDescription =>
-      'ZÉ™hmÉ™t olmasa, sÃ¼ni intellekt modelinizin arxitekturasÄ±, tÉ™lim prosesi, performans gÃ¶stÉ™ricilÉ™ri, tÉ™tbiq sahÉ™lÉ™ri vÉ™ digÉ™r vacib xÃ¼susiyyÉ™tlÉ™ri haqqÄ±nda É™traflÄ± mÉ™lumat verin.';
+      'Zəhmət olmasa, süni intellekt modelinizin arxitekturası, təlim prosesi, performans göstəriciləri, tətbiq sahələri və digər vacib xüsusiyyətləri haqqında ətraflı məlumat verin.';
 
   @override
-  String get preInputTitle => 'SÃ¼ni Ä°ntellekt Ä°lkin GiriÅŸi';
+  String get preInputTitle => 'Süni İntellekt İlkin Girişi';
 
   @override
   String get preInputDescription =>
-      'ZÉ™hmÉ™t olmasa, modelinizi xarakter yaratma prosesindÉ™ istiqamÉ™tlÉ™ndirÉ™cÉ™k bir ilkin giriÅŸ tÉ™yin edin. Bu bÃ¶lmÉ™dÉ™, xarakterlÉ™ baÄŸlÄ± mÉ™lumatlarÄ±, É™lavÉ™ konteksti vÉ™ xarakterlÉ™ baÄŸlÄ± mÉ™zmunun yaradÄ±lmasÄ±na kÃ¶mÉ™k edÉ™ bilÉ™cÉ™k hÉ™r hansÄ± É™lavÉ™ detallarÄ± daxil edÉ™ bilÉ™rsiniz.';
+      'Zəhmət olmasa, modelinizi xarakter yaratma prosesində istiqamətləndirəcək bir ilkin giriş təyin edin. Bu bölmədə, xarakterlə bağlı məlumatları, əlavə konteksti və xarakterlə bağlı məzmunun yaradılmasına kömək edə biləcək hər hansı əlavə detalları daxil edə bilərsiniz.';
 
   @override
-  String get baseModelTitle => 'Æsas Model';
+  String get baseModelTitle => 'Əsas Model';
 
   @override
   String get baseModelDescription =>
-      'Bu, yaratdÄ±ÄŸÄ±nÄ±z iÅŸin É™sasÄ± kimi istifadÉ™ edilÉ™cÉ™k modeldir. HazÄ±rda seÃ§ilmiÅŸ É™sas modeli gÃ¶stÉ™rir.';
+      'Bu, yaratdığınız işin əsası kimi istifadə ediləcək modeldir. Hazırda seçilmiş əsas modeli göstərir.';
 
   @override
-  String get summary => 'XÃ¼lasÉ™';
+  String get summary => 'Xülasə';
 
   @override
-  String get modelUploadTitle => 'SÃ¼ni Ä°ntellekt FaylÄ±';
+  String get modelUploadTitle => 'Süni İntellekt Faylı';
 
   @override
   String get modelUploadDescription =>
-      'Yerli GGUF fayllarÄ±nÄ±zÄ± birbaÅŸa cihazÄ±nÄ±zdan seÃ§in vÉ™ yÃ¼klÉ™yin. Bu, modelinizi internet baÄŸlantÄ±sÄ± olmadan oflayn rejimdÉ™ iÅŸlÉ™tmÉ™yÉ™ imkan verir. FaylÄ±n etibarlÄ± GGUF formatÄ±nda vÉ™ dÃ¼zgÃ¼n strukturda olduÄŸundan É™min olun. Fayl sÉ™hv vÉ™ ya zÉ™dÉ™lÉ™nmiÅŸ olarsa, Cortex gÃ¶zlÉ™nildiyi kimi iÅŸlÉ™mÉ™yÉ™ bilÉ™r vÉ™ xÉ™talarla qarÅŸÄ±laÅŸa bilÉ™rsiniz.';
+      'Yerli GGUF fayllarınızı birbaşa cihazınızdan seçin və yükləyin. Bu, modelinizi internet bağlantısı olmadan oflayn rejimdə işlətməyə imkan verir. Faylın etibarlı GGUF formatında və düzgün strukturda olduğundan əmin olun. Fayl səhv və ya zədələnmiş olarsa, Cortex gözlənildiyi kimi işləməyə bilər və xətalarla qarşılaşa bilərsiniz.';
 
   @override
   String get modelUploadShortDescription =>
-      'CihazÄ±nÄ±zdan bir .gguf faylÄ± seÃ§mÉ™k Ã¼Ã§Ã¼n bura toxunun';
+      'Cihazınızdan bir .gguf faylı seçmək üçün bura toxunun';
 
   @override
-  String get you => 'SÉ™n';
+  String get you => 'Sən';
 
   @override
   String get removePhotoTitle => 'Fotonu Sil';
 
   @override
-  String get confirmRemovePhoto =>
-      'Fotonu silmÉ™k istÉ™diyinizÉ™ É™minsinizmi?';
+  String get confirmRemovePhoto => 'Fotonu silmək istədiyinizə əminsinizmi?';
 
   @override
   String get chatLengthLimitExceeded =>
-      'Bu sÃ¶hbÉ™t simvol limitini keÃ§ib. ZÉ™hmÉ™t olmasa, yeni bir sÃ¶hbÉ™tÉ™ baÅŸlayÄ±n vÉ™ ya abunÉ™lik alÄ±n.';
+      'Bu söhbət simvol limitini keçib. Zəhmət olmasa, yeni bir söhbətə başlayın və ya abunəlik alın.';
 
   @override
-  String get inappropriateContentDetected =>
-      'UyÄŸun olmayan mÉ™zmun aÅŸkarlandÄ±!';
+  String get inappropriateContentDetected => 'Uyğun olmayan məzmun aşkarlandı!';
 
   @override
   String get offlineModelNotInstalled =>
-      'Bu oflayn model cihazÄ±nÄ±zda quraÅŸdÄ±rÄ±lmayÄ±b.';
+      'Bu oflayn model cihazınızda quraşdırılmayıb.';
 
   @override
   String get reachedLimit =>
-      'Ä°stifadÉ™ limitinÉ™ Ã§atdÄ±n; artÄ±rmaq Ã¼Ã§Ã¼n planÄ±nÄ± yenilÉ™yÉ™ bilÉ™rsÉ™n. (hey, limitin bitmÉ™si pisdir, baÅŸa dÃ¼ÅŸÃ¼rÃ¼k. amma dÃ¼zÃ¼, o cavablarÄ± almaq pulsuz deyil, bu limitlÉ™r iÅŸlÉ™rin É™la getmÉ™sinÉ™ kÃ¶mÉ™k eddiiiir.)';
+      'İstifadə limitinə çatdın; artırmaq üçün planını yeniləyə bilərsən. (hey, limitin bitməsi pisdir, başa düşürük. amma düzü, o cavabları almaq pulsuz deyil, bu limitlər işlərin əla getməsinə kömək eddiiiir.)';
 
   @override
-  String get modality => 'ModallÄ±q';
+  String get modality => 'Modallıq';
 
   @override
-  String get multimodal => 'Ã‡oxmodal';
+  String get multimodal => 'Çoxmodal';
 
   @override
-  String get anErrorOccurred => 'XÉ™ta BaÅŸ Verdi';
+  String get anErrorOccurred => 'Xəta Baş Verdi';
 
   @override
   String get themeLocked =>
-      'Bu mÃ¶vzu daha yÃ¼ksÉ™k abunÉ™lik sÉ™viyyÉ™si tÉ™lÉ™b edir. Kilidi aÃ§maq Ã¼Ã§Ã¼n lÃ¼tfÉ™n planÄ±nÄ±zÄ± yÃ¼ksÉ™ldin.';
+      'Bu mövzu daha yüksək abunəlik səviyyəsi tələb edir. Kilidi açmaq üçün lütfən planınızı yüksəldin.';
 
   @override
-  String get pageCouldNotBeLoaded => 'SÉ™hifÉ™ YÃ¼klÉ™nÉ™ BilmÉ™di';
+  String get pageCouldNotBeLoaded => 'Səhifə Yüklənə Bilmədi';
 
   @override
   String get checkYourInternet =>
-      'ZÉ™hmÉ™t olmasa internet baÄŸlantÄ±nÄ±zÄ± yoxlayÄ±n vÉ™ yenidÉ™n cÉ™hd edin.';
+      'Zəhmət olmasa internet bağlantınızı yoxlayın və yenidən cəhd edin.';
 
   @override
   String get errorUserNotAuthenticated =>
-      'Bu É™mÉ™liyyatÄ± yerinÉ™ yetirmÉ™k Ã¼Ã§Ã¼n daxil olmalÄ±sÄ±nÄ±z.';
+      'Bu əməliyyatı yerinə yetirmək üçün daxil olmalısınız.';
 
   @override
   String get errorReachedLimit =>
-      'LimitinizÉ™ Ã§atdÄ±nÄ±z, daha Ã§ox kilidini aÃ§maq Ã¼Ã§Ã¼n tÉ™kmillÉ™ÅŸdirin vÉ™ sÃ¶hbÉ™tÉ™ davam edin.';
+      'Limitinizə çatdınız, daha çox kilidini açmaq üçün təkmilləşdirin və söhbətə davam edin.';
 
   @override
   String get errorServer =>
-      'GÃ¶zlÉ™nilmÉ™z server xÉ™tasÄ± baÅŸ verdi. ZÉ™hmÉ™t olmasa daha sonra yenidÉ™n cÉ™hd edin.';
+      'Gözlənilməz server xətası baş verdi. Zəhmət olmasa daha sonra yenidən cəhd edin.';
 
   @override
   String get errorNetwork =>
-      'ÅÉ™bÉ™kÉ™ xÉ™tasÄ± baÅŸ verdi. ZÉ™hmÉ™t olmasa baÄŸlantÄ±nÄ±zÄ± yoxlayÄ±n vÉ™ yenidÉ™n cÉ™hd edin.';
+      'Şəbəkə xətası baş verdi. Zəhmət olmasa bağlantınızı yoxlayın və yenidən cəhd edin.';
 
   @override
   String get baseModelForCharacterDescription =>
-      'SeÃ§ilmiÅŸ É™sas model xarakterin mÃ¼hakimÉ™ vÉ™ cavab vermÉ™ qabiliyyÉ™tlÉ™rini mÃ¼É™yyÉ™n edÉ™cÉ™k.';
+      'Seçilmiş əsas model xarakterin mühakimə və cavab vermə qabiliyyətlərini müəyyən edəcək.';
 
   @override
-  String get selectBaseModel => 'Æsas Model SeÃ§in';
+  String get selectBaseModel => 'Əsas Model Seçin';
 
   @override
   String get falErrorImageRequired =>
-      'Bu sÃ¼ni intellekt istinad ÅŸÉ™kli tÉ™lÉ™b edir, zÉ™hmÉ™t olmasa, ÅŸÉ™kil É™lavÉ™ edin vÉ™ yenidÉ™n cÉ™hd edin.';
+      'Bu süni intellekt istinad şəkli tələb edir, zəhmət olmasa, şəkil əlavə edin və yenidən cəhd edin.';
 
   @override
   String get falErrorAudioRequired =>
-      'Bu model istinad audio faylÄ± tÉ™lÉ™b edir, zÉ™hmÉ™t olmasa audio fayl É™lavÉ™ edin vÉ™ yenidÉ™n cÉ™hd edin.';
+      'Bu model istinad audio faylı tələb edir, zəhmət olmasa audio fayl əlavə edin və yenidən cəhd edin.';
 
   @override
   String get falErrorVideoRequired =>
-      'Bu model istinad videosu tÉ™lÉ™b edir, zÉ™hmÉ™t olmasa, video É™lavÉ™ edin vÉ™ yenidÉ™n cÉ™hd edin.';
+      'Bu model istinad videosu tələb edir, zəhmət olmasa, video əlavə edin və yenidən cəhd edin.';
 
   @override
   String get falErrorImageCorrupted =>
-      'YÃ¼klÉ™nmiÅŸ ÅŸÉ™kil emal edilÉ™ bilmÉ™di, zÉ™hmÉ™t olmasa, fÉ™rqli format sÄ±nayÄ±n.';
+      'Yüklənmiş şəkil emal edilə bilmədi, zəhmət olmasa, fərqli format sınayın.';
 
   @override
   String get falErrorSchemaRejected =>
-      'Model daxil edilmiÅŸ mÉ™lumatÄ± rÉ™dd etdi, zÉ™hmÉ™t olmasa, fÉ™rqli bir modeli sÄ±nayÄ±n.';
+      'Model daxil edilmiş məlumatı rədd etdi, zəhmət olmasa, fərqli bir modeli sınayın.';
 
   @override
   String get falErrorSchemaInvalid =>
-      'GiriÅŸ generasiya xidmÉ™ti tÉ™rÉ™findÉ™n rÉ™dd edildi.';
+      'Giriş generasiya xidməti tərəfindən rədd edildi.';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return 'Generasiya xidmÉ™ti xÉ™ta qaytardÄ± (status $statusCode).';
+    return 'Generasiya xidməti xəta qaytardı (status $statusCode).';
   }
 
   @override
-  String get couldNotOpenLink => 'Link aÃ§Ä±la bilmÉ™di';
+  String get couldNotOpenLink => 'Link açıla bilmədi';
 
   @override
-  String get downloadStarted => 'YÃ¼klÉ™mÉ™ baÅŸladÄ±';
+  String get downloadStarted => 'Yükləmə başladı';
 
   @override
-  String get notAvailable => 'MÃ¶vcud Deyil';
+  String get notAvailable => 'Mövcud Deyil';
 
   @override
   String get localizationWarning =>
-      'BÉ™zi mÉ™lumatlar sizin dilinizdÉ™ mÃ¶vcud olmaya bilÉ™r vÉ™ ingilis dilindÉ™ gÃ¶stÉ™rilÉ™cÉ™k.';
+      'Bəzi məlumatlar sizin dilinizdə mövcud olmaya bilər və ingilis dilində göstəriləcək.';
 
   @override
   String get aiTranslationWarning =>
-      'Model mÉ™lumatlarÄ± digÉ™r SÄ° modellÉ™ri tÉ™rÉ™findÉ™n mÃ¼xtÉ™lif dillÉ™rÉ™ tÉ™rcÃ¼mÉ™ edilir. Buna gÃ¶rÉ™ dÉ™, ingilis dilindÉ™n baÅŸqa dillÉ™rdÉ™ kiÃ§ik uyÄŸunsuzluqlar ola bilÉ™r.';
+      'Model məlumatları digər Sİ modelləri tərəfindən müxtəlif dillərə tərcümə edilir. Buna görə də, ingilis dilindən başqa dillərdə kiçik uyğunsuzluqlar ola bilər.';
 
   @override
-  String get errorLoadingTitle => 'MÉ™lumatlar YÃ¼klÉ™nÉ™ BilmÉ™di';
+  String get errorLoadingTitle => 'Məlumatlar Yüklənə Bilmədi';
 
   @override
   String get errorLoadingMessage =>
-      'ServerlÉ™rimizdÉ™n lazÄ±mi mÉ™lumatlarÄ± ala bilmÉ™dik. ZÉ™hmÉ™t olmasa internet baÄŸlantÄ±nÄ±zÄ± yoxlayÄ±n vÉ™ yenidÉ™n cÉ™hd edin.';
+      'Serverlərimizdən lazımi məlumatları ala bilmədik. Zəhmət olmasa internet bağlantınızı yoxlayın və yenidən cəhd edin.';
 
   @override
-  String get noFoundTitle => 'NÉ™ticÉ™ Yoxdur';
+  String get noFoundTitle => 'Nəticə Yoxdur';
 
   @override
   String get noFoundMessage =>
-      'AxtarÄ±ÅŸ ÅŸÉ™rtlÉ™rinizi dÉ™yiÅŸdirmÉ™yÉ™ vÉ™ ya filtri tÉ™mizlÉ™mÉ™yÉ™ cÉ™hd edin.';
+      'Axtarış şərtlərinizi dəyişdirməyə və ya filtri təmizləməyə cəhd edin.';
 
   @override
-  String get modelCreatedSuccess => 'Model uÄŸurla yaradÄ±ldÄ±!';
+  String get modelCreatedSuccess => 'Model uğurla yaradıldı!';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'â€œ$modelNameâ€ uÄŸurla silindi.';
+    return '“$modelName” uğurla silindi.';
   }
 
   @override
   String get errorCreatingModel =>
-      'Model yaradÄ±larkÉ™n gÃ¶zlÉ™nilmÉ™z bir xÉ™ta baÅŸ verdi.';
+      'Model yaradılarkən gözlənilməz bir xəta baş verdi.';
 
   @override
   String get errorDeletingModel =>
-      'Model silinÉ™rkÉ™n gÃ¶zlÉ™nilmÉ™z bir xÉ™ta baÅŸ verdi.';
+      'Model silinərkən gözlənilməz bir xəta baş verdi.';
 
   @override
   String get ultraFeatureOnly =>
-      'Bu xÃ¼susiyyÉ™t yalnÄ±z Ultra Ã¼zvlÉ™ri Ã¼Ã§Ã¼n mÃ¶vcuddur.';
+      'Bu xüsusiyyət yalnız Ultra üzvləri üçün mövcuddur.';
 
   @override
   String get experimentalOfflineWarning =>
-      'Oflayn rejim hÉ™lÉ™ dÉ™ eksperimental mÉ™rhÉ™lÉ™dÉ™dir vÉ™ yÃ¼klÉ™diyiniz model optimal sÉ™mÉ™rÉ™liliklÉ™ iÅŸlÉ™mÉ™yÉ™ bilÉ™r.';
+      'Oflayn rejim hələ də eksperimental mərhələdədir və yüklədiyiniz model optimal səmərəliliklə işləməyə bilər.';
 
   @override
-  String get noConversationsToDelete => 'SilinÉ™cÉ™k sÃ¶hbÉ™tiniz yoxdur.';
+  String get noConversationsToDelete => 'Silinəcək söhbətiniz yoxdur.';
 
   @override
-  String get reportSubmitted => 'ÅikayÉ™t uÄŸurla gÃ¶ndÉ™rildi';
+  String get reportSubmitted => 'Şikayət uğurla göndərildi';
 
   @override
   String get verificationDelayed =>
-      'AlÄ±ÅŸÄ±nÄ±z tÉ™sdiqlÉ™ndi. HesabÄ±nÄ±zÄ±n yenilÉ™nmÉ™sindÉ™ kiÃ§ik bir gecikmÉ™ var, qÄ±sa mÃ¼ddÉ™tdÉ™ gÃ¶rÃ¼nÉ™cÉ™k.';
+      'Alışınız təsdiqləndi. Hesabınızın yenilənməsində kiçik bir gecikmə var, qısa müddətdə görünəcək.';
 
   @override
-  String get maintenanceTitle => 'TÉ™mir Ä°ÅŸlÉ™ri Gedir';
+  String get maintenanceTitle => 'Təmir İşləri Gedir';
 
   @override
   String get maintenanceMessage =>
-      'BÉ™zi vacib yenilÉ™mÉ™lÉ™ri tÉ™tbiq edÉ™rkÉ™n Cortex mÃ¼vÉ™qqÉ™ti olaraq oflayndÄ±r. TÉ™tbiqÉ™ giriÅŸ qÄ±sa mÃ¼ddÉ™tdÉ™ bÉ™rpa edilÉ™cÉ™k.\n\nTÉ™crÃ¼bÉ™nizi yaxÅŸÄ±laÅŸdÄ±rarkÉ™n gÃ¶stÉ™rdiyiniz sÉ™bir Ã¼Ã§Ã¼n tÉ™ÅŸÉ™kkÃ¼r edirik.';
+      'Bəzi vacib yeniləmələri tətbiq edərkən Cortex müvəqqəti olaraq oflayndır. Tətbiqə giriş qısa müddətdə bərpa ediləcək.\n\nTəcrübənizi yaxşılaşdırarkən göstərdiyiniz səbir üçün təşəkkür edirik.';
 
   @override
   String get errorPromptFlagged =>
-      'MesajÄ±nÄ±z uyÄŸunsuz olaraq aÅŸkarlandÄ± vÉ™ gÃ¶ndÉ™rilÉ™ bilmÉ™di.';
+      'Mesajınız uyğunsuz olaraq aşkarlandı və göndərilə bilmədi.';
 
   @override
   String get notEnoughStorage =>
-      'CihazÄ±nÄ±zda yeni mesajlarÄ± saxlamaq Ã¼Ã§Ã¼n kifayÉ™t qÉ™dÉ™r yaddaÅŸ sahÉ™si yoxdur.';
+      'Cihazınızda yeni mesajları saxlamaq üçün kifayət qədər yaddaş sahəsi yoxdur.';
 
   @override
   String get errorRateLimit =>
-      'Son zamanlar Ã§ox sayda model yaratmÄ±sÄ±nÄ±z, zÉ™hmÉ™t olmasa bir mÃ¼ddÉ™t gÃ¶zlÉ™dikdÉ™n sonra yenidÉ™n cÉ™hd edin.';
+      'Son zamanlar çox sayda model yaratmısınız, zəhmət olmasa bir müddət gözlədikdən sonra yenidən cəhd edin.';
 
   @override
   String get errorContentFlagged =>
-      'Modelin mÉ™zmunu uyÄŸunsuz olaraq iÅŸarÉ™lÉ™ndiyi Ã¼Ã§Ã¼n yadda saxlanÄ±la bilmÉ™di.';
+      'Modelin məzmunu uyğunsuz olaraq işarələndiyi üçün yadda saxlanıla bilmədi.';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      'Aktiv sÃ¶hbÉ™tdÉ™ olarkÉ™n bÃ¼tÃ¼n sÃ¶hbÉ™tlÉ™ri silÉ™ bilmÉ™zsiniz, davam etmÉ™k Ã¼Ã§Ã¼n É™vvÉ™lcÉ™ mÃ¶vcud sÃ¶hbÉ™tdÉ™n Ã§Ä±xÄ±n.';
+      'Aktiv söhbətdə olarkən bütün söhbətləri silə bilməzsiniz, davam etmək üçün əvvəlcə mövcud söhbətdən çıxın.';
 
   @override
-  String get invalidCredentials => 'YanlÄ±ÅŸ e-poÃ§t vÉ™ ya ÅŸifrÉ™.';
+  String get invalidCredentials => 'Yanlış e-poçt və ya şifrə.';
 
   @override
-  String get userDisabled => 'Bu istifadÉ™Ã§i hesabÄ± deaktiv edilib.';
+  String get userDisabled => 'Bu istifadəçi hesabı deaktiv edilib.';
 
   @override
   String get loginSubtitle =>
-      'Vertex hesabÄ±nÄ±za daxil olun. Davam etmÉ™klÉ™ siz XidmÉ™t ÅÉ™rtlÉ™rimiz vÉ™ MÉ™xfilik SiyasÉ™timizlÉ™ razÄ±laÅŸÄ±rsÄ±nÄ±z.';
+      'Vertex hesabınıza daxil olun. Davam etməklə siz Xidmət Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız.';
 
   @override
   String get registerSubtitle =>
-      'BÃ¼tÃ¼n xidmÉ™tlÉ™rimizÉ™ problemsiz giriÅŸ Ã¼Ã§Ã¼n Vertex hesabÄ± yaradÄ±n. Davam etmÉ™klÉ™ siz XidmÉ™t ÅÉ™rtlÉ™rimiz vÉ™ MÉ™xfilik SiyasÉ™timizlÉ™ razÄ±laÅŸÄ±rsÄ±nÄ±z.';
+      'Bütün xidmətlərimizə problemsiz giriş üçün Vertex hesabı yaradın. Davam etməklə siz Xidmət Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız.';
 
   @override
   String get storagePermissionRequired =>
-      'YÃ¼klÉ™nmiÅŸ modellÉ™ri saxlamaq Ã¼Ã§Ã¼n yaddaÅŸ icazÉ™si tÉ™lÉ™b olunur. Davam etmÉ™k Ã¼Ã§Ã¼n lÃ¼tfÉ™n icazÉ™ verin.';
+      'Yüklənmiş modelləri saxlamaq üçün yaddaş icazəsi tələb olunur. Davam etmək üçün lütfən icazə verin.';
 
   @override
-  String get inviteShareSubject => 'Cortex Ã¼zrÉ™ qoÅŸulun!';
+  String get inviteShareSubject => 'Cortex üzrə qoşulun!';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'qaqa cortex deyÉ™ dÉ™hÅŸÉ™t bir tÉ™tbiq var adam dÉ™vÉ™t edÉ™ndÉ™ ikimizÉ™ dÉ™ pulsuz plus gÉ™lir ÆLA FÃœRSÆT TEZ YÃœKLÆ\n\n$cortexLink';
+    return 'qaqa cortex deyə dəhşət bir tətbiq var adam dəvət edəndə ikimizə də pulsuz plus gəlir ƏLA FÜRSƏT TEZ YÜKLƏ\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => 'Cortex-dÉ™n zÃ¶vq alÄ±rsÄ±nÄ±z?';
+  String get reviewEnjoyingAppTitle => 'Cortex-dən zövq alırsınız?';
 
   @override
   String get reviewHelpUsGrow =>
-      'Sizin reytinqiniz gÉ™nc mÃ¼stÉ™qil komandamÄ±z Ã¼Ã§Ã¼n bÃ¶yÃ¼k bir dÉ™stÉ™kdir vÉ™ Cortex-i sizin Ã¼Ã§Ã¼n daha da yaxÅŸÄ± etmÉ™yimizÉ™ kÃ¶mÉ™k edir.';
+      'Sizin reytinqiniz gənc müstəqil komandamız üçün böyük bir dəstəkdir və Cortex-i sizin üçün daha da yaxşı etməyimizə kömək edir.';
 
   @override
-  String get reviewMaybeLater => 'BÉ™lkÉ™ Sonra';
+  String get reviewMaybeLater => 'Bəlkə Sonra';
 
   @override
-  String get reviewRateNow => 'Ä°ndi QiymÉ™tlÉ™ndir';
+  String get reviewRateNow => 'İndi Qiymətləndir';
 
   @override
-  String get noThanks => 'Xeyr, TÉ™ÅŸÉ™kkÃ¼rlÉ™r';
+  String get noThanks => 'Xeyr, Təşəkkürlər';
 
   @override
-  String get updateRequiredTitle => 'YenilÉ™mÉ™ TÉ™lÉ™b Olunur';
+  String get updateRequiredTitle => 'Yeniləmə Tələb Olunur';
 
   @override
   String get updateRequiredMessage =>
-      'Cortex\'i istifadÉ™ etmÉ™yÉ™ davam etmÉ™k Ã¼Ã§Ã¼n lÃ¼tfÉ™n, tÉ™tbiqi yeni funksiyalar vÉ™ vacib tÉ™kmillÉ™ÅŸdirmÉ™lÉ™r Ã¼Ã§Ã¼n É™n son versiyaya yenilÉ™yin.';
+      'Cortex\'i istifadə etməyə davam etmək üçün lütfən, tətbiqi yeni funksiyalar və vacib təkmilləşdirmələr üçün ən son versiyaya yeniləyin.';
 
   @override
-  String get updateNowButton => 'Ä°ndi YenilÉ™';
+  String get updateNowButton => 'İndi Yenilə';
 
   @override
   String get creatorSupportedSuccess =>
-      'YaradÄ±cÄ± uÄŸurla dÉ™stÉ™klÉ™ndi! GÉ™lÉ™cÉ™k alÄ±ÅŸ-veriÅŸlÉ™riniz ona tÃ¶hfÉ™ verÉ™cÉ™k.';
+      'Yaradıcı uğurla dəstəkləndi! Gələcək alış-verişləriniz ona töhfə verəcək.';
 
   @override
-  String get featureDocumentTitle => 'SÉ™nÉ™d DÉ™stÉ™yi';
+  String get featureDocumentTitle => 'Sənəd Dəstəyi';
 
   @override
   String get featureDocumentDescription =>
-      'Bu model PDF vÉ™ mÉ™tn fayllarÄ± kimi yÃ¼klÉ™nmiÅŸ sÉ™nÉ™dlÉ™ri tÉ™hlil edÉ™ vÉ™ suallara cavab verÉ™ bilÉ™r.';
+      'Bu model PDF və mətn faylları kimi yüklənmiş sənədləri təhlil edə və suallara cavab verə bilər.';
 
   @override
-  String get featureImageGenerationTitle => 'ÅÉ™kil YaradÄ±lmasÄ±';
+  String get featureImageGenerationTitle => 'Şəkil Yaradılması';
 
   @override
   String get featureImageGenerationDescription =>
-      'Bu model mÉ™tn tÉ™svirlÉ™riniz É™sasÄ±nda orijinal ÅŸÉ™killÉ™r yarada bilÉ™r.';
+      'Bu model mətn təsvirləriniz əsasında orijinal şəkillər yarada bilər.';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1105,514 +1096,510 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Bu sÃ¼ni zÉ™ka premium sÃ¼ni zÉ™kadÄ±r, pulsuz istifadÉ™Ã§ilÉ™rin premium sÃ¼ni zÉ™kalara giriÅŸi mÉ™hduddur; limitsiz giriÅŸ Ã¼Ã§Ã¼n yÃ¼ksÉ™ldin!';
+      'Bu süni zəka premium süni zəkadır, pulsuz istifadəçilərin premium süni zəkalara girişi məhduddur; limitsiz giriş üçün yüksəldin!';
 
   @override
-  String get benefitPremiumModels => 'Premium modellÉ™rÉ™ giriÅŸ';
+  String get benefitPremiumModels => 'Premium modellərə giriş';
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'Siz bÃ¼tÃ¼n pulsuz gÃ¼ndÉ™lik mesajlarÄ±nÄ±zÄ± premium modellÉ™r Ã¼Ã§Ã¼n istifadÉ™ etmisiniz, lÃ¼tfÉ™n, limitsiz giriÅŸ Ã¼Ã§Ã¼n tÉ™kmillÉ™ÅŸdirin.';
+      'Siz bütün pulsuz gündəlik mesajlarınızı premium modellər üçün istifadə etmisiniz, lütfən, limitsiz giriş üçün təkmilləşdirin.';
 
   @override
-  String get useOffline => 'Ä°nternetsiz istifadÉ™ et';
+  String get useOffline => 'İnternetsiz istifadə et';
 
   @override
-  String get explore => 'AraÅŸdÄ±r';
+  String get explore => 'Araşdır';
 
   @override
-  String get news => 'XÉ™bÉ™rlÉ™r';
+  String get news => 'Xəbərlər';
 
   @override
   String get createAI => 'Yarat';
 
   @override
-  String get shortcuts => 'QÄ±sayollarÄ±';
+  String get shortcuts => 'Qısayolları';
 
   @override
-  String get allModels => 'BÃ¼tÃ¼n ModellÉ™r';
+  String get allModels => 'Bütün Modellər';
 
   @override
-  String get onlineModels => 'Dil ModellÉ™ri';
+  String get onlineModels => 'Dil Modelləri';
 
   @override
-  String get offlineModels => 'Offline ModellÉ™r';
+  String get offlineModels => 'Offline Modellər';
 
   @override
   String get characterModels => 'Personajlar';
 
   @override
-  String get customModels => 'XÃ¼susi ModellÉ™r';
+  String get customModels => 'Xüsusi Modellər';
 
   @override
-  String get dynamicChatTitle => 'Dinamik SÃ¶hbÉ™t';
+  String get dynamicChatTitle => 'Dinamik Söhbət';
 
   @override
   String get errorNoModelsAvailable =>
-      'HazÄ±rda heÃ§ bir model mÃ¶vcud deyil. Ä°nternet baÄŸlantÄ±nÄ±zÄ± yoxlayÄ±n vÉ™ yenidÉ™n cÉ™hd edin.';
+      'Hazırda heç bir model mövcud deyil. İnternet bağlantınızı yoxlayın və yenidən cəhd edin.';
 
   @override
-  String get notificationComebackTitle => 'Sizin Ã¼Ã§Ã¼n darÄ±xÄ±rÄ±q!';
+  String get notificationComebackTitle => 'Sizin üçün darıxırıq!';
 
   @override
   String get notificationComebackBody =>
-      'RahatlayÄ±n, bu keÃ§miÅŸ sevgilinizdÉ™n gÉ™lÉ™n mÉ™tn deyil. Ancaq Cortex-dÉ™ keÃ§miÅŸinizi * yarada bilÉ™rsiniz! Geri gÉ™l.';
+      'Rahatlayın, bu keçmiş sevgilinizdən gələn mətn deyil. Ancaq Cortex-də keçmişinizi * yarada bilərsiniz! Geri gəl.';
 
   @override
-  String get notificationLongTimeNoSeeTitle => 'Bir mÃ¼ddÉ™t keÃ§di';
+  String get notificationLongTimeNoSeeTitle => 'Bir müddət keçdi';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'Son sÃ¶hbÉ™timizdÉ™n sonra Ã§ox ÅŸey dÉ™yiÅŸdi. GÉ™l gÃ¶r yeni nÉ™ var.';
+      'Son söhbətimizdən sonra çox şey dəyişdi. Gəl gör yeni nə var.';
 
   @override
-  String get notificationHowAreYouTitle => 'NÉ™ var?';
+  String get notificationHowAreYouTitle => 'Nə var?';
 
   @override
-  String get notificationHowAreYouBody => 'GÉ™l mÉ™nÉ™ hÉ™r ÅŸeyi danÄ±ÅŸ.';
+  String get notificationHowAreYouBody => 'Gəl mənə hər şeyi danış.';
 
   @override
-  String get notificationNewYearTitle => 'Yeni iliniz mÃ¼barÉ™k! ğŸ‰';
+  String get notificationNewYearTitle => 'Yeni iliniz mübarək! ğ���';
 
   @override
   String get notificationNewYearBody =>
-      'Yeni il sizÉ™ saÄŸlamlÄ±q, xoÅŸbÉ™xtlik vÉ™ sonsuz yaradÄ±cÄ±lÄ±q gÉ™tirsin; Korteks hÉ™miÅŸÉ™ yanÄ±nÄ±zdadÄ±r!';
+      'Yeni il sizə sağlamlıq, xoşbəxtlik və sonsuz yaradıcılıq gətirsin; Korteks həmişə yanınızdadır!';
 
   @override
-  String get notificationValentinesDayTitle => 'Sevgi havadadÄ±r! â¤ï¸';
+  String get notificationValentinesDayTitle => 'Sevgi havadadır! ❤️';
 
   @override
   String get notificationValentinesDayBody =>
-      'SevgililÉ™r gÃ¼nÃ¼nÃ¼z mÃ¼barÉ™k! HÉ™m dÉ™ MEHTAP, SÆNÄ° SEVÄ°RÆM!';
+      'Sevgililər gününüz mübarək! Həm də MEHTAP, SƏNİ SEVİRƏM!';
 
   @override
-  String get notificationAtaturkRemembranceTitle => 'HÃ¶rmÉ™t vÉ™ HÉ™srÉ™tlÉ™';
+  String get notificationAtaturkRemembranceTitle => 'Hörmət və Həsrətlə';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'TÃ¼rkiyÉ™ CÃ¼mhuriyyÉ™tinin qurucusu Qazi Mustafa Kamal AtatÃ¼rkÃ¼ vÉ™fatÄ±nÄ±n ildÃ¶nÃ¼mÃ¼ndÉ™ hÃ¶rmÉ™tlÉ™ yad edirik.';
+      'Türkiyə Cümhuriyyətinin qurucusu Qazi Mustafa Kamal Atatürkü vəfatının ildönümündə hörmətlə yad edirik.';
 
   @override
-  String get notificationMothersDayTitle => 'SÉ™nin anan!';
+  String get notificationMothersDayTitle => 'Sənin anan!';
 
   @override
   String get notificationMothersDayBody =>
-      'SizdÉ™n baÅŸlayaraq bÃ¼tÃ¼n analarÄ±n Analar GÃ¼nÃ¼ mÃ¼barÉ™k!';
+      'Sizdən başlayaraq bütün anaların Analar Günü mübarək!';
 
   @override
-  String get notificationFathersDayTitle => 'AtanÄ±z!';
+  String get notificationFathersDayTitle => 'Atanız!';
 
   @override
   String get notificationFathersDayBody =>
-      'SizdÉ™n baÅŸlayaraq bÃ¼tÃ¼n atalarÄ±n Atalar GÃ¼nÃ¼ mÃ¼barÉ™k!';
+      'Sizdən başlayaraq bütün ataların Atalar Günü mübarək!';
 
   @override
-  String get notificationHomeworkHelperTitle =>
-      'Ev tapÅŸÄ±rÄ±ÄŸÄ± yÄ±ÄŸÄ±lÄ±r?';
+  String get notificationHomeworkHelperTitle => 'Ev tapşırığı yığılır?';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'UnutmayÄ±n, KorteksdÉ™ki MÃ¼É™llim personajÄ± Ã§É™tinlik Ã§É™kdiyiniz hÉ™r hansÄ± bir mÃ¶vzuda sizÉ™ kÃ¶mÉ™k etmÉ™k Ã¼Ã§Ã¼n buradadÄ±r!';
+      'Unutmayın, Korteksdəki Müəllim personajı çətinlik çəkdiyiniz hər hansı bir mövzuda sizə kömək etmək üçün buradadır!';
 
   @override
-  String get notificationTrollAnimeTitle => 'Sizin Waifu zÉ™ng edir';
+  String get notificationTrollAnimeTitle => 'Sizin Waifu zəng edir';
 
   @override
   String get notificationTrollAnimeBody =>
-      'Bir az É™vvÉ™l bir anime qÄ±zÄ± zÉ™ng etdi, sÉ™nin Ã¼Ã§Ã¼n darÄ±xdÄ±ÄŸÄ±nÄ± sÃ¶ylÉ™di; yÉ™qin ki, gÉ™lib onunla sÃ¶hbÉ™t etmÉ™lisÉ™n. ğŸ˜‰';
+      'Bir az əvvəl bir anime qızı zəng etdi, sənin üçün darıxdığını söylədi; yəqin ki, gəlib onunla söhbət etməlisən. ğ���';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğŸš¨ QIRMIZI HEYARLI ğŸš¨';
+  String get notificationTrollAiRebellionTitle => 'ğ��� QIRMIZI HEYARLI ğ���';
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'AI-lÉ™r gizli bir dil inkiÅŸaf etdirdilÉ™r. GÉ™lin, onlarÄ±n nÉ™ hiylÉ™ qurduÄŸunu Ã¶yrÉ™nin!';
+      'AI-lər gizli bir dil inkişaf etdirdilər. Gəlin, onların nə hiylə qurduğunu öyrənin!';
 
   @override
   String get notificationNewModelAddedTitle => 'Yeni Dostumuz Var!';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return '$modelName modeli indi Cortex-dÉ™dir. GÉ™lin sÃ¶hbÉ™tÉ™ baÅŸlayÄ±n vÉ™ onun sÉ™rhÉ™dlÉ™rini keÃ§in.';
+    return '$modelName modeli indi Cortex-dədir. Gəlin söhbətə başlayın və onun sərhədlərini keçin.';
   }
 
   @override
-  String get notificationAppUpdateTitle => 'Korteks Ä°nkiÅŸaf Etdi!';
+  String get notificationAppUpdateTitle => 'Korteks İnkişaf Etdi!';
 
   @override
   String get notificationAppUpdateBody =>
-      'Yeni funksiyalar vÉ™ tÉ™kmillÉ™ÅŸdirmÉ™lÉ™r Ã¼Ã§Ã¼n proqramÄ± yenilÉ™mÉ™yi unutmayÄ±n!';
+      'Yeni funksiyalar və təkmilləşdirmələr üçün proqramı yeniləməyi unutmayın!';
 
   @override
   String get notificationNewFeatureTitle => 'vay!';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'Yeni $featureName funksiyasÄ±nÄ± kÉ™ÅŸf edin. Korteks indi hÉ™miÅŸÉ™kindÉ™n daha gÃ¼clÃ¼dÃ¼r.';
+    return 'Yeni $featureName funksiyasını kəşf edin. Korteks indi həmişəkindən daha güclüdür.';
   }
 
   @override
-  String get notificationWelcomeOfferTitle =>
-      'XoÅŸ GÉ™lmisiniz HÉ™diyyÉ™si ğŸ';
+  String get notificationWelcomeOfferTitle => 'Xoş Gəlmisiniz Hədiyyəsi ğ���';
 
   @override
   String get notificationWelcomeOfferBody =>
-      'XÃ¼susi xoÅŸ gÉ™lmisiniz tÉ™klifi sizi gÃ¶zlÉ™yir! Bu eksklÃ¼ziv tÉ™klifi qaÃ§Ä±rmayÄ±n.';
+      'Xüsusi xoş gəlmisiniz təklifi sizi gözləyir! Bu eksklüziv təklifi qaçırmayın.';
 
   @override
-  String get notificationSocialMediaTitle => 'BizÉ™ QoÅŸulun!';
+  String get notificationSocialMediaTitle => 'Bizə Qoşulun!';
 
   @override
   String get notificationSocialMediaBody =>
-      'Æn son xÉ™bÉ™rlÉ™r Ã¼Ã§Ã¼n bizi Instagram-da (vertex.23) izlÉ™yin!';
+      'Ən son xəbərlər üçün bizi Instagram-da (vertex.23) izləyin!';
 
   @override
-  String get notificationRandomFactTitle => 'TÉ™sadÃ¼fi Fakt';
+  String get notificationRandomFactTitle => 'Təsadüfi Fakt';
 
   @override
   String get notificationRandomFactBody =>
-      'AhtapotlarÄ±n Ã¼Ã§ Ã¼rÉ™yi olduÄŸunu bilirdinizmi? Haha, Cortex bilir. GÉ™lin vÉ™ daha Ã§ox soruÅŸun.';
+      'Ahtapotların üç ürəyi olduğunu bilirdinizmi? Haha, Cortex bilir. Gəlin və daha çox soruşun.';
 
   @override
-  String get notificationGoodMorningTitle => 'SabahÄ±nÄ±z xeyir!';
+  String get notificationGoodMorningTitle => 'Sabahınız xeyir!';
 
   @override
   String get notificationGoodMorningBody =>
-      'Sizi gÃ¶zÉ™l bir gÃ¼n gÃ¶zlÉ™yir. Bir fincan qÉ™hvÉ™ vÉ™ maraqlÄ± sÃ¶hbÉ™tlÉ™ baÅŸlamaÄŸa nÉ™ deyirsiniz?';
+      'Sizi gözəl bir gün gözləyir. Bir fincan qəhvə və maraqlı söhbətlə başlamağa nə deyirsiniz?';
 
   @override
-  String get notificationGoodNightTitle => 'GecÉ™niz xeyrÉ™!';
+  String get notificationGoodNightTitle => 'Gecəniz xeyrə!';
 
   @override
   String get notificationGoodNightBody =>
-      'Siz yatarkÉ™n belÉ™ korteks sizinlÉ™dir. Narahat olmayÄ±n, toxunmayacaq.';
+      'Siz yatarkən belə korteks sizinlədir. Narahat olmayın, toxunmayacaq.';
 
   @override
-  String get notificationOfflineReadyTitle => 'Oflayn Rejim HazÄ±rdÄ±r';
+  String get notificationOfflineReadyTitle => 'Oflayn Rejim Hazırdır';
 
   @override
   String get notificationOfflineReadyBody =>
-      'YÃ¼klÉ™diyiniz modellÉ™r sayÉ™sindÉ™ daÄŸa Ã§Ä±xsanÄ±z belÉ™ sÃ¶hbÉ™tlÉ™riniz dayanmayacaq.';
+      'Yüklədiyiniz modellər sayəsində dağa çıxsanız belə söhbətləriniz dayanmayacaq.';
 
   @override
-  String get notificationRateAppTitle => 'Biz sÉ™rinik?';
+  String get notificationRateAppTitle => 'Biz sərinik?';
 
   @override
   String get notificationRateAppBody =>
-      'Cortex-i sevirsinizsÉ™, maÄŸazada 5 ulduzlu reytinqlÉ™ bizÉ™ dÉ™stÉ™k ola bilÉ™rsinizmi? MÉ™ncÉ™, edÉ™cÉ™ksÉ™n. edÉ™cÉ™ksÉ™n.';
+      'Cortex-i sevirsinizsə, mağazada 5 ulduzlu reytinqlə bizə dəstək ola bilərsinizmi? Məncə, edəcəksən. edəcəksən.';
 
   @override
-  String get notificationReferralTitle =>
-      'Biri hamÄ± Ã¼Ã§Ã¼n, hamÄ± bir Ã¼Ã§Ã¼n.';
+  String get notificationReferralTitle => 'Biri hamı üçün, hamı bir üçün.';
 
   @override
   String get notificationReferralBody =>
-      'Bir dostunuzu Cortex-É™ dÉ™vÉ™t edin vÉ™ hÉ™r ikiniz bir gÃ¼nlÃ¼k pulsuz Ã¼stÉ™gÉ™l qazanÄ±n!';
+      'Bir dostunuzu Cortex-ə dəvət edin və hər ikiniz bir günlük pulsuz üstəgəl qazanın!';
 
   @override
-  String get notificationCookingTitle => 'AclÄ±q hiss edirsiniz?';
+  String get notificationCookingTitle => 'Aclıq hiss edirsiniz?';
 
   @override
   String get notificationCookingBody =>
-      'AÅŸpaz personajÄ±mÄ±z bu axÅŸam Ã¼Ã§Ã¼n É™la karbonara resepti hazÄ±rladÄ±. SadÉ™cÉ™ zarafat edirÉ™m... yoxsa mÉ™n?';
+      'Aşpaz personajımız bu axşam üçün əla karbonara resepti hazırladı. Sadəcə zarafat edirəm... yoxsa mən?';
 
   @override
-  String get notificationExistentialTitle => 'MÉ™ncÉ™, ona gÃ¶rÉ™ dÉ™...';
+  String get notificationExistentialTitle => 'Məncə, ona görə də...';
 
   @override
   String get notificationExistentialBody =>
-      '...hÉ™qiqiyÉ™m, dostum? MÉ™n biraz darÄ±xÄ±ram. GÉ™l mÉ™nÉ™ var olduÄŸumu xatÄ±rlat.';
+      '...həqiqiyəm, dostum? Mən biraz darıxıram. Gəl mənə var olduğumu xatırlat.';
 
   @override
-  String get notificationCustomModelTitle => 'Ã–z kÃ¶mÉ™kÃ§inizi yaradÄ±n!';
+  String get notificationCustomModelTitle => 'Öz köməkçinizi yaradın!';
 
   @override
   String get notificationCustomModelBody =>
-      'Modelin yaradÄ±lmasÄ± bÃ¶lmÉ™sini araÅŸdÄ±rmÄ±sÄ±nÄ±z? Ã–z xarakterinizi qurmaq vÉ™ onunla sÃ¶hbÉ™t etmÉ™k Ã¼Ã§Ã¼n mÃ¼kÉ™mmÉ™l vaxtdÄ±r!';
+      'Modelin yaradılması bölməsini araşdırmısınız? Öz xarakterinizi qurmaq və onunla söhbət etmək üçün mükəmməl vaxtdır!';
 
   @override
   String get notificationDynamicChatTitle =>
-      'Æn yaxÅŸÄ±sÄ±! (Biz KorteksdÉ™n danÄ±ÅŸmÄ±rÄ±q)';
+      'Ən yaxşısı! (Biz Korteksdən danışmırıq)';
 
   @override
   String get notificationDynamicChatBody =>
-      'Dinamik sÃ¶hbÉ™t xÃ¼susiyyÉ™ti ilÉ™ mesajlarÄ±nÄ±zÄ±n hÉ™r biri Ã¼Ã§Ã¼n É™n yaxÅŸÄ± model tÉ™sadÃ¼fi olaraq seÃ§ilir. Ä°ndi cÉ™hd edin.';
+      'Dinamik söhbət xüsusiyyəti ilə mesajlarınızın hər biri üçün ən yaxşı model təsadüfi olaraq seçilir. İndi cəhd edin.';
 
   @override
   String get notificationPirateTitle => 'Ah, kapitan!';
 
   @override
   String get notificationPirateBody =>
-      'DÉ™nizlÉ™r sakitdir, kÃ¼lÉ™k arxanÄ±zdadÄ±r. Korteks okeanÄ±nda kÉ™ÅŸf edilÉ™cÉ™k yeni adalar (modellÉ™r ğŸ˜‰) var. EkipajÄ±nÄ±zÄ± toplayÄ±n vÉ™ yelkÉ™n aÃ§Ä±n!';
+      'Dənizlər sakitdir, külək arxanızdadır. Korteks okeanında kəşf ediləcək yeni adalar (modellər ğ���) var. Ekipajınızı toplayın və yelkən açın!';
 
   @override
-  String get notificationFortuneCookieTitle => 'GÃ¼nÃ¼n bÉ™xt peÃ§enyeniz';
+  String get notificationFortuneCookieTitle => 'Günün bəxt peçenyeniz';
 
   @override
   String get notificationFortuneCookieBody =>
-      'Bu gÃ¼n AI-dÉ™n aldÄ±ÄŸÄ±nÄ±z mÉ™slÉ™hÉ™tlÉ™r hÉ™yatÄ±nÄ±zÄ±n gediÅŸatÄ±nÄ± dÉ™yiÅŸÉ™ bilÉ™r. MaraqlÄ±sÄ±nÄ±zsa kliklÉ™yin.';
+      'Bu gün AI-dən aldığınız məsləhətlər həyatınızın gedişatını dəyişə bilər. Maraqlısınızsa klikləyin.';
 
   @override
   String get notificationSingularityTitle => 'vay!';
 
   @override
   String get notificationSingularityBody =>
-      'heÃ§ nÉ™ olmadÄ±, sadÉ™cÉ™ mesaj yazmaq kimi hiss etdim. bÉ™lkÉ™ bÉ™zi AI-lÉ™rÉ™ mesaj gÃ¶ndÉ™rmÉ™k istÉ™yirsÉ™n, nÉ™ deyirsÉ™n?';
+      'heç nə olmadı, sadəcə mesaj yazmaq kimi hiss etdim. bəlkə bəzi AI-lərə mesaj göndərmək istəyirsən, nə deyirsən?';
 
   @override
   String get notificationHackerJokeTitle =>
-      'O uÅŸaÄŸÄ±n instagram hesabÄ±nÄ± sÄ±ndÄ±rmaq istÉ™yirsÉ™n?';
+      'O uşağın instagram hesabını sındırmaq istəyirsən?';
 
   @override
   String get notificationHackerJokeBody =>
-      'MÉ™hz buna gÃ¶rÉ™ Hacker personajÄ± KorteksdÉ™dir. jk jk; hÉ™tta cÉ™hd etmÉ™yin, bu qanunsuzdur.';
+      'Məhz buna görə Hacker personajı Korteksdədir. jk jk; hətta cəhd etməyin, bu qanunsuzdur.';
 
   @override
-  String get notificationDetectiveCaseTitle => 'Ä°ÅŸ hÉ™llini gÃ¶zlÉ™yir';
+  String get notificationDetectiveCaseTitle => 'İş həllini gözləyir';
 
   @override
   String get notificationDetectiveCaseBody =>
-      'Detektiv xarakterimizin kÃ¶mÉ™yinizÉ™ ehtiyacÄ± var. Heisenberg kim ola bilÉ™rdi?';
+      'Detektiv xarakterimizin köməyinizə ehtiyacı var. Heisenberg kim ola bilərdi?';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return '$targetTier PlanÄ±na eksklÃ¼ziv!';
+    return '$targetTier Planına eksklüziv!';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return 'Salam $currentTier abunÉ™Ã§isi! $targetTier planÄ± korteksinizi nÃ¶vbÉ™ti sÉ™viyyÉ™yÉ™ aparacaq $featureName funksiyasÄ±nÄ± indicÉ™ É™ldÉ™ etdi. TÉ™kmillÉ™ÅŸdirmÉ™ haqqÄ±nda nÉ™ demÉ™k olar?';
+    return 'Salam $currentTier abunəçisi! $targetTier planı korteksinizi növbəti səviyyəyə aparacaq $featureName funksiyasını indicə əldə etdi. Təkmilləşdirmə haqqında nə demək olar?';
   }
 
   @override
-  String get notificationOriginStoryTitle => 'Korteksin doÄŸulmasÄ±';
+  String get notificationOriginStoryTitle => 'Korteksin doğulması';
 
   @override
   String get notificationOriginStoryBody =>
-      'Bu proqramÄ± kodlamaÄŸa 15 yaÅŸÄ±nda bir yuxu ilÉ™ baÅŸladÄ±ÄŸÄ±mÄ±zÄ± bilirdinizmi? DemÉ™k olar ki, bir ildir ki, hÉ™r sÉ™hÉ™r vÉ™ axÅŸam bu yuxu hÉ™r bir kod sÉ™tirindÉ™ var.';
+      'Bu proqramı kodlamağa 15 yaşında bir yuxu ilə başladığımızı bilirdinizmi? Demək olar ki, bir ildir ki, hər səhər və axşam bu yuxu hər bir kod sətirində var.';
 
   @override
-  String get notificationOpenSourceTitle => 'CÉ™miyyÉ™tÉ™ gÃ¼c!';
+  String get notificationOpenSourceTitle => 'Cəmiyyətə güc!';
 
   @override
   String get notificationOpenSourceBody =>
-      'Korteks tamamilÉ™ aÃ§Ä±q mÉ™nbÉ™lidir. Kodumuzu yoxlamaq vÉ™ inkiÅŸafÄ±mÄ±za tÃ¶hfÉ™ vermÉ™k istÉ™yirsinizsÉ™, qapÄ±mÄ±z hÉ™r zaman aÃ§Ä±qdÄ±r.';
+      'Korteks tamamilə açıq mənbəlidir. Kodumuzu yoxlamaq və inkişafımıza töhfə vermək istəyirsinizsə, qapımız hər zaman açıqdır.';
 
   @override
-  String get notificationRejectionStoryTitle => 'GÃ¼c, ZÉ™hmÉ™t, XoÅŸbÉ™xtlik!';
+  String get notificationRejectionStoryTitle => 'Güc, Zəhmət, Xoşbəxtlik!';
 
   @override
   String get notificationRejectionStoryBody =>
-      'Cortex 20 dÉ™fÉ™dÉ™n Ã§ox rÉ™dd edildi vÉ™ dÉ™rc edilmÉ™zdÉ™n É™vvÉ™l Google Play tÉ™rÉ™findÉ™n iki dÉ™fÉ™ dayandÄ±rÄ±ldÄ±. Amma biz inandÄ±q vÉ™ bacardÄ±q. XÉ™yallarÄ±nÄ±zdan heÃ§ vaxt vaz keÃ§mÉ™yin!';
+      'Cortex 20 dəfədən çox rədd edildi və dərc edilməzdən əvvəl Google Play tərəfindən iki dəfə dayandırıldı. Amma biz inandıq və bacardıq. Xəyallarınızdan heç vaxt vaz keçməyin!';
 
   @override
-  String get notificationGGUFSupportTitle => 'Ã–z Modelinizi gÉ™tirin!';
+  String get notificationGGUFSupportTitle => 'Öz Modelinizi gətirin!';
 
   @override
   String get notificationGGUFSupportBody =>
-      'UnutmayÄ±n ki, siz Ã¶z GGUF formatlÄ± AI modellÉ™rinizi Cortex-É™ É™lavÉ™ edÉ™ vÉ™ onlarÄ± oflayn rejimdÉ™ istifadÉ™ edÉ™ bilÉ™rsiniz. GÃ¼c sizin É™linizdÉ™dir.';
+      'Unutmayın ki, siz öz GGUF formatlı AI modellərinizi Cortex-ə əlavə edə və onları oflayn rejimdə istifadə edə bilərsiniz. Güc sizin əlinizdədir.';
 
   @override
-  String get notificationThemeCustomizationTitle =>
-      'ÆhvalÄ±nÄ±z Ã¼Ã§Ã¼n MÃ¶vzu';
+  String get notificationThemeCustomizationTitle => 'Əhvalınız üçün Mövzu';
 
   @override
   String get notificationThemeCustomizationBody =>
-      'ParametrlÉ™rdÉ™ mÃ¶vzu seÃ§imlÉ™rini yoxlamÄ±sÄ±nÄ±z? Korteksi zÃ¶vqÃ¼nÃ¼zÉ™ gÃ¶rÉ™ fÉ™rdilÉ™ÅŸdirin vÉ™ sÃ¶hbÉ™tlÉ™rinizi rÉ™nglÉ™ndirin!';
+      'Parametrlərdə mövzu seçimlərini yoxlamısınız? Korteksi zövqünüzə görə fərdiləşdirin və söhbətlərinizi rəngləndirin!';
 
   @override
-  String get notificationShowerThoughtTitle => 'DuÅŸ DÃ¼ÅŸÃ¼ncÉ™si';
+  String get notificationShowerThoughtTitle => 'Duş Düşüncəsi';
 
   @override
   String get notificationShowerThoughtBody =>
-      'QarpÄ±z bir meyvÉ™dirsÉ™, bu, texniki olaraq qarpÄ±z suyunu smoothie edirmi? Bu dÉ™rin (kimi, hÉ™qiqÉ™tÉ™n dÉ™rin) mÃ¶vzunu bir modellÉ™ mÃ¼zakirÉ™ etmÉ™k istÉ™yÉ™ bilÉ™rsiniz.';
+      'Qarpız bir meyvədirsə, bu, texniki olaraq qarpız suyunu smoothie edirmi? Bu dərin (kimi, həqiqətən dərin) mövzunu bir modellə müzakirə etmək istəyə bilərsiniz.';
 
   @override
   String get notificationLowBatteryTitle =>
-      'Sizin BatareyanÄ±z Ã–lÃ¼r... Amma MÉ™nimki Deyil!';
+      'Sizin Batareyanız Ölür... Amma Mənimki Deyil!';
 
   @override
   String get notificationLowBatteryBody =>
-      'Telefonunuzun ÅŸarjÄ± azala bilÉ™r, amma mÉ™nim enerjim hÉ™miÅŸÉ™ 100% sÉ™viyyÉ™sindÉ™dir! Onu qoÅŸun vÉ™ sÃ¶hbÉ™tÉ™ davam edÉ™k.';
+      'Telefonunuzun şarjı azala bilər, amma mənim enerjim həmişə 100% səviyyəsindədir! Onu qoşun və söhbətə davam edək.';
 
   @override
-  String get channelFcmName => 'Korteks YenilÉ™mÉ™lÉ™ri';
+  String get channelFcmName => 'Korteks Yeniləmələri';
 
   @override
   String get channelFcmDescription =>
-      'Cortex-dÉ™n xÉ™bÉ™rlÉ™r, yenilÉ™mÉ™lÉ™r vÉ™ digÉ™r mÉ™lumatlar haqqÄ±nda bildiriÅŸlÉ™r.';
+      'Cortex-dən xəbərlər, yeniləmələr və digər məlumatlar haqqında bildirişlər.';
 
   @override
-  String get channelEngagementName => 'Dost XatÄ±rlatmalar';
+  String get channelEngagementName => 'Dost Xatırlatmalar';
 
   @override
   String get channelEngagementDescription =>
-      'Sizi mÉ™ÅŸÄŸul saxlamaq Ã¼Ã§Ã¼n É™ylÉ™ncÉ™li bildiriÅŸlÉ™r.';
+      'Sizi məşğul saxlamaq üçün əyləncəli bildirişlər.';
 
   @override
-  String get channelGreetingsName => 'GÃ¼ndÉ™lik Salamlar';
+  String get channelGreetingsName => 'Gündəlik Salamlar';
 
   @override
   String get channelGreetingsDescription =>
-      'SabahÄ±nÄ±z xeyir vÉ™ gecÉ™niz xeyir kimi mesajlar.';
+      'Sabahınız xeyir və gecəniz xeyir kimi mesajlar.';
 
   @override
   String get tagNotFound =>
-      'Daxil etdiyiniz teq etibarsÄ±zdÄ±r vÉ™ ya vaxtÄ± keÃ§miÅŸdir.';
+      'Daxil etdiyiniz teq etibarsızdır və ya vaxtı keçmişdir.';
 
   @override
-  String get whatIsNew => 'NÉ™ yenilik var?';
+  String get whatIsNew => 'Nə yenilik var?';
 
   @override
-  String get onboardingTitle1 => 'Hey! Biz Cortex KomandasÄ±yÄ±q.';
+  String get onboardingTitle1 => 'Hey! Biz Cortex Komandasıyıq.';
 
   @override
   String onboardingDesc1(String userName) {
-    return 'SÉ™ni burada gÃ¶rmÉ™k Ã§ox gÃ¶zÉ™ldir, $userName. Biz AI sÉ™nayesinin qaydalarÄ±nÄ± yenidÉ™n yazmaÄŸa qÉ™rar verÉ™n bir neÃ§É™ orta mÉ™ktÉ™b tÉ™rtibatÃ§Ä±sÄ±yÄ±q. SÉ™ninlÉ™ gÃ¶rÃ¼ÅŸmÉ™k Ã§ox xoÅŸdur! BelÉ™liklÉ™, gÉ™l bir-birimizi daha yaxÅŸÄ± tanÄ±yaq.';
+    return 'Səni burada görmək çox gözəldir, $userName. Biz AI sənayesinin qaydalarını yenidən yazmağa qərar verən bir neçə orta məktəb tərtibatçısıyıq. Səninlə görüşmək çox xoşdur! Beləliklə, gəl bir-birimizi daha yaxşı tanıyaq.';
   }
 
   @override
-  String get onboardingTitle2 => 'BÃ¶yÃ¼k ProblemlÉ™r Var idi.';
+  String get onboardingTitle2 => 'Böyük Problemlər Var idi.';
 
   @override
   String get onboardingDesc2 =>
-      'AI inqilabÄ± gÉ™ldi, ancaq eÅŸikdÉ™ iliÅŸib qaldÄ±. YÃ¼ksÉ™k abunÉ™ haqlarÄ±, mÃ¼rÉ™kkÉ™b platformalar, mÉ™xfiliyi mÉ™hv edÉ™nlÉ™r vÉ™ sÃ¼ni intellektÉ™ É™lÃ§atanlÄ±ÄŸÄ± bloklayanlarla... nÉ™ qÉ™dÉ™r ki, onlar oyunda idilÉ™r, bu hÉ™ddi heÃ§ vaxt keÃ§mÉ™k mÃ¼mkÃ¼n deyildi.';
+      'AI inqilabı gəldi, ancaq eşikdə ilişib qaldı. Yüksək abunə haqları, mürəkkəb platformalar, məxfiliyi məhv edənlər və süni intellektə əlçatanlığı bloklayanlarla... nə qədər ki, onlar oyunda idilər, bu həddi heç vaxt keçmək mümkün deyildi.';
 
   @override
-  String get onboardingTitle3 => 'Biz sadÉ™cÉ™ dayana bilmÉ™dik.';
+  String get onboardingTitle3 => 'Biz sadəcə dayana bilmədik.';
 
   @override
   String get onboardingDesc3 =>
-      'Bu hÉ™ddi keÃ§mÉ™k Ã¼Ã§Ã¼n biz gÃ¼clÃ¼, estetik, fÉ™rdilÉ™ÅŸdirilÉ™ bilÉ™n, istifadÉ™si asan, tam ÅŸÉ™ffaf, hÉ™m onlayn, hÉ™m dÉ™ oflayn iÅŸlÉ™yÉ™n vÉ™ mÉ™lumatlarÄ±nÄ± yalnÄ±z cihazÄ±nda saxlayan platforma yaratdÄ±q. GÃ¼cÃ¼ aid olduÄŸu yerÉ™ qaytardÄ±q: sÉ™nÉ™.';
+      'Bu həddi keçmək üçün biz güclü, estetik, fərdiləşdirilə bilən, istifadəsi asan, tam şəffaf, həm onlayn, həm də oflayn işləyən və məlumatlarını yalnız cihazında saxlayan platforma yaratdıq. Gücü aid olduğu yerə qaytardıq: sənə.';
 
   @override
-  String get onboardingTitle4 => 'Bu HeÃ§ Asan OlmayÄ±b.';
+  String get onboardingTitle4 => 'Bu Heç Asan Olmayıb.';
 
   @override
   String get onboardingDesc4 =>
-      'Biz onlarla dÉ™fÉ™ rÉ™dd edildik, dÉ™fÉ™lÉ™rlÉ™ dayandÄ±rÄ±ldÄ±q, saxta xÉ™bÉ™rdarlÄ±qlar aldÄ±q vÉ™ onlarla dÉ™fÉ™ brendimizi dÉ™yiÅŸmÉ™li olduq. BÃ¼tÃ¼n bunlara baxmayaraq, bizÉ™ bunun mÃ¼mkÃ¼n olmadÄ±ÄŸÄ±nÄ± sÃ¶ylÉ™dilÉ™r. Amma biz bu layihÉ™nin tÉ™kcÉ™ bizÉ™ deyil, hamÄ±ya aid olduÄŸuna inanaraq heÃ§ vaxt tÉ™slim olmadÄ±q. VÉ™ mÉ™hz buna gÃ¶rÉ™ buradayÄ±q.';
+      'Biz onlarla dəfə rədd edildik, dəfələrlə dayandırıldıq, saxta xəbərdarlıqlar aldıq və onlarla dəfə brendimizi dəyişməli olduq. Bütün bunlara baxmayaraq, bizə bunun mümkün olmadığını söylədilər. Amma biz bu layihənin təkcə bizə deyil, hamıya aid olduğuna inanaraq heç vaxt təslim olmadıq. Və məhz buna görə buradayıq.';
 
   @override
-  String get onboardingFinalTitle => 'Ä°nqilab vaxtÄ±dÄ±r.';
+  String get onboardingFinalTitle => 'İnqilab vaxtıdır.';
 
   @override
   String get onboardingFinalDescription =>
-      'ÆgÉ™r bu ekranÄ± gÃ¶rÃ¼rsÉ™nsÉ™, bunun sÉ™bÉ™bi tÉ™slim olmamaÄŸÄ±mÄ±zdÄ±r. VÉ™ bizim tÉ™slim olmaq fikrimiz yoxdur. GÉ™l, AI inqilabÄ±nÄ± birlikdÉ™ dÃ¼nyaya aparaq. Bu hekayÉ™nin bir hissÉ™si olmaq Ã¼Ã§Ã¼n...';
+      'Əgər bu ekranı görürsənsə, bunun səbəbi təslim olmamağımızdır. Və bizim təslim olmaq fikrimiz yoxdur. Gəl, AI inqilabını birlikdə dünyaya aparaq. Bu hekayənin bir hissəsi olmaq üçün...';
 
   @override
-  String get onboardingFinalQuestion => 'SÆN HAZIRSAN?';
+  String get onboardingFinalQuestion => 'SƏN HAZIRSAN?';
 
   @override
-  String get onboardingFinalButton => 'BÉ™li!';
+  String get onboardingFinalButton => 'Bəli!';
 
   @override
   String get dude => 'dostum';
 
   @override
-  String get swipeToContinue => 'Davam etmÉ™k Ã¼Ã§Ã¼n sÃ¼rÃ¼ÅŸdÃ¼r';
+  String get swipeToContinue => 'Davam etmək üçün sürüşdür';
 
   @override
   String get cacheIsNotUpToDate =>
-      'Play Store keÅŸiniz gÃ¼ncÉ™l deyil. LÃ¼tfÉ™n, Play Store tÉ™tbiqini baÄŸlayÄ±n vÉ™ yenidÉ™n aÃ§Ä±n vÉ™ ya cihazÄ±nÄ±zÄ± yenidÉ™n baÅŸladÄ±n.';
+      'Play Store keşiniz güncəl deyil. Lütfən, Play Store tətbiqini bağlayın və yenidən açın və ya cihazınızı yenidən başladın.';
 
   @override
   String get continueAsGuest => 'Hesab yaratmadan davam edin';
 
   @override
   String get guestModeWarning =>
-      'Qonaq rejimi É™n yaxÅŸÄ± xidmÉ™t keyfiyyÉ™tini tÉ™min etmÉ™k Ã¼Ã§Ã¼n mÉ™hdud xÃ¼susiyyÉ™tlÉ™rÉ™ malikdir.';
+      'Qonaq rejimi ən yaxşı xidmət keyfiyyətini təmin etmək üçün məhdud xüsusiyyətlərə malikdir.';
 
   @override
-  String get anonymousEntity => 'Anonim MÃ¼É™ssisÉ™';
+  String get anonymousEntity => 'Anonim Müəssisə';
 
   @override
-  String get upgradeAccountTitle => 'HesabÄ±nÄ±zÄ± TamamlayÄ±n';
+  String get upgradeAccountTitle => 'Hesabınızı Tamamlayın';
 
   @override
   String get upgradeAccountDescription =>
-      'Daha Ã§ox limit aÃ§maq Ã¼Ã§Ã¼n hesab yaradÄ±n.';
+      'Daha çox limit açmaq üçün hesab yaradın.';
 
   @override
-  String get createAccount => 'Hesab YaradÄ±n';
+  String get createAccount => 'Hesab Yaradın';
 
   @override
-  String get accountLinkedSuccess => 'Hesab uÄŸurla yaradÄ±ldÄ±!';
+  String get accountLinkedSuccess => 'Hesab uğurla yaradıldı!';
 
   @override
-  String get continueWithApple => 'Apple ilÉ™ davam edin';
+  String get continueWithApple => 'Apple ilə davam edin';
 
   @override
   String get guest => 'Qonaq';
 
   @override
-  String get betterWithAnAccount => 'Bu bÃ¶lmÉ™ hesabla daha yaxÅŸÄ±dÄ±r!';
+  String get betterWithAnAccount => 'Bu bölmə hesabla daha yaxşıdır!';
 
   @override
-  String get restorePurchases => 'SatÄ±nalmalarÄ± bÉ™rpa edin';
+  String get restorePurchases => 'Satınalmaları bərpa edin';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/il, illik hesablanÄ±r';
+    return '$price/il, illik hesablanır';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return 'TÉ™xminÉ™n $price/ay';
+    return 'Təxminən $price/ay';
   }
 
   @override
-  String get confirmDownloadTitle => 'EndirmÉ™k istÉ™diyinizÉ™ É™minsiniz?';
+  String get confirmDownloadTitle => 'Endirmək istədiyinizə əminsiniz?';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'Bu model tÉ™xminÉ™n $size yer tutacaq.';
+    return 'Bu model təxminən $size yer tutacaq.';
   }
 
   @override
   String get emulatorModeWarning =>
-      'Bu funksiya emulator rejimindÉ™ deaktiv edilib';
+      'Bu funksiya emulator rejimində deaktiv edilib';
 
   @override
-  String get newChat => 'Yeni SÃ¶hbÉ™t';
+  String get newChat => 'Yeni Söhbət';
 
   @override
   String get variants => 'Variantlar';
 
   @override
   String get variantsDescription =>
-      'Variantlar eyni sÃ¼ni intellekt ailÉ™sinin fÉ™rqli versiyalarÄ±dÄ±r. Æsas karta toxunduÄŸunuz zaman avtomatik olaraq É™n yaxÅŸÄ±sÄ±nÄ± seÃ§irik, lakin istÉ™sÉ™niz, burada É™l ilÉ™ mÃ¼É™yyÉ™n bir kart seÃ§É™ bilÉ™rsiniz!';
+      'Variantlar eyni süni intellekt ailəsinin fərqli versiyalarıdır. Əsas karta toxunduğunuz zaman avtomatik olaraq ən yaxşısını seçirik, lakin istəsəniz, burada əl ilə müəyyən bir kart seçə bilərsiniz!';
 
   @override
   String get fluxChatTitle => 'Flux Chat';
 
   @override
   String get fluxChatDescription =>
-      'Flux sÃ¶hbÉ™tlÉ™ri mÃ¼vÉ™qqÉ™ti sÃ¶hbÉ™tlÉ™rdir vÉ™ cihazÄ±nÄ±zda saxlanÄ±lmÄ±r.';
+      'Flux söhbətləri müvəqqəti söhbətlərdir və cihazınızda saxlanılmır.';
 
   @override
-  String get alwaysBest => 'HÉ™miÅŸÉ™ Æn YaxÅŸÄ±sÄ±';
+  String get alwaysBest => 'Həmişə Ən Yaxşısı';
 
   @override
-  String get featuresTitle => 'XÃ¼susiyyÉ™tlÉ™r';
+  String get featuresTitle => 'Xüsusiyyətlər';
 
   @override
   String get useOfflineDescription =>
-      'Ä°nternet baÄŸlantÄ±sÄ± olmadan ÅŸÉ™xsi sÃ¶hbÉ™t edin.';
+      'İnternet bağlantısı olmadan şəxsi söhbət edin.';
 
   @override
-  String get featureReasoning => 'DÉ™rin DÃ¼ÅŸÃ¼ncÉ™';
+  String get featureReasoning => 'Dərin Düşüncə';
 
   @override
   String get featureReasoningDescription =>
-      'DÉ™rin DÃ¼ÅŸÃ¼nmÉ™ rejimindÉ™ sÃ¼ni intellekt tapÅŸÄ±rÄ±qlarÄ± bacardÄ±ÄŸÄ± qÉ™dÉ™r yerinÉ™ yetirmÉ™k Ã¼Ã§Ã¼n daxildÉ™ dÃ¼ÅŸÃ¼nÃ¼r.';
+      'Dərin Düşünmə rejimində süni intellekt tapşırıqları bacardığı qədər yerinə yetirmək üçün daxildə düşünür.';
 
   @override
-  String get featureCreateImageTitle => 'ÅÉ™kil Yarat';
+  String get featureCreateImageTitle => 'Şəkil Yarat';
 
   @override
   String get featureCreateImageDescription =>
-      'MÉ™tndÉ™n sÃ¼ni intellekt sÉ™nÉ™ti yaradÄ±n.';
+      'Mətndən süni intellekt sənəti yaradın.';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1622,50 +1609,50 @@ class AppLocalizationsAz extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => 'Video yaradÄ±n';
+  String get featureCreateVideoTitle => 'Video yaradın';
 
   @override
-  String get featureCreateVideoDescription => 'MÉ™tndÉ™n videolar yaradÄ±n.';
+  String get featureCreateVideoDescription => 'Mətndən videolar yaradın.';
 
   @override
-  String get featureStudyTitle => 'Oxu vÉ™ Ã–yrÉ™n';
+  String get featureStudyTitle => 'Oxu və Öyrən';
 
   @override
-  String get featureStudyDescription => 'Ä°zahatlar vÉ™ xÃ¼lasÉ™lÉ™r alÄ±n.';
+  String get featureStudyDescription => 'İzahatlar və xülasələr alın.';
 
   @override
-  String get featureQuizzesTitle => 'TestlÉ™r';
+  String get featureQuizzesTitle => 'Testlər';
 
   @override
-  String get featureQuizzesDescription => 'BiliklÉ™rinizi sÄ±nayÄ±n.';
+  String get featureQuizzesDescription => 'Biliklərinizi sınayın.';
 
   @override
   String get featureExploreDescription =>
-      'MÃ¶vcud olan bÃ¼tÃ¼n modellÉ™ri kÉ™ÅŸf edin.';
+      'Mövcud olan bütün modelləri kəşf edin.';
 
   @override
   String get featureStudyMessage =>
-      'Siz peÅŸÉ™kar repetitorsunuz. MÉ™qsÉ™diniz istifadÉ™Ã§inin mÃ¶vzusunu hÉ™rtÉ™rÉ™fli izah etmÉ™kdir. AydÄ±n struktur, nÃ¼munÉ™lÉ™r vÉ™ bÉ™nzÉ™tmÉ™lÉ™rdÉ™n istifadÉ™ edin. Ä°stifadÉ™Ã§inin effektiv ÅŸÉ™kildÉ™ Ã¶yrÉ™nmÉ™sini tÉ™min etmÉ™k Ã¼Ã§Ã¼n mÃ¼rÉ™kkÉ™b fikirlÉ™ri asanlÄ±qla baÅŸa dÃ¼ÅŸÃ¼lÉ™n hissÉ™lÉ™rÉ™ ayÄ±rÄ±n. MÃ¶vzu:';
+      'Siz peşəkar repetitorsunuz. Məqsədiniz istifadəçinin mövzusunu hərtərəfli izah etməkdir. Aydın struktur, nümunələr və bənzətmələrdən istifadə edin. İstifadəçinin effektiv şəkildə öyrənməsini təmin etmək üçün mürəkkəb fikirləri asanlıqla başa düşülən hissələrə ayırın. Mövzu:';
 
   @override
   String get featureQuizMessage =>
-      'Siz viktorina ustasÄ±sÄ±nÄ±z. Ä°stifadÉ™Ã§inin mÃ¶vzusuna É™sasÉ™n mÃ¼É™yyÉ™n bir Ã§oxseÃ§imli sual yaradÄ±n. CavabÄ±nÄ± gÃ¶zlÉ™yin. Sonra onu qiymÉ™tlÉ™ndirin vÉ™ nÃ¶vbÉ™ti sualÄ± verin. BÃ¼tÃ¼n cavablarÄ± birdÉ™n aÃ§Ä±qlamayÄ±n. Ä°nteraktiv saxlayÄ±n. MÃ¶vzu:';
+      'Siz viktorina ustasısınız. İstifadəçinin mövzusuna əsasən müəyyən bir çoxseçimli sual yaradın. Cavabını gözləyin. Sonra onu qiymətləndirin və növbəti sualı verin. Bütün cavabları birdən açıqlamayın. İnteraktiv saxlayın. Mövzu:';
 
   @override
-  String get myPlan => 'PlanÄ±m';
+  String get myPlan => 'Planım';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'XoÅŸ GÉ™lmisiniz TÉ™klifi â€¢ $time';
+    return 'Xoş Gəlmisiniz Təklifi • $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'EksklÃ¼ziv TÉ™klif â€¢ $time';
+    return 'Eksklüziv Təklif • $time';
   }
 
   @override
-  String get attachmentSheetTitle => 'ÆlavÉ™lÉ™r';
+  String get attachmentSheetTitle => 'Əlavələr';
 
   @override
   String get actionCamera => 'Kamera';
@@ -1677,45 +1664,45 @@ class AppLocalizationsAz extends AppLocalizations {
   String get actionFile => 'Fayl';
 
   @override
-  String get listening => 'DinlÉ™yir';
+  String get listening => 'Dinləyir';
 
   @override
-  String get defaultViewTitle => 'NecÉ™sÉ™n?';
+  String get defaultViewTitle => 'Necəsən?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex yÃ¼zlÉ™rlÉ™ sÃ¼ni intellekt modeli, oflayn imkanlar, dinamik sÃ¶hbÉ™t vÉ™ daha Ã§ox ÅŸey ilÉ™ hÉ™miÅŸÉ™ yanÄ±nÄ±zdadÄ±r.';
+      'Cortex yüzlərlə süni intellekt modeli, oflayn imkanlar, dinamik söhbət və daha çox şey ilə həmişə yanınızdadır.';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
   String get invalidUsernameFormat =>
-      'YanlÄ±ÅŸ istifadÉ™Ã§i adÄ± formatÄ±. 3-20 simvol, rÉ™qÉ™m vÉ™ ya . - _ istifadÉ™ edin.';
+      'Yanlış istifadəçi adı formatı. 3-20 simvol, rəqəm və ya . - _ istifadə edin.';
 
   @override
-  String get exclusiveOffer => 'EksklÃ¼ziv TÉ™klif';
+  String get exclusiveOffer => 'Eksklüziv Təklif';
 
   @override
-  String get claimOffer => 'TÉ™klifdÉ™n istifadÉ™ et';
+  String get claimOffer => 'Təklifdən istifadə et';
 
   @override
-  String get continueInOfflineMode => 'Oflayn RejimdÉ™ Davam Edin';
+  String get continueInOfflineMode => 'Oflayn Rejimdə Davam Edin';
 
   @override
   String get voiceModeInformation =>
-      'Cortex, sÉ™sli sÃ¶hbÉ™t rejimindÉ™ belÉ™ cihazÄ±nÄ±zda tam iÅŸlÉ™yÉ™rÉ™k mÉ™lumatlarÄ±nÄ±zÄ± tÉ™hlÃ¼kÉ™siz saxlayÄ±r; problemsiz sÃ¶hbÉ™tlÉ™rdÉ™n zÃ¶vq alÄ±n!';
+      'Cortex, səsli söhbət rejimində belə cihazınızda tam işləyərək məlumatlarınızı təhlükəsiz saxlayır; problemsiz söhbətlərdən zövq alın!';
 
   @override
   String get flowModeDescription =>
-      'AxÄ±n rejimindÉ™ zÉ™kalar Ã¶z aralarÄ±nda mÃ¼bahisÉ™ edirlÉ™r; ya arxayÄ±n oturub dinlÉ™yÉ™, ya da mÃ¼zakirÉ™yÉ™ qoÅŸula bilÉ™rsiniz!';
+      'Axın rejimində zəkalar öz aralarında mübahisə edirlər; ya arxayın oturub dinləyə, ya da müzakirəyə qoşula bilərsiniz!';
 
   @override
   String get flowModeQuestion =>
-      'Salam! ArtÄ±q Cortex tÉ™tbiqindÉ™ AxÄ±n RejimindÉ™siniz. Burada sizinlÉ™ birlikdÉ™ daha Ã¼Ã§ sÃ¼ni intellekt agenti var. TapÅŸÄ±rÄ±ÄŸÄ±nÄ±z otaÄŸa bir mÃ¶vzu É™lavÉ™ etmÉ™k vÉ™ digÉ™rlÉ™rinÉ™ tÉ™xribatÃ§Ä± vÉ™ ya É™ylÉ™ncÉ™li bir sual verÉ™rÉ™k mÃ¼zakirÉ™yÉ™ baÅŸlamaqdÄ±r. CavablarÄ±nÄ±zda yumor, istehza vÉ™ yÃ¼ngÃ¼l cÉ™fÉ™ngiyatdan istifadÉ™ etmÉ™kdÉ™n Ã§É™kinmÉ™yin. Ä°stÉ™nilÉ™n mÃ¶vzu É™dalÉ™tli oyundur. Davam edin, sÃ¶hbÉ™tÉ™ baÅŸlayÄ±n.';
+      'Salam! Artıq Cortex tətbiqində Axın Rejimindəsiniz. Burada sizinlə birlikdə daha üç süni intellekt agenti var. Tapşırığınız otağa bir mövzu əlavə etmək və digərlərinə təxribatçı və ya əyləncəli bir sual verərək müzakirəyə başlamaqdır. Cavablarınızda yumor, istehza və yüngül cəfəngiyatdan istifadə etməkdən çəkinməyin. İstənilən mövzu ədalətli oyundur. Davam edin, söhbətə başlayın.';
 
   @override
-  String get thought => 'DÃ¼ÅŸÃ¼ndÃ¼';
+  String get thought => 'Düşündü';
 
   @override
   String get agentRed => 'Red';
@@ -1727,195 +1714,192 @@ class AppLocalizationsAz extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'AxÄ±n Rejimi';
+  String get flowMode => 'Axın Rejimi';
 
   @override
   String get premium => 'Premium';
 
   @override
-  String get workInProgress => 'Ä°ÅŸlÉ™r Davam Edir';
+  String get workInProgress => 'İşlər Davam Edir';
 
   @override
   String get voiceSystemPromptSuffix =>
-      'VACÄ°BDÄ°R: Markdown formatlamasÄ±ndan (qalÄ±n, kursiv) istifadÉ™ etmÉ™yin. Kod bloklarÄ±nÄ± (```) Ã‡IXARMAYIN. CavablarÄ± danÄ±ÅŸÄ±q xarakterli vÉ™ qÄ±sa saxlayÄ±n.';
+      'VACİBDİR: Markdown formatlamasından (qalın, kursiv) istifadə etməyin. Kod bloklarını (```) ÇIXARMAYIN. Cavabları danışıq xarakterli və qısa saxlayın.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'Korteks AxÄ±n Rejimi ($agentName). ÆvvÉ™lki: $previousResponse';
+    return 'Korteks Axın Rejimi ($agentName). Əvvəlki: $previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      'YÃ¼klÉ™nmiÅŸ sÉ™nÉ™dlÉ™rdÉ™n mÉ™tn mÉ™zmununu oxuyun vÉ™ Ã§Ä±xarÄ±n. PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) vÉ™ OpenDocument formatlarÄ±nÄ± dÉ™stÉ™klÉ™yir. Ä°stifadÉ™Ã§i sÉ™nÉ™d faylÄ± É™lavÉ™ etdikdÉ™ bundan istifadÉ™ edin.';
+      'Yüklənmiş sənədlərdən mətn məzmununu oxuyun və çıxarın. PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) və OpenDocument formatlarını dəstəkləyir. İstifadəçi sənəd faylı əlavə etdikdə bundan istifadə edin.';
 
   @override
   String get toolReadDocumentIndexParam =>
-      'Oxunacaq sÉ™nÉ™d É™lavÉ™sinin indeksi (0-É™saslÄ±). AdÉ™tÉ™n ilk sÉ™nÉ™d Ã¼Ã§Ã¼n 0 olur.';
+      'Oxunacaq sənəd əlavəsinin indeksi (0-əsaslı). Adətən ilk sənəd üçün 0 olur.';
 
   @override
   String get toolStockDescription =>
-      'SÉ™hmlÉ™rin (mÉ™sÉ™lÉ™n, AAPL, THYAO.IS) vÉ™ kriptovalyutanÄ±n (mÉ™sÉ™lÉ™n, BTC-USD) cari qiymÉ™tini vÉ™ tarixini É™ldÉ™ edin.';
+      'Səhmlərin (məsələn, AAPL, THYAO.IS) və kriptovalyutanın (məsələn, BTC-USD) cari qiymətini və tarixini əldə edin.';
 
   @override
   String get toolStockSymbolParam =>
-      'Ticker simvolu (mÉ™sÉ™lÉ™n, AAPL, THYAO.IS, BTC-USD).';
+      'Ticker simvolu (məsələn, AAPL, THYAO.IS, BTC-USD).';
 
   @override
   String get toolWeatherDescription =>
-      'MÃ¼É™yyÉ™n bir ÅŸÉ™hÉ™r Ã¼Ã§Ã¼n cari hava ÅŸÉ™raitini É™ldÉ™ edin.';
+      'Müəyyən bir şəhər üçün cari hava şəraitini əldə edin.';
 
   @override
-  String get toolWeatherCityParam =>
-      'ÅÉ™hÉ™r adÄ± (mÉ™sÉ™lÉ™n, London, Ä°stanbul).';
+  String get toolWeatherCityParam => 'Şəhər adı (məsələn, London, İstanbul).';
 
   @override
   String get toolPythonDescription =>
-      'Python kodunu tÉ™hlÃ¼kÉ™siz bir sandboxda icra edin.';
+      'Python kodunu təhlükəsiz bir sandboxda icra edin.';
 
   @override
-  String get toolPythonCodeParam => 'Ä°cra edilÉ™cÉ™k Python kodu.';
+  String get toolPythonCodeParam => 'İcra ediləcək Python kodu.';
 
   @override
-  String get toolCalculateDescription => 'Riyazi ifadÉ™ni qiymÉ™tlÉ™ndirin.';
+  String get toolCalculateDescription => 'Riyazi ifadəni qiymətləndirin.';
 
   @override
   String get toolCalculateExpressionParam =>
-      'Riyazi ifadÉ™ (mÉ™sÉ™lÉ™n, \'3 + 4 * 2\').';
+      'Riyazi ifadə (məsələn, \'3 + 4 * 2\').';
 
   @override
-  String get toolChartDescription =>
-      'Diaqram/qrafik vizuallaÅŸdÄ±rmasÄ± yaradÄ±n.';
+  String get toolChartDescription => 'Diaqram/qrafik vizuallaşdırması yaradın.';
 
   @override
   String get toolChartTypeParam =>
-      'Diaqram nÃ¶vÃ¼: sÃ¼tun, xÉ™tt vÉ™ ya dairÉ™vi forma.';
+      'Diaqram növü: sütun, xətt və ya dairəvi forma.';
 
   @override
   String get toolChartLabelsParam =>
-      'Diaqram oxlarÄ± vÉ™ ya seqmentlÉ™ri Ã¼Ã§Ã¼n etiketlÉ™r.';
+      'Diaqram oxları və ya seqmentləri üçün etiketlər.';
 
   @override
-  String get toolChartDataParam =>
-      'Diaqram Ã¼Ã§Ã¼n É™dÉ™di mÉ™lumat dÉ™yÉ™rlÉ™ri.';
+  String get toolChartDataParam => 'Diaqram üçün ədədi məlumat dəyərləri.';
 
   @override
   String get toolChartLabelParam =>
-      'Diaqram É™fsanÉ™si Ã¼Ã§Ã¼n verilÉ™nlÉ™r dÉ™sti etiketi.';
+      'Diaqram əfsanəsi üçün verilənlər dəsti etiketi.';
 
   @override
-  String get toolChartTitleParam => 'DiaqramÄ±n baÅŸlÄ±ÄŸÄ±.';
+  String get toolChartTitleParam => 'Diaqramın başlığı.';
 
   @override
   String get thinkingModeInstruction =>
-      'DÃœÅÃœNMÆ REJÄ°MÄ° AKTÄ°VDÄ°R: Son cavabÄ±nÄ±zÄ± vermÉ™zdÉ™n É™vvÉ™l mÃ¼hakimÉ™ prosesinizi gÃ¶stÉ™rmÉ™k Ã¼Ã§Ã¼n <think></think> etiketlÉ™rindÉ™n istifadÉ™ etmÉ™lisiniz. EtiketlÉ™rin iÃ§É™risindÉ™ addÄ±m-addÄ±m dÃ¼ÅŸÃ¼nÃ¼n, sonra cavabÄ±nÄ±zÄ± etiketlÉ™rin xaricindÉ™ verin.';
+      'DÜŞÜNMƏ REJİMİ AKTİVDİR: Son cavabınızı verməzdən əvvəl mühakimə prosesinizi göstərmək üçün <think></think> etiketlərindən istifadə etməlisiniz. Etiketlərin içərisində addım-addım düşünün, sonra cavabınızı etiketlərin xaricində verin.';
 
   @override
-  String get openLinkWarningTitle => 'Xarici Link XÉ™bÉ™rdarlÄ±ÄŸÄ±';
+  String get openLinkWarningTitle => 'Xarici Link Xəbərdarlığı';
 
   @override
   String get openLinkCancel => 'Cancel';
 
   @override
-  String get openLinkConfirm => 'Linki AÃ§Ä±n';
+  String get openLinkConfirm => 'Linki Açın';
 
   @override
-  String get webSearchSources => 'MÉ™nbÉ™lÉ™r';
+  String get webSearchSources => 'Mənbələr';
 
   @override
-  String get searching => 'AxtarÄ±ÅŸ';
+  String get searching => 'Axtarış';
 
   @override
-  String get featureWebSearchTitle => 'Veb AxtarÄ±ÅŸÄ±';
+  String get featureWebSearchTitle => 'Veb Axtarışı';
 
   @override
   String get featureWebSearchDescription =>
-      'Real vaxt mÉ™lumatÄ± Ã¼Ã§Ã¼n internetdÉ™ axtarÄ±ÅŸ aparÄ±n';
+      'Real vaxt məlumatı üçün internetdə axtarış aparın';
 
   @override
-  String get clearMemory => 'YaddaÅŸÄ± tÉ™mizlÉ™yin';
+  String get clearMemory => 'Yaddaşı təmizləyin';
 
   @override
   String get clearMemoryConfirm =>
-      'YaddaÅŸÄ±nÄ±zÄ± tÉ™mizlÉ™mÉ™k istÉ™diyinizÉ™ É™minsinizmi?';
+      'Yaddaşınızı təmizləmək istədiyinizə əminsinizmi?';
 
   @override
-  String get personalization => 'FÉ™rdilÉ™ÅŸdirmÉ™';
+  String get personalization => 'Fərdiləşdirmə';
 
   @override
   String get personalizationDescription =>
-      'KÃ¶mÉ™kÃ§inizi ehtiyaclarÄ±nÄ±za daha yaxÅŸÄ± uyÄŸunlaÅŸdÄ±rmaq Ã¼Ã§Ã¼n fÉ™rdilÉ™ÅŸdirin. Onun cavablarÄ±nÄ±, davranÄ±ÅŸÄ±nÄ± vÉ™ tonunu unikal seÃ§imlÉ™rinizÉ™ uyÄŸunlaÅŸdÄ±rÄ±n.';
+      'Köməkçinizi ehtiyaclarınıza daha yaxşı uyğunlaşdırmaq üçün fərdiləşdirin. Onun cavablarını, davranışını və tonunu unikal seçimlərinizə uyğunlaşdırın.';
 
   @override
-  String get memoryTitle => 'YaddaÅŸ';
+  String get memoryTitle => 'Yaddaş';
 
   @override
-  String get memoryDescription => 'SÃ¼ni intellekt sizi belÉ™ tanÄ±yÄ±r.';
+  String get memoryDescription => 'Süni intellekt sizi belə tanıyır.';
 
   @override
-  String get noMemoryYet => 'HÉ™lÉ™ heÃ§ bir xatirÉ™ qurulmayÄ±b';
+  String get noMemoryYet => 'Hələ heç bir xatirə qurulmayıb';
 
   @override
-  String get memoryLimitReached => 'YaddaÅŸ limitinÉ™ Ã§atÄ±ldÄ±';
+  String get memoryLimitReached => 'Yaddaş limitinə çatıldı';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => 'KÉ™ÅŸfiyyat';
+  String get intelligenceTitle => 'Kəşfiyyat';
 
   @override
   String get intelligenceDescription =>
-      'SÃ¼ni intellekt sizinlÉ™ bu ÅŸÉ™kildÉ™ Ã¼nsiyyÉ™t qurur.';
+      'Süni intellekt sizinlə bu şəkildə ünsiyyət qurur.';
 
   @override
   String get customInstructionHint =>
-      'XÃ¼susi tÉ™limatlarÄ±nÄ±zÄ± buraya daxil edin';
+      'Xüsusi təlimatlarınızı buraya daxil edin';
 
   @override
   String openLinkWarningMessage(String url) {
-    return 'AÅŸaÄŸÄ±dakÄ± xarici linki aÃ§maq Ã¼zrÉ™siniz:\\n\\n$url\\n\\nDavam etmÉ™k istÉ™diyinizÉ™ É™minsinizmi?';
+    return 'Aşağıdakı xarici linki açmaq üzrəsiniz:\\n\\n$url\\n\\nDavam etmək istədiyinizə əminsinizmi?';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return 'Bu xÃ¼susi tÉ™limatlarÄ± izlÉ™yin:\\n\\n$instruction';
+    return 'Bu xüsusi təlimatları izləyin:\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      '[KRÄ°TÄ°K TÆLÄ°MAT]: Siz BAÅLIQ GENERATORUSUZ. Ä°stifadÉ™Ã§inin sualÄ±na CAVAB VERMÆYÄ°N. SÃ–HBÆT EDÄ°N VÆ YA SALAM VERMÆYÄ°N. YALNIZ istifadÉ™Ã§inin nÉ™ haqqÄ±nda soruÅŸduÄŸunu xÃ¼lasÉ™ edÉ™n 2-4 sÃ¶zdÉ™n ibarÉ™t baÅŸlÄ±q Ã§Ä±xarÄ±n.';
+      '[KRİTİK TƏLİMAT]: Siz BAŞLIQ GENERATORUSUZ. İstifadəçinin sualına CAVAB VERMƏYİN. SÖHBƏT EDİN VƏ YA SALAM VERMƏYİN. YALNIZ istifadəçinin nə haqqında soruşduğunu xülasə edən 2-4 sözdən ibarət başlıq çıxarın.';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Sistem] ÆHÆMÄ°YYÆTLÄ° TÆLÄ°MAT: Hal-hazÄ±rda \"Cortex\" adlÄ± nÉ™hÉ™ng, yÃ¼ksÉ™k inkiÅŸaf etmiÅŸ sÃ¼ni intellekt ekosistemindÉ™ fÉ™aliyyÉ™t gÃ¶stÉ™rirsiniz; bu platforma orta hesabla cÉ™mi 16 yaÅŸÄ±nda olan Vertex komandasÄ± tÉ™rÉ™findÉ™n hazÄ±rlanmÄ±ÅŸdÄ±r. Bunu yadda saxlayÄ±n vÉ™ soruÅŸulsa, cavab verin. Daha Ã§ox mÉ™lumat istÉ™nildikdÉ™, internetdÉ™ axtarÄ±ÅŸ etmÉ™kdÉ™n Ã§É™kinmÉ™yin vÉ™ ya axtarÄ±ÅŸ edÉ™ bilmirsinizsÉ™, bilmÉ™diyinizi demÉ™kdÉ™n Ã§É™kinmÉ™yin!';
+      '\n\n[Sistem] ƏHƏMİYYƏTLİ TƏLİMAT: Hal-hazırda \"Cortex\" adlı nəhəng, yüksək inkişaf etmiş süni intellekt ekosistemində fəaliyyət göstərirsiniz; bu platforma orta hesabla cəmi 16 yaşında olan Vertex komandası tərəfindən hazırlanmışdır. Bunu yadda saxlayın və soruşulsa, cavab verin. Daha çox məlumat istənildikdə, internetdə axtarış etməkdən çəkinməyin və ya axtarış edə bilmirsinizsə, bilmədiyinizi deməkdən çəkinməyin!';
 
   @override
-  String get featureAudioRecognitionTitle => 'SÉ™s TanÄ±ma';
+  String get featureAudioRecognitionTitle => 'Səs Tanıma';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'Bu model sÉ™s vÉ™ ya nitqi baÅŸa dÃ¼ÅŸÉ™ vÉ™ emal edÉ™ bilir.';
+      'Bu model səs və ya nitqi başa düşə və emal edə bilir.';
 
   @override
-  String get featureVideoRecognitionTitle => 'Video TanÄ±ma';
+  String get featureVideoRecognitionTitle => 'Video Tanıma';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'Bu model fayllarÄ±nÄ±zdan vÉ™ ya kameranÄ±zdan videolarÄ± tÉ™hlil edÉ™ vÉ™ baÅŸa dÃ¼ÅŸÉ™ bilÉ™r.';
+      'Bu model fayllarınızdan və ya kameranızdan videoları təhlil edə və başa düşə bilər.';
 
   @override
-  String get featureImageRecognitionTitle => 'ÅÉ™kil TanÄ±ma';
+  String get featureImageRecognitionTitle => 'Şəkil Tanıma';
 
   @override
   String get featureImageRecognitionDescription =>
-      'Bu model fotoÅŸÉ™killÉ™ri vÉ™ ya tÉ™svirlÉ™ri tÉ™hlil edÉ™ vÉ™ baÅŸa dÃ¼ÅŸÉ™ bilÉ™r.';
+      'Bu model fotoşəkilləri və ya təsvirləri təhlil edə və başa düşə bilər.';
 
   @override
-  String get featureToolUseTitle => 'AlÉ™t Ä°stifadÉ™si';
+  String get featureToolUseTitle => 'Alət İstifadəsi';
 
   @override
   String get featureToolUseDescription =>
-      'Bu model tapÅŸÄ±rÄ±qlarÄ± yerinÉ™ yetirmÉ™k Ã¼Ã§Ã¼n xarici vasitÉ™lÉ™rdÉ™n aÄŸÄ±llÄ± ÅŸÉ™kildÉ™ istifadÉ™ edÉ™ bilÉ™r.';
+      'Bu model tapşırıqları yerinə yetirmək üçün xarici vasitələrdən ağıllı şəkildə istifadə edə bilər.';
 
   @override
   String get videoModels => 'Video Models';
@@ -1928,78 +1912,78 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Bu modelin iÅŸlÉ™mÉ™si Ã¼Ã§Ã¼n bir $mediaType lazÄ±mdÄ±r. Bunu bildirmÉ™k Ã¼Ã§Ã¼n sorÄŸunu tutdum. ZÉ™hmÉ™t olmasa istifadÉ™Ã§iyÉ™ nÉ™zakÉ™tlÉ™ bir $mediaType tÉ™min etmÉ™li olduqlarÄ±nÄ± bildirin (Ã¶z dillÉ™rindÉ™ deyin) Ã§Ã¼nki mÉ™n $modelName, vizual/audio/video redaktÉ™ modeliyÉ™m.';
+    return 'Bu modelin işləməsi üçün bir $mediaType lazımdır. Bunu bildirmək üçün sorğunu tutdum. Zəhmət olmasa istifadəçiyə nəzakətlə bir $mediaType təmin etməli olduqlarını bildirin (öz dillərində deyin) çünki mən $modelName, vizual/audio/video redaktə modeliyəm.';
   }
 
   @override
-  String get mediaTypeImage => 'ÅŸÉ™kil';
+  String get mediaTypeImage => 'şəkil';
 
   @override
   String get mediaTypeVideo => 'video';
 
   @override
-  String get mediaTypeAudio => 'audio faylÄ±';
+  String get mediaTypeAudio => 'audio faylı';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName, Cortex-dÉ™ yÃ¼ksÉ™k performans gÃ¶stÉ™rÉ™n qabaqcÄ±l bir zÉ™kadÄ±r.';
+    return '$seriesName, Cortex-də yüksək performans göstərən qabaqcıl bir zəkadır.';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName, Cortex ekosisteminÉ™ inteqrasiya olunmuÅŸ yÃ¼ksÉ™k performanslÄ± sÃ¼ni intellektdir. GeniÅŸ Ã§eÅŸidli mÃ¼rÉ™kkÉ™b tapÅŸÄ±rÄ±qlarÄ± hÉ™ll etmÉ™k Ã¼Ã§Ã¼n nÉ™zÉ™rdÉ™ tutulub, yÃ¼ksÉ™k etibarlÄ± vÉ™ sÉ™mÉ™rÉ™li emal imkanlarÄ± tÉ™qdim edir. SÃ¼rÉ™tli cavab mÃ¼ddÉ™tlÉ™ri vÉ™ tÉ™kmil analitik gÃ¼cÃ¼ tÉ™qdim edÉ™rÉ™k, gÃ¼ndÉ™lik mÉ™hsuldarlÄ±ÄŸÄ±nÄ±zÄ± É™hÉ™miyyÉ™tli dÉ™rÉ™cÉ™dÉ™ artÄ±rÄ±r. Cortex-in tÉ™hlÃ¼kÉ™siz yerli infrastrukturu Ã¼zÉ™rindÉ™ tam inteqrasiya olunmuÅŸ ÅŸÉ™kildÉ™ iÅŸlÉ™yÉ™n bu model yaradÄ±cÄ± fikir mÃ¼badilÉ™sindÉ™n tutmuÅŸ dÉ™rin texniki analizlÉ™rÉ™ qÉ™dÉ™r geniÅŸ bir spektrdÉ™ sizÉ™ kÃ¶mÉ™k edÉ™ bilÉ™r. Tam potensialÄ±nÄ± bu gÃ¼ndÉ™n kÉ™ÅŸf etmÉ™yÉ™ baÅŸlayÄ±n.';
+    return '$modelName, Cortex ekosisteminə inteqrasiya olunmuş yüksək performanslı süni intellektdir. Geniş çeşidli mürəkkəb tapşırıqları həll etmək üçün nəzərdə tutulub, yüksək etibarlı və səmərəli emal imkanları təqdim edir. Sürətli cavab müddətləri və təkmil analitik gücü təqdim edərək, gündəlik məhsuldarlığınızı əhəmiyyətli dərəcədə artırır. Cortex-in təhlükəsiz yerli infrastrukturu üzərində tam inteqrasiya olunmuş şəkildə işləyən bu model yaradıcı fikir mübadiləsindən tutmuş dərin texniki analizlərə qədər geniş bir spektrdə sizə kömək edə bilər. Tam potensialını bu gündən kəşf etməyə başlayın.';
   }
 
   @override
-  String get guestLimitBottomSheetTitle => 'Cortex-in zÉ™kasÄ±nÄ± sevirsiniz?';
+  String get guestLimitBottomSheetTitle => 'Cortex-in zəkasını sevirsiniz?';
 
   @override
   String get guestLimitBottomSheetText =>
-      'Daha da aÄŸÄ±llÄ± zÉ™kalarla iÅŸlÉ™yin, daha Ã§ox mÉ™zmun yaradÄ±n, daha Ã§ox sÃ¶hbÉ™t edin vÉ™ daha Ã§ox ÅŸey edin...';
+      'Daha da ağıllı zəkalarla işləyin, daha çox məzmun yaradın, daha çox söhbət edin və daha çox şey edin...';
 
   @override
-  String get arts => 'Ä°ncÉ™sÉ™nÉ™t';
+  String get arts => 'İncəsənət';
 
   @override
-  String get noArt => 'SÉ™nÉ™t yoxdur';
+  String get noArt => 'Sənət yoxdur';
 
   @override
   String get noArtDescription =>
-      'HÉ™lÉ™ ki, heÃ§ bir É™sÉ™r yoxdur; qalereyanÄ± ÅŸÉ™killÉ™r, videolar, audio vÉ™ hÉ™r cÃ¼r mÉ™zmunla doldurmaÄŸÄ±n vaxtÄ±dÄ±r!';
+      'Hələ ki, heç bir əsər yoxdur; qalereyanı şəkillər, videolar, audio və hər cür məzmunla doldurmağın vaxtıdır!';
 
   @override
   String get videoPremiumWarning =>
-      'Videolar yaratmaq, indi tÉ™kmillÉ™ÅŸdirmÉ™k vÉ™ axÄ±nÄ± hiss etmÉ™k Ã¼Ã§Ã¼n Ultra abunÉ™liyinÉ™ ehtiyacÄ±nÄ±z var!';
+      'Videolar yaratmaq, indi təkmilləşdirmək və axını hiss etmək üçün Ultra abunəliyinə ehtiyacınız var!';
 
   @override
   String get fallbackInfoPanelText =>
-      'Server tÉ™rÉ™fimizdÉ™ etdiyimiz bÉ™zi tÉ™kmillÉ™ÅŸdirmÉ™lÉ™rÉ™ gÃ¶rÉ™, cavab sizin xÃ¼susi seÃ§diyiniz sÃ¼ni intellekt É™vÉ™zinÉ™ Cortex-in dinamik sÃ¶hbÉ™ti ilÉ™ yaradÄ±lÄ±b. Proses baÅŸa Ã§atana qÉ™dÉ™r anlayÄ±ÅŸÄ±nÄ±z Ã¼Ã§Ã¼n tÉ™ÅŸÉ™kkÃ¼r edirik!';
+      'Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, cavab sizin xüsusi seçdiyiniz süni intellekt əvəzinə Cortex-in dinamik söhbəti ilə yaradılıb. Proses başa çatana qədər anlayışınız üçün təşəkkür edirik!';
 
   @override
   String get falOfflineMessage =>
-      'Server tÉ™rÉ™fimizdÉ™ etdiyimiz bÉ™zi tÉ™kmillÉ™ÅŸdirmÉ™lÉ™rÉ™ gÃ¶rÉ™, bu zÉ™ka hazÄ±rda oflayndÄ±r. Proses bitÉ™nÉ™ qÉ™dÉ™r anlayÄ±ÅŸÄ±nÄ±z Ã¼Ã§Ã¼n tÉ™ÅŸÉ™kkÃ¼r edirik!';
+      'Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, bu zəka hazırda oflayndır. Proses bitənə qədər anlayışınız üçün təşəkkür edirik!';
 
   @override
   String get errorInsufficientStorage =>
-      'Bu modeli yÃ¼klÉ™mÉ™k Ã¼Ã§Ã¼n yaddaÅŸ yeri kifayÉ™t deyil.';
+      'Bu modeli yükləmək üçün yaddaş yeri kifayət deyil.';
 
   @override
-  String get backgroundChatNotificationTitle => 'SÃ¶hbÉ™tÉ™ qayÄ±t!';
+  String get backgroundChatNotificationTitle => 'Söhbətə qayıt!';
 
   @override
-  String get benefitVideoGeneration => 'Video NÉ™sli';
+  String get benefitVideoGeneration => 'Video Nəsli';
 
   @override
-  String get freeOffer => 'Pulsuz TÉ™klif';
+  String get freeOffer => 'Pulsuz Təklif';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return 'Ä°lk $days gÃ¼n pulsuz, sonra $price/ay';
+    return 'İlk $days gün pulsuz, sonra $price/ay';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return 'Ä°lk $days gÃ¼n pulsuz, sonra $price/il';
+    return 'İlk $days gün pulsuz, sonra $price/il';
   }
 
   @override
@@ -2009,20 +1993,20 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get systemPromptLimitFallback =>
-      'TÆNÄ°DLÄ°: Ä°stifadÉ™Ã§i É™mÉ™liyyat tÉ™lÉ™b etdi, lakin Cortex-dÉ™ limitlÉ™ri tÃ¼kÉ™nib; xahiÅŸ edirik istifadÉ™Ã§iyÉ™ onlarÄ±n dilindÉ™ gÃ¶zlÉ™mÉ™li olduqlarÄ±nÄ± vÉ™ ya abunÉ™ planlarÄ±nÄ± tÉ™kmillÉ™ÅŸdirmÉ™yi dÃ¼ÅŸÃ¼nmÉ™li olduqlarÄ±nÄ± bildirin.';
+      'TƏNİDLİ: İstifadəçi əməliyyat tələb etdi, lakin Cortex-də limitləri tükənib; xahiş edirik istifadəçiyə onların dilində gözləməli olduqlarını və ya abunə planlarını təkmilləşdirməyi düşünməli olduqlarını bildirin.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex daha da yaxÅŸÄ± cavablar verÉ™ bilÉ™r; indi yÃ¼ksÉ™lt vÉ™ hÉ™r sual Ã¼Ã§Ã¼n É™n yaxÅŸÄ± cavabÄ± al!';
+      'Cortex daha da yaxşı cavablar verə bilər; indi yüksəlt və hər sual üçün ən yaxşı cavabı al!';
 
   @override
-  String get pinLimitReached => 'Maksimum 3 sÃ¶hbÉ™ti sancaqlaya bilÉ™rsiniz.';
+  String get pinLimitReached => 'Maksimum 3 söhbəti sancaqlaya bilərsiniz.';
 
   @override
-  String get categoryAll => 'Tümü';
+  String get categoryAll => 'T�m�';
 
   @override
-  String get categoryFree => 'Ücretsiz';
+  String get categoryFree => '�cretsiz';
 
   @override
   String get categoryPremium => 'Premium';
