@@ -42,6 +42,23 @@ class Cortex extends StatelessWidget {
 
     _cachedThemeName = currentTheme;
     _cachedThemeData = baseTheme.copyWith(
+      textTheme: baseTheme.textTheme.apply(
+        fontFamily: 'Inter',
+        fontFamilyFallback: const [
+          'Roboto',
+          'Segoe UI',
+          'San Francisco',
+          'PingFang SC',
+          'Heiti SC',
+          'Noto Sans CJK SC',
+          'Noto Sans CJK TC',
+          'Noto Sans CJK JP',
+          'Noto Sans CJK KR',
+          'Arial',
+          'Noto Sans',
+          'sans-serif',
+        ],
+      ),
       primaryColor: AppColors.background,
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: baseTheme.colorScheme.copyWith(
