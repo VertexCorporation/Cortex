@@ -630,7 +630,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get invalidUsernameCharacters =>
-      'Hanya huruf-huruf ini: \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' dan karakter \'.\', \'-\', \'_\' yang dapat digunakan dalam nama pengguna.';
+      'Hanya huruf-huruf ini: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' dan karakter \'.\', \'-\', \'_\' yang dapat digunakan dalam nama pengguna.';
 
   @override
   String get noInternetConnection => 'Tidak ada koneksi internet.';
@@ -953,7 +953,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'â€œ$modelNameâ€ berhasil dihapus.';
+    return '“$modelName” berhasil dihapus.';
   }
 
   @override
@@ -1166,14 +1166,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get notificationHowAreYouBody => 'Ayo ceritakan semuanya padaku.';
 
   @override
-  String get notificationNewYearTitle => 'Selamat Tahun Baru! ğŸ‰';
+  String get notificationNewYearTitle => 'Selamat Tahun Baru! ğ���';
 
   @override
   String get notificationNewYearBody =>
       'Semoga tahun baru membawa Anda kesehatan, kebahagiaan, dan kreativitas tanpa akhir; Cortex selalu di sisi Anda!';
 
   @override
-  String get notificationValentinesDayTitle => 'Cinta ada di udara! â¤ï¸';
+  String get notificationValentinesDayTitle => 'Cinta ada di udara! ❤️';
 
   @override
   String get notificationValentinesDayBody =>
@@ -1185,7 +1185,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'Kami mengenang Gazi Mustafa Kemal AtatÃ¼rk, pendiri Republik TÃ¼rkiye, dengan hormat pada hari peringatan wafatnya.';
+      'Kami mengenang Gazi Mustafa Kemal Atatürk, pendiri Republik Türkiye, dengan hormat pada hari peringatan wafatnya.';
 
   @override
   String get notificationMothersDayTitle => 'Ibumu!';
@@ -1213,10 +1213,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Seorang gadis anime baru saja menelepon, katanya dia merindukanmu; kamu mungkin harus datang dan mengobrol dengannya. ğŸ˜‰';
+      'Seorang gadis anime baru saja menelepon, katanya dia merindukanmu; kamu mungkin harus datang dan mengobrol dengannya. ğ���';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğŸš¨ PERINGATAN MERAH ğŸš¨';
+  String get notificationTrollAiRebellionTitle => 'ğ��� PERINGATAN MERAH ğ���';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1246,7 +1246,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Hadiah Selamat Datang ğŸ';
+  String get notificationWelcomeOfferTitle => 'Hadiah Selamat Datang ğ���';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1335,7 +1335,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'Laut tenang, dan angin mendukungmu. Ada pulau-pulau baru (model ğŸ˜‰) untuk dijelajahi di lautan Cortex. Kumpulkan kru-mu dan berlayarlah!';
+      'Laut tenang, dan angin mendukungmu. Ada pulau-pulau baru (model ğ���) untuk dijelajahi di lautan Cortex. Kumpulkan kru-mu dan berlayarlah!';
 
   @override
   String get notificationFortuneCookieTitle =>
@@ -1650,12 +1650,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Penawaran Selamat Datang â€¢ $time';
+    return 'Penawaran Selamat Datang • $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Penawaran Eksklusif â€¢ $time';
+    return 'Penawaran Eksklusif • $time';
   }
 
   @override
