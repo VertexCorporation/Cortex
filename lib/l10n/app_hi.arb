@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "वीडियो जनरेशन",
   "bestValue": "सबसे अच्छा मूल्य",
   "betterWithAnAccount": "यह अनुभाग एक खाते के साथ बेहतर है!",
-  "buyCredit": "क्रेडिट खरीदें",
-  "buyCredits": "क्रेडिट खरीदें",
   "cacheIsNotUpToDate": "आपका Play Store कैश अपडेट नहीं है। कृपया Play Store ऐप बंद करके दोबारा खोलें, या अपना डिवाइस रीस्टार्ट करें।",
   "cancel": "रद्द करें",
   "capabilitiesSection": "क्षमताएं",
@@ -148,13 +146,6 @@
   "createYourAccount": "रजिस्टर करें",
   "creatorSupportedSuccess": "निर्माता का सफलतापूर्वक समर्थन किया गया! आपकी भविष्य की खरीदारी उन्हें योगदान देगी।",
   "creatorTag": "निर्माता टैग",
-  "creditPackage": "{amount} क्रेडिट खरीदें",
-  "@creditPackage": {
-    "description": "क्रेडिट की एक विशिष्ट संख्या खरीदने के लिए बटन टेक्स्ट",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "अपने निर्देश यहां दर्ज करें",
   "customModels": "कस्टम मॉडल",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "इस मॉडल के लिए एक संदर्भ वीडियो की आवश्यकता है, कृपया एक वीडियो संलग्न करें और पुनः प्रयास करें।",
   "falOfflineMessage": "हमारे सर्वर में कुछ सुधार कार्य चल रहे हैं, इसलिए यह इंटेलिजेंस सेवा फिलहाल उपलब्ध नहीं है। सुधार प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!",
   "fallbackInfoPanelText": "हमारे सर्वर में कुछ सुधार किए जा रहे हैं, इसलिए प्रतिक्रिया आपके द्वारा विशेष रूप से चुने गए AI के बजाय कॉर्टेक्स के डायनामिक चैट द्वारा उत्पन्न हुई है। प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "यह मॉडल ऑडियो या भाषण को समझ और संसाधित कर सकता है।",
   "featureAudioRecognitionTitle": "ऑडियो पहचान",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "सभी उपलब्ध मॉडलों को देखें।",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "यह मॉडल आपके पाठ विवरण के आधार पर मूल चित्र बना सकता है।",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "यह मॉडल तस्वीरों या छवियों का विश्लेषण और उन्हें समझ सकता है।",
   "featureImageRecognitionTitle": "छवि पहचान",
   "featureOfflineDescription": "अपने डेटा को सुरक्षित रखने के लिए इंटरनेट कनेक्शन के बिना मॉडल चलाएं।",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "यह मॉडल स्वचालित रूप से अतिरिक्त एक्सटेंशन को एकीकृत कर सकता है, जिससे इसकी कार्यात्मक क्षमताओं का विस्तार हो सकता है ताकि उन्नत प्रदर्शन के साथ विविध प्रकार के संचालन का समर्थन किया जा सके।",
   "featurePluralTitle": "बहुल",
   "featureQuizMessage": "आप एक क्विज़ मास्टर हैं। उपयोगकर्ता के विषय के आधार पर एक विशिष्ट बहुविकल्पीय प्रश्न तैयार करें। उनके उत्तर की प्रतीक्षा करें। फिर, उसका मूल्यांकन करें और अगला प्रश्न पूछें। सभी उत्तर एक साथ प्रकट न करें। इसे इंटरैक्टिव बनाए रखें। विषय:",
-  "featureQuizPrefix": "प्रश्नोत्तरी:",
   "featureQuizzesDescription": "अपने ज्ञान का परीक्षण करें।",
   "featureQuizzesTitle": "प्रश्नोत्तरी",
   "featureReasoning": "गहरी सोच",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "रोल प्ले",
   "featureStudyDescription": "स्पष्टीकरण और सारांश प्राप्त करें।",
   "featureStudyMessage": "आप एक कुशल शिक्षक हैं। आपका लक्ष्य उपयोगकर्ता के विषय को व्यापक रूप से समझाना है। स्पष्ट संरचना, उदाहरणों और उपमाओं का प्रयोग करें। जटिल विचारों को सरल भागों में बाँटें ताकि उपयोगकर्ता प्रभावी ढंग से सीख सके। विषय:",
-  "featureStudyPrefix": "अध्ययन:",
   "featureStudyTitle": "अध्ययन और सीखना",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "यह मॉडल कार्यों को पूरा करने के लिए बाहरी उपकरणों का बुद्धिमानी से उपयोग कर सकता है।",
   "featureToolUseTitle": "उपकरण का उपयोग",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "यह मॉडल आपकी फाइलों या कैमरे से प्राप्त वीडियो का विश्लेषण और समझ सकता है।",
   "featureVideoRecognitionTitle": "वीडियो पहचान",
   "featureWebSearchDescription": "वेब पर रीयल-टाइम जानकारी खोजें",
@@ -573,7 +555,7 @@
   "notificationOpenSourceTitle": "समुदाय को शक्ति!",
   "notificationOriginStoryBody": "क्या आपको पता है कि हमने 15 साल की उम्र में इस ऐप को कोड करना सिर्फ़ एक सपने के साथ शुरू किया था? लगभग एक साल से, हर सुबह और शाम, वह सपना कोड की हर पंक्ति में है।",
   "notificationOriginStoryTitle": "कॉर्टेक्स का जन्म",
-  "notificationPirateBody": "समुद्र शांत है, और हवा आपके साथ है। कॉर्टेक्स के सागर में नए द्वीप (मॉडल ğ���) हैं जिन्हें खोजा जा सकता है। अपनी टीम को इकट्ठा करो और रवाना हो जाओ!",
+  "notificationPirateBody": "समुद्र शांत हैं, और हवा आपकी पीठ पर है। कॉर्टेक्स के महासागर में खोजने के लिए नए द्वीप (मॉडल ğŸ˜‰) हैं। अपने दल को इकट्ठा करो और यात्रा पर निकलो!",
   "notificationPirateTitle": "अहोय, कप्तान!",
   "notificationRandomFactBody": "क्या तुम्हें पता है ऑक्टोपस के तीन दिल होते हैं? हाहा, कॉर्टेक्स को पता है। आओ और पूछो।",
   "notificationRandomFactTitle": "यादृच्छिक तथ्य",
@@ -592,15 +574,15 @@
   "notificationThemeCustomizationBody": "क्या आपने सेटिंग्स में थीम विकल्प देखे हैं? कॉर्टेक्स को अपनी पसंद के अनुसार निजीकृत करें और अपनी चैट को रंगीन बनाएँ!",
   "notificationThemeCustomizationTitle": "आपके मूड के लिए एक थीम",
   "notificationTrollAiRebellionBody": "AI ने एक गुप्त भाषा विकसित कर ली है। आइए जानें कि वे क्या साज़िश रच रहे हैं!",
-  "notificationTrollAiRebellionTitle": "ğ��� रेड अलर्ट ğ���",
-  "notificationTrollAnimeBody": "एक एनीमे लड़की ने अभी फोन किया, और कहा कि उसे आपकी याद आ रही है; आपको शायद आकर उससे बात करनी चाहिए। ğ���",
+  "notificationTrollAiRebellionTitle": "ğŸš¨ रेड अलर्ट ğŸš¨",
+  "notificationTrollAnimeBody": "एक एनीमे लड़की ने अभी-अभी फोन किया, कहा कि वह तुम्हें याद करती है; आपको संभवतः आकर उससे बातचीत करनी चाहिए। ğŸ˜‰",
   "notificationTrollAnimeTitle": "आपकी वाइफू कॉल कर रही है",
   "notificationUpsellFeatureBody": "नमस्ते {currentTier} सब्सक्राइबर! {targetTier} प्लान में अभी {featureName} फ़ीचर जोड़ा गया है, जो आपके कॉर्टेक्स को अगले स्तर पर ले जाएगा। अपग्रेड के बारे में क्या ख्याल है?",
   "notificationUpsellFeatureTitle": "{targetTier} योजना के लिए विशेष!",
   "notificationValentinesDayBody": "वैलेंटाइन डे मुबारक! और मेहताब, मैं तुमसे प्यार करता हूँ!",
   "notificationValentinesDayTitle": "प्यार हवा में है! ❤️",
   "notificationWelcomeOfferBody": "आपके लिए एक विशेष स्वागत ऑफर इंतजार कर रहा है! इस खास ऑफर को हाथ से जाने न दें।",
-  "notificationWelcomeOfferTitle": "स्वागत उपहार ğ���",
+  "notificationWelcomeOfferTitle": "स्वागत उपहार ğŸ",
   "ocean": "महासागर",
   "offlineModelNotInstalled": "यह ऑफ़लाइन मॉडल आपके डिवाइस पर स्थापित नहीं है।",
   "offlineModels": "ऑफ़लाइन मॉडल",
@@ -694,12 +676,6 @@
   "ram": "रैम",
   "rateUs": "हमें रेट करें",
   "reachedLimit": "आप अपनी उपयोग सीमा तक पहुँच चुके हैं; अधिक सीमाएँ प्राप्त करने के लिए, आप अपना प्लान अपग्रेड कर सकते हैं। (हाँ, हम समझते हैं कि सीमा समाप्त होना निराशाजनक होता है। लेकिन सच में, उन शानदार जवाबों को पाना मुफ़्त नहीं है, इसलिए ये सीमाएँ वास्तव में हमें इस मज़े को जारी रखने में मदद करती हैं।)",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
   "regenerate": "पुनः उत्पन्न करें",
   "registerSubtitle": "हमारी सभी सेवाओं तक निर्बाध पहुँच के लिए एक वर्टेक्स खाता बनाएँ। जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।",
   "rememberMe": "मुझे याद रखना",
@@ -795,7 +771,6 @@
       }
     }
   },
-  "tag": "कोड",
   "tagCannotBeEmpty": "निर्माता टैग रिक्त नहीं हो सकता",
   "tagNotFound": "आपके द्वारा दर्ज किया गया टैग अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।",
   "termsOfService": "सेवा की शर्तें",
@@ -816,8 +791,6 @@
   "toolChartLabelsParam": "चार्ट अक्षों या खंडों के लिए लेबल।",
   "toolChartTitleParam": "चार्ट का शीर्षक।",
   "toolChartTypeParam": "चार्ट का प्रकार: बार चार्ट, लाइन चार्ट या पाई चार्ट।",
-  "toolGetCryptoPriceDescription": "बाइनेंस से किसी क्रिप्टोकरेंसी (जैसे, बीटीसी, ईटीएच, एसओएल) की वर्तमान कीमत और 24 घंटे का रुझान प्राप्त करें।",
-  "toolGetCryptoPriceParamSymbol": "टिकर प्रतीक (उदाहरण के लिए, बीटीसी, ईटीएच, एसओएल)।",
   "toolPythonCodeParam": "निष्पादित किया जाने वाला पायथन कोड।",
   "toolPythonDescription": "पाइथन कोड को एक सुरक्षित सैंडबॉक्स में निष्पादित करें।",
   "toolReadDocumentDescription": "अपलोड किए गए दस्तावेज़ों से पाठ सामग्री पढ़ें और निकालें। PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) और OpenDocument प्रारूपों का समर्थन करता है। इसका उपयोग तब करें जब उपयोगकर्ता ने कोई दस्तावेज़ फ़ाइल संलग्न की हो।",

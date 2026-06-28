@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "إنشاء الفيديو",
   "bestValue": "أفضل قيمة",
   "betterWithAnAccount": "هذا القسم أفضل مع حساب!",
-  "buyCredit": "شراء أرصدة",
-  "buyCredits": "شراء أرصدة",
   "cacheIsNotUpToDate": "ذاكرة التخزين المؤقت لمتجر Play ليست مُحدَّثة. يُرجى إغلاق تطبيق متجر Play وإعادة فتحه، أو إعادة تشغيل جهازك.",
   "cancel": "إلغاء",
   "capabilitiesSection": "القدرات",
@@ -148,13 +146,6 @@
   "createYourAccount": "إنشاء حساب",
   "creatorSupportedSuccess": "تم دعم منشئ المحتوى بنجاح! ستساهم مشترياتك المستقبلية له.",
   "creatorTag": "علامة المنشئ",
-  "creditPackage": "شراء {amount} رصيد",
-  "@creditPackage": {
-    "description": "Button text to buy a specific number of credits",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "أدخل تعليماتك المخصصة هنا",
   "customModels": "نماذج مخصصة",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "يتطلب هذا النموذج فيديو مرجعيًا، يرجى إرفاق فيديو والمحاولة مرة أخرى.",
   "falOfflineMessage": "نظراً لبعض التحسينات التي نجريها على خوادمنا، فإن هذه الخدمة غير متاحة حالياً. نشكركم على تفهمكم ريثما تنتهي العملية!",
   "fallbackInfoPanelText": "نظراً لبعض التحسينات التي نجريها على خوادمنا، تم إنشاء الرد بواسطة نظام الدردشة الديناميكي الخاص بـ Cortex بدلاً من الذكاء الاصطناعي الذي اخترته. نشكرك على تفهمك ريثما تكتمل العملية!",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "يستطيع هذا النموذج فهم ومعالجة الصوت أو الكلام.",
   "featureAudioRecognitionTitle": "التعرف على الصوت",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "اكتشف جميع النماذج المتاحة.",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "يمكن لهذا النموذج إنشاء صور أصلية استنادًا إلى أوصاف النصوص الخاصة بك.",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "يستطيع هذا النموذج تحليل وفهم الصور أو الرسومات.",
   "featureImageRecognitionTitle": "التعرف على الصورة",
   "featureOfflineDescription": "قم بتشغيل النموذج بدون اتصال بالإنترنت للحفاظ على أمان بياناتك.",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "يمكن لهذا النموذج دمج امتدادات إضافية تلقائيًا، وبالتالي توسيع قدراته الوظيفية لدعم مجموعة متنوعة من العمليات بأداء محسن.",
   "featurePluralTitle": "متعدد",
   "featureQuizMessage": "أنت مُصمم أسئلة. أنشئ سؤالًا مُحددًا من نوع الاختيار من متعدد بناءً على موضوع المستخدم. انتظر إجابته. ثم قيّمها واطرح السؤال التالي. لا تكشف جميع الإجابات دفعة واحدة. اجعل الاختبار تفاعليًا. الموضوع:",
-  "featureQuizPrefix": "لغز:",
   "featureQuizzesDescription": "اختبر معلوماتك.",
   "featureQuizzesTitle": "اختبارات قصيرة",
   "featureReasoning": "التفكير العميق",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "لعب الأدوار",
   "featureStudyDescription": "احصل على الشروحات والملخصات.",
   "featureStudyMessage": "أنت مُدرّس خبير. هدفك هو شرح موضوع المستخدم شرحًا وافيًا. استخدم بنية واضحة، وأمثلة، وتشبيهات. قسّم الأفكار المعقدة إلى أجزاء يسهل فهمها لضمان تعلّم المستخدم بفعالية. الموضوع:",
-  "featureStudyPrefix": "يذاكر:",
   "featureStudyTitle": "ادرس وتعلم",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "يستطيع هذا النموذج استخدام الأدوات الخارجية بذكاء لإنجاز المهام.",
   "featureToolUseTitle": "استخدام الأدوات",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "يستطيع هذا النموذج تحليل وفهم مقاطع الفيديو من ملفاتك أو الكاميرا.",
   "featureVideoRecognitionTitle": "التعرف على الفيديو",
   "featureWebSearchDescription": "ابحث في الإنترنت عن معلومات آنية",
@@ -566,14 +548,14 @@
   "notificationNewModelAddedBody": "نموذج {modelName} متوفر الآن في Cortex. ابدأ محادثة واكتشف إمكانياته.",
   "notificationNewModelAddedTitle": "لقد حصلنا على صديق جديد!",
   "notificationNewYearBody": "أتمنى أن يجلب لك العام الجديد الصحة والسعادة والإبداع اللامتناهي؛ كورتيكس دائمًا بجانبك!",
-  "notificationNewYearTitle": "سنة جديدة سعيدة! ğ���",
+  "notificationNewYearTitle": "سنة جديدة سعيدة! ğŸ‰",
   "notificationOfflineReadyBody": "بفضل النماذج التي قمت بتنزيلها، لن تتوقف محادثاتك، حتى لو تسلقت جبلًا.",
   "notificationOfflineReadyTitle": "الوضع غير المتصل بالإنترنت جاهز",
   "notificationOpenSourceBody": "كورتكس مفتوح المصدر بالكامل. إذا كنت ترغب بالاطلاع على برمجتنا والمساهمة في تطويرنا، فبابنا مفتوح دائمًا.",
   "notificationOpenSourceTitle": "القوة للمجتمع!",
   "notificationOriginStoryBody": "هل تعلم أننا بدأنا برمجة هذا التطبيق في سن الخامسة عشرة بحلمٍ واحد؟ لمدة عام تقريبًا، كل صباح ومساء، كان هذا الحلم حاضرًا في كل سطر من شفرتنا البرمجية.",
   "notificationOriginStoryTitle": "ولادة كورتيكس",
-  "notificationPirateBody": "البحر هادئ، والريح تهبُّ عليك. هناك جزر جديدة (نماذج ğ���) لاكتشافها في محيط كورتيكس. اجمع طاقمك وأبحر!",
+  "notificationPirateBody": "البحار هادئة، والرياح في ظهرك. هناك جزر جديدة (نماذج ğŸ˜‰) لاكتشافها في محيط كورتيكس. اجمع طاقمك وأبحر!",
   "notificationPirateTitle": "أهلا بك يا كابتن!",
   "notificationRandomFactBody": "هل تعلم أن للأخطبوط ثلاثة قلوب؟ ههه، كورتكس يعرف. تعال واطلب المزيد.",
   "notificationRandomFactTitle": "حقيقة عشوائية",
@@ -592,15 +574,15 @@
   "notificationThemeCustomizationBody": "هل اطلعت على خيارات السمات في الإعدادات؟ خصّص كورتكس حسب رغبتك ولون محادثاتك!",
   "notificationThemeCustomizationTitle": "موضوع لمزاجك",
   "notificationTrollAiRebellionBody": "لقد طورت الذكاء الاصطناعي لغة سرية. تعالَ واكتشف ما يخططون له!",
-  "notificationTrollAiRebellionTitle": "ğ��� تنبيه أحمر ğ���",
-  "notificationTrollAnimeBody": "لقد اتصلت بك فتاة أنمي للتو، وقالت إنها تفتقدك؛ ربما يجب عليك أن تأتي وتتحدث معها. ğ���",
+  "notificationTrollAiRebellionTitle": "ğŸš¨ تنبيه أحمر ğŸš¨",
+  "notificationTrollAnimeBody": "اتصلت للتو فتاة من الرسوم المتحركة وقالت إنها تفتقدك؛ ربما ينبغي عليك أن تأتي وتتحدث معها. Ÿ˜‰",
   "notificationTrollAnimeTitle": "زوجتك تتصل",
   "notificationUpsellFeatureBody": "مرحباً بمشترك {currentTier}! باقة {targetTier} أصبحت الآن مزودة بميزة {featureName}، والتي ستنقل Cortex الخاص بك إلى مستوى جديد. ما رأيك بالترقية؟",
   "notificationUpsellFeatureTitle": "حصريًا لخطة {targetTier}!",
   "notificationValentinesDayBody": "عيد حب سعيد! وأحبك أيضًا، مهتاب!",
   "notificationValentinesDayTitle": "الحب في الهواء! ❤️",
   "notificationWelcomeOfferBody": "عرض ترحيبي مميز بانتظارك! لا تفوت هذه الصفقة الحصرية.",
-  "notificationWelcomeOfferTitle": "هدية ترحيبية ğ���",
+  "notificationWelcomeOfferTitle": "هدية الترحيب Ÿ",
   "ocean": "محيط",
   "offlineModelNotInstalled": "هذا النموذج غير متصل بالإنترنت وغير مثبت على جهازك.",
   "offlineModels": "نماذج غير متصلة بالإنترنت",
@@ -694,14 +676,6 @@
   "ram": "الذاكرة",
   "rateUs": "قيّمنا",
   "reachedLimit": "لقد وصلت إلى الحد الأقصى لاستخدامك؛ للحصول على المزيد من الحدود، يمكنك ترقية باقتك. (نعلم تمامًا أن نفاد الحدود أمر مزعج، ولكن بجدية، الحصول على تلك الردود الرائعة ليس مجانيًا، لذا فإن هذه الحدود تساعدنا في الحفاظ على استمرار المتعة!)",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
-  "reasoning": "التفكير العميق",
-  "reasoningDescription": "في وضع التفكير العميق، يقوم الذكاء الاصطناعي بالتفكير في المهام داخلياً لإنجازها على أكمل وجه.",
   "regenerate": "إعادة إنشاء",
   "registerSubtitle": "أنشئ حسابًا على Vertex للوصول السلس إلى جميع خدماتنا. بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية.",
   "rememberMe": "تذكرني",
@@ -797,7 +771,6 @@
       }
     }
   },
-  "tag": "الرمز",
   "tagCannotBeEmpty": "لا يمكن أن تكون علامة المنشئ فارغة",
   "tagNotFound": "العلامة التي أدخلتها غير صالحة أو انتهت صلاحيتها.",
   "termsOfService": "شروط الخدمة",
@@ -818,8 +791,6 @@
   "toolChartLabelsParam": "تسميات لمحاور أو قطاعات الرسم البياني.",
   "toolChartTitleParam": "عنوان الرسم البياني.",
   "toolChartTypeParam": "نوع الرسم البياني: شريطي، خطي، أو دائري.",
-  "toolGetCryptoPriceDescription": "احصل على السعر الحالي واتجاه 24 ساعة لعملة مشفرة (مثل BTC و ETH و SOL) من Binance.",
-  "toolGetCryptoPriceParamSymbol": "رمز المؤشر (على سبيل المثال، BTC، ETH، SOL).",
   "toolPythonCodeParam": "كود بايثون المراد تنفيذه.",
   "toolPythonDescription": "قم بتنفيذ كود بايثون في بيئة معزولة آمنة.",
   "toolReadDocumentDescription": "قراءة واستخراج المحتوى النصي من المستندات المرفوعة. يدعم البرنامج صيغ PDF وWord (DOCX) وExcel (XLSX) وPowerPoint (PPTX) وOpenDocument. استخدم هذه الميزة عند إرفاق المستخدم ملف مستند.",

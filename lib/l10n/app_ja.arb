@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "ビデオ生成",
   "bestValue": "ベストバリュー",
   "betterWithAnAccount": "このセクションはアカウントがあればさらに便利になります!",
-  "buyCredit": "クレジットを購入",
-  "buyCredits": "クレジットを購入",
   "cacheIsNotUpToDate": "Playストアのキャッシュが最新ではありません。Playストアアプリを閉じて再度開くか、デバイスを再起動してください。",
   "cancel": "キャンセル",
   "capabilitiesSection": "能力",
@@ -148,13 +146,6 @@
   "createYourAccount": "登録",
   "creatorSupportedSuccess": "クリエイターのサポートが完了しました！今後のご購入は、そのクリエイターに貢献します。",
   "creatorTag": "クリエイタータグ",
-  "creditPackage": "{amount}クレジットを購入",
-  "@creditPackage": {
-    "description": "特定の数のクレジットを購入するためのボタンテキスト",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "ここにカスタム指示を入力してください",
   "customModels": "カスタムモデル",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "このモデルには参考動画が必要です。動画を添付して再度お試しください。",
   "falOfflineMessage": "サーバー側の改善作業のため、現在このサービスは一時的にご利用いただけません。作業完了までご理解いただけますようお願い申し上げます。",
   "fallbackInfoPanelText": "サーバー側の改善作業のため、お客様が選択されたAIではなく、Cortexの動的チャット機能によって応答が生成されました。処理が完了するまで、ご理解いただけますようお願い申し上げます。",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "このモデルは音声や話し言葉を理解して処理することができます。",
   "featureAudioRecognitionTitle": "音声認識",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "利用可能なすべてのモデルをご覧ください。",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "このモデルは、テキストの説明に基づいてオリジナルの画像を作成できます。",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "このモデルは写真や画像を分析・理解することができます。",
   "featureImageRecognitionTitle": "画像認識",
   "featureOfflineDescription": "インターネット接続なしでモデルを実行し、データを安全に保ちます。",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "このモデルは追加の拡張機能を自動的に統合し、それによって機能的能力を拡張して、多様な操作を強化されたパフォーマンスでサポートします。",
   "featurePluralTitle": "複数",
   "featureQuizMessage": "あなたはクイズマスターです。ユーザーのトピックに基づいて、具体的な多肢選択式の質問を作成します。回答を待ちます。その後、回答を評価し、次の質問をします。一度にすべての回答を公開しないでください。インタラクティブな形式にしてください。トピック：",
-  "featureQuizPrefix": "クイズ：",
   "featureQuizzesDescription": "あなたの知識をテストしてください。",
   "featureQuizzesTitle": "クイズ",
   "featureReasoning": "深い思考",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "ロールプレイ",
   "featureStudyDescription": "説明と要約を入手します。",
   "featureStudyMessage": "あなたは熟練した講師です。目標は、ユーザーのトピックを包括的に説明することです。明確な構成、例、類推を用いて説明しましょう。複雑な概念を分かりやすい部分に分割し、ユーザーが効果的に学習できるようにします。トピック：",
-  "featureStudyPrefix": "勉強：",
   "featureStudyTitle": "勉強と学習",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "このモデルは、外部ツールを賢く活用してタスクを完了することができます。",
   "featureToolUseTitle": "ツールの使用",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "このモデルは、ファイルやカメラから取得した動画を分析・理解することができます。",
   "featureVideoRecognitionTitle": "ビデオ認識",
   "featureWebSearchDescription": "ウェブでリアルタイム情報を検索する",
@@ -566,14 +548,14 @@
   "notificationNewModelAddedBody": "{modelName} モデルが Cortex に登場しました。チャットに参加して、その限界に挑戦してみましょう。",
   "notificationNewModelAddedTitle": "新しい友達ができました！",
   "notificationNewYearBody": "新しい年があなたに健康と幸福、そして無限の創造性をもたらしますように。Cortex は常にあなたのそばにいます!",
-  "notificationNewYearTitle": "明けましておめでとうございます！ğ���",
+  "notificationNewYearTitle": "あけましておめでとう！",
   "notificationOfflineReadyBody": "ダウンロードしたモデルのおかげで、山を登ってもチャットが止まることはありません。",
   "notificationOfflineReadyTitle": "オフラインモードの準備ができました",
   "notificationOpenSourceBody": "Cortexは完全にオープンソースです。コードをチェックして開発に貢献したい方は、いつでも歓迎いたします。",
   "notificationOpenSourceTitle": "コミュニティに力を！",
   "notificationOriginStoryBody": "私たちが15歳の時に、ただ一つの夢を抱いてこのアプリのコーディングを始めたことをご存知ですか？ほぼ1年間、毎朝毎晩、その夢はコードの1行1行に込められてきました。",
   "notificationOriginStoryTitle": "Cortexの誕生",
-  "notificationPirateBody": "海は穏やかで、風は追い風。コルテックスの海には、新しい島々（モデルğ���）が出現。仲間を集めて出航しましょう！",
+  "notificationPirateBody": "海は穏やかで、風が吹いています。コルテックスの海で発見できる新しい島 (モデル ğŸ˜``) があります。乗組員を集めて出航しましょう！",
   "notificationPirateTitle": "やあ、キャプテン！",
   "notificationRandomFactBody": "タコには心臓が3つあるって知ってた？ハハハ、Cortexなら知ってるよ。もっと詳しく聞いてきてね。",
   "notificationRandomFactTitle": "ランダムな事実",
@@ -592,15 +574,15 @@
   "notificationThemeCustomizationBody": "設定のテーマオプションはもうチェックしましたか？Cortexをお好みに合わせてカスタマイズし、チャットを彩りましょう！",
   "notificationThemeCustomizationTitle": "あなたの気分に合わせたテーマ",
   "notificationTrollAiRebellionBody": "AIたちは秘密の言語を開発しました。彼らが何を企んでいるのか、さあ探ってみましょう！",
-  "notificationTrollAiRebellionTitle": "ğ��� 赤色警報 ğ���",
-  "notificationTrollAnimeBody": "アニメの女の子が電話してきて、会いたいと言っていたよ。会いに行って話しかけてみたらどうかな。ğ���",
+  "notificationTrollAiRebellionTitle": "レッドアラート",
+  "notificationTrollAnimeBody": "たった今電話してきたアニメの女の子が、あなたに会いたいと言いました。おそらく来て彼女と話をしたほうがいいでしょう。",
   "notificationTrollAnimeTitle": "あなたのワイフが呼んでいます",
   "notificationUpsellFeatureBody": "{currentTier}プランをご利用のお客様、こんにちは！{targetTier}プランに{featureName}機能が加わりました。Cortexを次のレベルへと引き上げます。アップグレードはいかがでしょうか？",
   "notificationUpsellFeatureTitle": "{targetTier} プラン限定！",
   "notificationValentinesDayBody": "ハッピーバレンタインデー！それから、MEHTAP、愛してるよ！",
   "notificationValentinesDayTitle": "愛が空気中に漂っています！❤️",
   "notificationWelcomeOfferBody": "特別なウェルカムオファーをご用意しております！この限定オファーをお見逃しなく。",
-  "notificationWelcomeOfferTitle": "ウェルカムギフトğ���",
+  "notificationWelcomeOfferTitle": "ウェルカムギフトğŸ",
   "ocean": "海",
   "offlineModelNotInstalled": "このオフラインモデルはデバイスにインストールされていません。",
   "offlineModels": "オフラインモデル",
@@ -694,12 +676,6 @@
   "ram": "RAM",
   "rateUs": "評価する",
   "reachedLimit": "使用制限に達しました。制限を増やすには、プランをアップグレードしてください。(制限がなくなるのは残念なことですよね。でも、素晴らしい返信を受け取るのは無料ではないので、この制限は私たちが楽しい時間を過ごし続けるために役立っているんです。)",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
   "regenerate": "再生成",
   "registerSubtitle": "Vertexアカウントを作成すると、すべてのサービスにシームレスにアクセスできます。続行すると、利用規約とプライバシーポリシーに同意したことになります。",
   "rememberMe": "ログイン状態を維持する",
@@ -795,7 +771,6 @@
       }
     }
   },
-  "tag": "コード",
   "tagCannotBeEmpty": "作成者タグは空にできません",
   "tagNotFound": "入力したタグは無効または期限切れです。",
   "termsOfService": "利用規約",
@@ -816,8 +791,6 @@
   "toolChartLabelsParam": "グラフの軸またはセグメントのラベル。",
   "toolChartTitleParam": "グラフのタイトル。",
   "toolChartTypeParam": "グラフの種類: 棒グラフ、折れ線グラフ、円グラフ。",
-  "toolGetCryptoPriceDescription": "Binance から暗号通貨 (BTC、ETH、SOL など) の現在の価格と 24 時間の傾向を取得します。",
-  "toolGetCryptoPriceParamSymbol": "ティッカーシンボル（例：BTC、ETH、SOL）。",
   "toolPythonCodeParam": "実行する Python コード。",
   "toolPythonDescription": "安全なサンドボックス内で Python コードを実行します。",
   "toolReadDocumentDescription": "アップロードされたドキュメントからテキストコンテンツを読み取り、抽出します。PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX)、OpenDocument形式に対応しています。ユーザーがドキュメントファイルを添付している場合にご利用ください。",
