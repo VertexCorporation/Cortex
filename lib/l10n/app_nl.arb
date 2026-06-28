@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "Videogeneratie",
   "bestValue": "Beste Keuze",
   "betterWithAnAccount": "Deze sectie is beter met een account!",
-  "buyCredit": "Credits Kopen",
-  "buyCredits": "Credits Kopen",
   "cacheIsNotUpToDate": "Je Play Store-cache is niet up-to-date. Sluit de Play Store-app en open deze opnieuw, of start je apparaat opnieuw op.",
   "cancel": "Annuleren",
   "capabilitiesSection": "Capaciteiten",
@@ -148,13 +146,6 @@
   "createYourAccount": "Registreren",
   "creatorSupportedSuccess": "Creator succesvol ondersteund! Je toekomstige aankopen zullen aan hen bijdragen.",
   "creatorTag": "Creator-tag",
-  "creditPackage": "Koop {amount} Credits",
-  "@creditPackage": {
-    "description": "Button text to buy a specific number of credits",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "Voer hier uw aangepaste instructies in.",
   "customModels": "Aangepaste modellen",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "Voor dit model is een referentievideo vereist. Voeg een video toe en probeer het opnieuw.",
   "falOfflineMessage": "Vanwege enkele verbeteringen aan onze server is deze intelligentie momenteel offline. Bedankt voor uw begrip totdat het proces is afgerond!",
   "fallbackInfoPanelText": "Vanwege enkele verbeteringen die we aan onze serverkant doorvoeren, is het antwoord gegenereerd door de dynamische chat van Cortex in plaats van door de door u geselecteerde AI. Bedankt voor uw begrip totdat het proces is afgerond!",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "Dit model kan audio of spraak begrijpen en verwerken.",
   "featureAudioRecognitionTitle": "Audiorecognitie",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "Ontdek alle beschikbare modellen.",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "Dit model kan originele afbeeldingen maken op basis van uw tekstbeschrijvingen.",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "Dit model kan foto's of afbeeldingen analyseren en begrijpen.",
   "featureImageRecognitionTitle": "Beeldherkenning",
   "featureOfflineDescription": "Gebruik het model zonder internetverbinding om je gegevens veilig te houden.",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "Dit model kan automatisch extra extensies integreren, waardoor de functionele capaciteiten worden uitgebreid om een breed scala aan operaties met verbeterde prestaties te ondersteunen.",
   "featurePluralTitle": "Pluraal",
   "featureQuizMessage": "Je bent de quizmaster. Genereer een specifieke meerkeuzevraag op basis van het onderwerp van de gebruiker. Wacht op het antwoord. Evalueer het vervolgens en stel de volgende vraag. Onthul niet alle antwoorden in één keer. Houd het interactief. Onderwerp:",
-  "featureQuizPrefix": "Quiz:",
   "featureQuizzesDescription": "Test je kennis.",
   "featureQuizzesTitle": "Quizzen",
   "featureReasoning": "Diep nadenken",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "Rollenspel",
   "featureStudyDescription": "Ontvang uitleg en samenvattingen.",
   "featureStudyMessage": "U bent een ervaren docent. Uw doel is om het onderwerp van de gebruiker volledig uit te leggen. Gebruik een duidelijke structuur, voorbeelden en analogieën. Breek complexe ideeën op in behapbare delen om ervoor te zorgen dat de gebruiker effectief leert. Onderwerp:",
-  "featureStudyPrefix": "Studie:",
   "featureStudyTitle": "Studeren en leren",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "Dit model kan op intelligente wijze externe tools gebruiken om taken uit te voeren.",
   "featureToolUseTitle": "Gereedschapsgebruik",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "Dit model kan video's uit uw bestanden of van uw camera analyseren en interpreteren.",
   "featureVideoRecognitionTitle": "Videoherkenning",
   "featureWebSearchDescription": "Zoek op internet naar actuele informatie.",
@@ -566,14 +548,14 @@
   "notificationNewModelAddedBody": "Het {modelName}-model staat nu in Cortex. Start een chat en verleg de grenzen.",
   "notificationNewModelAddedTitle": "We hebben een nieuwe vriend!",
   "notificationNewYearBody": "Ik hoop dat het nieuwe jaar u gezondheid, geluk en eindeloze creativiteit brengt; Cortex staat altijd aan uw zijde!",
-  "notificationNewYearTitle": "Gelukkig nieuwjaar! ğ���",
+  "notificationNewYearTitle": "Gelukkig nieuwjaar! ğŸ‰",
   "notificationOfflineReadyBody": "Dankzij de modellen die je hebt gedownload, blijven je chats doorgaan, zelfs als je een berg beklimt.",
   "notificationOfflineReadyTitle": "Offline-modus is gereed",
   "notificationOpenSourceBody": "Cortex is volledig open source. Als je onze code wilt bekijken en wilt bijdragen aan onze ontwikkeling, staat onze deur altijd open.",
   "notificationOpenSourceTitle": "Macht aan de gemeenschap!",
   "notificationOriginStoryBody": "Wist je dat we op ons vijftiende begonnen met het programmeren van deze app, met slechts een droom? Bijna een jaar lang, elke ochtend en avond, zit die droom in elke regel code.",
   "notificationOriginStoryTitle": "De geboorte van Cortex",
-  "notificationPirateBody": "De zee is kalm en de wind staat in de rug. Er zijn nieuwe eilanden (modellen ğ���) te ontdekken in de oceaan van Cortex. Verzamel je bemanning en hijs de zeilen!",
+  "notificationPirateBody": "De zee is kalm en de wind staat in de rug. Er zijn nieuwe eilanden (modellen ğŸ˜‰) te ontdekken in de oceaan van Cortex. Verzamel je bemanning en ga varen!",
   "notificationPirateTitle": "Ahoi, kapitein!",
   "notificationRandomFactBody": "Wist je dat octopussen drie harten hebben? Haha, Cortex weet het. Kom gerust vragen.",
   "notificationRandomFactTitle": "Willekeurig feit",
@@ -592,15 +574,15 @@
   "notificationThemeCustomizationBody": "Heb je de thema-opties in Instellingen al bekeken? Personaliseer Cortex naar eigen wens en geef je chats kleur!",
   "notificationThemeCustomizationTitle": "Een thema voor jouw stemming",
   "notificationTrollAiRebellionBody": "De AI's hebben een geheime taal ontwikkeld. Kom erachter wat ze van plan zijn!",
-  "notificationTrollAiRebellionTitle": "ğ��� ROOD ALARM ğ���",
-  "notificationTrollAnimeBody": "Een animemeisje belde net en zei dat ze je mist. Je moet waarschijnlijk eens langskomen en met haar kletsen. ğ���",
+  "notificationTrollAiRebellionTitle": "ğŸš¨ ROOD ALERT ğŸš¨",
+  "notificationTrollAnimeBody": "Een anime-meisje belde net en zei dat ze je mist; Je zou waarschijnlijk eens met haar moeten komen praten. ğŸ˜‰",
   "notificationTrollAnimeTitle": "Je Waifu roept",
   "notificationUpsellFeatureBody": "Hallo {currentTier}-abonnee! Het {targetTier}-abonnement heeft nu de {featureName}-functie, waarmee je Cortex naar een hoger niveau wordt getild. Wat dacht je van een upgrade?",
   "notificationUpsellFeatureTitle": "Exclusief voor het {targetTier} Plan!",
   "notificationValentinesDayBody": "Fijne Valentijnsdag! En MEHTAP, IK HOU VAN JE!",
   "notificationValentinesDayTitle": "Er hangt liefde in de lucht! ❤️",
   "notificationWelcomeOfferBody": "Een speciale welkomstaanbieding wacht op u! Mis deze exclusieve deal niet.",
-  "notificationWelcomeOfferTitle": "Welkomstcadeau ğ���",
+  "notificationWelcomeOfferTitle": "Welkomstgeschenk ğŸ",
   "ocean": "Oceaan",
   "offlineModelNotInstalled": "Dit offline model is niet op je apparaat geïnstalleerd.",
   "offlineModels": "Offline modellen",
@@ -694,14 +676,6 @@
   "ram": "RAM",
   "rateUs": "Beoordeel Ons",
   "reachedLimit": "Je hebt je gebruikslimiet bereikt; om meer limieten te krijgen, kun je je abonnement upgraden. (We snappen natuurlijk helemaal dat het balen is als je limiet op is. Maar serieus, die geweldige reacties krijgen is niet gratis, dus deze limieten helpen ons juist om de leuke momenten te blijven voortzetten.)",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
-  "reasoning": "Diep nadenken",
-  "reasoningDescription": "In de modus 'Diep Denken' denkt de AI intern na over taken om deze zo goed mogelijk te voltooien.",
   "regenerate": "Opnieuw genereren",
   "registerSubtitle": "Maak een Vertex-account aan voor naadloze toegang tot al onze diensten. Door verder te gaan, gaat u akkoord met onze Servicevoorwaarden en ons Privacybeleid.",
   "rememberMe": "Onthoud mij",
@@ -797,7 +771,6 @@
       }
     }
   },
-  "tag": "Code",
   "tagCannotBeEmpty": "Creator-tag mag niet leeg zijn",
   "tagNotFound": "De tag die u hebt ingevoerd is ongeldig of verlopen.",
   "termsOfService": "Servicevoorwaarden",
@@ -818,8 +791,6 @@
   "toolChartLabelsParam": "Labels voor grafiekassen of -segmenten.",
   "toolChartTitleParam": "Titel van de grafiek.",
   "toolChartTypeParam": "Grafiektype: staafdiagram, lijndiagram of cirkeldiagram.",
-  "toolGetCryptoPriceDescription": "Bekijk de actuele prijs en de trend van de afgelopen 24 uur van een cryptocurrency (bijv. BTC, ETH, SOL) op Binance.",
-  "toolGetCryptoPriceParamSymbol": "Het tickersymbool (bijv. BTC, ETH, SOL).",
   "toolPythonCodeParam": "De Python-code die moet worden uitgevoerd.",
   "toolPythonDescription": "Voer Python-code uit in een beveiligde sandbox.",
   "toolReadDocumentDescription": "Lees en extraheer tekstinhoud uit geüploade documenten. Ondersteunt PDF-, Word (DOCX)-, Excel (XLSX)-, PowerPoint (PPTX)- en OpenDocument-formaten. Gebruik dit wanneer de gebruiker een documentbestand heeft bijgevoegd.",

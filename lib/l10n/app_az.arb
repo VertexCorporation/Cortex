@@ -60,14 +60,12 @@
   "benefitVideoGeneration": "Video Nəsli",
   "bestValue": "Ən Yaxşı Dəyər",
   "betterWithAnAccount": "Bu bölmə hesabla daha yaxşıdır!",
-  "buyCredit": "Kredit Al",
-  "buyCredits": "Kredit Al",
   "cacheIsNotUpToDate": "Play Store keşiniz güncəl deyil. Lütfən, Play Store tətbiqini bağlayın və yenidən açın və ya cihazınızı yenidən başladın.",
   "cancel": "Ləğv et",
   "capabilitiesSection": "Bacarıqlar",
-  "categoryAll": "T�m�",
+  "categoryAll": "Hamısı",
   "categoryFeminine": "Dişil",
-  "categoryFree": "�cretsiz",
+  "categoryFree": "Pulsuz",
   "categoryInanimate": "Cansız",
   "categoryMasculine": "Eril",
   "categoryPhoto": "Fotoğraf",
@@ -148,7 +146,6 @@
   "createYourAccount": "Qeydiyyatdan keç",
   "creatorSupportedSuccess": "Yaradıcı uğurla dəstəkləndi! Gələcək alış-verişləriniz ona töhfə verəcək.",
   "creatorTag": "Yaradıcı etiketi",
-  "creditPackage": "{amount} Kredit Al",
   "customInstructionHint": "Xüsusi təlimatlarınızı buraya daxil edin",
   "customModels": "Xüsusi Modellər",
   "@customModels": {
@@ -279,7 +276,6 @@
   "falErrorVideoRequired": "Bu model istinad videosu tələb edir, zəhmət olmasa, video əlavə edin və yenidən cəhd edin.",
   "falOfflineMessage": "Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, bu zəka hazırda oflayndır. Proses bitənə qədər anlayışınız üçün təşəkkür edirik!",
   "fallbackInfoPanelText": "Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, cavab sizin xüsusi seçdiyiniz süni intellekt əvəzinə Cortex-in dinamik söhbəti ilə yaradılıb. Proses başa çatana qədər anlayışınız üçün təşəkkür edirik!",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -288,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "Bu model səs və ya nitqi başa düşə və emal edə bilir.",
   "featureAudioRecognitionTitle": "Səs Tanıma",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -306,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "Mövcud olan bütün modelləri kəşf edin.",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "Bu model mətn təsvirləriniz əsasında orijinal şəkillər yarada bilər.",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -315,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "Bu model fotoşəkilləri və ya təsvirləri təhlil edə və başa düşə bilər.",
   "featureImageRecognitionTitle": "Şəkil Tanıma",
   "featureOfflineDescription": "Məlumatlarınızı təhlükəsiz saxlamaq üçün modeli internet bağlantısı olmadan işlədin.",
@@ -325,7 +318,6 @@
   "featurePluralDescription": "Bu model avtomatik olaraq əlavə genişləndirmələri inteqrasiya edə bilir, bununla da funksional imkanlarını artıraraq müxtəlif əməliyyatları daha yüksək performansla dəstəkləyir.",
   "featurePluralTitle": "Çoxşaxəli",
   "featureQuizMessage": "Siz viktorina ustasısınız. İstifadəçinin mövzusuna əsasən müəyyən bir çoxseçimli sual yaradın. Cavabını gözləyin. Sonra onu qiymətləndirin və növbəti sualı verin. Bütün cavabları birdən açıqlamayın. İnteraktiv saxlayın. Mövzu:",
-  "featureQuizPrefix": "Viktorina:",
   "featureQuizzesDescription": "Biliklərinizi sınayın.",
   "featureQuizzesTitle": "Testlər",
   "featureReasoning": "Dərin Düşüncə",
@@ -334,12 +326,9 @@
   "featureRoleplayTitle": "Rol Oyunu",
   "featureStudyDescription": "İzahatlar və xülasələr alın.",
   "featureStudyMessage": "Siz peşəkar repetitorsunuz. Məqsədiniz istifadəçinin mövzusunu hərtərəfli izah etməkdir. Aydın struktur, nümunələr və bənzətmələrdən istifadə edin. İstifadəçinin effektiv şəkildə öyrənməsini təmin etmək üçün mürəkkəb fikirləri asanlıqla başa düşülən hissələrə ayırın. Mövzu:",
-  "featureStudyPrefix": "Tədqiqat:",
   "featureStudyTitle": "Oxu və Öyrən",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "Bu model tapşırıqları yerinə yetirmək üçün xarici vasitələrdən ağıllı şəkildə istifadə edə bilər.",
   "featureToolUseTitle": "Alət İstifadəsi",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -348,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "Bu model fayllarınızdan və ya kameranızdan videoları təhlil edə və başa düşə bilər.",
   "featureVideoRecognitionTitle": "Video Tanıma",
   "featureWebSearchDescription": "Real vaxt məlumatı üçün internetdə axtarış aparın",
@@ -560,14 +548,14 @@
   "notificationNewModelAddedBody": "{modelName} modeli indi Cortex-dədir. Gəlin söhbətə başlayın və onun sərhədlərini keçin.",
   "notificationNewModelAddedTitle": "Yeni Dostumuz Var!",
   "notificationNewYearBody": "Yeni il sizə sağlamlıq, xoşbəxtlik və sonsuz yaradıcılıq gətirsin; Korteks həmişə yanınızdadır!",
-  "notificationNewYearTitle": "Yeni iliniz mübarək! ğ���",
+  "notificationNewYearTitle": "Yeni iliniz mübarək! ğŸ‰",
   "notificationOfflineReadyBody": "Yüklədiyiniz modellər sayəsində dağa çıxsanız belə söhbətləriniz dayanmayacaq.",
   "notificationOfflineReadyTitle": "Oflayn Rejim Hazırdır",
   "notificationOpenSourceBody": "Korteks tamamilə açıq mənbəlidir. Kodumuzu yoxlamaq və inkişafımıza töhfə vermək istəyirsinizsə, qapımız hər zaman açıqdır.",
   "notificationOpenSourceTitle": "Cəmiyyətə güc!",
   "notificationOriginStoryBody": "Bu proqramı kodlamağa 15 yaşında bir yuxu ilə başladığımızı bilirdinizmi? Demək olar ki, bir ildir ki, hər səhər və axşam bu yuxu hər bir kod sətirində var.",
   "notificationOriginStoryTitle": "Korteksin doğulması",
-  "notificationPirateBody": "Dənizlər sakitdir, külək arxanızdadır. Korteks okeanında kəşf ediləcək yeni adalar (modellər ğ���) var. Ekipajınızı toplayın və yelkən açın!",
+  "notificationPirateBody": "Dənizlər sakitdir, külək arxanızdadır. Korteks okeanında kəşf ediləcək yeni adalar (gŸ˜‰ modelləri) var. Ekipajınızı toplayın və yelkən açın!",
   "notificationPirateTitle": "Ah, kapitan!",
   "notificationRandomFactBody": "Ahtapotların üç ürəyi olduğunu bilirdinizmi? Haha, Cortex bilir. Gəlin və daha çox soruşun.",
   "notificationRandomFactTitle": "Təsadüfi Fakt",
@@ -586,15 +574,15 @@
   "notificationThemeCustomizationBody": "Parametrlərdə mövzu seçimlərini yoxlamısınız? Korteksi zövqünüzə görə fərdiləşdirin və söhbətlərinizi rəngləndirin!",
   "notificationThemeCustomizationTitle": "Əhvalınız üçün Mövzu",
   "notificationTrollAiRebellionBody": "AI-lər gizli bir dil inkişaf etdirdilər. Gəlin, onların nə hiylə qurduğunu öyrənin!",
-  "notificationTrollAiRebellionTitle": "ğ��� QIRMIZI HEYARLI ğ���",
-  "notificationTrollAnimeBody": "Bir az əvvəl bir anime qızı zəng etdi, sənin üçün darıxdığını söylədi; yəqin ki, gəlib onunla söhbət etməlisən. ğ���",
+  "notificationTrollAiRebellionTitle": "qŸš¨ QIRMIZI HEYDANI ğŸš¨",
+  "notificationTrollAnimeBody": "Bir az əvvəl bir anime qızı zəng etdi, sənin üçün darıxdığını söylədi; yəqin ki, gəlib onunla söhbət etməlisən. ğŸ˜‰",
   "notificationTrollAnimeTitle": "Sizin Waifu zəng edir",
   "notificationUpsellFeatureBody": "Salam {currentTier} abunəçisi! {targetTier} planı korteksinizi növbəti səviyyəyə aparacaq {featureName} funksiyasını indicə əldə etdi. Təkmilləşdirmə haqqında nə demək olar?",
   "notificationUpsellFeatureTitle": "{targetTier} Planına eksklüziv!",
   "notificationValentinesDayBody": "Sevgililər gününüz mübarək! Həm də MEHTAP, SƏNİ SEVİRƏM!",
   "notificationValentinesDayTitle": "Sevgi havadadır! ❤️",
   "notificationWelcomeOfferBody": "Xüsusi xoş gəlmisiniz təklifi sizi gözləyir! Bu eksklüziv təklifi qaçırmayın.",
-  "notificationWelcomeOfferTitle": "Xoş Gəlmisiniz Hədiyyəsi ğ���",
+  "notificationWelcomeOfferTitle": "Xoş gəlmisiniz Hədiyyə ğŸ",
   "ocean": "Okean",
   "offlineModelNotInstalled": "Bu oflayn model cihazınızda quraşdırılmayıb.",
   "offlineModels": "Offline Modellər",
@@ -783,7 +771,6 @@
       }
     }
   },
-  "tag": "Kod",
   "tagCannotBeEmpty": "Yaradıcı teqi boş ola bilməz",
   "tagNotFound": "Daxil etdiyiniz teq etibarsızdır və ya vaxtı keçmişdir.",
   "termsOfService": "Xidmət Şərtləri",
@@ -804,8 +791,6 @@
   "toolChartLabelsParam": "Diaqram oxları və ya seqmentləri üçün etiketlər.",
   "toolChartTitleParam": "Diaqramın başlığı.",
   "toolChartTypeParam": "Diaqram növü: sütun, xətt və ya dairəvi forma.",
-  "toolGetCryptoPriceDescription": "Binance-dan kriptovalyutanın (məsələn, BTC, ETH, SOL) cari qiymətini və 24 saatlıq trendini əldə edin.",
-  "toolGetCryptoPriceParamSymbol": "Ticker simvolu (məsələn, BTC, ETH, SOL).",
   "toolPythonCodeParam": "İcra ediləcək Python kodu.",
   "toolPythonDescription": "Python kodunu təhlükəsiz bir sandboxda icra edin.",
   "toolReadDocumentDescription": "Yüklənmiş sənədlərdən mətn məzmununu oxuyun və çıxarın. PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) və OpenDocument formatlarını dəstəkləyir. İstifadəçi sənəd faylı əlavə etdikdə bundan istifadə edin.",
