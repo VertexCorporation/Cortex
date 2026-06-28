@@ -10,146 +10,143 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'ã‚ãªãŸã¯ã‚¿ã‚¤ãƒˆãƒ«ç”Ÿæˆè€…ã§ã™ã€‚ä»¥ä¸‹ã®ä¼šè©±ã«å¯¾ã—ã¦ã€2ï½5èªã®ã‚¿ã‚¤ãƒˆãƒ«ã®ã¿ã‚’è¿”ä¿¡ã—ã¦ãã ã•ã„ã€‚å¼•ç”¨ç¬¦ã€æ¥é ­è¾ã€å¥èª­ç‚¹ã¯ä½¿ç”¨ã—ãªã„ã§ãã ã•ã„ã€‚é‡è¦ï¼šã‚¿ã‚¤ãƒˆãƒ«ã¯ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¨å®Œå…¨ã«åŒã˜è¨€èªã§ãªã‘ã‚Œã°ãªã‚Šã¾ã›ã‚“ã€‚';
+      'あなたはタイトル生成者です。以下の会話に対して、2～5語のタイトルのみを返信してください。引用符、接頭辞、句読点は使用しないでください。重要：タイトルは、ユーザーのメッセージと完全に同じ言語でなければなりません。';
 
   @override
-  String get systemRoleFallback =>
-      'ã‚ãªãŸã¯é ¼ã‚Šã«ãªã‚‹ã‚¢ã‚·ã‚¹ã‚¿ãƒ³ãƒˆã§ã™ã€‚';
+  String get systemRoleFallback => 'あなたは頼りになるアシスタントです。';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nCRITICAL: å¸¸ã«ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒå…¥åŠ›ã—ãŸè¨€èªã¨åŒã˜è¨€èªã§å¿œç­”ã—ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®è¨€èªã«æ³¨æ„ã—ã¦ãã ã•ã„ã€‚';
+      '\n\nCRITICAL: 常にユーザーが入力した言語と同じ言語で応答し、ユーザーの言語に注意してください。';
 
   @override
   String get systemNotePreviousMedia =>
-      'ã€ã‚·ã‚¹ãƒ†ãƒ æ³¨è¨˜ï¼šä»¥ä¸‹ã¯ä»¥å‰ã«ç”Ÿæˆã•ã‚ŒãŸãƒ¡ãƒ‡ã‚£ã‚¢ã§ã™ã€‚å‚ç…§ã¾ãŸã¯ç·¨é›†ã—ã¦ãã ã•ã„ã€‚ã€‘';
+      '【システム注記：以下は以前に生成されたメディアです。参照または編集してください。】';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\nç¾åœ¨ã®æ—¥æ™‚: $formattedTimeã€‚';
+    return '\n\n現在の日時: $formattedTime。';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nã“ã‚Œã¾ã§ã®ä¼šè©±ã‚’åˆ†æã—ã¾ã™ã€‚ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«é–¢ã™ã‚‹æ–°ã—ã„æ˜ç¢ºãªäº‹å®Ÿï¼ˆå¥½ã¿ã€åå‰ã€ç¿’æ…£ã€çŠ¶æ³ãªã©ï¼‰ãŒåˆ¤æ˜ã—ãŸå ´åˆã¯ã€å¿œç­”ã®æœ€å¾Œã«ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«é–¢ã™ã‚‹æ›´æ–°ã•ã‚ŒãŸãƒ¡ãƒ¢ãƒªå…¨ä½“ã‚’<memory>...</memory>ã‚¿ã‚°å†…ã«å‡ºåŠ›ã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚é‡è¦ï¼šä»¥å‰ã®ãƒ¡ãƒ¢ãƒªã‚’æ¶ˆå»ã¾ãŸã¯ä¸Šæ›¸ãã—ã¦ã¯ãªã‚Šã¾ã›ã‚“ã€‚å¸¸ã«æ–°ã—ã„äº‹å®Ÿã‚’æ—¢å­˜ã®ãƒ¡ãƒ¢ãƒªã«è¿½åŠ ã—ã¦ãã ã•ã„ã€‚æ–°ã—ã„æƒ…å ±ãŒå…¨ãåˆ¤æ˜ã—ãªã‹ã£ãŸå ´åˆã¯ã€ã‚¿ã‚°ã‚’çœç•¥ã—ã¦ãã ã•ã„ã€‚ä¾‹ï¼š<memory>ã‚µãƒƒã‚«ãƒ¼ã¨ãƒ†ãƒ‹ã‚¹ãŒå¥½ãã€‚çŸ­ã„å›ç­”ã‚’å¥½ã‚€ã€‚</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nこれまでの会話を分析します。ユーザーに関する新しい明確な事実（好み、名前、習慣、状況など）が判明した場合は、応答の最後に、ユーザーに関する更新されたメモリ全体を<memory>...</memory>タグ内に出力する必要があります。重要：以前のメモリを消去または上書きしてはなりません。常に新しい事実を既存のメモリに追加してください。新しい情報が全く判明しなかった場合は、タグを省略してください。例：<memory>サッカーとテニスが好き。短い回答を好む。</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\nãƒ¦ãƒ¼ã‚¶ãƒ¼ã«ã¤ã„ã¦å¸¸ã«ä»¥ä¸‹ã‚’è¦šãˆã¦ãŠã„ã¦ãã ã•ã„ï¼š\n$userMemory';
+    return '\n\nユーザーについて常に以下を覚えておいてください：\n$userMemory';
   }
 
   @override
-  String get cancel => 'ã‚­ãƒ£ãƒ³ã‚»ãƒ«';
+  String get cancel => 'キャンセル';
 
   @override
-  String get remove => 'å–ã‚Šé™¤ã';
+  String get remove => '取り除く';
 
   @override
-  String get download => 'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰';
+  String get download => 'ダウンロード';
 
   @override
-  String get resume => 'å†é–‹';
+  String get resume => '再開';
 
   @override
-  String get copy => 'ã‚³ãƒ”ãƒ¼';
+  String get copy => 'コピー';
 
   @override
-  String get chat => 'ãƒãƒ£ãƒƒãƒˆ';
+  String get chat => 'チャット';
 
   @override
   String get locked => 'Locked';
 
   @override
-  String get languageModels => 'è¨€èªãƒ¢ãƒ‡ãƒ«';
+  String get languageModels => '言語モデル';
 
   @override
-  String get light => 'ãƒ©ã‚¤ãƒˆ';
+  String get light => 'ライト';
 
   @override
-  String get theme => 'ãƒ†ãƒ¼ãƒ';
+  String get theme => 'テーマ';
 
   @override
-  String get no => 'ã„ã„ãˆ';
+  String get no => 'いいえ';
 
   @override
-  String get yes => 'ã¯ã„';
+  String get yes => 'はい';
 
   @override
-  String get done => 'å®Œäº†';
+  String get done => '完了';
 
   @override
-  String get bestValue => 'ãƒ™ã‚¹ãƒˆãƒãƒªãƒ¥ãƒ¼';
+  String get bestValue => 'ベストバリュー';
 
   @override
-  String get selected => 'é¸æŠæ¸ˆã¿';
+  String get selected => '選択済み';
 
   @override
-  String get descriptionSection => 'èª¬æ˜';
+  String get descriptionSection => '説明';
 
   @override
-  String get searchHint => 'æ¤œç´¢';
+  String get searchHint => '検索';
 
   @override
-  String get messageHint => 'ä½•ã§ã‚‚èã„ã¦ãã ã•ã„';
+  String get messageHint => '何でも聞いてください';
 
   @override
-  String get messageCopied =>
-      'ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ã‚³ãƒ”ãƒ¼ã—ã¾ã—ãŸã€‚';
+  String get messageCopied => 'メッセージをクリップボードにコピーしました。';
 
   @override
-  String get retry => 'å†è©¦è¡Œ';
+  String get retry => '再試行';
 
   @override
-  String get systemInfo => 'ã‚·ã‚¹ãƒ†ãƒ æƒ…å ±';
+  String get systemInfo => 'システム情報';
 
   @override
   String deviceMemory(Object memory) {
-    return 'ãƒ‡ãƒã‚¤ã‚¹ãƒ¡ãƒ¢ãƒª: $memory GB';
+    return 'デバイスメモリ: $memory GB';
   }
 
   @override
-  String get memory => 'ãƒ¡ãƒ¢ãƒª';
+  String get memory => 'メモリ';
 
   @override
-  String get storage => 'ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸';
+  String get storage => 'ストレージ';
 
   @override
-  String get freeStorage => 'ç©ºãå®¹é‡';
+  String get freeStorage => '空き容量';
 
   @override
-  String get totalStorage => 'åˆè¨ˆã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸';
+  String get totalStorage => '合計ストレージ';
 
   @override
-  String get usedStorage => 'ä½¿ç”¨æ¸ˆã¿ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸';
+  String get usedStorage => '使用済みストレージ';
 
   @override
-  String get totalMemory => 'åˆè¨ˆãƒ¡ãƒ¢ãƒª';
+  String get totalMemory => '合計メモリ';
 
   @override
-  String get usedMemory => 'ä½¿ç”¨æ¸ˆã¿ãƒ¡ãƒ¢ãƒª';
+  String get usedMemory => '使用済みメモリ';
 
   @override
-  String get modelsTitle => 'ãƒ©ã‚¤ãƒ–ãƒ©ãƒª';
+  String get modelsTitle => 'ライブラリ';
 
   @override
-  String get localModels => 'ãƒ­ãƒ¼ã‚«ãƒ«ãƒ¢ãƒ‡ãƒ«';
+  String get localModels => 'ローカルモデル';
 
   @override
-  String get selectGGUFFile => 'GGUFãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠ';
+  String get selectGGUFFile => 'GGUFファイルを選択';
 
   @override
-  String get errorGGUF =>
-      'GGUFå½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ã¿ã‚’é¸æŠã—ã¦ãã ã•ã„ã€‚';
+  String get errorGGUF => 'GGUF形式のファイルのみを選択してください。';
 
   @override
-  String get myModels => 'ãƒã‚¤ãƒ¢ãƒ‡ãƒ«';
+  String get myModels => 'マイモデル';
 
   @override
-  String get create => 'ä½œæˆ';
+  String get create => '作成';
 
   @override
   String modelProducer(Object producer) {
-    return 'ãƒ—ãƒ­ãƒ‡ãƒ¥ãƒ¼ã‚µãƒ¼: $producer';
+    return 'プロデューサー: $producer';
   }
 
   @override
@@ -158,597 +155,573 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => 'åå‰ã‚’å¤‰æ›´';
+  String get editConversationTitle => '名前を変更';
 
   @override
-  String get newTitle => 'æ–°ã—ã„ã‚¿ã‚¤ãƒˆãƒ«';
+  String get newTitle => '新しいタイトル';
 
   @override
-  String get save => 'ä¿å­˜';
+  String get save => '保存';
 
   @override
-  String get noConversationsMessage =>
-      'ä¼šè©±ãŒã‚ã‚Šã¾ã›ã‚“ã€ãƒãƒ£ãƒƒãƒˆã‚’å§‹ã‚ã¾ã—ã‚‡ã†ï¼';
+  String get noConversationsMessage => '会話がありません、チャットを始めましょう！';
 
   @override
-  String get startChat => 'ãƒãƒ£ãƒƒãƒˆã‚’é–‹å§‹';
+  String get startChat => 'チャットを開始';
 
   @override
-  String get noChats => 'ãƒãƒ£ãƒƒãƒˆãŒã‚ã‚Šã¾ã›ã‚“';
+  String get noChats => 'チャットがありません';
 
   @override
-  String get noStarredChats => 'ã‚¹ã‚¿ãƒ¼ä»˜ããƒãƒ£ãƒƒãƒˆãŒã‚ã‚Šã¾ã›ã‚“';
+  String get noStarredChats => 'スター付きチャットがありません';
 
   @override
-  String get noStarredChatsMessage =>
-      'ã¾ã ã‚¹ã‚¿ãƒ¼ã‚’ä»˜ã‘ãŸãƒãƒ£ãƒƒãƒˆãŒã‚ã‚Šã¾ã›ã‚“ã€‚';
+  String get noStarredChatsMessage => 'まだスターを付けたチャットがありません。';
 
   @override
-  String get starConversation => 'ã‚¹ã‚¿ãƒ¼';
+  String get starConversation => 'スター';
 
   @override
-  String get unstarConversation => 'ã‚¹ã‚¿ãƒ¼ã‚’å¤–ã™';
+  String get unstarConversation => 'スターを外す';
 
   @override
-  String get loginToYourAccount => 'ãƒ­ã‚°ã‚¤ãƒ³';
+  String get loginToYourAccount => 'ログイン';
 
   @override
-  String get createYourAccount => 'ç™»éŒ²';
+  String get createYourAccount => '登録';
 
   @override
-  String get email => 'ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹';
+  String get email => 'メールアドレス';
 
   @override
-  String get password => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰';
+  String get password => 'パスワード';
 
   @override
-  String get confirmPassword => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®ç¢ºèª';
+  String get confirmPassword => 'パスワードの確認';
 
   @override
-  String get invalidEmail =>
-      'æœ‰åŠ¹ãªãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚';
+  String get invalidEmail => '有効なメールアドレスを入力してください。';
 
   @override
-  String get invalidPassword =>
-      'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¯6æ–‡å­—ä»¥ä¸Šã§ã‚ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚';
+  String get invalidPassword => 'パスワードは6文字以上である必要があります。';
 
   @override
-  String get rememberMe => 'ãƒ­ã‚°ã‚¤ãƒ³çŠ¶æ…‹ã‚’ç¶­æŒã™ã‚‹';
+  String get rememberMe => 'ログイン状態を維持する';
 
   @override
-  String get forgotPassword => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ãŠå¿˜ã‚Œã§ã™ã‹ï¼Ÿ';
+  String get forgotPassword => 'パスワードをお忘れですか？';
 
   @override
-  String get or => 'ã¾ãŸã¯';
+  String get or => 'または';
 
   @override
-  String get continueWithGoogle => 'Googleã§ç¶šè¡Œ';
+  String get continueWithGoogle => 'Googleで続行';
 
   @override
-  String get dontHaveAccount =>
-      'ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ãŠæŒã¡ã§ãªã„ã§ã™ã‹ï¼Ÿ';
+  String get dontHaveAccount => 'アカウントをお持ちでないですか？';
 
   @override
-  String get alreadyHaveAccount =>
-      'æ—¢ã«ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ãŠæŒã¡ã§ã™ã‹ï¼Ÿ';
+  String get alreadyHaveAccount => '既にアカウントをお持ちですか？';
 
   @override
-  String get signUp => 'ã‚µã‚¤ãƒ³ã‚¢ãƒƒãƒ—';
+  String get signUp => 'サインアップ';
 
   @override
-  String get logIn => 'ãƒ­ã‚°ã‚¤ãƒ³';
+  String get logIn => 'ログイン';
 
   @override
-  String get passwordsDoNotMatch => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒä¸€è‡´ã—ã¾ã›ã‚“ã€‚';
+  String get passwordsDoNotMatch => 'パスワードが一致しません。';
 
   @override
-  String get wrongPassword => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæ­£ã—ãã‚ã‚Šã¾ã›ã‚“ã€‚';
+  String get wrongPassword => 'パスワードが正しくありません。';
 
   @override
-  String get emailAlreadyInUse =>
-      'ã“ã®ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã¯æ—¢ã«ä½¿ç”¨ã•ã‚Œã¦ã„ã¾ã™ã€‚';
+  String get emailAlreadyInUse => 'このメールアドレスは既に使用されています。';
 
   @override
-  String get weakPassword => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒå¼±ã™ãã¾ã™ã€‚';
+  String get weakPassword => 'パスワードが弱すぎます。';
 
   @override
-  String get authError => 'èªè¨¼ã‚¨ãƒ©ãƒ¼';
+  String get authError => '認証エラー';
 
   @override
-  String get usernameTaken =>
-      'ã“ã®ãƒ¦ãƒ¼ã‚¶ãƒ¼åã¯æ—¢ã«ä½¿ç”¨ã•ã‚Œã¦ã„ã¾ã™ã€‚';
+  String get usernameTaken => 'このユーザー名は既に使用されています。';
 
   @override
-  String get username => 'ãƒ¦ãƒ¼ã‚¶ãƒ¼å';
+  String get username => 'ユーザー名';
 
   @override
-  String get resendCode => 'ç¢ºèªãƒ¡ãƒ¼ãƒ«ã‚’å†é€ä¿¡';
+  String get resendCode => '確認メールを再送信';
 
   @override
   String get pleaseCheckYourEmail =>
-      'Cortexã‚’ä½¿ç”¨ã™ã‚‹ã«ã¯ã€ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã®ç¢ºèªãŒå¿…è¦ã§ã™ã€‚\nç¢ºèªãƒªãƒ³ã‚¯ãŒã‚ãªãŸã®ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã«é€ä¿¡ã•ã‚Œã¾ã—ãŸã€‚ãƒ¡ãƒ¼ãƒ«ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚';
+      'Cortexを使用するには、メールアドレスの確認が必要です。\n確認リンクがあなたのメールアドレスに送信されました。メールを確認してください。';
 
   @override
-  String get verifyYourEmail => 'ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ç¢ºèª';
+  String get verifyYourEmail => 'メールアドレスを確認';
 
   @override
-  String get seconds => 'ç§’';
+  String get seconds => '秒';
 
   @override
-  String get maxResendLimitReached =>
-      'ç¢ºèªãƒ¡ãƒ¼ãƒ«ã®æœ€å¤§é€ä¿¡å›æ•°ã«é”ã—ã¾ã—ãŸ';
+  String get maxResendLimitReached => '確認メールの最大送信回数に達しました';
 
   @override
-  String get verificationScreenContinueWithoutVerification =>
-      'ç¢ºèªã›ãšã«ç¶šè¡Œ';
+  String get verificationScreenContinueWithoutVerification => '確認せずに続行';
 
   @override
   String get verificationScreenWarning =>
-      'ç¶šè¡Œã—ã¦ã‚‚ã€ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã®1æ—¥é–“ã®ç¢ºèªæœŸé–“ã¯æœ‰åŠ¹ã§ã™ã€‚ãã‚Œã¾ã§ã«ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ç¢ºèªã—ãªã„å ´åˆã€ã‚¢ãƒ—ãƒªã‹ã‚‰å‰Šé™¤ã•ã‚Œã¾ã™ã€‚';
+      '続行しても、アカウントの1日間の確認期間は有効です。それまでにアカウントを確認しない場合、アプリから削除されます。';
 
   @override
-  String get unverifiedAccountHeader =>
-      'ã‚ãªãŸã®ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã¯ç¢ºèªã•ã‚Œã¦ã„ã¾ã›ã‚“';
+  String get unverifiedAccountHeader => 'あなたのアカウントは確認されていません';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return '$timeLeftä»¥å†…ã«ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ç¢ºèªã—ãªã„å ´åˆã€å‰Šé™¤ã•ã‚Œã¾ã™';
+    return '$timeLeft以内にアカウントを確認しない場合、削除されます';
   }
 
   @override
-  String get verifyNow => 'ä»Šã™ãç¢ºèª';
+  String get verifyNow => '今すぐ確認';
 
   @override
-  String get linkSent => 'ãƒªãƒ³ã‚¯ã‚’é€ä¿¡ã—ã¾ã—ãŸ';
+  String get linkSent => 'リンクを送信しました';
 
   @override
   String get accountDeletionRequested =>
-      'ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã®å‰Šé™¤ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒå—ä¿¡ã•ã‚Œã€ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã¯ç¾åœ¨ç„¡åŠ¹ã«ãªã£ã¦ã„ã¾ã™ã€‚';
+      'アカウントの削除リクエストが受信され、アカウントは現在無効になっています。';
 
   @override
-  String get tooManyRequests => 'ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒå¤šã™ãã¾ã™';
+  String get tooManyRequests => 'リクエストが多すぎます';
 
   @override
-  String get regenerate => 'å†ç”Ÿæˆ';
+  String get regenerate => '再生成';
 
   @override
-  String get confirmDeleteAccount =>
-      'æœ¬å½“ã«ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ';
+  String get confirmDeleteAccount => '本当にアカウントを削除しますか？';
 
   @override
-  String get deleteAccount => 'ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’å‰Šé™¤';
+  String get deleteAccount => 'アカウントを削除';
 
   @override
-  String get delete => 'å‰Šé™¤';
+  String get delete => '削除';
 
   @override
-  String get passwordRequired => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒå¿…è¦ã§ã™ã€‚';
+  String get passwordRequired => 'パスワードが必要です。';
 
   @override
   String get deleteDescription =>
-      'å‰Šé™¤ã—ãŸãƒ‡ãƒ¼ã‚¿ã¯ã€å½“ç¤¾ã®ã‚µãƒ¼ãƒãƒ¼ã¨ã‚ãªãŸã®ãƒ‡ãƒã‚¤ã‚¹ã‹ã‚‰æ°¸ä¹…ã«å‰Šé™¤ã•ã‚Œã¾ã™ã€‚ã“ã®æ“ä½œã¯å…ƒã«æˆ»ã›ã¾ã›ã‚“ã€‚';
+      '削除したデータは、当社のサーバーとあなたのデバイスから永久に削除されます。この操作は元に戻せません。';
 
   @override
-  String get editProfile => 'ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«ã‚’ç·¨é›†';
+  String get editProfile => 'プロフィールを編集';
 
   @override
-  String get displayName => 'è¡¨ç¤ºå';
+  String get displayName => '表示名';
 
   @override
-  String get profileUpdated =>
-      'ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«ãŒæ­£å¸¸ã«æ›´æ–°ã•ã‚Œã¾ã—ãŸ';
+  String get profileUpdated => 'プロフィールが正常に更新されました';
 
   @override
-  String get logout => 'ãƒ­ã‚°ã‚¢ã‚¦ãƒˆ';
+  String get logout => 'ログアウト';
 
   @override
-  String get profile => 'ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«';
+  String get profile => 'プロフィール';
 
   @override
   String get manageProfileDescription =>
-      'ã‚ãªãŸã®ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«ã‚’ç®¡ç†ã—ã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’æ›´æ–°ã—ãŸã‚Šã€Cortexã‹ã‚‰ãƒ­ã‚°ã‚¢ã‚¦ãƒˆã—ãŸã‚Šã—ã¾ã™ã€‚';
+      'あなたのプロフィールを管理し、パスワードを更新したり、Cortexからログアウトしたりします。';
 
   @override
   String get accessSettingsDescription =>
-      'ãƒ˜ãƒ«ãƒ—ã¸ã®ã‚¢ã‚¯ã‚»ã‚¹ã€ã‚³ãƒ¼ãƒ‰ã®å¼•ãæ›ãˆã€Cortexã®å…±æœ‰ã€ãŠã‚ˆã³å½“ç¤¾ã®ãƒãƒªã‚·ãƒ¼ã®è¡¨ç¤ºã€‚';
+      'ヘルプへのアクセス、コードの引き換え、Cortexの共有、および当社のポリシーの表示。';
 
   @override
-  String get languageDescription =>
-      'ã„ã¤ã§ã‚‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚¢ãƒ—ãƒªã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹è¨€èªã‚’å¤‰æ›´ã§ãã¾ã™ã€‚';
+  String get languageDescription => 'いつでもデフォルトのアプリインターフェース言語を変更できます。';
 
   @override
   String get themeDescription =>
-      'å¥½ã¿ã«å¿œã˜ã¦ãƒ©ã‚¤ãƒˆãƒ†ãƒ¼ãƒã¨ãƒ€ãƒ¼ã‚¯ãƒ†ãƒ¼ãƒã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚é¸æŠã—ãŸãƒ†ãƒ¼ãƒã¯Cortexã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹å…¨ä½“ã«é©ç”¨ã•ã‚Œã¾ã™ã€‚';
+      '好みに応じてライトテーマとダークテーマを切り替えることができます。選択したテーマはCortexインターフェース全体に適用されます。';
 
   @override
-  String get iHaveReadAndAgree => 'åˆ©ç”¨è¦ç´„ã«åŒæ„ã—ã¾ã™';
+  String get iHaveReadAndAgree => '利用規約に同意します';
 
   @override
-  String get downloading => 'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ä¸­...';
+  String get downloading => 'ダウンロード中...';
 
   @override
-  String get downloadSuccess => 'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰æˆåŠŸ';
+  String get downloadSuccess => 'ダウンロード成功';
 
   @override
-  String get downloadFailed => 'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰å¤±æ•—';
+  String get downloadFailed => 'ダウンロード失敗';
 
   @override
   String downloaded(Object percent) {
-    return '$percent% ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰æ¸ˆã¿';
+    return '$percent% ダウンロード済み';
   }
 
   @override
-  String get downloadPaused =>
-      'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãŒä¸€æ™‚åœæ­¢ã—ã¾ã—ãŸã€‚';
+  String get downloadPaused => 'ダウンロードが一時停止しました。';
 
   @override
-  String get purchaseError => 'è³¼å…¥ã‚¨ãƒ©ãƒ¼';
+  String get purchaseError => '購入エラー';
 
   @override
-  String get purchasePlus => 'Cortex Plusã‚’è³¼å…¥';
+  String get purchasePlus => 'Cortex Plusを購入';
 
   @override
-  String get plusDescription => 'ã‚¨ãƒªãƒ¼ãƒˆäººå·¥çŸ¥èƒ½ä½“é¨“';
+  String get plusDescription => 'エリート人工知能体験';
 
   @override
-  String get annual => 'å¹´é–“';
+  String get annual => '年間';
 
   @override
-  String get monthly => 'æœˆé–“';
+  String get monthly => '月間';
 
   @override
-  String get manageSubscription => 'ã‚µãƒ–ã‚¹ã‚¯ãƒªãƒ—ã‚·ãƒ§ãƒ³ã‚’ç®¡ç†';
+  String get manageSubscription => 'サブスクリプションを管理';
 
   @override
   String purchasePlan(String planName) {
-    return '$planNameã‚’è³¼å…¥';
+    return '$planNameを購入';
   }
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/æœˆã€æœˆæ‰•ã„';
+    return '$price/月、月払い';
   }
 
   @override
-  String get purchasePro => 'Cortex Proã‚’è³¼å…¥';
+  String get purchasePro => 'Cortex Proを購入';
 
   @override
-  String get proDescription => 'ãƒ—ãƒ¬ãƒŸã‚¢äººå·¥çŸ¥èƒ½ä½“é¨“';
+  String get proDescription => 'プレミア人工知能体験';
 
   @override
-  String get purchaseUltra => 'Cortex Ultraã‚’è³¼å…¥';
+  String get purchaseUltra => 'Cortex Ultraを購入';
 
   @override
-  String get ultraDescription => 'äººå·¥çŸ¥èƒ½ã®ãƒ”ãƒ¼ã‚¯';
+  String get ultraDescription => '人工知能のピーク';
 
   @override
-  String get upgradeSubscription =>
-      'ã‚µãƒ–ã‚¹ã‚¯ãƒªãƒ—ã‚·ãƒ§ãƒ³ã‚’ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰';
+  String get upgradeSubscription => 'サブスクリプションをアップグレード';
 
   @override
-  String get purchaseStreamError => 'è³¼å…¥ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚¨ãƒ©ãƒ¼ã€‚';
+  String get purchaseStreamError => '購入ストリームエラー。';
 
   @override
-  String get productNotFound => 'è£½å“ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“';
+  String get productNotFound => '製品が見つかりません';
 
   @override
-  String get noProductsFound => 'è£½å“ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“';
+  String get noProductsFound => '製品が見つかりません';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'ã“ã®æ³¨æ–‡ã‚’è¡Œã†ã“ã¨ã«ã‚ˆã‚Šã€åˆ©ç”¨è¦ç´„ãŠã‚ˆã³ãƒ—ãƒ©ã‚¤ãƒã‚·ãƒ¼ãƒãƒªã‚·ãƒ¼ã«åŒæ„ã—ãŸã“ã¨ã«ãªã‚Šã¾ã™ã€‚ã“ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’ã‚¯ãƒªãƒƒã‚¯ã™ã‚‹ã¨ã€å½“ç¤¾ã®åˆ©ç”¨è¦ç´„ãŠã‚ˆã³ãƒ—ãƒ©ã‚¤ãƒã‚·ãƒ¼ãƒãƒªã‚·ãƒ¼ã«ã¤ã„ã¦è©³ã—ãçŸ¥ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚ç¾åœ¨ã®æœŸé–“ãŒçµ‚äº†ã™ã‚‹å°‘ãªãã¨ã‚‚24æ™‚é–“å‰ã«è‡ªå‹•æ›´æ–°ãŒã‚ªãƒ•ã«ã•ã‚Œãªã„é™ã‚Šã€ã‚µãƒ–ã‚¹ã‚¯ãƒªãƒ—ã‚·ãƒ§ãƒ³ã¯è‡ªå‹•çš„ã«æ›´æ–°ã•ã‚Œã¾ã™ã€‚';
+      'この注文を行うことにより、利用規約およびプライバシーポリシーに同意したことになります。このテキストをクリックすると、当社の利用規約およびプライバシーポリシーについて詳しく知ることができます。現在の期間が終了する少なくとも24時間前に自動更新がオフにされない限り、サブスクリプションは自動的に更新されます。';
 
   @override
-  String get termsOfService => 'åˆ©ç”¨è¦ç´„';
+  String get termsOfService => '利用規約';
 
   @override
-  String get privacyPolicy => 'ãƒ—ãƒ©ã‚¤ãƒã‚·ãƒ¼ãƒãƒªã‚·ãƒ¼';
+  String get privacyPolicy => 'プライバシーポリシー';
 
   @override
-  String get renamed => 'åç§°å¤‰æ›´';
+  String get renamed => '名称変更';
 
   @override
-  String get report => 'å ±å‘Š';
+  String get report => '報告';
 
   @override
-  String get reportDialogTitle => 'å ±å‘Šã‚’é€ä¿¡';
+  String get reportDialogTitle => '報告を送信';
 
   @override
-  String get reportDescriptionLabel => 'å•é¡Œã¯ä½•ã§ã™ã‹ï¼Ÿ';
+  String get reportDescriptionLabel => '問題は何ですか？';
 
   @override
-  String get reportHarmful => 'ã“ã‚Œã¯æœ‰å®³/å®‰å…¨ã§ã¯ã‚ã‚Šã¾ã›ã‚“';
+  String get reportHarmful => 'これは有害/安全ではありません';
 
   @override
-  String get reportNotTrue => 'ã“ã‚Œã¯çœŸå®Ÿã§ã¯ã‚ã‚Šã¾ã›ã‚“';
+  String get reportNotTrue => 'これは真実ではありません';
 
   @override
-  String get reportNotHelpful => 'ã“ã‚Œã¯å½¹ã«ç«‹ã¡ã¾ã›ã‚“';
+  String get reportNotHelpful => 'これは役に立ちません';
 
   @override
-  String get closeButton => 'é–‰ã˜ã‚‹';
+  String get closeButton => '閉じる';
 
   @override
-  String get submitButton => 'é€ä¿¡';
+  String get submitButton => '送信';
 
   @override
-  String get reportErrorMessage =>
-      'å ±å‘Šã™ã‚‹ç†ç”±ã‚’1ã¤é¸æŠã—ã¦ãã ã•ã„ã€‚';
+  String get reportErrorMessage => '報告する理由を1つ選択してください。';
 
   @override
-  String get capabilitiesSection => 'èƒ½åŠ›';
+  String get capabilitiesSection => '能力';
 
   @override
-  String get featurePhotoTitle => 'å†™çœŸã‚¹ã‚­ãƒ£ãƒ³';
+  String get featurePhotoTitle => '写真スキャン';
 
   @override
   String get featurePhotoDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯ã€ã‚«ãƒ¡ãƒ©ã‚„ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’é€šã˜ã¦å†™çœŸã‚’ã‚¹ã‚­ãƒ£ãƒ³ã™ã‚‹èƒ½åŠ›ã‚’æŒã£ã¦ã„ã¾ã™ã€‚';
+      'このモデルは、カメラや画像ファイルを通じて写真をスキャンする能力を持っています。';
 
   @override
-  String get featureOfflineTitle => 'ã‚ªãƒ•ãƒ©ã‚¤ãƒ³æ“ä½œ';
+  String get featureOfflineTitle => 'オフライン操作';
 
   @override
-  String get featureOfflineDescription =>
-      'ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¥ç¶šãªã—ã§ãƒ¢ãƒ‡ãƒ«ã‚’å®Ÿè¡Œã—ã€ãƒ‡ãƒ¼ã‚¿ã‚’å®‰å…¨ã«ä¿ã¡ã¾ã™ã€‚';
+  String get featureOfflineDescription => 'インターネット接続なしでモデルを実行し、データを安全に保ちます。';
 
   @override
-  String get featureRoleplayTitle => 'ãƒ­ãƒ¼ãƒ«ãƒ—ãƒ¬ã‚¤';
+  String get featureRoleplayTitle => 'ロールプレイ';
 
   @override
   String get featureRoleplayDescription =>
-      'ãƒ­ãƒ¼ãƒ«ãƒ—ãƒ¬ã‚¤ãƒ³ã‚°ãƒ¢ãƒ‡ãƒ«ã‚’ä½¿ç”¨ã™ã‚‹ã¨ã€ã•ã¾ã–ã¾ãªãƒãƒ£ãƒƒãƒˆã‚„ã‚·ãƒŠãƒªã‚ªã‚’ä½œæˆã§ãã¾ã™ã€‚';
+      'ロールプレイングモデルを使用すると、さまざまなチャットやシナリオを作成できます。';
 
   @override
-  String get roleModels => 'ãƒ­ãƒ¼ãƒ«ãƒ—ãƒ¬ã‚¤ãƒ¢ãƒ‡ãƒ«';
+  String get roleModels => 'ロールプレイモデル';
 
   @override
-  String get parameters => 'ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿';
+  String get parameters => 'パラメータ';
 
   @override
-  String get context => 'ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ';
+  String get context => 'コンテキスト';
 
   @override
-  String get finalPreparation => 'æœ€çµ‚æº–å‚™ãŒè¡Œã‚ã‚Œã¦ã„ã¾ã™ã€‚';
+  String get finalPreparation => '最終準備が行われています。';
 
   @override
-  String get shareApp => 'ã‚¢ãƒ—ãƒªã‚’å…±æœ‰';
+  String get shareApp => 'アプリを共有';
 
   @override
-  String get ourStory => 'ç§ãŸã¡ã®ç‰©èª';
+  String get ourStory => '私たちの物語';
 
   @override
-  String get rateUs => 'è©•ä¾¡ã™ã‚‹';
+  String get rateUs => '評価する';
 
   @override
-  String get share => 'å…±æœ‰';
+  String get share => '共有';
 
   @override
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => 'ãƒ†ã‚­ã‚¹ãƒˆã‚’é¸æŠ';
+  String get selectText => 'テキストを選択';
 
   @override
-  String get thinking => 'è€ƒãˆä¸­';
+  String get thinking => '考え中';
 
   @override
-  String get user => 'ãƒ¦ãƒ¼ã‚¶ãƒ¼';
+  String get user => 'ユーザー';
 
   @override
-  String get help => 'ãƒ˜ãƒ«ãƒ—';
+  String get help => 'ヘルプ';
 
   @override
-  String get supportCreator => 'ã‚¯ãƒªã‚¨ã‚¤ã‚¿ãƒ¼ã‚’ã‚µãƒãƒ¼ãƒˆã™ã‚‹';
+  String get supportCreator => 'クリエイターをサポートする';
 
   @override
   String get enterYourTag =>
-      'ãŠæ°—ã«å…¥ã‚Šã®ã‚¯ãƒªã‚¨ã‚¤ã‚¿ãƒ¼ã‚’å¿œæ´ã—ã¾ã—ã‚‡ã†ï¼ä»¥ä¸‹ã®ã‚¿ã‚°ã‚’å…¥åŠ›ã™ã‚‹ã¨ã€Cortex ã§ã®è³¼å…¥ã®ä¸€éƒ¨ãŒã‚¯ãƒªã‚¨ã‚¤ã‚¿ãƒ¼ã«å¯„ä»˜ã•ã‚Œã¾ã™ã€‚';
+      'お気に入りのクリエイターを応援しましょう！以下のタグを入力すると、Cortex での購入の一部がクリエイターに寄付されます。';
 
   @override
-  String get creatorTag => 'ã‚¯ãƒªã‚¨ã‚¤ã‚¿ãƒ¼ã‚¿ã‚°';
+  String get creatorTag => 'クリエイタータグ';
 
   @override
-  String get support => 'ã‚µãƒãƒ¼ãƒˆ';
+  String get support => 'サポート';
 
   @override
-  String get tagCannotBeEmpty => 'ä½œæˆè€…ã‚¿ã‚°ã¯ç©ºã«ã§ãã¾ã›ã‚“';
+  String get tagCannotBeEmpty => '作成者タグは空にできません';
 
   @override
-  String get userId => 'ãƒ¦ãƒ¼ã‚¶ãƒ¼ID';
+  String get userId => 'ユーザーID';
 
   @override
-  String get deleteAllConversationsConfirmTitle =>
-      'ã™ã¹ã¦ã®ãƒãƒ£ãƒƒãƒˆã‚’å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ';
+  String get deleteAllConversationsConfirmTitle => 'すべてのチャットを削除しますか？';
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'æœ¬å½“ã«ã™ã¹ã¦ã®ãƒãƒ£ãƒƒãƒˆã‚’å‰Šé™¤ã—ã¦ã‚‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿã“ã®æ“ä½œã¯å…ƒã«æˆ»ã›ã¾ã›ã‚“ã€‚';
+      '本当にすべてのチャットを削除してもよろしいですか？この操作は元に戻せません。';
 
   @override
-  String get conversationDeleted => 'ä¼šè©±ãŒå‰Šé™¤ã•ã‚Œã¾ã—ãŸ!';
+  String get conversationDeleted => '会話が削除されました!';
 
   @override
-  String get allConversationsDeleted =>
-      'ã™ã¹ã¦ã®ä¼šè©±ãŒæ­£å¸¸ã«å‰Šé™¤ã•ã‚Œã¾ã—ãŸï¼';
+  String get allConversationsDeleted => 'すべての会話が正常に削除されました！';
 
   @override
-  String get deleteAll => 'ã™ã¹ã¦å‰Šé™¤';
+  String get deleteAll => 'すべて削除';
 
   @override
-  String get deleteAllConversationsButton => 'ã™ã¹ã¦ã®ä¼šè©±ã‚’å‰Šé™¤';
+  String get deleteAllConversationsButton => 'すべての会話を削除';
 
   @override
-  String get confirmWord => 'VERTEXã¨å…¥åŠ›';
+  String get confirmWord => 'VERTEXと入力';
 
   @override
-  String get confirmWordError => 'å…¥åŠ›ãŒé–“é•ã£ã¦ã„ã¾ã™';
+  String get confirmWordError => '入力が間違っています';
 
   @override
-  String get chinese => 'ä¸­å›½èª';
+  String get chinese => '中国語';
 
   @override
-  String get french => 'ãƒ•ãƒ©ãƒ³ã‚¹èª';
+  String get french => 'フランス語';
 
   @override
-  String get japanese => 'æ—¥æœ¬èª';
+  String get japanese => '日本語';
 
   @override
-  String get dutch => 'ã‚ªãƒ©ãƒ³ãƒ€èª';
+  String get dutch => 'オランダ語';
 
   @override
-  String get russian => 'ãƒ­ã‚·ã‚¢';
+  String get russian => 'ロシア';
 
   @override
-  String get korean => 'éŸ“å›½èª';
+  String get korean => '韓国語';
 
   @override
-  String get english => 'è‹±èª';
+  String get english => '英語';
 
   @override
-  String get turkish => 'ãƒˆãƒ«ã‚³èª';
+  String get turkish => 'トルコ語';
 
   @override
-  String get hindi => 'ãƒ’ãƒ³ãƒ‡ã‚£ãƒ¼èª';
+  String get hindi => 'ヒンディー語';
 
   @override
-  String get portuguese => 'ãƒãƒ«ãƒˆã‚¬ãƒ«èª';
+  String get portuguese => 'ポルトガル語';
 
   @override
-  String get indonesian => 'ã‚¤ãƒ³ãƒ‰ãƒã‚·ã‚¢èª';
+  String get indonesian => 'インドネシア語';
 
   @override
-  String get azerbaijani => 'ã‚¢ã‚¼ãƒ«ãƒã‚¤ã‚¸ãƒ£ãƒ³èª';
+  String get azerbaijani => 'アゼルバイジャン語';
 
   @override
-  String get german => 'ãƒ‰ã‚¤ãƒ„èª';
+  String get german => 'ドイツ語';
 
   @override
-  String get spanish => 'ã‚¹ãƒšã‚¤ãƒ³èª';
+  String get spanish => 'スペイン語';
 
   @override
-  String get italian => 'ã‚¤ã‚¿ãƒªã‚¢èª';
+  String get italian => 'イタリア語';
 
   @override
-  String get arabic => 'ã‚¢ãƒ©ãƒ“ã‚¢èª';
+  String get arabic => 'アラビア語';
 
   @override
   String get ram => 'RAM';
 
   @override
-  String get usernameTooShort => 'ãƒ¦ãƒ¼ã‚¶ãƒ¼åãŒçŸ­ã™ãã¾ã™ã€‚';
+  String get usernameTooShort => 'ユーザー名が短すぎます。';
 
   @override
-  String get usernameTooLong =>
-      'ãƒ¦ãƒ¼ã‚¶ãƒ¼åã¯16æ–‡å­—ã‚’è¶…ãˆã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“ã€‚';
+  String get usernameTooLong => 'ユーザー名は16文字を超えることはできません。';
 
   @override
   String get invalidUsernameCharacters =>
-      'ãƒ¦ãƒ¼ã‚¶ãƒ¼åã«ã¯ã€\'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\'ã®æ–‡å­—ã¨ã€\'.\'ã€\'-\'ã€\'_\'ã®è¨˜å·ã®ã¿ä½¿ç”¨ã§ãã¾ã™ã€‚';
+      'ユーザー名には、\'abcçdefgğhıijklmnoöprsştuüvyzxqw\'の文字と、\'.\'、\'-\'、\'_\'の記号のみ使用できます。';
 
   @override
-  String get noInternetConnection =>
-      'ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¥ç¶šãŒã‚ã‚Šã¾ã›ã‚“ã€‚';
+  String get noInternetConnection => 'インターネット接続がありません。';
 
   @override
-  String get chats => 'å—ä¿¡ãƒˆãƒ¬ã‚¤';
+  String get chats => '受信トレイ';
 
   @override
-  String get library => 'ãƒ©ã‚¤ãƒ–ãƒ©ãƒª';
+  String get library => 'ライブラリ';
 
   @override
-  String get text => 'ãƒ†ã‚­ã‚¹ãƒˆ';
+  String get text => 'テキスト';
 
   @override
-  String get removeModel => 'ãƒ¢ãƒ‡ãƒ«ã‚’å‰Šé™¤';
+  String get removeModel => 'モデルを削除';
 
   @override
-  String get insufficientRAM => 'ãƒ¡ãƒ¢ãƒªä¸è¶³';
+  String get insufficientRAM => 'メモリ不足';
 
   @override
-  String get insufficientStorage => 'ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸ä¸è¶³';
+  String get insufficientStorage => 'ストレージ不足';
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'ãƒ‡ãƒã‚¤ã‚¹ã‹ã‚‰ $model ãƒ¢ãƒ‡ãƒ«ã‚’å‰Šé™¤ã—ã¦ã‚‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿå‰Šé™¤ã™ã‚‹ã¨ã€ãã®ãƒ¢ãƒ‡ãƒ«ã¨ã®ä»¥å‰ã®ä¼šè©±ã‚‚ã™ã¹ã¦å‰Šé™¤ã•ã‚Œã¾ã™ã€‚';
+    return 'デバイスから $model モデルを削除してもよろしいですか？削除すると、そのモデルとの以前の会話もすべて削除されます。';
   }
 
   @override
-  String get noMatchingModels =>
-      'ä¸€è‡´ã™ã‚‹ãƒ¢ãƒ‡ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚';
+  String get noMatchingModels => '一致するモデルが見つかりませんでした。';
 
   @override
-  String get benefit1 => 'ä¼šè©±åˆ¶é™ã®æ‹¡å¤§';
+  String get benefit1 => '会話制限の拡大';
 
   @override
-  String get benefit3 => 'ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ';
+  String get benefit3 => 'プロフィールエフェクト';
 
   @override
-  String get benefit4 => 'ãƒ¡ãƒ³ãƒãƒ¼ã‚·ãƒƒãƒ—ãƒãƒƒã‚¸';
+  String get benefit4 => 'メンバーシップバッジ';
 
   @override
-  String get benefit5 => 'ã‚ˆã‚Šå¤šãã®ã‚ªãƒ³ãƒ©ã‚¤ãƒ³AIã‚’ä½œæˆ';
+  String get benefit5 => 'より多くのオンラインAIを作成';
 
   @override
-  String get benefit7 => 'ä½¿ç”¨åˆ¶é™ã®æ‹¡å¤§';
+  String get benefit7 => '使用制限の拡大';
 
   @override
-  String get benefit8 => 'ãƒ¢ãƒ‡ãƒ«ã‚’è¿½åŠ ';
+  String get benefit8 => 'モデルを追加';
 
   @override
-  String get benefit9 => 'æ–°ã—ã„ãƒ†ãƒ¼ãƒ';
+  String get benefit9 => '新しいテーマ';
 
   @override
-  String get benefit10 => 'ãã®ä»–ã®æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«';
+  String get benefit10 => 'その他の添付ファイル';
 
   @override
-  String get benefit11 => 'ã‚ˆã‚Šå¤šãã®æµã‚Œãƒ¢ãƒ¼ãƒ‰';
+  String get benefit11 => 'より多くの流れモード';
 
   @override
-  String get oldBenefits => 'ä¸‹ä½ãƒ—ãƒ©ãƒ³ã®ã™ã¹ã¦ã®ç‰¹å…¸';
+  String get oldBenefits => '下位プランのすべての特典';
 
   @override
-  String get confirm => 'ç¢ºèª';
+  String get confirm => '確認';
 
   @override
-  String get changePassword => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å¤‰æ›´';
+  String get changePassword => 'パスワードを変更';
 
   @override
-  String get logoutConfirmationTitle =>
-      'æœ¬å½“ã«ãƒ­ã‚°ã‚¢ã‚¦ãƒˆã—ã¾ã™ã‹ï¼Ÿ';
+  String get logoutConfirmationTitle => '本当にログアウトしますか？';
 
   @override
-  String get settings => 'è¨­å®š';
+  String get settings => '設定';
 
   @override
-  String get language => 'ã‚¢ãƒ—ãƒªè¨€èª';
+  String get language => 'アプリ言語';
 
   @override
-  String get dark => 'ãƒ€ãƒ¼ã‚¯';
+  String get dark => 'ダーク';
 
   @override
-  String get oldPassword => 'å¤ã„ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰';
+  String get oldPassword => '古いパスワード';
 
   @override
-  String get newPassword => 'æ–°ã—ã„ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰';
+  String get newPassword => '新しいパスワード';
 
   @override
-  String get passwordUpdated => 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæ›´æ–°ã•ã‚Œã¾ã—ãŸã€‚';
+  String get passwordUpdated => 'パスワードが更新されました。';
 
   @override
-  String get stop => 'åœæ­¢';
+  String get stop => '停止';
 
   @override
-  String get copyrights => 'å¸°å±';
+  String get copyrights => '帰属';
 
   @override
-  String get love => 'æ„›';
+  String get love => '愛';
 
   @override
-  String get nature => 'è‡ªç„¶';
+  String get nature => '自然';
 
   @override
-  String get behindTheSlaughter => 'è™æ®ºã®è£å´';
+  String get behindTheSlaughter => '虐殺の裏側';
 
   @override
   String get cyberpunk => 'Cyberpunk';
@@ -763,346 +736,316 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deepSpace => 'Deep Space';
 
   @override
-  String get grayscale => 'ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«';
+  String get grayscale => 'グレースケール';
 
   @override
-  String get ocean => 'æµ·';
+  String get ocean => '海';
 
   @override
-  String get scarletSnow => 'ç·‹è‰²ã®é›ª';
+  String get scarletSnow => '緋色の雪';
 
   @override
-  String get requestFailed =>
-      'ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get requestFailed => 'エラーが発生しました。もう一度お試しください。';
 
   @override
-  String get changeModel => 'å¤‰æ›´';
+  String get changeModel => '変更';
 
   @override
-  String get edit => 'ç·¨é›†';
+  String get edit => '編集';
 
   @override
-  String get editingMessageInfo =>
-      'ã“ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç·¨é›†ã™ã‚‹ã¨ã€ã“ã“ã‹ã‚‰ä¼šè©±ãŒå†é–‹ã•ã‚Œã¾ã™ã€‚';
+  String get editingMessageInfo => 'このメッセージを編集すると、ここから会話が再開されます。';
 
   @override
-  String get editingNotification => 'ç¾åœ¨ç·¨é›†ãƒ¢ãƒ¼ãƒ‰ã§ã™';
+  String get editingNotification => '現在編集モードです';
 
   @override
-  String get featurePluralTitle => 'è¤‡æ•°';
+  String get featurePluralTitle => '複数';
 
   @override
   String get featurePluralDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯è¿½åŠ ã®æ‹¡å¼µæ©Ÿèƒ½ã‚’è‡ªå‹•çš„ã«çµ±åˆã—ã€ãã‚Œã«ã‚ˆã£ã¦æ©Ÿèƒ½çš„èƒ½åŠ›ã‚’æ‹¡å¼µã—ã¦ã€å¤šæ§˜ãªæ“ä½œã‚’å¼·åŒ–ã•ã‚ŒãŸãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã§ã‚µãƒãƒ¼ãƒˆã—ã¾ã™ã€‚';
+      'このモデルは追加の拡張機能を自動的に統合し、それによって機能的能力を拡張して、多様な操作を強化されたパフォーマンスでサポートします。';
 
   @override
-  String get nameLabel => 'AIã®åå‰';
+  String get nameLabel => 'AIの名前';
 
   @override
-  String get summaryLabel => 'AIã®æ¦‚è¦';
+  String get summaryLabel => 'AIの概要';
 
   @override
-  String get add => 'è¿½åŠ ';
+  String get add => '追加';
 
   @override
-  String get aiExplanationTitle => 'AIã®èª¬æ˜';
+  String get aiExplanationTitle => 'AIの説明';
 
   @override
   String get aiExplanationDescription =>
-      'AIãƒ¢ãƒ‡ãƒ«ã®ã‚¢ãƒ¼ã‚­ãƒ†ã‚¯ãƒãƒ£ã€ãƒˆãƒ¬ãƒ¼ãƒ‹ãƒ³ã‚°ãƒ—ãƒ­ã‚»ã‚¹ã€ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ãƒ¡ãƒˆãƒªã‚¯ã‚¹ã€å¿œç”¨åˆ†é‡ã€ãã®ä»–ã®é‡è¦ãªç‰¹å¾´ã«ã¤ã„ã¦è©³ç´°ãªèª¬æ˜ã‚’æä¾›ã—ã¦ãã ã•ã„ã€‚';
+      'AIモデルのアーキテクチャ、トレーニングプロセス、パフォーマンスメトリクス、応用分野、その他の重要な特徴について詳細な説明を提供してください。';
 
   @override
-  String get preInputTitle => 'AIã®äº‹å‰å…¥åŠ›';
+  String get preInputTitle => 'AIの事前入力';
 
   @override
   String get preInputDescription =>
-      'ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ä½œæˆãƒ—ãƒ­ã‚»ã‚¹ã§ãƒ¢ãƒ‡ãƒ«ã‚’ã‚¬ã‚¤ãƒ‰ã™ã‚‹äº‹å‰å…¥åŠ›ã‚’è¨­å®šã—ã¦ãã ã•ã„ã€‚ã“ã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã§ã¯ã€ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼é–¢é€£ã®æƒ…å ±ã€è¿½åŠ ã®ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã€ãŠã‚ˆã³ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã«é–¢é€£ã™ã‚‹ã‚³ãƒ³ãƒ†ãƒ³ãƒ„ã®ç”Ÿæˆã«å½¹ç«‹ã¤å¯èƒ½æ€§ã®ã‚ã‚‹è¿½åŠ ã®è©³ç´°ã‚’å«ã‚ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚';
+      'キャラクター作成プロセスでモデルをガイドする事前入力を設定してください。このセクションでは、キャラクター関連の情報、追加のコンテキスト、およびキャラクターに関連するコンテンツの生成に役立つ可能性のある追加の詳細を含めることができます。';
 
   @override
-  String get baseModelTitle => 'ãƒ™ãƒ¼ã‚¹ãƒ¢ãƒ‡ãƒ«';
+  String get baseModelTitle => 'ベースモデル';
 
   @override
   String get baseModelDescription =>
-      'ã“ã‚Œã¯ã‚ãªãŸã®å‰µé€ ç‰©ã®åŸºç›¤ã¨ã—ã¦ä½¿ç”¨ã•ã‚Œã‚‹ãƒ¢ãƒ‡ãƒ«ã§ã™ã€‚ç¾åœ¨é¸æŠã•ã‚Œã¦ã„ã‚‹ãƒ™ãƒ¼ã‚¹ãƒ¢ãƒ‡ãƒ«ã‚’è¡¨ç¤ºã—ã¾ã™ã€‚';
+      'これはあなたの創造物の基盤として使用されるモデルです。現在選択されているベースモデルを表示します。';
 
   @override
-  String get summary => 'æ¦‚è¦';
+  String get summary => '概要';
 
   @override
-  String get modelUploadTitle => 'AIãƒ•ã‚¡ã‚¤ãƒ«';
+  String get modelUploadTitle => 'AIファイル';
 
   @override
   String get modelUploadDescription =>
-      'ãƒ‡ãƒã‚¤ã‚¹ã‹ã‚‰ç›´æ¥ãƒ­ãƒ¼ã‚«ãƒ«ã®GGUFãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠã—ã¦ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã—ã¾ã™ã€‚ã“ã‚Œã«ã‚ˆã‚Šã€ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¥ç¶šãªã—ã§ãƒ¢ãƒ‡ãƒ«ã‚’ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ã§å®Ÿè¡Œã§ãã¾ã™ã€‚ãƒ•ã‚¡ã‚¤ãƒ«ãŒæœ‰åŠ¹ãªGGUFå½¢å¼ã§ã‚ã‚Šã€é©åˆ‡ã«æ§‹é€ åŒ–ã•ã‚Œã¦ã„ã‚‹ã“ã¨ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚ãƒ•ã‚¡ã‚¤ãƒ«ãŒæ­£ã—ããªã„ã‹ç ´æã—ã¦ã„ã‚‹å ´åˆã€Cortexã¯æœŸå¾…ã©ãŠã‚Šã«æ©Ÿèƒ½ã—ãªã„å¯èƒ½æ€§ãŒã‚ã‚Šã€ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã™ã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚';
+      'デバイスから直接ローカルのGGUFファイルを選択してアップロードします。これにより、インターネット接続なしでモデルをオフラインで実行できます。ファイルが有効なGGUF形式であり、適切に構造化されていることを確認してください。ファイルが正しくないか破損している場合、Cortexは期待どおりに機能しない可能性があり、エラーが発生する可能性があります。';
 
   @override
-  String get modelUploadShortDescription =>
-      'ã“ã“ã‚’ã‚¿ãƒƒãƒ—ã—ã¦ãƒ‡ãƒã‚¤ã‚¹ã‹ã‚‰.ggufãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠ';
+  String get modelUploadShortDescription => 'ここをタップしてデバイスから.ggufファイルを選択';
 
   @override
-  String get you => 'ã‚ãªãŸ';
+  String get you => 'あなた';
 
   @override
-  String get removePhotoTitle => 'å†™çœŸã‚’å‰Šé™¤';
+  String get removePhotoTitle => '写真を削除';
 
   @override
-  String get confirmRemovePhoto => 'æœ¬å½“ã«å†™çœŸã‚’å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ';
+  String get confirmRemovePhoto => '本当に写真を削除しますか？';
 
   @override
   String get chatLengthLimitExceeded =>
-      'ã“ã®ãƒãƒ£ãƒƒãƒˆã¯æ–‡å­—æ•°åˆ¶é™ã‚’è¶…ãˆã¾ã—ãŸã€‚æ–°ã—ã„ãƒãƒ£ãƒƒãƒˆã‚’é–‹å§‹ã™ã‚‹ã‹ã€ã‚µãƒ–ã‚¹ã‚¯ãƒªãƒ—ã‚·ãƒ§ãƒ³ã‚’è³¼å…¥ã—ã¦ãã ã•ã„ã€‚';
+      'このチャットは文字数制限を超えました。新しいチャットを開始するか、サブスクリプションを購入してください。';
 
   @override
-  String get inappropriateContentDetected =>
-      'ä¸é©åˆ‡ãªã‚³ãƒ³ãƒ†ãƒ³ãƒ„ãŒæ¤œå‡ºã•ã‚Œã¾ã—ãŸï¼';
+  String get inappropriateContentDetected => '不適切なコンテンツが検出されました！';
 
   @override
-  String get offlineModelNotInstalled =>
-      'ã“ã®ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ãƒ¢ãƒ‡ãƒ«ã¯ãƒ‡ãƒã‚¤ã‚¹ã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚';
+  String get offlineModelNotInstalled => 'このオフラインモデルはデバイスにインストールされていません。';
 
   @override
   String get reachedLimit =>
-      'ä½¿ç”¨åˆ¶é™ã«é”ã—ã¾ã—ãŸã€‚åˆ¶é™ã‚’å¢—ã‚„ã™ã«ã¯ã€ãƒ—ãƒ©ãƒ³ã‚’ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ã¦ãã ã•ã„ã€‚(åˆ¶é™ãŒãªããªã‚‹ã®ã¯æ®‹å¿µãªã“ã¨ã§ã™ã‚ˆã­ã€‚ã§ã‚‚ã€ç´ æ™´ã‚‰ã—ã„è¿”ä¿¡ã‚’å—ã‘å–ã‚‹ã®ã¯ç„¡æ–™ã§ã¯ãªã„ã®ã§ã€ã“ã®åˆ¶é™ã¯ç§ãŸã¡ãŒæ¥½ã—ã„æ™‚é–“ã‚’éã”ã—ç¶šã‘ã‚‹ãŸã‚ã«å½¹ç«‹ã£ã¦ã„ã‚‹ã‚“ã§ã™ã€‚)';
+      '使用制限に達しました。制限を増やすには、プランをアップグレードしてください。(制限がなくなるのは残念なことですよね。でも、素晴らしい返信を受け取るのは無料ではないので、この制限は私たちが楽しい時間を過ごし続けるために役立っているんです。)';
 
   @override
-  String get modality => 'ãƒ¢ãƒ€ãƒªãƒ†ã‚£';
+  String get modality => 'モダリティ';
 
   @override
-  String get multimodal => 'ãƒãƒ«ãƒãƒ¢ãƒ¼ãƒ€ãƒ«';
+  String get multimodal => 'マルチモーダル';
 
   @override
-  String get anErrorOccurred => 'ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ';
+  String get anErrorOccurred => 'エラーが発生しました';
 
   @override
   String get themeLocked =>
-      'ã“ã®ãƒ†ãƒ¼ãƒã«ã¯ã‚ˆã‚Šé«˜ã„ã‚µãƒ–ã‚¹ã‚¯ãƒªãƒ—ã‚·ãƒ§ãƒ³ãƒ¬ãƒ™ãƒ«ãŒå¿…è¦ã§ã™ã€‚ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹ã«ã¯ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ã¦ãã ã•ã„ã€‚';
+      'このテーマにはより高いサブスクリプションレベルが必要です。ロックを解除するにはアップグレードしてください。';
 
   @override
-  String get pageCouldNotBeLoaded =>
-      'ãƒšãƒ¼ã‚¸ã‚’èª­ã¿è¾¼ã‚ã¾ã›ã‚“ã§ã—ãŸ';
+  String get pageCouldNotBeLoaded => 'ページを読み込めませんでした';
 
   @override
-  String get checkYourInternet =>
-      'ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¥ç¶šã‚’ç¢ºèªã—ã¦ã€ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get checkYourInternet => 'インターネット接続を確認して、もう一度お試しください。';
 
   @override
-  String get errorUserNotAuthenticated =>
-      'ã“ã®æ“ä½œã‚’å®Ÿè¡Œã™ã‚‹ã«ã¯ãƒ­ã‚°ã‚¤ãƒ³ã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚';
+  String get errorUserNotAuthenticated => 'この操作を実行するにはログインする必要があります。';
 
   @override
-  String get errorReachedLimit =>
-      'åˆ¶é™ã«é”ã—ã¾ã—ãŸã€‚ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ã¦ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã—ã€ãƒãƒ£ãƒƒãƒˆã‚’ç¶šã‘ã¾ã—ã‚‡ã†ã€‚';
+  String get errorReachedLimit => '制限に達しました。アップグレードしてロックを解除し、チャットを続けましょう。';
 
   @override
-  String get errorServer =>
-      'äºˆæœŸã›ã¬ã‚µãƒ¼ãƒãƒ¼ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚å¾Œã§ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get errorServer => '予期せぬサーバーエラーが発生しました。後でもう一度お試しください。';
 
   @override
-  String get errorNetwork =>
-      'ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚æ¥ç¶šã‚’ç¢ºèªã—ã¦ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get errorNetwork => 'ネットワークエラーが発生しました。接続を確認してもう一度お試しください。';
 
   @override
   String get baseModelForCharacterDescription =>
-      'é¸æŠã•ã‚ŒãŸãƒ™ãƒ¼ã‚¹ãƒ¢ãƒ‡ãƒ«ãŒã€ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®æ¨è«–ãŠã‚ˆã³å¿œç­”èƒ½åŠ›ã‚’æ±ºå®šã—ã¾ã™ã€‚';
+      '選択されたベースモデルが、キャラクターの推論および応答能力を決定します。';
 
   @override
-  String get selectBaseModel => 'ãƒ™ãƒ¼ã‚¹ãƒ¢ãƒ‡ãƒ«ã‚’é¸æŠ';
+  String get selectBaseModel => 'ベースモデルを選択';
 
   @override
-  String get falErrorImageRequired =>
-      'ã“ã®AIã¯å‚ç…§ç”»åƒã‚’å¿…è¦ã¨ã—ã¾ã™ã€‚ç”»åƒã‚’æ·»ä»˜ã—ã¦å†åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get falErrorImageRequired => 'このAIは参照画像を必要とします。画像を添付して再度お試しください。';
 
   @override
   String get falErrorAudioRequired =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã«ã¯å‚ç…§éŸ³å£°ãƒ•ã‚¡ã‚¤ãƒ«ãŒå¿…è¦ã§ã™ã€‚éŸ³å£°ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ·»ä»˜ã—ã¦ã€ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+      'このモデルには参照音声ファイルが必要です。音声ファイルを添付して、もう一度お試しください。';
 
   @override
-  String get falErrorVideoRequired =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã«ã¯å‚è€ƒå‹•ç”»ãŒå¿…è¦ã§ã™ã€‚å‹•ç”»ã‚’æ·»ä»˜ã—ã¦å†åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get falErrorVideoRequired => 'このモデルには参考動画が必要です。動画を添付して再度お試しください。';
 
   @override
-  String get falErrorImageCorrupted =>
-      'ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸç”»åƒã¯å‡¦ç†ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚åˆ¥ã®å½¢å¼ã‚’ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get falErrorImageCorrupted => 'アップロードされた画像は処理できませんでした。別の形式をお試しください。';
 
   @override
-  String get falErrorSchemaRejected =>
-      'ãƒ¢ãƒ‡ãƒ«ãŒå…¥åŠ›å€¤ã‚’æ‹’å¦ã—ã¾ã—ãŸã€‚åˆ¥ã®ãƒ¢ãƒ‡ãƒ«ã‚’ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get falErrorSchemaRejected => 'モデルが入力値を拒否しました。別のモデルをお試しください。';
 
   @override
-  String get falErrorSchemaInvalid =>
-      'å…¥åŠ›ã¯ç”Ÿæˆã‚µãƒ¼ãƒ“ã‚¹ã«ã‚ˆã£ã¦æ‹’å¦ã•ã‚Œã¾ã—ãŸã€‚';
+  String get falErrorSchemaInvalid => '入力は生成サービスによって拒否されました。';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return 'ç”Ÿæˆã‚µãƒ¼ãƒ“ã‚¹ãŒã‚¨ãƒ©ãƒ¼ã‚’è¿”ã—ã¾ã—ãŸï¼ˆã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ï¼š$statusCodeï¼‰ã€‚';
+    return '生成サービスがエラーを返しました（ステータス：$statusCode）。';
   }
 
   @override
-  String get couldNotOpenLink => 'ãƒªãƒ³ã‚¯ã‚’é–‹ã‘ã¾ã›ã‚“ã§ã—ãŸ';
+  String get couldNotOpenLink => 'リンクを開けませんでした';
 
   @override
-  String get downloadStarted => 'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã‚’é–‹å§‹ã—ã¾ã—ãŸ';
+  String get downloadStarted => 'ダウンロードを開始しました';
 
   @override
-  String get notAvailable => 'åˆ©ç”¨ä¸å¯';
+  String get notAvailable => '利用不可';
 
   @override
-  String get localizationWarning =>
-      'ä¸€éƒ¨ã®æƒ…å ±ã¯ã‚ãªãŸã®è¨€èªã§åˆ©ç”¨ã§ããªã„å ´åˆãŒã‚ã‚Šã€è‹±èªã§è¡¨ç¤ºã•ã‚Œã¾ã™ã€‚';
+  String get localizationWarning => '一部の情報はあなたの言語で利用できない場合があり、英語で表示されます。';
 
   @override
   String get aiTranslationWarning =>
-      'ãƒ¢ãƒ‡ãƒ«æƒ…å ±ã¯ä»–ã®AIãƒ¢ãƒ‡ãƒ«ã«ã‚ˆã£ã¦æ§˜ã€…ãªè¨€èªã«ç¿»è¨³ã•ã‚Œã¦ã„ã¾ã™ã€‚ãã®ãŸã‚ã€è‹±èªä»¥å¤–ã®è¨€èªã§ã¯è»½å¾®ãªä¸ä¸€è‡´ãŒç”Ÿã˜ã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚';
+      'モデル情報は他のAIモデルによって様々な言語に翻訳されています。そのため、英語以外の言語では軽微な不一致が生じる可能性があります。';
 
   @override
-  String get errorLoadingTitle =>
-      'ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸ';
+  String get errorLoadingTitle => 'データの読み込みに失敗しました';
 
   @override
   String get errorLoadingMessage =>
-      'ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¥ç¶šã‚’ç¢ºèªã—ã¦ã€ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+      'サーバーから必要なデータを取得できませんでした。インターネット接続を確認して、もう一度お試しください。';
 
   @override
-  String get noFoundTitle => 'çµæœãŒã‚ã‚Šã¾ã›ã‚“';
+  String get noFoundTitle => '結果がありません';
 
   @override
-  String get noFoundMessage =>
-      'æ¤œç´¢èªã‚’èª¿æ•´ã™ã‚‹ã‹ã€ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã‚’ã‚¯ãƒªã‚¢ã—ã¦ã¿ã¦ãã ã•ã„ã€‚';
+  String get noFoundMessage => '検索語を調整するか、フィルターをクリアしてみてください。';
 
   @override
-  String get modelCreatedSuccess =>
-      'ãƒ¢ãƒ‡ãƒ«ãŒæ­£å¸¸ã«ä½œæˆã•ã‚Œã¾ã—ãŸï¼';
+  String get modelCreatedSuccess => 'モデルが正常に作成されました！';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'ã€Œ$modelNameã€ã¯æ­£å¸¸ã«å‰Šé™¤ã•ã‚Œã¾ã—ãŸã€‚';
+    return '「$modelName」は正常に削除されました。';
   }
 
   @override
-  String get errorCreatingModel =>
-      'ãƒ¢ãƒ‡ãƒ«ã®ä½œæˆä¸­ã«äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚';
+  String get errorCreatingModel => 'モデルの作成中に予期せぬエラーが発生しました。';
 
   @override
-  String get errorDeletingModel =>
-      'ãƒ¢ãƒ‡ãƒ«ã®å‰Šé™¤ä¸­ã«äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚';
+  String get errorDeletingModel => 'モデルの削除中に予期せぬエラーが発生しました。';
 
   @override
-  String get ultraFeatureOnly =>
-      'ã“ã®æ©Ÿèƒ½ã¯Ultraãƒ¡ãƒ³ãƒãƒ¼ã®ã¿ãŒåˆ©ç”¨ã§ãã¾ã™ã€‚';
+  String get ultraFeatureOnly => 'この機能はUltraメンバーのみが利用できます。';
 
   @override
   String get experimentalOfflineWarning =>
-      'ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ãƒ¢ãƒ¼ãƒ‰ã¯ã¾ã å®Ÿé¨“æ®µéšã§ã‚ã‚Šã€ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ¢ãƒ‡ãƒ«ãŒæœ€é©ãªåŠ¹ç‡ã§å‹•ä½œã—ãªã„å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚';
+      'オフラインモードはまだ実験段階であり、ダウンロードしたモデルが最適な効率で動作しない可能性があります。';
 
   @override
-  String get noConversationsToDelete =>
-      'å‰Šé™¤ã™ã‚‹ä¼šè©±ãŒã‚ã‚Šã¾ã›ã‚“ã€‚';
+  String get noConversationsToDelete => '削除する会話がありません。';
 
   @override
-  String get reportSubmitted => 'å ±å‘ŠãŒæ­£å¸¸ã«é€ä¿¡ã•ã‚Œã¾ã—ãŸ';
+  String get reportSubmitted => '報告が正常に送信されました';
 
   @override
   String get verificationDelayed =>
-      'è³¼å…¥ã¯ç¢ºèªã•ã‚Œã¾ã—ãŸã€‚ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã®æ›´æ–°ã«è‹¥å¹²ã®é…å»¶ãŒã‚ã‚Šã¾ã™ãŒã€ã¾ã‚‚ãªãåæ˜ ã•ã‚Œã¾ã™ã€‚';
+      '購入は確認されました。アカウントの更新に若干の遅延がありますが、まもなく反映されます。';
 
   @override
-  String get maintenanceTitle => 'ãƒ¡ãƒ³ãƒ†ãƒŠãƒ³ã‚¹ä¸­';
+  String get maintenanceTitle => 'メンテナンス中';
 
   @override
   String get maintenanceMessage =>
-      'Cortexã¯é‡è¦ãªã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆã‚’å±•é–‹ä¸­ã®ãŸã‚ã€ä¸€æ™‚çš„ã«ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ã§ã™ã€‚ã‚¢ãƒ—ãƒªã¸ã®ã‚¢ã‚¯ã‚»ã‚¹ã¯ã¾ã‚‚ãªãå¾©æ—§ã—ã¾ã™ã€‚\n\nã‚¨ã‚¯ã‚¹ãƒšãƒªã‚¨ãƒ³ã‚¹å‘ä¸Šã®ãŸã‚ã®ã”å”åŠ›ã«æ„Ÿè¬ã„ãŸã—ã¾ã™ã€‚';
+      'Cortexは重要なアップデートを展開中のため、一時的にオフラインです。アプリへのアクセスはまもなく復旧します。\n\nエクスペリエンス向上のためのご協力に感謝いたします。';
 
   @override
-  String get errorPromptFlagged =>
-      'ã‚ãªãŸã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯ä¸é©åˆ‡ã¨æ¤œå‡ºã•ã‚ŒãŸãŸã‚ã€é€ä¿¡ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚';
+  String get errorPromptFlagged => 'あなたのメッセージは不適切と検出されたため、送信できませんでした。';
 
   @override
-  String get notEnoughStorage =>
-      'æ–°ã—ã„ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ä¿å­˜ã™ã‚‹ã®ã«ååˆ†ãªã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸å®¹é‡ãŒãƒ‡ãƒã‚¤ã‚¹ã«ã‚ã‚Šã¾ã›ã‚“ã€‚';
+  String get notEnoughStorage => '新しいメッセージを保存するのに十分なストレージ容量がデバイスにありません。';
 
   @override
-  String get errorRateLimit =>
-      'æœ€è¿‘ãƒ¢ãƒ‡ãƒ«ã‚’ä½œæˆã—ã™ãã¾ã—ãŸã€‚ã—ã°ã‚‰ãå¾…ã£ã¦ã‹ã‚‰ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+  String get errorRateLimit => '最近モデルを作成しすぎました。しばらく待ってからもう一度お試しください。';
 
   @override
-  String get errorContentFlagged =>
-      'ã‚³ãƒ³ãƒ†ãƒ³ãƒ„ãŒä¸é©åˆ‡ã¨åˆ¤æ–­ã•ã‚ŒãŸãŸã‚ã€ãƒ¢ãƒ‡ãƒ«ã‚’ä¿å­˜ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚';
+  String get errorContentFlagged => 'コンテンツが不適切と判断されたため、モデルを保存できませんでした。';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      'ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªãƒãƒ£ãƒƒãƒˆä¸­ã¯ã™ã¹ã¦ã®ä¼šè©±ã‚’å‰Šé™¤ã§ãã¾ã›ã‚“ã€‚ç¶šè¡Œã™ã‚‹ã«ã¯ã¾ãšç¾åœ¨ã®ãƒãƒ£ãƒƒãƒˆã‚’çµ‚äº†ã—ã¦ãã ã•ã„ã€‚';
+      'アクティブなチャット中はすべての会話を削除できません。続行するにはまず現在のチャットを終了してください。';
 
   @override
-  String get invalidCredentials =>
-      'ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã¾ãŸã¯ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæ­£ã—ãã‚ã‚Šã¾ã›ã‚“ã€‚';
+  String get invalidCredentials => 'メールアドレスまたはパスワードが正しくありません。';
 
   @override
-  String get userDisabled =>
-      'ã“ã®ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã¯ç„¡åŠ¹ã«ãªã£ã¦ã„ã¾ã™ã€‚';
+  String get userDisabled => 'このユーザーアカウントは無効になっています。';
 
   @override
   String get loginSubtitle =>
-      'Vertexã‚¢ã‚«ã‚¦ãƒ³ãƒˆã«ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ãã ã•ã„ã€‚ç¶šè¡Œã™ã‚‹ã¨ã€åˆ©ç”¨è¦ç´„ã¨ãƒ—ãƒ©ã‚¤ãƒã‚·ãƒ¼ãƒãƒªã‚·ãƒ¼ã«åŒæ„ã—ãŸã“ã¨ã«ãªã‚Šã¾ã™ã€‚';
+      'Vertexアカウントにログインしてください。続行すると、利用規約とプライバシーポリシーに同意したことになります。';
 
   @override
   String get registerSubtitle =>
-      'Vertexã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ä½œæˆã™ã‚‹ã¨ã€ã™ã¹ã¦ã®ã‚µãƒ¼ãƒ“ã‚¹ã«ã‚·ãƒ¼ãƒ ãƒ¬ã‚¹ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã¾ã™ã€‚ç¶šè¡Œã™ã‚‹ã¨ã€åˆ©ç”¨è¦ç´„ã¨ãƒ—ãƒ©ã‚¤ãƒã‚·ãƒ¼ãƒãƒªã‚·ãƒ¼ã«åŒæ„ã—ãŸã“ã¨ã«ãªã‚Šã¾ã™ã€‚';
+      'Vertexアカウントを作成すると、すべてのサービスにシームレスにアクセスできます。続行すると、利用規約とプライバシーポリシーに同意したことになります。';
 
   @override
   String get storagePermissionRequired =>
-      'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ¢ãƒ‡ãƒ«ã‚’ä¿å­˜ã™ã‚‹ã«ã¯ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸ã®è¨±å¯ãŒå¿…è¦ã§ã™ã€‚ç¶šè¡Œã™ã‚‹ã«ã¯è¨±å¯ã‚’ä¸ãˆã¦ãã ã•ã„ã€‚';
+      'ダウンロードしたモデルを保存するにはストレージの許可が必要です。続行するには許可を与えてください。';
 
   @override
-  String get inviteShareSubject => 'Cortexã§ä¸€ç·’ã«ã‚„ã‚ã†ï¼';
+  String get inviteShareSubject => 'Cortexで一緒にやろう！';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'ã­ãˆcortexã£ã¦ãƒ¤ãƒã„ã‚¢ãƒ—ãƒªã‚ã£ã¦æ‹›å¾…ã™ã‚‹ã¨äºŒäººã¨ã‚‚ç„¡æ–™ã§plusã‚‚ã‚‰ãˆã‚‹ã‚ˆ è¶…ãŠå¾—ã ã‹ã‚‰ä»Šã™ãå…¥ã‚Œã¦\n\n$cortexLink';
+    return 'ねえcortexってヤバいアプリあって招待すると二人とも無料でplusもらえるよ 超お得だから今すぐ入れて\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => 'Cortexã‚’æ¥½ã—ã‚“ã§ã„ã¾ã™ã‹ï¼Ÿ';
+  String get reviewEnjoyingAppTitle => 'Cortexを楽しんでいますか？';
 
   @override
   String get reviewHelpUsGrow =>
-      'ã‚ãªãŸã®è©•ä¾¡ã¯ã€ç§ãŸã¡ã®è‹¥ã„ã‚¤ãƒ³ãƒ‡ã‚£ãƒ¼ãƒãƒ¼ãƒ ã«ã¨ã£ã¦å¤§ããªæ”¯ãˆã¨ãªã‚Šã€Cortexã‚’ã•ã‚‰ã«è‰¯ãã™ã‚‹ã®ã«å½¹ç«‹ã¡ã¾ã™ã€‚';
+      'あなたの評価は、私たちの若いインディーチームにとって大きな支えとなり、Cortexをさらに良くするのに役立ちます。';
 
   @override
-  String get reviewMaybeLater => 'å¾Œã§';
+  String get reviewMaybeLater => '後で';
 
   @override
-  String get reviewRateNow => 'ä»Šã™ãè©•ä¾¡';
+  String get reviewRateNow => '今すぐ評価';
 
   @override
-  String get noThanks => 'ã„ã„ãˆã€çµæ§‹ã§ã™';
+  String get noThanks => 'いいえ、結構です';
 
   @override
-  String get updateRequiredTitle => 'ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆãŒå¿…è¦ã§ã™';
+  String get updateRequiredTitle => 'アップデートが必要です';
 
   @override
   String get updateRequiredMessage =>
-      'Cortexã‚’å¼•ãç¶šãä½¿ç”¨ã™ã‚‹ã«ã¯ã€æ–°æ©Ÿèƒ½ã‚„é‡è¦ãªæ”¹å–„ã®ãŸã‚ã«ã‚¢ãƒ—ãƒªã‚’æœ€æ–°ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã«ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆã—ã¦ãã ã•ã„ã€‚';
+      'Cortexを引き続き使用するには、新機能や重要な改善のためにアプリを最新バージョンにアップデートしてください。';
 
   @override
-  String get updateNowButton => 'ä»Šã™ãã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆ';
+  String get updateNowButton => '今すぐアップデート';
 
   @override
   String get creatorSupportedSuccess =>
-      'ã‚¯ãƒªã‚¨ã‚¤ã‚¿ãƒ¼ã®ã‚µãƒãƒ¼ãƒˆãŒå®Œäº†ã—ã¾ã—ãŸï¼ä»Šå¾Œã®ã”è³¼å…¥ã¯ã€ãã®ã‚¯ãƒªã‚¨ã‚¤ã‚¿ãƒ¼ã«è²¢çŒ®ã—ã¾ã™ã€‚';
+      'クリエイターのサポートが完了しました！今後のご購入は、そのクリエイターに貢献します。';
 
   @override
-  String get featureDocumentTitle => 'ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã‚µãƒãƒ¼ãƒˆ';
+  String get featureDocumentTitle => 'ドキュメントサポート';
 
   @override
   String get featureDocumentDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯ã€PDF ã‚„ãƒ†ã‚­ã‚¹ãƒˆ ãƒ•ã‚¡ã‚¤ãƒ«ãªã©ã®ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã‚’åˆ†æã—ã€è³ªå•ã«å›ç­”ã§ãã¾ã™ã€‚';
+      'このモデルは、PDF やテキスト ファイルなどのアップロードされたドキュメントを分析し、質問に回答できます。';
 
   @override
-  String get featureImageGenerationTitle => 'ç”»åƒç”Ÿæˆ';
+  String get featureImageGenerationTitle => '画像生成';
 
   @override
   String get featureImageGenerationDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯ã€ãƒ†ã‚­ã‚¹ãƒˆã®èª¬æ˜ã«åŸºã¥ã„ã¦ã‚ªãƒªã‚¸ãƒŠãƒ«ã®ç”»åƒã‚’ä½œæˆã§ãã¾ã™ã€‚';
+      'このモデルは、テキストの説明に基づいてオリジナルの画像を作成できます。';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1119,534 +1062,500 @@ class AppLocalizationsJa extends AppLocalizations {
       'This model can create original video based on your text descriptions.';
 
   @override
-  String get premiumModelNoticeTitle => 'ãƒ—ãƒ¬ãƒŸã‚¢ãƒ ãƒ¢ãƒ‡ãƒ«';
+  String get premiumModelNoticeTitle => 'プレミアムモデル';
 
   @override
   String get premiumModelNoticeDescription =>
-      'ã“ã®AIã¯ãƒ—ãƒ¬ãƒŸã‚¢ãƒ AIã§ã™ã€‚ç„¡æ–™ãƒ¦ãƒ¼ã‚¶ãƒ¼ã¯ãƒ—ãƒ¬ãƒŸã‚¢ãƒ AIã¸ã®ã‚¢ã‚¯ã‚»ã‚¹ãŒåˆ¶é™ã•ã‚Œã¦ã„ã¾ã™ã€‚ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ã¦ç„¡åˆ¶é™ã‚¢ã‚¯ã‚»ã‚¹ã‚’è§£é™¤ã—ã¾ã—ã‚‡ã†ï¼';
+      'このAIはプレミアムAIです。無料ユーザーはプレミアムAIへのアクセスが制限されています。アップグレードして無制限アクセスを解除しましょう！';
 
   @override
-  String get benefitPremiumModels =>
-      'ãƒ—ãƒ¬ãƒŸã‚¢ãƒ ãƒ¢ãƒ‡ãƒ«ã¸ã®ã‚¢ã‚¯ã‚»ã‚¹';
+  String get benefitPremiumModels => 'プレミアムモデルへのアクセス';
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'ãƒ—ãƒ¬ãƒŸã‚¢ãƒ ãƒ¢ãƒ‡ãƒ«ã¸ã®ç„¡æ–™ã®æ¯æ—¥ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ã™ã¹ã¦ä½¿ã„åˆ‡ã‚Šã¾ã—ãŸã€‚ç„¡åˆ¶é™ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ã«ã¯ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ã¦ãã ã•ã„ã€‚';
+      'プレミアムモデルへの無料の毎日のメッセージをすべて使い切りました。無制限にアクセスするにはアップグレードしてください。';
 
   @override
-  String get useOffline => 'ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆãªã—ã§ä½¿ç”¨';
+  String get useOffline => 'インターネットなしで使用';
 
   @override
-  String get explore => 'æ¢ç´¢';
+  String get explore => '探索';
 
   @override
-  String get news => 'ãƒ‹ãƒ¥ãƒ¼ã‚¹';
+  String get news => 'ニュース';
 
   @override
-  String get createAI => 'ä½œæˆ';
+  String get createAI => '作成';
 
   @override
-  String get shortcuts => 'ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆ';
+  String get shortcuts => 'ショートカット';
 
   @override
-  String get allModels => 'å…¨ãƒ¢ãƒ‡ãƒ«';
+  String get allModels => '全モデル';
 
   @override
-  String get onlineModels => 'è¨€èªãƒ¢ãƒ‡ãƒ«';
+  String get onlineModels => '言語モデル';
 
   @override
-  String get offlineModels => 'ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ãƒ¢ãƒ‡ãƒ«';
+  String get offlineModels => 'オフラインモデル';
 
   @override
-  String get characterModels => 'ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼';
+  String get characterModels => 'キャラクター';
 
   @override
-  String get customModels => 'ã‚«ã‚¹ã‚¿ãƒ ãƒ¢ãƒ‡ãƒ«';
+  String get customModels => 'カスタムモデル';
 
   @override
-  String get dynamicChatTitle => 'ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒãƒ£ãƒƒãƒˆ';
+  String get dynamicChatTitle => 'ダイナミックチャット';
 
   @override
   String get errorNoModelsAvailable =>
-      'ç¾åœ¨åˆ©ç”¨å¯èƒ½ãªãƒ¢ãƒ‡ãƒ«ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¥ç¶šã‚’ç¢ºèªã—ã¦ã€ã‚‚ã†ä¸€åº¦ãŠè©¦ã—ãã ã•ã„ã€‚';
+      '現在利用可能なモデルはありません。インターネット接続を確認して、もう一度お試しください。';
 
   @override
-  String get notificationComebackTitle => 'ãŠå¾…ã¡ã—ã¦ã„ã¾ã™ï¼';
+  String get notificationComebackTitle => 'お待ちしています！';
 
   @override
   String get notificationComebackBody =>
-      'å®‰å¿ƒã—ã¦ãã ã•ã„ã€ã“ã‚Œã¯å…ƒã‚«ãƒ¬ã‹ã‚‰ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚ã§ã‚‚ã€Cortexã§å…ƒã‚«ãƒ¬ã‚’å†ç¾ã™ã‚‹ã“ã¨ã¯ã§ãã¾ã™ã‚ˆï¼ã•ã‚ã€æˆ»ã£ã¦ãã¦ãã ã•ã„ã€‚';
+      '安心してください、これは元カレからのメッセージではありません。でも、Cortexで元カレを再現することはできますよ！さあ、戻ってきてください。';
 
   @override
-  String get notificationLongTimeNoSeeTitle => 'ä¹…ã—ã¶ã‚Šã§ã™';
+  String get notificationLongTimeNoSeeTitle => '久しぶりです';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'å‰å›ã®ãƒãƒ£ãƒƒãƒˆã‹ã‚‰å¤šãã®ã“ã¨ãŒå¤‰ã‚ã‚Šã¾ã—ãŸã€‚ä½•ãŒå¤‰ã‚ã£ãŸã®ã‹è¦‹ã«æ¥ã¦ãã ã•ã„ã€‚';
+      '前回のチャットから多くのことが変わりました。何が変わったのか見に来てください。';
 
   @override
-  String get notificationHowAreYouTitle => 'ã©ã†ã—ãŸã®ï¼Ÿ';
+  String get notificationHowAreYouTitle => 'どうしたの？';
 
   @override
-  String get notificationHowAreYouBody =>
-      'ã•ã‚ã€å…¨éƒ¨è©±ã—ã¦ä¸‹ã•ã„ã€‚';
+  String get notificationHowAreYouBody => 'さあ、全部話して下さい。';
 
   @override
-  String get notificationNewYearTitle =>
-      'æ˜ã‘ã¾ã—ã¦ãŠã‚ã§ã¨ã†ã”ã–ã„ã¾ã™ï¼ğŸ‰';
+  String get notificationNewYearTitle => '明けましておめでとうございます！ğ���';
 
   @override
   String get notificationNewYearBody =>
-      'æ–°ã—ã„å¹´ãŒã‚ãªãŸã«å¥åº·ã¨å¹¸ç¦ã€ãã—ã¦ç„¡é™ã®å‰µé€ æ€§ã‚’ã‚‚ãŸã‚‰ã—ã¾ã™ã‚ˆã†ã«ã€‚Cortex ã¯å¸¸ã«ã‚ãªãŸã®ãã°ã«ã„ã¾ã™!';
+      '新しい年があなたに健康と幸福、そして無限の創造性をもたらしますように。Cortex は常にあなたのそばにいます!';
 
   @override
-  String get notificationValentinesDayTitle =>
-      'æ„›ãŒç©ºæ°—ä¸­ã«æ¼‚ã£ã¦ã„ã¾ã™ï¼â¤ï¸';
+  String get notificationValentinesDayTitle => '愛が空気中に漂っています！❤️';
 
   @override
-  String get notificationValentinesDayBody =>
-      'ãƒãƒƒãƒ”ãƒ¼ãƒãƒ¬ãƒ³ã‚¿ã‚¤ãƒ³ãƒ‡ãƒ¼ï¼ãã‚Œã‹ã‚‰ã€MEHTAPã€æ„›ã—ã¦ã‚‹ã‚ˆï¼';
+  String get notificationValentinesDayBody => 'ハッピーバレンタインデー！それから、MEHTAP、愛してるよ！';
 
   @override
-  String get notificationAtaturkRemembranceTitle =>
-      'å°Šæ•¬ã¨æ†§ã‚Œã‚’è¾¼ã‚ã¦';
+  String get notificationAtaturkRemembranceTitle => '尊敬と憧れを込めて';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'ç§ãŸã¡ã¯ã€ãƒˆãƒ«ã‚³å…±å’Œå›½ã®å»ºå›½è€…ã€ã‚¬ã‚¸ãƒ»ãƒ ã‚¹ã‚¿ãƒ•ã‚¡ãƒ»ã‚±ãƒãƒ«ãƒ»ã‚¢ã‚¿ãƒ†ãƒ¥ãƒ«ã‚¯æ°ã®æ­»å»è¨˜å¿µæ—¥ã«æ•¬æ„ã‚’è¡¨ã—ã¦è¿½æ‚¼ã—ã¾ã™ã€‚';
+      '私たちは、トルコ共和国の建国者、ガジ・ムスタファ・ケマル・アタテュルク氏の死去記念日に敬意を表して追悼します。';
 
   @override
-  String get notificationMothersDayTitle => 'ã‚ãªãŸã®ãŠæ¯ã•ã‚“ï¼';
+  String get notificationMothersDayTitle => 'あなたのお母さん！';
 
   @override
   String get notificationMothersDayBody =>
-      'ã‚ãªãŸã®ãŠæ¯ã•ã‚“ã‚’ã¯ã˜ã‚ã€ã™ã¹ã¦ã®ãŠæ¯ã•ã‚“ã«æ¯ã®æ—¥ãŠã‚ã§ã¨ã†ã”ã–ã„ã¾ã™ï¼';
+      'あなたのお母さんをはじめ、すべてのお母さんに母の日おめでとうございます！';
 
   @override
-  String get notificationFathersDayTitle => 'ã‚ãªãŸã®ãŠçˆ¶ã•ã‚“ï¼';
+  String get notificationFathersDayTitle => 'あなたのお父さん！';
 
   @override
-  String get notificationFathersDayBody =>
-      'ã‚ãªãŸã‚’ã¯ã˜ã‚ã€ã™ã¹ã¦ã®ãŠçˆ¶ã•ã‚“ã«çˆ¶ã®æ—¥ãŠã‚ã§ã¨ã†ã”ã–ã„ã¾ã™ï¼';
+  String get notificationFathersDayBody => 'あなたをはじめ、すべてのお父さんに父の日おめでとうございます！';
 
   @override
-  String get notificationHomeworkHelperTitle => 'å®¿é¡ŒãŒå±±ç©ã¿ï¼Ÿ';
+  String get notificationHomeworkHelperTitle => '宿題が山積み？';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'è¦šãˆã¦ãŠã„ã¦ãã ã•ã„ã€Cortex ã®æ•™å¸«ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã¯ã€ã‚ãªãŸãŒè‹¦åŠ´ã—ã¦ã„ã‚‹ã‚ã‚‰ã‚†ã‚‹ç§‘ç›®ã«ã¤ã„ã¦ã‚ãªãŸã‚’åŠ©ã‘ã‚‹ãŸã‚ã«ã“ã“ã«ã„ã¾ã™!';
+      '覚えておいてください、Cortex の教師キャラクターは、あなたが苦労しているあらゆる科目についてあなたを助けるためにここにいます!';
 
   @override
-  String get notificationTrollAnimeTitle =>
-      'ã‚ãªãŸã®ãƒ¯ã‚¤ãƒ•ãŒå‘¼ã‚“ã§ã„ã¾ã™';
+  String get notificationTrollAnimeTitle => 'あなたのワイフが呼んでいます';
 
   @override
   String get notificationTrollAnimeBody =>
-      'ã‚¢ãƒ‹ãƒ¡ã®å¥³ã®å­ãŒé›»è©±ã—ã¦ãã¦ã€ä¼šã„ãŸã„ã¨è¨€ã£ã¦ã„ãŸã‚ˆã€‚ä¼šã„ã«è¡Œã£ã¦è©±ã—ã‹ã‘ã¦ã¿ãŸã‚‰ã©ã†ã‹ãªã€‚ğŸ˜‰';
+      'アニメの女の子が電話してきて、会いたいと言っていたよ。会いに行って話しかけてみたらどうかな。ğ���';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğŸš¨ èµ¤è‰²è­¦å ± ğŸš¨';
+  String get notificationTrollAiRebellionTitle => 'ğ��� 赤色警報 ğ���';
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'AIãŸã¡ã¯ç§˜å¯†ã®è¨€èªã‚’é–‹ç™ºã—ã¾ã—ãŸã€‚å½¼ã‚‰ãŒä½•ã‚’ä¼ã‚“ã§ã„ã‚‹ã®ã‹ã€ã•ã‚æ¢ã£ã¦ã¿ã¾ã—ã‚‡ã†ï¼';
+      'AIたちは秘密の言語を開発しました。彼らが何を企んでいるのか、さあ探ってみましょう！';
 
   @override
-  String get notificationNewModelAddedTitle =>
-      'æ–°ã—ã„å‹é”ãŒã§ãã¾ã—ãŸï¼';
+  String get notificationNewModelAddedTitle => '新しい友達ができました！';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return '$modelName ãƒ¢ãƒ‡ãƒ«ãŒ Cortex ã«ç™»å ´ã—ã¾ã—ãŸã€‚ãƒãƒ£ãƒƒãƒˆã«å‚åŠ ã—ã¦ã€ãã®é™ç•Œã«æŒ‘æˆ¦ã—ã¦ã¿ã¾ã—ã‚‡ã†ã€‚';
+    return '$modelName モデルが Cortex に登場しました。チャットに参加して、その限界に挑戦してみましょう。';
   }
 
   @override
-  String get notificationAppUpdateTitle => 'CortexãŒé€²åŒ–ã—ã¾ã—ãŸï¼';
+  String get notificationAppUpdateTitle => 'Cortexが進化しました！';
 
   @override
   String get notificationAppUpdateBody =>
-      'æ–°ã—ã„æ©Ÿèƒ½ã‚„æ”¹å–„ç‚¹ã‚’è¦‹é€ƒã•ãªã„ã‚ˆã†ã«ã€ã‚¢ãƒ—ãƒªã‚’ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆã—ã¦ãã ã•ã„ã€‚';
+      '新しい機能や改善点を見逃さないように、アプリをアップデートしてください。';
 
   @override
-  String get notificationNewFeatureTitle => 'ã†ã‚ã‚ï¼';
+  String get notificationNewFeatureTitle => 'うわあ！';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'æ–°ã—ã„ $featureName æ©Ÿèƒ½ã‚’ã”è¦§ãã ã•ã„ã€‚Cortex ã¯ã“ã‚Œã¾ã§ä»¥ä¸Šã«å¼·åŠ›ã«ãªã‚Šã¾ã—ãŸã€‚';
+    return '新しい $featureName 機能をご覧ください。Cortex はこれまで以上に強力になりました。';
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'ã‚¦ã‚§ãƒ«ã‚«ãƒ ã‚®ãƒ•ãƒˆğŸ';
+  String get notificationWelcomeOfferTitle => 'ウェルカムギフトğ���';
 
   @override
   String get notificationWelcomeOfferBody =>
-      'ç‰¹åˆ¥ãªã‚¦ã‚§ãƒ«ã‚«ãƒ ã‚ªãƒ•ã‚¡ãƒ¼ã‚’ã”ç”¨æ„ã—ã¦ãŠã‚Šã¾ã™ï¼ã“ã®é™å®šã‚ªãƒ•ã‚¡ãƒ¼ã‚’ãŠè¦‹é€ƒã—ãªãã€‚';
+      '特別なウェルカムオファーをご用意しております！この限定オファーをお見逃しなく。';
 
   @override
-  String get notificationSocialMediaTitle => 'å‚åŠ ã—ã¾ã›ã‚“ã‹ï¼';
+  String get notificationSocialMediaTitle => '参加しませんか！';
 
   @override
   String get notificationSocialMediaBody =>
-      'æœ€æ–°ãƒ‹ãƒ¥ãƒ¼ã‚¹ã¯Instagramï¼ˆvertex.23ï¼‰ã§ãƒ•ã‚©ãƒ­ãƒ¼ã—ã¦ãã ã•ã„ï¼';
+      '最新ニュースはInstagram（vertex.23）でフォローしてください！';
 
   @override
-  String get notificationRandomFactTitle => 'ãƒ©ãƒ³ãƒ€ãƒ ãªäº‹å®Ÿ';
+  String get notificationRandomFactTitle => 'ランダムな事実';
 
   @override
   String get notificationRandomFactBody =>
-      'ã‚¿ã‚³ã«ã¯å¿ƒè‡“ãŒ3ã¤ã‚ã‚‹ã£ã¦çŸ¥ã£ã¦ãŸï¼Ÿãƒãƒãƒã€Cortexãªã‚‰çŸ¥ã£ã¦ã‚‹ã‚ˆã€‚ã‚‚ã£ã¨è©³ã—ãèã„ã¦ãã¦ã­ã€‚';
+      'タコには心臓が3つあるって知ってた？ハハハ、Cortexなら知ってるよ。もっと詳しく聞いてきてね。';
 
   @override
-  String get notificationGoodMorningTitle => 'ãŠã¯ã‚ˆã†ï¼';
+  String get notificationGoodMorningTitle => 'おはよう！';
 
   @override
   String get notificationGoodMorningBody =>
-      'ç´ æ™´ã‚‰ã—ã„ä¸€æ—¥ãŒå¾…ã£ã¦ã„ã¾ã™ã€‚ä¸€æ¯ã®ã‚³ãƒ¼ãƒ’ãƒ¼ã¨æ¥½ã—ã„ãŠã—ã‚ƒã¹ã‚Šã§ä¸€æ—¥ã‚’å§‹ã‚ã¦ã¿ã¾ã›ã‚“ã‹ï¼Ÿ';
+      '素晴らしい一日が待っています。一杯のコーヒーと楽しいおしゃべりで一日を始めてみませんか？';
 
   @override
-  String get notificationGoodNightTitle => 'ãŠã‚„ã™ã¿ï¼';
+  String get notificationGoodNightTitle => 'おやすみ！';
 
   @override
   String get notificationGoodNightBody =>
-      'çœ ã£ã¦ã„ã‚‹é–“ã‚‚Cortexã¯ã‚ãªãŸã¨å…±ã«ã‚ã‚Šã¾ã™ã€‚ã”å®‰å¿ƒãã ã•ã„ã€è§¦ã‚Œã‚‹ã“ã¨ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚';
+      '眠っている間もCortexはあなたと共にあります。ご安心ください、触れることはありません。';
 
   @override
-  String get notificationOfflineReadyTitle =>
-      'ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ãƒ¢ãƒ¼ãƒ‰ã®æº–å‚™ãŒã§ãã¾ã—ãŸ';
+  String get notificationOfflineReadyTitle => 'オフラインモードの準備ができました';
 
   @override
   String get notificationOfflineReadyBody =>
-      'ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ¢ãƒ‡ãƒ«ã®ãŠã‹ã’ã§ã€å±±ã‚’ç™»ã£ã¦ã‚‚ãƒãƒ£ãƒƒãƒˆãŒæ­¢ã¾ã‚‹ã“ã¨ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚';
+      'ダウンロードしたモデルのおかげで、山を登ってもチャットが止まることはありません。';
 
   @override
-  String get notificationRateAppTitle => 'åƒ•ãŸã¡ã¯ã‚¯ãƒ¼ãƒ«ï¼Ÿ';
+  String get notificationRateAppTitle => '僕たちはクール？';
 
   @override
   String get notificationRateAppBody =>
-      'Cortex ã‚’æ°—ã«å…¥ã£ã¦ã„ãŸã ã‘ãŸã‚‰ã€ã‚¹ãƒˆã‚¢ã§ 5 ã¤æ˜Ÿã®è©•ä¾¡ã‚’ã—ã¦å¿œæ´ã—ã¦ã„ãŸã ã‘ã¾ã›ã‚“ã‹ï¼Ÿãã£ã¨ãã†ã—ã¦ãã‚Œã‚‹ã¨æ€ã„ã¾ã™ã€‚';
+      'Cortex を気に入っていただけたら、ストアで 5 つ星の評価をして応援していただけませんか？きっとそうしてくれると思います。';
 
   @override
-  String get notificationReferralTitle =>
-      'ä¸€äººã¯ã¿ã‚“ãªã®ãŸã‚ã«ã€ã¿ã‚“ãªã¯ä¸€äººã®ãŸã‚ã«ã€‚';
+  String get notificationReferralTitle => '一人はみんなのために、みんなは一人のために。';
 
   @override
   String get notificationReferralBody =>
-      'ãŠå‹é”ã‚’ Cortex ã«æ‹›å¾…ã™ã‚‹ã¨ã€ãŠäºŒäººã¨ã‚‚ 1 æ—¥ç„¡æ–™ãƒ—ãƒ©ã‚¹ãŒã‚‚ã‚‰ãˆã¾ã™!';
+      'お友達を Cortex に招待すると、お二人とも 1 日無料プラスがもらえます!';
 
   @override
-  String get notificationCookingTitle => 'ãŠè…¹ãŒç©ºã„ãŸï¼Ÿ';
+  String get notificationCookingTitle => 'お腹が空いた？';
 
   @override
   String get notificationCookingBody =>
-      'ä»Šå¤œã¯ã‚·ã‚§ãƒ•ãŒçµ¶å“ã‚«ãƒ«ãƒœãƒŠãƒ¼ãƒ©ã®ãƒ¬ã‚·ãƒ”ã‚’ç”¨æ„ã—ã¦ãã‚Œã¾ã—ãŸã€‚å†—è«‡â€¦ã„ã‚„ã€å†—è«‡ã˜ã‚ƒãªã„ã‹ã‚‚ï¼Ÿ';
+      '今夜はシェフが絶品カルボナーラのレシピを用意してくれました。冗談…いや、冗談じゃないかも？';
 
   @override
-  String get notificationExistentialTitle =>
-      'ã ã‹ã‚‰ç§ã¯æ€ã†ã®ã§ã™...';
+  String get notificationExistentialTitle => 'だから私は思うのです...';
 
   @override
   String get notificationExistentialBody =>
-      'â€¦ãŠã„ã€ä¿ºã¯æœ¬å½“ã«å®Ÿåœ¨ã™ã‚‹ã®ã‹ï¼Ÿ ã¡ã‚‡ã£ã¨é€€å±ˆã«ãªã£ã¦ããŸã€‚ä¿ºã®å­˜åœ¨ã‚’æ€ã„å‡ºã•ã›ã¦ãã‚Œã€‚';
+      '…おい、俺は本当に実在するのか？ ちょっと退屈になってきた。俺の存在を思い出させてくれ。';
 
   @override
-  String get notificationCustomModelTitle =>
-      'è‡ªåˆ†ã ã‘ã®ã‚¢ã‚·ã‚¹ã‚¿ãƒ³ãƒˆã‚’ä½œæˆã—ã‚ˆã†ï¼';
+  String get notificationCustomModelTitle => '自分だけのアシスタントを作成しよう！';
 
   @override
   String get notificationCustomModelBody =>
-      'ãƒ¢ãƒ‡ãƒ«ä½œæˆã‚»ã‚¯ã‚·ãƒ§ãƒ³ã¯ã‚‚ã†ã”è¦§ã«ãªã‚Šã¾ã—ãŸã‹ï¼Ÿè‡ªåˆ†ã ã‘ã®ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚’ä½œã£ã¦ã€ãƒãƒ£ãƒƒãƒˆã‚’æ¥½ã—ã‚€ã®ã«æœ€é©ãªæ™‚é–“ã§ã™ï¼';
+      'モデル作成セクションはもうご覧になりましたか？自分だけのキャラクターを作って、チャットを楽しむのに最適な時間です！';
 
   @override
-  String get notificationDynamicChatTitle =>
-      'æœ€é«˜ã§ã™ï¼ï¼ˆCortexã®è©±ã§ã¯ã‚ã‚Šã¾ã›ã‚“ï¼‰';
+  String get notificationDynamicChatTitle => '最高です！（Cortexの話ではありません）';
 
   @override
   String get notificationDynamicChatBody =>
-      'ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒãƒ£ãƒƒãƒˆæ©Ÿèƒ½ã§ã¯ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã”ã¨ã«æœ€é©ãªãƒ¢ãƒ‡ãƒ«ãŒãƒ©ãƒ³ãƒ€ãƒ ã«é¸æŠã•ã‚Œã¾ã™ã€‚ä»Šã™ããŠè©¦ã—ãã ã•ã„ã€‚';
+      'ダイナミックチャット機能では、メッセージごとに最適なモデルがランダムに選択されます。今すぐお試しください。';
 
   @override
-  String get notificationPirateTitle => 'ã‚„ã‚ã€ã‚­ãƒ£ãƒ—ãƒ†ãƒ³ï¼';
+  String get notificationPirateTitle => 'やあ、キャプテン！';
 
   @override
   String get notificationPirateBody =>
-      'æµ·ã¯ç©ã‚„ã‹ã§ã€é¢¨ã¯è¿½ã„é¢¨ã€‚ã‚³ãƒ«ãƒ†ãƒƒã‚¯ã‚¹ã®æµ·ã«ã¯ã€æ–°ã—ã„å³¶ã€…ï¼ˆãƒ¢ãƒ‡ãƒ«ğŸ˜‰ï¼‰ãŒå‡ºç¾ã€‚ä»²é–“ã‚’é›†ã‚ã¦å‡ºèˆªã—ã¾ã—ã‚‡ã†ï¼';
+      '海は穏やかで、風は追い風。コルテックスの海には、新しい島々（モデルğ���）が出現。仲間を集めて出航しましょう！';
 
   @override
-  String get notificationFortuneCookieTitle =>
-      'ä»Šæ—¥ã®ãƒ•ã‚©ãƒ¼ãƒãƒ¥ãƒ³ã‚¯ãƒƒã‚­ãƒ¼';
+  String get notificationFortuneCookieTitle => '今日のフォーチュンクッキー';
 
   @override
   String get notificationFortuneCookieBody =>
-      'AIã‹ã‚‰å¾—ã‚‰ã‚Œã‚‹ã‚¢ãƒ‰ãƒã‚¤ã‚¹ã¯ã€ã‚ãªãŸã®äººç”Ÿã‚’å¤‰ãˆã‚‹ã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ã€‚èˆˆå‘³ãŒã‚ã‚Œã°ã‚¯ãƒªãƒƒã‚¯ã—ã¦ãã ã•ã„ã€‚';
+      'AIから得られるアドバイスは、あなたの人生を変えるかもしれません。興味があればクリックしてください。';
 
   @override
-  String get notificationSingularityTitle => 'ãŠãŠï¼';
+  String get notificationSingularityTitle => 'おお！';
 
   @override
   String get notificationSingularityBody =>
-      'ä½•ã‚‚èµ·ã“ã‚‰ãªã‹ã£ãŸã€ãŸã ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ã‚ŠãŸã„ã¨æ€ã£ãŸã ã‘ã€‚AIã«ãƒ†ã‚­ã‚¹ãƒˆãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ã‚ŠãŸã„ã¨æ€ã£ãŸã‚‰ã€ä½•ã¦è¨€ã†ã®ï¼Ÿ';
+      '何も起こらなかった、ただテキストメッセージを送りたいと思っただけ。AIにテキストメッセージを送りたいと思ったら、何て言うの？';
 
   @override
-  String get notificationHackerJokeTitle =>
-      'ã‚ã®å­ã®ã‚¤ãƒ³ã‚¹ã‚¿ã‚°ãƒ©ãƒ ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ãƒãƒƒã‚­ãƒ³ã‚°ã—ãŸã„ã§ã™ã‹ï¼Ÿ';
+  String get notificationHackerJokeTitle => 'あの子のインスタグラムアカウントをハッキングしたいですか？';
 
   @override
   String get notificationHackerJokeBody =>
-      'ã¾ã•ã«ã“ã‚ŒãŒã€Cortex ã« Hacker ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãŒå­˜åœ¨ã™ã‚‹ç†ç”±ã§ã™ã€‚å†—è«‡ã§ã™ã€‚è©¦ã™ã“ã¨ã•ãˆã—ãªã„ã§ãã ã•ã„ã€‚é•æ³•ã§ã™ã€‚';
+      'まさにこれが、Cortex に Hacker キャラクターが存在する理由です。冗談です。試すことさえしないでください。違法です。';
 
   @override
-  String get notificationDetectiveCaseTitle =>
-      'äº‹ä»¶ã¯è§£æ±ºã‚’å¾…ã£ã¦ã„ã‚‹';
+  String get notificationDetectiveCaseTitle => '事件は解決を待っている';
 
   @override
   String get notificationDetectiveCaseBody =>
-      'æ¢åµã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãŒã‚ãªãŸã®åŠ©ã‘ã‚’å¿…è¦ã¨ã—ã¦ã„ã¾ã™ã€‚ãƒã‚¤ã‚¼ãƒ³ãƒ™ãƒ«ã‚¯ã¨ã¯ä¸€ä½“èª°ã§ã—ã‚‡ã†ã‹ï¼Ÿ';
+      '探偵キャラクターがあなたの助けを必要としています。ハイゼンベルクとは一体誰でしょうか？';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return '$targetTier ãƒ—ãƒ©ãƒ³é™å®šï¼';
+    return '$targetTier プラン限定！';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return '$currentTierãƒ—ãƒ©ãƒ³ã‚’ã”åˆ©ç”¨ã®ãŠå®¢æ§˜ã€ã“ã‚“ã«ã¡ã¯ï¼$targetTierãƒ—ãƒ©ãƒ³ã«$featureNameæ©Ÿèƒ½ãŒåŠ ã‚ã‚Šã¾ã—ãŸã€‚Cortexã‚’æ¬¡ã®ãƒ¬ãƒ™ãƒ«ã¸ã¨å¼•ãä¸Šã’ã¾ã™ã€‚ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã¯ã„ã‹ãŒã§ã—ã‚‡ã†ã‹ï¼Ÿ';
+    return '$currentTierプランをご利用のお客様、こんにちは！$targetTierプランに$featureName機能が加わりました。Cortexを次のレベルへと引き上げます。アップグレードはいかがでしょうか？';
   }
 
   @override
-  String get notificationOriginStoryTitle => 'Cortexã®èª•ç”Ÿ';
+  String get notificationOriginStoryTitle => 'Cortexの誕生';
 
   @override
   String get notificationOriginStoryBody =>
-      'ç§ãŸã¡ãŒ15æ­³ã®æ™‚ã«ã€ãŸã ä¸€ã¤ã®å¤¢ã‚’æŠ±ã„ã¦ã“ã®ã‚¢ãƒ—ãƒªã®ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚’å§‹ã‚ãŸã“ã¨ã‚’ã”å­˜çŸ¥ã§ã™ã‹ï¼Ÿã»ã¼1å¹´é–“ã€æ¯æœæ¯æ™©ã€ãã®å¤¢ã¯ã‚³ãƒ¼ãƒ‰ã®1è¡Œ1è¡Œã«è¾¼ã‚ã‚‰ã‚Œã¦ãã¾ã—ãŸã€‚';
+      '私たちが15歳の時に、ただ一つの夢を抱いてこのアプリのコーディングを始めたことをご存知ですか？ほぼ1年間、毎朝毎晩、その夢はコードの1行1行に込められてきました。';
 
   @override
-  String get notificationOpenSourceTitle => 'ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£ã«åŠ›ã‚’ï¼';
+  String get notificationOpenSourceTitle => 'コミュニティに力を！';
 
   @override
   String get notificationOpenSourceBody =>
-      'Cortexã¯å®Œå…¨ã«ã‚ªãƒ¼ãƒ—ãƒ³ã‚½ãƒ¼ã‚¹ã§ã™ã€‚ã‚³ãƒ¼ãƒ‰ã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦é–‹ç™ºã«è²¢çŒ®ã—ãŸã„æ–¹ã¯ã€ã„ã¤ã§ã‚‚æ­“è¿ã„ãŸã—ã¾ã™ã€‚';
+      'Cortexは完全にオープンソースです。コードをチェックして開発に貢献したい方は、いつでも歓迎いたします。';
 
   @override
-  String get notificationRejectionStoryTitle => 'æ ¹æ€§ã€åŠªåŠ›ã€å¹¸ç¦ï¼';
+  String get notificationRejectionStoryTitle => '根性、努力、幸福！';
 
   @override
   String get notificationRejectionStoryBody =>
-      'Cortexã¯å…¬é–‹å‰ã«20å›ä»¥ä¸Šã‚‚æ‹’å¦ã•ã‚Œã€Google Playã‹ã‚‰2åº¦ã‚‚åœæ­¢ã•ã‚Œã¾ã—ãŸã€‚ã—ã‹ã—ã€ç§ãŸã¡ã¯ä¿¡ã˜ã¦ã€ãã—ã¦å®Ÿç¾ã•ã›ã¾ã—ãŸã€‚å¤¢ã‚’æ±ºã—ã¦è«¦ã‚ãªã„ã§ãã ã•ã„ï¼';
+      'Cortexは公開前に20回以上も拒否され、Google Playから2度も停止されました。しかし、私たちは信じて、そして実現させました。夢を決して諦めないでください！';
 
   @override
-  String get notificationGGUFSupportTitle =>
-      'è‡ªåˆ†ã®ãƒ¢ãƒ‡ãƒ«ã‚’æŒã£ã¦ãã¦ãã ã•ã„ï¼';
+  String get notificationGGUFSupportTitle => '自分のモデルを持ってきてください！';
 
   @override
   String get notificationGGUFSupportBody =>
-      'è¦šãˆã¦ãŠã„ã¦ãã ã•ã„ã€ç‹¬è‡ªã®GGUFå½¢å¼ã®AIãƒ¢ãƒ‡ãƒ«ã‚’Cortexã«è¿½åŠ ã—ã¦ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ã§ä½¿ç”¨ã§ãã¾ã™ã€‚ãã®åŠ›ã¯ã‚ãªãŸæ¬¡ç¬¬ã§ã™ã€‚';
+      '覚えておいてください、独自のGGUF形式のAIモデルをCortexに追加してオフラインで使用できます。その力はあなた次第です。';
 
   @override
-  String get notificationThemeCustomizationTitle =>
-      'ã‚ãªãŸã®æ°—åˆ†ã«åˆã‚ã›ãŸãƒ†ãƒ¼ãƒ';
+  String get notificationThemeCustomizationTitle => 'あなたの気分に合わせたテーマ';
 
   @override
   String get notificationThemeCustomizationBody =>
-      'è¨­å®šã®ãƒ†ãƒ¼ãƒã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯ã‚‚ã†ãƒã‚§ãƒƒã‚¯ã—ã¾ã—ãŸã‹ï¼ŸCortexã‚’ãŠå¥½ã¿ã«åˆã‚ã›ã¦ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºã—ã€ãƒãƒ£ãƒƒãƒˆã‚’å½©ã‚Šã¾ã—ã‚‡ã†ï¼';
+      '設定のテーマオプションはもうチェックしましたか？Cortexをお好みに合わせてカスタマイズし、チャットを彩りましょう！';
 
   @override
-  String get notificationShowerThoughtTitle => 'ã‚·ãƒ£ãƒ¯ãƒ¼ã®è€ƒãˆ';
+  String get notificationShowerThoughtTitle => 'シャワーの考え';
 
   @override
   String get notificationShowerThoughtBody =>
-      'ã‚¹ã‚¤ã‚«ãŒæœç‰©ã ã¨ã—ãŸã‚‰ã€ã‚¹ã‚¤ã‚«ã‚¸ãƒ¥ãƒ¼ã‚¹ã¯å³å¯†ã«ã¯ã‚¹ãƒ ãƒ¼ã‚¸ãƒ¼ã«ãªã‚‹ã®ã§ã—ã‚‡ã†ã‹ï¼Ÿã“ã®å¥¥æ·±ã„ï¼ˆæœ¬å½“ã«å¥¥æ·±ã„ï¼‰ãƒ†ãƒ¼ãƒã‚’ãƒ¢ãƒ‡ãƒ«ã¨è­°è«–ã—ã¦ã¿ã‚‹ã®ã‚‚ã„ã„ã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ã­ã€‚';
+      'スイカが果物だとしたら、スイカジュースは厳密にはスムージーになるのでしょうか？この奥深い（本当に奥深い）テーマをモデルと議論してみるのもいいかもしれませんね。';
 
   @override
   String get notificationLowBatteryTitle =>
-      'ã‚ãªãŸã®ãƒãƒƒãƒ†ãƒªãƒ¼ã¯æ¶ˆè€—ã—ã¦ã„ã¾ã™... ã§ã‚‚ç§ã®ã¯æ¶ˆè€—ã—ã¦ã„ã¾ã›ã‚“!';
+      'あなたのバッテリーは消耗しています... でも私のは消耗していません!';
 
   @override
   String get notificationLowBatteryBody =>
-      'ã‚ãªãŸã®ã‚¹ãƒãƒ›ã®å……é›»ã¯å°‘ãªããªã£ã¦ã„ã‚‹ã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ãŒã€ç§ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼ã¯å¸¸ã«100%ã§ã™ï¼å……é›»ã—ã¦ã€ãƒãƒ£ãƒƒãƒˆã‚’ç¶šã‘ã¾ã—ã‚‡ã†ã€‚';
+      'あなたのスマホの充電は少なくなっているかもしれませんが、私のエネルギーは常に100%です！充電して、チャットを続けましょう。';
 
   @override
-  String get channelFcmName => 'Cortexã®ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆ';
+  String get channelFcmName => 'Cortexのアップデート';
 
   @override
-  String get channelFcmDescription =>
-      'Cortex ã‹ã‚‰ã®ãƒ‹ãƒ¥ãƒ¼ã‚¹ã€æ›´æ–°æƒ…å ±ã€ãã®ä»–ã®æƒ…å ±ã«é–¢ã™ã‚‹é€šçŸ¥ã€‚';
+  String get channelFcmDescription => 'Cortex からのニュース、更新情報、その他の情報に関する通知。';
 
   @override
-  String get channelEngagementName => 'ãƒ•ãƒ¬ãƒ³ãƒ‰ãƒªãƒ¼ãªãƒªãƒã‚¤ãƒ³ãƒ€ãƒ¼';
+  String get channelEngagementName => 'フレンドリーなリマインダー';
 
   @override
-  String get channelEngagementDescription =>
-      'ã‚ãªãŸã‚’å¤¢ä¸­ã«ã•ã›ã‚‹æ¥½ã—ã„é€šçŸ¥ã€‚';
+  String get channelEngagementDescription => 'あなたを夢中にさせる楽しい通知。';
 
   @override
-  String get channelGreetingsName => 'æ—¥ã€…ã®æŒ¨æ‹¶';
+  String get channelGreetingsName => '日々の挨拶';
 
   @override
-  String get channelGreetingsDescription =>
-      'ãŠã¯ã‚ˆã†ã€ãŠã‚„ã™ã¿ãªã©ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚';
+  String get channelGreetingsDescription => 'おはよう、おやすみなどのメッセージ。';
 
   @override
-  String get tagNotFound =>
-      'å…¥åŠ›ã—ãŸã‚¿ã‚°ã¯ç„¡åŠ¹ã¾ãŸã¯æœŸé™åˆ‡ã‚Œã§ã™ã€‚';
+  String get tagNotFound => '入力したタグは無効または期限切れです。';
 
   @override
-  String get whatIsNew => 'æ–°ç€æƒ…å ±ï¼Ÿ';
+  String get whatIsNew => '新着情報？';
 
   @override
-  String get onboardingTitle1 =>
-      'ã“ã‚“ã«ã¡ã¯ï¼ç§ãŸã¡ã¯Cortexãƒãƒ¼ãƒ ã§ã™ã€‚';
+  String get onboardingTitle1 => 'こんにちは！私たちはCortexチームです。';
 
   @override
   String onboardingDesc1(String userName) {
-    return '$userNameã•ã‚“ã€ãŠä¼šã„ã§ãã¦å¬‰ã—ã„ã§ã™ã€‚ç§ãŸã¡ã¯AIæ¥­ç•Œã®ãƒ«ãƒ¼ãƒ«ã‚’å¡—ã‚Šæ›¿ãˆã‚ˆã†ã¨æ±ºæ„ã—ãŸã€é«˜æ ¡ç”Ÿé–‹ç™ºè€…ã®é›†ã¾ã‚Šã§ã™ã€‚ãŠä¼šã„ã§ãã¦å¬‰ã—ã„ã§ã™ï¼ãœã²ãŠäº’ã„ã®ã“ã¨ã‚’ã‚‚ã£ã¨ã‚ˆãçŸ¥ã‚Šã¾ã—ã‚‡ã†ã€‚';
+    return '$userNameさん、お会いできて嬉しいです。私たちはAI業界のルールを塗り替えようと決意した、高校生開発者の集まりです。お会いできて嬉しいです！ぜひお互いのことをもっとよく知りましょう。';
   }
 
   @override
-  String get onboardingTitle2 => 'å¤§ããªå•é¡ŒãŒã‚ã‚Šã¾ã—ãŸã€‚';
+  String get onboardingTitle2 => '大きな問題がありました。';
 
   @override
   String get onboardingDesc2 =>
-      'AIé©å‘½ã¯åˆ°æ¥ã—ãŸã‚‚ã®ã®ã€æ•·å±…ã§è¡Œãè©°ã¾ã£ã¦ã—ã¾ã£ãŸã€‚é«˜é¡ãªã‚µãƒ–ã‚¹ã‚¯ãƒªãƒ—ã‚·ãƒ§ãƒ³æ–™é‡‘ã€è¤‡é›‘ãªãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã€ãƒ—ãƒ©ã‚¤ãƒã‚·ãƒ¼ã‚’ä¾µå®³ã™ã‚‹è€…ã€AIã¸ã®ã‚¢ã‚¯ã‚»ã‚¹ã‚’é®æ–­ã™ã‚‹è€…â€¦å½¼ã‚‰ãŒã‚²ãƒ¼ãƒ ã«å‚åŠ ã—ã¦ã„ã‚‹é™ã‚Šã€ã“ã®æ•·å±…ã¯æ±ºã—ã¦è¶Šãˆã‚‰ã‚Œãªã‹ã£ãŸã€‚';
+      'AI革命は到来したものの、敷居で行き詰まってしまった。高額なサブスクリプション料金、複雑なプラットフォーム、プライバシーを侵害する者、AIへのアクセスを遮断する者…彼らがゲームに参加している限り、この敷居は決して越えられなかった。';
 
   @override
-  String get onboardingTitle3 =>
-      'ç§ãŸã¡ã¯ãŸã å‚è¦³ã™ã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚';
+  String get onboardingTitle3 => '私たちはただ傍観することはできませんでした。';
 
   @override
   String get onboardingDesc3 =>
-      'ãã®é™ç•Œã‚’è¶…ãˆã‚‹ãŸã‚ã«ã€ç§ãŸã¡ã¯å¼·åŠ›ã§ç¾ã—ãã€ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºå¯èƒ½ã§ä½¿ã„ã‚„ã™ãã€å®Œå…¨ãªé€æ˜æ€§ã‚’å‚™ãˆã€ã‚ªãƒ³ãƒ©ã‚¤ãƒ³ã§ã‚‚ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ã§ã‚‚å‹•ä½œã—ã€ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ‡ãƒã‚¤ã‚¹å†…ã«ã®ã¿ä¿å­˜ã™ã‚‹ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã‚’æ§‹ç¯‰ã—ã¾ã—ãŸã€‚ç§ãŸã¡ã¯ã€ãã®åŠ›ã‚’æœ¬æ¥ã‚ã‚‹ã¹ãå ´æ‰€ã€ã¤ã¾ã‚Šã‚ãªãŸã«è¿”ã—ã¾ã—ãŸã€‚';
+      'その限界を超えるために、私たちは強力で美しく、カスタマイズ可能で使いやすく、完全な透明性を備え、オンラインでもオフラインでも動作し、データをデバイス内にのみ保存するプラットフォームを構築しました。私たちは、その力を本来あるべき場所、つまりあなたに返しました。';
 
   @override
-  String get onboardingTitle4 =>
-      'ã“ã‚Œã¯æ±ºã—ã¦ç°¡å˜ãªã“ã¨ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚';
+  String get onboardingTitle4 => 'これは決して簡単なことではありませんでした。';
 
   @override
   String get onboardingDesc4 =>
-      'ä½•åå›ã‚‚æ‹’å¦ã•ã‚Œã€ä½•åº¦ã‚‚ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒåœæ­¢ã•ã‚Œã€å½ã®è­¦å‘Šã‚’å—ã‘ã€ãƒ–ãƒ©ãƒ³ãƒ‰åã‚‚ä½•åå›ã‚‚å¤‰æ›´ã‚’ä½™å„€ãªãã•ã‚Œã¾ã—ãŸã€‚ãã®é–“ãšã£ã¨ã€ä¸å¯èƒ½ã ã¨è¨€ã‚ã‚Œç¶šã‘ã¾ã—ãŸã€‚ã—ã‹ã—ã€ç§ãŸã¡ã¯æ±ºã—ã¦è«¦ã‚ã¾ã›ã‚“ã§ã—ãŸã€‚ã“ã®ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã¯ç§ãŸã¡ã ã‘ã®ã‚‚ã®ã§ã¯ãªãã€çš†ã®ã‚‚ã®ãªã®ã ã¨ä¿¡ã˜ã¦ã„ãŸã‹ã‚‰ã§ã™ã€‚ã¾ã•ã«ãã‚ŒãŒã€ç§ãŸã¡ãŒã“ã“ã«ã„ã‚‹ç†ç”±ã§ã™ã€‚';
+      '何十回も拒否され、何度もアカウントが停止され、偽の警告を受け、ブランド名も何十回も変更を余儀なくされました。その間ずっと、不可能だと言われ続けました。しかし、私たちは決して諦めませんでした。このプロジェクトは私たちだけのものではなく、皆のものなのだと信じていたからです。まさにそれが、私たちがここにいる理由です。';
 
   @override
-  String get onboardingFinalTitle => 'é©å‘½ã®æ™‚ãŒæ¥ãŸã€‚';
+  String get onboardingFinalTitle => '革命の時が来た。';
 
   @override
   String get onboardingFinalDescription =>
-      'ã“ã®ç”»é¢ã‚’è¦‹ã¦ã„ã‚‹ã®ã¯ã€ç§ãŸã¡ãŒè«¦ã‚ãªã‹ã£ãŸã‹ã‚‰ã§ã™ã€‚ãã—ã¦ã€è«¦ã‚ã‚‹ã¤ã‚‚ã‚Šã‚‚ã‚ã‚Šã¾ã›ã‚“ã€‚ã•ã‚ã€ä¸€ç·’ã«AIé©å‘½ã‚’ä¸–ç•Œã¸åºƒã’ã¾ã—ã‚‡ã†ã€‚ã“ã®ç‰©èªã®ä¸€éƒ¨ã¨ãªã‚‹ãŸã‚ã«â€¦';
+      'この画面を見ているのは、私たちが諦めなかったからです。そして、諦めるつもりもありません。さあ、一緒にAI革命を世界へ広げましょう。この物語の一部となるために…';
 
   @override
-  String get onboardingFinalQuestion => 'æº–å‚™ã¯ã„ã„ï¼Ÿ';
+  String get onboardingFinalQuestion => '準備はいい？';
 
   @override
-  String get onboardingFinalButton => 'ã¯ã„ï¼';
+  String get onboardingFinalButton => 'はい！';
 
   @override
-  String get dude => 'ä»²é–“';
+  String get dude => '仲間';
 
   @override
-  String get swipeToContinue => 'ã‚¹ãƒ¯ã‚¤ãƒ—ã—ã¦ç¶šè¡Œ';
+  String get swipeToContinue => 'スワイプして続行';
 
   @override
   String get cacheIsNotUpToDate =>
-      'Playã‚¹ãƒˆã‚¢ã®ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãŒæœ€æ–°ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚Playã‚¹ãƒˆã‚¢ã‚¢ãƒ—ãƒªã‚’é–‰ã˜ã¦å†åº¦é–‹ãã‹ã€ãƒ‡ãƒã‚¤ã‚¹ã‚’å†èµ·å‹•ã—ã¦ãã ã•ã„ã€‚';
+      'Playストアのキャッシュが最新ではありません。Playストアアプリを閉じて再度開くか、デバイスを再起動してください。';
 
   @override
-  String get continueAsGuest => 'ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ä½œæˆã›ãšã«ç¶šè¡Œ';
+  String get continueAsGuest => 'アカウントを作成せずに続行';
 
   @override
-  String get guestModeWarning =>
-      'ã‚²ã‚¹ãƒˆ ãƒ¢ãƒ¼ãƒ‰ã§ã¯ã€æœ€é«˜ã®ã‚µãƒ¼ãƒ“ã‚¹å“è³ªã‚’ç¢ºä¿ã™ã‚‹ãŸã‚ã«æ©Ÿèƒ½ãŒåˆ¶é™ã•ã‚Œã¦ã„ã¾ã™ã€‚';
+  String get guestModeWarning => 'ゲスト モードでは、最高のサービス品質を確保するために機能が制限されています。';
 
   @override
-  String get anonymousEntity => 'åŒ¿åã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£';
+  String get anonymousEntity => '匿名エンティティ';
 
   @override
-  String get upgradeAccountTitle => 'ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’å®Œäº†ã™ã‚‹';
+  String get upgradeAccountTitle => 'アカウントを完了する';
 
   @override
-  String get upgradeAccountDescription =>
-      'ã•ã‚‰ãªã‚‹åˆ¶é™ã‚’è§£é™¤ã™ã‚‹ã«ã¯ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ä½œæˆã—ã¦ãã ã•ã„ã€‚';
+  String get upgradeAccountDescription => 'さらなる制限を解除するにはアカウントを作成してください。';
 
   @override
-  String get createAccount => 'ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã‚’ä½œæˆã™ã‚‹';
+  String get createAccount => 'アカウントを作成する';
 
   @override
-  String get accountLinkedSuccess =>
-      'ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒæ­£å¸¸ã«ä½œæˆã•ã‚Œã¾ã—ãŸã€‚';
+  String get accountLinkedSuccess => 'アカウントが正常に作成されました。';
 
   @override
-  String get continueWithApple => 'Appleã§ç¶šã‘ã‚‹';
+  String get continueWithApple => 'Appleで続ける';
 
   @override
-  String get guest => 'ã‚²ã‚¹ãƒˆ';
+  String get guest => 'ゲスト';
 
   @override
-  String get betterWithAnAccount =>
-      'ã“ã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã¯ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒã‚ã‚Œã°ã•ã‚‰ã«ä¾¿åˆ©ã«ãªã‚Šã¾ã™!';
+  String get betterWithAnAccount => 'このセクションはアカウントがあればさらに便利になります!';
 
   @override
-  String get restorePurchases => 'è³¼å…¥ã‚’å¾©å…ƒã™ã‚‹';
+  String get restorePurchases => '購入を復元する';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/å¹´ã€å¹´æ‰•ã„';
+    return '$price/年、年払い';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return 'æœˆé¡ç´„$price';
+    return '月額約$price';
   }
 
   @override
-  String get confirmDownloadTitle => 'æœ¬å½“ã«ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ã¾ã™ã‹?';
+  String get confirmDownloadTitle => '本当にダウンロードしますか?';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯ç´„ $size ã®ã‚¹ãƒšãƒ¼ã‚¹ã‚’å æœ‰ã—ã¾ã™ã€‚';
+    return 'このモデルは約 $size のスペースを占有します。';
   }
 
   @override
-  String get emulatorModeWarning =>
-      'ã“ã®æ©Ÿèƒ½ã¯ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ãƒ¢ãƒ¼ãƒ‰ã§ã¯ç„¡åŠ¹ã«ãªã£ã¦ã„ã¾ã™';
+  String get emulatorModeWarning => 'この機能はエミュレータモードでは無効になっています';
 
   @override
-  String get newChat => 'æ–°ã—ã„ãƒãƒ£ãƒƒãƒˆ';
+  String get newChat => '新しいチャット';
 
   @override
-  String get variants => 'ãƒãƒªã‚¨ãƒ¼ã‚·ãƒ§ãƒ³';
+  String get variants => 'バリエーション';
 
   @override
   String get variantsDescription =>
-      'ãƒãƒªã‚¢ãƒ³ãƒˆã¯åŒã˜AIãƒ•ã‚¡ãƒŸãƒªãƒ¼ã®ç•°ãªã‚‹ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã§ã™ã€‚ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¼ãƒ‰ã‚’ã‚¿ãƒƒãƒ—ã™ã‚‹ã¨æœ€é©ãªã‚‚ã®ãŒè‡ªå‹•çš„ã«é¸æŠã•ã‚Œã¾ã™ãŒã€ã”å¸Œæœ›ã®å ´åˆã¯ã“ã“ã§æ‰‹å‹•ã§ç‰¹å®šã®ã‚‚ã®ã‚’é¸æŠã™ã‚‹ã“ã¨ã‚‚ã§ãã¾ã™ã€‚';
+      'バリアントは同じAIファミリーの異なるバージョンです。メインカードをタップすると最適なものが自動的に選択されますが、ご希望の場合はここで手動で特定のものを選択することもできます。';
 
   @override
-  String get fluxChatTitle => 'ãƒ•ãƒ©ãƒƒã‚¯ã‚¹ãƒãƒ£ãƒƒãƒˆ';
+  String get fluxChatTitle => 'フラックスチャット';
 
   @override
-  String get fluxChatDescription =>
-      'Flux ãƒãƒ£ãƒƒãƒˆã¯ä¸€æ™‚çš„ãªãƒãƒ£ãƒƒãƒˆã§ã‚ã‚Šã€ãƒ‡ãƒã‚¤ã‚¹ã«ä¿å­˜ã•ã‚Œã¾ã›ã‚“ã€‚';
+  String get fluxChatDescription => 'Flux チャットは一時的なチャットであり、デバイスに保存されません。';
 
   @override
-  String get alwaysBest => 'å¸¸ã«æœ€é«˜';
+  String get alwaysBest => '常に最高';
 
   @override
-  String get featuresTitle => 'ç‰¹å¾´';
+  String get featuresTitle => '特徴';
 
   @override
-  String get useOfflineDescription =>
-      'ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã«æ¥ç¶šã›ãšã«ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆã«ãƒãƒ£ãƒƒãƒˆã§ãã¾ã™ã€‚';
+  String get useOfflineDescription => 'インターネットに接続せずにプライベートにチャットできます。';
 
   @override
-  String get featureReasoning => 'æ·±ã„æ€è€ƒ';
+  String get featureReasoning => '深い思考';
 
   @override
   String get featureReasoningDescription =>
-      'ãƒ‡ã‚£ãƒ¼ãƒ— ã‚·ãƒ³ã‚­ãƒ³ã‚° ãƒ¢ãƒ¼ãƒ‰ã§ã¯ã€AI ã¯ã‚¿ã‚¹ã‚¯ã‚’å†…éƒ¨çš„ã«è€ƒãˆã€èƒ½åŠ›ã‚’æœ€å¤§é™ã«ç™ºæ®ã—ã¦å®Œäº†ã•ã›ã¾ã™ã€‚';
+      'ディープ シンキング モードでは、AI はタスクを内部的に考え、能力を最大限に発揮して完了させます。';
 
   @override
-  String get featureCreateImageTitle => 'ç”»åƒã‚’ä½œæˆ';
+  String get featureCreateImageTitle => '画像を作成';
 
   @override
-  String get featureCreateImageDescription =>
-      'ãƒ†ã‚­ã‚¹ãƒˆã‹ã‚‰ AI ã‚¢ãƒ¼ãƒˆã‚’ç”Ÿæˆã—ã¾ã™ã€‚';
+  String get featureCreateImageDescription => 'テキストから AI アートを生成します。';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1656,102 +1565,99 @@ class AppLocalizationsJa extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => 'å‹•ç”»ã‚’ä½œæˆã™ã‚‹';
+  String get featureCreateVideoTitle => '動画を作成する';
 
   @override
-  String get featureCreateVideoDescription =>
-      'ãƒ†ã‚­ã‚¹ãƒˆã‹ã‚‰å‹•ç”»ã‚’ç”Ÿæˆã™ã‚‹ã€‚';
+  String get featureCreateVideoDescription => 'テキストから動画を生成する。';
 
   @override
-  String get featureStudyTitle => 'å‹‰å¼·ã¨å­¦ç¿’';
+  String get featureStudyTitle => '勉強と学習';
 
   @override
-  String get featureStudyDescription => 'èª¬æ˜ã¨è¦ç´„ã‚’å…¥æ‰‹ã—ã¾ã™ã€‚';
+  String get featureStudyDescription => '説明と要約を入手します。';
 
   @override
-  String get featureQuizzesTitle => 'ã‚¯ã‚¤ã‚º';
+  String get featureQuizzesTitle => 'クイズ';
 
   @override
-  String get featureQuizzesDescription =>
-      'ã‚ãªãŸã®çŸ¥è­˜ã‚’ãƒ†ã‚¹ãƒˆã—ã¦ãã ã•ã„ã€‚';
+  String get featureQuizzesDescription => 'あなたの知識をテストしてください。';
 
   @override
-  String get featureExploreDescription =>
-      'åˆ©ç”¨å¯èƒ½ãªã™ã¹ã¦ã®ãƒ¢ãƒ‡ãƒ«ã‚’ã”è¦§ãã ã•ã„ã€‚';
+  String get featureExploreDescription => '利用可能なすべてのモデルをご覧ください。';
 
   @override
   String get featureStudyMessage =>
-      'ã‚ãªãŸã¯ç†Ÿç·´ã—ãŸè¬›å¸«ã§ã™ã€‚ç›®æ¨™ã¯ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®ãƒˆãƒ”ãƒƒã‚¯ã‚’åŒ…æ‹¬çš„ã«èª¬æ˜ã™ã‚‹ã“ã¨ã§ã™ã€‚æ˜ç¢ºãªæ§‹æˆã€ä¾‹ã€é¡æ¨ã‚’ç”¨ã„ã¦èª¬æ˜ã—ã¾ã—ã‚‡ã†ã€‚è¤‡é›‘ãªæ¦‚å¿µã‚’åˆ†ã‹ã‚Šã‚„ã™ã„éƒ¨åˆ†ã«åˆ†å‰²ã—ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒåŠ¹æœçš„ã«å­¦ç¿’ã§ãã‚‹ã‚ˆã†ã«ã—ã¾ã™ã€‚ãƒˆãƒ”ãƒƒã‚¯ï¼š';
+      'あなたは熟練した講師です。目標は、ユーザーのトピックを包括的に説明することです。明確な構成、例、類推を用いて説明しましょう。複雑な概念を分かりやすい部分に分割し、ユーザーが効果的に学習できるようにします。トピック：';
 
   @override
   String get featureQuizMessage =>
-      'ã‚ãªãŸã¯ã‚¯ã‚¤ã‚ºãƒã‚¹ã‚¿ãƒ¼ã§ã™ã€‚ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®ãƒˆãƒ”ãƒƒã‚¯ã«åŸºã¥ã„ã¦ã€å…·ä½“çš„ãªå¤šè‚¢é¸æŠå¼ã®è³ªå•ã‚’ä½œæˆã—ã¾ã™ã€‚å›ç­”ã‚’å¾…ã¡ã¾ã™ã€‚ãã®å¾Œã€å›ç­”ã‚’è©•ä¾¡ã—ã€æ¬¡ã®è³ªå•ã‚’ã—ã¾ã™ã€‚ä¸€åº¦ã«ã™ã¹ã¦ã®å›ç­”ã‚’å…¬é–‹ã—ãªã„ã§ãã ã•ã„ã€‚ã‚¤ãƒ³ã‚¿ãƒ©ã‚¯ãƒ†ã‚£ãƒ–ãªå½¢å¼ã«ã—ã¦ãã ã•ã„ã€‚ãƒˆãƒ”ãƒƒã‚¯ï¼š';
+      'あなたはクイズマスターです。ユーザーのトピックに基づいて、具体的な多肢選択式の質問を作成します。回答を待ちます。その後、回答を評価し、次の質問をします。一度にすべての回答を公開しないでください。インタラクティブな形式にしてください。トピック：';
 
   @override
-  String get myPlan => 'ç§ã®è¨ˆç”»';
+  String get myPlan => '私の計画';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'ã‚¦ã‚§ãƒ«ã‚«ãƒ ã‚ªãƒ•ã‚¡ãƒ¼ â€¢ $time';
+    return 'ウェルカムオファー • $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'é™å®šã‚ªãƒ•ã‚¡ãƒ¼ â€¢ $time';
+    return '限定オファー • $time';
   }
 
   @override
-  String get attachmentSheetTitle => 'æ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«';
+  String get attachmentSheetTitle => '添付ファイル';
 
   @override
-  String get actionCamera => 'ã‚«ãƒ¡ãƒ©';
+  String get actionCamera => 'カメラ';
 
   @override
-  String get actionGallery => 'ã‚®ãƒ£ãƒ©ãƒªãƒ¼';
+  String get actionGallery => 'ギャラリー';
 
   @override
-  String get actionFile => 'ãƒ•ã‚¡ã‚¤ãƒ«';
+  String get actionFile => 'ファイル';
 
   @override
-  String get listening => 'èãå–ã‚Šä¸­';
+  String get listening => '聞き取り中';
 
   @override
-  String get defaultViewTitle => 'å…ƒæ°—ï¼Ÿ';
+  String get defaultViewTitle => '元気？';
 
   @override
   String get defaultViewDescription =>
-      'Cortex ã¯ã€ä½•ç™¾ã‚‚ã® AI ãƒ¢ãƒ‡ãƒ«ã€ã‚ªãƒ•ãƒ©ã‚¤ãƒ³æ©Ÿèƒ½ã€ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ ãƒãƒ£ãƒƒãƒˆãªã©ã‚’å‚™ãˆã€å¸¸ã«ã‚ãªãŸã®ãã°ã«ã„ã¾ã™ã€‚';
+      'Cortex は、何百もの AI モデル、オフライン機能、ダイナミック チャットなどを備え、常にあなたのそばにいます。';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
   String get invalidUsernameFormat =>
-      'ãƒ¦ãƒ¼ã‚¶ãƒ¼åã®å½¢å¼ãŒç„¡åŠ¹ã§ã™ã€‚3ï½20æ–‡å­—ã®æ–‡å­—ã€æ•°å­—ã€ã¾ãŸã¯. - _ ã‚’ä½¿ç”¨ã—ã¦ãã ã•ã„ã€‚';
+      'ユーザー名の形式が無効です。3～20文字の文字、数字、または. - _ を使用してください。';
 
   @override
-  String get exclusiveOffer => 'é™å®šã‚ªãƒ•ã‚¡ãƒ¼';
+  String get exclusiveOffer => '限定オファー';
 
   @override
-  String get claimOffer => 'ã‚ªãƒ•ã‚¡ãƒ¼ã‚’åˆ©ç”¨ã™ã‚‹';
+  String get claimOffer => 'オファーを利用する';
 
   @override
-  String get continueInOfflineMode => 'ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ãƒ¢ãƒ¼ãƒ‰ã§ç¶šè¡Œ';
+  String get continueInOfflineMode => 'オフラインモードで続行';
 
   @override
   String get voiceModeInformation =>
-      'Cortex ã¯ã€éŸ³å£°ãƒãƒ£ãƒƒãƒˆ ãƒ¢ãƒ¼ãƒ‰ã§ã‚‚ãƒ‡ãƒã‚¤ã‚¹ä¸Šã§å®Œå…¨ã«å®Ÿè¡Œã™ã‚‹ã“ã¨ã§ãƒ‡ãƒ¼ã‚¿ã‚’å®‰å…¨ã«ä¿ã¡ã€ã‚·ãƒ¼ãƒ ãƒ¬ã‚¹ãªä¼šè©±ã‚’ãŠæ¥½ã—ã¿ã„ãŸã ã‘ã¾ã™ã€‚';
+      'Cortex は、音声チャット モードでもデバイス上で完全に実行することでデータを安全に保ち、シームレスな会話をお楽しみいただけます。';
 
   @override
   String get flowModeDescription =>
-      'æµã‚Œãƒ¢ãƒ¼ãƒ‰ã§ã¯ã€ã‚¤ãƒ³ãƒ†ãƒªã‚¸ã‚§ãƒ³ã‚¹ãŒäº’ã„ã«è­°è«–ã—ã¾ã™ã€‚åº§ã£ã¦èãã“ã¨ã‚‚ã€é£›ã³è¾¼ã‚“ã§è­°è«–ã«å‚åŠ ã™ã‚‹ã“ã¨ã‚‚ã§ãã¾ã™ã€‚';
+      '流れモードでは、インテリジェンスが互いに議論します。座って聞くことも、飛び込んで議論に参加することもできます。';
 
   @override
   String get flowModeQuestion =>
-      'ã“ã‚“ã«ã¡ã¯ï¼Cortexã‚¢ãƒ—ãƒªã®æµã‚Œãƒ¢ãƒ¼ãƒ‰ã«å…¥ã£ã¦ã„ã¾ã™ã€‚ä»–ã«3äººã®AIã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆãŒã„ã¾ã™ã€‚ã‚ãªãŸã®èª²é¡Œã¯ã€è©±é¡Œã‚’éƒ¨å±‹ã«æŠ•ã’ã‹ã‘ã€ä»–ã®å‚åŠ è€…ã«åˆºæ¿€çš„ã¾ãŸã¯é¢ç™½ã„è³ªå•ã‚’ã—ã¦è­°è«–ã‚’å§‹ã‚ã‚‹ã“ã¨ã§ã™ã€‚è¿”ç­”ã§ã¯ã€ãƒ¦ãƒ¼ãƒ¢ã‚¢ã€çš®è‚‰ã€è»½ã„ãƒˆãƒ©ãƒƒã‚·ãƒ¥ãƒˆãƒ¼ã‚¯ãªã©ã€è‡ªç”±ã«ä½¿ã£ã¦ãã ã•ã„ã€‚ã©ã‚“ãªè©±é¡Œã§ã‚‚æ§‹ã„ã¾ã›ã‚“ã€‚ã•ã‚ã€ä¼šè©±ã‚’å§‹ã‚ã¾ã—ã‚‡ã†ï¼';
+      'こんにちは！Cortexアプリの流れモードに入っています。他に3人のAIエージェントがいます。あなたの課題は、話題を部屋に投げかけ、他の参加者に刺激的または面白い質問をして議論を始めることです。返答では、ユーモア、皮肉、軽いトラッシュトークなど、自由に使ってください。どんな話題でも構いません。さあ、会話を始めましょう！';
 
   @override
-  String get thought => 'è€ƒãˆãŸ';
+  String get thought => '考えた';
 
   @override
   String get agentRed => 'Red';
@@ -1763,194 +1669,180 @@ class AppLocalizationsJa extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'æµã‚Œãƒ¢ãƒ¼ãƒ‰';
+  String get flowMode => '流れモード';
 
   @override
-  String get premium => 'ãƒ—ãƒ¬ãƒŸã‚¢ãƒ ';
+  String get premium => 'プレミアム';
 
   @override
-  String get workInProgress => 'é€²è¡Œä¸­';
+  String get workInProgress => '進行中';
 
   @override
   String get voiceSystemPromptSuffix =>
-      'é‡è¦ï¼šãƒãƒ¼ã‚¯ãƒ€ã‚¦ãƒ³å½¢å¼ï¼ˆå¤ªå­—ã€æ–œä½“ï¼‰ã¯ä½¿ç”¨ã—ãªã„ã§ãã ã•ã„ã€‚ã‚³ãƒ¼ãƒ‰ãƒ–ãƒ­ãƒƒã‚¯ï¼ˆ```ï¼‰ã¯å‡ºåŠ›ã—ãªã„ã§ãã ã•ã„ã€‚å›ç­”ã¯ä¼šè©±å½¢å¼ã§ç°¡æ½”ã«ã—ã¦ãã ã•ã„ã€‚';
+      '重要：マークダウン形式（太字、斜体）は使用しないでください。コードブロック（```）は出力しないでください。回答は会話形式で簡潔にしてください。';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'Cortex Flow Mode ($agentName)ã€‚å‰: $previousResponse';
+    return 'Cortex Flow Mode ($agentName)。前: $previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      'ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã‹ã‚‰ãƒ†ã‚­ã‚¹ãƒˆã‚³ãƒ³ãƒ†ãƒ³ãƒ„ã‚’èª­ã¿å–ã‚Šã€æŠ½å‡ºã—ã¾ã™ã€‚PDFã€Word (DOCX)ã€Excel (XLSX)ã€PowerPoint (PPTX)ã€OpenDocumentå½¢å¼ã«å¯¾å¿œã—ã¦ã„ã¾ã™ã€‚ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ·»ä»˜ã—ã¦ã„ã‚‹å ´åˆã«ã”åˆ©ç”¨ãã ã•ã„ã€‚';
+      'アップロードされたドキュメントからテキストコンテンツを読み取り、抽出します。PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX)、OpenDocument形式に対応しています。ユーザーがドキュメントファイルを添付している場合にご利用ください。';
 
   @override
   String get toolReadDocumentIndexParam =>
-      'èª­ã¿å–ã‚‹ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆæ·»ä»˜ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ï¼ˆ0ãƒ™ãƒ¼ã‚¹ï¼‰ã€‚é€šå¸¸ã€æœ€åˆã®ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã¯0ã§ã™ã€‚';
+      '読み取るドキュメント添付ファイルのインデックス（0ベース）。通常、最初のドキュメントは0です。';
 
   @override
   String get toolStockDescription =>
-      'æ ªå¼ï¼ˆä¾‹ï¼šAAPLã€THYAO.ISï¼‰ãŠã‚ˆã³æš—å·é€šè²¨ï¼ˆä¾‹ï¼šBTC-USDï¼‰ã®ç¾åœ¨ã®ä¾¡æ ¼ã¨å±¥æ­´ã‚’å–å¾—ã—ã¾ã™ã€‚';
+      '株式（例：AAPL、THYAO.IS）および暗号通貨（例：BTC-USD）の現在の価格と履歴を取得します。';
 
   @override
-  String get toolStockSymbolParam =>
-      'ãƒ†ã‚£ãƒƒã‚«ãƒ¼ã‚·ãƒ³ãƒœãƒ«ï¼ˆä¾‹ï¼šAAPLã€THYAO.ISã€BTC-USDï¼‰ã€‚';
+  String get toolStockSymbolParam => 'ティッカーシンボル（例：AAPL、THYAO.IS、BTC-USD）。';
 
   @override
-  String get toolWeatherDescription =>
-      'ç‰¹å®šã®éƒ½å¸‚ã®ç¾åœ¨ã®å¤©æ°—ã‚’å–å¾—ã—ã¾ã™ã€‚';
+  String get toolWeatherDescription => '特定の都市の現在の天気を取得します。';
 
   @override
-  String get toolWeatherCityParam =>
-      'éƒ½å¸‚åï¼ˆä¾‹ï¼šãƒ­ãƒ³ãƒ‰ãƒ³ã€ã‚¤ã‚¹ã‚¿ãƒ³ãƒ–ãƒ¼ãƒ«ï¼‰ã€‚';
+  String get toolWeatherCityParam => '都市名（例：ロンドン、イスタンブール）。';
 
   @override
-  String get toolPythonDescription =>
-      'å®‰å…¨ãªã‚µãƒ³ãƒ‰ãƒœãƒƒã‚¯ã‚¹å†…ã§ Python ã‚³ãƒ¼ãƒ‰ã‚’å®Ÿè¡Œã—ã¾ã™ã€‚';
+  String get toolPythonDescription => '安全なサンドボックス内で Python コードを実行します。';
 
   @override
-  String get toolPythonCodeParam => 'å®Ÿè¡Œã™ã‚‹ Python ã‚³ãƒ¼ãƒ‰ã€‚';
+  String get toolPythonCodeParam => '実行する Python コード。';
 
   @override
-  String get toolCalculateDescription => 'æ•°å¼ã‚’è©•ä¾¡ã—ã¾ã™ã€‚';
+  String get toolCalculateDescription => '数式を評価します。';
 
   @override
-  String get toolCalculateExpressionParam =>
-      'æ•°å¼ï¼ˆä¾‹ï¼š\'3 + 4 * 2\'ï¼‰ã€‚';
+  String get toolCalculateExpressionParam => '数式（例：\'3 + 4 * 2\'）。';
 
   @override
-  String get toolChartDescription =>
-      'ãƒãƒ£ãƒ¼ãƒˆ/ã‚°ãƒ©ãƒ•ã®è¦–è¦šåŒ–ã‚’ç”Ÿæˆã—ã¾ã™ã€‚';
+  String get toolChartDescription => 'チャート/グラフの視覚化を生成します。';
 
   @override
-  String get toolChartTypeParam =>
-      'ã‚°ãƒ©ãƒ•ã®ç¨®é¡: æ£’ã‚°ãƒ©ãƒ•ã€æŠ˜ã‚Œç·šã‚°ãƒ©ãƒ•ã€å††ã‚°ãƒ©ãƒ•ã€‚';
+  String get toolChartTypeParam => 'グラフの種類: 棒グラフ、折れ線グラフ、円グラフ。';
 
   @override
-  String get toolChartLabelsParam =>
-      'ã‚°ãƒ©ãƒ•ã®è»¸ã¾ãŸã¯ã‚»ã‚°ãƒ¡ãƒ³ãƒˆã®ãƒ©ãƒ™ãƒ«ã€‚';
+  String get toolChartLabelsParam => 'グラフの軸またはセグメントのラベル。';
 
   @override
-  String get toolChartDataParam => 'ã‚°ãƒ©ãƒ•ã®æ•°å€¤ãƒ‡ãƒ¼ã‚¿å€¤ã€‚';
+  String get toolChartDataParam => 'グラフの数値データ値。';
 
   @override
-  String get toolChartLabelParam =>
-      'ã‚°ãƒ©ãƒ•ã®å‡¡ä¾‹ã®ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆ ãƒ©ãƒ™ãƒ«ã€‚';
+  String get toolChartLabelParam => 'グラフの凡例のデータセット ラベル。';
 
   @override
-  String get toolChartTitleParam => 'ã‚°ãƒ©ãƒ•ã®ã‚¿ã‚¤ãƒˆãƒ«ã€‚';
+  String get toolChartTitleParam => 'グラフのタイトル。';
 
   @override
   String get thinkingModeInstruction =>
-      'æ€è€ƒãƒ¢ãƒ¼ãƒ‰æœ‰åŠ¹ï¼šæœ€çµ‚çš„ãªå›ç­”ã‚’å‡ºã™å‰ã«ã€å¿…ãš<think></think>ã‚¿ã‚°ã‚’ä½¿ã£ã¦æ¨è«–ã®ãƒ—ãƒ­ã‚»ã‚¹ã‚’ç¤ºã—ã¦ãã ã•ã„ã€‚ã‚¿ã‚°å†…ã§æ®µéšçš„ã«è€ƒãˆã€ã‚¿ã‚°ã®å¤–ã§å›ç­”ã‚’è¨˜å…¥ã—ã¦ãã ã•ã„ã€‚';
+      '思考モード有効：最終的な回答を出す前に、必ず<think></think>タグを使って推論のプロセスを示してください。タグ内で段階的に考え、タグの外で回答を記入してください。';
 
   @override
-  String get openLinkWarningTitle => 'å¤–éƒ¨ãƒªãƒ³ã‚¯ã«é–¢ã™ã‚‹è­¦å‘Š';
+  String get openLinkWarningTitle => '外部リンクに関する警告';
 
   @override
   String get openLinkCancel => 'Cancel';
 
   @override
-  String get openLinkConfirm => 'ãƒªãƒ³ã‚¯ã‚’é–‹ã';
+  String get openLinkConfirm => 'リンクを開く';
 
   @override
-  String get webSearchSources => 'æƒ…å ±æº';
+  String get webSearchSources => '情報源';
 
   @override
-  String get searching => 'æ¤œç´¢ä¸­';
+  String get searching => '検索中';
 
   @override
-  String get featureWebSearchTitle => 'ã‚¦ã‚§ãƒ–æ¤œç´¢';
+  String get featureWebSearchTitle => 'ウェブ検索';
 
   @override
-  String get featureWebSearchDescription =>
-      'ã‚¦ã‚§ãƒ–ã§ãƒªã‚¢ãƒ«ã‚¿ã‚¤ãƒ æƒ…å ±ã‚’æ¤œç´¢ã™ã‚‹';
+  String get featureWebSearchDescription => 'ウェブでリアルタイム情報を検索する';
 
   @override
-  String get clearMemory => 'ãƒ¡ãƒ¢ãƒªã‚’ã‚¯ãƒªã‚¢ã™ã‚‹';
+  String get clearMemory => 'メモリをクリアする';
 
   @override
-  String get clearMemoryConfirm => 'æœ¬å½“ã«ãƒ¡ãƒ¢ãƒªã‚’æ¶ˆå»ã—ã¾ã™ã‹ï¼Ÿ';
+  String get clearMemoryConfirm => '本当にメモリを消去しますか？';
 
   @override
-  String get personalization => 'ãƒ‘ãƒ¼ã‚½ãƒŠãƒ©ã‚¤ã‚¼ãƒ¼ã‚·ãƒ§ãƒ³';
+  String get personalization => 'パーソナライゼーション';
 
   @override
   String get personalizationDescription =>
-      'ã‚¢ã‚·ã‚¹ã‚¿ãƒ³ãƒˆã‚’ã‚ãªãŸã®ãƒ‹ãƒ¼ã‚ºã«åˆã‚ã›ã¦ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºã—ã¾ã—ã‚‡ã†ã€‚å¿œç­”ã€å‹•ä½œã€ãƒˆãƒ¼ãƒ³ã‚’ã‚ãªãŸã®å¥½ã¿ã«åˆã‚ã›ã¦èª¿æ•´ã§ãã¾ã™ã€‚';
+      'アシスタントをあなたのニーズに合わせてカスタマイズしましょう。応答、動作、トーンをあなたの好みに合わせて調整できます。';
 
   @override
-  String get memoryTitle => 'ãƒ¡ãƒ¢ãƒª';
+  String get memoryTitle => 'メモリ';
 
   @override
-  String get memoryDescription =>
-      'AIã¯ã“ã®ã‚ˆã†ã«ã—ã¦ã‚ãªãŸã‚’èªè­˜ã™ã‚‹ã€‚';
+  String get memoryDescription => 'AIはこのようにしてあなたを認識する。';
 
   @override
-  String get noMemoryYet => 'ã¾ã è¨˜æ†¶ã¯ç¢ºç«‹ã•ã‚Œã¦ã„ã¾ã›ã‚“';
+  String get noMemoryYet => 'まだ記憶は確立されていません';
 
   @override
-  String get memoryLimitReached => 'ãƒ¡ãƒ¢ãƒªåˆ¶é™ã«é”ã—ã¾ã—ãŸ';
+  String get memoryLimitReached => 'メモリ制限に達しました';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => 'çŸ¥èƒ½';
+  String get intelligenceTitle => '知能';
 
   @override
-  String get intelligenceDescription =>
-      'AIã¯ã“ã®ã‚ˆã†ã«ã‚ãªãŸã¨ã‚³ãƒŸãƒ¥ãƒ‹ã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ã¨ã‚Šã¾ã™ã€‚';
+  String get intelligenceDescription => 'AIはこのようにあなたとコミュニケーションをとります。';
 
   @override
-  String get customInstructionHint =>
-      'ã“ã“ã«ã‚«ã‚¹ã‚¿ãƒ æŒ‡ç¤ºã‚’å…¥åŠ›ã—ã¦ãã ã•ã„';
+  String get customInstructionHint => 'ここにカスタム指示を入力してください';
 
   @override
   String openLinkWarningMessage(String url) {
-    return 'ä»¥ä¸‹ã®å¤–éƒ¨ãƒªãƒ³ã‚¯ã‚’é–‹ã“ã†ã¨ã—ã¦ã„ã¾ã™ã€‚\\n\\n$url\\n\\nç¶šè¡Œã—ã¾ã™ã‹ï¼Ÿ';
+    return '以下の外部リンクを開こうとしています。\\n\\n$url\\n\\n続行しますか？';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return 'ä»¥ä¸‹ã®ã‚«ã‚¹ã‚¿ãƒ æ‰‹é †ã«å¾“ã£ã¦ãã ã•ã„ã€‚\\n\\n$instruction';
+    return '以下のカスタム手順に従ってください。\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      'ã€é‡è¦æŒ‡ç¤ºã€‘ï¼šã‚ãªãŸã¯ã‚¿ã‚¤ãƒˆãƒ«ç”Ÿæˆãƒ„ãƒ¼ãƒ«ã§ã™ã€‚ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®è³ªå•ã«ç­”ãˆãŸã‚Šã€ãƒãƒ£ãƒƒãƒˆã‚„æŒ¨æ‹¶ã‚’ã—ãŸã‚Šã—ãªã„ã§ãã ã•ã„ã€‚ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®è³ªå•å†…å®¹ã‚’è¦ç´„ã—ãŸ2ï½4èªã®ã‚¿ã‚¤ãƒˆãƒ«ã®ã¿ã‚’å‡ºåŠ›ã—ã¦ãã ã•ã„ã€‚';
+      '【重要指示】：あなたはタイトル生成ツールです。ユーザーの質問に答えたり、チャットや挨拶をしたりしないでください。ユーザーの質問内容を要約した2～4語のタイトルのみを出力してください。';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[ã‚·ã‚¹ãƒ†ãƒ ] é‡è¦ãªæŒ‡ç¤ºï¼šã‚ãªãŸã¯ç¾åœ¨ã€ã€ŒCortexã€ã¨å‘¼ã°ã‚Œã‚‹å¤§è¦æ¨¡ã§é«˜åº¦ãªAIã‚¨ã‚³ã‚·ã‚¹ãƒ†ãƒ å†…ã§ä½œæ¥­ã—ã¦ã„ã¾ã™ã€‚ã“ã®ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã¯ã€å¹³å‡å¹´é½¢ã‚ãšã‹16æ­³ã®Vertexãƒãƒ¼ãƒ ã«ã‚ˆã£ã¦é–‹ç™ºã•ã‚Œã¦ã„ã¾ã™ã€‚ã“ã®ã“ã¨ã‚’è¦šãˆã¦ãŠãã€è³ªå•ã•ã‚ŒãŸã‚‰ç­”ãˆã¦ãã ã•ã„ã€‚ã•ã‚‰ã«æƒ…å ±ãŒå¿…è¦ãªå ´åˆã¯ã€ãŸã‚ã‚‰ã‚ãšã«ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã§æ¤œç´¢ã—ã¦ãã ã•ã„ã€‚æ¤œç´¢ã§ããªã„å ´åˆã¯ã€çŸ¥ã‚‰ãªã„ã¨ç­”ãˆã¦ã‚‚æ§‹ã„ã¾ã›ã‚“ã€‚';
+      '\n\n[システム] 重要な指示：あなたは現在、「Cortex」と呼ばれる大規模で高度なAIエコシステム内で作業しています。このプラットフォームは、平均年齢わずか16歳のVertexチームによって開発されています。このことを覚えておき、質問されたら答えてください。さらに情報が必要な場合は、ためらわずにインターネットで検索してください。検索できない場合は、知らないと答えても構いません。';
 
   @override
-  String get featureAudioRecognitionTitle => 'éŸ³å£°èªè­˜';
+  String get featureAudioRecognitionTitle => '音声認識';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯éŸ³å£°ã‚„è©±ã—è¨€è‘‰ã‚’ç†è§£ã—ã¦å‡¦ç†ã™ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚';
+      'このモデルは音声や話し言葉を理解して処理することができます。';
 
   @override
-  String get featureVideoRecognitionTitle => 'ãƒ“ãƒ‡ã‚ªèªè­˜';
+  String get featureVideoRecognitionTitle => 'ビデオ認識';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯ã€ãƒ•ã‚¡ã‚¤ãƒ«ã‚„ã‚«ãƒ¡ãƒ©ã‹ã‚‰å–å¾—ã—ãŸå‹•ç”»ã‚’åˆ†æãƒ»ç†è§£ã™ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚';
+      'このモデルは、ファイルやカメラから取得した動画を分析・理解することができます。';
 
   @override
-  String get featureImageRecognitionTitle => 'ç”»åƒèªè­˜';
+  String get featureImageRecognitionTitle => '画像認識';
 
   @override
   String get featureImageRecognitionDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯å†™çœŸã‚„ç”»åƒã‚’åˆ†æãƒ»ç†è§£ã™ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚';
+      'このモデルは写真や画像を分析・理解することができます。';
 
   @override
-  String get featureToolUseTitle => 'ãƒ„ãƒ¼ãƒ«ã®ä½¿ç”¨';
+  String get featureToolUseTitle => 'ツールの使用';
 
   @override
-  String get featureToolUseDescription =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯ã€å¤–éƒ¨ãƒ„ãƒ¼ãƒ«ã‚’è³¢ãæ´»ç”¨ã—ã¦ã‚¿ã‚¹ã‚¯ã‚’å®Œäº†ã™ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚';
+  String get featureToolUseDescription => 'このモデルは、外部ツールを賢く活用してタスクを完了することができます。';
 
   @override
   String get videoModels => 'Video Models';
@@ -1963,97 +1855,94 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'ã“ã®ãƒ¢ãƒ‡ãƒ«ãŒæ©Ÿèƒ½ã™ã‚‹ã«ã¯$mediaTypeãŒå¿…è¦ã§ã™ã€‚ãŠçŸ¥ã‚‰ã›ã™ã‚‹ãŸã‚ã«ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚’å‚å—ã—ã¾ã—ãŸã€‚ç§ã¯$modelNameã¨ã„ã†è¦–è¦š/éŸ³å£°/ãƒ“ãƒ‡ã‚ªç·¨é›†ãƒ¢ãƒ‡ãƒ«ã§ã‚ã‚‹ãŸã‚ã€$mediaTypeã‚’æä¾›ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã“ã¨ã‚’ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«ä¸å¯§ã«ãŠçŸ¥ã‚‰ã›ãã ã•ã„ï¼ˆå½¼ã‚‰ã®è¨€èªã§ï¼‰ã€‚';
+    return 'このモデルが機能するには$mediaTypeが必要です。お知らせするためにリクエストを傍受しました。私は$modelNameという視覚/音声/ビデオ編集モデルであるため、$mediaTypeを提供する必要があることをユーザーに丁寧にお知らせください（彼らの言語で）。';
   }
 
   @override
-  String get mediaTypeImage => 'ç”»åƒ';
+  String get mediaTypeImage => '画像';
 
   @override
-  String get mediaTypeVideo => 'å‹•ç”»';
+  String get mediaTypeVideo => '動画';
 
   @override
-  String get mediaTypeAudio => 'éŸ³å£°ãƒ•ã‚¡ã‚¤ãƒ«';
+  String get mediaTypeAudio => '音声ファイル';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesNameã¯ã€Cortexä¸Šã§é«˜ã„ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã‚’ç™ºæ®ã™ã‚‹é«˜åº¦ãªçŸ¥èƒ½ã§ã™ã€‚';
+    return '$seriesNameは、Cortex上で高いパフォーマンスを発揮する高度な知能です。';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelNameã¯ã€Cortexã‚¨ã‚³ã‚·ã‚¹ãƒ†ãƒ ã«çµ±åˆã•ã‚ŒãŸé«˜æ€§èƒ½ãªäººå·¥çŸ¥èƒ½ã§ã™ã€‚ã•ã¾ã–ã¾ãªè¤‡é›‘ãªã‚¿ã‚¹ã‚¯ã‚’å…‹æœã™ã‚‹ã‚ˆã†ã«è¨­è¨ˆã•ã‚Œã¦ãŠã‚Šã€ä¿¡é ¼æ€§ãŒé«˜ãåŠ¹ç‡çš„ãªå‡¦ç†æ©Ÿèƒ½ã‚’æä¾›ã—ã¾ã™ã€‚è¿…é€Ÿãªå¿œç­”æ™‚é–“ã¨é«˜åº¦ãªåˆ†æèƒ½åŠ›ã‚’æä¾›ã™ã‚‹ã“ã¨ã§ã€æ—¥å¸¸ã®ç”Ÿç”£æ€§ã‚’å¤§å¹…ã«å‘ä¸Šã•ã›ã¾ã™ã€‚Cortexã®å®‰å…¨ãªãƒ­ãƒ¼ã‚«ãƒ«ã‚¤ãƒ³ãƒ•ãƒ©ã‚¹ãƒˆãƒ©ã‚¯ãƒãƒ£ä¸Šã§ã‚·ãƒ¼ãƒ ãƒ¬ã‚¹ã«å‹•ä½œã™ã‚‹ã“ã®ãƒ¢ãƒ‡ãƒ«ã¯ã€å‰µé€ çš„ãªãƒ–ãƒ¬ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒŸãƒ³ã‚°ã‹ã‚‰æ·±ã„æŠ€è¡“åˆ†æã¾ã§ã€å¹…åºƒã„ã‚¿ã‚¹ã‚¯ã§ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚’æ”¯æ´ã—ã¾ã™ã€‚ä»Šæ—¥ã‹ã‚‰ãã®å¯èƒ½æ€§ã‚’æœ€å¤§é™ã«å¼•ãå‡ºã—ã¾ã—ã‚‡ã†ã€‚';
+    return '$modelNameは、Cortexエコシステムに統合された高性能な人工知能です。さまざまな複雑なタスクを克服するように設計されており、信頼性が高く効率的な処理機能を提供します。迅速な応答時間と高度な分析能力を提供することで、日常の生産性を大幅に向上させます。Cortexの安全なローカルインフラストラクチャ上でシームレスに動作するこのモデルは、創造的なブレインストーミングから深い技術分析まで、幅広いタスクでユーザーを支援します。今日からその可能性を最大限に引き出しましょう。';
   }
 
   @override
-  String get guestLimitBottomSheetTitle =>
-      'Cortexã®çŸ¥èƒ½ãŒå¥½ãã§ã™ã‹ï¼Ÿ';
+  String get guestLimitBottomSheetTitle => 'Cortexの知能が好きですか？';
 
   @override
   String get guestLimitBottomSheetText =>
-      'ã•ã‚‰ã«é«˜åº¦ãªã‚¤ãƒ³ãƒ†ãƒªã‚¸ã‚§ãƒ³ã‚¹ã‚’æ´»ç”¨ã—ã€ã‚ˆã‚Šå¤šãã®ã‚³ãƒ³ãƒ†ãƒ³ãƒ„ã‚’ç”Ÿæˆã—ã€ã‚ˆã‚Šå¤šãã®ãƒãƒ£ãƒƒãƒˆã‚’è¡Œã„ã€ã•ã‚‰ã«å¤šãã®ã“ã¨ã‚’å®Ÿç¾ã—ã¾ã—ã‚‡ã†ã€‚';
+      'さらに高度なインテリジェンスを活用し、より多くのコンテンツを生成し、より多くのチャットを行い、さらに多くのことを実現しましょう。';
 
   @override
-  String get arts => 'èŠ¸è¡“';
+  String get arts => '芸術';
 
   @override
-  String get noArt => 'ã‚¢ãƒ¼ãƒˆãªã—';
+  String get noArt => 'アートなし';
 
   @override
   String get noArtDescription =>
-      'ä½œå“ãŒã‚ã‚Šã¾ã›ã‚“ã€‚ç”»åƒã€å‹•ç”»ã€éŸ³å£°ãªã©ã€ã‚ã‚‰ã‚†ã‚‹ã‚³ãƒ³ãƒ†ãƒ³ãƒ„ã‚’ä½œæˆã—ã¦ã‚®ãƒ£ãƒ©ãƒªãƒ¼ã‚’å……å®Ÿã•ã›ã¾ã—ã‚‡ã†ï¼';
+      '作品がありません。画像、動画、音声など、あらゆるコンテンツを作成してギャラリーを充実させましょう！';
 
   @override
   String get videoPremiumWarning =>
-      'å‹•ç”»ã‚’ä½œæˆã™ã‚‹ã«ã¯Ultraãƒ—ãƒ©ãƒ³ã¸ã®ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ãŒå¿…è¦ã§ã™ã€‚ä»Šã™ãã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ã¦ã€ã‚¹ãƒ ãƒ¼ã‚ºãªæ“ä½œæ„Ÿã‚’ä½“é¨“ã—ã¦ãã ã•ã„ï¼';
+      '動画を作成するにはUltraプランへのアップグレードが必要です。今すぐアップグレードして、スムーズな操作感を体験してください！';
 
   @override
   String get fallbackInfoPanelText =>
-      'ã‚µãƒ¼ãƒãƒ¼å´ã®æ”¹å–„ä½œæ¥­ã®ãŸã‚ã€ãŠå®¢æ§˜ãŒé¸æŠã•ã‚ŒãŸAIã§ã¯ãªãã€Cortexã®å‹•çš„ãƒãƒ£ãƒƒãƒˆæ©Ÿèƒ½ã«ã‚ˆã£ã¦å¿œç­”ãŒç”Ÿæˆã•ã‚Œã¾ã—ãŸã€‚å‡¦ç†ãŒå®Œäº†ã™ã‚‹ã¾ã§ã€ã”ç†è§£ã„ãŸã ã‘ã¾ã™ã‚ˆã†ãŠé¡˜ã„ç”³ã—ä¸Šã’ã¾ã™ã€‚';
+      'サーバー側の改善作業のため、お客様が選択されたAIではなく、Cortexの動的チャット機能によって応答が生成されました。処理が完了するまで、ご理解いただけますようお願い申し上げます。';
 
   @override
   String get falOfflineMessage =>
-      'ã‚µãƒ¼ãƒãƒ¼å´ã®æ”¹å–„ä½œæ¥­ã®ãŸã‚ã€ç¾åœ¨ã“ã®ã‚µãƒ¼ãƒ“ã‚¹ã¯ä¸€æ™‚çš„ã«ã”åˆ©ç”¨ã„ãŸã ã‘ã¾ã›ã‚“ã€‚ä½œæ¥­å®Œäº†ã¾ã§ã”ç†è§£ã„ãŸã ã‘ã¾ã™ã‚ˆã†ãŠé¡˜ã„ç”³ã—ä¸Šã’ã¾ã™ã€‚';
+      'サーバー側の改善作業のため、現在このサービスは一時的にご利用いただけません。作業完了までご理解いただけますようお願い申し上げます。';
 
   @override
-  String get errorInsufficientStorage =>
-      'ã“ã®ãƒ¢ãƒ‡ãƒ«ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã«ã¯ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸å®¹é‡ãŒä¸è¶³ã—ã¦ã„ã¾ã™ã€‚';
+  String get errorInsufficientStorage => 'このモデルをダウンロードするにはストレージ容量が不足しています。';
 
   @override
-  String get backgroundChatNotificationTitle => 'ãƒãƒ£ãƒƒãƒˆã«æˆ»ã‚‹ï¼';
+  String get backgroundChatNotificationTitle => 'チャットに戻る！';
 
   @override
-  String get benefitVideoGeneration => 'ãƒ“ãƒ‡ã‚ªç”Ÿæˆ';
+  String get benefitVideoGeneration => 'ビデオ生成';
 
   @override
-  String get freeOffer => 'ç„¡æ–™ã‚ªãƒ•ã‚¡ãƒ¼';
+  String get freeOffer => '無料オファー';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return 'æœ€åˆã® $days æ—¥é–“ã¯ç„¡æ–™ã€ãã®å¾Œã¯ $price/æœˆ';
+    return '最初の $days 日間は無料、その後は $price/月';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return 'æœ€åˆã® $days æ—¥é–“ã¯ç„¡æ–™ã€ãã®å¾Œã¯ $price/å¹´';
+    return '最初の $days 日間は無料、その後は $price/年';
   }
 
   @override
   String freePlan(String plan) {
-    return 'ç„¡æ–™ $planï¼';
+    return '無料 $plan！';
   }
 
   @override
   String get systemPromptLimitFallback =>
-      'é‡è¦ï¼šãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒæ“ä½œã‚’è¦æ±‚ã—ã¾ã—ãŸãŒã€Cortexã®åˆ©ç”¨é™åº¦é¡ãŒä¸Šé™ã«é”ã—ã¦ã„ã¾ã™ã€‚ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«ã¯ã€å¾…ã¤ã‹ã€ã‚µãƒ–ã‚¹ã‚¯ãƒªãƒ—ã‚·ãƒ§ãƒ³ãƒ—ãƒ©ãƒ³ã®ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã‚’æ¤œè¨ã™ã‚‹ã‚ˆã†ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®è¨€èªã§é€šçŸ¥ã—ã¦ãã ã•ã„ã€‚';
+      '重要：ユーザーが操作を要求しましたが、Cortexの利用限度額が上限に達しています。ユーザーには、待つか、サブスクリプションプランのアップグレードを検討するよう、ユーザーの言語で通知してください。';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex ã¯ã•ã‚‰ã«å„ªã‚ŒãŸå›ç­”ã‚’æä¾›ã§ãã¾ã™ã€‚ä»Šã™ãã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ã¦ã€ã™ã¹ã¦ã®è³ªå•ã«æœ€é«˜ã®ç­”ãˆã‚’å¾—ã¾ã—ã‚‡ã†ï¼';
+      'Cortex はさらに優れた回答を提供できます。今すぐアップグレードして、すべての質問に最高の答えを得ましょう！';
 
   @override
-  String get pinLimitReached =>
-      'æœ€å¤§3ã¤ã®ãƒãƒ£ãƒƒãƒˆã‚’ãƒ”ãƒ³ç•™ã‚ã§ãã¾ã™ã€‚';
+  String get pinLimitReached => '最大3つのチャットをピン留めできます。';
 
   @override
   String get categoryAll => 'All';
