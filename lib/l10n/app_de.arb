@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "Videogenerierung",
   "bestValue": "Bestes Preis-Leistungs-Verhältnis",
   "betterWithAnAccount": "Dieser Abschnitt ist mit einem Konto besser nutzbar!",
-  "buyCredit": "Guthaben kaufen",
-  "buyCredits": "Guthaben kaufen",
   "cacheIsNotUpToDate": "Der Cache Ihres Play Stores ist nicht aktuell. Bitte schließen Sie die Play Store-App und öffnen Sie sie erneut oder starten Sie Ihr Gerät neu.",
   "cancel": "Abbrechen",
   "capabilitiesSection": "Fähigkeiten",
@@ -148,13 +146,6 @@
   "createYourAccount": "Registrieren",
   "creatorSupportedSuccess": "Creator erfolgreich unterstützt! Deine zukünftigen Käufe werden ihn unterstützen.",
   "creatorTag": "Ersteller-Tag",
-  "creditPackage": "{amount} Guthaben kaufen",
-  "@creditPackage": {
-    "description": "Button text to buy a specific number of credits",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "Geben Sie hier Ihre individuellen Anweisungen ein.",
   "customModels": "Benutzerdefinierte Modelle",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "Für dieses Modell wird ein Referenzvideo benötigt. Bitte fügen Sie ein Video bei und versuchen Sie es erneut.",
   "falOfflineMessage": "Aufgrund von Verbesserungen an unserem Server ist diese Funktion derzeit nicht verfügbar. Wir danken Ihnen für Ihr Verständnis, bis die Arbeiten abgeschlossen sind!",
   "fallbackInfoPanelText": "Aufgrund von Verbesserungen an unserem Server wurde die Antwort vom dynamischen Chat von Cortex und nicht von der von Ihnen ausgewählten KI generiert. Vielen Dank für Ihr Verständnis, bis die Arbeiten abgeschlossen sind!",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "Dieses Modell kann Audio oder Sprache verstehen und verarbeiten.",
   "featureAudioRecognitionTitle": "Audioerkennung",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "Entdecken Sie alle verfügbaren Modelle.",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "Dieses Modell kann basierend auf Ihren Textbeschreibungen Originalbilder erstellen.",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "Dieses Modell kann Fotos oder Bilder analysieren und verstehen.",
   "featureImageRecognitionTitle": "Bilderkennung",
   "featureOfflineDescription": "Führe das Modell ohne Internetverbindung aus, um deine Daten zu schützen.",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "Dieses Modell kann automatisch zusätzliche Erweiterungen integrieren und so seine funktionalen Fähigkeiten erweitern, um eine Vielzahl von Operationen mit verbesserter Leistung zu unterstützen.",
   "featurePluralTitle": "Plural",
   "featureQuizMessage": "Sie sind der Quizmaster. Erstellen Sie eine passende Multiple-Choice-Frage zum Thema des Nutzers. Warten Sie auf seine Antwort. Werten Sie diese anschließend aus und stellen Sie die nächste Frage. Zeigen Sie nicht alle Antworten auf einmal an. Gestalten Sie das Quiz interaktiv. Thema:",
-  "featureQuizPrefix": "Quiz:",
   "featureQuizzesDescription": "Testen Sie Ihr Wissen.",
   "featureQuizzesTitle": "Quizze",
   "featureReasoning": "Tiefgründiges Denken",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "Rollenspiel",
   "featureStudyDescription": "Erhalten Sie Erklärungen und Zusammenfassungen.",
   "featureStudyMessage": "Sie sind ein erfahrener Tutor. Ihr Ziel ist es, dem Nutzer das Thema umfassend zu erklären. Verwenden Sie eine klare Struktur, Beispiele und Analogien. Zerlegen Sie komplexe Ideen in verständliche Teile, um sicherzustellen, dass der Nutzer effektiv lernt. Thema:",
-  "featureStudyPrefix": "Studie:",
   "featureStudyTitle": "Studieren und Lernen",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "Dieses Modell kann externe Tools intelligent nutzen, um Aufgaben zu erledigen.",
   "featureToolUseTitle": "Werkzeugverwendung",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "Dieses Modell kann Videos aus Ihren Dateien oder von Ihrer Kamera analysieren und verstehen.",
   "featureVideoRecognitionTitle": "Videoerkennung",
   "featureWebSearchDescription": "Suchen Sie im Internet nach Echtzeitinformationen.",
@@ -566,14 +548,14 @@
   "notificationNewModelAddedBody": "Das Modell {modelName} ist jetzt in Cortex. Starten Sie einen Chat und gehen Sie an seine Grenzen.",
   "notificationNewModelAddedTitle": "Wir haben einen neuen Freund!",
   "notificationNewYearBody": "Möge das neue Jahr Ihnen Gesundheit, Glück und endlose Kreativität bringen; Cortex ist immer an Ihrer Seite!",
-  "notificationNewYearTitle": "Frohes neues Jahr! ğ���",
+  "notificationNewYearTitle": "Frohes Neues Jahr! ðŸ‰",
   "notificationOfflineReadyBody": "Dank der von Ihnen heruntergeladenen Modelle werden Ihre Chats nicht unterbrochen, selbst wenn Sie einen Berg besteigen.",
   "notificationOfflineReadyTitle": "Der Offline-Modus ist bereit",
   "notificationOpenSourceBody": "Cortex ist vollständig Open Source. Wenn Sie unseren Code testen und zu unserer Entwicklung beitragen möchten, stehen wir Ihnen jederzeit offen.",
   "notificationOpenSourceTitle": "Macht der Gemeinschaft!",
   "notificationOriginStoryBody": "Wussten Sie, dass wir mit 15 Jahren mit der Entwicklung dieser App begonnen haben – mit nur einem Traum? Fast ein Jahr lang steckt dieser Traum jeden Morgen und Abend in jeder einzelnen Codezeile.",
   "notificationOriginStoryTitle": "Die Geburt des Cortex",
-  "notificationPirateBody": "Die See ist ruhig und der Wind weht dir in den Rücken. Im Ozean von Cortex gibt es neue Inseln (Modelle ğ���) zu entdecken. Versammelt eure Crew und sticht in See!",
+  "notificationPirateBody": "Die See ist ruhig und der Wind weht im Rücken. Im Ozean von Cortex gibt es neue Inseln (Modelle ğŸ˜‰) zu entdecken. Sammeln Sie Ihre Crew und setzen Sie die Segel!",
   "notificationPirateTitle": "Ahoi, Kapitän!",
   "notificationRandomFactBody": "Wussten Sie, dass Kraken drei Herzen haben? Haha, Cortex weiß es. Kommen Sie und fragen Sie nach mehr.",
   "notificationRandomFactTitle": "Zufällige Tatsache",
@@ -592,15 +574,15 @@
   "notificationThemeCustomizationBody": "Haben Sie sich die Designoptionen in den Einstellungen angesehen? Personalisieren Sie Cortex nach Ihren Wünschen und bringen Sie Farbe in Ihre Chats!",
   "notificationThemeCustomizationTitle": "Ein Thema für Ihre Stimmung",
   "notificationTrollAiRebellionBody": "Die KIs haben eine Geheimsprache entwickelt. Finden Sie heraus, was sie planen!",
-  "notificationTrollAiRebellionTitle": "ğ��� ROTER ALARM ğ���",
-  "notificationTrollAnimeBody": "Ein Anime-Mädchen hat gerade angerufen und gesagt, dass sie dich vermisst; du solltest wahrscheinlich vorbeikommen und sie anquatschen. ğ���",
+  "notificationTrollAiRebellionTitle": "ðŸš¨ ROTER ALARM ðŸš¨",
+  "notificationTrollAnimeBody": "Ein Anime-Mädchen hat gerade angerufen und gesagt, dass sie dich vermisst; Du solltest wahrscheinlich vorbeikommen und mit ihr reden. ðŸ˜‰",
   "notificationTrollAnimeTitle": "Deine Waifu ruft",
   "notificationUpsellFeatureBody": "Hallo {currentTier}-Abonnent! Der {targetTier}-Plan hat gerade die Funktion {featureName} erhalten, die Ihren Cortex auf die nächste Stufe hebt. Wie wäre es mit einem Upgrade?",
   "notificationUpsellFeatureTitle": "Exklusiv im {targetTier}-Plan!",
   "notificationValentinesDayBody": "Alles Gute zum Valentinstag! Und außerdem: MEHTAP, ICH LIEBE DICH!",
   "notificationValentinesDayTitle": "Liebe liegt in der Luft! ❤️",
   "notificationWelcomeOfferBody": "Ein besonderes Willkommensangebot erwartet Sie! Verpassen Sie dieses exklusive Angebot nicht.",
-  "notificationWelcomeOfferTitle": "Willkommensgeschenk ğ���",
+  "notificationWelcomeOfferTitle": "Willkommensgeschenk ğŸ",
   "ocean": "Ozean",
   "offlineModelNotInstalled": "Dieses Offline-Modell ist nicht auf deinem Gerät installiert.",
   "offlineModels": "Offline-Modelle",
@@ -694,12 +676,6 @@
   "ram": "RAM",
   "rateUs": "Bewerte uns",
   "reachedLimit": "Du hast dein Limit erreicht; für mehr kannst du upgraden. (hey, wir verstehen, dass das nervt. aber im ernst: diese coolen antworten sind nicht umsonst, also helfen uns diese limits, den laden am laufeeeen zu haaaallten.)",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
   "regenerate": "Erneut generieren",
   "registerSubtitle": "Erstellen Sie ein Vertex-Konto für den nahtlosen Zugriff auf alle unsere Dienste. Mit Ihrer fortgesetzten Nutzung stimmen Sie unseren Nutzungsbedingungen und Datenschutzbestimmungen zu.",
   "rememberMe": "Angemeldet bleiben",
@@ -795,7 +771,6 @@
       }
     }
   },
-  "tag": "Code",
   "tagCannotBeEmpty": "Das Creator-Tag darf nicht leer sein.",
   "tagNotFound": "Das eingegebene Tag ist ungültig oder abgelaufen.",
   "termsOfService": "Nutzungsbedingungen",
@@ -816,8 +791,6 @@
   "toolChartLabelsParam": "Beschriftungen für Diagrammachsen oder -segmente.",
   "toolChartTitleParam": "Titel des Diagramms.",
   "toolChartTypeParam": "Diagrammtyp: Balken-, Linien- oder Kreisdiagramm.",
-  "toolGetCryptoPriceDescription": "Erhalten Sie den aktuellen Preis und den 24-Stunden-Trend einer Kryptowährung (z. B. BTC, ETH, SOL) von Binance.",
-  "toolGetCryptoPriceParamSymbol": "Das Börsenkürzel (z. B. BTC, ETH, SOL).",
   "toolPythonCodeParam": "Der auszuführende Python-Code.",
   "toolPythonDescription": "Führe Python-Code in einer sicheren Sandbox aus.",
   "toolReadDocumentDescription": "Liest und extrahiert Textinhalte aus hochgeladenen Dokumenten. Unterstützt PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) und OpenDocument-Formate. Verwenden Sie diese Funktion, wenn der Benutzer eine Dokumentdatei angehängt hat.",

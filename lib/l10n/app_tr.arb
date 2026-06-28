@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "Video Üretimi",
   "bestValue": "En İyi Fiyat",
   "betterWithAnAccount": "Bu kısım bir hesapla daha iyi!",
-  "buyCredit": "Kredi Satın Al",
-  "buyCredits": "Kredi Satın Al",
   "cacheIsNotUpToDate": "Play Store önbelleğiniz güncel değil. Lütfen Play Store uygulamasını kapatıp yeniden açın veya cihazınızı yeniden başlatın.",
   "cancel": "İptal",
   "capabilitiesSection": "Yetenekler",
@@ -148,13 +146,6 @@
   "createYourAccount": "Kayıt Ol",
   "creatorSupportedSuccess": "İçerik üretici başarıyla desteklendi! Gelecekteki satın alımlarınızla ona katkıda bulunacaksınız.",
   "creatorTag": "Yaratıcı Etiketi",
-  "creditPackage": "{amount} Kredi Satın Al",
-  "@creditPackage": {
-    "description": "Belirli sayıda kredi satın almak için düğme metni",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "Özel talimatlarınızı buraya girin",
   "customModels": "Özel Modeller",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "Bu model için referans videosu gerekmektedir, lütfen bir video ekleyip tekrar deneyin.",
   "falOfflineMessage": "Sunucu tarafımızda yaptığımız bazı iyileştirmeler nedeniyle, bu zekâ hizmeti şu anda çevrimdışı durumdadır. İşlem tamamlanana kadar anlayışınız için teşekkür ederiz!",
   "fallbackInfoPanelText": "Sunucu tarafımızda yaptığımız bazı iyileştirmeler nedeniyle, yanıt, özel olarak seçtiğiniz yapay zekâ yerine Cortex'in dinamik sohbeti tarafından oluşturulmuştur. İşlem tamamlanana kadar anlayışınız için teşekkür ederiz!",
-  "featureAudioGeneration": "Ses Üretimi",
   "featureAudioGenerationDescription": "Bu model yeni ses parçaları veya konuşmalar oluşturabilir.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Ses Tanıma",
   "featureAudioRecognitionDescription": "Bu model ses girdilerini anlayabilir ve işleyebilir.",
   "featureAudioRecognitionTitle": "Ses Tanıma",
   "featureCreateAudioDescription": "Metinden yapay zekâ destekli ses veya müzik oluşturun.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "Mevcut tüm modelleri keşfedin.",
-  "featureImageGeneration": "Görüntü Oluşturma",
   "featureImageGenerationDescription": "Bu model metinlerden yeni görseller oluşturabilir.",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Görüntü Tanıma",
   "featureImageRecognitionDescription": "Bu model görsel girdileri anlayabilir ve işleyebilir.",
   "featureImageRecognitionTitle": "Görsel Tanıma",
   "featureOfflineDescription": "Verilerinizi güvende tutmak için modeli internet bağlantısı olmadan çalıştırın.",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "Bu model, ek uzantıları otomatik olarak entegre edebilir, böylece işlevsel yeteneklerini genişleterek çeşitli işlemleri gelişmiş performansla destekler.",
   "featurePluralTitle": "Çoğulcu",
   "featureQuizMessage": "Siz bir bilgi yarışması yöneticisisiniz. Kullanıcının konusuna göre belirli bir çoktan seçmeli soru oluşturun. Cevaplarını bekleyin. Ardından, cevapları değerlendirin ve bir sonraki soruyu sorun. Tüm cevapları aynı anda göstermeyin. Etkileşimli tutun. Konu:",
-  "featureQuizPrefix": "Sınav:",
   "featureQuizzesDescription": "Bilginizi test edin.",
   "featureQuizzesTitle": "Sınavlar",
   "featureReasoning": "Derin Düşünme",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "Rol Yapma",
   "featureStudyDescription": "Açıklamaları ve özetleri edinin.",
   "featureStudyMessage": "Siz uzman bir eğitmensiniz. Amacınız, kullanıcının konusunu kapsamlı bir şekilde açıklamaktır. Açık bir yapı, örnekler ve benzetmeler kullanın. Kullanıcının etkili bir şekilde öğrenmesini sağlamak için karmaşık fikirleri anlaşılabilir parçalara ayırın. Konu:",
-  "featureStudyPrefix": "Çalışmak:",
   "featureStudyTitle": "Öğren ve Çalış",
-  "featureToolUse": "Alet Kullanımı",
   "featureToolUseDescription": "Bu model harici araçlara ve API'lere erişebilir.",
   "featureToolUseTitle": "Araç Kullanımı",
-  "featureVideoGeneration": "Video Üretimi",
   "featureVideoGenerationDescription": "Bu model metin veya görsellerden yeni videolar oluşturabilir.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Tanıma",
   "featureVideoRecognitionDescription": "Bu model video girdilerini anlayabilir ve işleyebilir.",
   "featureVideoRecognitionTitle": "Video Tanıma",
   "featureWebSearchDescription": "Gerçek zamanlı bilgi için internette arama yapın.",
@@ -694,12 +676,6 @@
   "ram": "RAM",
   "rateUs": "Bizi Değerlendir",
   "reachedLimit": "Kullanım limitinize ulaştınız; daha fazla limit kazanmak için planınızı yükseltebilirsiniz. (kanka, biliyoruz limitlerin bitmesi can sıkıcı. ama o harika cevapları almanın bize maliyeti çok fazla, bu yüzden bu limitler aslında güzel zamanların devam etmesine yardımcı olluuuuyor.)",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
   "regenerate": "Yeniden Oluştur",
   "registerSubtitle": "Tüm hizmetlerimize kesintisiz erişim için bir Vertex hesabı oluşturun. Devam ederek, Hizmet Şartlarımızı ve Gizlilik Politikamızı kabul etmiş olursunuz.",
   "rememberMe": "Beni hatırla",
@@ -743,17 +719,6 @@
   "signUp": "Kayıt Ol",
   "spanish": "İspanyolca",
   "speakTheMessage": "Mesajı Seslendir",
-  "specialOfferBonus": "+100 Bonus Kredi",
-  "specialOfferCountdown": "+100 Kredi • {time} kaldı",
-  "@specialOfferCountdown": {
-    "placeholders": {
-      "time": {
-        "type": "String",
-        "example": "23:59:59"
-      }
-    }
-  },
-  "specialOfferTitle": "Özel Teklif!",
   "starConversation": "Yıldızla",
   "startChat": "Sohbet başlat",
   "stop": "Durdur",
@@ -806,7 +771,6 @@
       }
     }
   },
-  "tag": "Kod",
   "tagCannotBeEmpty": "Oluşturucu etiketi boş olamaz",
   "tagNotFound": "Girdiğiniz etiket geçersiz veya süresi dolmuş.",
   "termsOfService": "Hizmet Şartları",
@@ -827,8 +791,6 @@
   "toolChartLabelsParam": "Grafik eksenleri veya segmentleri için etiketler.",
   "toolChartTitleParam": "Grafiğin başlığı.",
   "toolChartTypeParam": "Grafik türü: bar, line veya pie.",
-  "toolGetCryptoPriceDescription": "Binance'ten bir kripto para biriminin (örneğin BTC, ETH, SOL) güncel fiyatını ve 24 saatlik trendini öğrenin.",
-  "toolGetCryptoPriceParamSymbol": "Kripto para sembolü (örneğin, BTC, ETH, SOL).",
   "toolPythonCodeParam": "Çalıştırılacak Python kodu.",
   "toolPythonDescription": "Güvenli bir ortamda Python kodu çalıştırın.",
   "toolReadDocumentDescription": "Yüklenen belgelerden metin içeriğini okuyun ve çıkarın. PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) ve OpenDocument formatlarını destekler. Kullanıcı bir belge dosyası eklediğinde bunu kullanın.",

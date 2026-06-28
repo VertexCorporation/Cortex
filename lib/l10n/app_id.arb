@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "Pembuatan Video",
   "bestValue": "Penawaran Terbaik",
   "betterWithAnAccount": "Bagian ini lebih baik dengan akun!",
-  "buyCredit": "Beli Kredit",
-  "buyCredits": "Beli Kredit",
   "cacheIsNotUpToDate": "Cache Play Store Anda belum diperbarui. Silakan tutup dan buka kembali aplikasi Play Store, atau mulai ulang perangkat Anda.",
   "cancel": "Batal",
   "capabilitiesSection": "Kemampuan",
@@ -148,13 +146,6 @@
   "createYourAccount": "Daftar",
   "creatorSupportedSuccess": "Kreator berhasil didukung! Pembelian Anda di masa mendatang akan berkontribusi untuk mereka.",
   "creatorTag": "Tag Pembuat",
-  "creditPackage": "Beli {amount} Kredit",
-  "@creditPackage": {
-    "description": "Teks tombol untuk membeli sejumlah kredit tertentu",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "Masukkan instruksi khusus Anda di sini.",
   "customModels": "Model Kustom",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "Model ini memerlukan video referensi, silakan lampirkan video dan coba lagi.",
   "falOfflineMessage": "Karena beberapa perbaikan yang sedang kami lakukan di sisi server, kecerdasan ini saat ini sedang offline. Terima kasih atas pengertian Anda sampai proses ini selesai!",
   "fallbackInfoPanelText": "Karena beberapa perbaikan yang sedang kami lakukan di sisi server, respons dihasilkan oleh obrolan dinamis Cortex, bukan oleh AI yang Anda pilih secara khusus. Terima kasih atas pengertian Anda sampai proses ini selesai!",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "Model ini dapat memahami dan memproses audio atau ucapan.",
   "featureAudioRecognitionTitle": "Pengenalan Audio",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "Temukan semua model yang tersedia.",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "Model ini dapat membuat gambar asli berdasarkan deskripsi teks Anda.",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "Model ini dapat menganalisis dan memahami foto atau gambar.",
   "featureImageRecognitionTitle": "Pengenalan Gambar",
   "featureOfflineDescription": "Jalankan model tanpa koneksi internet untuk menjaga keamanan data Anda.",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "Model ini dapat secara otomatis mengintegrasikan ekstensi tambahan, sehingga memperluas kemampuan fungsionalnya untuk mendukung beragam operasi dengan kinerja yang ditingkatkan.",
   "featurePluralTitle": "Jamak",
   "featureQuizMessage": "Anda adalah seorang pengelola kuis. Buat pertanyaan pilihan ganda spesifik berdasarkan topik yang diberikan pengguna. Tunggu jawabannya. Kemudian, evaluasi jawaban tersebut dan ajukan pertanyaan berikutnya. Jangan ungkapkan semua jawaban sekaligus. Jaga agar tetap interaktif. Topik:",
-  "featureQuizPrefix": "Kuis:",
   "featureQuizzesDescription": "Uji pengetahuan Anda.",
   "featureQuizzesTitle": "Kuis",
   "featureReasoning": "Pemikiran Mendalam",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "Bermain Peran",
   "featureStudyDescription": "Dapatkan penjelasan dan ringkasan.",
   "featureStudyMessage": "Anda adalah seorang tutor ahli. Tujuan Anda adalah menjelaskan topik pengguna secara komprehensif. Gunakan struktur yang jelas, contoh, dan analogi. Uraikan ide-ide kompleks menjadi bagian-bagian yang mudah dipahami untuk memastikan pengguna belajar secara efektif. Topik:",
-  "featureStudyPrefix": "Belajar:",
   "featureStudyTitle": "Belajar & Mengajar",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "Model ini dapat secara cerdas menggunakan alat eksternal untuk menyelesaikan tugas.",
   "featureToolUseTitle": "Penggunaan Alat",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "Model ini dapat menganalisis dan memahami video dari file atau kamera Anda.",
   "featureVideoRecognitionTitle": "Pengenalan Video",
   "featureWebSearchDescription": "Cari informasi secara real-time di web.",
@@ -566,14 +548,14 @@
   "notificationNewModelAddedBody": "Model {modelName} kini ada di Cortex. Ayo, mulai obrolan dan gali potensinya.",
   "notificationNewModelAddedTitle": "Kami Punya Teman Baru!",
   "notificationNewYearBody": "Semoga tahun baru membawa Anda kesehatan, kebahagiaan, dan kreativitas tanpa akhir; Cortex selalu di sisi Anda!",
-  "notificationNewYearTitle": "Selamat Tahun Baru! ğ���",
+  "notificationNewYearTitle": "Selamat tahun baru! ğŸ‰",
   "notificationOfflineReadyBody": "Berkat model yang Anda unduh, obrolan Anda tidak akan berhenti, bahkan jika Anda mendaki gunung.",
   "notificationOfflineReadyTitle": "Mode Offline Sudah Siap",
   "notificationOpenSourceBody": "Cortex sepenuhnya sumber terbuka. Jika Anda ingin melihat kode kami dan berkontribusi dalam pengembangan, pintu kami selalu terbuka.",
   "notificationOpenSourceTitle": "Kekuatan untuk Komunitas!",
   "notificationOriginStoryBody": "Tahukah Anda bahwa kami mulai membuat kode aplikasi ini di usia 15 tahun hanya dengan sebuah mimpi? Selama hampir setahun, setiap pagi dan sore, mimpi itu ada di setiap baris kode.",
   "notificationOriginStoryTitle": "Kelahiran Cortex",
-  "notificationPirateBody": "Laut tenang, dan angin mendukungmu. Ada pulau-pulau baru (model ğ���) untuk dijelajahi di lautan Cortex. Kumpulkan kru-mu dan berlayarlah!",
+  "notificationPirateBody": "Lautnya tenang, dan angin bertiup di belakang Anda. Ada pulau-pulau baru (model ğŸ˜‰) untuk ditemukan di lautan Cortex. Kumpulkan kru Anda dan berlayar!",
   "notificationPirateTitle": "Ahoy, Kapten!",
   "notificationRandomFactBody": "Tahukah kamu gurita punya tiga jantung? Haha, Cortex tahu. Ayo, tanya lebih lanjut.",
   "notificationRandomFactTitle": "Fakta Acak",
@@ -592,15 +574,15 @@
   "notificationThemeCustomizationBody": "Sudahkah Anda memeriksa opsi tema di Pengaturan? Personalisasikan Cortex sesuai keinginan Anda dan warnai obrolan Anda!",
   "notificationThemeCustomizationTitle": "Tema untuk Suasana Hati Anda",
   "notificationTrollAiRebellionBody": "AI telah mengembangkan bahasa rahasia. Ayo cari tahu apa yang mereka rencanakan!",
-  "notificationTrollAiRebellionTitle": "ğ��� PERINGATAN MERAH ğ���",
-  "notificationTrollAnimeBody": "Seorang gadis anime baru saja menelepon, katanya dia merindukanmu; kamu mungkin harus datang dan mengobrol dengannya. ğ���",
+  "notificationTrollAiRebellionTitle": "ğŸš¨ PERINGATAN MERAH ğŸš¨",
+  "notificationTrollAnimeBody": "Seorang gadis anime baru saja menelepon, mengatakan dia merindukanmu; Anda mungkin harus datang dan mengobrol dengannya. ğŸ˜‰",
   "notificationTrollAnimeTitle": "Waifu Anda Memanggil",
   "notificationUpsellFeatureBody": "Halo pelanggan {currentTier}! Paket {targetTier} baru saja mendapatkan fitur {featureName}, yang akan membawa Cortex Anda ke level selanjutnya. Bagaimana kalau upgrade?",
   "notificationUpsellFeatureTitle": "Eksklusif untuk Paket {targetTier}!",
   "notificationValentinesDayBody": "Selamat Hari Valentine! Dan, MEHTAP, AKU CINTA KAMU!",
   "notificationValentinesDayTitle": "Cinta ada di udara! ❤️",
   "notificationWelcomeOfferBody": "Penawaran sambutan spesial menanti Anda! Jangan lewatkan penawaran eksklusif ini.",
-  "notificationWelcomeOfferTitle": "Hadiah Selamat Datang ğ���",
+  "notificationWelcomeOfferTitle": "Hadiah Selamat Datang ğŸ",
   "ocean": "Lautan",
   "offlineModelNotInstalled": "Model offline ini tidak terpasang di perangkat Anda.",
   "offlineModels": "Model Offline",
@@ -694,12 +676,6 @@
   "ram": "RAM",
   "rateUs": "Beri Kami Nilai",
   "reachedLimit": "Kamu sudah mencapai batas; upgrade untuk dapat lebih banyak. (hei, kami tahu ini menyebalkan. tapi serius, jawaban keren itu nggak gratis, jadi batas ini bantu kami biar semuanya tetap lancaaaaaarrjaya.)",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
   "regenerate": "Buat Ulang",
   "registerSubtitle": "Buat akun Vertex untuk akses mudah ke semua layanan kami. Dengan melanjutkan, Anda menyetujui Persyaratan Layanan & Kebijakan Privasi kami.",
   "rememberMe": "Ingat saya",
@@ -795,7 +771,6 @@
       }
     }
   },
-  "tag": "Kode",
   "tagCannotBeEmpty": "Tag pembuat tidak boleh kosong",
   "tagNotFound": "Tag yang Anda masukkan tidak valid atau telah kedaluwarsa.",
   "termsOfService": "Persyaratan Layanan",
@@ -816,8 +791,6 @@
   "toolChartLabelsParam": "Label untuk sumbu atau segmen grafik.",
   "toolChartTitleParam": "Judul grafik.",
   "toolChartTypeParam": "Jenis grafik: batang, garis, atau lingkaran.",
-  "toolGetCryptoPriceDescription": "Dapatkan harga terkini dan tren 24 jam dari mata uang kripto (misalnya, BTC, ETH, SOL) dari Binance.",
-  "toolGetCryptoPriceParamSymbol": "Simbol saham (misalnya, BTC, ETH, SOL).",
   "toolPythonCodeParam": "Kode Python yang akan dieksekusi.",
   "toolPythonDescription": "Jalankan kode Python di dalam lingkungan sandbox yang aman.",
   "toolReadDocumentDescription": "Membaca dan mengekstrak konten teks dari dokumen yang diunggah. Mendukung format PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), dan OpenDocument. Gunakan ini ketika pengguna telah melampirkan file dokumen.",

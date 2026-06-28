@@ -60,8 +60,6 @@
   "benefitVideoGeneration": "视频生成",
   "bestValue": "最超值",
   "betterWithAnAccount": "注册账号后，此部分内容会显示得更清晰！",
-  "buyCredit": "购买积分",
-  "buyCredits": "购买积分",
   "cacheIsNotUpToDate": "您的Play商店缓存未更新。请关闭并重新打开Play商店应用，或重启您的设备。",
   "cancel": "取消",
   "capabilitiesSection": "能力",
@@ -148,13 +146,6 @@
   "createYourAccount": "注册",
   "creatorSupportedSuccess": "成功支持了创作者！您未来的购买将为他们提供支持。",
   "creatorTag": "创作者标签",
-  "creditPackage": "购买 {amount} 积分",
-  "@creditPackage": {
-    "description": "购买特定数量积分的按钮文本",
-    "placeholders": {
-      "amount": {}
-    }
-  },
   "customInstructionHint": "在此处输入您的自定义说明",
   "customModels": "定制模型",
   "@customModels": {
@@ -285,7 +276,6 @@
   "falErrorVideoRequired": "此模型需要参考视频，请上传视频后再试一次。",
   "falOfflineMessage": "由于服务器端正在进行一些改进，此智能服务目前暂时离线。感谢您的理解，我们将尽快完成升级！",
   "fallbackInfoPanelText": "由于我们正在对服务器端进行一些改进，因此回复是由 Cortex 的动态聊天功能生成的，而不是您专门选择的 AI。感谢您的理解，我们将尽快完成改进！",
-  "featureAudioGeneration": "Audio Generation",
   "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
   "@featureAudioGenerationDescription": {
     "description": "Description for the audio generation feature."
@@ -294,7 +284,6 @@
   "@featureAudioGenerationTitle": {
     "description": "Title for the feature indicating the model can create audio."
   },
-  "featureAudioRecognition": "Audio Recognition",
   "featureAudioRecognitionDescription": "该模型能够理解和处理音频或语音。",
   "featureAudioRecognitionTitle": "音频识别",
   "featureCreateAudioDescription": "Generate sounds or voice from text.",
@@ -312,7 +301,6 @@
     "description": "Title for the feature indicating the model can process documents."
   },
   "featureExploreDescription": "发现所有可用模型。",
-  "featureImageGeneration": "Image Generation",
   "featureImageGenerationDescription": "该模型可以根据您的文本描述创建原始图像。",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
@@ -321,7 +309,6 @@
   "@featureImageGenerationTitle": {
     "description": "Title for the feature indicating the model can create images."
   },
-  "featureImageRecognition": "Image Recognition",
   "featureImageRecognitionDescription": "该模型可以分析和理解照片或图像。",
   "featureImageRecognitionTitle": "图像识别",
   "featureOfflineDescription": "无需互联网连接即可运行模型，确保您的数据安全。",
@@ -331,7 +318,6 @@
   "featurePluralDescription": "该模型可以自动集成其他扩展，从而扩展其功能，以支持具有增强性能的各种操作。",
   "featurePluralTitle": "多元",
   "featureQuizMessage": "您是一位出题人。请根据用户选择的主题生成一道选择题。等待用户作答。然后，评估答案并提出下一题。不要一次性显示所有答案。保持互动性。主题：",
-  "featureQuizPrefix": "测验：",
   "featureQuizzesDescription": "测试一下你的知识。",
   "featureQuizzesTitle": "测验",
   "featureReasoning": "深度思考",
@@ -340,12 +326,9 @@
   "featureRoleplayTitle": "角色扮演",
   "featureStudyDescription": "获取解释和摘要。",
   "featureStudyMessage": "您是一位资深导师。您的目标是全面深入地讲解用户感兴趣的主题。请使用清晰的结构、丰富的示例和类比。将复杂的概念分解成易于理解的部分，以确保用户能够高效学习。主题：",
-  "featureStudyPrefix": "学习：",
   "featureStudyTitle": "学习",
-  "featureToolUse": "Tool Use",
   "featureToolUseDescription": "该模型能够智能地利用外部工具完成任务。",
   "featureToolUseTitle": "工具使用",
-  "featureVideoGeneration": "Video Generation",
   "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
   "@featureVideoGenerationDescription": {
     "description": "Description for the video generation feature."
@@ -354,7 +337,6 @@
   "@featureVideoGenerationTitle": {
     "description": "Title for the feature indicating the model can create video."
   },
-  "featureVideoRecognition": "Video Recognition",
   "featureVideoRecognitionDescription": "该型号可以分析和理解来自您的文件或相机的视频。",
   "featureVideoRecognitionTitle": "视频识别",
   "featureWebSearchDescription": "在网络上搜索实时信息",
@@ -566,14 +548,14 @@
   "notificationNewModelAddedBody": "{modelName} 模型现已在 Cortex 中。快来开启聊天，挑战它的极限吧。",
   "notificationNewModelAddedTitle": "我们有了一个新朋友！",
   "notificationNewYearBody": "祝新的一年给您带来健康、快乐和无尽的创造力；Cortex 永远陪伴您！",
-  "notificationNewYearTitle": "新年快乐！ğ���",
+  "notificationNewYearTitle": "新年快乐！ ¤",
   "notificationOfflineReadyBody": "由于您下载了模型，即使您爬山，您的聊天也不会停止。",
   "notificationOfflineReadyTitle": "离线模式已准备就绪",
   "notificationOpenSourceBody": "Cortex 完全开源。如果您想查看我们的代码并为我们的开发做出贡献，我们的大门永远敞开。",
   "notificationOpenSourceTitle": "为社区贡献力量！",
   "notificationOriginStoryBody": "你知道吗？我们15岁的时候，就怀揣着一个梦想，开始编写这个应用。近一年来，每天早晚，这个梦想都写在每一行代码里。",
   "notificationOriginStoryTitle": "Cortex 的诞生",
-  "notificationPirateBody": "风平浪静，海面平静，风向顺着你。Cortex 的海洋中还有新的岛屿（模型ğ���）等你探索。召集你的船员，扬帆起航！",
+  "notificationPirateBody": "大海很平静，风在你的背后。在皮层的海洋中有新的岛屿（模型 ğŸ~‰）有待发现。召集你的船员并扬帆起航！",
   "notificationPirateTitle": "喂，船长！",
   "notificationRandomFactBody": "你知道章鱼有三颗心脏吗？哈哈，Cortex 知道。快来问问吧。",
   "notificationRandomFactTitle": "随机事实",
@@ -592,15 +574,15 @@
   "notificationThemeCustomizationBody": "你查看过“设置”中的主题选项了吗？根据你的喜好个性化 Cortex，为你的聊天增添色彩！",
   "notificationThemeCustomizationTitle": "适合您心情的主题",
   "notificationTrollAiRebellionBody": "人工智能开发了一种秘密语言。快来一探究竟！",
-  "notificationTrollAiRebellionTitle": "ğ��� 红色警报 ğ���",
-  "notificationTrollAnimeBody": "一位动漫女孩刚刚打来电话说她想你；你应该过来和她聊聊。ğ���",
+  "notificationTrollAiRebellionTitle": "红色警报",
+  "notificationTrollAnimeBody": "一个动漫女孩刚刚打来电话，说她想你；你也许应该过来和她聊聊。 γ～‰",
   "notificationTrollAnimeTitle": "你的老婆在召唤你",
   "notificationUpsellFeatureBody": "您好，{currentTier} 订阅用户！{targetTier} 套餐刚刚添加了 {featureName} 功能，这将使您的 Cortex 体验更上一层楼。想升级一下吗？",
   "notificationUpsellFeatureTitle": "仅限 {targetTier} 计划！",
   "notificationValentinesDayBody": "情人节快乐！还有，MEHTAP，我爱你！",
   "notificationValentinesDayTitle": "空气中弥漫着爱意！❤️",
   "notificationWelcomeOfferBody": "一份特别的迎新优惠等着您！千万不要错过这项独家优惠。",
-  "notificationWelcomeOfferTitle": "欢迎礼品ğ���",
+  "notificationWelcomeOfferTitle": "欢迎礼物 Ÿ",
   "ocean": "海洋",
   "offlineModelNotInstalled": "此离线模型未安装在您的设备上。",
   "offlineModels": "离线模型",
@@ -694,12 +676,6 @@
   "ram": "内存",
   "rateUs": "给我们评分",
   "reachedLimit": "您的使用量已达上限；如需获得更多限额，您可以升级套餐。（嘿，我们完全理解限额用完很扫兴。但说真的，获得那些精彩的回复可不是免费的，所以这些限额实际上有助于我们继续提供优质服务。）",
-  "@reachedLimit": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
   "regenerate": "重新生成",
   "registerSubtitle": "创建 Vertex 帐户，即可无缝访问我们的所有服务。继续操作即表示您同意我们的服务条款和隐私政策。",
   "rememberMe": "记住我",
@@ -795,7 +771,6 @@
       }
     }
   },
-  "tag": "代码",
   "tagCannotBeEmpty": "创建者标签不能为空",
   "tagNotFound": "您输入的标签无效或已过期。",
   "termsOfService": "服务条款",
@@ -816,8 +791,6 @@
   "toolChartLabelsParam": "图表坐标轴或分段的标签。",
   "toolChartTitleParam": "图表标题。",
   "toolChartTypeParam": "图表类型：柱状图、折线图或饼图。",
-  "toolGetCryptoPriceDescription": "从币安获取加密货币（例如 BTC、ETH、SOL）的当前价格和 24 小时趋势。",
-  "toolGetCryptoPriceParamSymbol": "股票代码（例如，BTC、ETH、SOL）。",
   "toolPythonCodeParam": "要执行的Python代码。",
   "toolPythonDescription": "在安全沙箱中执行Python代码。",
   "toolReadDocumentDescription": "读取并提取上传文档中的文本内容。支持 PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX) 和 OpenDocument 格式。当用户附加文档文件时，请使用此功能。",
