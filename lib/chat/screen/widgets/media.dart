@@ -33,24 +33,78 @@ class MediaShimmerPlaceholder extends StatelessWidget {
 
     switch (type) {
       case MediaGenerationType.audio:
-        // Compressed: short height, extends right, left-aligned
         width = isTablet ? screenWidth * 0.5 : screenWidth * 0.7;
         height = isTablet ? 90 : 80;
         borderRadius = 20;
         break;
       case MediaGenerationType.image:
-        width = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
-        height = width; // Perfect square
-        borderRadius = 12;
+        width = isTablet ? screenWidth * 0.4 : screenWidth * 0.65;
+        height = width;
+        borderRadius = 24.0;
         break;
       case MediaGenerationType.video:
-        // Match video card ratio to avoid abrupt layout jump on swap.
-        width = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
+        width = isTablet ? screenWidth * 0.4 : screenWidth * 0.65;
         height = width * 0.7;
-        borderRadius = 12;
+        borderRadius = 24.0;
         break;
       case MediaGenerationType.none:
         return const SizedBox.shrink();
+    }
+
+    Widget content = Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: AppColors.shimmerBase,
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+    );
+
+    if (type == MediaGenerationType.image) {
+      content = Container(
+        width: width,
+        height: height,
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: AppColors.secondaryColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(
+            color: AppColors.tertiaryColor.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Görsel oluşturuluyor",
+              style: TextStyle(
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const Spacer(),
+            // Grid of dots to match the user's reference
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: List.generate(
+                  40,
+                  (index) => Container(
+                        width: 4,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor
+                              .withValues(alpha: 0.2 + (index % 5) * 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                      )),
+            ),
+            const Spacer(),
+          ],
+        ),
+      );
     }
 
     return Align(
@@ -58,106 +112,9 @@ class MediaShimmerPlaceholder extends StatelessWidget {
       child: Shimmer.fromColors(
         baseColor: AppColors.shimmerBase,
         highlightColor: AppColors.shimmerHighlight,
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: AppColors.tertiaryColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-          child: _buildInnerContent(type, isTablet, screenWidth),
-        ),
+        period: const Duration(milliseconds: 1500),
+        child: content,
       ),
     );
-  }
-
-  /// Builds subtle inner content hints for the shimmer placeholder.
-  /// These are decorative elements that hint at what content is loading.
-  Widget _buildInnerContent(
-      MediaGenerationType type, bool isTablet, double screenWidth) {
-    switch (type) {
-      case MediaGenerationType.audio:
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isTablet ? 20 : 16,
-            vertical: isTablet ? 18 : 14,
-          ),
-          child: Row(
-            children: [
-              // Play button circle hint
-              Container(
-                width: isTablet ? 40 : 34,
-                height: isTablet ? 40 : 34,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Waveform bars hint
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: List.generate(12, (i) {
-                    // Create varied heights for waveform effect
-                    final heights = [
-                      0.3,
-                      0.5,
-                      0.7,
-                      0.9,
-                      0.6,
-                      0.8,
-                      1.0,
-                      0.7,
-                      0.5,
-                      0.8,
-                      0.4,
-                      0.6
-                    ];
-                    final h =
-                        heights[i % heights.length] * (isTablet ? 36 : 30);
-                    return Container(
-                      width: isTablet ? 4 : 3,
-                      height: h,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ],
-          ),
-        );
-
-      case MediaGenerationType.image:
-        return Center(
-          child: Container(
-            width: isTablet ? 44 : 36,
-            height: isTablet ? 44 : 36,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-
-      case MediaGenerationType.video:
-        return Center(
-          child: Container(
-            width: isTablet ? 48 : 40,
-            height: isTablet ? 48 : 40,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
-              shape: BoxShape.circle,
-            ),
-          ),
-        );
-
-      case MediaGenerationType.none:
-        return const SizedBox.shrink();
-    }
   }
 }

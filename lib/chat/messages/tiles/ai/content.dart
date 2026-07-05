@@ -1,6 +1,9 @@
 part of '../ai.dart';
 
 class _AiBodyContent extends StatelessWidget {
+  static final _thinkTag = 'think';
+  static final _leadingColons = RegExp(r'^[\s:]+');
+
   final Message message;
   final Widget? embeddedMedia;
   final bool mediaAboveText;
@@ -25,41 +28,36 @@ class _AiBodyContent extends StatelessWidget {
   Widget build(BuildContext context) {
     String fullText = stableText + animatingText;
     String thinkContent = '';
-    
-    final thinkRegex = RegExp(r'<think>(.*?)(?:</think>|$)', dotAll: true);
-    final thinkMatch = thinkRegex.firstMatch(fullText);
-    
+
     String mainStable = stableText;
     String mainAnimating = animatingText;
 
-    if (thinkMatch != null) {
-      thinkContent = thinkMatch.group(1)?.trim() ?? '';
-      final matchedStr = thinkMatch.group(0)!;
-      
-      if (mainStable.contains(matchedStr)) {
-         mainStable = mainStable.replaceFirst(matchedStr, '').trimLeft();
-      } else if (fullText.startsWith(matchedStr)) {
-         int splitIndex = stableText.length;
-         if (matchedStr.length <= splitIndex) {
-            mainStable = mainStable.substring(matchedStr.length).trimLeft();
-         } else {
-            mainStable = '';
-            int animCut = matchedStr.length - splitIndex;
-            if (animCut < mainAnimating.length) {
-                mainAnimating = mainAnimating.substring(animCut).trimLeft();
-            } else {
-                mainAnimating = '';
-            }
-         }
+    final thinkStart = fullText.indexOf('<$_thinkTag>');
+    if (thinkStart != -1) {
+      final contentStart = thinkStart + '<$_thinkTag>'.length;
+      final thinkEnd = fullText.indexOf('</$_thinkTag>', contentStart);
+      final contentEnd = thinkEnd != -1 ? thinkEnd : fullText.length;
+
+      thinkContent = fullText.substring(contentStart, contentEnd).trim();
+
+      final blockEnd =
+          thinkEnd != -1 ? thinkEnd + '</$_thinkTag>'.length : fullText.length;
+
+      final beforeThink = fullText.substring(0, thinkStart);
+      final afterThink = fullText.substring(blockEnd);
+      final remaining = beforeThink + afterThink;
+
+      if (remaining.length <= stableText.length) {
+        mainStable = remaining;
+        mainAnimating = '';
       } else {
-         mainStable = mainStable.replaceAll(thinkRegex, '').trimLeft();
-         mainAnimating = mainAnimating.replaceAll(thinkRegex, '');
+        mainStable = remaining.substring(0, stableText.length);
+        mainAnimating = remaining.substring(stableText.length);
       }
 
-      // Strip leading colons and whitespace that might leak from model outputs after thinking
-      mainStable = mainStable.replaceFirst(RegExp(r'^[\s:]+'), '');
+      mainStable = mainStable.replaceFirst(_leadingColons, '');
       if (mainStable.isEmpty) {
-        mainAnimating = mainAnimating.replaceFirst(RegExp(r'^[\s:]+'), '');
+        mainAnimating = mainAnimating.replaceFirst(_leadingColons, '');
       }
     }
 
@@ -73,8 +71,10 @@ class _AiBodyContent extends StatelessWidget {
 
     final thinkBlock = hasThink
         ? Padding(
-            padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
-            child: ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
+            padding: EdgeInsets.only(
+                top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
+            child:
+                ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
           )
         : const SizedBox.shrink();
 
@@ -110,7 +110,8 @@ class _AiBodyContent extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, double s, String stableText, String animatingText) {
+  Widget _buildContent(
+      BuildContext context, double s, String stableText, String animatingText) {
     final baseStyle = TextStyle(
         fontSize: 17 * s, height: 1.38, color: AppColors.primaryColor.inverted);
 
@@ -146,47 +147,60 @@ class _AiBodyContent extends StatelessWidget {
     }
 
     if (!textAnimCtl.isAnimating && animatingText.isEmpty) {
-      return SelectionArea(
-        child: Text.rich(
-          TextSpan(
-            children: _getParsedSpans(context, stableText, s),
-            style: baseStyle,
+      return RepaintBoundary(
+        child: SelectionArea(
+          child: Text.rich(
+            TextSpan(
+              children: _getParsedSpans(context, stableText, s),
+              style: baseStyle,
+            ),
           ),
         ),
       );
     }
 
-    return AnimatedBuilder(
-      animation: textAnimCtl,
-      builder: (context, child) {
-        final markdownText =
-            _rebalanceMarkdownBoundary(stableText, animatingText);
-        final animValue = textAnimCtl.value;
-        final opacity = animValue.clamp(0.0, 1.0);
-        final sigma = (1.0 - opacity) * 2.0;
+    final markdownText = _rebalanceMarkdownBoundary(stableText, animatingText);
 
-        return SelectionArea(
-          child: Text.rich(
-            TextSpan(
-              style: baseStyle,
-              children: [
-                ..._getParsedSpans(context, markdownText.stable, s),
-                if (markdownText.animating.isNotEmpty)
-                  ..._getParsedSpans(context, markdownText.animating, s)
-                      .map((span) => _applyOpacity(span, opacity, sigma)),
-              ],
-            ),
-          ),
-        );
-      },
+    return RepaintBoundary(
+      child: SelectionArea(
+        child: AnimatedBuilder(
+          animation: textAnimCtl,
+          builder: (context, child) {
+            final animValue = textAnimCtl.value;
+            final opacity = animValue.clamp(0.0, 1.0);
+
+            return Text.rich(
+              TextSpan(
+                style: baseStyle,
+                children: [
+                  ..._getParsedSpans(context, markdownText.stable, s),
+                  if (markdownText.animating.isNotEmpty)
+                    ..._getAnimatingSpans(
+                        context, markdownText.animating, s, opacity),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
+  }
+
+  List<InlineSpan> _getAnimatingSpans(
+      BuildContext context, String text, double s, double opacity) {
+    if (text.isEmpty) return [];
+    final spans = _getParsedSpans(context, text, s);
+    return spans
+        .map((span) => _applyOpacity(span, opacity))
+        .toList(growable: false);
   }
 
   List<InlineSpan> _getParsedSpans(
       BuildContext context, String text, double s) {
     if (text.isEmpty) return [];
-    final cacheKey =
-        '$text:${message.isThinking}:${message.webSearchSources?.length ?? 0}:$s:${AppColors.primaryColor.inverted.toARGB32()}';
+    final colorKey = AppColors.primaryColor.inverted.toARGB32();
+    final citationKey = message.webSearchSources?.length ?? 0;
+    final cacheKey = '$text:${message.isThinking}:$citationKey:$s:$colorKey';
     if (parseCache.containsKey(cacheKey)) return parseCache[cacheKey]!;
 
     final spans = parseText(context, text,
@@ -194,19 +208,22 @@ class _AiBodyContent extends StatelessWidget {
         isFinished: !message.isThinking,
         citations: message.webSearchSources);
 
-    if (text.length < 1000) parseCache[cacheKey] = spans;
+    parseCache[cacheKey] = spans;
+    if (parseCache.length > 500) {
+      final key = parseCache.keys.first;
+      parseCache.remove(key);
+    }
     return spans;
   }
 
-  InlineSpan _applyOpacity(InlineSpan span, double opacity, double sigma) {
+  InlineSpan _applyOpacity(InlineSpan span, double opacity) {
     if (span is TextSpan) {
       final baseColor = span.style?.color ?? AppColors.primaryColor.inverted;
-
       return TextSpan(
         text: span.text,
         children: span.children
-            ?.map((child) => _applyOpacity(child, opacity, sigma))
-            .toList(),
+            ?.map((child) => _applyOpacity(child, opacity))
+            .toList(growable: false),
         style: span.style?.copyWith(
               color: baseColor.withValues(alpha: opacity),
               foreground: null,
@@ -315,14 +332,68 @@ class ThoughtProcessWidget extends StatefulWidget {
   State<ThoughtProcessWidget> createState() => _ThoughtProcessWidgetState();
 }
 
-class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget> {
+class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
+    with TickerProviderStateMixin {
+  bool _isExpanded = false;
+
+  late AnimationController _arrowController;
+  late Animation<double> _arrowTurns;
+
+  late AnimationController _contentController;
+  late Animation<double> _contentFade;
+  late Animation<Offset> _contentSlide;
+
+  @override
+  void initState() {
+    super.initState();
+    _arrowController = AnimationController(
+        duration: const Duration(milliseconds: 300), vsync: this);
+    _arrowTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
+      CurvedAnimation(parent: _arrowController, curve: Curves.easeInOut),
+    );
+
+    _contentController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _contentFade =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_contentController);
+    _contentSlide =
+        Tween<Offset>(begin: const Offset(0.0, -0.1), end: Offset.zero).animate(
+            CurvedAnimation(
+                parent: _contentController, curve: Curves.easeOutQuad));
+  }
+
+  @override
+  void dispose() {
+    _arrowController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  void _toggleExpand() {
+    if (widget.thinkContent.trim().isEmpty) return;
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _arrowController.forward();
+        _contentController.forward();
+      } else {
+        _arrowController.reverse();
+        _contentController.reverse();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (widget.thinkContent.trim().isEmpty) return const SizedBox.shrink();
-    
+    final content = widget.thinkContent.trim();
+    if (content.isEmpty) return const SizedBox.shrink();
+
+    final localizations = AppLocalizations.of(context);
+
     return Container(
       margin: EdgeInsets.only(bottom: 12 * widget.scale),
-      padding: EdgeInsets.only(left: 12 * widget.scale, top: 4 * widget.scale, bottom: 4 * widget.scale),
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
@@ -331,16 +402,80 @@ class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget> {
           ),
         ),
       ),
-      child: SelectionArea(
-        child: Text(
-          widget.thinkContent,
-          style: TextStyle(
-            fontSize: 14 * widget.scale,
-            color: AppColors.primaryColor.inverted.withValues(alpha: 0.6),
-            fontStyle: FontStyle.italic,
-            height: 1.5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _toggleExpand,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: EdgeInsets.only(
+                    left: 12 * widget.scale,
+                    top: 4 * widget.scale,
+                    bottom: 2 * widget.scale,
+                    right: 4 * widget.scale),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      localizations?.thought ?? 'Thought',
+                      style: TextStyle(
+                        fontSize: 13 * widget.scale,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.5),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    RotationTransition(
+                      turns: _arrowTurns,
+                      child: Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 18 * widget.scale,
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+          SizeTransition(
+            sizeFactor: CurvedAnimation(
+              parent: _contentController,
+              curve: Curves.easeInOut,
+            ),
+            alignment: Alignment.centerLeft,
+            child: FadeTransition(
+              opacity: _contentFade,
+              child: SlideTransition(
+                position: _contentSlide,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: 12 * widget.scale,
+                      right: 4 * widget.scale,
+                      bottom: 4 * widget.scale),
+                  child: SelectionArea(
+                    child: Text(
+                      content,
+                      style: TextStyle(
+                        fontSize: 14 * widget.scale,
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.6),
+                        fontStyle: FontStyle.italic,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

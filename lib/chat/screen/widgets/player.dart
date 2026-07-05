@@ -139,14 +139,8 @@ class _TtsPlayerBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ... (Layout constants same as before)
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final isTablet = screenWidth >= 600;
 
     final double height = screenHeight * 0.055;
@@ -235,7 +229,7 @@ class _TtsPlayerBar extends StatelessWidget {
                           child: Container(
                             alignment: Alignment.center,
                             padding:
-                            EdgeInsets.symmetric(horizontal: buttonPadding),
+                                EdgeInsets.symmetric(horizontal: buttonPadding),
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               transitionBuilder: (child, anim) =>
@@ -274,7 +268,7 @@ class _TtsPlayerBar extends StatelessWidget {
                                 overlayRadius: 10.0),
                             activeTrackColor: AppColors.primaryColor.inverted,
                             inactiveTrackColor:
-                            AppColors.border.withValues(alpha: 0.5),
+                                AppColors.border.withValues(alpha: 0.5),
                             overlayColor: AppColors.primaryColor.inverted
                                 .withValues(alpha: 0.1),
                           ),

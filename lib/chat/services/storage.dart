@@ -97,6 +97,8 @@ class ChatStorageService {
 
     try {
       final db = await DbHelper().db;
+      if (query.trim().length < 2) return [];
+
       final results = await db.rawQuery('''
         SELECT 
           m.conversationId, 
@@ -105,17 +107,18 @@ class ChatStorageService {
           c.title 
         FROM messages m 
         JOIN conversations c ON m.conversationId = c.id 
-        WHERE m.text LIKE ? AND m.text IS NOT NULL AND m.text != ''
+        WHERE instr(m.text, ?) > 0 AND m.text IS NOT NULL AND m.text != ''
         ORDER BY m.ts DESC 
         LIMIT 50
-      ''', ['%$query%']);
+      ''', [query]);
 
       return results.map((row) {
         return SearchHit(
           conversationId: row['conversationId'] as String,
           title: (row['title'] as String?) ?? 'Sohbet',
           snippet: row['snippet'] as String,
-          timestamp: DateTime.fromMillisecondsSinceEpoch(row['timestamp'] as int? ?? 0),
+          timestamp: DateTime.fromMillisecondsSinceEpoch(
+              row['timestamp'] as int? ?? 0),
           query: query,
         );
       }).toList();
@@ -175,13 +178,28 @@ class ChatStorageService {
     required String langCode,
     required ModelService modelService,
   }) async {
-    final String modelSeriesId =
-        modelService.getBaseIdFromFullId(modelId, langCode: langCode);
+    // Virtual cortex models and dynamic don't have entries in the cached model list.
+    // Resolve them to their known IDs for storage.
+    String resolvedId = modelId;
+    if (modelId == 'cortex/auto' || modelId == 'dynamic') {
+      resolvedId = 'cortex/auto';
+    } else if (modelId == 'cortex/roleplay') {
+      resolvedId = 'cortex/roleplay';
+    } else {
+      final String modelSeriesId =
+          modelService.getBaseIdFromFullId(modelId, langCode: langCode);
+      if (modelSeriesId.isNotEmpty) {
+        resolvedId = modelSeriesId;
+      }
+    }
 
     final allModels = modelService.getCachedModelsSync();
-    final bool isValidSeriesId = allModels.any((m) => m.id == modelSeriesId);
+    final bool isValidSeriesId = allModels.any((m) => m.id == resolvedId) ||
+        resolvedId == 'cortex/auto' ||
+        resolvedId == 'cortex/roleplay' ||
+        resolvedId == 'dynamic';
 
-    if (modelSeriesId.isEmpty || !isValidSeriesId) {
+    if (resolvedId.isEmpty || !isValidSeriesId) {
       debugPrint(
           "[Storage] FAILED to add recent model. Could not resolve a valid series ID from '$modelId'.");
       return;
@@ -192,13 +210,13 @@ class ChatStorageService {
       await db.insert(
         'recent_models',
         {
-          'model_id': modelSeriesId,
+          'model_id': resolvedId,
           'last_used': DateTime.now().millisecondsSinceEpoch
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       CacheService.invalidate(CacheKey.recentModels);
-      debugPrint("[Storage] Added/Updated '$modelSeriesId' in recent models.");
+      debugPrint("[Storage] Added/Updated '$resolvedId' in recent models.");
     } catch (e) {
       _handleDiskError(e, 'addRecentModel');
     }
@@ -758,15 +776,14 @@ class ChatStorageService {
     for (final raw in rawPaths) {
       if (raw.isEmpty) continue;
 
-      List<String> paths = [];
-      try {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) {
-          paths = decoded.cast<String>();
-        } else {
+      List<String> paths;
+      if (raw.startsWith('[')) {
+        try {
+          paths = (jsonDecode(raw) as List).cast<String>();
+        } catch (_) {
           paths = [raw];
         }
-      } catch (_) {
+      } else {
         paths = [raw];
       }
 
@@ -774,9 +791,8 @@ class ChatStorageService {
         if (path.isEmpty || path.startsWith('http')) continue;
         try {
           final file = File(path);
-          if (file.existsSync()) {
+          if (await file.exists()) {
             await file.delete();
-            debugPrint("[ChatStorage] Deleted media file: $path");
           }
         } catch (e) {
           debugPrint("[ChatStorage] Error deleting media file: $e");

@@ -287,7 +287,6 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.localModels,
               models: local,
-              
               pulseAnimation: pulseAnimation,
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
@@ -304,7 +303,11 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.onlineModels,
               models: serverSide,
-              subCategories: const ['categoryAll', 'categoryVideo', 'categoryPhoto'],
+              subCategories: const [
+                'categoryAll',
+                'categoryVideo',
+                'categoryPhoto'
+              ],
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
               getCompatibilityStatus: getCompatibilityStatus,
@@ -320,7 +323,12 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.roleModels,
               models: role,
-              subCategories: const ['categoryAll', 'categoryMasculine', 'categoryFeminine', 'categoryInanimate'],
+              subCategories: const [
+                'categoryAll',
+                'categoryMasculine',
+                'categoryFeminine',
+                'categoryInanimate'
+              ],
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
               getCompatibilityStatus: getCompatibilityStatus,

@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "Chat",
+  "branch": "Cabang",
   "chatLengthLimitExceeded": "Obrolan ini telah melebihi batas karakter. Silakan mulai obrolan baru atau beli langganan.",
   "chatTitleCriticalInstruction": "[INSTRUKSI PENTING]: Anda adalah PEMBUAT JUDUL. JANGAN menjawab pertanyaan pengguna. JANGAN mengobrol atau menyapa. HANYA keluarkan judul 2-4 kata yang merangkum apa yang ditanyakan pengguna.",
   "@chatTitleCriticalInstruction": {

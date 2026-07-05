@@ -22,8 +22,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
   late final TextEditingController _instructionController;
   final FocusNode _instructionFocusNode = FocusNode();
 
-
-
   @override
   void initState() {
     super.initState();
@@ -31,7 +29,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     _instructionController =
         TextEditingController(text: memoryProvider.customInstruction);
     _instructionFocusNode.addListener(_onInstructionFocusLost);
-
   }
 
   @override
@@ -39,7 +36,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     _instructionFocusNode.removeListener(_onInstructionFocusLost);
     _instructionFocusNode.dispose();
     _instructionController.dispose();
-
 
     super.dispose();
   }
@@ -50,7 +46,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
       context.read<UserMemoryProvider>().updateCustomInstruction(newText);
     }
   }
-
 
   void _showClearMemoryDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -192,7 +187,6 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     final double scale = screenWidth / 400.0;
     final memoryProvider = context.watch<UserMemoryProvider>();
 
-
     if (!_instructionFocusNode.hasFocus &&
         _instructionController.text != memoryProvider.customInstruction) {
       _instructionController.text = memoryProvider.customInstruction;
@@ -228,26 +222,41 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (memoryProvider.memoryList.isNotEmpty)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
                     onTap: () {
-                      _showClearMemoryDialog(context);
+                      context.read<UserMemoryProvider>().addMemory("");
                     },
                     child: Padding(
                       padding: EdgeInsets.only(bottom: 8 * scale),
-                      child: Text(
-                        l10n.clearMemory,
-                        style: TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 13 * scale,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      child: Icon(
+                        Icons.add_circle_outline,
+                        color: AppColors.primaryColor.inverted,
+                        size: 20 * scale,
                       ),
                     ),
                   ),
-                ),
+                  if (memoryProvider.memoryList.isNotEmpty)
+                    GestureDetector(
+                      onTap: () {
+                        _showClearMemoryDialog(context);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 8 * scale),
+                        child: Text(
+                          l10n.clearMemory,
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 13 * scale,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
               if (memoryProvider.memoryList.isEmpty)
                 Container(
                   width: double.infinity,
@@ -267,7 +276,8 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                 )
               else
                 Column(
-                  children: List.generate(memoryProvider.memoryList.length, (index) {
+                  children:
+                      List.generate(memoryProvider.memoryList.length, (index) {
                     final memory = memoryProvider.memoryList[index];
                     return _MemoryListItem(
                       initialMemory: memory,
@@ -294,9 +304,9 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                 ),
             ],
           ),
- ),
+        ),
 
- SizedBox(height: 12 * scale),
+        SizedBox(height: 12 * scale),
 
         // --- Intelligence Panel ---
         _buildPanel(
@@ -315,7 +325,9 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
             controller: _instructionController,
             focusNode: _instructionFocusNode,
             maxLength: 2048,
-            buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) => null,
+            buildCounter: (BuildContext context,
+                    {int? currentLength, int? maxLength, bool? isFocused}) =>
+                null,
             maxLines: 10,
             minLines: 7,
             style: TextStyle(

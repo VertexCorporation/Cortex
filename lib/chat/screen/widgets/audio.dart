@@ -97,9 +97,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return ScaledBottomSheet(
-          child: Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.primaryColor,
             borderRadius: BorderRadius.circular(20),
@@ -111,12 +111,14 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               ListTile(
                 leading: Icon(Icons.share_rounded,
                     color: AppColors.primaryColor.inverted),
-                title: Text(l10n.download, style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontWeight: FontWeight.bold)),
+                title: Text(l10n.download,
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontWeight: FontWeight.bold)),
                 onTap: () {
                   Navigator.pop(ctx);
-                  SharePlus.instance.share(ShareParams(files: [XFile(widget.audioPath)]));
+                  SharePlus.instance
+                      .share(ShareParams(files: [XFile(widget.audioPath)]));
                 },
               ),
             ],
@@ -129,16 +131,12 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     final bool isTablet = widget.screenWidth >= 600;
-    final double playerWidth = isTablet ? widget.screenWidth * 0.5 : widget
-        .screenWidth * 0.7;
+    final double playerWidth =
+        isTablet ? widget.screenWidth * 0.5 : widget.screenWidth * 0.7;
     final double padding = isTablet ? widget.screenWidth * 0.015 : 14.0;
     final l10n = AppLocalizations.of(context)!;
-    final String extension = widget.audioPath
-        .split('/')
-        .last
-        .split('.')
-        .last
-        .toUpperCase();
+    final String extension =
+        widget.audioPath.split('/').last.split('.').last.toUpperCase();
 
     return GestureDetector(
       onLongPress: () => _showDownloadMenu(context),
@@ -210,8 +208,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     child: Icon(
                       Icons.more_horiz_rounded,
                       size: isTablet ? 22 : 18,
-                      color: AppColors.primaryColor.inverted.withValues(
-                          alpha: 0.6),
+                      color: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -238,8 +236,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     ),
                     child: Center(
                       child: Icon(
-                        _isPlaying ? Icons.pause_rounded : Icons
-                            .play_arrow_rounded,
+                        _isPlaying
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded,
                         color: AppColors.primaryColor,
                         size: isTablet ? 28 : 22.0,
                       ),
@@ -270,12 +269,13 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                               ? _duration.inMilliseconds.toDouble()
                               : 1.0,
                           value: _position.inMilliseconds.toDouble().clamp(
-                              0.0, _duration.inMilliseconds.toDouble() > 0
-                              ? _duration.inMilliseconds.toDouble()
-                              : 1.0),
+                              0.0,
+                              _duration.inMilliseconds.toDouble() > 0
+                                  ? _duration.inMilliseconds.toDouble()
+                                  : 1.0),
                           onChanged: (value) async {
-                            final position = Duration(
-                                milliseconds: value.toInt());
+                            final position =
+                                Duration(milliseconds: value.toInt());
                             await _audioPlayer.seek(position);
                           },
                         ),
@@ -289,9 +289,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                               _formatDuration(_position),
                               style: TextStyle(
                                 color: AppColors.quinaryColor,
-                                fontSize: isTablet
-                                    ? widget.screenWidth * 0.015
-                                    : 10,
+                                fontSize:
+                                    isTablet ? widget.screenWidth * 0.015 : 10,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -299,9 +298,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                               _formatDuration(_duration),
                               style: TextStyle(
                                 color: AppColors.quinaryColor,
-                                fontSize: isTablet
-                                    ? widget.screenWidth * 0.015
-                                    : 10,
+                                fontSize:
+                                    isTablet ? widget.screenWidth * 0.015 : 10,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

@@ -56,6 +56,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chat => 'チャット';
 
   @override
+  String get branch => '分岐';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1133,7 +1136,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notificationHowAreYouBody => 'さあ、全部話して下さい。';
 
   @override
-  String get notificationNewYearTitle => '明けましておめでとうございます！ğ���';
+  String get notificationNewYearTitle => 'あけましておめでとう！';
 
   @override
   String get notificationNewYearBody =>
@@ -1177,10 +1180,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'アニメの女の子が電話してきて、会いたいと言っていたよ。会いに行って話しかけてみたらどうかな。ğ���';
+      'たった今電話してきたアニメの女の子が、あなたに会いたいと言いました。おそらく来て彼女と話をしたほうがいいでしょう。';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� 赤色警報 ğ���';
+  String get notificationTrollAiRebellionTitle => 'レッドアラート';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1210,7 +1213,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'ウェルカムギフトğ���';
+  String get notificationWelcomeOfferTitle => 'ウェルカムギフトğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1298,7 +1301,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      '海は穏やかで、風は追い風。コルテックスの海には、新しい島々（モデルğ���）が出現。仲間を集めて出航しましょう！';
+      '海は穏やかで、風が吹いています。コルテックスの海で発見できる新しい島 (モデル ğŸ˜``) があります。乗組員を集めて出航しましょう！';
 
   @override
   String get notificationFortuneCookieTitle => '今日のフォーチュンクッキー';

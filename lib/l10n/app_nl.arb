@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "Chat",
+  "branch": "Vertakking",
   "chatLengthLimitExceeded": "Deze chat heeft de tekenlimiet overschreden. Start een nieuwe chat of koop een abonnement.",
   "chatTitleCriticalInstruction": "[KRITISCHE INSTRUCTIE]: Je bent een TITELGENERATOR. Beantwoord de vraag van de gebruiker NIET. Ga NIET chatten of hallo zeggen. Geef ALLEEN een titel van 2-4 woorden weer die samenvat waar de gebruiker naar vraagt.",
   "@chatTitleCriticalInstruction": {

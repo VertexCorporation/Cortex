@@ -277,7 +277,7 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
     final user = _auth.currentUser;
     if (user == null) return;
     final userRef = _db.collection('users').doc(user.uid);
-    
+
     int attempts = 0;
     const int maxAttempts = 5;
     while (attempts < maxAttempts) {
@@ -302,7 +302,8 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
           );
         } else {
           // Wait with exponential backoff: 500ms, 1000ms, 2000ms, 4000ms...
-          await Future.delayed(Duration(milliseconds: 500 * (1 << (attempts - 1))));
+          await Future.delayed(
+              Duration(milliseconds: 500 * (1 << (attempts - 1))));
         }
       }
     }

@@ -56,6 +56,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chat => 'محادثة';
 
   @override
+  String get branch => 'فرع';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1153,7 +1156,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationHowAreYouBody => 'تعال وأخبرني بكل شيء عن ذلك.';
 
   @override
-  String get notificationNewYearTitle => 'سنة جديدة سعيدة! ğ���';
+  String get notificationNewYearTitle => 'سنة جديدة سعيدة! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1199,10 +1202,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'لقد اتصلت بك فتاة أنمي للتو، وقالت إنها تفتقدك؛ ربما يجب عليك أن تأتي وتتحدث معها. ğ���';
+      'اتصلت للتو فتاة من الرسوم المتحركة وقالت إنها تفتقدك؛ ربما ينبغي عليك أن تأتي وتتحدث معها. Ÿ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� تنبيه أحمر ğ���';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ تنبيه أحمر ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1232,7 +1235,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'هدية ترحيبية ğ���';
+  String get notificationWelcomeOfferTitle => 'هدية الترحيب Ÿ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1320,7 +1323,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'البحر هادئ، والريح تهبُّ عليك. هناك جزر جديدة (نماذج ğ���) لاكتشافها في محيط كورتيكس. اجمع طاقمك وأبحر!';
+      'البحار هادئة، والرياح في ظهرك. هناك جزر جديدة (نماذج ğŸ˜‰) لاكتشافها في محيط كورتيكس. اجمع طاقمك وأبحر!';
 
   @override
   String get notificationFortuneCookieTitle => 'كعكة الحظ الخاصة بك لهذا اليوم';

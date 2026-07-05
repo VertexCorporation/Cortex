@@ -67,117 +67,114 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
-      body: Builder(
-        builder: (context) {
-          final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-          return AnimatedPadding(
-            padding: EdgeInsets.only(bottom: bottomInset),
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-        child: Center(
-          child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: containerMaxWidth),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-                horizontal: 30 * fontScale, vertical: 16 * fontScale),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 1. FORMS (Login / Register CrossFade)
-                AnimatedCrossFade(
-                  duration: const Duration(milliseconds: 300),
-                  firstCurve: Curves.easeInOut,
-                  secondCurve: Curves.easeInOut,
-                  sizeCurve: Curves.easeInOut,
-                  alignment: Alignment.topCenter,
-                  crossFadeState: _controller.authMode == AuthMode.login
-                      ? CrossFadeState.showFirst
-                      : CrossFadeState.showSecond,
-                  firstChild: LoginForm(
-                    key: const ValueKey('login_form'),
-                    isLoading: _controller.isLoading,
-                    emailError: _controller.loginEmailError,
-                    passwordError: _controller.loginPasswordError,
-                    emailShakeController: _controller.loginEmailShakeController,
-                    passwordShakeController:
-                    _controller.loginPasswordShakeController,
-                    fontScale: fontScale,
-                    onSubmit: (email, password, rememberMe) =>
-                        _controller
+      body: Builder(builder: (context) {
+        final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+        return AnimatedPadding(
+          padding: EdgeInsets.only(bottom: bottomInset),
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: containerMaxWidth),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 30 * fontScale, vertical: 16 * fontScale),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // 1. FORMS (Login / Register CrossFade)
+                    AnimatedCrossFade(
+                      duration: const Duration(milliseconds: 300),
+                      firstCurve: Curves.easeInOut,
+                      secondCurve: Curves.easeInOut,
+                      sizeCurve: Curves.easeInOut,
+                      alignment: Alignment.topCenter,
+                      crossFadeState: _controller.authMode == AuthMode.login
+                          ? CrossFadeState.showFirst
+                          : CrossFadeState.showSecond,
+                      firstChild: LoginForm(
+                        key: const ValueKey('login_form'),
+                        isLoading: _controller.isLoading,
+                        emailError: _controller.loginEmailError,
+                        passwordError: _controller.loginPasswordError,
+                        emailShakeController:
+                            _controller.loginEmailShakeController,
+                        passwordShakeController:
+                            _controller.loginPasswordShakeController,
+                        fontScale: fontScale,
+                        onSubmit: (email, password, rememberMe) => _controller
                             .submitLogin(context, email, password, rememberMe),
-                    onForgotPassword: () =>
-                        _controller.launchResetPasswordURL(context),
-                    onInputChanged: _controller.clearErrorsOnInput,
-                  ),
-                  secondChild: RegisterForm(
-                    key: const ValueKey('register_form'),
-                    isLoading: _controller.isLoading,
-                    agreeToTerms: _controller.agreeToTerms,
-                    usernameError: _controller.registerUsernameError,
-                    emailError: _controller.registerEmailError,
-                    passwordError: _controller.registerPasswordError,
-                    usernameShakeController:
-                    _controller.registerUsernameShakeController,
-                    emailShakeController:
-                    _controller.registerEmailShakeController,
-                    passwordShakeController:
-                    _controller.registerPasswordShakeController,
-                    fontScale: fontScale,
-                    onSubmit: (username, email, password) =>
-                        _controller
+                        onForgotPassword: () =>
+                            _controller.launchResetPasswordURL(context),
+                        onInputChanged: _controller.clearErrorsOnInput,
+                      ),
+                      secondChild: RegisterForm(
+                        key: const ValueKey('register_form'),
+                        isLoading: _controller.isLoading,
+                        agreeToTerms: _controller.agreeToTerms,
+                        usernameError: _controller.registerUsernameError,
+                        emailError: _controller.registerEmailError,
+                        passwordError: _controller.registerPasswordError,
+                        usernameShakeController:
+                            _controller.registerUsernameShakeController,
+                        emailShakeController:
+                            _controller.registerEmailShakeController,
+                        passwordShakeController:
+                            _controller.registerPasswordShakeController,
+                        fontScale: fontScale,
+                        onSubmit: (username, email, password) => _controller
                             .submitRegister(context, username, email, password),
-                    onInputChanged: _controller.clearErrorsOnInput,
-                  ),
+                        onInputChanged: _controller.clearErrorsOnInput,
+                      ),
+                    ),
+
+                    SizedBox(height: 8 * fontScale),
+
+                    // 2. OR DIVIDER
+                    _buildOrDivider(l10n, fontScale),
+
+                    SizedBox(height: 8 * fontScale),
+
+                    // 3. SOCIAL BUTTONS
+                    _buildSocialButtons(l10n, screenHeight, fontScale),
+
+                    // 4. TERMS AND CONDITIONS (Register Only - Animated)
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      alignment: Alignment.topCenter,
+                      child: _controller.authMode == AuthMode.register
+                          ? Column(
+                              children: [
+                                SizedBox(height: 12 * fontScale),
+                                _buildTermsAndConditions(
+                                    l10n, fontScale, screenHeight),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+
+                    SizedBox(height: 12 * fontScale),
+
+                    // 5. SWITCH ACCOUNT
+                    _buildSwitchAuthModeButton(l10n, fontScale),
+
+                    // 6. GUEST LOGIN (Bottom - Always Visible)
+                    _buildGuestLoginButton(l10n, fontScale, screenHeight),
+                  ],
                 ),
-
-                SizedBox(height: 8 * fontScale),
-
-                // 2. OR DIVIDER
-                _buildOrDivider(l10n, fontScale),
-
-                SizedBox(height: 8 * fontScale),
-
-                // 3. SOCIAL BUTTONS
-                _buildSocialButtons(l10n, screenHeight, fontScale),
-
-                // 4. TERMS AND CONDITIONS (Register Only - Animated)
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  alignment: Alignment.topCenter,
-                  child: _controller.authMode == AuthMode.register
-                      ? Column(
-                    children: [
-                      SizedBox(height: 12 * fontScale),
-                      _buildTermsAndConditions(
-                          l10n, fontScale, screenHeight),
-                    ],
-                  )
-                      : const SizedBox.shrink(),
-                ),
-
-                SizedBox(height: 12 * fontScale),
-
-                // 5. SWITCH ACCOUNT
-                _buildSwitchAuthModeButton(l10n, fontScale),
-
-                // 6. GUEST LOGIN (Bottom - Always Visible)
-                _buildGuestLoginButton(l10n, fontScale, screenHeight),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
-),
-);
-}
 
   // --- Common UI Widgets ---
 
-  Widget _buildGuestLoginButton(AppLocalizations l10n, double fontScale,
-      double screenHeight) {
+  Widget _buildGuestLoginButton(
+      AppLocalizations l10n, double fontScale, double screenHeight) {
     // No "isRegisterMode" check. It is now always visible.
     // No "checkbox" requirement. It is frictionless.
 
@@ -193,16 +190,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
             onPressed: _controller.isLoading
                 ? null
                 : () {
-              HapticFeedback.lightImpact();
-              _controller.submitAnonymousLogin(context);
-            },
+                    HapticFeedback.lightImpact();
+                    _controller.submitAnonymousLogin(context);
+                  },
             style: TextButton.styleFrom(
               // Simple text style, no background
-              foregroundColor: Theme
-                  .of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.color,
+              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
               padding: EdgeInsets.zero,
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -244,35 +237,27 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       children: [
         Expanded(
             child: Divider(
-                color: Theme
-                    .of(context)
-                    .dividerColor,
+                color: Theme.of(context).dividerColor,
                 thickness: 1 * fontScale)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8 * fontScale),
           child: Text(
             l10n.or,
             style: TextStyle(
-                color: Theme
-                    .of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.color,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 fontSize: 16 * fontScale),
           ),
         ),
         Expanded(
             child: Divider(
-                color: Theme
-                    .of(context)
-                    .dividerColor,
+                color: Theme.of(context).dividerColor,
                 thickness: 1 * fontScale)),
       ],
     );
   }
 
-  Widget _buildSocialButtons(AppLocalizations l10n, double screenHeight,
-      double fontScale) {
+  Widget _buildSocialButtons(
+      AppLocalizations l10n, double screenHeight, double fontScale) {
     final isRegisterMode = _controller.authMode == AuthMode.register;
     final isDisabled =
         _controller.isLoading || (isRegisterMode && !_controller.agreeToTerms);
@@ -302,57 +287,57 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           ignoring: isDisabled,
           child: Column(
             children: [
-            // --- Apple Sign-In Button ---
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: elegantButtonStyle,
-                onPressed: () {
-                  HapticFeedback.lightImpact();
-                  _controller.signInWithApple(context);
-                },
-                icon: Icon(Icons.apple, size: 24 * fontScale),
-                label: Text(
-                  l10n.continueWithApple,
-                  style: TextStyle(
-                      fontSize: 16 * fontScale, fontWeight: FontWeight.w600),
+              // --- Apple Sign-In Button ---
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: elegantButtonStyle,
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _controller.signInWithApple(context);
+                  },
+                  icon: Icon(Icons.apple, size: 24 * fontScale),
+                  label: Text(
+                    l10n.continueWithApple,
+                    style: TextStyle(
+                        fontSize: 16 * fontScale, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
-            ),
 
-            SizedBox(height: 12 * fontScale),
+              SizedBox(height: 12 * fontScale),
 
-            // --- Google Sign-In Button ---
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: elegantButtonStyle,
-                onPressed: () {
-                  HapticFeedback.lightImpact();
-                  _controller.signInWithGoogle(context);
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/google.svg',
-                      colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.inverted, BlendMode.srcIn),
-                      width: 16 * fontScale,
-                      height: 16 * fontScale,
-                    ),
-                    SizedBox(width: 12 * fontScale),
-                    Text(
-                      l10n.continueWithGoogle,
-                      style: TextStyle(
-                          fontSize: 16 * fontScale,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ],
+              // --- Google Sign-In Button ---
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: elegantButtonStyle,
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _controller.signInWithGoogle(context);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/google.svg',
+                        colorFilter: ColorFilter.mode(
+                            AppColors.primaryColor.inverted, BlendMode.srcIn),
+                        width: 16 * fontScale,
+                        height: 16 * fontScale,
+                      ),
+                      SizedBox(width: 12 * fontScale),
+                      Text(
+                        l10n.continueWithGoogle,
+                        style: TextStyle(
+                            fontSize: 16 * fontScale,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
             ],
           ),
         ),
@@ -360,8 +345,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTermsAndConditions(AppLocalizations l10n, double fontScale,
-      double screenHeight) {
+  Widget _buildTermsAndConditions(
+      AppLocalizations l10n, double fontScale, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.0 * fontScale),
       child: Row(
@@ -379,11 +364,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 child: Text(
                   l10n.iHaveReadAndAgree,
                   style: TextStyle(
-                      color: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.color,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                       fontSize: 12.6 * fontScale),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -417,11 +398,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               : l10n.alreadyHaveAccount,
           style: TextStyle(
               fontSize: 16 * fontScale,
-              color: Theme
-                  .of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.color),
+              color: Theme.of(context).textTheme.bodyLarge?.color),
         ),
         TextButton(
           onPressed: () {

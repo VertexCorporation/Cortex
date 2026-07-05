@@ -13,6 +13,8 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import '../../../library/backend/data/service.dart';
@@ -287,6 +289,33 @@ class Tiles {
 
   // --- UNIVERSAL ATTACHMENT BUILDER ---
 
+  static Future<File?> _saveToTempFile(String path) async {
+    try {
+      final Directory tempDir = await getTemporaryDirectory();
+      final String tempPath = p.join(tempDir.path,
+          'temp_img_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final File tempFile = File(tempPath);
+      if (path.startsWith('data:image')) {
+        final commaIndex = path.indexOf(',');
+        if (commaIndex != -1) {
+          final base64Str = path.substring(commaIndex + 1);
+          final bytes = base64Decode(base64Str.replaceAll(RegExp(r'\s+'), ''));
+          await tempFile.writeAsBytes(bytes);
+          return tempFile;
+        }
+      } else if (path.startsWith('http')) {
+        final request = await HttpClient().getUrl(Uri.parse(path));
+        final response = await request.close();
+        final bytes = await consolidateHttpClientResponseBytes(response);
+        await tempFile.writeAsBytes(bytes);
+        return tempFile;
+      }
+    } catch (e) {
+      debugPrint('Error saving temp file: $e');
+    }
+    return null;
+  }
+
   /// Renders a list of attachments (Images/Docs) using a Wrap layout.
   static Widget _buildAttachmentList({
     Key? key,
@@ -298,9 +327,12 @@ class Tiles {
     final bool isTablet = screenWidth >= 600;
 
     // Dynamic sizing for items
-    final double imageSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.25;
+    final double imageSize = paths.length == 1
+        ? (isTablet ? screenWidth * 0.40 : screenWidth * 0.65)
+        : (isTablet ? screenWidth * 0.15 : screenWidth * 0.25);
     final double borderRadius = isTablet ? screenWidth * 0.015 : 24.0;
-    final int decodeCacheSize = (imageSize * MediaQuery.devicePixelRatioOf(context)).toInt();
+    final int decodeCacheSize =
+        (imageSize * MediaQuery.devicePixelRatioOf(context)).toInt();
     return Wrap(
       key: key,
       alignment: isUser ? WrapAlignment.end : WrapAlignment.start,
@@ -346,56 +378,131 @@ class Tiles {
                 Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
             child: InkWell(
               borderRadius: BorderRadius.circular(borderRadius),
-              onTap: isNetworkImage || isDataImage
-                  ? null
-                  : () => Navigator.push(
-                        context,
-                        PhotoViewer.route(
-                          file,
-                          onEditImage: (imageFile) {
-                            // Add image as attachment and request keyboard focus
-                            final inputProvider = Provider.of<InputProvider>(
-                                context,
-                                listen: false);
-                            inputProvider.addAttachment(imageFile,
-                                isImage: true);
-                          },
-                        ),
-                      ),
+              onTap: () async {
+                File? viewFile = file;
+                if (isNetworkImage || isDataImage) {
+                  viewFile = await _saveToTempFile(path);
+                }
+                if (viewFile != null && context.mounted) {
+                  Navigator.push(
+                    context,
+                    PhotoViewer.route(
+                      viewFile,
+                      onEditImage: (imageFile) {
+                        final inputProvider =
+                            Provider.of<InputProvider>(context, listen: false);
+                        inputProvider.addAttachment(imageFile, isImage: true);
+                      },
+                    ),
+                  );
+                }
+              },
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(borderRadius),
-                child: isDataImage
-                    ? Image.memory(
-                        base64Decode(path.split(',').last),
-                        width: imageSize,
-                        height: imageSize,
-                        cacheWidth: decodeCacheSize,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.broken_image, color: Colors.grey),
-                      )
-                    : isNetworkImage
-                        ? Image.network(
-                            path,
-                            width: imageSize,
-                            height: imageSize,
-                            cacheWidth: decodeCacheSize,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.broken_image,
-                                    color: Colors.grey),
-                          )
-                        : Image.file(
-                            file,
-                            width: imageSize,
-                            height: imageSize,
-                            cacheWidth: decodeCacheSize,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.broken_image,
-                                    color: Colors.grey),
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  child: Stack(
+                    children: [
+                      isDataImage
+                          ? Image.memory(
+                              base64Decode(path.split(',').last),
+                              width: imageSize,
+                              height: imageSize,
+                              cacheWidth: decodeCacheSize,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.broken_image,
+                                      color: Colors.grey),
+                            )
+                          : isNetworkImage
+                              ? Image.network(
+                                  path,
+                                  width: imageSize,
+                                  height: imageSize,
+                                  cacheWidth: decodeCacheSize,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(Icons.broken_image,
+                                          color: Colors.grey),
+                                )
+                              : Image.file(
+                                  file,
+                                  width: imageSize,
+                                  height: imageSize,
+                                  cacheWidth: decodeCacheSize,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(Icons.broken_image,
+                                          color: Colors.grey),
+                                ),
+                      if (paths.length == 1 && !isUser)
+                        Positioned(
+                          bottom: 12,
+                          left: 12,
+                          child: GestureDetector(
+                            onTap: () async {
+                              File? viewFile = file;
+                              if (isNetworkImage || isDataImage) {
+                                viewFile = await _saveToTempFile(path);
+                              }
+                              if (viewFile != null && context.mounted) {
+                                final inputProvider =
+                                    Provider.of<InputProvider>(context,
+                                        listen: false);
+                                inputProvider.addAttachment(viewFile,
+                                    isImage: true);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: const Text(
+                                "Düzenle",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
                           ),
-              ),
+                        ),
+                      if (paths.length == 1 && !isUser)
+                        Positioned(
+                          bottom: 12,
+                          right: 12,
+                          child: GestureDetector(
+                            onTap: () async {
+                              File? viewFile = file;
+                              if (isNetworkImage || isDataImage) {
+                                viewFile = await _saveToTempFile(path);
+                              }
+                              if (viewFile != null && context.mounted) {
+                                Navigator.push(
+                                  context,
+                                  PhotoViewer.route(viewFile,
+                                      onEditImage: (imageFile) {}),
+                                );
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.ios_share_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  )),
             ),
           );
         }
@@ -574,7 +681,12 @@ class Tiles {
       }
     }
 
-    return ListView.separated(
+    final messageMaxWidth = screenWidth > 800 ? 800.0 : screenWidth;
+
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(maxWidth: messageMaxWidth),
+        child: ListView.separated(
       controller: scrollController,
       padding: EdgeInsets.only(
           top: totalTopPadding, bottom: bottomPadding + (screenHeight * 0.01)),
@@ -620,6 +732,8 @@ class Tiles {
           modelService: modelService,
         );
       },
+        ),
+      ),
     );
   }
 }

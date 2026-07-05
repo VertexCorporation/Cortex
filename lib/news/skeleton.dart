@@ -46,10 +46,7 @@ class ShimmerNewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use the same screen-relative values as the real card for consistency.
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final double cardRadius = screenWidth * 0.06;
     final double basePadding = screenWidth * 0.04;
 
@@ -63,8 +60,8 @@ class ShimmerNewsCard extends StatelessWidget {
         child: Column(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(cardRadius - 1)),
+              borderRadius:
+                  BorderRadius.vertical(top: Radius.circular(cardRadius - 1)),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: Shimmer.fromColors(
@@ -100,16 +97,13 @@ class ShimmerNewsCard extends StatelessWidget {
   }
 
   /// A helper widget to build a single shimmering line with dynamic width and height.
-  Widget _buildShimmerLine(BuildContext context, double widthFactor,
-      double height) {
+  Widget _buildShimmerLine(
+      BuildContext context, double widthFactor, double height) {
     return Shimmer.fromColors(
       baseColor: AppColors.border,
       highlightColor: AppColors.background,
       child: Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width * widthFactor,
+        width: MediaQuery.of(context).size.width * widthFactor,
         height: height,
         decoration: BoxDecoration(
           color: Colors.white,

@@ -40,14 +40,14 @@ class ActionPanelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    
+
     // Tablet detection
     final bool isTablet = screenWidth > 600;
-    
+
     // Define a consistent container size for the icon to ensure all buttons have the same alignment.
     // Use fixed sizes for tablet to prevent buttons from being too large
     final double iconContainerSize = isTablet ? 22.0 : screenWidth * 0.05;
-    
+
     // Fixed padding and font sizes for tablet to ensure consistent, compact layout
     final double paddingV = isTablet ? 10.0 : screenWidth * 0.03;
     final double paddingH = isTablet ? 12.0 : screenWidth * 0.03;

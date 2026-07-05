@@ -36,7 +36,8 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
   @override
   void didUpdateWidget(covariant _InlineOptionsRow old) {
     super.didUpdateWidget(old);
-    if (old.message.isThinking && !widget.message.isThinking &&
+    if (old.message.isThinking &&
+        !widget.message.isThinking &&
         !widget.message.isError) {
       _animCtl.forward(from: 0.0);
     } else if (!old.message.isThinking && widget.message.isThinking) {
@@ -53,7 +54,8 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
   void _onCopyTapped() async {
     final localizations = AppLocalizations.of(context)!;
     final message = widget.message;
-    final bool isMediaOnly = message.hasAttachments && message.displayableText.trim().isEmpty;
+    final bool isMediaOnly =
+        message.hasAttachments && message.displayableText.trim().isEmpty;
 
     if (isMediaOnly) {
       try {
@@ -63,10 +65,10 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
           if (!mounted) return;
           Provider.of<IntrovertNotificationService>(context, listen: false)
               .showNotification(
-              message: localizations.messageCopied,
-              type: NotificationType.success,
-              bottomOffset: 0.07,
-              isChatMode: true);
+                  message: localizations.messageCopied,
+                  type: NotificationType.success,
+                  bottomOffset: 0.07,
+                  isChatMode: true);
         } else {
           _saveFirstMediaToGallery(message, localizations);
         }
@@ -77,17 +79,18 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
     }
 
     Clipboard.setData(ClipboardData(text: message.displayableText));
-    Provider
-        .of<IntrovertNotificationService>(context, listen: false)
+    Provider.of<IntrovertNotificationService>(context, listen: false)
         .showNotification(
-        message: localizations.messageCopied,
-        type: NotificationType.success,
-        bottomOffset: 0.07,
-        isChatMode: true);
+            message: localizations.messageCopied,
+            type: NotificationType.success,
+            bottomOffset: 0.07,
+            isChatMode: true);
   }
 
-  Future<void> _saveFirstMediaToGallery(Message message, AppLocalizations localizations) async {
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+  Future<void> _saveFirstMediaToGallery(
+      Message message, AppLocalizations localizations) async {
+    final notificationService =
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     try {
       final firstPath = message.attachmentPaths.first;
       final ext = firstPath.toLowerCase().split('.').last;
@@ -104,7 +107,8 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
         message: success == true
             ? localizations.downloadSuccess
             : localizations.downloadFailed,
-        type: success == true ? NotificationType.success : NotificationType.error,
+        type:
+            success == true ? NotificationType.success : NotificationType.error,
         bottomOffset: 0.07,
         isChatMode: true,
       );
@@ -117,7 +121,6 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
       );
     }
   }
-
 
   void _onChangeModelTapped() {
     showModelSelectionDialog(
@@ -160,11 +163,9 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
         iconAsset = 'assets/icons/voice.svg';
         onTap = () {
           final ttsService = TtsService();
-          final langCode = Localizations
-              .localeOf(context)
-              .languageCode;
-          ttsService.speak(
-              widget.message.displayableText, languageCode: langCode);
+          final langCode = Localizations.localeOf(context).languageCode;
+          ttsService.speak(widget.message.displayableText,
+              languageCode: langCode);
         };
         break;
       default:
@@ -185,10 +186,10 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
             child: InkWell(
               borderRadius: BorderRadius.circular(10 * s),
               onTap: onTap,
-              splashColor: AppColors.primaryColor.inverted.withValues(
-                  alpha: 0.1),
-              highlightColor: AppColors.primaryColor.inverted.withValues(
-                  alpha: 0.05),
+              splashColor:
+                  AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+              highlightColor:
+                  AppColors.primaryColor.inverted.withValues(alpha: 0.05),
               child: Padding(
                 padding: EdgeInsets.all(6.0 * s),
                 child: SvgPicture.asset(
@@ -214,19 +215,14 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
       return const SizedBox.shrink();
     }
 
-    final sessionProvider = context.watch<ChatSessionProvider>();
-    final conversationProvider = context.watch<ConversationProvider>();
-    final internetProvider = context.watch<InternetProvider>();
     final modelService = context.read<ModelService>();
-    final totalCredits = context
-        .watch<CreditsManager>()
-        .totalCreditsNotifier
-        .value ?? 0;
+    final creditsMgr = context.read<CreditsManager>();
+    final totalCredits = creditsMgr.totalCreditsNotifier.value ?? 0;
 
     final viewModel = OptionsPanelViewModel(
-      session: sessionProvider,
-      conversation: conversationProvider,
-      internet: internetProvider,
+      session: context.read<ChatSessionProvider>(),
+      conversation: context.read<ConversationProvider>(),
+      internet: context.read<InternetProvider>(),
       message: widget.message,
       modelService: modelService,
       totalCredits: totalCredits,
@@ -244,8 +240,8 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
       curve: Curves.easeOutCubic,
       alignment: Alignment.topCenter,
       child: Padding(
-        padding: EdgeInsets.only(
-            top: 10.0 * widget.scale, left: 2.0 * widget.scale),
+        padding:
+            EdgeInsets.only(top: 10.0 * widget.scale, left: 2.0 * widget.scale),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: List.generate(_visibleOptions.length, (index) {

@@ -1,6 +1,7 @@
 // lib/webview.dart
 
-import 'dart:math' as math; // Used for the PI constant for rotation calculations.
+import 'dart:math'
+    as math; // Used for the PI constant for rotation calculations.
 import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart'; // Provides access to the app's color scheme.
 import 'package:flutter/foundation.dart'; // Provides kDebugMode for conditional logging.
@@ -18,8 +19,8 @@ import 'package:webview_flutter/webview_flutter.dart'; // The core WebView widge
 final Map<String, WebViewController> _controllerCache = {};
 
 /// Displays a responsive, cached WebView within a modal bottom sheet.
-Future<void> showAppWebViewModal(BuildContext context, String title,
-    String url) async {
+Future<void> showAppWebViewModal(
+    BuildContext context, String title, String url) async {
   if (kDebugMode) {
     print('[AppWebView] Showing modal for: "$title" at $url');
   }
@@ -66,8 +67,7 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    )
-      ..repeat(reverse: true);
+    )..repeat(reverse: true);
     _animation =
         CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
 
@@ -87,8 +87,7 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
     } else {
       if (kDebugMode) {
         print(
-            '[WebViewModalContent] No cached controller found. Creating new one for ${widget
-                .url}');
+            '[WebViewModalContent] No cached controller found. Creating new one for ${widget.url}');
       }
       // If not cached, create a new controller.
       final WebViewController controller = WebViewController()
@@ -99,8 +98,7 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
             onPageFinished: (String url) {
               if (kDebugMode) {
                 print(
-                    '[WebViewModalContent] Page finished loading. Caching controller for ${widget
-                        .url}');
+                    '[WebViewModalContent] Page finished loading. Caching controller for ${widget.url}');
               }
               // Once the page successfully loads, add the controller to the cache.
               _controllerCache[widget.url] = _controller;
@@ -110,8 +108,8 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
             },
             onWebResourceError: (WebResourceError error) {
               if (kDebugMode) {
-                print('[WebViewModalContent] WebResourceError: ${error
-                    .description}');
+                print(
+                    '[WebViewModalContent] WebResourceError: ${error.description}');
               }
               if (mounted) {
                 setState(() {
@@ -158,10 +156,7 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
 
     return Container(
       width: double.infinity,
-      height: MediaQuery
-          .of(context)
-          .size
-          .height * 0.85,
+      height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -187,10 +182,12 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                         width: 22,
                       ),
                     ),
-                    onPressed: _canGoBack ? () {
-                      _controller.goBack();
-                      _updateNavigationState();
-                    } : null,
+                    onPressed: _canGoBack
+                        ? () {
+                            _controller.goBack();
+                            _updateNavigationState();
+                          }
+                        : null,
                   ),
                 ),
                 Expanded(
@@ -207,15 +204,16 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                 ),
                 IconButton(
                   icon: Icon(Icons.close,
-                      color: AppColors.primaryColor.inverted.withValues(
-                          alpha: 0.7),
+                      color: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.7),
                       size: 26),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
           ),
-          Divider(height: 1,
+          Divider(
+              height: 1,
               thickness: 1,
               color: AppColors.quinaryColor.withValues(alpha: 0.2)),
 
@@ -230,8 +228,8 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                     WebViewWidget(
                       controller: _controller,
                       gestureRecognizers: {
-                        Factory<VerticalDragGestureRecognizer>(() =>
-                            VerticalDragGestureRecognizer()),
+                        Factory<VerticalDragGestureRecognizer>(
+                            () => VerticalDragGestureRecognizer()),
                       },
                     ),
                   if (_isLoading && !_hasError)
@@ -261,15 +259,14 @@ class _TriangleLoadingIndicator extends StatelessWidget {
     return Center(
       child: AnimatedBuilder(
         animation: animation,
-        builder: (context, child) =>
-            CustomPaint(
-              size: const Size(60, 60),
-              painter: _TrianglePainter(
-                progress: animation.value,
-                color: AppColors.primaryColor.inverted,
-                strokeWidth: 3.5,
-              ),
-            ),
+        builder: (context, child) => CustomPaint(
+          size: const Size(60, 60),
+          painter: _TrianglePainter(
+            progress: animation.value,
+            color: AppColors.primaryColor.inverted,
+            strokeWidth: 3.5,
+          ),
+        ),
       ),
     );
   }
@@ -292,9 +289,8 @@ class _ErrorDisplay extends StatelessWidget {
           // A gentle pulsing animation for the error icon.
           ScaleTransition(
             scale: animation,
-            child: Icon(
-                Icons.error_rounded, color: AppColors.septenaryColor,
-                size: 70),
+            child: Icon(Icons.error_rounded,
+                color: AppColors.septenaryColor, size: 70),
           ),
           const SizedBox(height: 24),
           Text(

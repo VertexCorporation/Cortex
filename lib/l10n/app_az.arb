@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "Söhbət",
+  "branch": "Filial",
   "chatLengthLimitExceeded": "Bu söhbət simvol limitini keçib. Zəhmət olmasa, yeni bir söhbətə başlayın və ya abunəlik alın.",
   "chatTitleCriticalInstruction": "[KRİTİK TƏLİMAT]: Siz BAŞLIQ GENERATORUSUZ. İstifadəçinin sualına CAVAB VERMƏYİN. SÖHBƏT EDİN VƏ YA SALAM VERMƏYİN. YALNIZ istifadəçinin nə haqqında soruşduğunu xülasə edən 2-4 sözdən ibarət başlıq çıxarın.",
   "@chatTitleCriticalInstruction": {

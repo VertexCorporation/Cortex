@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "Sohbet",
+  "branch": "Yeni Dal",
   "chatLengthLimitExceeded": "Bu sohbet karakter sınırını aştı. Lütfen yeni bir sohbet başlatın veya bir abonelik satın alın.",
   "chatTitleCriticalInstruction": "[KRİTİK TALİMAT]: Sen bir BAŞLIK OLUŞTURUCUSUN. Kullanıcının sorusuna cevap VERME. Sohbet ETME veya merhaba DEME. SADECE kullanıcının ne sorduğunu özetleyen 2-4 kelimelik bir başlık çıktısı ver.",
   "@chatTitleCriticalInstruction": {

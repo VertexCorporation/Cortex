@@ -9,6 +9,25 @@ import 'package:cortex/chat/messages/codeblocks.dart';
 import 'inline.dart';
 import 'utils.dart';
 
+final _thinkingClean = RegExp(
+  r'(^<think>\s*)|(\s*</think>$)|</?think>|'
+  r'(?:^|[\r\n]+)[ \t]*>?\s*\*Thinking\.\.\.\*[\r\n]*>?[ \t]?|'
+  r'(?<=^|\n)>\s?|'
+  r'^[*]*Thinking[.*]*\s*|'
+  r'\*?Thinking\.\.\.\*?',
+  caseSensitive: false,
+);
+final _excessNewlines = RegExp(r'\n{3,}');
+final _singleNewline = RegExp(r'(?<!\n)\n(?!\n)');
+final _excessSpaces = RegExp(r' {2,}');
+final _blockquotePrefix = RegExp(r'^\s*>\s?');
+final _widgetPattern =
+    RegExp(r'<<<WIDGET:([a-zA-Z0-9_]+)>>>([\s\S]*?)<<<END>>>', multiLine: true);
+final _codeBlockPattern =
+    RegExp(r'^(```+)([^\r\n]*)\r?\n([\s\S]*?)\r?\n^\1$', multiLine: true);
+final _orderedHeadingPattern =
+    RegExp(r'^\s*(\d+)[.)]\s+(\*\*|__)([^\r\n]+?)\2\s*$');
+
 InlineSpan processBlockMatch(BuildContext context, MatchRange match,
     Map<String, RegExp> inlinePatterns, double fs,
     {bool isFinished = false,
@@ -25,23 +44,10 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
         final bool hasCloseTag = matchText.contains('</think>');
         final bool isThinkingFinished = hasCloseTag || isFinished;
 
-        content =
-            content.replaceAll(RegExp(r'(^<think>\s*)|(\s*</think>$)'), '');
-        content =
-            content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
-        content = content.replaceAll(
-            RegExp(r'(?:^|[\r\n]+)[ \t]*>?\s*\*Thinking\.\.\.\*[\r\n]*>?[ \t]?',
-                caseSensitive: false),
-            '');
-        content = content.replaceAll(RegExp(r'(?<=^|\n)>\s?'), '');
-        content = content.replaceAll(
-            RegExp(r'^[*]*Thinking[.*]*\s*', caseSensitive: false), '');
-        content = content.replaceAll(
-            RegExp(r'\*?Thinking\.\.\.\*?', caseSensitive: false), '');
-
-        content = content.replaceAll(RegExp(r'\n{3,}'), '\n\n');
-        content = content.replaceAll(RegExp(r'(?<!\n)\n(?!\n)'), ' ');
-        content = content.replaceAll(RegExp(r' {2,}'), ' ');
+        content = content.replaceAll(_thinkingClean, '');
+        content = content.replaceAll(_excessNewlines, '\n\n');
+        content = content.replaceAll(_singleNewline, ' ');
+        content = content.replaceAll(_excessSpaces, ' ');
         content = content.trim();
 
         const widgetKey = ValueKey('thinking_block_main');
@@ -73,7 +79,7 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
         final content = matchText
             .trimRight()
             .split('\n')
-            .map((line) => line.replaceFirst(RegExp(r'^\s*>\s?'), ''))
+            .map((line) => line.replaceFirst(_blockquotePrefix, ''))
             .join('\n')
             .trim();
 
@@ -118,10 +124,7 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
         );
       case 'widget':
         try {
-          final widgetMatch = RegExp(
-                  r'<<<WIDGET:([a-zA-Z0-9_]+)>>>([\s\S]*?)<<<END>>>',
-                  multiLine: true)
-              .firstMatch(matchText);
+          final widgetMatch = _widgetPattern.firstMatch(matchText);
           if (widgetMatch != null) {
             final type = widgetMatch.group(1)!;
             final jsonStr = widgetMatch.group(2)!;
@@ -145,9 +148,7 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
       case 'legacyUsing':
         return const WidgetSpan(child: SizedBox.shrink());
       case 'codeBlock':
-        final codeMatch = RegExp(r'^(```+)([^\r\n]*)\r?\n([\s\S]*?)\r?\n^\1$',
-                multiLine: true)
-            .firstMatch(matchText);
+        final codeMatch = _codeBlockPattern.firstMatch(matchText);
         if (codeMatch != null) {
           final language = codeMatch.group(2)?.trim() ?? '';
           final content = codeMatch.group(3)?.trim() ?? '';
@@ -242,7 +243,7 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
         // Each column gets an equal share of the available space.
         // If there are too many columns (>6), fall back to horizontal scroll
         // with a minimum per-column width for readability.
-                return WidgetSpan(
+        return WidgetSpan(
             child: Padding(
                 padding: const EdgeInsets.only(top: 2, bottom: 16),
                 child: LayoutBuilder(
@@ -284,8 +285,7 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
                 )));
       case 'orderedBoldHeading':
         final orderedHeadingMatch =
-            RegExp(r'^\s*(\d+)[.)]\s+(\*\*|__)([^\r\n]+?)\2\s*$')
-                .firstMatch(matchText.trimRight());
+            _orderedHeadingPattern.firstMatch(matchText.trimRight());
         if (orderedHeadingMatch != null) {
           final number = orderedHeadingMatch.group(1)!;
           final content = orderedHeadingMatch.group(3)!.trim();

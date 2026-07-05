@@ -21,10 +21,7 @@ void showGuestLimitSheet(BuildContext context, AppLocalizations localizations) {
     enableDrag: true,
     useSafeArea: false,
     constraints: BoxConstraints(
-      maxWidth: MediaQuery
-          .of(context)
-          .size
-          .width,
+      maxWidth: MediaQuery.of(context).size.width,
     ),
     builder: (BuildContext modalContext) {
       return ScaledBottomSheet(
@@ -72,7 +69,6 @@ class _GuestLimitSheetContentState extends State<_GuestLimitSheetContent>
 
   @override
   Widget build(BuildContext context) {
-    
     final sw = MediaQuery.sizeOf(context).width;
 
     // Scaling logic similar to AuthScreen

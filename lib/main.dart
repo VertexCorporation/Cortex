@@ -37,6 +37,7 @@ import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'axon/inbox/logic/general.dart';
 import 'arts/provider.dart';
+import 'roleplay/provider.dart';
 
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
@@ -87,7 +88,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 @pragma('vm:entry-point')
 void downloadCallback(String id, int status, int progress) {
   final SendPort? sendPort =
-  IsolateNameServer.lookupPortByName('downloader_send_port');
+      IsolateNameServer.lookupPortByName('downloader_send_port');
   sendPort?.send(<dynamic>[id, status, progress]);
 }
 
@@ -132,8 +133,7 @@ class BootstrapResult {
 /// - Orientation lock
 class AppBootstrap {
   static Future<BootstrapResult> init() async {
-    final stopwatch = Stopwatch()
-      ..start();
+    final stopwatch = Stopwatch()..start();
 
     // 1. Initialize Firebase, FlutterDownloader, and SharedPreferences concurrently.
     // This significantly reduces cold start time by not waiting sequentially.
@@ -162,15 +162,15 @@ class AppBootstrap {
       debugPrint("[AppBootstrap] Initialization warning: $e");
     }
 
-  if (prefs == null) {
-    try {
-      prefs = await SharedPreferences.getInstance();
-    } catch (e) {
-      debugPrint("[AppBootstrap] SharedPreferences fallback failed: $e");
-      rethrow;
+    if (prefs == null) {
+      try {
+        prefs = await SharedPreferences.getInstance();
+      } catch (e) {
+        debugPrint("[AppBootstrap] SharedPreferences fallback failed: $e");
+        rethrow;
+      }
     }
-  }
-  final SharedPreferences activePrefs = prefs!;
+    final SharedPreferences activePrefs = prefs!;
 
     // 2. Wire Crashlytics.
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -244,20 +244,20 @@ class AppBootstrap {
     // FIX: Filter out internal/system IDs (like 'trash') that should never be
     // loaded as an initial session model. Fall back to cortex/auto instead.
     const invalidModelIds = {'trash', 'recycle', 'delete', 'bin'};
-    final String savedModelId = activePrefs.getString('cortex') ?? 'cortex/auto';
-    final String initialModelId = invalidModelIds.contains(savedModelId)
-        ? 'cortex/auto'
-        : savedModelId;
+    final String savedModelId =
+        activePrefs.getString('cortex') ?? 'cortex/auto';
+    final String initialModelId =
+        invalidModelIds.contains(savedModelId) ? 'cortex/auto' : savedModelId;
     final String initialModelTitle = invalidModelIds.contains(savedModelId)
         ? ''
         : (activePrefs.getString('cortex_title') ?? '');
 
     // 8. Preload User Data for synchronous startup (Fixes Guest flash)
-    final String? initialUserDataJson = activePrefs.getString('cached_user_data');
+    final String? initialUserDataJson =
+        activePrefs.getString('cached_user_data');
 
     debugPrint(
-        "[AppBootstrap] Finished in ${stopwatch
-            .elapsedMilliseconds}ms. Status: $initialStatus");
+        "[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus");
     stopwatch.stop();
 
     return BootstrapResult(
@@ -280,7 +280,7 @@ class AppBootstrap {
 /// - Boots the [AppGatekeeper], which does the heavy lifting via a FutureBuilder.
 void main() async {
   final WidgetsBinding widgetsBinding =
-  WidgetsFlutterBinding.ensureInitialized();
+      WidgetsFlutterBinding.ensureInitialized();
 
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -356,10 +356,12 @@ class AppGatekeeper extends StatelessWidget {
 
 /// Core app-wide providers: networking, localization, connectivity, auth,
 /// models, initialization, notifications, theming, and storage helpers.
-List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
-    String initialTheme,
-    String? initialLanguageCode,
-    String? initialUserDataJson,) {
+List<SingleChildWidget> _buildCoreProviders(
+  AppStatus initialStatus,
+  String initialTheme,
+  String? initialLanguageCode,
+  String? initialUserDataJson,
+) {
   return <SingleChildWidget>[
     // Global Dio instance with Smart Retry.
     Provider<Dio>(
@@ -427,11 +429,10 @@ List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
       create: (_) => AuthService(),
     ),
     Provider<ExtrovertNotificationService>(
-      create: (_) =>
-          ExtrovertNotificationService(
-            navigatorKey: navigatorKey,
-            mainScreenKey: mainScreenKey,
-          ),
+      create: (_) => ExtrovertNotificationService(
+        navigatorKey: navigatorKey,
+        mainScreenKey: mainScreenKey,
+      ),
     ),
     Provider<IntrovertNotificationService>(
       create: (_) => IntrovertNotificationService(navigatorKey: navigatorKey),
@@ -439,50 +440,46 @@ List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
 
     // Model repository + service.
     Provider<ModelRepository>(
-      create: (BuildContext context) =>
-          ModelRepository(
-            dio: context.read<Dio>(),
-          ),
+      create: (BuildContext context) => ModelRepository(
+        dio: context.read<Dio>(),
+      ),
     ),
     ChangeNotifierProvider<ModelService>(
-      create: (BuildContext context) =>
-          ModelService(
-            repository: context.read<ModelRepository>(),
-          ),
+      create: (BuildContext context) => ModelService(
+        repository: context.read<ModelRepository>(),
+      ),
     ),
 
     // App initializer orchestrates startup + auth + lifecycle gatekeeping.
     ChangeNotifierProvider<AppInitializer>(
-      create: (BuildContext context) =>
-          AppInitializer(
-            initialStatus: initialStatus,
-            authService: context.read<AuthService>(),
-            modelService: context.read<ModelService>(),
-            extrovertNotificationService:
+      create: (BuildContext context) => AppInitializer(
+        initialStatus: initialStatus,
+        authService: context.read<AuthService>(),
+        modelService: context.read<ModelService>(),
+        extrovertNotificationService:
             context.read<ExtrovertNotificationService>(),
-            introvertNotificationService:
+        introvertNotificationService:
             context.read<IntrovertNotificationService>(),
-            internetProvider: context.read<InternetProvider>(),
-            userProvider: context.read<UserProvider>(),
-          ),
+        internetProvider: context.read<InternetProvider>(),
+        userProvider: context.read<UserProvider>(),
+      ),
     ),
 
     // News service depends on AppInitializer + Dio + connectivity.
-    ChangeNotifierProxyProvider3<AppInitializer,
-        Dio,
-        InternetProvider,
+    ChangeNotifierProxyProvider3<AppInitializer, Dio, InternetProvider,
         NewsService>(
-      create: (BuildContext context) =>
-          NewsService(
-            appInitializer: context.read<AppInitializer>(),
-            dio: context.read<Dio>(),
-            internetProvider: context.read<InternetProvider>(),
-          ),
-      update: (BuildContext _,
-          AppInitializer appInit,
-          Dio dio,
-          InternetProvider internet,
-          NewsService? previous,) {
+      create: (BuildContext context) => NewsService(
+        appInitializer: context.read<AppInitializer>(),
+        dio: context.read<Dio>(),
+        internetProvider: context.read<InternetProvider>(),
+      ),
+      update: (
+        BuildContext _,
+        AppInitializer appInit,
+        Dio dio,
+        InternetProvider internet,
+        NewsService? previous,
+      ) {
         final service = previous ??
             NewsService(
               appInitializer: appInit,
@@ -514,9 +511,11 @@ List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
 
     ChangeNotifierProxyProvider<IntrovertNotificationService, FundsBackend>(
       create: (BuildContext context) => FundsBackend(),
-      update: (BuildContext context,
-          IntrovertNotificationService notificationService,
-          FundsBackend? previous,) {
+      update: (
+        BuildContext context,
+        IntrovertNotificationService notificationService,
+        FundsBackend? previous,
+      ) {
         final backend = previous ?? FundsBackend();
         backend.setNotificationService(notificationService);
         return backend;
@@ -531,20 +530,20 @@ List<SingleChildWidget> _buildSettingsProviders() {
     Provider<ProfileService>(
       create: (_) => ProfileService(),
     ),
-    ChangeNotifierProxyProvider2<InternetProvider,
-        UserProvider,
+    ChangeNotifierProxyProvider2<InternetProvider, UserProvider,
         SettingsGeneralProvider>(
-      create: (BuildContext context) =>
-          SettingsGeneralProvider(
-            authService: context.read<AuthService>(),
-            profileService: context.read<ProfileService>(),
-            notificationService: context.read<IntrovertNotificationService>(),
-            userProvider: context.read<UserProvider>(),
-          ),
-      update: (BuildContext context,
-          InternetProvider internetProvider,
-          UserProvider userProvider,
-          SettingsGeneralProvider? previous,) {
+      create: (BuildContext context) => SettingsGeneralProvider(
+        authService: context.read<AuthService>(),
+        profileService: context.read<ProfileService>(),
+        notificationService: context.read<IntrovertNotificationService>(),
+        userProvider: context.read<UserProvider>(),
+      ),
+      update: (
+        BuildContext context,
+        InternetProvider internetProvider,
+        UserProvider userProvider,
+        SettingsGeneralProvider? previous,
+      ) {
         final provider = previous ??
             SettingsGeneralProvider(
               authService: context.read<AuthService>(),
@@ -558,14 +557,13 @@ List<SingleChildWidget> _buildSettingsProviders() {
       },
     ),
     ChangeNotifierProvider<SettingsActionProvider>(
-      create: (BuildContext context) =>
-          SettingsActionProvider(
-            authService: context.read<AuthService>(),
-            profileService: context.read<ProfileService>(),
-            notificationService: context.read<IntrovertNotificationService>(),
-            appInitializer: context.read<AppInitializer>(),
-            internetProvider: context.read<InternetProvider>(),
-          ),
+      create: (BuildContext context) => SettingsActionProvider(
+        authService: context.read<AuthService>(),
+        profileService: context.read<ProfileService>(),
+        notificationService: context.read<IntrovertNotificationService>(),
+        appInitializer: context.read<AppInitializer>(),
+        internetProvider: context.read<InternetProvider>(),
+      ),
     ),
   ];
 }
@@ -586,10 +584,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
           notificationService: context.read<IntrovertNotificationService>(),
         );
 
-        final langCode = context
-            .read<LocaleProvider>()
-            .locale
-            .languageCode;
+        final langCode = context.read<LocaleProvider>().locale.languageCode;
         scheduleMicrotask(() => vm.initialize(langCode));
 
         return vm;
@@ -604,6 +599,9 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ChangeNotifierProvider<ArtsProvider>(
       create: (_) => ArtsProvider(),
     ),
+    ChangeNotifierProvider<RoleplayProvider>(
+      create: (_) => RoleplayProvider(),
+    ),
 
     ChangeNotifierProxyProvider<ModelCatalogProvider, ModelLocalStateProvider>(
       create: (BuildContext context) {
@@ -611,9 +609,11 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
         provider.initialize(context: context);
         return provider;
       },
-      update: (BuildContext context,
-          ModelCatalogProvider catalog,
-          ModelLocalStateProvider? local,) {
+      update: (
+        BuildContext context,
+        ModelCatalogProvider catalog,
+        ModelLocalStateProvider? local,
+      ) {
         final localState = local ?? ModelLocalStateProvider();
         localState.update(catalog.allModels);
         return localState;
@@ -621,26 +621,24 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ),
 
     // Chat session.
-    ChangeNotifierProxyProvider4<UserProvider,
-        ModelService,
-        ModelLocalStateProvider,
-        LocaleProvider,
-        ChatSessionProvider>(
-      create: (BuildContext context) =>
-          ChatSessionProvider(
-            modelService: context.read<ModelService>(),
-            initialModelId: initialModelId,
-            initialModelTitle: initialModelTitle,
-            initialLocale: initialLanguageCode != null
-                ? Locale(initialLanguageCode)
-                : const Locale('en'),
-          ),
-      update: (BuildContext _,
-          UserProvider user,
-          ModelService modelService,
-          ModelLocalStateProvider local,
-          LocaleProvider localeProvider,
-          ChatSessionProvider? previous,) {
+    ChangeNotifierProxyProvider4<UserProvider, ModelService,
+        ModelLocalStateProvider, LocaleProvider, ChatSessionProvider>(
+      create: (BuildContext context) => ChatSessionProvider(
+        modelService: context.read<ModelService>(),
+        initialModelId: initialModelId,
+        initialModelTitle: initialModelTitle,
+        initialLocale: initialLanguageCode != null
+            ? Locale(initialLanguageCode)
+            : const Locale('en'),
+      ),
+      update: (
+        BuildContext _,
+        UserProvider user,
+        ModelService modelService,
+        ModelLocalStateProvider local,
+        LocaleProvider localeProvider,
+        ChatSessionProvider? previous,
+      ) {
         // Note: We don't re-pass initialModelId on update because the session preserves state itself.
         final session = previous ??
             ChatSessionProvider(
@@ -684,37 +682,31 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ),
 
     Provider<ResponseService>(
-      create: (BuildContext context) =>
-          ResponseService(
-            conversationProvider: context.read<ConversationProvider>(),
-            scrollService: context.read<ScrollService>(),
-          ),
+      create: (BuildContext context) => ResponseService(
+        conversationProvider: context.read<ConversationProvider>(),
+        scrollService: context.read<ScrollService>(),
+      ),
     ),
     Provider<ContextService>(
-      create: (BuildContext context) =>
-          ContextService(
-            sessionProvider: context.read<ChatSessionProvider>(),
-            conversationProvider: context.read<ConversationProvider>(),
-            modelService: context.read<ModelService>(),
-          ),
+      create: (BuildContext context) => ContextService(
+        sessionProvider: context.read<ChatSessionProvider>(),
+        conversationProvider: context.read<ConversationProvider>(),
+        modelService: context.read<ModelService>(),
+      ),
     ),
     Provider<OfflineService>(
-      create: (BuildContext context) =>
-          OfflineService(
-            responseService: context.read<ResponseService>(),
-            sessionProvider: context.read<ChatSessionProvider>(),
-            modelService: context.read<ModelService>(),
-            contextService: context.read<ContextService>(),
-          ),
+      create: (BuildContext context) => OfflineService(
+        responseService: context.read<ResponseService>(),
+        sessionProvider: context.read<ChatSessionProvider>(),
+        modelService: context.read<ModelService>(),
+        contextService: context.read<ContextService>(),
+      ),
     ),
-    ProxyProvider4<ChatSessionProvider,
-        ConversationProvider,
-        ModelService,
-        ModelLocalStateProvider,
-        SelectionService>(
+    ProxyProvider4<ChatSessionProvider, ConversationProvider, ModelService,
+        ModelLocalStateProvider, SelectionService>(
       update: (BuildContext context, session, conversation, modelService,
-          localState, previous) =>
-      previous ??
+              localState, previous) =>
+          previous ??
           SelectionService(
             sessionProvider: session,
             conversationProvider: conversation,
@@ -723,13 +715,12 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
           ),
     ),
     Provider<ReadService>(
-      create: (BuildContext context) =>
-          ReadService(
-            sessionProvider: context.read<ChatSessionProvider>(),
-            conversationProvider: context.read<ConversationProvider>(),
-            modelService: context.read<ModelService>(),
-            backgroundTaskService: context.read<BackgroundTaskService>(),
-          ),
+      create: (BuildContext context) => ReadService(
+        sessionProvider: context.read<ChatSessionProvider>(),
+        conversationProvider: context.read<ConversationProvider>(),
+        modelService: context.read<ModelService>(),
+        backgroundTaskService: context.read<BackgroundTaskService>(),
+      ),
     ),
     // Speech and Voice services (Must be before SendService)
     ChangeNotifierProvider<SpeechService>(
@@ -739,43 +730,40 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
       create: (context) =>
           VoiceService(speechService: context.read<SpeechService>()),
       update: (context, speech, previous) =>
-      previous ?? VoiceService(speechService: speech),
+          previous ?? VoiceService(speechService: speech),
     ),
 
     Provider<SendService>(
-      create: (BuildContext context) =>
-          SendService(
-            sessionProvider: context.read<ChatSessionProvider>(),
-            conversationProvider: context.read<ConversationProvider>(),
-            inputProvider: context.read<InputProvider>(),
-            apiService: context.read<ApiService>(),
-            contextService: context.read<ContextService>(),
-            scrollService: context.read<ScrollService>(),
-            offlineService: context.read<OfflineService>(),
-            modelService: context.read<ModelService>(),
-            voiceService: context.read<VoiceService>(),
-            userMemoryProvider: context.read<UserMemoryProvider>(),
-            backgroundTaskService: context.read<BackgroundTaskService>(),
-          ),
+      create: (BuildContext context) => SendService(
+        sessionProvider: context.read<ChatSessionProvider>(),
+        conversationProvider: context.read<ConversationProvider>(),
+        inputProvider: context.read<InputProvider>(),
+        apiService: context.read<ApiService>(),
+        contextService: context.read<ContextService>(),
+        scrollService: context.read<ScrollService>(),
+        offlineService: context.read<OfflineService>(),
+        modelService: context.read<ModelService>(),
+        voiceService: context.read<VoiceService>(),
+        userMemoryProvider: context.read<UserMemoryProvider>(),
+        backgroundTaskService: context.read<BackgroundTaskService>(),
+      ),
     ),
     Provider<StopService>(
-      create: (BuildContext context) =>
-          StopService(
-            conversationProvider: context.read<ConversationProvider>(),
-            sessionProvider: context.read<ChatSessionProvider>(),
-            apiService: context.read<ApiService>(),
-            offlineService: context.read<OfflineService>(),
-            modelService: context.read<ModelService>(),
-          ),
+      create: (BuildContext context) => StopService(
+        conversationProvider: context.read<ConversationProvider>(),
+        sessionProvider: context.read<ChatSessionProvider>(),
+        apiService: context.read<ApiService>(),
+        offlineService: context.read<OfflineService>(),
+        modelService: context.read<ModelService>(),
+      ),
     ),
     Provider<RegenerateService>(
-      create: (BuildContext context) =>
-          RegenerateService(
-            conversationProvider: context.read<ConversationProvider>(),
-            stopService: context.read<StopService>(),
-            sendService: context.read<SendService>(),
-            scrollService: context.read<ScrollService>(),
-          ),
+      create: (BuildContext context) => RegenerateService(
+        conversationProvider: context.read<ConversationProvider>(),
+        stopService: context.read<StopService>(),
+        sendService: context.read<SendService>(),
+        scrollService: context.read<ScrollService>(),
+      ),
     ),
   ];
 }

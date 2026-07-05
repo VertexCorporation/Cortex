@@ -1,5 +1,6 @@
 // lib/chat/providers/input.dart
 
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -58,6 +59,7 @@ class InputProvider with ChangeNotifier {
   // --- Voice & Features ---
   bool _isVoiceRecording = false;
   bool _isVoiceModeActive = false;
+  StreamSubscription? _authSub;
   ChatInputMode _featureMode = ChatInputMode.none;
 
   // --- Web Search ---
@@ -72,7 +74,7 @@ class InputProvider with ChangeNotifier {
 
   InputProvider() {
     try {
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      _authSub = FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           resetForLogout();
         }
@@ -80,6 +82,12 @@ class InputProvider with ChangeNotifier {
     } catch (_) {
       // Ignore during testing
     }
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
   }
 
   // ===========================================================================
@@ -286,7 +294,7 @@ class InputProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Strictly resets everything including the global draft for a complete sign-out, 
+  /// Strictly resets everything including the global draft for a complete sign-out,
   /// ensuring no drafts leak into another user's account.
   void resetForLogout() {
     _globalDraft = '';
@@ -299,7 +307,7 @@ class InputProvider with ChangeNotifier {
     resetInputState();
   }
 
-  /// Clears text, draft, and attachments after a send, but PERSISTS feature toggles 
+  /// Clears text, draft, and attachments after a send, but PERSISTS feature toggles
   /// (e.g. Web Search, Reasoning) so the user doesn't have to re-enable them per message.
   void clearAfterSend() {
     _globalDraft = '';

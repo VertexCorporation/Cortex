@@ -16,6 +16,7 @@ class Axon extends StatefulWidget {
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
   final VoidCallback onNewsTap;
+  final VoidCallback onRoleplayTap;
   final VoidCallback onCloseAxon;
   final VoidCallback onOpenAxon;
   final double referenceWidth;
@@ -28,6 +29,7 @@ class Axon extends StatefulWidget {
     required this.onLibraryTap,
     required this.onCreateAITap,
     required this.onArtsTap,
+    required this.onRoleplayTap,
     required this.onNewsTap,
     required this.onCloseAxon,
     required this.onOpenAxon,
@@ -105,10 +107,7 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
   void _handleSettingsTap() async {
     ActionPanelController.closeCurrent(); // Close context menu
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     // For Desktop sizes, open Settings in a centered dialog.
     if (screenWidth >= 800) {
@@ -128,10 +127,7 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: 680,
-                maxHeight: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.9,
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
               ),
               child: const SettingsScreen(),
             ),
@@ -175,13 +171,13 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
           onLibraryTap: widget.onLibraryTap,
           onCreateAITap: widget.onCreateAITap,
           onArtsTap: widget.onArtsTap,
+          onRoleplayTap: widget.onRoleplayTap,
           onNewsTap: widget.onNewsTap,
           onSettingsTap: _handleSettingsTap,
           onSearchChanged: _handleSearchQueryChanged,
           onExitSearchTap: _handleExitSearchMode,
           onCloseAxon: widget.onCloseAxon,
           activeTab: widget.activeTab,
-
         ),
       ),
     );

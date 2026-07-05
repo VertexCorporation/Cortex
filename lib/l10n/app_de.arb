@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "Chat",
+  "branch": "Zweig",
   "chatLengthLimitExceeded": "Dieser Chat hat das Zeichenlimit überschritten. Bitte starte einen neuen Chat oder kaufe ein Abonnement.",
   "chatTitleCriticalInstruction": "[KRITISCHE ANWEISUNG]: Sie sind ein Titelgenerator. Beantworten Sie NICHT die Frage des Nutzers. Führen Sie KEINEN Chat und begrüßen Sie ihn nicht. Geben Sie AUSSCHLIESSLICH einen Titel mit 2–4 Wörtern aus, der die Frage des Nutzers zusammenfasst.",
   "@chatTitleCriticalInstruction": {

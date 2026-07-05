@@ -80,7 +80,6 @@ class UserMessageTileState extends State<UserMessageTile>
 
   @override
   Widget build(BuildContext context) {
-
     final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isDesktop = screenWidth >= 800;
     final scale = isDesktop ? 1.0 : (screenWidth / 400).clamp(0.8, 1.2);

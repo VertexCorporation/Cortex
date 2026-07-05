@@ -3,7 +3,6 @@ part of 'service.dart';
 extension FundsVerification on FundsBackend {
   Future<void> _verifyAndCompletePurchase(
       PurchaseDetails purchaseDetails) async {
-
     String? verificationData;
 
     if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -13,7 +12,7 @@ extension FundsVerification on FundsBackend {
         log('iOS receipt is NULL. Cannot verify.', name: FundsBackend._logName);
         _notificationService.showNotification(
           message:
-          "Receipt missing. Please restart app or try Restore Purchases.",
+              "Receipt missing. Please restart app or try Restore Purchases.",
           type: NotificationType.error,
           oneLine: false,
         );
@@ -22,9 +21,9 @@ extension FundsVerification on FundsBackend {
       }
     } else {
       final server =
-      purchaseDetails.verificationData.serverVerificationData.trim();
+          purchaseDetails.verificationData.serverVerificationData.trim();
       final local =
-      purchaseDetails.verificationData.localVerificationData.trim();
+          purchaseDetails.verificationData.localVerificationData.trim();
 
       verificationData = !_isPlaceholderReceipt(server)
           ? server
@@ -32,9 +31,7 @@ extension FundsVerification on FundsBackend {
     }
 
     if (verificationData == null ||
-        verificationData
-            .trim()
-            .isEmpty ||
+        verificationData.trim().isEmpty ||
         verificationData.trim() == "{}" ||
         verificationData.trim() == "[]") {
       log('Invalid verification data for ${purchaseDetails.productID}',
@@ -127,7 +124,8 @@ extension FundsVerification on FundsBackend {
           reason: 'Server returned HttpsError for ${purchaseDetails.productID}',
           fatal: false);
     } catch (e, stack) {
-      log('Unexpected client verification error: $e', name: FundsBackend._logName);
+      log('Unexpected client verification error: $e',
+          name: FundsBackend._logName);
       _notificationService.showNotification(
         message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
         type: NotificationType.error,

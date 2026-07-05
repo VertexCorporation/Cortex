@@ -34,7 +34,7 @@ class ThemeProvider extends ChangeNotifier {
         systemNavigationBarDividerColor: Colors.transparent,
         statusBarColor: Colors.transparent,
         systemNavigationBarIconBrightness:
-        themeColors.navigationBarIconBrightness,
+            themeColors.navigationBarIconBrightness,
         statusBarIconBrightness: themeColors.statusBarIconBrightness,
       ),
     );
@@ -77,9 +77,9 @@ class ThemeColors {
 
 class AppColors {
   static String _currentTheme = 'light';
-  
+
   static String get currentTheme => _currentTheme;
-  
+
   static set currentTheme(String value) {
     _currentTheme = value;
     _cachedColors = _themeDefinitions[value] ?? _themeDefinitions['light']!;
@@ -322,8 +322,7 @@ class AppColors {
   static Color get premium => _cachedColors.premium;
 
   static Map<String, Map<String, dynamic>> get overlayStyles {
-    return _themeDefinitions.map((key, value) =>
-        MapEntry(
+    return _themeDefinitions.map((key, value) => MapEntry(
           key,
           {
             'navigationBarColor': value.navigationBarColor,
@@ -334,8 +333,7 @@ class AppColors {
         ));
   }
 
-  static List<Color> get animatedBorderGradientColors =>
-      [
+  static List<Color> get animatedBorderGradientColors => [
         Colors.red,
         Colors.orange,
         Colors.yellow,

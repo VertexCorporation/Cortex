@@ -28,6 +28,7 @@ import 'library/screen/models/controller.dart';
 import 'library/screen/new/controller.dart';
 import 'news/view.dart';
 import 'arts/screen.dart';
+import 'roleplay/screens/discover_screen.dart';
 import 'notifications/introvert.dart';
 
 enum MainScreenView {
@@ -36,6 +37,7 @@ enum MainScreenView {
   news,
   create,
   arts,
+  roleplay,
 }
 
 class FadeIndexedStack extends StatelessWidget {
@@ -134,6 +136,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       onLibraryTap: switchToLibrary,
       onCreateAITap: switchToCreate,
       onArtsTap: openArtsScreen,
+      onRoleplayTap: openRoleplayScreen,
       onNewsTap: openNewsScreen,
       onCloseAxon: closeAxon,
       onOpenAxon: () => _animateAxonTo(1.0),
@@ -336,6 +339,14 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   void _onDragUpdate(DragUpdateDetails details) {
     if (_ignoreDrag) return;
 
+    if (!_isSearchFocused) {
+      final focusNode = FocusManager.instance.primaryFocus;
+      if (focusNode != null && focusNode.hasFocus) {
+        focusNode.unfocus();
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
+      }
+    }
+
     final double screenW = MediaQuery.of(context).size.width;
     // Full-width sidebar: standardAxonW is now the full screen width.
     final double standardAxonW = screenW;
@@ -533,6 +544,12 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _forceCloseKeyboard();
     _updateCurrentView(MainScreenView.create);
     AnalyticsService().logTabSwitched('create');
+    closeAxon();
+  }
+
+  void openRoleplayScreen() {
+    _forceCloseKeyboard();
+    _updateCurrentView(MainScreenView.roleplay);
     closeAxon();
   }
 
@@ -736,6 +753,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         return 3;
       case MainScreenView.arts:
         return 4;
+      case MainScreenView.roleplay:
+        return 5;
     }
   }
 
@@ -771,6 +790,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         // Index 4: Arts
         const RepaintBoundary(
           child: ArtsScreen(),
+        ),
+        // Index 5: Roleplay / Discover
+        const RepaintBoundary(
+          child: DiscoverScreen(),
         ),
       ],
     );
@@ -844,7 +867,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
           if (_currentView == MainScreenView.library ||
               _currentView == MainScreenView.news ||
-              _currentView == MainScreenView.create) {
+              _currentView == MainScreenView.create ||
+              _currentView == MainScreenView.arts ||
+              _currentView == MainScreenView.roleplay) {
             _updateCurrentView(MainScreenView.chat);
             return;
           }
@@ -961,44 +986,44 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           // is already false; scroll button reads keyboard height in its
                           // own isolated AnimatedBuilder (view.dart:370).
                           child: Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      child!,
-                      Align(
-                        alignment: isRtl
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          width: 1.0,
-                          height: (screenHeight * 0.6) * rawValue,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: gradientColors,
-                              stops: const [0.0, 0.3, 0.7, 1.0],
-                            ),
+                            children: [
+                              Expanded(
+                                child: Stack(
+                                  children: [
+                                    child!,
+                                    Align(
+                                      alignment: isRtl
+                                          ? Alignment.centerRight
+                                          : Alignment.centerLeft,
+                                      child: Container(
+                                        width: 1.0,
+                                        height: (screenHeight * 0.6) * rawValue,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: gradientColors,
+                                            stops: const [0.0, 0.3, 0.7, 1.0],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    if (rawValue > 0 && searchValue == 0)
+                                      GestureDetector(
+                                        onTap: closeAxon,
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              _buildBottomNavigationBar(context),
+                            ],
                           ),
-                        ),
-                      ),
-                      if (rawValue > 0 && searchValue == 0)
-                        GestureDetector(
-                          onTap: closeAxon,
-                          behavior: HitTestBehavior.translucent,
-                          child: Container(
-                            color: Colors.transparent,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                _buildBottomNavigationBar(context),
-              ],
-            ),
                         ),
                       ),
                     ],
@@ -1012,11 +1037,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-
-
   Widget _buildBottomNavigationBar(BuildContext context) {
     return const SizedBox.shrink();
   }
-
-
 }

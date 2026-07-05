@@ -21,10 +21,7 @@ class AnonymousUpgradePanel extends StatelessWidget {
     context.watch<ThemeProvider>();
 
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
       children: [
@@ -92,7 +89,7 @@ class AnonymousUpgradePanel extends StatelessWidget {
                     backgroundColor: AppColors.primaryColor.inverted,
                     foregroundColor: AppColors.primaryColor,
                     padding:
-                    EdgeInsets.symmetric(vertical: screenWidth * 0.035),
+                        EdgeInsets.symmetric(vertical: screenWidth * 0.035),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

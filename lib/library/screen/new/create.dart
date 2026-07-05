@@ -19,22 +19,13 @@ class CreateForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ModelCreationProvider>();
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
 
     final double horizontalPadding = screenWidth * 0.04;
 
-    final double topContentPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double topContentPadding = MediaQuery.of(context).padding.top;
 
     return SingleChildScrollView(
       controller: scrollController,
@@ -55,18 +46,16 @@ class CreateForm extends StatelessWidget {
               nameShakeController: provider.nameShakeController,
             ),
             SizedBox(height: screenHeight * 0.02),
-
             BaseModelSelector(
               availableBaseModels: provider.availableBaseModels,
               selectedBaseModelId: provider.selectedBaseModelId,
-              selectedBaseModelDisplayTitle: provider
-                  .selectedBaseModelDisplayTitle,
+              selectedBaseModelDisplayTitle:
+                  provider.selectedBaseModelDisplayTitle,
               isPanelExpanded: provider.isBaseModelPanelExpanded,
               onTogglePanel: provider.toggleBaseModelPanel,
               onSelectBaseModel: provider.selectBaseModel,
             ),
             SizedBox(height: screenHeight * 0.02),
-
             CreationFormSection(
               title: localizations.preInputTitle,
               description: localizations.preInputDescription,
@@ -76,7 +65,6 @@ class CreateForm extends StatelessWidget {
               maxLines: 3,
             ),
             SizedBox(height: screenHeight * 0.02),
-
             CreationFormSection(
               title: localizations.aiExplanationTitle,
               description: localizations.aiExplanationDescription,

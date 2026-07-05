@@ -28,13 +28,16 @@ TrialInfo? getTrialInfo(ProductDetails? product) {
                     int.tryParse(period.substring(1, period.length - 1)) ?? 0;
               } else if (period.endsWith('W')) {
                 days = (int.tryParse(period.substring(1, period.length - 1)) ??
-                    0) * 7;
+                        0) *
+                    7;
               } else if (period.endsWith('M')) {
                 days = (int.tryParse(period.substring(1, period.length - 1)) ??
-                    0) * 30;
+                        0) *
+                    30;
               }
               if (days > 0) {
-                return TrialInfo(days.toString(), lastPhase.formattedPrice, lastPhase.priceAmountMicros / 1000000);
+                return TrialInfo(days.toString(), lastPhase.formattedPrice,
+                    lastPhase.priceAmountMicros / 1000000);
               }
             }
           }
@@ -72,10 +75,11 @@ extension FundsProducts on FundsBackend {
     }
 
     final cachedProducts =
-    CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+        CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
 
     if (cachedProducts != null && cachedProducts.isNotEmpty) {
-      log('Cache hit! Initializing with cached product data.', name: FundsBackend._logName);
+      log('Cache hit! Initializing with cached product data.',
+          name: FundsBackend._logName);
       _products = cachedProducts;
       _errorMessage = null;
       _setLoading(false);
@@ -84,7 +88,8 @@ extension FundsProducts on FundsBackend {
     }
 
     if (!kReleaseMode) {
-      log('Running in Test Mode. Using mock product data.', name: FundsBackend._logName);
+      log('Running in Test Mode. Using mock product data.',
+          name: FundsBackend._logName);
       await Future.delayed(const Duration(milliseconds: 800));
       _products = FundsBackend._mockProducts;
       CacheService.set(CacheKey.premiumProducts, FundsBackend._mockProducts);
@@ -121,7 +126,8 @@ extension FundsProducts on FundsBackend {
       CacheService.set(CacheKey.premiumProducts, _products);
       _errorMessage = null;
     } catch (e, stack) {
-      log('Error fetching product details: $e', name: FundsBackend._logName, error: e);
+      log('Error fetching product details: $e',
+          name: FundsBackend._logName, error: e);
 
       if (e.toString().contains("Store returned no products")) {
         _setError(_localizations?.noProductsFound ?? 'noProductsFound');

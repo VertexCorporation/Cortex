@@ -44,6 +44,7 @@ class ModelService with ChangeNotifier {
   /// This is the final, sorted, and ready-to-use list for the UI.
   List<ModelEntity>? _cachedEntities;
   String? _cachedEntitiesLangCode;
+  Future<List<ModelEntity>?>? _pendingFetch;
 
   // --- Public API ---
 
@@ -61,7 +62,16 @@ class ModelService with ChangeNotifier {
   /// 7. It caches the final, enriched list and notifies listeners to update the UI.
   ///
   /// Returns a list of [ModelEntity] objects, or null on a critical failure.
-  Future<List<ModelEntity>?> getModels({required String langCode}) async {
+  Future<List<ModelEntity>?> getModels({required String langCode}) {
+    if (_pendingFetch != null) return _pendingFetch!;
+    _pendingFetch = _getModelsInternal(langCode: langCode).whenComplete(() {
+      _pendingFetch = null;
+    });
+    return _pendingFetch!;
+  }
+
+  Future<List<ModelEntity>?> _getModelsInternal(
+      {required String langCode}) async {
     const String logPrefix = "[ModelService.getModels]";
     final normalizedLangCode = _normalizeLangCode(langCode);
 
@@ -134,13 +144,13 @@ class ModelService with ChangeNotifier {
 
     final allOnlineVariantIds = <String>{};
     final allModels = List<ModelEntity>.from(getCachedModelsSync());
-    allModels.where((m) => m.type == 'online').forEach((model) {
+    for (final model in allModels.where((m) => m.type == 'online')) {
       if (model.variants != null && model.variants!.isNotEmpty) {
         allOnlineVariantIds.addAll(model.variants!.keys);
       } else {
         allOnlineVariantIds.add(model.id);
       }
-    });
+    }
     allOnlineVariantIds.add('cortex/auto');
 
     for (final model in allModels) {
@@ -193,14 +203,15 @@ class ModelService with ChangeNotifier {
       final tempEntity = ModelEntity.fromMap(rawMap, langCode);
       final resolvedPath = getModelImagePath(tempEntity);
       finalEntities.add(tempEntity.copyWith(imagePath: resolvedPath));
-      
+
       // Inject cortexRoleplayData
       if (i == 0) {
-        final roleplayEntity = ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
+        final roleplayEntity =
+            ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
         final roleplayPath = getModelImagePath(roleplayEntity);
         finalEntities.add(roleplayEntity.copyWith(imagePath: roleplayPath));
       }
-      
+
       // Yield to the event loop frequently to completely eliminate UI stutter
       // during heavy synchronous filesystem checks.
       if (i % 5 == 0) {

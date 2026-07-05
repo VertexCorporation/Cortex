@@ -89,7 +89,8 @@ class InboxViewModel extends ChangeNotifier {
     final BuildContext? context = mainScreenKey.currentContext;
     String? activeId;
     if (context != null) {
-      activeId = Provider.of<ConversationProvider>(context, listen: false).conversationID;
+      activeId = Provider.of<ConversationProvider>(context, listen: false)
+          .conversationID;
     }
 
     bool activeDeleted = false;
@@ -186,7 +187,8 @@ class InboxViewModel extends ChangeNotifier {
     } else {
       // For short queries, we still only filter titles to avoid DB spam
       if (_currentSearchQuery.length >= 2) {
-        searchHits = await ChatStorageService.searchMessagesDeep(_currentSearchQuery);
+        searchHits =
+            await ChatStorageService.searchMessagesDeep(_currentSearchQuery);
       } else {
         searchHits = [];
       }
@@ -609,9 +611,10 @@ class InboxViewModel extends ChangeNotifier {
     if (manager == null) return false;
 
     final newStatus = !manager.isStarred;
-    
+
     if (newStatus) {
-      int pinnedCount = _conversationManagers.values.where((m) => m.isStarred).length;
+      int pinnedCount =
+          _conversationManagers.values.where((m) => m.isStarred).length;
       if (pinnedCount >= 3) {
         return false;
       }

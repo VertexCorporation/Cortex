@@ -68,10 +68,12 @@ class OptionPanelItem extends StatelessWidget {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
     // Define layout values based on screen size for responsiveness.
-    final double iconSize = iconSizeOverride ?? screenWidth * _UIFactors.iconSizeFactor;
+    final double iconSize =
+        iconSizeOverride ?? screenWidth * _UIFactors.iconSizeFactor;
     final double defaultHorizontalPadding = screenWidth * 0.04;
     final double defaultVerticalPadding = screenWidth * 0.02;
-    final double iconTextSpacing = screenWidth * _UIFactors.iconTextSpacingFactor;
+    final double iconTextSpacing =
+        screenWidth * _UIFactors.iconTextSpacingFactor;
     final double fontSize = screenWidth * _UIFactors.defaultFontSizeFactor;
     final double minHeight = screenHeight * _UIFactors.optionMinHeightFactor;
 
@@ -91,8 +93,8 @@ class OptionPanelItem extends StatelessWidget {
       child: InkWell(
         onTap: isDisabled ? null : onTap,
         borderRadius: BorderRadius.circular(borderRadius),
-        splashColor: AppColors.primaryColor.inverted.withValues(alpha:0.1),
-        highlightColor: AppColors.primaryColor.inverted.withValues(alpha:0.05),
+        splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+        highlightColor: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
         child: Container(
           constraints: BoxConstraints(minHeight: minHeight),
           padding: effectivePadding,
@@ -133,9 +135,12 @@ class OptionPanelItem extends StatelessWidget {
                             child: Text(
                               label,
                               style: textStyle,
-                              maxLines: 1,      // Render as a single line to enable horizontal scrolling.
-                              softWrap: false,  // Prevent the text from wrapping to the next line.
-                              overflow: TextOverflow.visible, // Allow the text to render beyond the visible bounds.
+                              maxLines:
+                                  1, // Render as a single line to enable horizontal scrolling.
+                              softWrap:
+                                  false, // Prevent the text from wrapping to the next line.
+                              overflow: TextOverflow
+                                  .visible, // Allow the text to render beyond the visible bounds.
                             ),
                           );
                         } else {
@@ -146,7 +151,8 @@ class OptionPanelItem extends StatelessWidget {
                             style: textStyle,
                             maxLines: 4,
                             softWrap: true,
-                            overflow: TextOverflow.ellipsis, // Fallback for edge cases.
+                            overflow: TextOverflow
+                                .ellipsis, // Fallback for edge cases.
                           );
                         }
                       },

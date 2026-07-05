@@ -40,7 +40,8 @@ class ReportDialog extends StatefulWidget {
   });
 
   // SHOW METHOD
-  static Future<void> show(BuildContext context, {
+  static Future<void> show(
+    BuildContext context, {
     required String aiMessage,
     required String modelId,
     required VoidCallback onReportSuccess,
@@ -109,7 +110,9 @@ class _ReportDialogState extends State<ReportDialog>
   Future<void> _handleSubmission() async {
     const logPrefix = "[ReportDialog._handleSubmission]";
     if (_isSubmitting) {
-      if (kDebugMode) debugPrint("$logPrefix Submission already in progress. Ignoring tap.");
+      if (kDebugMode) {
+        debugPrint("$logPrefix Submission already in progress. Ignoring tap.");
+      }
       return;
     }
 
@@ -121,7 +124,9 @@ class _ReportDialogState extends State<ReportDialog>
         _errorMessage = localizations.reportErrorMessage;
         _showError = true;
       });
-      if (kDebugMode) debugPrint("$logPrefix Validation failed: No subject selected.");
+      if (kDebugMode) {
+        debugPrint("$logPrefix Validation failed: No subject selected.");
+      }
       return;
     }
 
@@ -139,18 +144,24 @@ class _ReportDialogState extends State<ReportDialog>
           _errorMessage = localizations.noInternetConnection;
           _showError = true;
         });
-        if (kDebugMode) debugPrint("$logPrefix Submission failed: No internet connection.");
+        if (kDebugMode) {
+          debugPrint("$logPrefix Submission failed: No internet connection.");
+        }
         return;
       }
 
       await _submitReportToFirebase();
 
       if (mounted) {
-        if (kDebugMode) debugPrint("$logPrefix Submission successful. Closing dialog.");
+        if (kDebugMode) {
+          debugPrint("$logPrefix Submission successful. Closing dialog.");
+        }
         Navigator.of(context).pop();
       }
     } catch (e) {
-      if (kDebugMode) debugPrint("$logPrefix An error occurred during submission: $e");
+      if (kDebugMode) {
+        debugPrint("$logPrefix An error occurred during submission: $e");
+      }
       if (mounted) {
         setState(() {
           _errorMessage = localizations.anErrorOccurred;
@@ -165,11 +176,14 @@ class _ReportDialogState extends State<ReportDialog>
   }
 
   Future<void> _submitReportToFirebase() async {
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    final notificationService =
+        Provider.of<IntrovertNotificationService>(context, listen: false);
 
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      if (kDebugMode) debugPrint("[ReportDialog] Aborted: No authenticated user.");
+      if (kDebugMode) {
+        debugPrint("[ReportDialog] Aborted: No authenticated user.");
+      }
       return;
     }
 
@@ -182,19 +196,23 @@ class _ReportDialogState extends State<ReportDialog>
       'timestamp': FieldValue.serverTimestamp(),
     };
 
-    if (kDebugMode) debugPrint("[ReportDialog] Submitting report to Firestore: $reportData");
+    if (kDebugMode) {
+      debugPrint("[ReportDialog] Submitting report to Firestore: $reportData");
+    }
     await FirebaseFirestore.instance.collection('reports').add(reportData);
 
     widget.onReportSuccess();
-    if (kDebugMode) debugPrint("[ReportDialog] Called onReportSuccess callback to update parent UI.");
+    if (kDebugMode) {
+      debugPrint(
+          "[ReportDialog] Called onReportSuccess callback to update parent UI.");
+    }
 
     if (mounted) {
       final localizations = AppLocalizations.of(context);
       if (localizations != null) {
         notificationService.showNotification(
             message: localizations.reportSubmitted,
-            type: NotificationType.success
-        );
+            type: NotificationType.success);
       }
     }
   }
@@ -213,7 +231,8 @@ class _ReportDialogState extends State<ReportDialog>
       child: Dialog(
         backgroundColor: AppColors.background,
         insetPadding: EdgeInsets.all(16.0 * scale),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12 * scale)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12 * scale)),
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: ConstrainedBox(
@@ -226,7 +245,8 @@ class _ReportDialogState extends State<ReportDialog>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: EdgeInsets.fromLTRB(20.0 * scale, 20.0 * scale, 20.0 * scale, 12.0 * scale),
+                    padding: EdgeInsets.fromLTRB(
+                        20.0 * scale, 20.0 * scale, 20.0 * scale, 12.0 * scale),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -245,11 +265,15 @@ class _ReportDialogState extends State<ReportDialog>
                           controller: _descriptionController,
                           maxLength: 150,
                           maxLines: 3,
-                          style: TextStyle(color: AppColors.tertiaryColor, fontSize: 16 * scale),
+                          style: TextStyle(
+                              color: AppColors.tertiaryColor,
+                              fontSize: 16 * scale),
                           decoration: InputDecoration(
                             labelText: localizations.reportDescriptionLabel,
                             alignLabelWithHint: true,
-                            labelStyle: TextStyle(color: AppColors.tertiaryColor, fontSize: 16 * scale),
+                            labelStyle: TextStyle(
+                                color: AppColors.tertiaryColor,
+                                fontSize: 16 * scale),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0 * scale),
                               borderSide: BorderSide(color: AppColors.border),
@@ -282,16 +306,16 @@ class _ReportDialogState extends State<ReportDialog>
                           duration: const Duration(milliseconds: 300),
                           child: _showError
                               ? Padding(
-                            padding: EdgeInsets.only(bottom: 8.0 * scale),
-                            child: Text(
-                              _errorMessage,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: colors.error,
-                                fontSize: 14.0 * scale,
-                              ),
-                            ),
-                          )
+                                  padding: EdgeInsets.only(bottom: 8.0 * scale),
+                                  child: Text(
+                                    _errorMessage,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: colors.error,
+                                      fontSize: 14.0 * scale,
+                                    ),
+                                  ),
+                                )
                               : const SizedBox.shrink(),
                         ),
                       ],
@@ -328,7 +352,9 @@ class _ReportDialogState extends State<ReportDialog>
           children: [
             Padding(
               padding: EdgeInsets.only(left: 12.0 * scale),
-              child: Text(label, style: TextStyle(color: AppColors.tertiaryColor, fontSize: 16 * scale)),
+              child: Text(label,
+                  style: TextStyle(
+                      color: AppColors.tertiaryColor, fontSize: 16 * scale)),
             ),
             Transform.scale(
               scale: scale, // Scale the checkbox widget itself
@@ -367,8 +393,8 @@ class _ReportDialogState extends State<ReportDialog>
               Expanded(
                 child: InkWell(
                   onTap: () => Navigator.of(context).pop(),
-                  splashColor: cancelColor.withValues(alpha:0.16),
-                  highlightColor: cancelColor.withValues(alpha:0.10),
+                  splashColor: cancelColor.withValues(alpha: 0.16),
+                  highlightColor: cancelColor.withValues(alpha: 0.10),
                   child: Container(
                     alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(vertical: 16 * scale),
@@ -392,30 +418,30 @@ class _ReportDialogState extends State<ReportDialog>
                   onTap: _isSubmitting ? null : _handleSubmission,
                   splashColor: _isSubmitting
                       ? Colors.transparent
-                      : submitColor.withValues(alpha:0.18),
+                      : submitColor.withValues(alpha: 0.18),
                   highlightColor: _isSubmitting
                       ? Colors.transparent
-                      : submitColor.withValues(alpha:0.12),
+                      : submitColor.withValues(alpha: 0.12),
                   child: Container(
                     alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(vertical: 16 * scale),
                     child: _isSubmitting
                         ? SizedBox(
-                      width: 20 * scale,
-                      height: 20 * scale,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5 * scale,
-                        color: submitColor,
-                      ),
-                    )
+                            width: 20 * scale,
+                            height: 20 * scale,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5 * scale,
+                              color: submitColor,
+                            ),
+                          )
                         : Text(
-                      localizations.submitButton,
-                      style: TextStyle(
-                        color: submitColor,
-                        fontSize: 16 * scale,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                            localizations.submitButton,
+                            style: TextStyle(
+                              color: submitColor,
+                              fontSize: 16 * scale,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ),

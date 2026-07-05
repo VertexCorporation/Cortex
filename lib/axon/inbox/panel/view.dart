@@ -41,14 +41,15 @@ ActionPanelController showActionPanel({
   final overlay = Overlay.of(context);
   final screenHeight = MediaQuery.sizeOf(context).height;
   final screenWidth = MediaQuery.sizeOf(context).width;
-  
+
   // Tablet detection - wider panel for tablets to fit buttons properly
   final bool isTablet = screenWidth > 600;
 
   // Dynamic panel width based on device type
   // Tablet needs wider panel because buttons have larger touch targets
   final double panelWidth = isTablet ? 200.0 : 160.0;
-  final double estimatedHeight = (buttons.length * (isTablet ? 56.0 : 50.0)) + 20.0;
+  final double estimatedHeight =
+      (buttons.length * (isTablet ? 56.0 : 50.0)) + 20.0;
 
   final bool openUpwards = touchPosition.dy > (screenHeight * 0.6);
 

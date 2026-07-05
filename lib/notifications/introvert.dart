@@ -68,7 +68,6 @@ class IntrovertNotificationService {
   }) {
     dismissCurrentNotification();
 
-
     _showOverlayNotification(
       message: message,
       type: type,
@@ -79,7 +78,6 @@ class IntrovertNotificationService {
       onTap: onTap,
       isAxonMode: isAxonMode,
       axonWidth: axonWidth,
-
       isChatMode: isChatMode,
     );
   }
@@ -94,7 +92,6 @@ class IntrovertNotificationService {
     VoidCallback? onTap,
     required bool isAxonMode,
     required double axonWidth,
-
     required bool isChatMode,
   }) {
     final overlay = navigatorKey.currentState?.overlay;
@@ -105,7 +102,6 @@ class IntrovertNotificationService {
     late final OverlayEntry entry;
     entry = OverlayEntry(
       builder: (context) {
-        
         final double screenH = MediaQuery.sizeOf(context).height;
         final double screenW = MediaQuery.sizeOf(context).width;
 
@@ -133,10 +129,14 @@ class IntrovertNotificationService {
 
               // If the login button or an offer button is present, push notifications higher
               try {
-                final isAnonymous = Provider.of<UserProvider>(context, listen: false).isAnonymous;
-                final fundsBackend = Provider.of<FundsBackend>(context, listen: false);
-                final hasOfferButton = fundsBackend.hasFreeTrial || fundsBackend.isSpecialOfferActive;
-                
+                final isAnonymous =
+                    Provider.of<UserProvider>(context, listen: false)
+                        .isAnonymous;
+                final fundsBackend =
+                    Provider.of<FundsBackend>(context, listen: false);
+                final hasOfferButton = fundsBackend.hasFreeTrial ||
+                    fundsBackend.isSpecialOfferActive;
+
                 if (isAnonymous || hasOfferButton) {
                   bottomPosition = screenH * 0.15;
                   centerInAxon = true;
@@ -187,14 +187,16 @@ class IntrovertNotificationService {
                   right: rightPos,
                   width: explicitWidth,
                   child: Align(
-                    alignment: (isAxonMode && !centerInAxon) ? Alignment.centerLeft : Alignment.center,
+                    alignment: (isAxonMode && !centerInAxon)
+                        ? Alignment.centerLeft
+                        : Alignment.center,
                     child: Padding(
                       padding: (isAxonMode && !centerInAxon)
                           ? const EdgeInsets.only(left: 16.0)
                           : EdgeInsets.zero,
                       child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                            maxWidth: maxWidthConstraint),
+                        constraints:
+                            BoxConstraints(maxWidth: maxWidthConstraint),
                         child: _AnimatedNotification(
                           message: message,
                           backgroundColor: style.backgroundColor,

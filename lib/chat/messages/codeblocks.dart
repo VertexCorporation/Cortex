@@ -45,8 +45,6 @@ const Map<String, TextStyle> oneDarkProTheme = {
   'strong': TextStyle(fontWeight: FontWeight.bold),
 };
 
-/// A widget that displays a block of code with syntax highlighting, a copy button,
-/// and a language identifier.
 class CodeBlockWidget extends StatefulWidget {
   final String code;
   final String? language;
@@ -65,6 +63,9 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
   String? _resolvedLanguage;
   bool _copying = false;
 
+  static final _autoDetectCache = <String, String?>{};
+  static const int _maxAutoDetectLength = 50000;
+
   @override
   void initState() {
     super.initState();
@@ -80,10 +81,6 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
     }
   }
 
-  /// Resolves the language to be used for highlighting.
-  /// Priority:
-  /// 1. Use the language hint provided by the parser if it's valid and supported.
-  /// 2. If no valid hint is provided, fall back to auto-detection.
   void _resolveLanguage() {
     String? finalLang;
     final providedLang = widget.language?.toLowerCase().trim();
@@ -94,21 +91,34 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
       }
     }
 
-    // Heuristic: If the code heavily contains HTML tags, override to HTML.
-    // The user complained about HTML being wrapped in Python blocks.
-    if (widget.code.contains('<!DOCTYPE html>') || 
+    if (widget.code.contains('<!DOCTYPE html>') ||
         (widget.code.contains('<html') && widget.code.contains('</html')) ||
-        (widget.code.contains('<div') && widget.code.contains('</div>'))) {
+        (widget.code.contains('<div') && widget.code.contains('</div'))) {
       finalLang = 'html';
     }
 
     if (finalLang == null && widget.code.isNotEmpty) {
-      final result =
-          highlight.highlight.parse(widget.code, autoDetection: true);
-      finalLang = result.language;
+      if (_autoDetectCache.containsKey(widget.code)) {
+        finalLang = _autoDetectCache[widget.code];
+      } else if (widget.code.length < _maxAutoDetectLength) {
+        final code = widget.code;
+        Future(() {
+          final result = highlight.highlight.parse(code, autoDetection: true);
+          _autoDetectCache[code] = result.language;
+          if (_autoDetectCache.length > 200) {
+            final key = _autoDetectCache.keys.first;
+            _autoDetectCache.remove(key);
+          }
+          if (mounted && _resolvedLanguage != result.language) {
+            setState(() {
+              _resolvedLanguage = result.language;
+            });
+          }
+        });
+      }
     }
 
-    if (mounted) {
+    if (mounted && _resolvedLanguage != finalLang) {
       setState(() {
         _resolvedLanguage = finalLang;
       });
@@ -147,9 +157,10 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), // Sleek dark background
+        color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
@@ -163,29 +174,42 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Mac-like Header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFF2D2D2D), // Slightly lighter header
+                color: const Color(0xFF2D2D2D),
                 border: Border(
-                  bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                  bottom:
+                      BorderSide(color: Colors.white.withValues(alpha: 0.05)),
                 ),
               ),
               child: Row(
                 children: [
-                  // Mac window buttons
                   Row(
                     children: [
-                      Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFFFF5F56), shape: BoxShape.circle)),
+                      Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                              color: Color(0xFFFF5F56),
+                              shape: BoxShape.circle)),
                       const SizedBox(width: 8),
-                      Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFFFFBD2E), shape: BoxShape.circle)),
+                      Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                              color: Color(0xFFFFBD2E),
+                              shape: BoxShape.circle)),
                       const SizedBox(width: 8),
-                      Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFF27C93F), shape: BoxShape.circle)),
+                      Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                              color: Color(0xFF27C93F),
+                              shape: BoxShape.circle)),
                     ],
                   ),
                   const Spacer(),
-                  // Language Name
                   Text(
                     languageNameForDisplay,
                     style: TextStyle(
@@ -196,7 +220,6 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                     ),
                   ),
                   const Spacer(),
-                  // Copy Button
                   InkWell(
                     onTap: _copyCodeToClipboard,
                     borderRadius: BorderRadius.circular(6),
@@ -209,15 +232,20 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 200),
                         child: _copying
-                            ? const Icon(Icons.check_rounded, size: 16, color: Color(0xFF27C93F), key: ValueKey('check'))
-                            : Icon(Icons.copy_rounded, size: 16, color: Colors.white.withValues(alpha: 0.7), key: const ValueKey('copy')),
+                            ? const Icon(Icons.check_rounded,
+                                size: 16,
+                                color: Color(0xFF27C93F),
+                                key: ValueKey('check'))
+                            : Icon(Icons.copy_rounded,
+                                size: 16,
+                                color: Colors.white.withValues(alpha: 0.7),
+                                key: const ValueKey('copy')),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            // Code Content
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.zero,
@@ -227,7 +255,7 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                 theme: oneDarkProTheme,
                 padding: const EdgeInsets.all(16),
                 textStyle: const TextStyle(
-                  fontFamily: 'monospace', 
+                  fontFamily: 'monospace',
                   fontSize: 14,
                   height: 1.5,
                 ),

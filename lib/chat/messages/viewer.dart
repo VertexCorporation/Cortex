@@ -41,11 +41,10 @@ class PhotoViewer extends StatefulWidget {
       reverseTransitionDuration: const Duration(milliseconds: 150),
       opaque: false,
       barrierDismissible: false,
-      pageBuilder: (_, __, ___) =>
-          PhotoViewer(
-            imageFile: imageFile,
-            onEditImage: onEditImage,
-          ),
+      pageBuilder: (_, __, ___) => PhotoViewer(
+        imageFile: imageFile,
+        onEditImage: onEditImage,
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(animation);
         final scaleAnim = Tween<double>(begin: 0.90, end: 1.0).animate(
@@ -86,8 +85,7 @@ class PhotoViewerState extends State<PhotoViewer>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
-    )
-      ..addListener(() {
+    )..addListener(() {
         if (_animation != null) {
           _transformationController.value = _animation!.value;
         }
@@ -103,8 +101,8 @@ class PhotoViewerState extends State<PhotoViewer>
 
   /// Snaps back to identity ONLY when scale is back to (or below) 1.0.
   void _onInteractionEnd(ScaleEndDetails details) {
-    final double currentScale = _transformationController.value
-        .getMaxScaleOnAxis();
+    final double currentScale =
+        _transformationController.value.getMaxScaleOnAxis();
 
     if (currentScale <= _minScale + 0.01) {
       // Snap back to identity when user zoomed back out
@@ -124,15 +122,17 @@ class PhotoViewerState extends State<PhotoViewer>
   }
 
   void _onInteractionUpdate(ScaleUpdateDetails details) {
-    final double currentScale = _transformationController.value
-        .getMaxScaleOnAxis();
+    final double currentScale =
+        _transformationController.value.getMaxScaleOnAxis();
 
     // Haptic feedback when hitting zoom boundaries
-    if (currentScale <= _minScale + 0.01 && !_didHitMinBoundary &&
+    if (currentScale <= _minScale + 0.01 &&
+        !_didHitMinBoundary &&
         _previousScale > _minScale + 0.05) {
       _didHitMinBoundary = true;
       HapticFeedback.mediumImpact();
-    } else if (currentScale >= _maxScale - 0.01 && !_didHitMaxBoundary &&
+    } else if (currentScale >= _maxScale - 0.01 &&
+        !_didHitMaxBoundary &&
         _previousScale < _maxScale - 0.05) {
       _didHitMaxBoundary = true;
       HapticFeedback.mediumImpact();
@@ -149,16 +149,11 @@ class PhotoViewerState extends State<PhotoViewer>
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final notificationService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
-    final Size screenSize = MediaQuery
-        .of(context)
-        .size;
+        Provider.of<IntrovertNotificationService>(context, listen: false);
+    final Size screenSize = MediaQuery.of(context).size;
 
     final bool hasCredits =
-        (context
-            .watch<CreditsManager>()
-            .totalCreditsNotifier
-            .value ?? 0) > 0;
+        (context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0) > 0;
     final bool showEditButton = hasCredits && widget.onEditImage != null;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -179,7 +174,8 @@ class PhotoViewerState extends State<PhotoViewer>
                   child: Image.file(
                     widget.imageFile,
                     fit: BoxFit.cover,
-                    cacheWidth: 64, // Decoded extremely small for maximum performance
+                    cacheWidth:
+                        64, // Decoded extremely small for maximum performance
                   ),
                 ),
               ),
@@ -267,8 +263,8 @@ class PhotoViewerState extends State<PhotoViewer>
                           child: GestureDetector(
                             onTap: () async {
                               final box =
-                              context.findRenderObject() as RenderBox?;
-                              
+                                  context.findRenderObject() as RenderBox?;
+
                               if (!await widget.imageFile.exists()) {
                                 notificationService.showNotification(
                                   message: localizations.anErrorOccurred,
@@ -281,8 +277,8 @@ class PhotoViewerState extends State<PhotoViewer>
                                 ShareParams(
                                   files: [XFile(widget.imageFile.path)],
                                   sharePositionOrigin:
-                                  box!.localToGlobal(Offset.zero) &
-                                  box.size,
+                                      box!.localToGlobal(Offset.zero) &
+                                          box.size,
                                 ),
                               );
                             },
@@ -339,7 +335,8 @@ class PhotoViewerState extends State<PhotoViewer>
                                 }
                                 await widget.imageFile.copy(localFile.path);
                                 final bool? success =
-                                await GallerySaver.saveImage(localFile.path);
+                                    await GallerySaver.saveImage(
+                                        localFile.path);
                                 if (success == true) {
                                   notificationService.showNotification(
                                     message: localizations.downloadSuccess,
@@ -457,8 +454,7 @@ class _VideoViewerState extends State<VideoViewer>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
-    )
-      ..addListener(() {
+    )..addListener(() {
         if (_animation != null) {
           _transformationController.value = _animation!.value;
         }
@@ -469,9 +465,9 @@ class _VideoViewerState extends State<VideoViewer>
     try {
       final source = widget.videoPath;
       final VideoPlayerController controller =
-      source.startsWith('http://') || source.startsWith('https://')
-          ? VideoPlayerController.networkUrl(Uri.parse(source))
-          : VideoPlayerController.file(File(source));
+          source.startsWith('http://') || source.startsWith('https://')
+              ? VideoPlayerController.networkUrl(Uri.parse(source))
+              : VideoPlayerController.file(File(source));
 
       await controller.initialize();
       controller.setLooping(false);
@@ -511,8 +507,8 @@ class _VideoViewerState extends State<VideoViewer>
   }
 
   void _onInteractionEnd(ScaleEndDetails details) {
-    final double currentScale = _transformationController.value
-        .getMaxScaleOnAxis();
+    final double currentScale =
+        _transformationController.value.getMaxScaleOnAxis();
 
     if (currentScale <= _minScale + 0.01) {
       _animation = Matrix4Tween(
@@ -529,14 +525,16 @@ class _VideoViewerState extends State<VideoViewer>
   }
 
   void _onInteractionUpdate(ScaleUpdateDetails details) {
-    final double currentScale = _transformationController.value
-        .getMaxScaleOnAxis();
+    final double currentScale =
+        _transformationController.value.getMaxScaleOnAxis();
 
-    if (currentScale <= _minScale + 0.01 && !_didHitMinBoundary &&
+    if (currentScale <= _minScale + 0.01 &&
+        !_didHitMinBoundary &&
         _previousScale > _minScale + 0.05) {
       _didHitMinBoundary = true;
       HapticFeedback.mediumImpact();
-    } else if (currentScale >= _maxScale - 0.01 && !_didHitMaxBoundary &&
+    } else if (currentScale >= _maxScale - 0.01 &&
+        !_didHitMaxBoundary &&
         _previousScale < _maxScale - 0.05) {
       _didHitMaxBoundary = true;
       HapticFeedback.mediumImpact();
@@ -556,22 +554,20 @@ class _VideoViewerState extends State<VideoViewer>
     final bounded = target < Duration.zero
         ? Duration.zero
         : (target > controller.value.duration
-        ? controller.value.duration
-        : target);
+            ? controller.value.duration
+            : target);
     await controller.seekTo(bounded);
   }
 
   Future<void> _downloadVideo(AppLocalizations localizations) async {
     final notificationService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     try {
       String localPath = widget.videoPath;
       if (widget.videoPath.startsWith('http://') ||
           widget.videoPath.startsWith('https://')) {
         final tempDir = await getTemporaryDirectory();
-        final fileName = path.basename(widget.videoPath
-            .split('?')
-            .first);
+        final fileName = path.basename(widget.videoPath.split('?').first);
         final localFile = File(path.join(tempDir.path, fileName));
         final request = await HttpClient().getUrl(Uri.parse(widget.videoPath));
         final response = await request.close();
@@ -586,7 +582,7 @@ class _VideoViewerState extends State<VideoViewer>
             ? localizations.downloadSuccess
             : localizations.downloadFailed,
         type:
-        success == true ? NotificationType.success : NotificationType.error,
+            success == true ? NotificationType.success : NotificationType.error,
         bottomOffset: 0.1,
       );
     } catch (_) {
@@ -607,20 +603,15 @@ class _VideoViewerState extends State<VideoViewer>
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final playbackController =
-    (_controller != null && _controller!.value.isInitialized)
-        ? _controller
-        : null;
+        (_controller != null && _controller!.value.isInitialized)
+            ? _controller
+            : null;
     final isInitialized = playbackController != null;
 
     final bool hasCredits =
-        (context
-            .watch<CreditsManager>()
-            .totalCreditsNotifier
-            .value ?? 0) > 0;
+        (context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0) > 0;
     final bool showEditButton = hasCredits && widget.onEditVideo != null;
 
     // PERF: isInitialized / playbackController are precomputed here once.
@@ -678,24 +669,23 @@ class _VideoViewerState extends State<VideoViewer>
                             Positioned.fill(
                               child: _isLoading
                                   ? const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              )
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    )
                                   : _errorText != null
-                                  ? Center(
-                                child: Padding(
-                                  padding:
-                                  const EdgeInsets.all(20),
-                                  child: Text(
-                                    _errorText!,
-                                    style: const TextStyle(
-                                        color: Colors.white70),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              )
-                                  : VideoPlayer(playbackController!),
+                                      ? Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Text(
+                                              _errorText!,
+                                              style: const TextStyle(
+                                                  color: Colors.white70),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        )
+                                      : VideoPlayer(playbackController!),
                             ),
                             // PERF: Only the controls overlay needs to update
                             // at playback frame-rate (position, play/pause icon).
@@ -707,27 +697,26 @@ class _VideoViewerState extends State<VideoViewer>
                                 builder: (context, videoValue, _) {
                                   final duration = videoValue.duration;
                                   final position = videoValue.position;
-                                  final sliderMax =
-                                      duration.inMilliseconds > 0
-                                          ? duration.inMilliseconds.toDouble()
-                                          : 1.0;
+                                  final sliderMax = duration.inMilliseconds > 0
+                                      ? duration.inMilliseconds.toDouble()
+                                      : 1.0;
                                   final sliderValue = position.inMilliseconds
                                       .toDouble()
                                       .clamp(0.0, sliderMax);
                                   return Positioned.fill(
                                     child: Container(
                                       color:
-                                      Colors.black.withValues(alpha: 0.25),
+                                          Colors.black.withValues(alpha: 0.25),
                                       child: Column(
                                         children: [
                                           const Spacer(),
                                           Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                                MainAxisAlignment.center,
                                             children: [
                                               IconButton(
-                                                onPressed: () =>
-                                                    _seekBy(const Duration(
+                                                onPressed: () => _seekBy(
+                                                    const Duration(
                                                         seconds: -10)),
                                                 icon: const Icon(
                                                     Icons.replay_10_rounded,
@@ -748,17 +737,17 @@ class _VideoViewerState extends State<VideoViewer>
                                                 icon: Icon(
                                                   videoValue.isPlaying
                                                       ? Icons
-                                                      .pause_circle_filled_rounded
+                                                          .pause_circle_filled_rounded
                                                       : Icons
-                                                      .play_circle_fill_rounded,
+                                                          .play_circle_fill_rounded,
                                                   color: Colors.white,
                                                   size: 56,
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
                                               IconButton(
-                                                onPressed: () =>
-                                                    _seekBy(const Duration(
+                                                onPressed: () => _seekBy(
+                                                    const Duration(
                                                         seconds: 10)),
                                                 icon: const Icon(
                                                     Icons.forward_10_rounded,
@@ -776,9 +765,9 @@ class _VideoViewerState extends State<VideoViewer>
                                                   data: SliderTheme.of(context)
                                                       .copyWith(
                                                     activeTrackColor:
-                                                    Colors.white,
+                                                        Colors.white,
                                                     inactiveTrackColor:
-                                                    Colors.white30,
+                                                        Colors.white30,
                                                     thumbColor: Colors.white,
                                                   ),
                                                   child: Slider(
@@ -789,27 +778,27 @@ class _VideoViewerState extends State<VideoViewer>
                                                       playbackController.seekTo(
                                                         Duration(
                                                             milliseconds:
-                                                            value.toInt()),
+                                                                value.toInt()),
                                                       );
                                                     },
                                                   ),
                                                 ),
                                                 Row(
                                                   mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
                                                     Text(
                                                       _formatDuration(position),
                                                       style: const TextStyle(
                                                           color:
-                                                          Colors.white70),
+                                                              Colors.white70),
                                                     ),
                                                     Text(
                                                       _formatDuration(duration),
                                                       style: const TextStyle(
                                                           color:
-                                                          Colors.white70),
+                                                              Colors.white70),
                                                     ),
                                                   ],
                                                 ),
@@ -1008,7 +997,7 @@ class _AudioViewerState extends State<AudioViewer> {
 
   Future<void> _downloadAudio(AppLocalizations localizations) async {
     final notificationService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     try {
       final tempDir = await getTemporaryDirectory();
       final baseName = 'cortex-audio';
@@ -1043,15 +1032,10 @@ class _AudioViewerState extends State<AudioViewer> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
 
     final bool hasCredits =
-        (context
-            .watch<CreditsManager>()
-            .totalCreditsNotifier
-            .value ?? 0) > 0;
+        (context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0) > 0;
     final bool showEditButton = hasCredits && widget.onEditAudio != null;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -1088,7 +1072,6 @@ class _AudioViewerState extends State<AudioViewer> {
                             size: screenSize.width * 0.055,
                           ),
                         ),
-
                         if (showEditButton)
                           AppBarButton(
                             onTap: () {
@@ -1130,17 +1113,17 @@ class _AudioViewerState extends State<AudioViewer> {
                           },
                           child: _isPlaying
                               ? SvgPicture.asset(
-                            'assets/icons/stop.svg',
-                            width: screenSize.width * 0.16,
-                            height: screenSize.width * 0.16,
-                            colorFilter: const ColorFilter.mode(
-                                Colors.white, BlendMode.srcIn),
-                          )
+                                  'assets/icons/stop.svg',
+                                  width: screenSize.width * 0.16,
+                                  height: screenSize.width * 0.16,
+                                  colorFilter: const ColorFilter.mode(
+                                      Colors.white, BlendMode.srcIn),
+                                )
                               : Icon(
-                            Icons.play_circle_fill_rounded,
-                            color: Colors.white,
-                            size: screenSize.width * 0.18,
-                          ),
+                                  Icons.play_circle_fill_rounded,
+                                  color: Colors.white,
+                                  size: screenSize.width * 0.18,
+                                ),
                         ),
                       ],
                     ),

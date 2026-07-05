@@ -46,8 +46,8 @@ class ToolRegistry {
 
   /// Returns localized tool definitions to send to the server.
   /// The server will use these definitions for the AI model.
-  static List<Map<String, dynamic>> getLocalizedToolsJson(String langCode,
-      AppLocalizations l10n) {
+  static List<Map<String, dynamic>> getLocalizedToolsJson(
+      String langCode, AppLocalizations l10n) {
     return [
       // 0. Read Document - for PDF/XLSX/etc parsing
       {
@@ -144,7 +144,8 @@ class ToolRegistry {
         'type': 'function',
         'function': {
           'name': 'render_chart',
-          'description': l10n.toolChartDescription,
+          'description':
+              '${l10n.toolChartDescription} STRICTLY FOR NUMERIC DATA GRAPHS. NEVER use this tool to "draw" objects, pictures, faces, apples, cars, etc. It ONLY renders data visualizations.',
           'parameters': {
             'type': 'object',
             'properties': {
@@ -193,8 +194,8 @@ class ToolRegistry {
     _currentDocuments = null;
   }
 
-  static Future<String> _executeOnServer(String name,
-      Map<String, dynamic> args) async {
+  static Future<String> _executeOnServer(
+      String name, Map<String, dynamic> args) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return "Error: User not authenticated.";

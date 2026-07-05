@@ -73,7 +73,9 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
       if (seriesTitle.contains(_searchQuery)) return true;
       if (series.variants != null) {
         return series.variants!.values.whereType<Map<String, dynamic>>().any(
-            (v) => (v['title'] as String? ?? '').toLowerCase().contains(_searchQuery));
+            (v) => (v['title'] as String? ?? '')
+                .toLowerCase()
+                .contains(_searchQuery));
       }
       return false;
     }).toList();
@@ -148,8 +150,8 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
           color: AppColors.secondaryColor.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(borderRadius),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: paddingH, vertical: paddingV),
+            padding:
+                EdgeInsets.symmetric(horizontal: paddingH, vertical: paddingV),
             child: Row(
               children: [
                 Expanded(
@@ -157,7 +159,8 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                     widget.selectedBaseModelDisplayTitle ??
                         localizations.selectBaseModel,
                     style: TextStyle(
-                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.5),
                         fontSize: textSize),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -176,7 +179,8 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                     ),
                   ),
                 Icon(Icons.lock_outline,
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                    color:
+                        AppColors.primaryColor.inverted.withValues(alpha: 0.5),
                     size: isTablet ? 24 : screenWidth * 0.05),
               ],
             ),
@@ -216,8 +220,8 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
     final double sp12 = isTablet ? 12.0 : screenWidth * 0.03;
     final double sp8 = isTablet ? 8.0 : screenWidth * 0.02;
 
-    Widget buildListItem(ModelEntity series, String modelId, String modelTitle,
-        bool isPremium) {
+    Widget buildListItem(
+        ModelEntity series, String modelId, String modelTitle, bool isPremium) {
       final imagePath = modelService.getModelImagePath(series);
 
       final bool isSvg = imagePath.endsWith('.svg');
@@ -254,7 +258,8 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
           onTap: () {
             HapticFeedback.lightImpact();
             final userProvider = context.read<UserProvider>();
-            if (modelId != 'cortex/auto' && !userProvider.isSubscriptionActive) {
+            if (modelId != 'cortex/auto' &&
+                !userProvider.isSubscriptionActive) {
               final target = const UpgradeAccountScreen(showLoginFirst: false);
               navigateToScreen(target, direction: const Offset(0.0, 1.0));
               return;
@@ -320,8 +325,7 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
           children: [
             // Search bar inside the panel
             Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: sp12, vertical: sp8),
+              padding: EdgeInsets.symmetric(horizontal: sp12, vertical: sp8),
               child: SizedBox(
                 height: searchHeight,
                 child: TextField(
@@ -353,8 +357,8 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                         : null,
                     filled: true,
                     fillColor: AppColors.background,
-                    contentPadding: EdgeInsets.symmetric(
-                        horizontal: sp12, vertical: sp8),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: sp12, vertical: sp8),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(radius * 0.75),
                       borderSide: BorderSide.none,
@@ -379,8 +383,7 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                 height: listHeight,
                 child: ListView(
                   padding: EdgeInsets.zero,
-                  children:
-                      filteredModels.expand<Widget>((series) {
+                  children: filteredModels.expand<Widget>((series) {
                     final Map<String, dynamic> variants =
                         series.variants ?? const {};
 

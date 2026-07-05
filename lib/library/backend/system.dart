@@ -20,8 +20,7 @@ class SystemInfoProvider {
 
   static Future<int> _getDeviceMemory() async {
     try {
-      final int result = await _memoryChannel.invokeMethod(
-          'getDeviceMemory');
+      final int result = await _memoryChannel.invokeMethod('getDeviceMemory');
       return result;
     } on PlatformException catch (e) {
       if (kDebugMode) {
@@ -67,17 +66,17 @@ class SystemInfoProvider {
     }
   }
 
-  static const MethodChannel _storageChannel = MethodChannel(
-      'com.vertex.cortex/storage');
-  static const MethodChannel _memoryChannel = MethodChannel(
-      'com.vertex.cortex/memory');
+  static const MethodChannel _storageChannel =
+      MethodChannel('com.vertex.cortex/storage');
+  static const MethodChannel _memoryChannel =
+      MethodChannel('com.vertex.cortex/memory');
 }
 
 class SystemInfoData {
   final int deviceMemory; // in MB
-  final int freeStorage;  // in MB
+  final int freeStorage; // in MB
   final int totalStorage; // in MB
-  final int usedMemory;   // in MB
+  final int usedMemory; // in MB
 
   SystemInfoData({
     required this.deviceMemory,

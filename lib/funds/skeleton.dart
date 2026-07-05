@@ -9,22 +9,14 @@ class FundsSkeletonLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
-    final double topPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double topPadding = MediaQuery.of(context).padding.top;
 
     final double bottomPadding =
-        screenHeight * 0.02 + MediaQuery
-            .of(context)
-            .padding
-            .bottom;
+        screenHeight * 0.02 + MediaQuery.of(context).padding.bottom;
 
     final double contentBottomPadding = screenHeight * 0.015;
 
@@ -43,8 +35,7 @@ class FundsSkeletonLoader extends StatelessWidget {
             // --- 1. HEADER (DISCOUNT BANNER SKELETON) ---
             Padding(
               padding: EdgeInsets.only(
-                  top: topPadding * 0.5,
-                  bottom: contentBottomPadding),
+                  top: topPadding * 0.5, bottom: contentBottomPadding),
               child: Center(
                 child: Container(
                   width: screenWidth * 0.5,
@@ -75,8 +66,7 @@ class FundsSkeletonLoader extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                         3,
-                            (index) =>
-                            Container(
+                        (index) => Container(
                               margin: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.01),
                               width: index == 1
@@ -86,7 +76,7 @@ class FundsSkeletonLoader extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.shimmerBase,
                                 borderRadius:
-                                BorderRadius.circular(screenWidth * 0.022),
+                                    BorderRadius.circular(screenWidth * 0.022),
                               ),
                             )),
                   ),
@@ -133,9 +123,7 @@ class FundsSkeletonLoader extends StatelessWidget {
   }
 
   Widget _buildSkeletonPage(BuildContext context) {
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
@@ -146,7 +134,8 @@ class FundsSkeletonLoader extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.only(top: screenWidth * 0.03,
+        padding: EdgeInsets.only(
+            top: screenWidth * 0.03,
             left: horizontalPadding,
             right: horizontalPadding),
         child: Column(
@@ -195,14 +184,8 @@ class FundsSkeletonLoader extends StatelessWidget {
   }
 
   Widget _skeletonOptionBox(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     final estimatedHeight = (screenHeight * 0.03) +
         (screenWidth * 0.085) +
@@ -221,10 +204,7 @@ class FundsSkeletonLoader extends StatelessWidget {
   }
 
   Widget _skeletonBenefitsGrid(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Wrap(
       alignment: WrapAlignment.center,
       runAlignment: WrapAlignment.center,
@@ -233,8 +213,8 @@ class FundsSkeletonLoader extends StatelessWidget {
       children: List.generate(6, (index) {
         return SizedBox(
           width:
-          (screenWidth - (screenWidth * 0.06 * 2) - (screenWidth * 0.02)) /
-              2,
+              (screenWidth - (screenWidth * 0.06 * 2) - (screenWidth * 0.02)) /
+                  2,
           child: Row(
             children: [
               Container(

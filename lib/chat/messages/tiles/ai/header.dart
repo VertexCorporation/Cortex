@@ -7,6 +7,10 @@ class _AiHeader extends StatelessWidget {
   final Animation<double> thinkPulseAnim;
   final Animation<double> thinkRotateAnim;
   final Animation<double> headerEntryAnim;
+  final String textToDisplay;
+  final bool isCortexDynamic;
+
+  static final _nameSplitter = RegExp(r'[-_]');
 
   const _AiHeader({
     required this.message,
@@ -15,17 +19,14 @@ class _AiHeader extends StatelessWidget {
     required this.thinkPulseAnim,
     required this.thinkRotateAnim,
     required this.headerEntryAnim,
+    required this.textToDisplay,
+    required this.isCortexDynamic,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  static _HeaderData _resolveHeaderData(BuildContext context, Message message) {
     final modelService = context.read<ModelService>();
     final langCode = Localizations.localeOf(context).languageCode;
-    final isSearching = message.isWebSearchActive && message.isThinking;
-
     final mId = message.model ?? '';
-    final convProvider = context.read<ConversationProvider>();
-    ModelEntity model;
 
     bool isDynamicConversationId(String? id) {
       final normalized = (id ?? '').trim().toLowerCase();
@@ -33,6 +34,7 @@ class _AiHeader extends StatelessWidget {
     }
 
     String? associatedUserModelId;
+    final convProvider = context.read<ConversationProvider>();
     final messagesList = convProvider.messages;
     final msgIndex = messagesList.indexOf(message);
     if (msgIndex >= 0) {
@@ -48,6 +50,7 @@ class _AiHeader extends StatelessWidget {
         isDynamicConversationId(convProvider.persistedModelId) ||
             isDynamicConversationId(associatedUserModelId);
 
+    final ModelEntity model;
     if (modelService.hasModelInCache(mId)) {
       model = modelService.getPreciseModelData(mId, langCode: langCode);
     } else if (convProvider.persistedModelId == mId &&
@@ -68,7 +71,7 @@ class _AiHeader extends StatelessWidget {
       if (rawId.isEmpty) return 'Cortex';
       if (rawId == 'cortex/auto' || rawId == 'dynamic') return 'Cortex';
       String name = rawId.contains('/') ? rawId.split('/').last : rawId;
-      return name.split(RegExp(r'[-_]')).map((w) {
+      return name.split(_nameSplitter).map((w) {
         if (w.isEmpty) return '';
         if (w.toLowerCase() == 'gpt') return 'GPT';
         return '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}';
@@ -87,9 +90,6 @@ class _AiHeader extends StatelessWidget {
           ? model.displayTitle
           : formatModelId(mId);
     } else {
-      // SERIES NAME PRIORITY: Always show the series name instead of
-      // the individual variant title. The user should see "Gemini"
-      // not "Gemini 2.5 Pro" in the AI message header.
       final parentSeries = ModelDataUtils.findParentSeriesData(
         mId,
         langCode: langCode,
@@ -117,6 +117,14 @@ class _AiHeader extends StatelessWidget {
         textToDisplay = model.displayTitle;
       }
     }
+
+    return _HeaderData(
+        textToDisplay: textToDisplay, isCortexDynamic: isCortexDynamic);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isSearching = message.isWebSearchActive && message.isThinking;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -235,11 +243,12 @@ class _AiHeader extends StatelessWidget {
         ImageProvider imageProvider = isAsset
             ? AssetImage(avatarPath) as ImageProvider
             : FileImage(File(avatarPath));
-            
+
         // PERF: Prevent GC Jank on scrolling chat history.
         // Limit decode size of high-res custom model avatars in chat.
         final int cacheSize = (containerSize * 3).toInt().clamp(50, 200);
-        imageProvider = ResizeImage(imageProvider, width: cacheSize, height: cacheSize);
+        imageProvider =
+            ResizeImage(imageProvider, width: cacheSize, height: cacheSize);
 
         imageWidget = Image(
             image: imageProvider,
@@ -295,4 +304,14 @@ class _SearchingLabel extends StatelessWidget {
       ),
     );
   }
+}
+
+class _HeaderData {
+  final String textToDisplay;
+  final bool isCortexDynamic;
+
+  const _HeaderData({
+    required this.textToDisplay,
+    required this.isCortexDynamic,
+  });
 }

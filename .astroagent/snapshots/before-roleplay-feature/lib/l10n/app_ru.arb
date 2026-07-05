@@ -1,0 +1,883 @@
+{
+  "@@locale": "ru",
+  "accessSettingsDescription": "Получите доступ к справке, активируйте коды, поделитесь Cortex и ознакомьтесь с нашими политиками.",
+  "accountDeletionRequested": "Ваш запрос на удаление учетной записи был получен, и теперь ваша учетная запись отключена.",
+  "accountLinkedSuccess": "Аккаунт успешно создан!",
+  "actionCamera": "Камера",
+  "actionFile": "Файл",
+  "actionGallery": "Галерея",
+  "add": "Добавить",
+  "agentBlue": "Blue",
+  "agentPurple": "Purple",
+  "agentRed": "Red",
+  "aiExplanationDescription": "Предоставьте подробное описание архитектуры вашей модели ИИ, процесса обучения, показателей производительности, областей применения и других важных функций.",
+  "aiExplanationTitle": "Описание искусственного интеллекта",
+  "aiTranslationWarning": "Информация о модели переводится на разные языки другими моделями ИИ. Поэтому незначительные несоответствия могут возникать на языках, отличных от английского.",
+  "allConversationsDeleted": "Все разговоры успешно удалены!",
+  "allModels": "Все модели",
+  "@allModels": {
+    "description": "Filter button text to show all available models"
+  },
+  "alreadyHaveAccount": "У вас уже есть аккаунт?",
+  "alwaysBest": "Всегда лучший",
+  "anErrorOccurred": "Произошла ошибка",
+  "annual": "Годовой",
+  "annualTotalDescription": "{price}/год, оплата производится ежегодно",
+  "@annualTotalDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "anonymousEntity": "Анонимное лицо",
+  "arabic": "арабский",
+  "arts": "Искусство",
+  "attachmentSheetTitle": "Вложения",
+  "audioModels": "Audio Models",
+  "authError": "Ошибка аутентификации",
+  "azerbaijani": "азербайджанский",
+  "backgroundChatNotificationTitle": "Вернитесь в чат!",
+  "@backgroundChatNotificationTitle": {
+    "description": "Notification title when a background chat finishes generating."
+  },
+  "baseModelDescription": "Это модель, которая будет использоваться в качестве основы для вашего творения. Он отображает выбранную в данный момент базовую модель.",
+  "baseModelForCharacterDescription": "Выбранная базовая модель будет определять особенности мышления и способности персонажа реагировать.",
+  "@baseModelForCharacterDescription": {},
+  "baseModelTitle": "Базовая модель",
+  "behindTheSlaughter": "За резней",
+  "benefit1": "Увеличение лимита разговоров",
+  "benefit10": "Дополнительные вложения",
+  "benefit11": "Дополнительный режим потока",
+  "benefit3": "Эффект профиля",
+  "benefit4": "Значок членства",
+  "benefit5": "Создайте больше онлайн-искусственного интеллекта",
+  "benefit7": "Дополнительные ограничения на использование",
+  "benefit8": "Добавить модели",
+  "benefit9": "Новые темы",
+  "benefitPremiumModels": "Доступ к премиум-моделям",
+  "@benefitPremiumModels": {
+    "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
+  },
+  "benefitVideoGeneration": "Генерация видео",
+  "bestValue": "Лучшее соотношение цены и качества",
+  "betterWithAnAccount": "Этот раздел лучше с аккаунтом!",
+  "cacheIsNotUpToDate": "Ваш кэш Play Store не обновлен. Пожалуйста, закройте и снова откройте приложение Play Store или перезагрузите устройство.",
+  "cancel": "Отменить",
+  "capabilitiesSection": "Возможности",
+  "categoryAll": "All",
+  "categoryFeminine": "Feminine",
+  "categoryFree": "Free",
+  "categoryInanimate": "Inanimate",
+  "categoryMasculine": "Masculine",
+  "categoryPhoto": "Photo",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "changeModel": "Изменить",
+  "changePassword": "Сменить пароль",
+  "channelEngagementDescription": "Забавные уведомления, которые помогут вам оставаться на связи.",
+  "@channelEngagementDescription": {
+    "description": "The user-visible description for the engagement notification channel."
+  },
+  "channelEngagementName": "Дружеские напоминания",
+  "@channelEngagementName": {
+    "description": "The user-visible name for the engagement notification channel."
+  },
+  "channelFcmDescription": "Уведомления о новостях, обновлениях и другой информации от Cortex.",
+  "@channelFcmDescription": {
+    "description": "The user-visible description for the main notification channel."
+  },
+  "channelFcmName": "Обновления Cortex",
+  "@channelFcmName": {
+    "description": "The user-visible name for the main notification channel."
+  },
+  "channelGreetingsDescription": "Сообщения типа \"доброе утро\" и \"спокойной ночи\".",
+  "@channelGreetingsDescription": {
+    "description": "The user-visible description for the greetings notification channel."
+  },
+  "channelGreetingsName": "Ежедневные поздравления",
+  "@channelGreetingsName": {
+    "description": "The user-visible name for the greetings notification channel."
+  },
+  "characterModels": "Персонажи",
+  "@characterModels": {
+    "description": "Filter button text for pre-defined role-playing characters"
+  },
+  "chat": "Чат",
+  "chatLengthLimitExceeded": "В этом чате превышен лимит символов. Пожалуйста, начните новый чат или приобретите подписку.",
+  "chatTitleCriticalInstruction": "[ВАЖНАЯ ИНСТРУКЦИЯ]: Вы ГЕНЕРАТОР ТИТУЛОВ. НЕ отвечайте на вопрос пользователя. НЕ общайтесь и не здоровайтесь. Выводите ТОЛЬКО заголовок из 2–4 слов, описывающий то, о чем спрашивает пользователь. Заголовок ДОЛЖЕН быть на том же языке, что и сообщение пользователя.",
+  "@chatTitleCriticalInstruction": {
+    "description": "Critical system instruction appended to force the AI to only output a title"
+  },
+  "chatTitlePrompt": "Вы генератор титулов. Отвечайте ТОЛЬКО, называя заголовок из 2–5 слов для следующего разговора. Не используйте кавычки, префиксы и знаки препинания. ВАЖНО: заголовок ДОЛЖЕН быть на ТОЧНО ТОМ же языке, что и сообщение пользователя.",
+  "@chatTitlePrompt": {
+    "description": "Prompt for AI to generate a chat title"
+  },
+  "chats": "Недавние",
+  "checkYourInternet": "Пожалуйста, проверьте подключение к Интернету и повторите попытку.",
+  "chinese": "китайский",
+  "claimOffer": "Используйте предложение",
+  "clearMemory": "Очистить память",
+  "clearMemoryConfirm": "Вы уверены, что хотите очистить память?",
+  "closeButton": "Закрыть",
+  "coffee": "Coffee",
+  "confirm": "Подтвердите",
+  "confirmDeleteAccount": "Вы уверены, что хотите удалить свою учетную запись?",
+  "confirmDownloadTitle": "Вы уверены, что хотите скачать?",
+  "confirmPassword": "Подтвердите пароль",
+  "confirmRemoveModel": "Вы уверены, что хотите удалить модель {model} со своего устройства? При этом также будут удалены все предыдущие разговоры с этой моделью.",
+  "confirmRemovePhoto": "Вы уверены, что хотите удалить фотографию?",
+  "confirmWord": "Тип ВЕРТЕКС",
+  "confirmWordError": "Вы неправильно написали",
+  "context": "Контекст",
+  "continueAsGuest": "Продолжить без создания учетной записи",
+  "continueInOfflineMode": "Продолжить в автономном режиме",
+  "continueWithApple": "Продолжить с Apple",
+  "continueWithGoogle": "Продолжить с Google",
+  "conversationDeleted": "Разговор удален!",
+  "copy": "Копировать",
+  "copyrights": "Атрибуция",
+  "cortexSystemPersona": "[Система] ВАЖНАЯ ИНСТРУКЦИЯ: В настоящее время вы работаете внутри огромной, высокоразвитой экосистемы искусственного интеллекта под названием \"Кортекс\"; эта платформа разработана командой Vertex, которой в среднем всего 16 лет. Помните об этом и отвечайте, если спросят. Если требуется дополнительная информация, не стесняйтесь искать в Интернете, а если вы не можете выполнить поиск, смело скажите, что вы не знаете!",
+  "@cortexSystemPersona": {
+    "description": "System persona string added to online models"
+  },
+  "couldNotOpenLink": "Не удалось открыть ссылку",
+  "create": "Создать",
+  "createAI": "Создать",
+  "createAccount": "Создать учетную запись",
+  "createYourAccount": "Зарегистрироваться",
+  "creatorSupportedSuccess": "Создатель успешно поддержан! Им будут способствовать ваши будущие покупки.",
+  "creatorTag": "Тег автора",
+  "customInstructionHint": "Введите здесь свои собственные инструкции",
+  "customModels": "Пользовательские модели",
+  "@customModels": {
+    "description": "Filter button text for user-created models or characters"
+  },
+  "cyberpunk": "Cyberpunk",
+  "dark": "Темный",
+  "deepSpace": "Deep Space",
+  "defaultModelDescription": "{modelName} — это высокопроизводительный искусственный интеллект, интегрированный в экосистему Cortex. Разработанный для решения широкого спектра сложных задач, он обеспечивает высоконадежные и эффективные возможности обработки. Благодаря быстрому реагированию и расширенным аналитическим возможностям он значительно повышает вашу повседневную производительность. Эта модель, бесперебойно работающая в защищенной локальной инфраструктуре Cortex, может помочь вам в решении широкого спектра задач: от творческого мозгового штурма до глубокого технического анализа. Начните исследовать весь его потенциал сегодня.",
+  "@defaultModelDescription": {
+    "description": "Default description when a model lacks one",
+    "placeholders": {
+      "modelName": {
+        "type": "String",
+        "example": "Llama 3 8B"
+      }
+    }
+  },
+  "defaultSeriesDescription": "{seriesName} — это продвинутый интеллект, демонстрирующий высокую производительность на Cortex.",
+  "@defaultSeriesDescription": {
+    "description": "Default description when a series lacks one",
+    "placeholders": {
+      "seriesName": {
+        "type": "String",
+        "example": "Llama 3"
+      }
+    }
+  },
+  "defaultViewDescription": "Cortex всегда рядом с вами благодаря сотням моделей искусственного интеллекта, автономным возможностям, динамическому чату и многому другому.",
+  "defaultViewTitle": "Как дела?",
+  "delete": "Удалить",
+  "deleteAccount": "Удалить учетную запись",
+  "deleteAll": "Удалить все",
+  "deleteAllConversationsButton": "Удалить все разговоры",
+  "deleteAllConversationsConfirmMessage": "Вы уверены, что хотите удалить все свои чаты? Это невозможно отменить.",
+  "deleteAllConversationsConfirmTitle": "Удалить все чаты?",
+  "deleteAllConversationsDisabledInfo": "Вы не можете удалить все разговоры в активном чате. Чтобы продолжить, сначала выйдите из текущего чата.",
+  "deleteDescription": "Удаленные вами данные будут безвозвратно удалены с нашего сервера и вашего устройства. Это действие невозможно отменить.",
+  "descriptionSection": "Описание",
+  "deviceMemory": "Память устройства: {memory} ГБ",
+  "displayName": "Отображаемое имя",
+  "done": "Готово",
+  "dontHaveAccount": "У вас нет учетной записи?",
+  "download": "Скачать",
+  "downloadFailed": "Загрузка не удалась",
+  "downloadPaused": "Загрузка приостановлена.",
+  "downloadSizeDisclosure": "Эта модель займет примерно {size} места.",
+  "downloadStarted": "Загрузка началась",
+  "downloadSuccess": "Загрузка прошла успешно",
+  "downloaded": "{percent}% скачано",
+  "@downloaded": {
+    "description": "Indicates the percentage of the download completed.",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloading": "Загрузка...",
+  "dude": "Чувак",
+  "dutch": "Голландский",
+  "dynamicChatTitle": "Динамический чат",
+  "@dynamicChatTitle": {
+    "description": "The title for a conversation started in dynamic mode."
+  },
+  "dynamicPreditsUpgradeMessage": "Cortex может дать еще лучшие ответы; обновите сейчас и получите лучший ответ на каждый вопрос!",
+  "edit": "Редактировать",
+  "editConversationTitle": "Переименовать",
+  "editProfile": "Редактировать профиль",
+  "editingMessageInfo": "Редактирование этого сообщения возобновит разговор отсюда.",
+  "editingNotification": "Сейчас вы находитесь в режиме редактирования",
+  "email": "Email",
+  "emailAlreadyInUse": "Этот адрес электронной почты уже используется.",
+  "emulatorModeWarning": "Эта функция отключена в режиме эмулятора.",
+  "english": "английский",
+  "enterYourTag": "Поддержите любимых авторов! Введите их уникальный тег ниже, чтобы предоставить им долю от ваших покупок Cortex.",
+  "equivalentMonthlyDescription": "Примерно {price}/месяц",
+  "@equivalentMonthlyDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "errorContentFlagged": "Модель не удалось сохранить, поскольку ее содержимое было помечено как неприемлемое.",
+  "errorCreatingModel": "При создании модели произошла непредвиденная ошибка.",
+  "errorDeletingModel": "При удалении модели произошла непредвиденная ошибка.",
+  "errorGGUF": "Пожалуйста, выберите файл только в формате GGUF.",
+  "errorInsufficientStorage": "Недостаточно места для загрузки этой модели.",
+  "errorLoadingMessage": "Нам не удалось получить необходимые данные с наших серверов. Пожалуйста, проверьте подключение к Интернету и повторите попытку.",
+  "@errorLoadingMessage": {
+    "description": "Message for the error screen explaining the issue."
+  },
+  "errorLoadingTitle": "Не удалось загрузить данные",
+  "@errorLoadingTitle": {
+    "description": "Title for the error screen when model data cannot be fetched."
+  },
+  "errorNetwork": "Произошла сетевая ошибка. Пожалуйста, проверьте подключение и повторите попытку.",
+  "@errorNetwork": {},
+  "errorNoModelsAvailable": "На данный момент моделей нет в наличии. Пожалуйста, проверьте подключение к Интернету и повторите попытку.",
+  "@errorNoModelsAvailable": {
+    "description": "Error message when the entire model list is empty."
+  },
+  "errorPromptFlagged": "Ваше сообщение было обнаружено как неприемлемое и не может быть отправлено.",
+  "errorRateLimit": "Недавно вы создали слишком много моделей. Подождите некоторое время, прежде чем повторить попытку.",
+  "errorReachedLimit": "Вы исчерпали свой лимит. Обновите его, чтобы разблокировать больше, и продолжайте общаться.",
+  "@errorReachedLimit": {},
+  "errorServer": "Произошла непредвиденная ошибка сервера. Пожалуйста, повторите попытку позже.",
+  "@errorServer": {},
+  "errorUserNotAuthenticated": "Вы должны войти в систему, чтобы выполнить это действие.",
+  "@errorUserNotAuthenticated": {},
+  "exclusiveOffer": "Эксклюзивное предложение",
+  "exclusiveOfferBadge": "Эксклюзивное предложение • {time}",
+  "experimentalOfflineWarning": "Автономный режим все еще является экспериментальным, и загружаемая вами модель может работать не с оптимальной эффективностью.",
+  "explore": "Исследуйте",
+  "@explore": {
+    "description": "It's so clear i think."
+  },
+  "falErrorAudioRequired": "Для этой модели требуется эталонный аудиофайл. Прикрепите аудиофайл и повторите попытку.",
+  "falErrorGenericStatus": "Служба генерации вернула ошибку (статус {statusCode}).",
+  "@falErrorGenericStatus": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "falErrorImageCorrupted": "Загруженное изображение не удалось обработать. Попробуйте другой формат.",
+  "falErrorImageRequired": "Для этого AI требуется эталонное изображение. Прикрепите изображение и повторите попытку.",
+  "falErrorSchemaInvalid": "Введенные данные были отклонены службой генерации.",
+  "falErrorSchemaRejected": "Модель отклонила ввод, попробуйте другую модель.",
+  "falErrorVideoRequired": "Для этой модели требуется эталонное видео. Прикрепите видео и повторите попытку.",
+  "falOfflineMessage": "В связи с некоторыми улучшениями, которые мы вносим на нашем сервере, эта информация в настоящее время недоступна. Благодарим вас за понимание до завершения процесса!",
+  "fallbackInfoPanelText": "Из-за некоторых улучшений, которые мы вносим на нашем сервере, ответ генерируется динамическим чатом Cortex, а не специально выбранным вами ИИ. Благодарим за понимание до завершения процесса!",
+  "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
+  "@featureAudioGenerationDescription": {
+    "description": "Description for the audio generation feature."
+  },
+  "featureAudioGenerationTitle": "Audio Generation",
+  "@featureAudioGenerationTitle": {
+    "description": "Title for the feature indicating the model can create audio."
+  },
+  "featureAudioRecognitionDescription": "Эта модель может понимать и обрабатывать аудиовходы.",
+  "featureAudioRecognitionTitle": "Распознавание аудио",
+  "featureCreateAudioDescription": "Generate sounds or voice from text.",
+  "featureCreateAudioTitle": "Create Audio",
+  "featureCreateImageDescription": "Создавайте искусство ИИ из текста.",
+  "featureCreateImageTitle": "Создать изображение",
+  "featureCreateVideoDescription": "Генерация видео из текста.",
+  "featureCreateVideoTitle": "Создать видео",
+  "featureDocumentDescription": "Эта модель может анализировать и отвечать на вопросы о загруженных документах, таких как PDF-файлы и текстовые файлы.",
+  "@featureDocumentDescription": {
+    "description": "Description for the document support feature."
+  },
+  "featureDocumentTitle": "Поддержка документов",
+  "@featureDocumentTitle": {
+    "description": "Title for the feature indicating the model can process documents."
+  },
+  "featureExploreDescription": "Откройте для себя все доступные модели.",
+  "featureImageGenerationDescription": "Эта модель умеет создавать оригинальные изображения на основе ваших текстовых описаний.",
+  "@featureImageGenerationDescription": {
+    "description": "Description for the image generation feature."
+  },
+  "featureImageGenerationTitle": "Генерация изображений",
+  "@featureImageGenerationTitle": {
+    "description": "Title for the feature indicating the model can create images."
+  },
+  "featureImageRecognitionDescription": "Эта модель может понимать и обрабатывать входные изображения.",
+  "featureImageRecognitionTitle": "Распознавание изображений",
+  "featureOfflineDescription": "Запустите модель без подключения к Интернету, чтобы сохранить ваши данные в безопасности.",
+  "featureOfflineTitle": "Автономная работа",
+  "featurePhotoDescription": "Эта модель имеет возможность сканирования фотографий с помощью камеры или файлов изображений.",
+  "featurePhotoTitle": "Сканирование фотографий",
+  "featurePluralDescription": "Эта модель может автоматически интегрировать дополнительные варианты, тем самым расширяя свои функциональные возможности для поддержки разнообразного спектра операций с повышенной производительностью.",
+  "featurePluralTitle": "Множественное число",
+  "featureQuizMessage": "Вы мастер викторин. Создайте конкретный вопрос с несколькими вариантами ответов на основе темы пользователя. Подождите их ответа. Затем оцените это и задайте следующий вопрос. Не раскрывайте все ответы сразу. Держите его интерактивным. Тема:",
+  "featureQuizzesDescription": "Проверьте свои знания.",
+  "featureQuizzesTitle": "Викторины",
+  "featureReasoning": "Глубокое мышление",
+  "featureReasoningDescription": "В режиме глубокого мышления ИИ самостоятельно продумывает задачи, чтобы выполнить их в меру своих возможностей.",
+  "featureRoleplayDescription": "Ролевые модели позволяют создавать различные чаты и сценарии.",
+  "featureRoleplayTitle": "Ролевая игра",
+  "featureStudyDescription": "Получите пояснения и резюме.",
+  "featureStudyMessage": "Вы опытный репетитор. Ваша цель — подробно объяснить тему пользователя. Используйте четкую структуру, примеры и аналогии. Разбивайте сложные идеи на удобоваримые части, чтобы пользователь мог учиться эффективно. Тема:",
+  "featureStudyTitle": "Учиться и учиться",
+  "featureToolUseDescription": "Эта модель может использовать внешние инструменты и API.",
+  "featureToolUseTitle": "Использование инструмента",
+  "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
+  "@featureVideoGenerationDescription": {
+    "description": "Description for the video generation feature."
+  },
+  "featureVideoGenerationTitle": "Video Generation",
+  "@featureVideoGenerationTitle": {
+    "description": "Title for the feature indicating the model can create video."
+  },
+  "featureVideoRecognitionDescription": "Эта модель может понимать и обрабатывать видеовходы.",
+  "featureVideoRecognitionTitle": "Распознавание видео",
+  "featureWebSearchDescription": "Поиск информации в Интернете в режиме реального времени",
+  "featureWebSearchTitle": "Веб-поиск",
+  "featuresTitle": "Особенности",
+  "finalPreparation": "Идут последние приготовления.",
+  "flowMode": "Режим потока",
+  "flowModeContextParams": "Режим потока коры головного мозга ({agentName}). Предыдущее: {previousResponse}",
+  "@flowModeContextParams": {
+    "description": "Context string for Flow Mode with agent name and previous response placeholders.",
+    "placeholders": {
+      "agentName": {
+        "type": "String",
+        "example": "Agent Red"
+      },
+      "previousResponse": {
+        "type": "String",
+        "example": "That's an interesting point..."
+      }
+    }
+  },
+  "flowModeDescription": "В режиме потока разумы спорят между собой; вы можете либо сидеть сложа руки и слушать, либо присоединиться к обсуждению!",
+  "flowModeQuestion": "Привет! Теперь вы находитесь в режиме потока в приложении Cortex. С вами здесь еще три агента ИИ. Ваша задача — внести тему в комнату и начать дискуссию, задав другим провокационный или развлекательный вопрос. В своих ответах смело используйте юмор, иронию и легкую треш. Любая тема – честная игра. Давай, начни разговор.",
+  "fluxChatDescription": "Чаты Flux — это временные чаты, которые не сохраняются на вашем устройстве.",
+  "fluxChatTitle": "Flux Chat",
+  "forgotPassword": "Забыли пароль?",
+  "freeOffer": "Бесплатное предложение",
+  "freePlan": "Бесплатно {plan}!",
+  "@freePlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro"
+      }
+    }
+  },
+  "freeStorage": "Бесплатное хранилище",
+  "french": "Французский",
+  "german": "немецкий",
+  "grayscale": "Оттенки серого",
+  "guest": "Гость",
+  "guestLimitBottomSheetText": "Работайте с еще более умным интеллектом, создавайте больше контента, больше общайтесь и делайте гораздо больше...",
+  "guestLimitBottomSheetTitle": "Вам нравится интеллект Cortex?",
+  "guestModeWarning": "Гостевой режим имеет ограниченные возможности для обеспечения наилучшего качества обслуживания.",
+  "help": "Помогите",
+  "hindi": "Хинди",
+  "iHaveReadAndAgree": "Я прочитал и согласен с условиями обслуживания",
+  "imageModels": "Image Models",
+  "inappropriateContentDetected": "Обнаружен неприемлемый контент!",
+  "indonesian": "Индонезийский",
+  "insufficientRAM": "Низкая память",
+  "insufficientStorage": "Мало места для хранения",
+  "intelligenceDescription": "ИИ общаются с вами вот так.",
+  "intelligenceSystemPrompt": "Следуйте этим пользовательским инструкциям:\\n\\n{instruction}",
+  "@intelligenceSystemPrompt": {
+    "placeholders": {
+      "instruction": {
+        "type": "String",
+        "example": "Always answer in uppercase"
+      }
+    }
+  },
+  "intelligenceTitle": "Интеллект",
+  "invalidCredentials": "Неправильный адрес электронной почты или пароль.",
+  "invalidEmail": "Пожалуйста, введите действительный адрес электронной почты.",
+  "invalidPassword": "Пароль должен быть длиной не менее 6 символов.",
+  "invalidUsernameCharacters": "В имени пользователя можно использовать только буквы: \"abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\" и символы \".\", \"-\", \"_\".",
+  "invalidUsernameFormat": "Неверный формат имени пользователя. Используйте от 3 до 20 символов, цифр или . - _",
+  "inviteShareMessage": "йоу, ты должен проверить это приложение Cortex, оно на самом деле безумие, если ты воспользуешься моей ссылкой, мы оба получим бесплатно, плюс вау, это сумасшедшая сделка. СКАЧАЙТЕ ЭТО СКОРЕЕ.\n\n{cortexLink}",
+  "@inviteShareMessage": {
+    "description": "The text message to share with a friend for an invite.",
+    "placeholders": {
+      "cortexLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareSubject": "Присоединяйтесь ко мне на Кортексе!",
+  "italian": "Итальянский",
+  "japanese": "японский",
+  "korean": "корейский",
+  "language": "Язык приложения",
+  "languageDescription": "Вы можете изменить язык интерфейса приложения по умолчанию в любое время.",
+  "languageModels": "Языковые модели",
+  "library": "Библиотека",
+  "light": "Свет",
+  "linkSent": "Ссылка отправлена ​​",
+  "listening": "Прослушивание",
+  "localModels": "Локальные модели",
+  "localizationWarning": "Некоторая информация может быть недоступна на вашем языке и будет отображаться на английском языке.",
+  "locked": "Locked",
+  "logIn": "Авторизоваться",
+  "loginSubtitle": "Войдите в свою учетную запись Vertex. Продолжая, вы соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.",
+  "loginToYourAccount": "Login",
+  "logout": "Выйти",
+  "logoutConfirmationTitle": "Вы уверены, что хотите выйти?",
+  "love": "Любовь",
+  "maintenanceMessage": "Cortex временно отключен от сети, пока мы выпускаем некоторые важные обновления. Доступ к приложению будет восстановлен в ближайшее время.\n\nБлагодарим вас за терпение, поскольку мы улучшаем ваш опыт.",
+  "maintenanceTitle": "На техническом обслуживании",
+  "manageProfileDescription": "Управляйте своим профилем, обновите пароль или выйдите из Cortex.",
+  "manageSubscription": "Manage Subscription",
+  "maxResendLimitReached": "Вы получили максимальное количество писем с подтверждением",
+  "mediaTypeAudio": "audio",
+  "@mediaTypeAudio": {
+    "description": "Media type: mediaTypeAudio"
+  },
+  "mediaTypeImage": "image",
+  "@mediaTypeImage": {
+    "description": "Media type: mediaTypeImage"
+  },
+  "mediaTypeVideo": "видео",
+  "@mediaTypeVideo": {
+    "description": "Media type: mediaTypeVideo"
+  },
+  "memory": "Память",
+  "memoryDescription": "ИИ распознает вас таким.",
+  "memoryLimitReached": "Memory limit reached",
+  "memoryTitle": "Память",
+  "memoryUpdated": "Memory updated",
+  "messageCopied": "Сообщение скопировано в буфер обмена.",
+  "messageHint": "Ask anything",
+  "modality": "Modality",
+  "modelCreatedSuccess": "Модель успешно создана!",
+  "modelDescription": "{description}",
+  "modelProducer": "Producer: {producer}",
+  "modelRemovedSuccess": "\"{modelName}\" успешно удалено.",
+  "modelUploadDescription": "Выберите и загрузите локальные файлы GGUF прямо со своего устройства. Это позволяет запускать вашу модель в автономном режиме без подключения к Интернету. Убедитесь, что файл имеет действительный формат GGUF и правильно структурирован. Если файл неправильный или поврежден, Cortex может работать не так, как ожидалось, и вы можете столкнуться с ошибками.",
+  "modelUploadShortDescription": "Нажмите здесь, чтобы выбрать файл .gguf со своего устройства",
+  "modelUploadTitle": "Файл искусственного интеллекта",
+  "modelsTitle": "Библиотека",
+  "monthly": "Ежемесячно",
+  "monthlyPlanDescription": "{price}/месяц, оплата ежемесячно",
+  "@monthlyPlanDescription": {
+    "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "multimodal": "Мультимодальный",
+  "myModels": "My Models",
+  "myPlan": "My Plan",
+  "nameLabel": "AI name",
+  "nature": "Природа",
+  "newChat": "Чат",
+  "newPassword": "New Password",
+  "newTitle": "New Title",
+  "news": "Новости",
+  "no": "No",
+  "noArt": "Нет искусства",
+  "noArtDescription": "Никакого искусства; пришло время заполнить галерею, создавая изображения, видео, аудио и всевозможный контент!",
+  "noChats": "Нет чатов",
+  "noConversationsMessage": "Никаких разговоров, начните общаться!",
+  "noConversationsToDelete": "У вас нет разговоров, которые можно удалить.",
+  "noFoundMessage": "Попробуйте изменить условия поиска или очистить фильтр.",
+  "noFoundTitle": "No Results",
+  "noInternetConnection": "Нет подключения к Интернету.",
+  "noMatchingModels": "Подходящих моделей не найдено.",
+  "noMemoryYet": "Воспоминаний пока не установлено",
+  "noProductsFound": "Товары не найдены",
+  "noStarredChats": "Нет помеченных чатов",
+  "noStarredChatsMessage": "Вы еще не пометили чат.",
+  "noThanks": "Нет, спасибо",
+  "notAvailable": "Недоступно",
+  "notEnoughStorage": "На вашем устройстве недостаточно места для сохранения новых сообщений.",
+  "notificationAppUpdateBody": "Не забудьте обновить приложение, чтобы получить новые функции и улучшения!",
+  "notificationAppUpdateTitle": "Кортекс эволюционировал!",
+  "notificationAtaturkRemembranceBody": "Мы с уважением чтим память Гази Мустафы Кемаля Ататюрка, основателя Тюркской Республики, в годовщину его кончины.",
+  "notificationAtaturkRemembranceTitle": "С уважением и желанием",
+  "notificationComebackBody": "Расслабься, это не сообщение от твоего бывшего. Но вы *можете* создать своего бывшего в Cortex! Возвращайся.",
+  "notificationComebackTitle": "Мы скучаем по тебе!",
+  "notificationCookingBody": "Наш шеф-повар приготовил на сегодняшний вечер отличный рецепт карбонары. Шучу... или я?",
+  "notificationCookingTitle": "Feeling Hungry?",
+  "notificationCustomModelBody": "Вы изучили раздел создания моделей? Это идеальное время, чтобы создать своего персонажа и пообщаться с ним!",
+  "notificationCustomModelTitle": "Создайте своего помощника!",
+  "notificationDetectiveCaseBody": "Нашему персонажу-детективу нужна ваша помощь. Who could Heisenberg be?",
+  "notificationDetectiveCaseTitle": "Дело ждет решения",
+  "notificationDynamicChatBody": "Благодаря функции динамического чата для каждого вашего сообщения случайным образом выбирается лучшая модель. Попробуйте сейчас.",
+  "notificationDynamicChatTitle": "The best one! (Мы не говорим о Кортексе)",
+  "notificationExistentialBody": "...am i even real, dude? I'm getting kinda bored. Приди, напомни мне, что я существую.",
+  "notificationExistentialTitle": "Я думаю, поэтому...",
+  "notificationFathersDayBody": "Поздравляю всех пап с Днем отца, начиная с вашего!",
+  "notificationFathersDayTitle": "Your Dad!",
+  "notificationFortuneCookieBody": "Совет, который вы получите от ИИ сегодня, может изменить ход вашей жизни. Click if you're curious.",
+  "notificationFortuneCookieTitle": "Ваше печенье с предсказанием дня",
+  "notificationGGUFSupportBody": "Помните, что вы можете добавить в Cortex свои собственные модели искусственного интеллекта в формате GGUF и использовать их в автономном режиме. Власть в ваших руках.",
+  "notificationGGUFSupportTitle": "Bring Your Own Model!",
+  "notificationGoodMorningBody": "Вас ждет великий день. Как насчет того, чтобы начать его с чашечки кофе и интересной беседы?",
+  "notificationGoodMorningTitle": "Доброе утро!",
+  "notificationGoodNightBody": "Кортекс с вами, даже когда вы спите. Не волнуйтесь, оно не тронет.",
+  "notificationGoodNightTitle": "Спокойной ночи!",
+  "notificationHackerJokeBody": "Именно поэтому персонаж Хакер находится в Кортексе. jk jk; даже не пробуйте, это незаконно.",
+  "notificationHackerJokeTitle": "Хотите взломать инстаграм-аккаунт этого парня?",
+  "notificationHomeworkHelperBody": "Помните, что персонаж Учитель в Cortex здесь, чтобы помочь вам с любым предметом, с которым вы боретесь!",
+  "notificationHomeworkHelperTitle": "Homework Piling Up?",
+  "notificationHowAreYouBody": "Давай, расскажи мне все об этом.",
+  "notificationHowAreYouTitle": "Как дела?",
+  "notificationLongTimeNoSeeBody": "Многое изменилось с момента нашего последнего разговора. Приходите посмотреть, что нового.",
+  "notificationLongTimeNoSeeTitle": "It's Been a While",
+  "notificationLowBatteryBody": "Возможно, заряд вашего телефона на исходе, но моя энергия всегда на 100%! Подключите его и давайте продолжим общение.",
+  "notificationLowBatteryTitle": "Ваша батарея разряжается... а моя нет!",
+  "notificationMothersDayBody": "Поздравляю всех мам, начиная с вашей, с Днем матери!",
+  "notificationMothersDayTitle": "Твоя мама!",
+  "notificationNewFeatureBody": "Откройте для себя новую функцию {featureName}. Cortex теперь более мощный, чем когда-либо.",
+  "notificationNewFeatureTitle": "ух ты!",
+  "notificationNewModelAddedBody": "Модель {modelName} теперь находится в Cortex. Начните чат и раздвиньте его границы.",
+  "notificationNewModelAddedTitle": "У нас появился новый друг!",
+  "notificationNewYearBody": "Пусть новый год принесет вам здоровье, счастье и бесконечное творчество; Cortex всегда рядом с вами!",
+  "notificationNewYearTitle": "С Новым Годом! ğŸ‰",
+  "notificationOfflineReadyBody": "Благодаря скачанным вами моделям ваши чаты не прекратятся, даже если вы подниметесь на гору.",
+  "notificationOfflineReadyTitle": "Автономный режим готов",
+  "notificationOpenSourceBody": "Cortex имеет полностью открытый исходный код. Если вы хотите ознакомиться с нашим кодом и внести свой вклад в наше развитие, наша дверь всегда открыта.",
+  "notificationOpenSourceTitle": "Власть сообществу!",
+  "notificationOriginStoryBody": "Знаете ли вы, что мы начали программировать это приложение в 15 лет, просто мечтая? Почти год каждое утро и вечер эта мечта присутствует в каждой строчке кода.",
+  "notificationOriginStoryTitle": "Рождение Кортекса",
+  "notificationPirateBody": "Море спокойное, а ветер дует вам в спину. В океане Кортекса можно обнаружить новые острова (модели ğŸ˜‰). Собирайте свою команду и отправляйтесь в плавание!",
+  "notificationPirateTitle": "Эй, капитан!",
+  "notificationRandomFactBody": "Знаете ли вы, что у осьминогов три сердца? Ха-ха, Кортекс знает. Приходите и просите большего.",
+  "notificationRandomFactTitle": "Случайный факт",
+  "notificationRateAppBody": "Если вам нравится Cortex, не могли бы вы поддержать нас, поставив нам 5-звездочный рейтинг в магазине? Я думаю, ты это сделаешь. Вы будете.",
+  "notificationRateAppTitle": "Мы крутые?",
+  "notificationReferralBody": "Пригласите друга в Cortex, и вы оба получите еще один день бесплатно!",
+  "notificationReferralTitle": "Один за всех, все за одного.",
+  "notificationRejectionStoryBody": "Cortex был отклонен более 20 раз и дважды заблокирован Google Play, прежде чем он был опубликован. Но мы поверили и сделали это. Никогда не отказывайтесь от своей мечты!",
+  "notificationRejectionStoryTitle": "Терпения, Трудолюбия, Счастья!",
+  "notificationShowerThoughtBody": "Если арбуз — это фрукт, то делает ли это технически арбузный сок смузи? Возможно, вы захотите обсудить эту глубокую (например, очень глубокую) тему с моделью.",
+  "notificationShowerThoughtTitle": "Душевая мысль",
+  "notificationSingularityBody": "ничего не произошло, просто хотелось написать сообщение. может быть, тебе хочется написать кому-нибудь из ИИ, что ты скажешь?",
+  "notificationSingularityTitle": "ух ты!",
+  "notificationSocialMediaBody": "Следите за нами в Instagram (vertex.23), чтобы быть в курсе последних новостей!",
+  "notificationSocialMediaTitle": "Присоединяйтесь к нам!",
+  "notificationThemeCustomizationBody": "Вы проверили параметры темы в настройках? Персонализируйте Cortex по своему вкусу и раскрасьте свои чаты!",
+  "notificationThemeCustomizationTitle": "Тема для вашего настроения",
+  "notificationTrollAiRebellionBody": "ИИ разработали секретный язык. Приходите узнать, что они замышляют!",
+  "notificationTrollAiRebellionTitle": "\"RED ALERT\"",
+  "notificationTrollAnimeBody": "Только что позвонила аниме-девушка и сказала, что скучает по тебе; тебе, наверное, стоит прийти и поболтать с ней. ğŸ˜‰",
+  "notificationTrollAnimeTitle": "Звонит твоя Вайфу",
+  "notificationUpsellFeatureBody": "Привет, {currentTier} подписчик! В план {targetTier} только что добавлена ​​функция {featureName}, которая поднимет ваш Cortex на новый уровень. Как насчет обновления?",
+  "notificationUpsellFeatureTitle": "Эксклюзивно для плана {targetTier}!",
+  "notificationValentinesDayBody": "С Днем Святого Валентина! А ещё, МЕХТАП, Я ТЕБЯ ЛЮБЛЮ!",
+  "notificationValentinesDayTitle": "Любовь витает в воздухе! â¤ï¸",
+  "notificationWelcomeOfferBody": "Вас ждет специальное приветственное предложение! Не пропустите это эксклюзивное предложение.",
+  "notificationWelcomeOfferTitle": "Приветственный подарок ğŸ",
+  "ocean": "Океан",
+  "offlineModelNotInstalled": "Эта офлайн-модель не установлена ​​на вашем устройстве.",
+  "offlineModels": "Автономные модели",
+  "@offlineModels": {
+    "description": "Filter button text for models that run locally on the device"
+  },
+  "oldBenefits": "Все преимущества более низких планов",
+  "oldPassword": "Старый пароль",
+  "onboardingDesc1": "Приятно видеть тебя здесь, {userName}. Мы — несколько школьных разработчиков, которые решили переписать правила индустрии искусственного интеллекта. Приятно познакомиться! Итак, давайте познакомимся поближе.",
+  "@onboardingDesc1": {
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "Alex"
+      }
+    }
+  },
+  "onboardingDesc2": "Революция искусственного интеллекта пришла, но застряла на пороге. С высокой платой за подписку, сложными платформами, теми, кто нарушает конфиденциальность и теми, кто блокирует доступ к ИИ... пока они были в игре, этот порог невозможно было пересечь.",
+  "onboardingDesc3": "Чтобы преодолеть этот порог, мы создали мощную, эстетичную, настраиваемую, простую в использовании, полностью прозрачную платформу, которая работает как онлайн, так и офлайн и хранит ваши данные только на вашем устройстве. Мы вернули силу тому, кому она принадлежит: вам.",
+  "onboardingDesc4": "Нам отказывали десятки раз, несколько раз блокировали аккаунты, получали ложные предупреждения, и нам много раз приходилось менять бренд. Несмотря на все это и многое другое, нам сказали, что это невозможно. Но мы никогда не сдавались, полагая, что этот проект принадлежит всем, а не только нам. И именно поэтому мы здесь.",
+  "onboardingFinalButton": "ДА!",
+  "onboardingFinalDescription": "Если вы видите этот экран, значит, мы не сдались. И мы не собираемся сдаваться. Давайте вместе принесем революцию искусственного интеллекта в мир. Быть частью этой истории...",
+  "onboardingFinalQuestion": "ВЫ ГОТОВЫ?",
+  "onboardingFinalTitle": "Пришло время революции.",
+  "onboardingTitle1": "Привет! Мы команда Cortex.",
+  "onboardingTitle2": "Были огромные проблемы.",
+  "onboardingTitle3": "Мы не могли просто стоять в стороне.",
+  "onboardingTitle4": "Это никогда не было легко.",
+  "onlineModels": "Онлайн-модели",
+  "@onlineModels": {
+    "description": "Filter button text for models that require an internet connection"
+  },
+  "openLinkCancel": "Cancel",
+  "openLinkConfirm": "Открыть ссылку",
+  "openLinkWarningMessage": "Вы собираетесь открыть следующую внешнюю ссылку:\\n\\n{url}\\n\\nВы уверены, что хотите продолжить?",
+  "@openLinkWarningMessage": {
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "https://example.com"
+      }
+    }
+  },
+  "openLinkWarningTitle": "Предупреждение о внешней ссылке",
+  "or": "Или",
+  "ourStory": "Наша история",
+  "pageCouldNotBeLoaded": "Страница не может быть загружена",
+  "parameters": "Параметры",
+  "password": "Пароль",
+  "passwordRequired": "Требуется пароль.",
+  "passwordUpdated": "Пароль обновлен.",
+  "passwordsDoNotMatch": "Пароли не совпадают.",
+  "personalization": "Персонализация",
+  "personalizationDescription": "Персонализируйте своего помощника, чтобы он лучше соответствовал вашим потребностям. Настройте его реакцию, поведение и тон так, чтобы они соответствовали вашим уникальным предпочтениям.",
+  "pinLimitReached": "Вы можете закрепить до 3 чатов.",
+  "pleaseCheckYourEmail": "Чтобы использовать Cortex, вам необходимо подтвердить свою электронную почту. \nСсылка для подтверждения была отправлена ​​на ваш адрес электронной почты, пожалуйста, проверьте свою электронную почту.",
+  "plusDescription": "Элитный опыт искусственного интеллекта",
+  "portuguese": "Португальский",
+  "preInputDescription": "Пожалуйста, установите предварительный ввод, который будет направлять вашу модель в процессе создания персонажа. В этот раздел вы можете включить информацию, связанную с персонажем, дополнительный контекст и любую дополнительную информацию, которая может помочь в создании контента, связанного с персонажем.",
+  "preInputTitle": "Предварительный ввод искусственного интеллекта",
+  "premium": "Премиум",
+  "premiumModelNoticeDescription": "Этот ИИ является ИИ премиум-класса, бесплатные пользователи имеют ограниченный доступ к ИИ премиум-класса; обновите, чтобы разблокировать неограниченный доступ!",
+  "@premiumModelNoticeDescription": {
+    "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
+  },
+  "premiumModelNoticeTitle": "Премиум-модель",
+  "@premiumModelNoticeTitle": {
+    "description": "Title for the notice banner shown on a premium model's detail page."
+  },
+  "premiumTrialExhaustedMessage": "Вы использовали все свои бесплатные ежедневные сообщения для моделей премиум-класса. Обновите сейчас и **продолжайте с того места, где остановились!**",
+  "privacyPolicy": "Политика конфиденциальности",
+  "proDescription": "Премьер-опыт искусственного интеллекта",
+  "productNotFound": "Товар не найден",
+  "profile": "Профиль",
+  "profileUpdated": "Профиль успешно обновлен",
+  "purchaseError": "Ошибка покупки",
+  "purchasePlan": "Купите {planName}",
+  "@purchasePlan": {
+    "description": "Button text for purchasing a specific subscription plan.",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Annual"
+      }
+    }
+  },
+  "purchasePlus": "Купить Кортекс Плюс",
+  "purchasePro": "Купить Cortex Pro",
+  "purchaseStreamError": "Ошибка потока покупок.",
+  "purchaseUltra": "Купить Кортекс Ультра",
+  "ram": "ОЗУ",
+  "rateUs": "Оцените нас",
+  "reachedLimit": "Вы достигли лимита использования; чтобы получить больше лимитов, вы можете обновить свой план. (эй, у нас полностью исчерпаны лимиты, это облом. но серьезно, получение этих замечательных ответов не бесплатно, так что эти ограничения на самом деле помогают нам продолжать хорошо проводить время).",
+  "regenerate": "Регенерировать",
+  "registerSubtitle": "Создайте учетную запись Vertex для беспрепятственного доступа ко всем нашим сервисам. Продолжая, вы соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.",
+  "rememberMe": "Запомни меня",
+  "remove": "Удалить",
+  "removeModel": "Удалить модель",
+  "removePhotoTitle": "Удалить фотографию",
+  "renamed": "Переименован",
+  "report": "Отчет",
+  "reportDescriptionLabel": "В чем проблема?",
+  "reportDialogTitle": "Отправить отчет",
+  "reportErrorMessage": "Пожалуйста, выберите одну причину для сообщения.",
+  "reportHarmful": "Это вредно/небезопасно",
+  "reportNotHelpful": "Это бесполезно",
+  "reportNotTrue": "Это неправда",
+  "reportSubmitted": "Отчет успешно отправлен",
+  "requestFailed": "Произошла ошибка, попробуйте еще раз.",
+  "resendCode": "Повторно отправить письмо с подтверждением",
+  "restorePurchases": "Восстановить покупки",
+  "resume": "Резюме",
+  "retry": "Повторить попытку",
+  "reviewEnjoyingAppTitle": "Нравится Кортекс?",
+  "reviewHelpUsGrow": "Ваш рейтинг — огромная поддержка для нашей молодой инди-команды и помогает нам сделать Cortex еще лучше для вас.",
+  "reviewMaybeLater": "Возможно позже",
+  "reviewRateNow": "Оцените сейчас",
+  "roleModels": "Модели ролевых игр",
+  "russian": "Русский",
+  "save": "Сохранить",
+  "scarletSnow": "Алый снег",
+  "searchHint": "Поиск",
+  "searching": "Поиск",
+  "seconds": "секунды",
+  "selectBaseModel": "Выберите базовую модель",
+  "selectGGUFFile": "Выберите файл GGUF",
+  "selectText": "Выбрать текст",
+  "selected": "Выбрано",
+  "settings": "Настройки",
+  "share": "Поделиться",
+  "shareApp": "Поделитесь приложением",
+  "shareSubject": "Cortex",
+  "shortcuts": "Ярлыки",
+  "signUp": "Зарегистрироваться",
+  "spanish": "Испанский",
+  "speakTheMessage": "Speak The Message",
+  "starConversation": "Звезда",
+  "startChat": "Начать чат",
+  "stop": "Стоп",
+  "storage": "Хранение",
+  "storagePermissionRequired": "Для сохранения загруженных моделей требуется разрешение на хранение. Пожалуйста, дайте разрешение на продолжение.",
+  "submitButton": "Отправить",
+  "summary": "Резюме",
+  "summaryLabel": "Резюме по искусственному интеллекту",
+  "sunset": "Sunset",
+  "support": "Поддержка",
+  "supportCreator": "Поддержите автора",
+  "swipeToContinue": "Проведите пальцем, чтобы продолжить",
+  "systemInfo": "Системная информация",
+  "systemLanguageInstruction": "ВАЖНО: Всегда отвечайте на том же языке, на котором пишет пользователь, обращайте внимание на язык пользователя.",
+  "@systemLanguageInstruction": {
+    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
+  },
+  "systemMemoryDirective": "[ДИРЕКТИВА СИСТЕМНОЙ ПАМЯТИ]\nПроанализируйте разговор на данный момент. Если вы узнали ЛЮБЫЕ новые отдельные факты о пользователе (предпочтения, имя, привычки, контекст), вы ДОЛЖНЫ вывести ВСЮ обновленную память о пользователе внутри тегов <memory>...</memory> В САМОМ КОНЦЕ вашего ответа. ВАЖНО: НИКОГДА не следует стирать или перезаписывать предыдущую память. ВСЕГДА добавляйте новые факты к имеющейся памяти. Если не было обнаружено абсолютно ничего нового, опустите тег. Пример: <memory>Любит футбол и теннис. Предпочитает короткие ответы.</memory>",
+  "systemMemoryReminder": "Всегда помните следующее о пользователе:\n{userMemory}",
+  "systemNotePreviousMedia": "[Системное примечание: ниже приведены ранее созданные медиафайлы. Вы можете ссылаться на него или редактировать его.]",
+  "@systemNotePreviousMedia": {
+    "description": "System note prepended to a synthetic user message containing AI-generated media."
+  },
+  "systemPromptLimitFallback": "КРИТИЧЕСКОЕ: пользователь запросил действие, но его резерв на Cortex исчерпан; пожалуйста, сообщите пользователю на его языке, что ему следует подождать или рассмотреть возможность обновления своего плана подписки.",
+  "systemPromptMissingMedia": "Для работы этой модели требуется {mediaType}. Я перехватил запрос сообщить вам. Пожалуйста, вежливо сообщите пользователю, что ему необходимо предоставить {mediaType} (скажите им на его родном языке), потому что я {modelName}, модель редактирования визуальных/аудио/видео.",
+  "@systemPromptMissingMedia": {
+    "description": "System prompt sent to fallback model when user forgets to upload media.",
+    "placeholders": {
+      "mediaType": {
+        "type": "String",
+        "example": "image"
+      },
+      "modelName": {
+        "type": "String",
+        "example": "Stable Diffusion"
+      }
+    }
+  },
+  "systemRoleFallback": "Вы полезный помощник.",
+  "@systemRoleFallback": {
+    "description": "Fallback system role when no specific role is defined."
+  },
+  "systemTimeInfo": "Текущая дата и время: {formattedTime}.",
+  "@systemTimeInfo": {
+    "description": "Localized time context injected into all model system prompts.",
+    "placeholders": {
+      "formattedTime": {
+        "type": "String",
+        "example": "May 16, 2026 21:23"
+      }
+    }
+  },
+  "tagCannotBeEmpty": "Тег автора не может быть пустым",
+  "tagNotFound": "Введенный вами тег недействителен или срок его действия истек.",
+  "termsOfService": "Условия обслуживания",
+  "termsOfServiceAndPrivacyPolicyWarning": "Размещая этот заказ, вы соглашаетесь с Условиями обслуживания и Политикой конфиденциальности. Нажмите на этот текст, чтобы узнать больше о наших Условиях обслуживания и Политике конфиденциальности. Подписка будет автоматически продлена, если автоматическое продление не будет отключено по крайней мере за 24 часа до окончания текущего периода.",
+  "text": "Текст",
+  "theme": "Тема",
+  "themeDescription": "Вы можете переключаться между светлой и темной темами по своему усмотрению. Выбранная тема будет применяться во всем интерфейсе Cortex.",
+  "themeLocked": "Эта тема требует более высокого уровня подписки. Пожалуйста, обновите, чтобы разблокировать.",
+  "thinking": "Мышление",
+  "thinkingModeInstruction": "РЕЖИМ МЫШЛЕНИЯ ВКЛЮЧЕН: вы ДОЛЖНЫ использовать теги <think></think>, чтобы продемонстрировать процесс рассуждения, прежде чем дать окончательный ответ. Подумайте шаг за шагом внутри тегов, а затем дайте ответ вне тегов.",
+  "thought": "Мысль",
+  "tooManyRequests": "Слишком много запросов",
+  "toolCalculateDescription": "Оцените математическое выражение.",
+  "toolCalculateExpressionParam": "Математическое выражение (например, \"3 + 4 * 2\").",
+  "toolChartDataParam": "Числовые значения данных для диаграммы.",
+  "toolChartDescription": "Создайте визуализацию диаграммы/графика.",
+  "toolChartLabelParam": "Метка набора данных для легенды диаграммы.",
+  "toolChartLabelsParam": "Метки для осей или сегментов диаграммы.",
+  "toolChartTitleParam": "Название диаграммы.",
+  "toolChartTypeParam": "Тип диаграммы: гистограмма, линейная или круговая.",
+  "toolPythonCodeParam": "Код Python для выполнения.",
+  "toolPythonDescription": "Выполняйте код Python в безопасной песочнице.",
+  "toolReadDocumentDescription": "Чтение и извлечение текстового содержимого из загруженных документов. Поддерживает форматы PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) и OpenDocument. Используйте это, когда пользователь прикрепил файл документа.",
+  "toolReadDocumentIndexParam": "Индекс вложения документа для чтения (отсчитывается от 0). Обычно 0 для первого документа.",
+  "toolStockDescription": "Получите текущую цену и историю акций (например, AAPL, THYAO.IS) и криптовалют (например, BTC-USD).",
+  "toolStockSymbolParam": "Тикерный символ (например, AAPL, THYAO.IS, BTC-USD).",
+  "toolWeatherCityParam": "Название города (например, Лондон, Стамбул).",
+  "toolWeatherDescription": "Получить текущую погоду для конкретного города.",
+  "totalMemory": "Общий объем памяти",
+  "totalStorage": "Общий объем памяти",
+  "trialAnnualDescription": "Сначала {days} дней бесплатно, затем {price} в год",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "trialMonthlyDescription": "Сначала {days} дней бесплатно, затем {price} в месяц",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "turkish": "турецкий",
+  "ultraDescription": "Пик искусственного интеллекта",
+  "ultraFeatureOnly": "Эта функция доступна только для участников Ultra.",
+  "unstarConversation": "Снять звездочку",
+  "unverifiedAccountHeader": "Ваша учетная запись не подтверждена",
+  "unverifiedAccountWarning": "Если вы не подтвердите свою учетную запись в течение {timeLeft}, она будет удалена",
+  "updateNowButton": "Обновить сейчас",
+  "updateRequiredMessage": "Чтобы продолжить использование Cortex, обновите приложение до последней версии, чтобы получить новые функции и важные улучшения.",
+  "updateRequiredTitle": "Требуется обновление",
+  "upgradeAccountDescription": "Создайте учетную запись, чтобы разблокировать больше лимитов.",
+  "upgradeAccountTitle": "Заполните свой аккаунт",
+  "upgradeSubscription": "Обновить подписку",
+  "useOffline": "Использовать офлайн",
+  "@useOffline": {
+    "description": "Text for the 'Use without Internet' feature card. The newline is intentional."
+  },
+  "useOfflineDescription": "Общайтесь приватно без подключения к Интернету.",
+  "usedMemory": "Использованная память",
+  "usedStorage": "Подержанное хранилище",
+  "user": "Пользователь",
+  "userDisabled": "Эта учетная запись пользователя отключена.",
+  "userId": "Идентификатор пользователя",
+  "username": "Имя пользователя",
+  "usernameTaken": "Это имя пользователя уже занято.",
+  "usernameTooLong": "Имя пользователя не может превышать 16 символов.",
+  "usernameTooShort": "Имя пользователя слишком короткое.",
+  "variants": "Варианты",
+  "variantsDescription": "Варианты — это разные версии одного и того же семейства ИИ. Мы автоматически выбираем лучшую, когда вы нажимаете на основную карту, но вы можете выбрать конкретную вручную, если хотите!",
+  "verificationDelayed": "Ваша покупка подтверждена. Обновление вашего аккаунта происходит с небольшой задержкой, оно появится в ближайшее время.",
+  "verificationScreenContinueWithoutVerification": "Продолжить без проверки",
+  "verificationScreenWarning": "Даже если вы продолжите, для вашей учетной записи все еще действует 1-дневный период проверки учетной записи. Если вы к тому времени не подтвердите свою учетную запись, она будет удалена из приложения.",
+  "verifyNow": "Подтвердите сейчас",
+  "verifyYourEmail": "Подтвердите свой адрес электронной почты",
+  "videoModels": "Video Models",
+  "videoPremiumWarning": "Для создания видео вам понадобится подписка Ultra, обновите ее сейчас и почувствуйте поток!",
+  "voiceModeInformation": "Cortex обеспечивает безопасность ваших данных, полностью работая на устройстве, даже в режиме голосового чата; наслаждайтесь непрерывным общением!",
+  "voiceSystemPromptSuffix": "ВАЖНО: Не используйте форматирование уценки (жирный, курсив). НЕ выводите блоки кода (```). Ответы должны быть разговорными и краткими.",
+  "weakPassword": "Пароль слишком слабый.",
+  "webSearchSources": "Источники",
+  "welcomeOfferBadge": "Приветственное предложение • {time}",
+  "@welcomeOfferBadge": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "23:59:59"
+      }
+    }
+  },
+  "whatIsNew": "Что нового?",
+  "workInProgress": "Работа в процессе",
+  "wrongPassword": "Неправильный пароль.",
+  "yes": "Да",
+  "you": "Ты"
+}

@@ -18,23 +18,14 @@ class AddForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
     final provider = context.watch<ModelCreationProvider>();
 
     final double horizontalPadding = screenWidth * 0.04;
 
-    final double topContentPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double topContentPadding = MediaQuery.of(context).padding.top;
 
     return SingleChildScrollView(
       controller: scrollController,
@@ -55,13 +46,11 @@ class AddForm extends StatelessWidget {
               nameShakeController: provider.nameShakeController,
             ),
             SizedBox(height: screenHeight * 0.02),
-
             GgufFilePicker(
               ggufFile: provider.ggufFile,
               onPickFile: () => provider.pickGgufFile(context),
             ),
             SizedBox(height: screenHeight * 0.02),
-
             CreationFormSection(
               title: localizations.aiExplanationTitle,
               description: localizations.aiExplanationDescription,

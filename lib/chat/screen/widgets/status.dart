@@ -83,9 +83,7 @@ class _ToolStatusWidgetState extends State<ToolStatusWidget>
         highlightColor: AppColors.primaryColor.withValues(alpha: 0.5),
         period: const Duration(milliseconds: 2000),
         child: Text(
-          AppLocalizations
-              .of(context)
-              ?.workInProgress ?? 'Work In Progress',
+          AppLocalizations.of(context)?.workInProgress ?? 'Work In Progress',
           style: TextStyle(
             fontSize: widget.fontSize * 0.9,
             fontWeight: FontWeight.w400,

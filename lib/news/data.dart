@@ -31,10 +31,10 @@ class NewsArticle {
   /// Checks if the article has the minimum required data to be displayed.
   /// An article is considered valid if it has a title and summary in at least English.
   bool get isValid {
-    final hasEnglishTitle = title['en'] != null &&
-        title['en']!.trim().isNotEmpty;
-    final hasEnglishSummary = summary['en'] != null &&
-        summary['en']!.trim().isNotEmpty;
+    final hasEnglishTitle =
+        title['en'] != null && title['en']!.trim().isNotEmpty;
+    final hasEnglishSummary =
+        summary['en'] != null && summary['en']!.trim().isNotEmpty;
 
     return hasEnglishTitle && hasEnglishSummary;
   }
@@ -50,13 +50,15 @@ class NewsArticle {
     final Map<String, String> summaryMap = {};
     final Map<String, String> contentMap = {};
 
-    translations.forEach((langCode, translationData) {
+    for (final entry in translations.entries) {
+      final langCode = entry.key;
+      final translationData = entry.value;
       if (translationData is Map<String, dynamic>) {
         titleMap[langCode] = translationData['title'] as String? ?? '';
         summaryMap[langCode] = translationData['summary'] as String? ?? '';
         contentMap[langCode] = translationData['content'] as String? ?? '';
       }
-    });
+    }
 
     // Safely extract the first link from the references list.
     final references = json['references'] as List<dynamic>?;
@@ -66,15 +68,15 @@ class NewsArticle {
     }
 
     return NewsArticle(
-      id: json['id'] as String? ?? 'unknown_id_${DateTime
-          .now()
-          .millisecondsSinceEpoch}',
+      id: json['id'] as String? ??
+          'unknown_id_${DateTime.now().millisecondsSinceEpoch}',
       title: titleMap,
       summary: summaryMap,
       content: contentMap,
       link: link,
-      coverImagePaths: json['cover'] != null ? Map<String, String>.from(
-          json['cover'] as Map) : null,
+      coverImagePaths: json['cover'] != null
+          ? Map<String, String>.from(json['cover'] as Map)
+          : null,
       publishedAt: json['publishedAt'] != null
           ? DateTime.tryParse(json['publishedAt'] as String) ?? DateTime.now()
           : DateTime.now(),

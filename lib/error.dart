@@ -24,9 +24,10 @@ class ErrorView extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final screenHeight = MediaQuery.sizeOf(context).height;
 
-    assert((buttonText == null && onRetry == null) ||
-        (buttonText != null && onRetry != null),
-    'Both buttonText and onRetry must be provided together, or both must be null.');
+    assert(
+        (buttonText == null && onRetry == null) ||
+            (buttonText != null && onRetry != null),
+        'Both buttonText and onRetry must be provided together, or both must be null.');
 
     return Center(
       child: Padding(
@@ -37,7 +38,8 @@ class ErrorView extends StatelessWidget {
           children: [
             SvgPicture.asset(
               'assets/icons/warning.svg',
-              colorFilter: ColorFilter.mode(AppColors.septenaryColor, BlendMode.srcIn),
+              colorFilter:
+                  ColorFilter.mode(AppColors.septenaryColor, BlendMode.srcIn),
               width: screenWidth * 0.2,
             ),
             SizedBox(height: screenWidth * 0.06),

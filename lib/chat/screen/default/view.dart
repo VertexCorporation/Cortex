@@ -1,5 +1,6 @@
 // lib/chat/screen/default/view.dart
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/internet.dart';
 import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -53,6 +55,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
   // State tracking to trigger animations
   bool? _wasFluxMode;
+  int _subtitleIndex = 0;
+  bool _offlinePromptShown = false;
 
   @override
   void initState() {
@@ -113,6 +117,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       curve: Curves.easeInOutCubic,
     );
 
+    _subtitleIndex = math.Random().nextInt(1000);
     _startStandardDefaultSequence();
   }
 
@@ -148,6 +153,16 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       return;
     }
 
+    if (!_offlinePromptShown) {
+      _offlinePromptShown = true;
+      final internet = context.read<InternetProvider>();
+      if (!internet.isConnected) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showOfflinePrompt(context);
+        });
+      }
+    }
+
     // Handle subsequent mode changes
     if (_wasFluxMode != isFlux) {
       _wasFluxMode = isFlux;
@@ -161,48 +176,42 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     }
   }
 
+  Timer? _sequenceTimer;
+
   void _startStandardDefaultSequence([bool? startingWithButtonsOverride]) {
+    _sequenceTimer?.cancel();
     final int token = ++_sequenceToken;
 
-    // Kick a rebuild in case we were mid-state (e.g. widget recreated).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _sequenceToken != token) return;
       setState(() {});
     });
 
-    () async {
-      // Determine starting mode based on current _swapController value
-      final bool startingWithButtons =
-          startingWithButtonsOverride ?? (_swapController.value > 0.5);
+    final bool startWithButtons =
+        startingWithButtonsOverride ?? (_swapController.value > 0.5);
 
-      if (startingWithButtons) {
-        // We're in Button Mode — wait 8s, then crossfade to text
-        await Future.delayed(const Duration(seconds: 8));
-        if (!mounted || _sequenceToken != token) return;
-
-        await _swapController.reverse(from: 1.0).catchError((_) {});
-        if (!mounted || _sequenceToken != token) return;
+    void tick() {
+      if (!mounted || _sequenceToken != token) {
+        _sequenceTimer?.cancel();
+        _sequenceTimer = null;
+        return;
       }
-
-      // Infinite loop: Text(4s) -> Buttons(8s) -> repeat
-      while (mounted && _sequenceToken == token) {
-        // Text mode for 4 seconds
-        await Future.delayed(const Duration(seconds: 4));
-        if (!mounted || _sequenceToken != token) return;
-
-        // Crossfade to buttons
-        await _swapController.forward(from: 0.0).catchError((_) {});
-        if (!mounted || _sequenceToken != token) return;
-
-        // Button mode for 8 seconds
-        await Future.delayed(const Duration(seconds: 8));
-        if (!mounted || _sequenceToken != token) return;
-
-        // Crossfade back to text
-        await _swapController.reverse(from: 1.0).catchError((_) {});
-        if (!mounted || _sequenceToken != token) return;
+      final isTextMode = _swapController.value <= 0.5;
+      if (isTextMode) {
+        _swapController.forward(from: 0.0).catchError((_) {});
+        _sequenceTimer = Timer(const Duration(seconds: 8), tick);
+      } else {
+        _swapController.reverse(from: 1.0).catchError((_) {});
+        _sequenceTimer = Timer(const Duration(seconds: 4), tick);
       }
-    }();
+    }
+
+    if (startWithButtons) {
+      _swapController.reverse(from: 1.0).catchError((_) {});
+      _sequenceTimer = Timer(const Duration(seconds: 4), tick);
+    } else {
+      _sequenceTimer = Timer(const Duration(seconds: 4), tick);
+    }
   }
 
   void _handleIconTap() {
@@ -237,12 +246,11 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     required double fontSize,
     required double borderRadius,
   }) {
-    context.watch<ThemeProvider>();
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     final horizontalPadding = screenWidth * 0.02;
 
-    final catalog = context.watch<ModelCatalogProvider>();
+    final catalog = context.read<ModelCatalogProvider>();
 
     final hasImage = catalog.allModels
         .any((m) => m.outputs['image'] == true || m.category == 'image');
@@ -251,7 +259,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     final hasAudio = catalog.allModels
         .any((m) => m.outputs['audio'] == true || m.category == 'audio');
 
-    final userProvider = context.watch<UserProvider>();
+    final userProvider = context.read<UserProvider>();
     final int subLevel = userProvider.activeSubscriptionLevel;
     // Lifetime or Ultra
     final bool isUltra = subLevel >= 3;
@@ -262,90 +270,62 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         right: horizontalPadding,
         top: buttonHeight * 0.15,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: _buildBoxButton(
-                  context,
-                  width: null,
-                  height: buttonHeight,
-                  iconSize: iconSize,
-                  fontSize: fontSize,
-                  borderRadius: borderRadius,
-                  buttonSpacing: buttonSpacing,
-                  iconPath: 'assets/icons/make.svg',
-                  title: l10n.featureCreateImageTitle,
-                  iconColor:
-                      AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: !hasImage,
-                  onTap: () => _handleGeneration(context, 'image'),
-                ),
-              ),
-              SizedBox(width: buttonSpacing),
-              Expanded(
-                child: _buildBoxButton(
-                  context,
-                  width: null,
-                  height: buttonHeight,
-                  iconSize: iconSize,
-                  fontSize: fontSize,
-                  borderRadius: borderRadius,
-                  buttonSpacing: buttonSpacing,
-                  iconPath: 'assets/icons/transition.svg',
-                  title: l10n.featureCreateVideoTitle,
-                  iconColor:
-                      AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: !hasVideo,
-                  isAnimatedRainbowBorder: !isUltra,
-                  onTap: () => _handleGeneration(context, 'video'),
-                ),
-              ),
-            ],
+          Expanded(
+            child: _buildBoxButton(
+              context,
+              width: null,
+              height: buttonHeight,
+              iconSize: iconSize,
+              fontSize: fontSize,
+              borderRadius: borderRadius,
+              buttonSpacing: buttonSpacing,
+              iconPath: 'assets/icons/make.svg',
+              title: l10n.featureCreateImageTitle,
+              iconColor:
+                  AppColors.background.inverted.withValues(alpha: 0.2),
+              isDisabled: !hasImage,
+              onTap: () => _handleGeneration(context, 'image'),
+            ),
           ),
-          SizedBox(height: rowSpacing),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: _buildBoxButton(
-                  context,
-                  width: null,
-                  height: buttonHeight,
-                  iconSize: iconSize,
-                  fontSize: fontSize,
-                  borderRadius: borderRadius,
-                  buttonSpacing: buttonSpacing,
-                  iconPath: 'assets/icons/voice.svg',
-                  title: l10n.featureCreateAudioTitle,
-                  iconColor:
-                      AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: !hasAudio,
-                  onTap: () => _handleGeneration(context, 'audio'),
-                ),
-              ),
-              SizedBox(width: buttonSpacing),
-              Expanded(
-                child: _buildBoxButton(
-                  context,
-                  width: null,
-                  height: buttonHeight,
-                  iconSize: iconSize,
-                  fontSize: fontSize,
-                  borderRadius: borderRadius,
-                  buttonSpacing: buttonSpacing,
-                  iconPath: 'assets/icons/context.svg',
-                  title: l10n.useOffline,
-                  iconColor:
-                      AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: false,
-                  onTap: () => _handleOfflineAction(context),
-                ),
-              ),
-            ],
+          SizedBox(width: buttonSpacing),
+          Expanded(
+            child: _buildBoxButton(
+              context,
+              width: null,
+              height: buttonHeight,
+              iconSize: iconSize,
+              fontSize: fontSize,
+              borderRadius: borderRadius,
+              buttonSpacing: buttonSpacing,
+              iconPath: 'assets/icons/transition.svg',
+              title: l10n.featureCreateVideoTitle,
+              iconColor:
+                  AppColors.background.inverted.withValues(alpha: 0.2),
+              isDisabled: !hasVideo,
+              isAnimatedRainbowBorder: !isUltra,
+              onTap: () => _handleGeneration(context, 'video'),
+            ),
+          ),
+          SizedBox(width: buttonSpacing),
+          Expanded(
+            child: _buildBoxButton(
+              context,
+              width: null,
+              height: buttonHeight,
+              iconSize: iconSize,
+              fontSize: fontSize,
+              borderRadius: borderRadius,
+              buttonSpacing: buttonSpacing,
+              iconPath: 'assets/icons/voice.svg',
+              title: l10n.featureCreateAudioTitle,
+              iconColor:
+                  AppColors.background.inverted.withValues(alpha: 0.2),
+              isDisabled: !hasAudio,
+              onTap: () => _handleGeneration(context, 'audio'),
+            ),
           ),
         ],
       ),
@@ -525,6 +505,40 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     }
   }
 
+  void _showOfflinePrompt(BuildContext context) {
+    final local = context.read<ModelLocalStateProvider>();
+    final catalog = context.read<ModelCatalogProvider>();
+    final l10n = AppLocalizations.of(context)!;
+
+    final hasOfflineModels = catalog.allModels.any((m) {
+      final path = local.getFilePathById(m.id);
+      return m.type == 'offline' && local.isModelOnDisk(path);
+    });
+
+    if (!hasOfflineModels) return;
+
+    showAdaptiveDialog(
+      context: context,
+      builder: (ctx) => AlertDialog.adaptive(
+        title: Text(l10n.noInternetConnection),
+        content: const Text('İnternet bağlantınız yok. İndirdiğiniz modellerden biriyle çevrimdışı sohbet etmek ister misiniz?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _handleOfflineAction(context);
+            },
+            child: const Text('Çevrimdışı Kullan'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleOfflineAction(BuildContext context) {
     final catalog = context.read<ModelCatalogProvider>();
     final local = context.read<ModelLocalStateProvider>();
@@ -549,6 +563,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
   @override
   void dispose() {
+    _sequenceTimer?.cancel();
     _breathingController.dispose();
     _entranceController.dispose();
     _swapController.dispose();
@@ -594,67 +609,230 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     final int hour = DateTime.now().hour;
     final locale = Localizations.localeOf(context);
     final String lang = locale.languageCode;
+    final bool isMorning = hour >= 5 && hour < 12;
+    final bool isAfternoon = hour >= 12 && hour < 17;
+    final bool isEvening = hour >= 17 && hour < 22;
+    final i = _subtitleIndex;
+
+    String from(List<String> pool) => pool[i % pool.length];
 
     switch (lang) {
       case 'tr':
-        if (hour >= 5 && hour < 12) {
-          return 'Bugün harika şeyler yapmaya hazır mısın? ☕';
-        } else if (hour >= 12 && hour < 17) {
-          return 'Günün nasıl geçiyor? Yardımcı olabilirim. 🚀';
-        } else if (hour >= 17 && hour < 22) {
-          return 'Bugünü nasıl tamamladık? Planlarımız neler? 🌟';
+        if (isMorning) {
+          return from([
+            'Bugün harika şeyler yapmaya hazır mısın? ☕',
+            'Yeni bir gün, yeni bir başlangıç! Nasıl yardımcı olabilirim? 🌅',
+            'Güne harika başlamak için ne yapabilirim? ✨',
+            'Kahven hazır, ben de buradayım. Nereden başlayalım? ☕',
+            'Bugün seni neler bekliyor? Hadi plan yapalım! 📋',
+            'Sabah sabah aklında ne var? Anlat bakalım! 🌞',
+            'Günaydın! Bugünün verimli geçmesi için ne yapabilirim? ⚡',
+            'Uyandın mı? Harika! Nerelerdeyiz bugün? 🚀',
+            'Bugün birlikte neler başaracağız? Haydi! 💪',
+          ]);
+        } else if (isAfternoon) {
+          return from([
+            'Günün nasıl geçiyor? Yardımcı olabilirim. 🚀',
+            'Öğlen oldu bile! Bugün neler yaptın? ⏰',
+            'Mola zamanı! Sana kahve söylesem mi? ☕',
+            'Gün ortasında enerjini tazelemek için ne yapabilirim? ⚡',
+            'Öğle arasında aklında bir şey var mı? 🍝',
+            'Günün koşturmacası nasıl? Biraz yardım ister misin? 🏃',
+            'Şu ana kadar neler yaptın, neler kaldı? Hadi planlayalım! 📊',
+            'Merhaba! Öğleden sonran nasıl geçiyor? 😊',
+            'Yarım gün bitti, kalan yarıda neler yapacağız? 🎯',
+          ]);
+        } else if (isEvening) {
+          return from([
+            'Bugünü nasıl tamamladık? Planlarımız neler? 🌟',
+            'Akşam oldu, günün yorgunluğunu atmak ister misin? 🌆',
+            'Bugün neler yaptın, neler öğrendin? Anlat bakalım! 📖',
+            'Akşam keyfi için ne yapalım? Film, müzik, sohbet? 🎬',
+            'Gün batarken aklında kalanlar neler? 🌅',
+            'Akşam akşam kafanı dağıtmak ister misin? Sohbet edelim! 🌙',
+            'Bugünün en iyi anısı neydi? Hadi paylaş! ✨',
+            'Yemeğini yedin mi? Afiyet olsun! 🍽️',
+            'Akşam planın var mı yoksa birlikte bir şeyler mi yapsak? 🎯',
+          ]);
         } else {
-          return 'Uykudan önce son bir soru? 🥱';
+          return from([
+            'Uykudan önce son bir soru? 🥱',
+            'Gecenin sessizliğinde ne düşünüyorsun? 🌙',
+            'Yatmadan önce kafanı kurcalayan bir şey var mı? 🌌',
+            'Uykun geldiyse son bir şey sormak ister misin? 😴',
+            'Rüyalarında ne görmek istersin? Tatlı rüyalar! 🌠',
+            'Gece gece aklında ne var? Anlat, sonra uykuya dal! ✨',
+            'Günü değerlendirmek ister misin? Nasıl geçti bugün? 📝',
+            'Yarın için bir planın var mı? Hazırlık yapalım! 📋',
+            'Birazdan uyuyacaksın, son bir şey sorsana? 🛌',
+            'Yastığa başını koymadan önce anlatmak istediğin bir şey? 🌜',
+          ]);
         }
       case 'az':
-        if (hour >= 5 && hour < 12) {
-          return 'Bu gün gözəl işlər görməyə hazırsınız? ☕';
-        } else if (hour >= 12 && hour < 17) {
-          return 'Gününüz necə keçir? Kömək edə bilərəm. 🚀';
-        } else if (hour >= 17 && hour < 22) {
-          return 'Günü necə tamamladıq? 🌟';
+        if (isMorning) {
+          return from([
+            'Bu gün gözəl işlər görməyə hazırsınız? ☕',
+            'Yeni bir gün başlayır! Sizə necə kömək edə bilərəm? 🌅',
+            'Sabahınız xeyir! Bu gün nə planlayırsınız? ✨',
+            'Günə enerjili başlamaq üçün nə edək? 🚀',
+          ]);
+        } else if (isAfternoon) {
+          return from([
+            'Gününüz necə keçir? Kömək edə bilərəm. 🚀',
+            'Gün ortasıdır, enerjiniz necə? ☕',
+            'Nahar fasiləsi verək? 🍝',
+          ]);
+        } else if (isEvening) {
+          return from([
+            'Günü necə tamamladıq? 🌟',
+            'Axşamınız xeyir! Bu gün nələr etdiniz? 🌆',
+            'Günün yekununu birlikdə edək! 📝',
+          ]);
         } else {
-          return 'Yatmazdan əvvəl son bir sual? 🥱';
+          return from([
+            'Yatmazdan əvvəl son bir sual? 🥱',
+            'Gecəniz xeyirə! Rüyalarınız gözəl olsun. 🌙',
+            'Yatmazdan qabaq nə düşünürsünüz? 🌌',
+            'Son bir şey sorun, sonra yatın! 😴',
+          ]);
         }
       case 'de':
-        if (hour >= 5 && hour < 12) {
-          return 'Bereit, heute Großes zu tun? ☕';
-        } else if (hour >= 12 && hour < 17) {
-          return 'Wie läuft dein Tag? Kann ich helfen? 🚀';
-        } else if (hour >= 17 && hour < 22) {
-          return 'Wie war dein Tag? Was steht an? 🌟';
+        if (isMorning) {
+          return from([
+            'Bereit, heute Großes zu tun? ☕',
+            'Guten Morgen! Wie kann ich dir helfen? 🌅',
+            'Ein neuer Tag voller Möglichkeiten! Wo fangen wir an? ✨',
+            'Dein Kaffee wartet, ich auch! Was heute los? ☕',
+            'Heute wird großartig! Was hast du vor? 🚀',
+          ]);
+        } else if (isAfternoon) {
+          return from([
+            'Wie läuft dein Tag? Kann ich helfen? 🚀',
+            'Schon Mittag! Wie war dein Morgen? ⏰',
+            'Zeit für eine Pause? Kaffee? ☕',
+            'Wie ist der Tag bisher gelaufen? 📊',
+          ]);
+        } else if (isEvening) {
+          return from([
+            'Wie war dein Tag? Was steht an? 🌟',
+            'Feierabend! Wie war\'s heute? 🌆',
+            'Abendplanung: Was machen wir heute? 🎬',
+            'Zeit zum Entspannen. Erzähl mir von deinem Tag! ✨',
+          ]);
         } else {
-          return 'Eine letzte Frage vor dem Schlafen? 🥱';
+          return from([
+            'Eine letzte Frage vor dem Schlafen? 🥱',
+            'Bevor du ins Bett gehst, noch etwas? 🌙',
+            'Was beschäftigt dich heute Nacht? 🌌',
+            'Träum was Schönes! Noch eine letzte Frage? 😴',
+            'Schlaf gut! Noch irgendwas? 🌠',
+          ]);
         }
       case 'es':
-        if (hour >= 5 && hour < 12) {
-          return '¿Listo para hacer grandes cosas hoy? ☕';
-        } else if (hour >= 12 && hour < 17) {
-          return '¿Cómo va tu día? Puedo ayudarte. 🚀';
-        } else if (hour >= 17 && hour < 22) {
-          return '¿Cómo terminamos el día hoy? 🌟';
+        if (isMorning) {
+          return from([
+            '¿Listo para hacer grandes cosas hoy? ☕',
+            '¡Buenos días! ¿Cómo puedo ayudarte hoy? 🌅',
+            'Un nuevo día, una nueva oportunidad. ¿Por dónde empezamos? ✨',
+            '¡Arriba! ¿Qué tenemos hoy en la agenda? 📋',
+            '¿Café y charla? ¡Dime todo! ☕',
+          ]);
+        } else if (isAfternoon) {
+          return from([
+            '¿Cómo va tu día? Puedo ayudarte. 🚀',
+            '¡Ya es mediodía! ¿Cómo va todo? ⏰',
+            '¿Hora de comer? ¡Aprovecha y cuéntame! 🍝',
+          ]);
+        } else if (isEvening) {
+          return from([
+            '¿Cómo terminamos el día hoy? 🌟',
+            '¡Buenas tardes! ¿Qué tal te fue hoy? 🌆',
+            'Hora de relajarse. ¿Vemos algo o charlamos? 🎬',
+          ]);
         } else {
-          return '¿Una última pregunta antes de dormir? 🥱';
+          return from([
+            '¿Una última pregunta antes de dormir? 🥱',
+            'Antes de dormir, ¿algo en mente? 🌙',
+            '¿En qué piensas esta noche? 🌌',
+            '¡Dulces sueños! ¿Una última cosa? 😴',
+          ]);
         }
       case 'fr':
-        if (hour >= 5 && hour < 12) {
-          return 'Prêt à accomplir de belles choses aujourd\'hui ? ☕';
-        } else if (hour >= 12 && hour < 17) {
-          return 'Comment se passe votre journée ? Je peux aider. 🚀';
-        } else if (hour >= 17 && hour < 22) {
-          return 'Comment s\'est passée votre journée ? 🌟';
+        if (isMorning) {
+          return from([
+            'Prêt à accomplir de belles choses aujourd\'hui ? ☕',
+            'Bonjour ! Comment puis-je t\'aider aujourd\'hui ? 🌅',
+            'Nouveau jour, nouvelle aventure ! On commence par quoi ? ✨',
+            'Café ? Je suis là. Raconte-moi tout ! ☕',
+            'Bien dormi ? Prêt pour une journée productive ? 🚀',
+          ]);
+        } else if (isAfternoon) {
+          return from([
+            'Comment se passe votre journée ? Je peux aider. 🚀',
+            'Déjà midi ! Comment s\'est passée ta matinée ? ⏰',
+            'Pause déjeuner ? Bon appétit ! 🍝',
+            'Comment avance la journée ? 📊',
+          ]);
+        } else if (isEvening) {
+          return from([
+            'Comment s\'est passée votre journée ? 🌟',
+            'Bonsoir ! Une bonne journée ? 🌆',
+            'Soirée détente. On regarde un film ou on discute ? 🎬',
+            'Raconte-moi ta journée ! ✨',
+          ]);
         } else {
-          return 'Une dernière question avant de dormir ? 🥱';
+          return from([
+            'Une dernière question avant de dormir ? 🥱',
+            'Avant de te coucher, quelque chose en tête ? 🌙',
+            'À quoi penses-tu cette nuit ? 🌌',
+            'Fais de beaux rêves ! Une dernière chose ? 😴',
+            'Bonne nuit ! Un dernier mot ? 🌠',
+          ]);
         }
       default:
-        if (hour >= 5 && hour < 12) {
-          return 'Ready to do great things today? ☕';
-        } else if (hour >= 12 && hour < 17) {
-          return 'How is your day going? I can help. 🚀';
-        } else if (hour >= 17 && hour < 22) {
-          return 'How did we wrap up today? What\'s the plan? 🌟';
+        if (isMorning) {
+          return from([
+            'Ready to do great things today? ☕',
+            'Good morning! What can I do for you? 🌅',
+            'Fresh day, fresh start! Where do we begin? ✨',
+            'Coffee\'s ready, so am I. What\'s on your mind? ☕',
+            'Morning! Got big plans today? 🚀',
+            'Rise and shine! Let\'s make today count! 💪',
+            'What\'s the first thing on your list today? 📋',
+            'New day, new possibilities! How can I help? ⚡',
+            'Good to see you! What are we tackling today? 🎯',
+          ]);
+        } else if (isAfternoon) {
+          return from([
+            'How is your day going? I can help. 🚀',
+            'Almost halfway through! How\'s it going? ⏰',
+            'Lunch break already? Enjoy! 🍝',
+            'How\'s the day treating you? Need a hand? 📊',
+            'Afternoon vibes! What are we up to? ☀️',
+            'Time for a mental refresh? I\'m here! ⚡',
+            'Day still young! What\'s next on the agenda? 📋',
+          ]);
+        } else if (isEvening) {
+          return from([
+            'How did we wrap up today? What\'s the plan? 🌟',
+            'Evening wind-down time! How was your day? 🌆',
+            'Good evening! Ready to relax? 🎬',
+            'Tell me about your day — the good, the bad, the funny! 📖',
+            'Evening plans? Or just hanging out? 🎯',
+            'Time to unwind. Movie, music, or deep chat? ✨',
+          ]);
         } else {
-          return 'One last question before sleep? 🥱';
+          return from([
+            'One last question before sleep? 🥱',
+            'Late night thoughts? I\'m all ears. 🌙',
+            'Can\'t sleep? Let\'s talk about it. 🌌',
+            'Before you drift off, anything on your mind? 🌠',
+            'Sweet dreams ahead! One final thing? 😴',
+            'Night owl! What\'s keeping you up? 🦉',
+            'Ready for bed? Let\'s finish the day right. 🛌',
+            'The night is quiet. What do you want to talk about? ✨',
+            'Sleep well! Anything before you go? 🌜',
+          ]);
         }
     }
   }
@@ -868,8 +1046,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // Colors
     final Color contentColor = AppColors.primaryColor.inverted;
 
-    final double logoSize =
-        isDesktop ? 96.0 : (isTablet ? screenWidth * 0.15 : screenWidth * 0.125);
+    final double logoSize = isDesktop
+        ? 96.0
+        : (isTablet ? screenWidth * 0.15 : screenWidth * 0.125);
 
     final double verticalSpacing = screenHeight * 0.022;
 
@@ -879,14 +1058,25 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         ? 16.0
         : (isTablet ? screenWidth * 0.025 : screenWidth * 0.04);
 
-    final double buttonHeight = isDesktop ? 44.0 : (isTablet ? screenHeight * 0.045 : screenHeight * 0.042);
-    final double buttonSpacing = isDesktop ? 16.0 : (isTablet ? screenWidth * 0.03 : screenWidth * 0.03);
-    final double rowSpacing = isDesktop ? 12.0 : (isTablet ? screenHeight * 0.01 : screenHeight * 0.008);
-    final double iconSize = isDesktop ? 20.0 : (isTablet ? screenWidth * 0.045 : screenWidth * 0.045);
-    final double fontSize = isDesktop ? 14.0 : (isTablet ? screenWidth * 0.026 : screenWidth * 0.028);
-    final double borderRadius = isDesktop ? 22.0 : (isTablet ? screenWidth * 0.08 : screenWidth * 0.1);
-    
-    final double buttonsAreaHeight = buttonHeight * 2 + rowSpacing + (buttonHeight * 0.15) + 16.0;
+    final double buttonHeight = isDesktop
+        ? 34.0
+        : (isTablet ? screenHeight * 0.035 : screenHeight * 0.036);
+    final double buttonSpacing =
+        isDesktop ? 10.0 : (isTablet ? screenWidth * 0.02 : screenWidth * 0.02);
+    final double rowSpacing = isDesktop
+        ? 8.0
+        : (isTablet ? screenHeight * 0.008 : screenHeight * 0.006);
+    final double iconSize = isDesktop
+        ? 16.0
+        : (isTablet ? screenWidth * 0.035 : screenWidth * 0.035);
+    final double fontSize = isDesktop
+        ? 12.0
+        : (isTablet ? screenWidth * 0.02 : screenWidth * 0.022);
+    final double borderRadius =
+        isDesktop ? 16.0 : (isTablet ? screenWidth * 0.06 : screenWidth * 0.07);
+
+    final double buttonsAreaHeight =
+        buttonHeight * 2 + rowSpacing + (buttonHeight * 0.15) + 16.0;
 
     final double contentMaxWidth =
         isDesktop ? 600.0 : (isTablet ? screenWidth * 0.6 : screenWidth);
@@ -1019,35 +1209,65 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                           children: [
                                             // Title (Standard)
                                             _buildEntranceItem(
-                                              startTime: 0.0,
-                                              endTime: 0.5,
-                                              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _getGreetingText(context, username),
-                    style: TextStyle(
-                      fontSize: titleSize,
-                      letterSpacing: 0.5,
-                      color: contentColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: verticalSpacing * 0.25),
-                  Text(
-                    _getSubtitleText(context),
-                    style: TextStyle(
-                      fontSize: titleSize * 0.55,
-                      color: contentColor.withValues(alpha: 0.65),
-                      fontWeight: FontWeight.normal,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              )
-                                            ),
-                                            SizedBox(height: verticalSpacing * 0.3),
+                                                startTime: 0.0,
+                                                endTime: 0.5,
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    ShaderMask(
+                                                      shaderCallback: (bounds) =>
+                                                          LinearGradient(
+                                                        colors: [
+                                                          contentColor
+                                                              .withValues(
+                                                                  alpha: 0.55),
+                                                          contentColor,
+                                                          contentColor
+                                                              .withValues(
+                                                                  alpha: 0.55),
+                                                        ],
+                                                        stops:
+                                                            const [0.0, 0.5, 1.0],
+                                                      ).createShader(bounds),
+                                                      blendMode:
+                                                          BlendMode.srcIn,
+                                                      child: Text(
+                                                        _getGreetingText(
+                                                            context, username),
+                                                        style: TextStyle(
+                                                          fontSize: titleSize,
+                                                          letterSpacing: 0.5,
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        height:
+                                                            verticalSpacing *
+                                                                0.25),
+                                                    Text(
+                                                      _getSubtitleText(context),
+                                                      style: TextStyle(
+                                                        fontSize:
+                                                            titleSize * 0.55,
+                                                        color: contentColor
+                                                            .withValues(
+                                                                alpha: 0.65),
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ],
+                                                )),
+                                            SizedBox(
+                                                height: verticalSpacing * 0.3),
 
                                             // Description <-> Buttons (Timed, smooth crossfade, same position)
                                             SizedBox(
@@ -1135,15 +1355,21 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                                 ),
                                                                 child:
                                                                     _buildFeatureButtons(
-                                  context,
-                                  l10n,
-                                  buttonHeight: buttonHeight,
-                                  buttonSpacing: buttonSpacing,
-                                  rowSpacing: rowSpacing,
-                                  iconSize: iconSize,
-                                  fontSize: fontSize,
-                                  borderRadius: borderRadius,
-                                ),
+                                                                  context,
+                                                                  l10n,
+                                                                  buttonHeight:
+                                                                      buttonHeight,
+                                                                  buttonSpacing:
+                                                                      buttonSpacing,
+                                                                  rowSpacing:
+                                                                      rowSpacing,
+                                                                  iconSize:
+                                                                      iconSize,
+                                                                  fontSize:
+                                                                      fontSize,
+                                                                  borderRadius:
+                                                                      borderRadius,
+                                                                ),
                                                               ),
                                                             ),
                                                           ),

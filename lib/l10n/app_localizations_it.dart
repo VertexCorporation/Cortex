@@ -56,6 +56,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get branch => 'Ramificazione';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1168,7 +1171,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get notificationHowAreYouBody => 'Vieni a raccontarmi tutto.';
 
   @override
-  String get notificationNewYearTitle => 'Buon anno! ğ���';
+  String get notificationNewYearTitle => 'Buon Anno! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1214,10 +1217,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Una ragazza anime ha appena chiamato e ha detto che le manchi; probabilmente dovresti andare a chiacchierare con lei. ğ���';
+      'Una ragazza anime ha appena chiamato, ha detto che le manchi; probabilmente dovresti venire a chiacchierare con lei. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� ALLERTA ROSSA ğ���';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ALLARME ROSSOğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1247,7 +1250,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Regalo di benvenuto ğ���';
+  String get notificationWelcomeOfferTitle => 'Regalo di benvenutoğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1336,7 +1339,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'Il mare è calmo e il vento è a favore. Ci sono nuove isole (modelli ğ���) da scoprire nell\'oceano di Cortex. Raduna il tuo equipaggio e salpa!';
+      'Il mare è calmo e il vento è alle tue spalle. Ci sono nuove isole (modelli ğŸ˜‰) da scoprire nell\'oceano di Cortex. Raduna il tuo equipaggio e salpa!';
 
   @override
   String get notificationFortuneCookieTitle =>

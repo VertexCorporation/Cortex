@@ -64,7 +64,6 @@ class AppDataState {
   }
 }
 
-
 /// A highly optimized, centralized in-memory cache service.
 class CacheService {
   /// The central data store. Access is O(1) thanks to the Map structure.
@@ -138,8 +137,8 @@ class CacheService {
     // Cancel any existing timer for this key.
     _timers[key]?.cancel();
 
-    final timeout = _defaultTimeouts[key] ??
-        const Duration(minutes: 5); // Fallback timeout
+    final timeout =
+        _defaultTimeouts[key] ?? const Duration(minutes: 5); // Fallback timeout
 
     _timers[key] = Timer(timeout, () {
       invalidate(key);

@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "Chat",
+  "branch": "Rama",
   "chatLengthLimitExceeded": "Este chat ha excedido el límite de caracteres. Por favor, inicia un nuevo chat o compra una suscripción.",
   "chatTitleCriticalInstruction": "[INSTRUCCIÓN CRÍTICA]: Usted es un GENERADOR DE TÍTULOS. NO responda a la pregunta del usuario. NO chatee ni salude. SOLO genere un título de 2 a 4 palabras que resuma la pregunta del usuario.",
   "@chatTitleCriticalInstruction": {

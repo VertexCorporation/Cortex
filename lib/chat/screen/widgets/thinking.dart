@@ -29,7 +29,9 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
     with TickerProviderStateMixin {
   bool _isExpanded = false;
   bool _isVisible = true;
-  bool _wasFinished = false; // Track if we've transitioned to "finished" state
+  bool _wasFinished = false;
+  List<InlineSpan>? _cachedParsedContent;
+  String? _cachedContentText;
 
   late AnimationController _arrowController;
   late Animation<double> _arrowTurns;
@@ -101,18 +103,28 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
     }
   }
 
+  List<InlineSpan> _getParsedContent(BuildContext context) {
+    if (_cachedContentText == widget.content && _cachedParsedContent != null) {
+      return _cachedParsedContent!;
+    }
+    _cachedContentText = widget.content;
+    _cachedParsedContent = parseText(context, widget.content,
+        fontSize: 12, isFinished: widget.isFinished);
+    return _cachedParsedContent!;
+  }
+
   @override
   void didUpdateWidget(ThinkingWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
-    // Detect transition from "thinking" to "finished"
+
+    if (widget.content != oldWidget.content) {
+      _cachedParsedContent = null;
+    }
+
     if (widget.isFinished && !_wasFinished) {
       _wasFinished = true;
       _labelTransitionController.forward();
     }
-    
-    // IMPORTANT: Do NOT reset _isExpanded when content updates!
-    // This preserves the expanded state across streaming updates.
   }
 
   @override
@@ -151,7 +163,8 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
     final hasContent = widget.content.isNotEmpty;
 
     // Label texts for both states
-    final thinkingLabel = widget.label ?? (localizations?.thinking ?? 'Thinking');
+    final thinkingLabel =
+        widget.label ?? (localizations?.thinking ?? 'Thinking');
     final thoughtLabel = localizations?.thought ?? 'Thought';
 
     return AnimatedOpacity(
@@ -176,23 +189,25 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                       animation: _labelTransitionController,
                       builder: (context, child) {
                         // Show "Thinking" with shimmer when fading out, "Thought" when fading in
-                        final showThinking = _labelTransitionController.value < 0.5;
-                        final opacity = showThinking 
-                            ? _labelFadeOut.value 
+                        final showThinking =
+                            _labelTransitionController.value < 0.5;
+                        final opacity = showThinking
+                            ? _labelFadeOut.value
                             : _labelFadeIn.value;
-                        
-                        final labelText = showThinking ? thinkingLabel : thoughtLabel;
-                        
+
+                        final labelText =
+                            showThinking ? thinkingLabel : thoughtLabel;
+
                         // Show shimmer only when still in thinking state (not transitioning)
                         final showShimmer = showThinking && !widget.isFinished;
-                        
+
                         return Opacity(
                           opacity: opacity.clamp(0.0, 1.0),
                           child: showShimmer
                               ? Shimmer.fromColors(
                                   baseColor: AppColors.tertiaryColor,
-                                  highlightColor:
-                                      AppColors.primaryColor.withValues(alpha: 0.5),
+                                  highlightColor: AppColors.primaryColor
+                                      .withValues(alpha: 0.5),
                                   period: const Duration(milliseconds: 2000),
                                   child: Text(
                                     labelText,
@@ -262,14 +277,12 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                   child: SelectionArea(
                     child: RichText(
                       text: TextSpan(
-                        children: parseText(context, widget.content,
-                            fontSize: 12, isFinished: widget.isFinished),
+                        children: _getParsedContent(context),
                         style: TextStyle(
                           color: AppColors.primaryColor.inverted
                               .withValues(alpha: 0.8),
                           fontSize: 12,
                           height: 1.4,
-                          // Ensure child text style is normal too, unless overridden
                         ),
                       ),
                     ),

@@ -39,8 +39,12 @@ class ModelsSearchController {
   final CompatibilityStatus Function(int? modelSizeInMB) getCompatibilityStatus;
   final void Function(String id) openModelDetail;
   final Future<void> Function(String id) removeModel;
-  final Future<void> Function(String id, bool isServerSide, {bool isCustomModel, String? modelPath}) startChat;
-  final void Function({required String id, required String url, required String title}) startDownload;
+  final Future<void> Function(String id, bool isServerSide,
+      {bool isCustomModel, String? modelPath}) startChat;
+  final void Function(
+      {required String id,
+      required String url,
+      required String title}) startDownload;
   final void Function(String id) cancelDownload;
   final void Function(String id) resumeDownload;
 
@@ -96,11 +100,8 @@ class ModelsSearchController {
               color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
               fontSize: fontSize,
             ),
-            prefixIcon: Icon(
-                Icons.search,
-                size: iconSize,
-                color: AppColors.primaryColor.inverted
-            ),
+            prefixIcon: Icon(Icons.search,
+                size: iconSize, color: AppColors.primaryColor.inverted),
             filled: true,
             fillColor: AppColors.quaternaryColor,
             border: OutlineInputBorder(
@@ -137,11 +138,13 @@ class ModelsSearchController {
     if (currentResults.isEmpty) {
       _exiting.clear();
     } else {
-      _exiting.removeWhere((exitingModel) =>
-          currentResults.any((resultModel) => resultModel.id == exitingModel.id));
+      _exiting.removeWhere((exitingModel) => currentResults
+          .any((resultModel) => resultModel.id == exitingModel.id));
 
-      final List<ModelEntity> newlyLeavingModels = _prev.where((prevModel) =>
-      !currentResults.any((currentModel) => currentModel.id == prevModel.id)).toList();
+      final List<ModelEntity> newlyLeavingModels = _prev
+          .where((prevModel) => !currentResults
+              .any((currentModel) => currentModel.id == prevModel.id))
+          .toList();
 
       if (newlyLeavingModels.isNotEmpty) {
         _exiting.addAll(newlyLeavingModels);
@@ -179,7 +182,6 @@ class ModelsSearchController {
         child: Stack(
           // Stack allows us to overlay the "No Results" exactly where we want.
           children: [
-
             // LAYER 1: The List
             // Using AnimatedOpacity to fade it out without removing it from layout immediately,
             // preventing sudden layout shifts.
@@ -197,9 +199,10 @@ class ModelsSearchController {
                 itemCount: mergedDisplayList.length,
                 itemBuilder: (ctx, i) {
                   final model = mergedDisplayList[i];
-                  final bool isLeaving =
-                      _exiting.any((exitingModel) => exitingModel.id == model.id) &&
-                          !currentResults.any((currentModel) => currentModel.id == model.id);
+                  final bool isLeaving = _exiting
+                          .any((exitingModel) => exitingModel.id == model.id) &&
+                      !currentResults
+                          .any((currentModel) => currentModel.id == model.id);
                   return _buildResultTile(
                     model,
                     index: i,
@@ -219,7 +222,8 @@ class ModelsSearchController {
               left: 0,
               right: 0,
               child: IgnorePointer(
-                ignoring: showResults, // Allow clicks to pass through to list when results exist
+                ignoring:
+                    showResults, // Allow clicks to pass through to list when results exist
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 250),
                   opacity: showResults ? 0.0 : 1.0, // Fade in when no results
@@ -266,10 +270,7 @@ class ModelsSearchController {
       key: key,
       // Padding ensures it sits nicely under the search bar
       padding: EdgeInsets.only(
-          top: isTablet ? 40 : w * .15,
-          left: w * .05,
-          right: w * .05
-      ),
+          top: isTablet ? 40 : w * .15, left: w * .05, right: w * .05),
       child: Column(
         mainAxisSize: MainAxisSize.min, // Takes minimal vertical space
         children: [
@@ -282,10 +283,12 @@ class ModelsSearchController {
     );
   }
 
-  Widget _buildResultTile(ModelEntity model, {required int index, required bool isLeaving}) {
+  Widget _buildResultTile(ModelEntity model,
+      {required int index, required bool isLeaving}) {
     final dm = downloadManagers.putIfAbsent(model.id, () => DownloadManager());
     final compatibilityStatus = getCompatibilityStatus(model.size);
-    final isEffectivelyDownloaded = (downloadedFileStates[model.id] ?? false) || dm.isDownloaded;
+    final isEffectivelyDownloaded =
+        (downloadedFileStates[model.id] ?? false) || dm.isDownloaded;
 
     final tile = ModelTile(
       key: ValueKey(model.id),
@@ -299,11 +302,17 @@ class ModelsSearchController {
         openModelDetail(model.id);
       },
       onRemoveRequested: () => removeModel(model.id),
-      onChatPressed: () => startChat(model.id, model.isServerSide, isCustomModel: model.isCustomModel, modelPath: null),
+      onChatPressed: () => startChat(model.id, model.isServerSide,
+          isCustomModel: model.isCustomModel, modelPath: null),
       onDownloadPressed: () {
-        final isOfflineSeries = !model.isServerSide && (model.variants?.isNotEmpty ?? false);
-        final url = isOfflineSeries ? ModelDataUtils.getOptimalDownloadUrl(model) : model.url;
-        final id = isOfflineSeries ? (ModelDataUtils.getOptimalVariantId(model) ?? model.id) : model.id;
+        final isOfflineSeries =
+            !model.isServerSide && (model.variants?.isNotEmpty ?? false);
+        final url = isOfflineSeries
+            ? ModelDataUtils.getOptimalDownloadUrl(model)
+            : model.url;
+        final id = isOfflineSeries
+            ? (ModelDataUtils.getOptimalVariantId(model) ?? model.id)
+            : model.id;
         startDownload(id: id, url: url ?? '', title: model.displayTitle);
       },
       onCancelDownload: () => cancelDownload(model.id),

@@ -8,7 +8,6 @@ import 'package:cortex/l10n/app_localizations.dart';
 /// This service manages the creation and sharing of user-specific referral links,
 /// ensuring the correct store link is provided based on the user's platform (iOS or Android).
 class InviteService {
-
   /// Generates a platform-specific referral/store link and opens the share dialog.
   Future<void> createAndShareReferralLink(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -34,15 +33,13 @@ class InviteService {
     late final String finalLink;
 
     // Determine the platform to serve the correct store link.
-    if (Theme
-        .of(context)
-        .platform == TargetPlatform.iOS) {
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
       // iOS: Direct App Store link (iOS App Store does not support referrer params in the same way as Play Store)
       finalLink = iosAppStoreLink;
     } else {
       // Android: Google Play Store link with the referrer parameter appended for tracking.
       finalLink =
-      'https://play.google.com/store/apps/details?id=$androidPackageName&referrer=$encodedReferrer';
+          'https://play.google.com/store/apps/details?id=$androidPackageName&referrer=$encodedReferrer';
     }
 
     debugPrint('[InviteService] Generated store link: $finalLink');

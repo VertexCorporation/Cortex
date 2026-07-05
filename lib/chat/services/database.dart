@@ -68,7 +68,7 @@ class DbHelper {
         last_used   INTEGER
       );
     ''');
- await d.execute('''
+    await d.execute('''
  CREATE TABLE semantic_memories (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  category TEXT,
@@ -126,8 +126,8 @@ class DbHelper {
           batch.execute(
               "ALTER TABLE conversations ADD COLUMN modelImagePath TEXT DEFAULT '';");
           break;
- case 9:
- batch.execute('''
+        case 9:
+          batch.execute('''
  CREATE TABLE semantic_memories (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  category TEXT,
@@ -137,7 +137,7 @@ class DbHelper {
  importance INTEGER DEFAULT 3
  );
  ''');
- break;
+          break;
       }
     }
     await batch.commit();

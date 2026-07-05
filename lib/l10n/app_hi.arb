@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "चैट",
+  "branch": "शाखा",
   "chatLengthLimitExceeded": "यह चैट वर्ण सीमा को पार कर गई है। कृपया एक नई चैट शुरू करें या सदस्यता खरीदें।",
   "chatTitleCriticalInstruction": "[महत्वपूर्ण निर्देश]: आप एक शीर्षक जनरेटर हैं। उपयोगकर्ता के प्रश्न का उत्तर न दें। चैट न करें या हैलो न कहें। केवल 2-4 शब्दों का शीर्षक आउटपुट करें जो उपयोगकर्ता के प्रश्न का सारांश प्रस्तुत करता हो।",
   "@chatTitleCriticalInstruction": {

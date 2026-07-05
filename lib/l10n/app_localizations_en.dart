@@ -56,6 +56,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get branch => 'Branch';
+
+  @override
   String get locked => 'Locked';
 
   @override

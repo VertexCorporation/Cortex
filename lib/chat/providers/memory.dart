@@ -22,17 +22,19 @@ class UserMemoryProvider extends ChangeNotifier {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final memoryStr = prefs.getString(_memoryKey) ?? "";
-    
+
     if (memoryStr.isNotEmpty) {
       try {
         final decoded = jsonDecode(memoryStr);
         if (decoded is List) {
           _memoryList = decoded.cast<String>();
         } else {
-          _memoryList = memoryStr.split('\n').where((s) => s.trim().isNotEmpty).toList();
+          _memoryList =
+              memoryStr.split('\n').where((s) => s.trim().isNotEmpty).toList();
         }
       } catch (e) {
-        _memoryList = memoryStr.split('\n').where((s) => s.trim().isNotEmpty).toList();
+        _memoryList =
+            memoryStr.split('\n').where((s) => s.trim().isNotEmpty).toList();
       }
     } else {
       _memoryList = [];
@@ -48,8 +50,13 @@ class UserMemoryProvider extends ChangeNotifier {
   }
 
   Future<void> addMemory(String memory) async {
+    if (memory.isEmpty) {
+      _memoryList.add("");
+      await _saveMemory();
+      notifyListeners();
+      return;
+    }
     final trimmed = memory.trim();
-    if (trimmed.isEmpty) return;
     if (!_memoryList.contains(trimmed)) {
       _memoryList.add(trimmed);
       await _saveMemory();
@@ -79,7 +86,8 @@ class UserMemoryProvider extends ChangeNotifier {
   }
 
   Future<void> updateMemory(String newMemory) async {
-    final newMemories = newMemory.split('\n').where((s) => s.trim().isNotEmpty).toList();
+    final newMemories =
+        newMemory.split('\n').where((s) => s.trim().isNotEmpty).toList();
     if (_memoryList.join('\n') == newMemories.join('\n')) return;
     _memoryList = newMemories;
     await _saveMemory();

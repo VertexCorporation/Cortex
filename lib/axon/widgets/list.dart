@@ -67,12 +67,12 @@ class _AxonConversationListState extends State<AxonConversationList> {
 
   void _onScroll() {
     if (!widget.scrollController.hasClients) return;
-    
+
     // Load more when user scrolls near the bottom
-    if (widget.scrollController.position.pixels >= 
+    if (widget.scrollController.position.pixels >=
         widget.scrollController.position.maxScrollExtent - 200) {
       if (_viewModel == null) return;
-      
+
       final newIds = _viewModel!.conversations;
       if (_currentLimit < newIds.length) {
         setState(() {
@@ -106,7 +106,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
   void _checkForUpdates() {
     final vm = context.read<InboxViewModel>();
     final newIds = vm.conversations;
-    
+
     List<String> newDisplayed;
     if (newIds.length > _currentLimit) {
       newDisplayed = newIds.sublist(0, _currentLimit);
@@ -115,7 +115,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
     }
 
     if (_areListsEqual(_displayedIds, newDisplayed)) return;
-    
+
     setState(() {
       _displayedIds = newDisplayed;
     });
@@ -192,17 +192,18 @@ class _AxonConversationListState extends State<AxonConversationList> {
 
   Widget _buildListContent(AppLocalizations localizations,
       InboxViewModel inboxViewModel, double horizontalPadding) {
-    
     final bool hasSearchText = widget.searchController.text.trim().isNotEmpty;
-    final bool isDeepSearch = widget.isSearchActive && hasSearchText && widget.searchController.text.trim().length >= 2;
-    
+    final bool isDeepSearch = widget.isSearchActive &&
+        hasSearchText &&
+        widget.searchController.text.trim().length >= 2;
+
     final List<String> currentIds = inboxViewModel.conversations;
     final List<SearchHit> searchHits = inboxViewModel.searchHits;
-    
-    final bool isEmpty = isDeepSearch 
-        ? searchHits.isEmpty 
+
+    final bool isEmpty = isDeepSearch
+        ? searchHits.isEmpty
         : (currentIds.isEmpty && _displayedIds.isEmpty);
-        
+
     final bool showNoResults =
         widget.isSearchActive && hasSearchText && isEmpty;
 
@@ -230,78 +231,82 @@ class _AxonConversationListState extends State<AxonConversationList> {
             bottomFogHeight: 30,
             showTop: true,
             showBottom: true,
-            child: isDeepSearch 
-            ? ListView.builder(
-                controller: widget.scrollController,
-                padding: EdgeInsets.fromLTRB(horizontalPadding * 0.5, 0, horizontalPadding * 0.5, 0),
-                itemCount: searchHits.length,
-                itemBuilder: (context, index) {
-                  final hit = searchHits[index];
-                  return SearchHitTile(
-                    hit: hit,
-                    onTap: () {
-                      mainScreenKey.currentState?.closeAxon();
-                      final manager = inboxViewModel.conversationManagers[hit.conversationId];
-                      if (manager != null) {
-                        mainScreenKey.currentState?.openConversation(manager);
-                      }
-                    },
-                  );
-                },
-              )
-            : ListView.builder(
-              controller: widget.scrollController,
-              addAutomaticKeepAlives: false,
-              addRepaintBoundaries: true,
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding * 0.5,
-                0,
-                horizontalPadding * 0.5,
-                0,
-              ),
-              itemCount: _displayedIds.length,
-              itemBuilder: (context, index) {
-                if (index >= _displayedIds.length) {
-                  return const SizedBox.shrink();
-                }
-                final id = _displayedIds[index];
-                final manager = inboxViewModel.conversationManagers[id];
-
-                if (manager == null) return const SizedBox.shrink();
-
-                return AxonConversationTile(
-                  key: ValueKey(id),
-                  manager: manager,
-                  onDelete: () {
-                    inboxViewModel.deleteConversation(id);
-                    Provider.of<IntrovertNotificationService>(context,
-                            listen: false)
-                        .showNotification(
-                      message: localizations.conversationDeleted,
-                      type: NotificationType.success,
-                      isAxonMode: true,
-                      axonWidth: widget.referenceWidth,
-                    );
-                  },
-                  onEdit: (newTitle) =>
-                      inboxViewModel.editConversation(id, newTitle),
-                  onTogglePin: () async {
-                    bool success = await inboxViewModel.togglePinStatus(id);
-                    if (!success) {
-                      if (!context.mounted) return;
-                      Provider.of<IntrovertNotificationService>(context,
-                              listen: false)
-                          .showNotification(
-                        message: localizations.pinLimitReached,
-                        type: NotificationType.error,
-                        isAxonMode: true,
-                        axonWidth: widget.referenceWidth,
+            child: isDeepSearch
+                ? ListView.builder(
+                    controller: widget.scrollController,
+                    padding: EdgeInsets.fromLTRB(
+                        horizontalPadding * 0.5, 0, horizontalPadding * 0.5, 0),
+                    itemCount: searchHits.length,
+                    itemBuilder: (context, index) {
+                      final hit = searchHits[index];
+                      return SearchHitTile(
+                        hit: hit,
+                        onTap: () {
+                          mainScreenKey.currentState?.closeAxon();
+                          final manager = inboxViewModel
+                              .conversationManagers[hit.conversationId];
+                          if (manager != null) {
+                            mainScreenKey.currentState
+                                ?.openConversation(manager);
+                          }
+                        },
                       );
-                    }
-                  },
-                );
-              },
-            ),
+                    },
+                  )
+                : ListView.builder(
+                    controller: widget.scrollController,
+                    addAutomaticKeepAlives: false,
+                    addRepaintBoundaries: true,
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding * 0.5,
+                      0,
+                      horizontalPadding * 0.5,
+                      0,
+                    ),
+                    itemCount: _displayedIds.length,
+                    itemBuilder: (context, index) {
+                      if (index >= _displayedIds.length) {
+                        return const SizedBox.shrink();
+                      }
+                      final id = _displayedIds[index];
+                      final manager = inboxViewModel.conversationManagers[id];
+
+                      if (manager == null) return const SizedBox.shrink();
+
+                      return AxonConversationTile(
+                        key: ValueKey(id),
+                        manager: manager,
+                        onDelete: () {
+                          inboxViewModel.deleteConversation(id);
+                          Provider.of<IntrovertNotificationService>(context,
+                                  listen: false)
+                              .showNotification(
+                            message: localizations.conversationDeleted,
+                            type: NotificationType.success,
+                            isAxonMode: true,
+                            axonWidth: widget.referenceWidth,
+                          );
+                        },
+                        onEdit: (newTitle) =>
+                            inboxViewModel.editConversation(id, newTitle),
+                        onTogglePin: () async {
+                          bool success =
+                              await inboxViewModel.togglePinStatus(id);
+                          if (!success) {
+                            if (!context.mounted) return;
+                            Provider.of<IntrovertNotificationService>(context,
+                                    listen: false)
+                                .showNotification(
+                              message: localizations.pinLimitReached,
+                              type: NotificationType.error,
+                              isAxonMode: true,
+                              axonWidth: widget.referenceWidth,
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
           ),
         ),
       ],

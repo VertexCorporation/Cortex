@@ -38,6 +38,7 @@ class ChatSessionProvider with ChangeNotifier {
   String? _displayName;
   String? _email;
   Locale _currentLocale = const Locale('en');
+  StreamSubscription? _authSub;
   static const String _prefDefaultModelKey = 'cortex';
 
   // -------------------- Session-wide UI Flags --------------------
@@ -165,14 +166,16 @@ class ChatSessionProvider with ChangeNotifier {
   bool _checkModality(String modality) {
     if (_selectedModel == null) return false;
     if (_selectedModel!.modalities[modality] == true) return true;
-    
-    final isCharacter = _selectedModel!.category == 'roleplay' || _selectedModel!.category == 'self';
-    if (isCharacter && _selectedModel!.baseModelId != null && _selectedModel!.baseModelId!.isNotEmpty) {
+
+    final isCharacter = _selectedModel!.category == 'roleplay' ||
+        _selectedModel!.category == 'self';
+    if (isCharacter &&
+        _selectedModel!.baseModelId != null &&
+        _selectedModel!.baseModelId!.isNotEmpty) {
       try {
         final baseModel = _modelService.getPreciseModelData(
-          _selectedModel!.baseModelId!, 
-          langCode: _currentLocale.languageCode
-        );
+            _selectedModel!.baseModelId!,
+            langCode: _currentLocale.languageCode);
         return baseModel.modalities[modality] == true;
       } catch (_) {}
     }
@@ -264,7 +267,7 @@ class ChatSessionProvider with ChangeNotifier {
     Locale initialLocale = const Locale('en'),
   }) : _modelService = modelService {
     try {
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      _authSub = FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           resetForLogout();
         }
@@ -375,6 +378,7 @@ class ChatSessionProvider with ChangeNotifier {
   @override
   void dispose() {
     _modelService.removeListener(_onModelServiceUpdate);
+    _authSub?.cancel();
     super.dispose();
   }
 
@@ -492,7 +496,8 @@ class ChatSessionProvider with ChangeNotifier {
 
         if (downloadedOfflineModels.isNotEmpty) {
           // If the user's saved model is NOT one of the downloaded offline models, override it
-          final isSavedModelDownloadedOffline = downloadedOfflineModels.any((m) => m.id == savedId);
+          final isSavedModelDownloadedOffline =
+              downloadedOfflineModels.any((m) => m.id == savedId);
           if (!isSavedModelDownloadedOffline) {
             savedId = downloadedOfflineModels.first.id;
           }

@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "チャット",
+  "branch": "分岐",
   "chatLengthLimitExceeded": "このチャットは文字数制限を超えました。新しいチャットを開始するか、サブスクリプションを購入してください。",
   "chatTitleCriticalInstruction": "【重要指示】：あなたはタイトル生成ツールです。ユーザーの質問に答えたり、チャットや挨拶をしたりしないでください。ユーザーの質問内容を要約した2～4語のタイトルのみを出力してください。",
   "@chatTitleCriticalInstruction": {

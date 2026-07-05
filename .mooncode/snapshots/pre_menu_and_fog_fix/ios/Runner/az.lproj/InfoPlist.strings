@@ -1,5 +1,0 @@
-"NSCameraUsageDescription" = "Cortex kameranızdan istifadə edərək AI modelləri ilə vizual analiz üçün paylaşıla bilən şəkillər çəkir. Şəkilləriniz yalnız paylaşmağı seçdiyinizdə göndərilir.";
-"NSPhotoLibraryUsageDescription" = "Cortex foto qalereyanıza daxil olur ki, AI modelləri ilə vizual söhbətlər üçün şəkillər seçə biləsiniz. Şəkillər yalnız göndərməyi seçdiyinizdə paylaşılır.";
-"NSPhotoLibraryAddUsageDescription" = "Cortex yükləməyi seçdiyinizdə AI tərəfindən yaradılmış şəkilləri və söhbət ixraclarını qalereyanızda saxlayır.";
-"NSMicrophoneUsageDescription" = "Cortex AI ilə səsli söhbətlər üçün mikrofonunuzdan istifadə edir. Suallarınızı başa düşmək və real vaxt cavabları vermək üçün səsiniz emal edilir.";
-"NSSpeechRecognitionUsageDescription" = "Cortex nitq tanıma funksiyasından istifadə edərək sözlərinizi mətnə çevirir və AI ilə əlsiz söhbətlərə imkan yaradır. Səs məlumatları təhlükəsiz şəkildə emal edilir.";

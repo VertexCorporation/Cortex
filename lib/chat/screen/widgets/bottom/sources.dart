@@ -78,15 +78,12 @@ class WebSearchSourcesWidget extends StatelessWidget {
       builder: (BuildContext context) {
         return Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery
-                .of(context)
-                .size
-                .height * 0.8,
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
           ),
           decoration: BoxDecoration(
             color: AppColors.background,
             borderRadius:
-            BorderRadius.vertical(top: Radius.circular(24 * scale)),
+                BorderRadius.vertical(top: Radius.circular(24 * scale)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -183,8 +180,8 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                     border: Border.all(
                                         color: AppColors.border
                                             .withValues(alpha: 0.5)),
-                                    borderRadius: BorderRadius.circular(
-                                        12 * scale),
+                                    borderRadius:
+                                        BorderRadius.circular(12 * scale),
                                   ),
                                   child: Row(
                                     children: [
@@ -194,7 +191,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                         decoration: BoxDecoration(
                                           color: AppColors.quaternaryColor,
                                           borderRadius:
-                                          BorderRadius.circular(6 * scale),
+                                              BorderRadius.circular(6 * scale),
                                         ),
                                         alignment: Alignment.center,
                                         child: Text(
@@ -203,56 +200,57 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                             fontFamily: 'Inter',
                                             fontSize: 12 * scale,
                                             fontWeight: FontWeight.w600,
-                                            color: AppColors.primaryColor
-                                                .inverted,
+                                            color:
+                                                AppColors.primaryColor.inverted,
                                           ),
                                         ),
                                       ),
                                       SizedBox(width: 12 * scale),
                                       ClipRRect(
                                         borderRadius:
-                                        BorderRadius.circular(4 * scale),
+                                            BorderRadius.circular(4 * scale),
                                         child: context
-                                            .watch<InternetProvider>()
-                                            .isConnected
+                                                .watch<InternetProvider>()
+                                                .isConnected
                                             ? Image.network(
-                                          'https://www.google.com/s2/favicons?domain=$host&sz=64',
-                                          width: 20 * scale,
-                                          height: 20 * scale,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                              SvgPicture.asset(
+                                                'https://www.google.com/s2/favicons?domain=$host&sz=64',
+                                                width: 20 * scale,
+                                                height: 20 * scale,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    SvgPicture.asset(
+                                                  'assets/icons/world.svg',
+                                                  width: 20 * scale,
+                                                  height: 20 * scale,
+                                                  colorFilter: ColorFilter.mode(
+                                                      AppColors.primaryColor
+                                                          .inverted,
+                                                      BlendMode.srcIn),
+                                                ),
+                                              )
+                                            : SvgPicture.asset(
                                                 'assets/icons/world.svg',
                                                 width: 20 * scale,
                                                 height: 20 * scale,
                                                 colorFilter: ColorFilter.mode(
-                                                    AppColors.primaryColor
-                                                        .inverted,
+                                                    AppColors
+                                                        .primaryColor.inverted,
                                                     BlendMode.srcIn),
                                               ),
-                                        )
-                                            : SvgPicture.asset(
-                                          'assets/icons/world.svg',
-                                          width: 20 * scale,
-                                          height: 20 * scale,
-                                          colorFilter: ColorFilter.mode(
-                                              AppColors.primaryColor.inverted,
-                                              BlendMode.srcIn),
-                                        ),
                                       ),
                                       SizedBox(width: 12 * scale),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               title,
                                               style: TextStyle(
                                                 fontFamily: 'Inter',
                                                 fontSize: 15 * scale,
-                                                color:
-                                                AppColors.primaryColor.inverted,
+                                                color: AppColors
+                                                    .primaryColor.inverted,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               maxLines: 1,
@@ -281,8 +279,8 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                         color: AppColors.primaryColor.inverted
                                             .withValues(alpha: 0.5),
                                       ),
-                                    ],)
-                              ),
+                                    ],
+                                  )),
                             ),
                           ),
                         );
@@ -294,10 +292,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .padding
-                      .bottom + 8 * scale),
+                  height: MediaQuery.of(context).padding.bottom + 8 * scale),
             ],
           ),
         );

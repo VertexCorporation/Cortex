@@ -18,7 +18,6 @@ import '../providers/actions.dart';
 import 'package:cortex/invite.dart';
 import 'package:cortex/meet.dart';
 
-
 /// A widget that displays the main settings and information section.
 ///
 /// This component provides access to informational pages (Help, ToS, Privacy),
@@ -77,14 +76,8 @@ class _SettingsSectionState extends State<SettingsSection>
       barrierDismissible: true,
       barrierLabel: 'RedeemCodeDialog',
       pageBuilder: (ctx, _, __) {
-        final screenWidth = MediaQuery
-            .of(ctx)
-            .size
-            .width;
-        final keyboardPadding = MediaQuery
-            .of(ctx)
-            .viewInsets
-            .bottom;
+        final screenWidth = MediaQuery.of(ctx).size.width;
+        final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
 
         return AnimatedPadding(
           padding: EdgeInsets.only(bottom: keyboardPadding),
@@ -144,35 +137,35 @@ class _SettingsSectionState extends State<SettingsSection>
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                     color:
-                                                    AppColors.quinaryColor),
+                                                        AppColors.quinaryColor),
                                                 borderRadius:
-                                                BorderRadius.circular(
-                                                    10.0)),
+                                                    BorderRadius.circular(
+                                                        10.0)),
                                             focusedBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                     color: AppColors
                                                         .primaryColor.inverted),
                                                 borderRadius:
-                                                BorderRadius.circular(
-                                                    10.0)),
+                                                    BorderRadius.circular(
+                                                        10.0)),
                                           ),
                                         ),
                                       ),
                                       AnimatedSwitcher(
                                         duration:
-                                        const Duration(milliseconds: 300),
+                                            const Duration(milliseconds: 300),
                                         child: errorText != null
                                             ? Padding(
-                                            padding: EdgeInsets.only(
-                                                top: screenWidth * 0.02),
-                                            child: Text(errorText!,
-                                                style: TextStyle(
-                                                    color: Colors.red,
-                                                    fontSize:
-                                                    screenWidth * 0.03),
-                                                key: ValueKey(errorText)))
+                                                padding: EdgeInsets.only(
+                                                    top: screenWidth * 0.02),
+                                                child: Text(errorText!,
+                                                    style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize:
+                                                            screenWidth * 0.03),
+                                                    key: ValueKey(errorText)))
                                             : const SizedBox.shrink(
-                                            key: ValueKey("emptyError")),
+                                                key: ValueKey("emptyError")),
                                       ),
                                     ],
                                   ),
@@ -191,10 +184,10 @@ class _SettingsSectionState extends State<SettingsSection>
                                               onTap: isRedeeming
                                                   ? null
                                                   : () {
-                                                HapticFeedback
-                                                    .lightImpact();
-                                                Navigator.of(ctx).pop();
-                                              },
+                                                      HapticFeedback
+                                                          .lightImpact();
+                                                      Navigator.of(ctx).pop();
+                                                    },
                                               splashColor: AppColors
                                                   .septenaryColor
                                                   .withValues(alpha: 0.1),
@@ -205,15 +198,15 @@ class _SettingsSectionState extends State<SettingsSection>
                                                   alignment: Alignment.center,
                                                   padding: EdgeInsets.symmetric(
                                                       vertical:
-                                                      screenWidth * 0.04),
+                                                          screenWidth * 0.04),
                                                   child: Text(
                                                       appLocalizations.cancel,
                                                       style: TextStyle(
                                                           color: AppColors
                                                               .septenaryColor,
                                                           fontSize:
-                                                          screenWidth *
-                                                              0.04)))),
+                                                              screenWidth *
+                                                                  0.04)))),
                                         ),
                                       ),
                                       VerticalDivider(
@@ -232,70 +225,68 @@ class _SettingsSectionState extends State<SettingsSection>
                                             onTap: isRedeeming
                                                 ? null
                                                 : () async {
-                                              HapticFeedback
-                                                  .lightImpact();
-                                              final code = codeController
-                                                  .text
-                                                  .trim();
+                                                    HapticFeedback
+                                                        .lightImpact();
+                                                    final code = codeController
+                                                        .text
+                                                        .trim();
 
-                                              if (code.isEmpty) {
-                                                if (ctx.mounted) {
-                                                  setDialogInnerState(
-                                                          () =>
-                                                      errorText =
-                                                          appLocalizations
-                                                              .tagCannotBeEmpty);
-                                                  _redeemCodeShakeController
-                                                      .forward(from: 0);
-                                                }
-                                                return;
-                                              }
+                                                    if (code.isEmpty) {
+                                                      if (ctx.mounted) {
+                                                        setDialogInnerState(
+                                                            () => errorText =
+                                                                appLocalizations
+                                                                    .tagCannotBeEmpty);
+                                                        _redeemCodeShakeController
+                                                            .forward(from: 0);
+                                                      }
+                                                      return;
+                                                    }
 
-                                              try {
-                                                await actionProvider
-                                                    .redeemCode(
-                                                    ctx, code);
-                                                await generalProvider
-                                                    .refreshData();
+                                                    try {
+                                                      await actionProvider
+                                                          .redeemCode(
+                                                              ctx, code);
+                                                      await generalProvider
+                                                          .refreshData();
 
-                                                if (ctx.mounted) {
-                                                  Navigator.of(ctx).pop();
-                                                }
-                                              } catch (e) {
-                                                if (ctx.mounted) {
-                                                  setDialogInnerState(
-                                                          () =>
-                                                      errorText =
-                                                          e.toString());
-                                                  _redeemCodeShakeController
-                                                      .forward(from: 0);
-                                                }
-                                              }
-                                            },
+                                                      if (ctx.mounted) {
+                                                        Navigator.of(ctx).pop();
+                                                      }
+                                                    } catch (e) {
+                                                      if (ctx.mounted) {
+                                                        setDialogInnerState(
+                                                            () => errorText =
+                                                                e.toString());
+                                                        _redeemCodeShakeController
+                                                            .forward(from: 0);
+                                                      }
+                                                    }
+                                                  },
                                             child: Container(
                                               alignment: Alignment.center,
                                               padding: EdgeInsets.symmetric(
                                                   vertical: screenWidth * 0.04),
                                               child: isRedeeming
                                                   ? SizedBox(
-                                                  width: screenWidth * 0.05,
-                                                  height:
-                                                  screenWidth * 0.05,
-                                                  child:
-                                                  CircularProgressIndicator(
-                                                      strokeWidth: 2.0,
-                                                      color: AppColors
-                                                          .senaryColor))
+                                                      width: screenWidth * 0.05,
+                                                      height:
+                                                          screenWidth * 0.05,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                              strokeWidth: 2.0,
+                                                              color: AppColors
+                                                                  .senaryColor))
                                                   : Text(
-                                                  appLocalizations.support,
-                                                  style: TextStyle(
-                                                      color: AppColors
-                                                          .senaryColor,
-                                                      fontSize:
-                                                      screenWidth *
-                                                          0.04,
-                                                      fontWeight:
-                                                      FontWeight.bold)),
+                                                      appLocalizations.support,
+                                                      style: TextStyle(
+                                                          color: AppColors
+                                                              .senaryColor,
+                                                          fontSize:
+                                                              screenWidth *
+                                                                  0.04,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
                                             ),
                                           ),
                                         ),
@@ -329,12 +320,9 @@ class _SettingsSectionState extends State<SettingsSection>
   /// Builds a styled button for a setting item.
   Widget _buildSettingsButton(BuildContext context,
       {required String text,
-        required Widget icon,
-        required VoidCallback onPressed}) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+      required Widget icon,
+      required VoidCallback onPressed}) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Material(
       color: AppColors.secondaryColor,
       child: InkWell(
@@ -380,14 +368,8 @@ class _SettingsSectionState extends State<SettingsSection>
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     final List<Map<String, dynamic>> settingsButtons = [
       {
@@ -398,8 +380,7 @@ class _SettingsSectionState extends State<SettingsSection>
       {
         'key': 'shareApp',
         'icon': 'assets/icons/world.svg',
-        'action': () =>
-            InviteService().createAndShareReferralLink(context)
+        'action': () => InviteService().createAndShareReferralLink(context)
       },
       {
         'key': 'ourStory',
@@ -408,7 +389,7 @@ class _SettingsSectionState extends State<SettingsSection>
           Navigator.of(context).push(
             PageRouteBuilder(
               pageBuilder: (_, __, ___) =>
-              const OnboardingScreen(isStoryMode: true),
+                  const OnboardingScreen(isStoryMode: true),
               transitionDuration: const Duration(milliseconds: 500),
               reverseTransitionDuration: const Duration(milliseconds: 500),
               transitionsBuilder: (_, animation, __, child) {
@@ -421,9 +402,8 @@ class _SettingsSectionState extends State<SettingsSection>
       {
         'key': 'rateUs',
         'icon': 'assets/icons/on/star.svg',
-        'action': () =>
-            _launchURL(context,
-                "https://play.google.com/store/apps/details?id=com.vertex.cortex")
+        'action': () => _launchURL(context,
+            "https://play.google.com/store/apps/details?id=com.vertex.cortex")
       },
       {
         'key': 'redeemCode',
@@ -433,23 +413,20 @@ class _SettingsSectionState extends State<SettingsSection>
       {
         'key': 'termsOfService',
         'icon': Icons.article,
-        'action': () =>
-            _showWebView(context, appLocalizations.termsOfService,
-                "https://vertexishere.com/cortex-terms-of-service")
+        'action': () => _showWebView(context, appLocalizations.termsOfService,
+            "https://vertexishere.com/cortex-terms-of-service")
       },
       {
         'key': 'privacyPolicy',
         'icon': Icons.privacy_tip,
-        'action': () =>
-            _showWebView(context, appLocalizations.privacyPolicy,
-                "https://vertexishere.com/cortex-privacy-policy")
+        'action': () => _showWebView(context, appLocalizations.privacyPolicy,
+            "https://vertexishere.com/cortex-privacy-policy")
       },
       {
         'key': 'copyrights',
         'icon': 'assets/icons/copyrights.svg',
-        'action': () =>
-            _showWebView(context, appLocalizations.copyrights,
-                "https://vertexishere.com/cortex-attributions")
+        'action': () => _showWebView(context, appLocalizations.copyrights,
+            "https://vertexishere.com/cortex-attributions")
       },
     ];
 
@@ -618,10 +595,7 @@ class _PremiumButtonState extends State<_PremiumButton>
       _shineController.forward();
     }
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Material(
       color: Colors.transparent,
@@ -645,9 +619,9 @@ class _PremiumButtonState extends State<_PremiumButton>
                 // Unified border
                 border: widget.hasBorder
                     ? Border.all(
-                  color: AppColors.premium,
-                  width: 1,
-                )
+                        color: AppColors.premium,
+                        width: 1,
+                      )
                     : null,
               ),
               child: Row(

@@ -28,11 +28,12 @@ class VoiceService with ChangeNotifier {
 
   String _currentLocale = "en-US";
   Timer? _silenceTimer;
+  Timer? _voiceTimer;
   Function(String)? _onFinalSentence; // Callback to send text to AI
   String? _voiceSystemPrompt;
 
   String Function(String agentName, String previousResponse)?
-  _flowPromptBuilder;
+      _flowPromptBuilder;
   bool isFlowMode = false; // "Setup" mode (Flow selected but not started)
   bool isFlowActive = false; // "Active" mode (Flow loop running)
   int currentFlowAgentIndex = 0; // 0, 1, 2 for the 3 agents
@@ -42,7 +43,7 @@ class VoiceService with ChangeNotifier {
   bool _isSpeaking = false;
   final StringBuffer _incomingTextBuffer = StringBuffer();
   final StringBuffer _fullAiResponseBuffer =
-  StringBuffer(); // Accumulates full response for Flow Loop
+      StringBuffer(); // Accumulates full response for Flow Loop
 
   // Need to know when to switch back to listening
   bool _aiGenerationComplete = false;
@@ -50,8 +51,7 @@ class VoiceService with ChangeNotifier {
   VoiceService({
     required SpeechService speechService,
     FlutterTts? flutterTts,
-  })
-      : _speechService = speechService,
+  })  : _speechService = speechService,
         _flutterTts = flutterTts ?? FlutterTts() {
     _initTts();
     _speechService.addListener(_onSpeechStatusChange);
@@ -236,7 +236,7 @@ class VoiceService with ChangeNotifier {
     _shouldNextMessageBeHidden = false; // consume it
     return val;
   }
-  
+
   /// Get the current voice system prompt for API calls
   String? get voiceSystemPrompt => _voiceSystemPrompt;
 
@@ -275,7 +275,7 @@ class VoiceService with ChangeNotifier {
     // [NEW] Localized strings passed from UI
     required String voiceSystemPromptSuffix,
     required String Function(String agentName, String previousResponse)
-    flowPromptBuilder,
+        flowPromptBuilder,
   }) async {
     // -------------------------------------------------------------------------
     // 1. LIMIT & CREDIT CHECK (Before starting)
@@ -311,9 +311,7 @@ class VoiceService with ChangeNotifier {
 
     // Check Chat Limits (e.g. free user max messages)
     if (session.chatLimitManager
-        ?.isLimitExceeded(context
-        .read<ConversationProvider>()
-        .messages) ==
+            ?.isLimitExceeded(context.read<ConversationProvider>().messages) ==
         true) {
       debugPrint("[VoiceService] Chat limit exceeded. Stopping.");
       stopSession();
@@ -322,10 +320,7 @@ class VoiceService with ChangeNotifier {
     }
 
     // Check Credits
-    final credits = context
-        .read<CreditsManager>()
-        .totalCreditsNotifier
-        .value;
+    final credits = context.read<CreditsManager>().totalCreditsNotifier.value;
     if (credits != null && credits <= 0) {
       // Credits check logic primarily happens at generation, but good to double check?
       // Actually CreditsManager handles it.
@@ -337,6 +332,7 @@ class VoiceService with ChangeNotifier {
   Future<void> stopSession({bool resetState = true}) async {
     _silenceTimer?.cancel();
     _testModeTimer?.cancel(); // Cancel test timer
+    _voiceTimer?.cancel();
 
     if (resetState) {
       _updateState(
@@ -384,10 +380,7 @@ class VoiceService with ChangeNotifier {
     );
   }
 
-  bool get hasRecognizedText =>
-      _lastRecognizedText
-          .trim()
-          .isNotEmpty;
+  bool get hasRecognizedText => _lastRecognizedText.trim().isNotEmpty;
 
   void manualSubmit(BuildContext context) async {
     _silenceTimer?.cancel();
@@ -443,9 +436,7 @@ class VoiceService with ChangeNotifier {
       return;
     }
 
-    if (_lastRecognizedText
-        .trim()
-        .isEmpty) {
+    if (_lastRecognizedText.trim().isEmpty) {
       // [NEW] If interrupted but no speech (silence timeout), RESUME FLOW automatically.
       // This fixes the "stuck" issue when Flow pauses for input but user says nothing.
       if (isFlowActive && _state == VoiceState.listening) {
@@ -508,13 +499,17 @@ class VoiceService with ChangeNotifier {
     if (_incomingTextBuffer.isNotEmpty) {
       // Logic fix: Ensure we don't drop text if it doesn't end with punctuation
       String text = _incomingTextBuffer.toString();
-      
+
       // Clean remaining block tags
       text = text.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
       text = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
       // If broken/unclosed tags remain, cut them off
-      if (text.contains('<memory>')) text = text.substring(0, text.indexOf('<memory>'));
-      if (text.contains('<think>')) text = text.substring(0, text.indexOf('<think>'));
+      if (text.contains('<memory>')) {
+        text = text.substring(0, text.indexOf('<memory>'));
+      }
+      if (text.contains('<think>')) {
+        text = text.substring(0, text.indexOf('<think>'));
+      }
 
       if (text.trim().isNotEmpty) {
         _enqueueSentence(text);
@@ -528,8 +523,10 @@ class VoiceService with ChangeNotifier {
     String currentText = _incomingTextBuffer.toString();
 
     // First strip out any fully formed <memory>...</memory> and <think>...</think> blocks
-    currentText = currentText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
-    currentText = currentText.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
+    currentText =
+        currentText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
+    currentText =
+        currentText.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
 
     // If there is an open tag that hasn't closed yet, wait for more chunks.
     if (currentText.contains('<memory>') || currentText.contains('<think>')) {
@@ -577,8 +574,7 @@ class VoiceService with ChangeNotifier {
     speechText = speechText.replaceAll('*', ''); // Remove bold/italic markers
 
     debugPrint(
-        "[VoiceService] Enqueuing Sentence: ${speechText.substring(
-            0, speechText.length > 20 ? 20 : speechText.length)}...");
+        "[VoiceService] Enqueuing Sentence: ${speechText.substring(0, speechText.length > 20 ? 20 : speechText.length)}...");
     _sentenceQueue.add(speechText);
     _processQueue();
   }
@@ -635,7 +631,7 @@ class VoiceService with ChangeNotifier {
       // Flow Mode Logic: Cycle to next agent
       if (isFlowActive) {
         // Wait a bit before next turn
-        Future.delayed(const Duration(milliseconds: 800), () {
+        _voiceTimer = Timer(const Duration(milliseconds: 800), () {
           if (!isFlowActive) return; // check if cancelled
 
           // Prepare next turn
@@ -676,7 +672,7 @@ class VoiceService with ChangeNotifier {
 
       // Edge case: Generation finished but nothing was spoken (e.g. very short answer or bug)
       // Or generation finished while we were idle.
-      Future.delayed(const Duration(milliseconds: 500), () {
+      _voiceTimer = Timer(const Duration(milliseconds: 500), () {
         if (_state != VoiceState.idle) {
           if (!isFlowActive) {
             // STRICT CHECK

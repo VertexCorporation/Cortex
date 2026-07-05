@@ -33,7 +33,8 @@ class PremiumBottomSheetContent extends StatefulWidget {
   const PremiumBottomSheetContent({super.key});
 
   @override
-  State<PremiumBottomSheetContent> createState() => _PremiumBottomSheetContentState();
+  State<PremiumBottomSheetContent> createState() =>
+      _PremiumBottomSheetContentState();
 }
 
 class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
@@ -286,7 +287,7 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
             ),
             SizedBox(height: w * 0.08),
 
-                        // Primary Button (Premium'u İncele)
+            // Primary Button (Premium'u İncele)
             _buildAnimatedItem(
               start: 0.4,
               end: 0.9,
@@ -299,7 +300,8 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
                       HapticFeedback.mediumImpact();
                       Navigator.pop(context);
                       final target = const FundsScreen();
-                      navigateToScreen(target, direction: const Offset(0.0, 1.0));
+                      navigateToScreen(target,
+                          direction: const Offset(0.0, 1.0));
                     },
                     borderRadius: BorderRadius.circular(w * 0.035),
                     splashColor: AppColors.premium.withValues(alpha: 0.1),
@@ -309,7 +311,9 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
                         // 1. Base Content
                         Ink(
                           decoration: BoxDecoration(
-                            color: Color.alphaBlend(AppColors.premium.withValues(alpha: 0.15), AppColors.background),
+                            color: Color.alphaBlend(
+                                AppColors.premium.withValues(alpha: 0.15),
+                                AppColors.background),
                             borderRadius: BorderRadius.circular(w * 0.035),
                             border: Border.all(
                               color: AppColors.premium.withValues(alpha: 0.25),
@@ -348,7 +352,8 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
                               animation: _shineAnimation,
                               builder: (context, child) {
                                 return Transform.translate(
-                                  offset: Offset(w * 1.5 * _shineAnimation.value, 0.0),
+                                  offset: Offset(
+                                      w * 1.5 * _shineAnimation.value, 0.0),
                                   child: child,
                                 );
                               },

@@ -1,4 +1,3 @@
-
 class ResponseMetrics {
   final DateTime startTime;
   DateTime? firstTokenTime;
@@ -42,7 +41,9 @@ class MetricsTracker {
   List<ResponseMetrics> get history => _history;
   ResponseMetrics? get currentMetrics => _currentMetrics;
 
-  void startTracking(String modelId, {required int originalPromptLength, required int compressedPromptLength}) {
+  void startTracking(String modelId,
+      {required int originalPromptLength,
+      required int compressedPromptLength}) {
     // Estimating: 1 token ≈ 4 characters in average English/Turkish content
     final originalTokens = (originalPromptLength / 4.0).round();
     final compressedTokens = (compressedPromptLength / 4.0).round();

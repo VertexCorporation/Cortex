@@ -56,6 +56,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get branch => 'Vertakking';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1170,7 +1173,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get notificationHowAreYouBody => 'Kom, vertel het me maar.';
 
   @override
-  String get notificationNewYearTitle => 'Gelukkig nieuwjaar! ğ���';
+  String get notificationNewYearTitle => 'Gelukkig nieuwjaar! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1217,10 +1220,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Een animemeisje belde net en zei dat ze je mist. Je moet waarschijnlijk eens langskomen en met haar kletsen. ğ���';
+      'Een anime-meisje belde net en zei dat ze je mist; Je zou waarschijnlijk eens met haar moeten komen praten. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� ROOD ALARM ğ���';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ ROOD ALERT ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1250,7 +1253,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Welkomstcadeau ğ���';
+  String get notificationWelcomeOfferTitle => 'Welkomstgeschenk ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1339,7 +1342,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'De zee is kalm en de wind staat in de rug. Er zijn nieuwe eilanden (modellen ğ���) te ontdekken in de oceaan van Cortex. Verzamel je bemanning en hijs de zeilen!';
+      'De zee is kalm en de wind staat in de rug. Er zijn nieuwe eilanden (modellen ğŸ˜‰) te ontdekken in de oceaan van Cortex. Verzamel je bemanning en ga varen!';
 
   @override
   String get notificationFortuneCookieTitle => 'Uw gelukskoekje van de dag';

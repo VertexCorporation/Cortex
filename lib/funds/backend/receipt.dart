@@ -42,8 +42,8 @@ extension FundsReceipt on FundsBackend {
 
       final refreshed = await storekit.refreshPurchaseVerificationData();
       final refreshedReceipt = (refreshed?.serverVerificationData ??
-          refreshed?.localVerificationData ??
-          '')
+              refreshed?.localVerificationData ??
+              '')
           .trim();
 
       if (!_isPlaceholderReceipt(refreshedReceipt) &&

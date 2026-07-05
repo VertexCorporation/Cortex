@@ -142,18 +142,18 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
       _purchaseCompletedSubscription =
           _backend.onPurchaseCompleted.listen((String purchasedProductId) {
-            if (mounted) {
-              _confettiController.play();
-              _updateUiAfterPurchase(purchasedProductId);
-              // Log successful purchase
-              AnalyticsService().logPurchaseSuccess(
-                productId: purchasedProductId,
-                productType: 'subscription',
-                value: 0.0, // Backend doesn't expose price here
-                currency: 'USD',
-              );
-            }
-          });
+        if (mounted) {
+          _confettiController.play();
+          _updateUiAfterPurchase(purchasedProductId);
+          // Log successful purchase
+          AnalyticsService().logPurchaseSuccess(
+            productId: purchasedProductId,
+            productType: 'subscription',
+            value: 0.0, // Backend doesn't expose price here
+            currency: 'USD',
+          );
+        }
+      });
 
       // Check if data is already preloaded (from background)
       // This covers: cache exists OR backend already has products loaded
@@ -276,9 +276,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       return;
     }
 
-    final now = DateTime
-        .now()
-        .millisecondsSinceEpoch;
+    final now = DateTime.now().millisecondsSinceEpoch;
     final remaining = expiresAt - now;
 
     // --- CRITICAL CHANGE: Handle expiration cleanly ---
@@ -404,9 +402,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   void _onPrimaryButtonPressed() {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
-    final isAnonymous = context
-        .read<UserProvider>()
-        .isAnonymous;
+    final isAnonymous = context.read<UserProvider>().isAnonymous;
 
     if (isAnonymous) {
       navigateToScreen(const UpgradeAccountScreen(),
@@ -426,7 +422,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final int planLevel = _currentPage + 1;
     final billingOption = _selectedBillingOptions[planType]!;
     final int activePlanLevel =
-    _planLevelFromSubscriptionLevel(_uiActiveSubscriptionLevel);
+        _planLevelFromSubscriptionLevel(_uiActiveSubscriptionLevel);
 
     String? productIdToPurchase;
 
@@ -458,7 +454,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (productIdToPurchase != null) {
       try {
         final productDetails =
-        backend.allProducts.firstWhere((p) => p.id == productIdToPurchase);
+            backend.allProducts.firstWhere((p) => p.id == productIdToPurchase);
         // Log purchase initiated
         AnalyticsService().logPurchaseInitiated(
           productId: productIdToPurchase,
@@ -496,11 +492,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (mounted) {
       Provider.of<IntrovertNotificationService>(context, listen: false)
           .showNotification(
-          message: message,
-          type: isSuccess,
-          oneLine: false,
-          fontSize: 0.025,
-          bottomOffset: 0.01);
+              message: message,
+              type: isSuccess,
+              oneLine: false,
+              fontSize: 0.025,
+              bottomOffset: 0.01);
     }
   }
 
@@ -520,10 +516,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   valueListenable: _countdownNotifier,
                   builder: (context, countdownText, _) {
                     return _buildFixedDiscountBadge(context,
-                        MediaQuery
-                            .of(context)
-                            .size
-                            .width, countdownText);
+                        MediaQuery.of(context).size.width, countdownText);
                   },
                 ),
               ),
@@ -537,7 +530,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       opacity: _isContentLoaded ? 0.0 : 1.0,
                       curve: Curves.easeOutCubic,
                       child:
-                      const FundsSkeletonLoader(key: ValueKey('skeleton')),
+                          const FundsSkeletonLoader(key: ValueKey('skeleton')),
                     ),
                   ),
                   if (backend.hasError)
@@ -574,9 +567,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   Widget _buildErrorScreen(BuildContext context, String message) {
     final localizations = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     return Container(
       color: AppColors.background,
       child: SafeArea(
@@ -625,10 +616,10 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       onPressed: () {
                         HapticFeedback.lightImpact();
                         final backend =
-                        Provider.of<FundsBackend>(context, listen: false);
+                            Provider.of<FundsBackend>(context, listen: false);
                         final notificationService =
-                        Provider.of<IntrovertNotificationService>(context,
-                            listen: false);
+                            Provider.of<IntrovertNotificationService>(context,
+                                listen: false);
                         backend.initialize(
                             notificationService: notificationService,
                             localizations: localizations);
@@ -651,15 +642,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   Widget _buildMainContent(BuildContext context, FundsBackend backend) {
     final localizations = AppLocalizations.of(context)!;
 
-    final screenWidth = MediaQuery
-        .sizeOf(context)
-        .width;
-    final screenHeight = MediaQuery
-        .sizeOf(context)
-        .height;
-    final double topPadding = MediaQuery
-        .paddingOf(context)
-        .top;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final double topPadding = MediaQuery.paddingOf(context).top;
 
     if (!backend.isLoading && _isSpecialOfferChecked && !_isContentLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -701,7 +686,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       planType: _planTypes[i],
                       availableProducts: backend.subscriptionProducts,
                       selectedBillingOption:
-                      _selectedBillingOptions[_planTypes[i]]!,
+                          _selectedBillingOptions[_planTypes[i]]!,
                       activeSubscriptionLevel: _uiActiveSubscriptionLevel,
                       activeSubscriptionOption: _uiActiveSubscriptionOption,
                       onBillingOptionChanged: (newOption) {
@@ -729,10 +714,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   screenWidth * 0.06,
                   screenHeight * 0.01,
                   screenWidth * 0.06,
-                  screenHeight * 0.02 + MediaQuery
-                      .of(context)
-                      .padding
-                      .bottom),
+                  screenHeight * 0.02 + MediaQuery.of(context).padding.bottom),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -753,20 +735,20 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       onPressed: (backend.isPurchasePending || _isEmulator)
                           ? null
                           : () {
-                        HapticFeedback.lightImpact();
-                        _onPrimaryButtonPressed();
-                      },
+                              HapticFeedback.lightImpact();
+                              _onPrimaryButtonPressed();
+                            },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: AppColors.primaryColor,
                         backgroundColor: AppColors.primaryColor.inverted,
                         disabledBackgroundColor: AppColors.primaryColor.inverted
                             .withValues(alpha: 0.6),
                         disabledForegroundColor:
-                        AppColors.primaryColor.withValues(alpha: 0.6),
+                            AppColors.primaryColor.withValues(alpha: 0.6),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
                         padding:
-                        EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                            EdgeInsets.symmetric(vertical: screenHeight * 0.02),
                         minimumSize: Size(double.infinity, screenHeight * 0.06),
                         splashFactory: backend.isPurchasePending
                             ? NoSplash.splashFactory
@@ -785,35 +767,34 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                                 color: AppColors.primaryColor,
                               ),
                             )
-                          else
-                            ...[
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 250),
-                                child: _buildButtonText(
-                                    context, backend, screenWidth),
-                              ),
-                              if (_isEmulator) ...[
-                                SizedBox(height: screenHeight * 0.002),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.04),
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      localizations.emulatorModeWarning,
-                                      textAlign: TextAlign.center,
-                                      maxLines: 3,
-                                      style: TextStyle(
-                                        fontSize: screenWidth * 0.025,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.primaryColor
-                                            .withValues(alpha: 0.8),
-                                      ),
+                          else ...[
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 250),
+                              child: _buildButtonText(
+                                  context, backend, screenWidth),
+                            ),
+                            if (_isEmulator) ...[
+                              SizedBox(height: screenHeight * 0.002),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.04),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    localizations.emulatorModeWarning,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 3,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.025,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.primaryColor
+                                          .withValues(alpha: 0.8),
                                     ),
                                   ),
                                 ),
-                              ]
+                              ),
                             ]
+                          ]
                         ],
                       ),
                     ),
@@ -823,9 +804,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                     onPressed: backend.isPurchasePending
                         ? null
                         : () async {
-                      HapticFeedback.lightImpact();
-                      await backend.restorePurchases();
-                    },
+                            HapticFeedback.lightImpact();
+                            await backend.restorePurchases();
+                          },
                     child: Text(
                       localizations.restorePurchases,
                       style: TextStyle(
@@ -868,8 +849,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     );
   }
 
-  Widget _buildFixedDiscountBadge(BuildContext context, double screenWidth,
-      String countdownText) {
+  Widget _buildFixedDiscountBadge(
+      BuildContext context, double screenWidth, String countdownText) {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     // Rely on countdown text being present to show special offer badge
     final bool showSpecialOffer = backend.currentUserSubscriptionLevel == 0 &&
@@ -912,8 +893,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final localizations = AppLocalizations.of(context)!;
     final String badgeText = showSpecialOffer
         ? (backend.isWelcomeOffer
-        ? localizations.welcomeOfferBadge(countdownText)
-        : localizations.exclusiveOfferBadge(countdownText))
+            ? localizations.welcomeOfferBadge(countdownText)
+            : localizations.exclusiveOfferBadge(countdownText))
         : localizations.freePlan('Pro');
 
     return AnimatedSwitcher(
@@ -933,58 +914,57 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       },
       child: showBadge
           ? ClipRRect(
-        key: const ValueKey('welcomeOfferBadge'),
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Container(
-          height: badgeHeight,
-          padding: EdgeInsets.symmetric(horizontal: paddingH),
-          decoration: BoxDecoration(
-            color: baseColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: borderColor, width: borderWidth),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                'assets/icons/sparkle.svg',
-                colorFilter:
-                ColorFilter.mode(contentColor, BlendMode.srcIn),
-                width: iconSize,
-                height: iconSize,
-              ),
-              SizedBox(width: gap),
-              Flexible(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  transitionBuilder: (child, animation) =>
-                      FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      ),
-                  child: Text(
-                    badgeText,
-                    // Key changes every second for fade effect
-                    key: ValueKey(showSpecialOffer
-                        ? countdownText
-                        : 'freeTrialBadge'),
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.5,
-                      color: contentColor,
+              key: const ValueKey('welcomeOfferBadge'),
+              borderRadius: BorderRadius.circular(borderRadius),
+              child: Container(
+                height: badgeHeight,
+                padding: EdgeInsets.symmetric(horizontal: paddingH),
+                decoration: BoxDecoration(
+                  color: baseColor,
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  border: Border.all(color: borderColor, width: borderWidth),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/sparkle.svg',
+                      colorFilter:
+                          ColorFilter.mode(contentColor, BlendMode.srcIn),
+                      width: iconSize,
+                      height: iconSize,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    SizedBox(width: gap),
+                    Flexible(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                        child: Text(
+                          badgeText,
+                          // Key changes every second for fade effect
+                          key: ValueKey(showSpecialOffer
+                              ? countdownText
+                              : 'freeTrialBadge'),
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: fontSize,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.5,
+                            color: contentColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      )
+            )
           : const SizedBox.shrink(key: ValueKey('empty')),
     );
   }
@@ -1019,8 +999,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     );
   }
 
-  Widget _buildButtonText(BuildContext context, FundsBackend backend,
-      double screenWidth) {
+  Widget _buildButtonText(
+      BuildContext context, FundsBackend backend, double screenWidth) {
     final localizations = AppLocalizations.of(context)!;
     final textStyle = TextStyle(
         fontSize: screenWidth * 0.042,

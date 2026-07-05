@@ -79,8 +79,8 @@ class ModelDetailProvider extends ChangeNotifier {
   /// True if this model is an offline series with multiple variants.
   bool get isOfflineSeries =>
       _mainModel != null &&
-          !_mainModel!.isServerSide &&
-          (_mainModel!.variants?.isNotEmpty ?? false);
+      !_mainModel!.isServerSide &&
+      (_mainModel!.variants?.isNotEmpty ?? false);
 
   /// For offline series: checks if the currently SELECTED VARIANT is downloaded.
   /// For regular models: checks if the model itself is downloaded.
@@ -95,8 +95,9 @@ class ModelDetailProvider extends ChangeNotifier {
   /// For offline series: checks the download manager of the selected variant.
   bool get isDownloading {
     if (isOfflineSeries && selectedVariantName != null) {
-      return _localStateProvider.downloadManagers[selectedVariantName]
-          ?.isDownloading ?? false;
+      return _localStateProvider
+              .downloadManagers[selectedVariantName]?.isDownloading ??
+          false;
     }
     return _downloadManager?.isDownloading ?? false;
   }
@@ -104,8 +105,9 @@ class ModelDetailProvider extends ChangeNotifier {
   /// For offline series: checks the download manager of the selected variant.
   bool get isPaused {
     if (isOfflineSeries && selectedVariantName != null) {
-      return _localStateProvider.downloadManagers[selectedVariantName]
-          ?.isPaused ?? false;
+      return _localStateProvider
+              .downloadManagers[selectedVariantName]?.isPaused ??
+          false;
     }
     return _downloadManager?.isPaused ?? false;
   }
@@ -113,8 +115,9 @@ class ModelDetailProvider extends ChangeNotifier {
   /// For offline series: gets the download progress of the selected variant.
   double get downloadProgress {
     if (isOfflineSeries && selectedVariantName != null) {
-      return _localStateProvider.downloadManagers[selectedVariantName]
-          ?.progress ?? 0.0;
+      return _localStateProvider
+              .downloadManagers[selectedVariantName]?.progress ??
+          0.0;
     }
     return _downloadManager?.progress ?? 0.0;
   }
@@ -170,8 +173,7 @@ class ModelDetailProvider extends ChangeNotifier {
     required String modelId,
     required BuildContext context,
     required DownloadManager? downloadManager,
-  })
-      : _modelId = modelId,
+  })  : _modelId = modelId,
         _downloadManager = downloadManager,
         _modelService = context.read<ModelService>(),
         _localStateProvider = context.read<ModelLocalStateProvider>(),
@@ -222,20 +224,21 @@ class ModelDetailProvider extends ChangeNotifier {
 
       for (var entry in _mainModel!.variants!.entries) {
         final variantData = entry.value as Map<String, dynamic>;
-        final ram = int.tryParse(variantData['ram']?.toString() ?? '') ??
-            999999;
-        final size = int.tryParse(variantData['size']?.toString() ?? '') ??
-            999999;
+        final ram =
+            int.tryParse(variantData['ram']?.toString() ?? '') ?? 999999;
+        final size =
+            int.tryParse(variantData['size']?.toString() ?? '') ?? 999999;
 
         // Prioritize RAM. If equal, prioritize Storage Size.
         if (ram < lowestRam) {
           lowestRam = ram;
           lowestVariantKey = entry.key;
         } else if (ram == lowestRam && ram != 999999) {
-          final currentLowestData = _mainModel!
-              .variants![lowestVariantKey] as Map<String, dynamic>;
-          final currentLowestSize = int.tryParse(
-              currentLowestData['size']?.toString() ?? '') ?? 999999;
+          final currentLowestData =
+              _mainModel!.variants![lowestVariantKey] as Map<String, dynamic>;
+          final currentLowestSize =
+              int.tryParse(currentLowestData['size']?.toString() ?? '') ??
+                  999999;
           if (size < currentLowestSize) {
             lowestVariantKey = entry.key;
           }
@@ -256,8 +259,8 @@ class ModelDetailProvider extends ChangeNotifier {
     // Add Dynamic Chat as a base model option
     // Add Dynamic Chat as a base model option
     final dynamicModel =
-    ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode)
-        .copyWith(
+        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode)
+            .copyWith(
       displayTitle: localizations.alwaysBest,
       variants: {
         'cortex/auto': {
@@ -304,8 +307,8 @@ class ModelDetailProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> selectBaseModel(BuildContext context,
-      String newBaseModelId) async {
+  Future<void> selectBaseModel(
+      BuildContext context, String newBaseModelId) async {
     if (isButtonLocked) return;
     isButtonLocked = true;
     notifyListeners();
@@ -320,7 +323,7 @@ class ModelDetailProvider extends ChangeNotifier {
       }
 
       final success =
-      await _modelService.updateBaseModel(_modelId, newBaseModelId);
+          await _modelService.updateBaseModel(_modelId, newBaseModelId);
       if (!success) {
         _notificationService.showNotification(
             message: localizations.anErrorOccurred,
@@ -473,10 +476,10 @@ class ModelDetailProvider extends ChangeNotifier {
       _currentCapabilitiesSource = selectedVariant ?? _mainModel;
     } else if (isPluralModel) {
       selectedVariant =
-      (selectedVariantName != null && selectedVariantName!.isNotEmpty)
-          ? _modelService.getPreciseModelData(selectedVariantName!,
-          langCode: langCode)
-          : null;
+          (selectedVariantName != null && selectedVariantName!.isNotEmpty)
+              ? _modelService.getPreciseModelData(selectedVariantName!,
+                  langCode: langCode)
+              : null;
       _currentCapabilitiesSource = selectedVariant ?? _mainModel;
     } else {
       _currentCapabilitiesSource = _mainModel;
@@ -488,41 +491,29 @@ class ModelDetailProvider extends ChangeNotifier {
 
     if (isPluralModel) {
       displaySummary = selectedVariant?.displaySummary ?? '';
-      if (displaySummary
-          .trim()
-          .isEmpty) {
+      if (displaySummary.trim().isEmpty) {
         displaySummary = _mainModel!.displaySummary;
       }
 
       displayDescription = selectedVariant?.displayDescription ?? '';
-      if (displayDescription
-          .trim()
-          .isEmpty) {
+      if (displayDescription.trim().isEmpty) {
         displayDescription = _mainModel!.displayDescription;
       }
-      if (displayDescription
-          .trim()
-          .isEmpty) {
+      if (displayDescription.trim().isEmpty) {
         displayDescription =
             localizations.defaultSeriesDescription(_mainModel!.displayTitle);
       }
     } else if (isCharacterModel) {
       displaySummary = _mainModel!.displaySummary;
-      if (displaySummary
-          .trim()
-          .isEmpty) {
+      if (displaySummary.trim().isEmpty) {
         displaySummary = selectedBaseModel?.displaySummary ?? '';
       }
 
       displayDescription = _mainModel!.displayDescription;
-      if (displayDescription
-          .trim()
-          .isEmpty) {
+      if (displayDescription.trim().isEmpty) {
         displayDescription = selectedBaseModel?.displayDescription ?? '';
       }
-      if (displayDescription
-          .trim()
-          .isEmpty) {
+      if (displayDescription.trim().isEmpty) {
         displayDescription =
             localizations.defaultModelDescription(_mainModel!.displayTitle);
       }
@@ -530,9 +521,7 @@ class ModelDetailProvider extends ChangeNotifier {
       displaySummary = _mainModel!.displaySummary;
       displayDescription = _mainModel!.displayDescription;
 
-      if (displayDescription
-          .trim()
-          .isEmpty) {
+      if (displayDescription.trim().isEmpty) {
         displayDescription =
             localizations.defaultModelDescription(_mainModel!.displayTitle);
       }
@@ -567,16 +556,13 @@ class ModelDetailProvider extends ChangeNotifier {
 
     // Modalities (Input/Recognition)
     if (capabilities.modalities['image'] == true) {
-      features.add(
-          'image_recognition');
+      features.add('image_recognition');
     }
     if (capabilities.modalities['video'] == true) {
-      features.add(
-          'video_recognition');
+      features.add('video_recognition');
     }
     if (capabilities.modalities['audio'] == true) {
-      features.add(
-          'audio_recognition');
+      features.add('audio_recognition');
     }
     if (capabilities.modalities['file'] == true ||
         capabilities.modalities['document'] == true) {

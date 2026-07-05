@@ -16,7 +16,11 @@ class ArtItem {
   final String conversationID;
   final String? modelId;
 
-  const ArtItem({required this.path, required this.type, required this.conversationID, this.modelId});
+  const ArtItem(
+      {required this.path,
+      required this.type,
+      required this.conversationID,
+      this.modelId});
 }
 
 enum ArtType { image, video, audio }
@@ -35,7 +39,8 @@ class ArtsProvider extends ChangeNotifier {
 
   ArtsProvider() {
     _msgSub = ChatStorageService.lastMsgStream.listen((event) {
-      if (event['photoPath'] != null && event['photoPath'].toString().isNotEmpty) {
+      if (event['photoPath'] != null &&
+          event['photoPath'].toString().isNotEmpty) {
         loadMedia();
       }
     });
@@ -48,7 +53,13 @@ class ArtsProvider extends ChangeNotifier {
   }
 
   static const _imageExtensions = {
-    'jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'
+    'jpg',
+    'jpeg',
+    'png',
+    'webp',
+    'gif',
+    'bmp',
+    'heic'
   };
   static const _videoExtensions = {'mp4', 'webm', 'mov', 'mkv', 'm4v'};
   static const _audioExtensions = {'mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac'};
@@ -66,16 +77,14 @@ class ArtsProvider extends ChangeNotifier {
         final raw = row['photoPath'] as String?;
         if (raw == null || raw.isEmpty) continue;
 
-        // photoPath can be a JSON array or a single path
         List<String> paths;
-        try {
-          final decoded = jsonDecode(raw);
-          if (decoded is List) {
-            paths = decoded.cast<String>();
-          } else {
+        if (raw.startsWith('[')) {
+          try {
+            paths = (jsonDecode(raw) as List).cast<String>();
+          } catch (_) {
             paths = [raw];
           }
-        } catch (_) {
+        } else {
           paths = [raw];
         }
 
@@ -85,13 +94,12 @@ class ArtsProvider extends ChangeNotifier {
         for (final filePath in paths) {
           if (filePath.isEmpty) continue;
 
-          // Only include local files (not remote URLs)
-          if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+          if (filePath.startsWith('http://') ||
+              filePath.startsWith('https://')) {
             continue;
           }
 
-          // Check file actually exists
-          if (!File(filePath).existsSync()) continue;
+          if (!await File(filePath).exists()) continue;
 
           final ext = p.extension(filePath).toLowerCase().replaceAll('.', '');
           ArtType? type;
@@ -105,7 +113,11 @@ class ArtsProvider extends ChangeNotifier {
           }
 
           if (type != null) {
-            results.add(ArtItem(path: filePath, type: type, conversationID: conversationID ?? '', modelId: modelId));
+            results.add(ArtItem(
+                path: filePath,
+                type: type,
+                conversationID: conversationID ?? '',
+                modelId: modelId));
           }
         }
       }

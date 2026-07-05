@@ -1,5 +1,0 @@
-"NSCameraUsageDescription" = "Cortex usa tu cámara para capturar fotos que pueden compartirse con modelos de IA para análisis visual. Tus fotos solo se envían cuando eliges compartirlas.";
-"NSPhotoLibraryUsageDescription" = "Cortex accede a tu galería para que puedas seleccionar imágenes y compartirlas con modelos de IA para conversaciones visuales. Las imágenes solo se comparten cuando decides enviarlas.";
-"NSPhotoLibraryAddUsageDescription" = "Cortex guarda imágenes generadas por IA y exportaciones de chat en tu galería cuando eliges descargarlas.";
-"NSMicrophoneUsageDescription" = "Cortex usa tu micrófono para conversaciones de voz con IA. Tu voz se procesa para entender tus preguntas y dar respuestas en tiempo real.";
-"NSSpeechRecognitionUsageDescription" = "Cortex usa el reconocimiento de voz para convertir tus palabras en texto, permitiendo conversaciones manos libres con IA. Los datos de voz se procesan de forma segura.";

@@ -13,9 +13,11 @@
 
 import 'dart:async';
 import 'dart:io'; // Required for File checks
+import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/processor.dart';
 import 'package:cortex/chat/services/response.dart';
+import 'package:cortex/chat/services/speculative.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../../library/backend/data/entity.dart';
@@ -29,25 +31,77 @@ class SamplerPreset {
   final double temperature;
   final double topP;
   final int topK;
+  final double repeatPenalty;
+  final double frequencyPenalty;
+  final double presencePenalty;
+  final int mirostatMode;
+  final double mirostatTau;
+  final double mirostatEta;
 
-  SamplerPreset(this.temperature, this.topP, this.topK);
+  const SamplerPreset({
+    required this.temperature,
+    required this.topP,
+    required this.topK,
+    this.repeatPenalty = 1.0,
+    this.frequencyPenalty = 0.0,
+    this.presencePenalty = 0.0,
+    this.mirostatMode = 0,
+    this.mirostatTau = 5.0,
+    this.mirostatEta = 0.1,
+  });
 }
 
 SamplerPreset computeSampler(ModelEntity model) {
-  // Enhanced Logic: Avoid extremely low temperatures which cause repetition loops.
-  // Llama-3 and Gemma prefer slightly higher temps (0.6 - 0.8).
-  final size = model.size ?? 0; // MB
+  final size = model.size ?? 0;
 
   if (size <= 1000) {
-    // Tiny models (TinyLlama) need guidance but not 0.1
-    return SamplerPreset(0.5, 0.9, 20);
+    return SamplerPreset(
+      temperature: 0.5,
+      topP: 0.9,
+      topK: 20,
+      repeatPenalty: 1.15,
+      presencePenalty: 0.1,
+    );
   } else if (size <= 4000) {
-    // 3B - 4B models (Phi-3, Gemma 2B)
-    return SamplerPreset(0.6, 0.9, 40);
+    return SamplerPreset(
+      temperature: 0.65,
+      topP: 0.9,
+      topK: 40,
+      repeatPenalty: 1.1,
+      presencePenalty: 0.05,
+    );
   } else {
-    // 7B+ models
-    return SamplerPreset(0.7, 0.95, 40);
+    return SamplerPreset(
+      temperature: 0.7,
+      topP: 0.95,
+      topK: 40,
+      repeatPenalty: 1.05,
+      presencePenalty: 0.05,
+    );
   }
+}
+
+SamplerPreset codeSampler(ModelEntity model) {
+  return SamplerPreset(
+    temperature: 0.2,
+    topP: 0.85,
+    topK: 20,
+    repeatPenalty: 1.2,
+    presencePenalty: 0.1,
+  );
+}
+
+SamplerPreset creativeSampler(ModelEntity model) {
+  return SamplerPreset(
+    temperature: 0.8,
+    topP: 0.95,
+    topK: 50,
+    repeatPenalty: 1.05,
+    presencePenalty: 0.1,
+    mirostatMode: 2,
+    mirostatTau: 5.0,
+    mirostatEta: 0.1,
+  );
 }
 
 class OfflineService {
@@ -57,6 +111,8 @@ class OfflineService {
   final ContextService _contextService;
 
   ChatFormatProcessor? _currentProcessor;
+  SpeculativeDecodingConfig _speculativeConfig =
+      const SpeculativeDecodingConfig();
 
   // Repetition guard state per stream
   String _visibleHistory = '';
@@ -76,6 +132,7 @@ class OfflineService {
 
   Completer<bool>? _modelLoadCompleter;
   Completer<bool>? _singleLoadAttemptCompleter;
+  Timer? _retryTimer;
 
   OfflineService({
     required ResponseService responseService,
@@ -87,6 +144,10 @@ class OfflineService {
         _modelService = modelService,
         _contextService = contextService {
     _llamaChannel.setMethodCallHandler(methodCallHandler);
+  }
+
+  void setSpeculativeDecodingConfig(SpeculativeDecodingConfig config) {
+    _speculativeConfig = config;
   }
 
   // ===========================================================================
@@ -107,10 +168,10 @@ class OfflineService {
 
       // Calculate free RAM
       int freeRAM = totalRAM - usedRAM;
-      
+
       // If freeRAM is negative or abnormally low, fall back to safe defaults
       if (freeRAM <= 0) {
-        freeRAM = 1024; 
+        freeRAM = 1024;
       }
 
       // We should assume that the model itself takes huge RAM (e.g. 2-5 GB).
@@ -119,7 +180,7 @@ class OfflineService {
       if (totalRAM >= 8192) {
         nCtx = 8192; // 8GB+ devices can handle 8K
       } else if (totalRAM >= 6144) {
-        nCtx = 4096; // 6GB devices 
+        nCtx = 4096; // 6GB devices
       } else {
         nCtx = 2048; // Standard safe fallback
       }
@@ -175,13 +236,12 @@ class OfflineService {
     // DYNAMIC CONTEXT SIZE based on device RAM
     final int nCtx = await _computeOptimalContextSize();
 
-    // GPU Layers: On Android, forcing GPU can cause silent crashes if Vulkan/OpenCL is unsupported. 
+    // GPU Layers: On Android, forcing GPU can cause silent crashes if Vulkan/OpenCL is unsupported.
     // We pass 99 for iOS since Metal usually handles it well, but let's be careful on Android.
     int nGpu = 0;
     if (Platform.isIOS) {
-       nGpu = 99;
+      nGpu = 99;
     }
-
 
     // DYNAMIC THREADS based on RAM (proxy for CPU power)
     const memoryChannel = MethodChannel('com.vertex.cortex/memory');
@@ -207,7 +267,8 @@ class OfflineService {
         _sessionProvider.setLocalModelLoaded(false);
 
         if (attempt < _maxModelLoadRetries) {
-          await Future.delayed(const Duration(milliseconds: 350));
+          _retryTimer?.cancel();
+          await _retryDelay(const Duration(milliseconds: 350));
         }
       }
 
@@ -310,7 +371,8 @@ class OfflineService {
     _singleLoadAttemptCompleter = null;
   }
 
-  Future<void> sendMessage(String text, String? photoPath) async {
+  Future<void> sendMessage(String text, String? photoPath,
+      [ChatInputMode? activeMode]) async {
     final String? modelId = _sessionProvider.modelId;
     if (modelId == null) {
       _responseService.onMessageResponse("[Error: No model selected.]");
@@ -340,16 +402,33 @@ class OfflineService {
     );
     _resetRepetitionGuardState();
 
+    final bool enableThinkingMode =
+        activeMode == ChatInputMode.featureReasoning;
+    final langCode = _sessionProvider.getLocale().languageCode;
+
     // Prepare Prompt
-    final String finalPrompt =
-        await _buildFormattedPrompt(model: model, latestMessage: text);
+    final String finalPrompt = await _buildFormattedPrompt(
+      model: model,
+      latestMessage: text,
+      enableThinkingMode: enableThinkingMode,
+      langCode: langCode,
+    );
     if (finalPrompt.isEmpty) {
       _responseService.finalizeResponse();
       return;
     }
 
-    // OPTIMIZATION: Computed Samplers
-    final sampler = computeSampler(model);
+    // OPTIMIZATION: Computed Samplers with per-task presets
+    final SamplerPreset sampler;
+    switch (activeMode) {
+      case ChatInputMode.featureReasoning:
+        sampler = codeSampler(model);
+      case ChatInputMode.study:
+      case ChatInputMode.quiz:
+        sampler = creativeSampler(model);
+      default:
+        sampler = computeSampler(model);
+    }
     debugPrint(
         "[OfflineService] Sending Message with Samplers: T=${sampler.temperature}, P=${sampler.topP}, K=${sampler.topK}");
 
@@ -360,6 +439,10 @@ class OfflineService {
     // So we don't need to manually clear it here if native does it, but calling it ensures sync.
     // await _resetKvCache(); // Native code handles this now in 'send' flow based on the full prompt.
 
+    final specArgs = _speculativeConfig.enabled
+        ? _speculativeConfig.toNativeArgs()
+        : <String, dynamic>{};
+
     await _llamaChannel.invokeMethod<void>(
       'sendMessage',
       {
@@ -368,13 +451,27 @@ class OfflineService {
         'temp': sampler.temperature,
         'topP': sampler.topP,
         'topK': sampler.topK,
+        'repeatPenalty': sampler.repeatPenalty,
+        'frequencyPenalty': sampler.frequencyPenalty,
+        'presencePenalty': sampler.presencePenalty,
+        'mirostatMode': sampler.mirostatMode,
+        'mirostatTau': sampler.mirostatTau,
+        'mirostatEta': sampler.mirostatEta,
+        ...specArgs,
       },
     );
   }
 
   Future<void> stopGeneration() async {
     debugPrint("[OfflineService] Invoking 'stopGeneration'.");
+    _retryTimer?.cancel();
     await _llamaChannel.invokeMethod('stopGeneration');
+  }
+
+  Future<void> _retryDelay(Duration duration) {
+    final completer = Completer<void>();
+    _retryTimer = Timer(duration, () => completer.complete());
+    return completer.future;
   }
 
   // ===========================================================================
@@ -451,6 +548,8 @@ class OfflineService {
   Future<String> _buildFormattedPrompt({
     required ModelEntity model,
     required String latestMessage,
+    bool enableThinkingMode = false,
+    String langCode = 'en',
   }) async {
     // 1. Fallback to default ChatML if no format is provided (safety net).
     // Use ModelDefaults.defaultChatFormat if model.chatFormat is null.
@@ -467,7 +566,23 @@ class OfflineService {
         ChatTokens.fromMap(ModelDefaults.getFallbackFormat(model.id));
 
     final sb = StringBuffer();
-    final systemPrompt = (model.role ?? "").trim();
+    var systemPrompt = (model.role ?? "").trim();
+
+    // Short, direct instructions for better local model output
+    final langName = _languageName(langCode);
+    if (langCode == 'tr') {
+      systemPrompt +=
+          "\n\nSen Türkçe konuşan bir asistansın. Kısa ve doğal yanıt ver. Asla düşünce etiketi (<think>), işaretleme dili (markdown) veya biçimlendirme kullanma. Sadece düz metinle yanıtla. Konuşma geçmişini hatırla ve bağlamı koru.";
+    } else if (langCode == 'de') {
+      systemPrompt +=
+          "\n\nDu bist ein Assistent, der Deutsch spricht. Antworte kurz und natürlich. Verwende niemals Denk-Tags (<think>), Markdown oder Formatierungen. Antworte nur in Klartext. Behalte den Gesprächsverlauf im Gedächtnis.";
+    } else if (langCode == 'fr') {
+      systemPrompt +=
+          "\n\nTu es un assistant qui parle français. Réponds brièvement et naturellement. N'utilise jamais de balises de pensée (<think>), de markdown ou de formatage. Réponds uniquement en texte brut. Souviens-toi de l'historique de la conversation.";
+    } else {
+      systemPrompt +=
+          "\n\nYou are a $langName-speaking assistant. Keep responses short and natural. Never use think tags (<think>), markdown, or formatting. Respond in plain text only. Remember the conversation history.";
+    }
 
     // System Preamble
     if (systemPrompt.isNotEmpty &&
@@ -482,8 +597,9 @@ class OfflineService {
     final history = await _contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: model.id,
-      langCode: 'en',
+      langCode: langCode,
       isServerSide: false,
+      enableThinkingMode: enableThinkingMode,
     );
 
     for (final msg in history) {
@@ -510,20 +626,35 @@ class OfflineService {
         end: effectiveTokens.userEnd,
         content: latestMessage);
 
-    // Assistant Primer
+    // Assistant Primer (consistent with _appendTurn — adds newline after start token)
     if (effectiveTokens.assistantStart?.isNotEmpty ?? false) {
       sb.write(effectiveTokens.assistantStart!);
-      // Smart newline check: Only add if the token doesn't already end with one.
       if (!effectiveTokens.assistantStart!.endsWith('\n')) {
-        // Some formats might not want a newline here, but for most (ChatML/Llama3),
-        // the start token implies a header start. Llama3: <|start_header_id|>assistant<|end_header_id|>\n\n
-        // ChatML: <|im_start|>assistant\n
-        // If our default has \n, we skip. If not, we might need one.
-        // For safety, we trust the token definition primarily.
+        sb.write('\n');
       }
     }
 
     return sb.toString();
+  }
+
+  String _languageName(String langCode) {
+    switch (langCode) {
+      case 'tr': return 'Turkish';
+      case 'de': return 'German';
+      case 'fr': return 'French';
+      case 'es': return 'Spanish';
+      case 'it': return 'Italian';
+      case 'pt': return 'Portuguese';
+      case 'nl': return 'Dutch';
+      case 'pl': return 'Polish';
+      case 'ru': return 'Russian';
+      case 'ja': return 'Japanese';
+      case 'ko': return 'Korean';
+      case 'zh': return 'Chinese';
+      case 'ar': return 'Arabic';
+      case 'hi': return 'Hindi';
+      default: return 'English';
+    }
   }
 
   String _extractVisibleText(dynamic content) {

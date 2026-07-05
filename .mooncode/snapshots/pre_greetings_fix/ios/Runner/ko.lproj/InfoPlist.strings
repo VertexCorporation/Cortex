@@ -1,5 +1,0 @@
-"NSCameraUsageDescription" = "Cortex는 AI 모델의 시각적 분석을 위해 사진을 촬영합니다. 사진은 공유를 선택한 경우에만 전송됩니다.";
-"NSPhotoLibraryUsageDescription" = "Cortex는 AI 모델과의 시각적 대화를 위해 이미지를 선택할 수 있도록 사진 라이브러리에 접근합니다. 이미지는 전송을 선택한 경우에만 공유됩니다.";
-"NSPhotoLibraryAddUsageDescription" = "Cortex는 다운로드를 선택하면 AI 생성 이미지와 채팅 내보내기를 갤러리에 저장합니다.";
-"NSMicrophoneUsageDescription" = "Cortex는 AI와의 음성 대화를 위해 마이크를 사용합니다. 질문을 이해하고 실시간 응답을 제공하기 위해 음성이 처리됩니다.";
-"NSSpeechRecognitionUsageDescription" = "Cortex는 음성 인식을 사용하여 말을 텍스트로 변환하고 AI와 핸즈프리 대화를 가능하게 합니다. 음성 데이터는 안전하게 처리됩니다.";

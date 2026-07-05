@@ -18,7 +18,6 @@ import '../../../../services/speech.dart';
 import '../../../../services/voice.dart'; // [NEW]
 import '../../../../services/send.dart'; // [NEW]
 
-
 import '../panels/features/sheet.dart';
 import '../panels/selection/sheet.dart';
 
@@ -417,8 +416,6 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
   @override
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
-    
-
 
     // Match the Mic/Send button styling:
     // Background: AppColors.secondaryColor.withValues(alpha: 0.5)
@@ -428,7 +425,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     final Color iconColor = AppColors.primaryColor.inverted;
 
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
-    final bool buttonDisabled = widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
+    final bool buttonDisabled =
+        widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
     final double size = 36.0; // Reduced size to match the pill and Mic better
 
     return GestureDetector(
@@ -439,7 +437,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
           : () async {
               HapticFeedback.lightImpact();
               if (mounted) setState(() => _isOpened = true);
-              await showFeaturesSheet(context: context, controller: widget.controller);
+              await showFeaturesSheet(
+                  context: context, controller: widget.controller);
               if (mounted) setState(() => _isOpened = false);
             },
       child: AnimatedContainer(
@@ -465,7 +464,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
                   'assets/icons/add.svg',
                   width: 26.0,
                   height: 26.0,
-                  colorFilter: ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
+                  colorFilter:
+                      ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
                 );
               },
             ),

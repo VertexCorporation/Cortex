@@ -327,7 +327,8 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                       quarterTurns: 2,
                       child: SvgPicture.asset(
                         'assets/icons/arrow.svg',
-                        colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                            AppColors.primaryColor, BlendMode.srcIn),
                       ),
                     ),
                   )

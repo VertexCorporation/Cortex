@@ -33,7 +33,8 @@ class BottomActionButtons extends StatelessWidget {
         : provider.mainModel!.id;
 
     // Enforce Premium Restriction
-    final isOnlineOrRP = provider.mainModel!.isServerSide || provider.mainModel!.category == 'roleplay';
+    final isOnlineOrRP = provider.mainModel!.isServerSide ||
+        provider.mainModel!.category == 'roleplay';
     if ((provider.mainModel!.isPremium || isOnlineOrRP) && !isSubscribed) {
       showPremiumBottomSheet(context);
       return;
@@ -41,9 +42,7 @@ class BottomActionButtons extends StatelessWidget {
 
     // filePath is only relevant for downloaded offline models.
     final filePath = !provider.mainModel!.isServerSide && provider.isDownloaded
-        ? context
-            .read<ModelLocalStateProvider>()
-            .getFilePathById(chatModelId)
+        ? context.read<ModelLocalStateProvider>().getFilePathById(chatModelId)
         : null;
 
     // Pop the screen and return a map containing the action and the necessary data.
@@ -256,8 +255,7 @@ class BottomActionButtons extends StatelessWidget {
     final internetProvider = Provider.of<InternetProvider>(context);
     final bool hasInternet = internetProvider.isConnected;
 
-    final compatibility =
-        localProvider.getCompatibilityStatus(targetSize);
+    final compatibility = localProvider.getCompatibilityStatus(targetSize);
     final isCompatible = compatibility == CompatibilityStatus.compatible;
 
     String buttonText;

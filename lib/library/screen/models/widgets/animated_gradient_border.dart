@@ -58,7 +58,8 @@ class _AnimatedGradientBorderState extends State<AnimatedGradientBorder>
         return Container(
           padding: EdgeInsets.all(widget.borderWidth),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(widget.borderRadius + widget.borderWidth),
+            borderRadius:
+                BorderRadius.circular(widget.borderRadius + widget.borderWidth),
             gradient: SweepGradient(
               transform: GradientRotation(_controller.value * 2 * 3.1415926535),
               colors: widget.gradient.colors,

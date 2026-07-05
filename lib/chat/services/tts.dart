@@ -2,6 +2,7 @@
 //
 // Text-to-Speech service for reading messages aloud.
 
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -15,6 +16,7 @@ class TtsService with ChangeNotifier {
   final FlutterTts _flutterTts = FlutterTts();
 
   TtsState _state = TtsState.idle;
+  Timer? _ttsTimer;
   TtsState get state => _state;
 
   String _currentText = '';
@@ -50,7 +52,7 @@ class TtsService with ChangeNotifier {
         notifyListeners();
 
         // Reset after 2 seconds delay as requested
-        Future.delayed(const Duration(milliseconds: 2000), () {
+        _ttsTimer = Timer(const Duration(milliseconds: 2000), () {
           if (_state == TtsState.idle) {
             _progress = 0.0;
             _currentText = '';
@@ -113,15 +115,19 @@ class TtsService with ChangeNotifier {
     if (_state == TtsState.playing) {
       await _flutterTts.stop();
       // [FIX] Error -8 often happens if we speak too fast after stop
-      await Future.delayed(const Duration(milliseconds: 50));
+      _ttsTimer?.cancel();
+      await _ttsTimerAndWait(const Duration(milliseconds: 50));
     }
     _isInterrupted = false;
 
     // --- ENHANCED REGEX FILTERING ---
     // 0. Remove <think> and <memory> blocks and their trailing colons/whitespace
-    String cleanText = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
-    cleanText = cleanText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
-    cleanText = cleanText.replaceAll(RegExp(r'\[SYSTEM MEMORY DIRECTIVE\][\s\S]*'), '');
+    String cleanText =
+        text.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
+    cleanText =
+        cleanText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
+    cleanText =
+        cleanText.replaceAll(RegExp(r'\[SYSTEM MEMORY DIRECTIVE\][\s\S]*'), '');
 
     // 1. Remove Code Blocks (```...```) content entirely
     cleanText = cleanText.replaceAll(RegExp(r'```[\s\S]*?```'), '');
@@ -162,10 +168,12 @@ class TtsService with ChangeNotifier {
 
     // 9. Remove Widget/Flutter notation patterns (e.g., Widget(), Container(), etc.)
     // Match PascalCase followed by parentheses with content
-    cleanText = cleanText.replaceAll(RegExp(r'\b[A-Z][a-zA-Z]*\s*\([^)]*\)'), '');
+    cleanText =
+        cleanText.replaceAll(RegExp(r'\b[A-Z][a-zA-Z]*\s*\([^)]*\)'), '');
 
     // 10. Remove remaining noisy symbols
-    cleanText = cleanText.replaceAll(RegExp(r'[\=\\\$\;\<\>\{\}\[\]\^\_\|\~]'), '');
+    cleanText =
+        cleanText.replaceAll(RegExp(r'[\=\\\$\;\<\>\{\}\[\]\^\_\|\~]'), '');
 
     // 11. Remove standalone numbers that aren't part of sentences
     // (e.g., step numbers like "1." at start of line)
@@ -183,6 +191,13 @@ class TtsService with ChangeNotifier {
     await _speakInternal(cleanText);
   }
 
+  Future<void> _ttsTimerAndWait(Duration duration) {
+    _ttsTimer?.cancel();
+    final completer = Completer<void>();
+    _ttsTimer = Timer(duration, () => completer.complete());
+    return completer.future;
+  }
+
   Future<void> _speakInternal(String textChunk) async {
     _currentText = textChunk; // This is the chunk currently being spoken
     _state = TtsState.playing;
@@ -192,6 +207,7 @@ class TtsService with ChangeNotifier {
 
   Future<void> stop() async {
     _isInterrupted = false; // Allow completion handler to clean up
+    _ttsTimer?.cancel();
     await _flutterTts.stop();
     // Handler will be called, but we can double check:
     _state = TtsState.idle;

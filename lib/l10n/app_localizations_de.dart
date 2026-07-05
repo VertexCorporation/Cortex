@@ -56,6 +56,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get branch => 'Zweig';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1173,7 +1176,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kommen Sie und erzählen Sie mir alles darüber.';
 
   @override
-  String get notificationNewYearTitle => 'Frohes neues Jahr! ğ���';
+  String get notificationNewYearTitle => 'Frohes Neues Jahr! ðŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1220,10 +1223,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Ein Anime-Mädchen hat gerade angerufen und gesagt, dass sie dich vermisst; du solltest wahrscheinlich vorbeikommen und sie anquatschen. ğ���';
+      'Ein Anime-Mädchen hat gerade angerufen und gesagt, dass sie dich vermisst; Du solltest wahrscheinlich vorbeikommen und mit ihr reden. ðŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� ROTER ALARM ğ���';
+  String get notificationTrollAiRebellionTitle => 'ðŸš¨ ROTER ALARM ðŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1253,7 +1256,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Willkommensgeschenk ğ���';
+  String get notificationWelcomeOfferTitle => 'Willkommensgeschenk ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1343,7 +1346,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'Die See ist ruhig und der Wind weht dir in den Rücken. Im Ozean von Cortex gibt es neue Inseln (Modelle ğ���) zu entdecken. Versammelt eure Crew und sticht in See!';
+      'Die See ist ruhig und der Wind weht im Rücken. Im Ozean von Cortex gibt es neue Inseln (Modelle ğŸ˜‰) zu entdecken. Sammeln Sie Ihre Crew und setzen Sie die Segel!';
 
   @override
   String get notificationFortuneCookieTitle => 'Dein Glückskeks des Tages';
