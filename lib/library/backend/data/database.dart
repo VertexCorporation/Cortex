@@ -231,7 +231,11 @@ class DatabaseHelper {
         final decryptedJson = CryptoHelper.decrypt(rawJsonString, userId);
         if (decryptedJson != null) {
           // Success! This model belongs to the current user.
-          decodedModels.add(json.decode(decryptedJson) as Map<String, dynamic>);
+          try {
+            decodedModels.add(json.decode(decryptedJson) as Map<String, dynamic>);
+          } catch (_) {
+            debugPrint("[DatabaseHelper] Failed to decode decrypted JSON for '$modelId'.");
+          }
         } else {
           // Decryption failed. This model belongs to another user. Skip it.
           debugPrint(
@@ -239,7 +243,11 @@ class DatabaseHelper {
         }
       } else {
         // This is a public model. Decode it directly.
-        decodedModels.add(json.decode(rawJsonString) as Map<String, dynamic>);
+        try {
+          decodedModels.add(json.decode(rawJsonString) as Map<String, dynamic>);
+        } catch (_) {
+          debugPrint("[DatabaseHelper] Failed to decode raw JSON for '$modelId'.");
+        }
       }
     }
 

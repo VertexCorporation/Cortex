@@ -62,8 +62,8 @@ class NewsService with ChangeNotifier {
     if (_internetProvider.isConnected && _languagesWithFetchErrors.isNotEmpty) {
       debugPrint(
           "[NewsService] 📶 Internet reconnected. Retrying failed languages...");
-      final bool shouldRetry = _languagesWithFetchErrors.contains(
-          _currentLanguageCode);
+      final bool shouldRetry =
+          _languagesWithFetchErrors.contains(_currentLanguageCode);
       _languagesWithFetchErrors.clear();
       if (shouldRetry) {
         loadNewsForLanguage(_currentLanguageCode);
@@ -81,7 +81,8 @@ class NewsService with ChangeNotifier {
 
   static const String _cacheKey = 'news_cache_data_v3';
   static const String _timestampKey = 'news_cache_timestamp_v3';
-  static const String _getCacheUrlEndpoint = "https://europe-west1-vertex-ai-1618.cloudfunctions.net/getNewsCacheUrl";
+  static const String _getCacheUrlEndpoint =
+      "https://europe-west1-vertex-ai-1618.cloudfunctions.net/getNewsCacheUrl";
 
   // --- Public Methods ---
 
@@ -121,13 +122,10 @@ class NewsService with ChangeNotifier {
     _isLoadingOperation = true;
     _setState(NewsState.loading, "force_refresh");
     try {
-      await _appInitializer.onCoreServicesReady.timeout(
-          const Duration(seconds: 5),
-          onTimeout: () {
-            debugPrint(
-                "[NewsService] ⚠️ AppInit timed out. Proceeding anyway.");
-          }
-      );
+      await _appInitializer.onCoreServicesReady
+          .timeout(const Duration(seconds: 5), onTimeout: () {
+        debugPrint("[NewsService] ⚠️ AppInit timed out. Proceeding anyway.");
+      });
       await _fetchFromNetworkAndCache();
     } catch (e, s) {
       _handleError('Refresh failed', e, s);
@@ -144,12 +142,9 @@ class NewsService with ChangeNotifier {
       final lastFetchTimestamp = prefs.getInt(_timestampKey);
 
       if (lastFetchTimestamp != null) {
-        final lastFetchDate = DateTime.fromMillisecondsSinceEpoch(
-            lastFetchTimestamp);
-        if (DateTime
-            .now()
-            .difference(lastFetchDate)
-            .inDays < 7) {
+        final lastFetchDate =
+            DateTime.fromMillisecondsSinceEpoch(lastFetchTimestamp);
+        if (DateTime.now().difference(lastFetchDate).inDays < 7) {
           final cachedData = prefs.getString(_cacheKey);
           if (cachedData != null) {
             final parsedArticles = _parseAndValidateArticles(cachedData);
@@ -186,8 +181,7 @@ class NewsService with ChangeNotifier {
         debugPrint("[NewsService] 🔑 Getting ID Token...");
         final idToken = await user.getIdToken(attempts == 1).timeout(
             const Duration(seconds: 10),
-            onTimeout: () => throw TimeoutException("Token fetch timed out")
-        );
+            onTimeout: () => throw TimeoutException("Token fetch timed out"));
 
         debugPrint("[NewsService] 🌍 Calling Cloud Function...");
         final urlResponse = await _dio.post(
@@ -209,8 +203,7 @@ class NewsService with ChangeNotifier {
 
         final String? signedUrl = urlResponse.data['result']?['signedUrl'];
         if (signedUrl == null) {
-          throw Exception(
-              "Cloud Function returned NULL signedUrl.");
+          throw Exception("Cloud Function returned NULL signedUrl.");
         }
 
         debugPrint("[NewsService] 🔗 Downloading content...");
@@ -218,8 +211,7 @@ class NewsService with ChangeNotifier {
           signedUrl,
           options: Options(
               responseType: ResponseType.bytes,
-              receiveTimeout: const Duration(seconds: 10)
-          ),
+              receiveTimeout: const Duration(seconds: 10)),
         );
 
         if (newsResponse.statusCode == 200 && newsResponse.data != null) {
@@ -230,9 +222,7 @@ class NewsService with ChangeNotifier {
 
           SharedPreferences.getInstance().then((prefs) {
             prefs.setString(_cacheKey, newsJsonString);
-            prefs.setInt(_timestampKey, DateTime
-                .now()
-                .millisecondsSinceEpoch);
+            prefs.setInt(_timestampKey, DateTime.now().millisecondsSinceEpoch);
           });
 
           debugPrint("[NewsService] ✅ Success!");
@@ -254,8 +244,9 @@ class NewsService with ChangeNotifier {
   List<NewsArticle> _parseAndValidateArticles(String jsonString) {
     try {
       final List<dynamic> jsonData = json.decode(jsonString);
-      final allArticles = jsonData.map((json) =>
-          NewsArticle.fromJson(json as Map<String, dynamic>)).toList();
+      final allArticles = jsonData
+          .map((json) => NewsArticle.fromJson(json as Map<String, dynamic>))
+          .toList();
       return allArticles.where((article) => article.isValid).toList();
     } catch (e) {
       throw Exception('Failed to parse news articles: $e');
@@ -275,8 +266,8 @@ class NewsService with ChangeNotifier {
 
   void _setState(NewsState newState, String source) {
     if (_state == newState) return;
-    debugPrint("[NewsService] 🔔 State: $newState ($source). Count: ${articles
-        .length}");
+    debugPrint(
+        "[NewsService] 🔔 State: $newState ($source). Count: ${articles.length}");
     _state = newState;
     notifyListeners();
   }

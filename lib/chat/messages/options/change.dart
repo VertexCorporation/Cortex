@@ -258,7 +258,9 @@ List<Map<String, dynamic>> _buildCategorizedModelList(
 
   int sorter(ModelEntity a, ModelEntity b) =>
       a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase());
-  categories.forEach((_, list) => list.sort(sorter));
+  for (final list in categories.values) {
+    list.sort(sorter);
+  }
 
   final List<Map<String, dynamic>> assembledList = [];
   void addCategory(String title, List<ModelEntity> models) {

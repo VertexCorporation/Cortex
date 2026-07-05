@@ -37,12 +37,13 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
   static const int _historySize = 60;
   double _animationValue = 0.0;
   final _WaveformNotifier _notifier = _WaveformNotifier();
+  final Stopwatch _stopwatch = Stopwatch();
 
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker(_onTick)
-      ..start();
+    _ticker = createTicker(_onTick)..start();
+    _stopwatch.start();
     for (int i = 0; i < _historySize; i++) {
       _history.add(0.0);
     }
@@ -67,19 +68,16 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
     final voiceService = context.read<VoiceService>();
 
     double rawLevel = 0.0;
-    
+
     if (widget.simulatePlaying) {
-      final double time = DateTime.now().millisecondsSinceEpoch / 1000.0;
+      final double time = _stopwatch.elapsedMilliseconds / 1000.0;
       final double sine = math.sin(time * 15.0).abs();
       final double noise = math.Random().nextDouble();
       rawLevel = 0.2 + (sine * 0.4) + (noise * 0.2);
     } else {
-
       if (voiceService.state == VoiceState.speaking ||
           voiceService.state == VoiceState.processing) {
-        final double time = DateTime
-            .now()
-            .millisecondsSinceEpoch / 1000.0;
+        final double time = _stopwatch.elapsedMilliseconds / 1000.0;
         final double sine = math.sin(time * 15.0).abs();
         final double noise = math.Random().nextDouble();
 

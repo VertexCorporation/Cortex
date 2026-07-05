@@ -5,6 +5,9 @@ import 'package:cortex/theme.dart';
 import 'patterns.dart';
 import 'utils.dart';
 
+final _linkPattern = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
+final _citationBracketClean = RegExp(r'[\[\]【】\s]');
+
 List<InlineSpan> processInlineElements(
     BuildContext context, String text, Map<String, RegExp> patterns, double fs,
     {Map<String, int>? urlMap, List<dynamic>? citations}) {
@@ -92,7 +95,7 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
                     style: baseStyle.copyWith(
                         fontSize: fs * 0.9, fontFamily: 'monospace'))));
       case 'link':
-        final m = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(matchText);
+        final m = _linkPattern.firstMatch(matchText);
         if (m == null) return TextSpan(text: matchText, style: baseStyle);
 
         final title = m.group(1)!;
@@ -171,7 +174,7 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
                         decoration: TextDecoration.underline))));
       case 'citation':
         final citationIndexStr =
-            matchText.replaceAll(RegExp(r'[\[\]【】\s]'), '');
+            matchText.replaceAll(_citationBracketClean, '');
         final citationIndex = int.tryParse(citationIndexStr) ?? 0;
 
         String? citationUrl;

@@ -31,6 +31,13 @@ class SourceCarousel extends StatelessWidget {
 
   const SourceCarousel({super.key, required this.sources});
 
+  Widget _buildSourceCard(Source source) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: _SourceCard(source: source),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (sources.isEmpty) return const SizedBox.shrink();
@@ -54,12 +61,7 @@ class SourceCarousel extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           child: Row(
-            children: sources.map((source) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: _SourceCard(source: source),
-              );
-            }).toList(),
+            children: sources.map(_buildSourceCard).toList(),
           ),
         ),
         const SizedBox(height: 8),

@@ -82,8 +82,7 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
           if (newItems.length == _displayedItems.length) break;
         }
       }
-    }
-    else if (newItems.length < _displayedItems.length) {
+    } else if (newItems.length < _displayedItems.length) {
       for (int i = 0; i < _displayedItems.length; i++) {
         if (i >= newItems.length || _displayedItems[i] != newItems[i]) {
           final removedItem = _displayedItems[i];
@@ -95,7 +94,7 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
             duration: const Duration(milliseconds: 300),
           );
           if (newItems.length == _displayedItems.length) break;
-          i--; 
+          i--;
         }
       }
     }
@@ -202,7 +201,8 @@ class _AttachmentItem extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100.0), // Fully rounded pill
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.2), width: 1.0),
+          border: Border.all(
+              color: AppColors.border.withValues(alpha: 0.2), width: 1.0),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(100.0),

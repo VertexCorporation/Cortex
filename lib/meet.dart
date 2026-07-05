@@ -125,7 +125,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     final double screenHeight = MediaQuery.sizeOf(context).height;
     final l10n = AppLocalizations.of(context)!;
     final userProvider = context.watch<UserProvider>();
@@ -264,32 +263,31 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 2500),
       vsync: this,
-    )
-      ..repeat();
+    )..repeat();
 
     // Staggered animations for a more fluid feel
     _textSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
             .animate(CurvedAnimation(
-          parent: _mainController,
-          curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
-        ));
+      parent: _mainController,
+      curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
+    ));
     _textFadeAnimation =
         Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-          parent: _mainController,
-          curve: const Interval(0.2, 0.7, curve: Curves.easeOut),
-        ));
+      parent: _mainController,
+      curve: const Interval(0.2, 0.7, curve: Curves.easeOut),
+    ));
     _imageSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
             .animate(CurvedAnimation(
-          parent: _mainController,
-          curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
-        ));
+      parent: _mainController,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
+    ));
     _imageFadeAnimation =
         Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-          parent: _mainController,
-          curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-        ));
+      parent: _mainController,
+      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+    ));
 
     _mainController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -346,7 +344,7 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
         double descFontSize = (textContainerHeight * 0.055).clamp(14.0, 19.0);
         final double promptIconSize = (descFontSize * 1.1).clamp(16.0, 20.0);
         final double swipeFontSize =
-        (textContainerHeight * 0.035).clamp(12.0, 16.0);
+            (textContainerHeight * 0.035).clamp(12.0, 16.0);
 
         return GestureDetector(
           onTap: _nextPage,
@@ -590,13 +588,13 @@ class _FinalOnboardingPageState extends State<_FinalOnboardingPage>
 
         // Dynamic font sizes based on text container height.
         final double titleFontSize =
-        (textContainerHeight * 0.08).clamp(22.0, 32.0);
+            (textContainerHeight * 0.08).clamp(22.0, 32.0);
         final double readyFontSize =
-        (textContainerHeight * 0.12).clamp(28.0, 42.0);
+            (textContainerHeight * 0.12).clamp(28.0, 42.0);
         final double descFontSize =
-        (textContainerHeight * 0.05).clamp(15.0, 19.0);
+            (textContainerHeight * 0.05).clamp(15.0, 19.0);
         final double buttonFontSize =
-        (textContainerHeight * 0.15).clamp(36.0, 52.0);
+            (textContainerHeight * 0.15).clamp(36.0, 52.0);
 
         return Stack(
           children: [

@@ -50,10 +50,10 @@ class ChatFormatProcessor {
   ChatFormatProcessor(this._format, {this.onStopTokenDetected});
 
   bool _discardNextWhitespace = false;
-  
+
   // Track if we've seen any real content yet (to filter leading junk like ":" or ":\n")
   bool _hasSeenRealContent = false;
-  
+
   // Characters to discard at the very beginning of generation (common model artifacts)
   static const Set<String> _leadingJunkChars = {':', '\n', '\r', ' ', '\t'};
 
@@ -94,15 +94,43 @@ class ChatFormatProcessor {
       }
     }
 
-    // This buffer will only contain text that is actually safe to render.
     final visibleBuffer = StringBuffer();
 
-    // Process character by character so we can correctly recognise control
-    // sequences even when they are split across multiple tokens.
-    for (final rune in token.runes) {
+    final controlStartChars = _getControlStartChars(tokens);
+    final tokenStr = token.toString();
+    int i = 0;
+    while (i < tokenStr.length) {
       if (_generationStopped) break;
-      final ch = String.fromCharCode(rune);
-      _processChar(ch, tokens, visibleBuffer);
+      final codeUnit = tokenStr.codeUnitAt(i);
+
+      if (codeUnit < 128 && controlStartChars.contains(codeUnit)) {
+        // This char might start a control sequence
+        _processChar(String.fromCharCode(codeUnit), tokens, visibleBuffer);
+        i++;
+      } else if (codeUnit & 0xFC00 == 0xD800) {
+        // Surrogate pair (non-BMP character)
+        if (i + 1 < tokenStr.length) {
+          final rune = tokenStr.codeUnitAt(i) << 10 |
+              tokenStr.codeUnitAt(i + 1) + 0x10000 - (0xD800 << 10) - 0xDC00;
+          _processChar(String.fromCharCode(rune), tokens, visibleBuffer);
+          i += 2;
+        } else {
+          i++;
+        }
+      } else {
+        // Batch contiguous non-control ASCII chars for speed
+        int start = i;
+        i++;
+        while (i < tokenStr.length && !_generationStopped) {
+          final next = tokenStr.codeUnitAt(i);
+          if (next < 128 && controlStartChars.contains(next)) break;
+          if (next & 0xFC00 == 0xD800) break;
+          i++;
+        }
+        if (start < i) {
+          _processBatch(tokenStr.substring(start, i), tokens, visibleBuffer);
+        }
+      }
     }
 
     if (_generationStopped) {
@@ -201,6 +229,47 @@ class ChatFormatProcessor {
     );
   }
 
+  Set<int> _getControlStartChars(dynamic tokens) {
+    _ensurePatternsInitialized(tokens);
+    final chars = <int>{};
+    for (final pattern in _controlPatterns) {
+      if (pattern.isNotEmpty) {
+        chars.add(pattern.codeUnitAt(0));
+      }
+    }
+    return chars;
+  }
+
+  void _processBatch(String batch, dynamic tokens, StringBuffer output) {
+    if (_generationStopped) return;
+    if (batch.isEmpty) return;
+    if (_discardNextWhitespace) {
+      int ws = 0;
+      while (ws < batch.length && batch.codeUnitAt(ws) <= 0x20) {
+        ws++;
+      }
+      if (ws > 0) {
+        batch = batch.substring(ws);
+        _discardNextWhitespace = false;
+      }
+    }
+    if (!_hasSeenRealContent) {
+      int start = 0;
+      while (start < batch.length && _leadingJunkChars.contains(batch[start])) {
+        start++;
+      }
+      if (start < batch.length) {
+        _hasSeenRealContent = true;
+        batch = batch.substring(start);
+      } else {
+        return;
+      }
+    }
+    if (batch.isNotEmpty) {
+      output.write(batch);
+    }
+  }
+
   /// Core state machine that consumes a single character from the stream.
   ///
   /// It decides whether this character:
@@ -208,7 +277,6 @@ class ChatFormatProcessor {
   /// - completes a control sequence (handle it & never show),
   /// - or should be flushed as normal visible text.
   void _processChar(String ch, dynamic tokens, StringBuffer output) {
-
     if (_generationStopped) return;
 
     if (_discardNextWhitespace) {
@@ -217,12 +285,13 @@ class ChatFormatProcessor {
       }
       _discardNextWhitespace = false;
     }
-    
+
     // Filter leading junk characters (e.g., ":" at the very start of generation)
     // Some models output ":" or ":\n" before actual content due to training artifacts
     if (!_hasSeenRealContent) {
       if (_leadingJunkChars.contains(ch)) {
-        debugPrint("[ChatFormatProcessor] Discarding leading junk char: '${ch.replaceAll('\n', '\\n')}'");
+        debugPrint(
+            "[ChatFormatProcessor] Discarding leading junk char: '${ch.replaceAll('\n', '\\n')}'");
         return;
       }
       // First non-junk character - mark as seen real content

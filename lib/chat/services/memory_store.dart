@@ -25,7 +25,8 @@ class SemanticMemoryService {
   }
 
   /// Saves or updates a memory in the local database.
-  Future<void> saveMemory(String keyPhrase, String content, {String category = 'general', int importance = 3}) async {
+  Future<void> saveMemory(String keyPhrase, String content,
+      {String category = 'general', int importance = 3}) async {
     final db = await _dbHelper.db;
     await db.insert(
       'semantic_memories',
@@ -58,7 +59,8 @@ class SemanticMemoryService {
 
   /// Finds and retrieves the most relevant memories for the given user prompt.
   /// Uses a fast local TF-IDF style term frequency intersection.
-  Future<List<Map<String, dynamic>>> queryRelevantMemories(String userPrompt, {int limit = 5}) async {
+  Future<List<Map<String, dynamic>>> queryRelevantMemories(String userPrompt,
+      {int limit = 5}) async {
     final db = await _dbHelper.db;
     final memories = await db.query('semantic_memories');
     if (memories.isEmpty) return [];
@@ -87,7 +89,7 @@ class SemanticMemoryService {
           score += 10; // high weight for key phrase matches
         }
         if (content.contains(word)) {
-          score += 3;  // normal weight for content matches
+          score += 3; // normal weight for content matches
         }
       }
 
@@ -103,7 +105,8 @@ class SemanticMemoryService {
     if (scoredMemories.isEmpty) return [];
 
     // Sort by score descending
-    scoredMemories.sort((a, b) => (b['relevance_score'] as int).compareTo(a['relevance_score'] as int));
+    scoredMemories.sort((a, b) =>
+        (b['relevance_score'] as int).compareTo(a['relevance_score'] as int));
 
     return scoredMemories.take(limit).toList();
   }

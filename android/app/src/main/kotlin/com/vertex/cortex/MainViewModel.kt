@@ -56,9 +56,20 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         currentMessage = newMessage
     }
 
-    fun send(photoBase64: String?, temp: Float, topP: Float, topK: Int) {
+    fun send(
+        photoBase64: String?,
+        temp: Float,
+        topP: Float,
+        topK: Int,
+        repeatPenalty: Float = 1.0f,
+        frequencyPenalty: Float = 0.0f,
+        presencePenalty: Float = 0.0f,
+        mirostatMode: Int = 0,
+        mirostatTau: Float = 5.0f,
+        mirostatEta: Float = 0.1f
+    ) {
         val text = currentMessage
-        currentMessage = "" // Clear buffer
+        currentMessage = ""
 
         viewModelScope.launch {
             if (photoBase64 != null && photoBase64.isNotEmpty()) {
@@ -66,12 +77,18 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
             }
 
             try {
-                
+
                 llamaAndroid.send(
                     message = text,
                     temp = temp,
                     topP = topP,
-                    topK = topK
+                    topK = topK,
+                    repeatPenalty = repeatPenalty,
+                    frequencyPenalty = frequencyPenalty,
+                    presencePenalty = presencePenalty,
+                    mirostatMode = mirostatMode,
+                    mirostatTau = mirostatTau,
+                    mirostatEta = mirostatEta
                 )
                     .catch { exception ->
                         Log.e(tag, "send() failed via Flow", exception)

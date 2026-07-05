@@ -200,9 +200,9 @@ class ScrollService {
   }) {
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
     final Color iconColor =
-    themeColors.statusBarIconBrightness == Brightness.light
-        ? Colors.white.withValues(alpha: 0.9)
-        : Colors.black.withValues(alpha: 0.8);
+        themeColors.statusBarIconBrightness == Brightness.light
+            ? Colors.white.withValues(alpha: 0.9)
+            : Colors.black.withValues(alpha: 0.8);
 
     // Add extra padding so it perfectly clears the input field edge and shadow
     const double extraMargin = 24.0;
@@ -241,7 +241,8 @@ class ScrollService {
                     },
                     customBorder: const CircleBorder(),
                     splashColor: AppColors.primaryColor.withValues(alpha: 0.3),
-                    highlightColor: AppColors.primaryColor.withValues(alpha: 0.1),
+                    highlightColor:
+                        AppColors.primaryColor.withValues(alpha: 0.1),
                     child: Container(
                       padding: EdgeInsets.all(screenWidth * 0.025),
                       decoration: BoxDecoration(
@@ -263,7 +264,8 @@ class ScrollService {
                         'assets/icons/arrov.svg',
                         width: screenWidth * 0.045,
                         height: screenWidth * 0.045,
-                        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                        colorFilter:
+                            ColorFilter.mode(iconColor, BlendMode.srcIn),
                       ),
                     ),
                   ),

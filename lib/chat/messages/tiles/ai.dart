@@ -386,6 +386,7 @@ class _AIMessageTileState extends State<AIMessageTile>
   }
 
   Widget _buildStandardTile(BuildContext context, double scale) {
+    final headerData = _AiHeader._resolveHeaderData(context, widget.message);
     return ScaleTransition(
       scale: _entryScaleAnim,
       child: FadeTransition(
@@ -408,6 +409,8 @@ class _AIMessageTileState extends State<AIMessageTile>
                     thinkPulseAnim: _thinkPulseAnim,
                     thinkRotateAnim: _thinkRotateCtl,
                     headerEntryAnim: _headerEntryAnim,
+                    textToDisplay: headerData.textToDisplay,
+                    isCortexDynamic: headerData.isCortexDynamic,
                   ),
                   SizeTransition(
                     sizeFactor: _headerEntryAnim,

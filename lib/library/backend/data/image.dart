@@ -26,7 +26,8 @@ class ModelImageCache {
     if (jsonString != null) {
       try {
         final Map<String, dynamic> decoded = json.decode(jsonString);
-        final paths = decoded.map((key, value) => MapEntry(key, value.toString()));
+        final paths =
+            decoded.map((key, value) => MapEntry(key, value.toString()));
         _inMemoryCache = paths; // Populate the in-memory cache
         return paths;
       } catch (e) {
@@ -48,7 +49,8 @@ class ModelImageCache {
   static Map<String, String> getPathsSync() {
     if (_inMemoryCache == null) {
       if (!_syncWarningShown) {
-        debugPrint("[ModelImageCache] WARNING: getPathsSync() called before cache was initialized. Returning empty map.");
+        debugPrint(
+            "[ModelImageCache] WARNING: getPathsSync() called before cache was initialized. Returning empty map.");
         _syncWarningShown = true;
       }
       return {};
@@ -93,7 +95,8 @@ class ModelImageCache {
           final file = File(localPath);
           if (await file.exists()) {
             await file.delete();
-            debugPrint("[ModelImageCache] Deleted cached image file: $localPath");
+            debugPrint(
+                "[ModelImageCache] Deleted cached image file: $localPath");
           }
         } catch (e) {
           debugPrint("[ModelImageCache] Error deleting file $localPath: $e");

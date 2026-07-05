@@ -72,8 +72,8 @@ class Cortex extends StatelessWidget {
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: AppColors.primaryColor.inverted,
-        selectionColor: AppColors.secondaryColor.inverted.withValues(
-            alpha: 0.3),
+        selectionColor:
+            AppColors.secondaryColor.inverted.withValues(alpha: 0.3),
         selectionHandleColor: AppColors.primaryColor.inverted,
       ),
       inputDecorationTheme: InputDecorationTheme(

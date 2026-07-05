@@ -32,10 +32,7 @@ class UserSection extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'UserActionDialog',
       pageBuilder: (ctx, _, __) {
-        final keyboardPadding = MediaQuery
-            .of(ctx)
-            .viewInsets
-            .bottom;
+        final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
         return AnimatedPadding(
           padding: EdgeInsets.only(bottom: keyboardPadding),
           duration: const Duration(milliseconds: 50),
@@ -47,11 +44,10 @@ class UserSection extends StatelessWidget {
   }
 
   Widget _buildCenteredButton(BuildContext context,
-      {required String text, required VoidCallback onPressed, bool enabled = true}) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+      {required String text,
+      required VoidCallback onPressed,
+      bool enabled = true}) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Opacity(
       opacity: enabled ? 1.0 : 0.5,
       child: Material(
@@ -88,20 +84,12 @@ class UserSection extends StatelessWidget {
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
     final appLocalizations = AppLocalizations.of(context)!;
-    final hasInternet = context
-        .watch<SettingsGeneralProvider>()
-        .hasInternet;
+    final hasInternet = context.watch<SettingsGeneralProvider>().hasInternet;
     final isPasswordUser =
-    context.select((AuthService auth) => auth.hasPasswordProvider());
+        context.select((AuthService auth) => auth.hasPasswordProvider());
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

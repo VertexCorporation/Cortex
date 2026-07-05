@@ -20,7 +20,7 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
 
       if (_auth.currentUser != null) {
         final pendingRequests =
-        await _localNotifications.pendingNotificationRequests();
+            await _localNotifications.pendingNotificationRequests();
         final engagementRequests = pendingRequests
             .where((p) => p.id != lowBatteryNotificationId)
             .toList();
@@ -41,9 +41,7 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
             final prefs = await SharedPreferences.getInstance();
             final lastSentTime =
                 prefs.getInt('lowBatteryNotificationSentTime') ?? 0;
-            final now = DateTime
-                .now()
-                .millisecondsSinceEpoch;
+            final now = DateTime.now().millisecondsSinceEpoch;
             if (now - lastSentTime > const Duration(hours: 12).inMilliseconds) {
               if (Random().nextDouble() < 0.1) {
                 await _scheduleLowBatteryNotification();
@@ -84,16 +82,13 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
   /// Records the timestamp of the app being opened for scheduling logic.
   Future<void> recordAppOpen() async {
     final prefs = await SharedPreferences.getInstance();
-    final now = DateTime
-        .now()
-        .millisecondsSinceEpoch;
+    final now = DateTime.now().millisecondsSinceEpoch;
     if (prefs.getInt('firstAppOpenTime') == null) {
       await prefs.setInt('firstAppOpenTime', now);
     }
     await prefs.setInt('lastAppOpenTime', now);
     debugPrint(
-        "[ExtrovertNotificationService] App open recorded at ${DateTime
-            .now()}.");
+        "[ExtrovertNotificationService] App open recorded at ${DateTime.now()}.");
   }
 
   /// The main scheduler for engagement notifications with richer content pools.
@@ -129,10 +124,8 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
           prefs.getBool('welcomeNotificationSent') ?? false;
       if (firstOpenTime != null && !welcomeNotificationSent) {
         final firstOpenDate =
-        DateTime.fromMillisecondsSinceEpoch(firstOpenTime);
-        if (now
-            .difference(firstOpenDate)
-            .inHours < 47) {
+            DateTime.fromMillisecondsSinceEpoch(firstOpenTime);
+        if (now.difference(firstOpenDate).inHours < 47) {
           final scheduledDateTime = now.add(const Duration(hours: 1));
           await _scheduleWelcomeNotification(scheduledDateTime);
           return;
@@ -163,7 +156,7 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
         };
         final tomorrow = now.add(const Duration(days: 1));
         final finalScheduleTime =
-        DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
+            DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
         await _scheduleFinalNotification(engagementNotificationId,
             selectedNotification, finalScheduleTime, _greetingsChannel);
       } else if (now.hour < 18) {
@@ -187,7 +180,7 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
             }
           ];
           selectedNotification =
-          comebackPool[Random().nextInt(comebackPool.length)];
+              comebackPool[Random().nextInt(comebackPool.length)];
         } else {
           const generalPool = [
             {
@@ -216,7 +209,7 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
             }
           ];
           selectedNotification =
-          generalPool[Random().nextInt(generalPool.length)];
+              generalPool[Random().nextInt(generalPool.length)];
         }
         await _scheduleFinalNotification(engagementNotificationId,
             selectedNotification, scheduledDateTime, _engagementChannel);
@@ -243,13 +236,14 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
     debugPrint(
         "[ExtrovertNotificationService] Maintenance is over. Intelligently scheduling deferred notification.");
 
+    final now = DateTime.now();
     final welcomeNotificationSent =
         prefs.getBool('welcomeNotificationSent') ?? false;
 
     if (!welcomeNotificationSent) {
       debugPrint(
           "[ExtrovertNotificationService] The pending notification was a 'Welcome' notification. Scheduling it now.");
-      final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
+      final scheduledTime = now.add(const Duration(minutes: 5));
       await _scheduleWelcomeNotification(scheduledTime);
     } else {
       debugPrint(
@@ -265,8 +259,8 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
         },
       ];
       final selectedNotification =
-      generalPool[Random().nextInt(generalPool.length)];
-      final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
+          generalPool[Random().nextInt(generalPool.length)];
+      final scheduledTime = now.add(const Duration(minutes: 5));
       await _scheduleFinalNotification(
           2, selectedNotification, scheduledTime, _engagementChannel);
     }
@@ -297,7 +291,8 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
   }
 
   /// Helper to build and schedule a notification, centralizing the logic.
-  Future<void> _scheduleFinalNotification(int id,
+  Future<void> _scheduleFinalNotification(
+      int id,
       Map<String, String> notificationKeys,
       DateTime scheduledTime,
       AndroidNotificationChannel channel) async {
@@ -316,11 +311,13 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
   }
 
   /// Performs the actual zoned scheduling with FlutterLocalNotifications.
-  Future<void> _zonedScheduleNotification(int id,
-      Map<String, String> content,
-      DateTime scheduledDateTime,
-      Map<String, dynamic> payload,
-      AndroidNotificationChannel channel,) async {
+  Future<void> _zonedScheduleNotification(
+    int id,
+    Map<String, String> content,
+    DateTime scheduledDateTime,
+    Map<String, dynamic> payload,
+    AndroidNotificationChannel channel,
+  ) async {
     timezone.TZDateTime timezoneScheduled;
     try {
       timezoneScheduled =
@@ -373,11 +370,8 @@ extension ExtrovertScheduler on ExtrovertNotificationService {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(
-        'lastSmartScheduleTime', DateTime
-        .now()
-        .millisecondsSinceEpoch);
+        'lastSmartScheduleTime', DateTime.now().millisecondsSinceEpoch);
     debugPrint(
-        "[ExtrovertNotificationService] Scheduled '${payload['notification_title_key']}' for ${timezoneScheduled
-            .toString()}.");
+        "[ExtrovertNotificationService] Scheduled '${payload['notification_title_key']}' for ${timezoneScheduled.toString()}.");
   }
 }

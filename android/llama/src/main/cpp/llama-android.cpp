@@ -341,10 +341,16 @@ JNIEXPORT jlong JNICALL
         JNIEnv * env,
         jobject /* thiz */,
         jfloat temperature,
-jfloat top_p,
-        jint top_k
+        jfloat top_p,
+        jint top_k,
+        jfloat repeat_penalty,
+        jfloat frequency_penalty,
+        jfloat presence_penalty,
+        jint mirostat_mode,
+        jfloat mirostat_tau,
+        jfloat mirostat_eta
 ) {
-(void) env; // unused warning fix
+(void) env;
 
 auto sparams = llama_sampler_chain_default_params();
 sparams.no_perf = true;
@@ -357,7 +363,15 @@ llama_sampler_chain_add(smpl, llama_sampler_init_greedy());
 return reinterpret_cast<jlong>(smpl);
 }
 
-// --- Stochastic path (temp / top-k / top-p + dist) ---
+// 0) Repetition / Frequency / Presence penalties
+if (repeat_penalty != 1.0f || frequency_penalty != 0.0f || presence_penalty != 0.0f) {
+llama_sampler_chain_add(smpl, llama_sampler_init_penalties(
+    64,  // penalty_last_n (64 = check last 64 tokens, -1 = all = slow, 0 = off)
+    repeat_penalty,
+    frequency_penalty,
+    presence_penalty
+));
+}
 
 // 1) Top-K
 if (top_k > 0) {
@@ -366,14 +380,18 @@ llama_sampler_chain_add(smpl, llama_sampler_init_top_k(top_k));
 
 // 2) Top-P
 if (top_p > 0.0f && top_p < 1.0f) {
-// min_keep = 1
 llama_sampler_chain_add(smpl, llama_sampler_init_top_p(top_p, 1));
 }
 
 // 3) Temperature
 llama_sampler_chain_add(smpl, llama_sampler_init_temp(temperature));
 
-// 4) Final sampler
+// 4) Mirostat V2 (adaptive entropy control, great for small models)
+if (mirostat_mode == 2) {
+llama_sampler_chain_add(smpl, llama_sampler_init_mirostat_v2(LLAMA_DEFAULT_SEED, mirostat_tau, mirostat_eta));
+}
+
+// 5) Final distribution sampler
 llama_sampler_chain_add(smpl, llama_sampler_init_dist(LLAMA_DEFAULT_SEED));
 
 return reinterpret_cast<jlong>(smpl);
@@ -496,6 +514,18 @@ return nullptr;
 
 auto new_token_chars = common_token_to_piece(context, new_token_id);
 cached_token_chars += new_token_chars;
+
+// Check for common stop sequences in the accumulated output
+const auto has_stop =
+cached_token_chars.find("<|im_end|>") != std::string::npos ||
+cached_token_chars.find("<end_of_turn>") != std::string::npos ||
+cached_token_chars.find("<|endoftext|>") != std::string::npos ||
+cached_token_chars.find("<|eot_id|>") != std::string::npos ||
+cached_token_chars.find("</s>") != std::string::npos;
+if (has_stop) {
+cached_token_chars.clear();
+return nullptr;
+}
 
 jstring new_token = nullptr;
 if (is_valid_utf8(cached_token_chars.c_str())) {

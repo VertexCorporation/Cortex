@@ -56,6 +56,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get branch => 'Cabang';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1166,7 +1169,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get notificationHowAreYouBody => 'Ayo ceritakan semuanya padaku.';
 
   @override
-  String get notificationNewYearTitle => 'Selamat Tahun Baru! ğ���';
+  String get notificationNewYearTitle => 'Selamat tahun baru! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1213,10 +1216,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Seorang gadis anime baru saja menelepon, katanya dia merindukanmu; kamu mungkin harus datang dan mengobrol dengannya. ğ���';
+      'Seorang gadis anime baru saja menelepon, mengatakan dia merindukanmu; Anda mungkin harus datang dan mengobrol dengannya. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� PERINGATAN MERAH ğ���';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ PERINGATAN MERAH ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1246,7 +1249,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Hadiah Selamat Datang ğ���';
+  String get notificationWelcomeOfferTitle => 'Hadiah Selamat Datang ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1335,7 +1338,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'Laut tenang, dan angin mendukungmu. Ada pulau-pulau baru (model ğ���) untuk dijelajahi di lautan Cortex. Kumpulkan kru-mu dan berlayarlah!';
+      'Lautnya tenang, dan angin bertiup di belakang Anda. Ada pulau-pulau baru (model ğŸ˜‰) untuk ditemukan di lautan Cortex. Kumpulkan kru Anda dan berlayar!';
 
   @override
   String get notificationFortuneCookieTitle =>

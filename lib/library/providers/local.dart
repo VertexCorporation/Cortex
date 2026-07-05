@@ -438,8 +438,8 @@ class ModelLocalStateProvider extends ChangeNotifier
     final Map<String, bool> combinedStates = {};
     for (var item in allToCheck) {
       final id = item['id'] as String;
-      combinedStates[id] = (newDownloadStates[id] ?? false) ||
-          (oldDownloadStates[id] ?? false);
+      combinedStates[id] =
+          (newDownloadStates[id] ?? false) || (oldDownloadStates[id] ?? false);
     }
 
     bool hasChanged = !mapEquals(_downloadCompleted, combinedStates);
@@ -459,7 +459,9 @@ class ModelLocalStateProvider extends ChangeNotifier
       final newState = combinedStates[id] ?? false;
       final oldState = _downloadManagers[id]?.isDownloaded ?? !newState;
       if (newState != oldState) {
-        _downloadManagers.putIfAbsent(id, () => DownloadManager()).setDownloaded(newState);
+        _downloadManagers
+            .putIfAbsent(id, () => DownloadManager())
+            .setDownloaded(newState);
         hasChanged = true;
       }
     }

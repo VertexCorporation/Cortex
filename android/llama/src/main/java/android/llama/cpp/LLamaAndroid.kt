@@ -55,7 +55,7 @@ class LLamaAndroid {
     private external fun kv_cache_clear(context: Long)
     private external fun new_batch(nTokens: Int, embd: Int, nSeqMax: Int): Long
     private external fun free_batch(batch: Long)
-    private external fun new_sampler(temp: Float, topP: Float, topK: Int): Long
+    private external fun new_sampler(temp: Float, topP: Float, topK: Int, repeatPenalty: Float, frequencyPenalty: Float, presencePenalty: Float, mirostatMode: Int, mirostatTau: Float, mirostatEta: Float): Long
     private external fun free_sampler(sampler: Long)
     private external fun request_stop()
     private external fun set_image(bytes: ByteArray)
@@ -85,7 +85,7 @@ class LLamaAndroid {
                     if (batch == 0L) throw IllegalStateException("new_batch() failed")
 
                     // Default sampler placeholder (will be overwritten per-message)
-                    val sampler = new_sampler(0.7f, 0.95f, 40)
+                    val sampler = new_sampler(0.7f, 0.95f, 40, 1.0f, 0.0f, 0.0f, 0, 0.0f, 0.0f)
                     if (sampler == 0L) throw IllegalStateException("new_sampler() failed")
 
                     threadLocalState.set(State.Loaded(model, context, batch, sampler, nCtx))
@@ -113,35 +113,36 @@ class LLamaAndroid {
         }
     }
 
-    // NEW: Send with explicit Sampler params
+    // NEW: Send with explicit Sampler params (with repetition penalty + mirostat support)
     fun send(
         message: String,
         temp: Float,
         topP: Float,
-        topK: Int
+        topK: Int,
+        repeatPenalty: Float = 1.0f,
+        frequencyPenalty: Float = 0.0f,
+        presencePenalty: Float = 0.0f,
+        mirostatMode: Int = 0,
+        mirostatTau: Float = 5.0f,
+        mirostatEta: Float = 0.1f
     ): Flow<String> = flow {
         when (val state = threadLocalState.get()) {
             is State.Loaded -> {
                 try {
                     // Re-create sampler with request params
-                    // We need to free the old one first? Or just make a new one per request?
-                    // The State holds a 'sampler'. Let's replace it.
-                    // Ideally we should manage lifecycle better, but following the established pattern:
                     free_sampler(state.sampler)
-                    val newSampler = new_sampler(temp, topP, topK)
+                    val newSampler = new_sampler(temp, topP, topK, repeatPenalty, frequencyPenalty, presencePenalty, mirostatMode, mirostatTau, mirostatEta)
                     val updatedState = state.copy(sampler = newSampler)
                     threadLocalState.set(updatedState)
 
-                    kv_cache_clear(state.context) // Clear context for clean state (User asked for this logic previously)
-
-                    val nlen = state.nCtx // Use configured context size limit
+                    val nlen = state.nCtx
 
                     val ncur = IntVar(
                         completion_init(
                             state.context,
                             state.batch,
                             message,
-                            true, // formatChat
+                            true,
                             nlen
                         )
                     )
@@ -158,10 +159,8 @@ class LLamaAndroid {
                         if (str.isNotEmpty()) emit(str)
                     }
                 } finally {
-                    // kv_cache_clear(state.context) 
-                    // Don't clear on exit, let context persist? 
-                    // Previous code did clear. Let's stick to previous safety behavior for now.
-                    kv_cache_clear(state.context)
+                    // Don't clear KV cache on exit — keep context between messages
+                    // for prompt caching benefits. Only explicit resetKv() clears it.
                 }
             }
             else -> Log.e(tag, "send() called but model is not loaded.")

@@ -20,10 +20,14 @@ class LocalPiiRedactionFilter {
     if (text.isEmpty) return text;
 
     String sanitized = text;
-    sanitized = sanitized.replaceAllMapped(_emailRegExp, (match) => '[E-POSTA MASKELENDİ]');
-    sanitized = sanitized.replaceAllMapped(_creditCardRegExp, (match) => '[KREDİ KARTI MASKELENDİ]');
-    sanitized = sanitized.replaceAllMapped(_phoneRegExp, (match) => '[TELEFON MASKELENDİ]');
-    sanitized = sanitized.replaceAllMapped(_tcknRegExp, (match) => '[TC KİMLİK MASKELENDİ]');
+    sanitized = sanitized.replaceAllMapped(
+        _emailRegExp, (match) => '[E-POSTA MASKELENDİ]');
+    sanitized = sanitized.replaceAllMapped(
+        _creditCardRegExp, (match) => '[KREDİ KARTI MASKELENDİ]');
+    sanitized = sanitized.replaceAllMapped(
+        _phoneRegExp, (match) => '[TELEFON MASKELENDİ]');
+    sanitized = sanitized.replaceAllMapped(
+        _tcknRegExp, (match) => '[TC KİMLİK MASKELENDİ]');
 
     return sanitized;
   }

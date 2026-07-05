@@ -56,6 +56,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get chat => 'चैट';
 
   @override
+  String get branch => 'शाखा';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1207,10 +1210,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'एक एनीमे लड़की ने अभी फोन किया, और कहा कि उसे आपकी याद आ रही है; आपको शायद आकर उससे बात करनी चाहिए। ğ���';
+      'एक एनीमे लड़की ने अभी-अभी फोन किया, कहा कि वह तुम्हें याद करती है; आपको संभवतः आकर उससे बातचीत करनी चाहिए। ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� रेड अलर्ट ğ���';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ रेड अलर्ट ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1240,7 +1243,7 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'स्वागत उपहार ğ���';
+  String get notificationWelcomeOfferTitle => 'स्वागत उपहार ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1329,7 +1332,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'समुद्र शांत है, और हवा आपके साथ है। कॉर्टेक्स के सागर में नए द्वीप (मॉडल ğ���) हैं जिन्हें खोजा जा सकता है। अपनी टीम को इकट्ठा करो और रवाना हो जाओ!';
+      'समुद्र शांत हैं, और हवा आपकी पीठ पर है। कॉर्टेक्स के महासागर में खोजने के लिए नए द्वीप (मॉडल ğŸ˜‰) हैं। अपने दल को इकट्ठा करो और यात्रा पर निकलो!';
 
   @override
   String get notificationFortuneCookieTitle => 'आज की आपकी फॉर्च्यून कुकी';

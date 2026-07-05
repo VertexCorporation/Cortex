@@ -26,21 +26,24 @@ class ModelDataUtils {
 
     var lowestVariantKey = model.variants!.keys.first;
     int lowestRam = 9999999;
-    
+
     for (var entry in model.variants!.entries) {
       final variantData = entry.value as Map<String, dynamic>;
       final ram = int.tryParse(variantData['ram']?.toString() ?? '') ?? 999999;
-      final size = int.tryParse(variantData['size']?.toString() ?? '') ?? 999999;
-      
+      final size =
+          int.tryParse(variantData['size']?.toString() ?? '') ?? 999999;
+
       if (ram < lowestRam) {
-         lowestRam = ram;
-         lowestVariantKey = entry.key;
+        lowestRam = ram;
+        lowestVariantKey = entry.key;
       } else if (ram == lowestRam && ram != 999999) {
-         final currentLowestData = model.variants![lowestVariantKey] as Map<String, dynamic>;
-         final currentLowestSize = int.tryParse(currentLowestData['size']?.toString() ?? '') ?? 999999;
-         if (size < currentLowestSize) {
-           lowestVariantKey = entry.key;
-         }
+        final currentLowestData =
+            model.variants![lowestVariantKey] as Map<String, dynamic>;
+        final currentLowestSize =
+            int.tryParse(currentLowestData['size']?.toString() ?? '') ?? 999999;
+        if (size < currentLowestSize) {
+          lowestVariantKey = entry.key;
+        }
       }
     }
     return model.variants![lowestVariantKey]['url'] as String?;
@@ -53,21 +56,24 @@ class ModelDataUtils {
 
     var lowestVariantKey = model.variants!.keys.first;
     int lowestRam = 9999999;
-    
+
     for (var entry in model.variants!.entries) {
       final variantData = entry.value as Map<String, dynamic>;
       final ram = int.tryParse(variantData['ram']?.toString() ?? '') ?? 999999;
-      final size = int.tryParse(variantData['size']?.toString() ?? '') ?? 999999;
-      
+      final size =
+          int.tryParse(variantData['size']?.toString() ?? '') ?? 999999;
+
       if (ram < lowestRam) {
-         lowestRam = ram;
-         lowestVariantKey = entry.key;
+        lowestRam = ram;
+        lowestVariantKey = entry.key;
       } else if (ram == lowestRam && ram != 999999) {
-         final currentLowestData = model.variants![lowestVariantKey] as Map<String, dynamic>;
-         final currentLowestSize = int.tryParse(currentLowestData['size']?.toString() ?? '') ?? 999999;
-         if (size < currentLowestSize) {
-           lowestVariantKey = entry.key;
-         }
+        final currentLowestData =
+            model.variants![lowestVariantKey] as Map<String, dynamic>;
+        final currentLowestSize =
+            int.tryParse(currentLowestData['size']?.toString() ?? '') ?? 999999;
+        if (size < currentLowestSize) {
+          lowestVariantKey = entry.key;
+        }
       }
     }
     return lowestVariantKey;

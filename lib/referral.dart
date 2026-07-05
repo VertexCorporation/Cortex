@@ -10,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// where the referrer data might not be immediately available on the first app launch.
 /// It now employs a retry mechanism to ensure the data is captured reliably.
 class ReferralHandler {
-
   // Keys for storing data in SharedPreferences.
   static const _referrerCheckedKey = 'has_referrer_been_checked';
   static const _savedReferrerIdKey = 'saved_referrer_id';
@@ -41,8 +40,8 @@ class ReferralHandler {
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        final ReferrerDetails referrerDetails = await PlayInstallReferrer
-            .installReferrer;
+        final ReferrerDetails referrerDetails =
+            await PlayInstallReferrer.installReferrer;
         final String? referrerUrl = referrerDetails.installReferrer;
 
         // If data is found, process it and exit immediately.

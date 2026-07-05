@@ -10,145 +10,146 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Ğ�ы — Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� 2-5 сĞ�Ğ�Ğ� Ğ�Ğ�я сĞ�Ğ�Ğ�ующĞ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�. Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� Ğ�Ğ�Ğ�ычĞ�Ğ�, Ğ�рĞ�фĞ�Ğ�сы Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я. Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ыть Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�, чтĞ� Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я.';
+      'Вы генератор титулов. Отвечайте ТОЛЬКО, называя заголовок из 2–5 слов для следующего разговора. Не используйте кавычки, префиксы и знаки препинания. ВАЖНО: заголовок ДОЛЖЕН быть на ТОЧНО ТОМ же языке, что и сообщение пользователя.';
 
   @override
-  String get systemRoleFallback => 'Ğ�ы — Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�.';
+  String get systemRoleFallback => 'Вы полезный помощник.';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nCRITICAL: Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ� тĞ�Ğ� Ğ�Ğ� яĞ�ыĞ�Ğ�, Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ� Ğ�Ğ�шĞ�т Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь, Ğ�Ğ�рĞ�щĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� яĞ�ыĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я.';
+      'ВАЖНО: Всегда отвечайте на том же языке, на котором пишет пользователь, обращайте внимание на язык пользователя.';
 
   @override
   String get systemNotePreviousMedia =>
-      '[Ğ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ�: Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�ы рĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�рĞ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�ы. Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� ссыĞ�Ğ�ться Ğ�Ğ� Ğ�Ğ�х Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�ть.]';
+      '[Системное примечание: ниже приведены ранее созданные медиафайлы. Вы можете ссылаться на него или редактировать его.]';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\nĞ�Ğ�Ğ�ущĞ�я Ğ�Ğ�тĞ� Ğ� Ğ�рĞ�Ğ�я: $formattedTime.';
+    return 'Текущая дата и время: $formattedTime.';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�руĞ�тĞ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�р Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�т. Ğ�сĞ�Ğ� Ğ�ы уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ыĞ� уĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� фĞ�Ğ�ты Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� (Ğ�рĞ�Ğ�Ğ�Ğ�чтĞ�Ğ�Ğ�я, Ğ�Ğ�я, Ğ�рĞ�Ğ�ычĞ�Ğ�, Ğ�Ğ�Ğ�тĞ�Ğ�ст), Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ�стĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ую Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�утрĞ� тĞ�Ğ�Ğ�Ğ� <memory>...</memory> Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�тĞ�Ğ�тĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ы стĞ�рĞ�ть Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�сыĞ�Ğ�ть Ğ�рĞ�Ğ�ыĞ�ущую Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�Ğ�ыĞ� фĞ�Ğ�ты Ğ� сущĞ�стĞ�ующĞ�Ğ� Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�Ğ�. Ğ�сĞ�Ğ� Ğ�Ğ�сĞ�Ğ�ютĞ�Ğ� Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�устĞ�тĞ� тĞ�Ğ�. Ğ�рĞ�Ğ�Ğ�р: <memory>Ğ�юĞ�Ğ�т футĞ�Ğ�Ğ� Ğ� тĞ�Ğ�Ğ�Ğ�с. Ğ�рĞ�Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�т Ğ�Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�тĞ�Ğ�ты.</memory>';
+      '[ДИРЕКТИВА СИСТЕМНОЙ ПАМЯТИ]\nПроанализируйте разговор на данный момент. Если вы узнали ЛЮБЫЕ новые отдельные факты о пользователе (предпочтения, имя, привычки, контекст), вы ДОЛЖНЫ вывести ВСЮ обновленную память о пользователе внутри тегов <memory>...</memory> В САМОМ КОНЦЕ вашего ответа. ВАЖНО: НИКОГДА не следует стирать или перезаписывать предыдущую память. ВСЕГДА добавляйте новые факты к имеющейся памяти. Если не было обнаружено абсолютно ничего нового, опустите тег. Пример: <memory>Любит футбол и теннис. Предпочитает короткие ответы.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\nĞ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�ующĞ�Ğ� Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�:\n$userMemory';
+    return 'Всегда помните следующее о пользователе:\n$userMemory';
   }
 
   @override
-  String get cancel => 'Ğ�тĞ�Ğ�Ğ�Ğ�';
+  String get cancel => 'Отменить';
 
   @override
-  String get remove => 'Ğ�Ğ�Ğ�Ğ�ять';
+  String get remove => 'Удалить';
 
   @override
-  String get download => 'Ğ�Ğ�Ğ�чĞ�ть';
+  String get download => 'Скачать';
 
   @override
-  String get resume => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get resume => 'Резюме';
 
   @override
-  String get copy => 'Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть';
+  String get copy => 'Копировать';
 
   @override
-  String get chat => 'Ğ�Ğ�т';
+  String get chat => 'Чат';
+
+  @override
+  String get branch => 'Ветвь';
 
   @override
   String get locked => 'Locked';
 
   @override
-  String get languageModels => 'Ğ�Ğ�ыĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get languageModels => 'Языковые модели';
 
   @override
-  String get light => 'Ğ�Ğ�Ğ�тĞ�Ğ�я';
+  String get light => 'Свет';
 
   @override
-  String get theme => 'Ğ�Ğ�Ğ�Ğ�';
+  String get theme => 'Тема';
 
   @override
-  String get no => 'Ğ�Ğ�т';
+  String get no => 'No';
 
   @override
-  String get yes => 'Ğ�Ğ�';
+  String get yes => 'Да';
 
   @override
-  String get done => 'Ğ�Ğ�тĞ�Ğ�Ğ�';
+  String get done => 'Готово';
 
   @override
-  String get bestValue => 'Ğ�учшĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get bestValue => 'Лучшее соотношение цены и качества';
 
   @override
-  String get selected => 'Ğ�ыĞ�рĞ�Ğ�Ğ�';
+  String get selected => 'Выбрано';
 
   @override
-  String get descriptionSection => 'Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�';
+  String get descriptionSection => 'Описание';
 
   @override
-  String get searchHint => 'Ğ�Ğ�Ğ�сĞ�';
+  String get searchHint => 'Поиск';
 
   @override
-  String get messageHint => 'Ğ�Ğ�рĞ�сĞ�тĞ� чтĞ� уĞ�Ğ�Ğ�Ğ�Ğ�';
+  String get messageHint => 'Ask anything';
 
   @override
-  String get messageCopied =>
-      'Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�уфĞ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+  String get messageCopied => 'Сообщение скопировано в буфер обмена.';
 
   @override
-  String get retry => 'Ğ�Ğ�Ğ�тĞ�рĞ�ть';
+  String get retry => 'Повторить попытку';
 
   @override
-  String get systemInfo => 'Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я Ğ� сĞ�стĞ�Ğ�Ğ�';
+  String get systemInfo => 'Системная информация';
 
   @override
   String deviceMemory(Object memory) {
-    return 'Ğ�Ğ�Ğ�ять устрĞ�Ğ�стĞ�Ğ�: $memory Ğ�Ğ�';
+    return 'Память устройства: $memory ГБ';
   }
 
   @override
-  String get memory => 'Ğ�Ğ�Ğ�ять';
+  String get memory => 'Память';
 
   @override
-  String get storage => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�щĞ�';
+  String get storage => 'Хранение';
 
   @override
-  String get freeStorage => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get freeStorage => 'Бесплатное хранилище';
 
   @override
-  String get totalStorage => 'Ğ�сĞ�Ğ�Ğ�';
+  String get totalStorage => 'Общий объем памяти';
 
   @override
-  String get usedStorage => 'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get usedStorage => 'Подержанное хранилище';
 
   @override
-  String get totalMemory => 'Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ятĞ�';
+  String get totalMemory => 'Общий объем памяти';
 
   @override
-  String get usedMemory => 'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ятĞ�';
+  String get usedMemory => 'Использованная память';
 
   @override
-  String get modelsTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�';
+  String get modelsTitle => 'Библиотека';
 
   @override
-  String get localModels => 'Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get localModels => 'Локальные модели';
 
   @override
-  String get selectGGUFFile => 'Ğ�ыĞ�Ğ�рĞ�тĞ� фĞ�Ğ�Ğ� GGUF';
+  String get selectGGUFFile => 'Выберите файл GGUF';
 
   @override
-  String get errorGGUF =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�ыĞ�Ğ�рĞ�тĞ� фĞ�Ğ�Ğ� тĞ�Ğ�ьĞ�Ğ� Ğ� фĞ�рĞ�Ğ�тĞ� GGUF.';
+  String get errorGGUF => 'Пожалуйста, выберите файл только в формате GGUF.';
 
   @override
-  String get myModels => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get myModels => 'My Models';
 
   @override
-  String get create => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get create => 'Создать';
 
   @override
   String modelProducer(Object producer) {
-    return 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ь: $producer';
+    return 'Producer: $producer';
   }
 
   @override
@@ -157,601 +158,584 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => 'Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get editConversationTitle => 'Переименовать';
 
   @override
-  String get newTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get newTitle => 'New Title';
 
   @override
-  String get save => 'Ğ�Ğ�хрĞ�Ğ�Ğ�ть';
+  String get save => 'Сохранить';
 
   @override
-  String get noConversationsMessage =>
-      'Ğ�Ğ�т чĞ�тĞ�Ğ�, Ğ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�щĞ�ться!';
+  String get noConversationsMessage => 'Никаких разговоров, начните общаться!';
 
   @override
-  String get startChat => 'Ğ�Ğ�чĞ�ть чĞ�т';
+  String get startChat => 'Начать чат';
 
   @override
-  String get noChats => 'Ğ�Ğ�т чĞ�тĞ�Ğ�';
+  String get noChats => 'Нет чатов';
 
   @override
-  String get noStarredChats => 'Ğ�Ğ�т Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ых чĞ�тĞ�Ğ�';
+  String get noStarredChats => 'Нет помеченных чатов';
 
   @override
-  String get noStarredChatsMessage =>
-      'Ğ�ы Ğ�щё Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� чĞ�т Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�.';
+  String get noStarredChatsMessage => 'Вы еще не пометили чат.';
 
   @override
-  String get starConversation => 'Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�';
+  String get starConversation => 'Звезда';
 
   @override
-  String get unstarConversation => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get unstarConversation => 'Снять звездочку';
 
   @override
-  String get loginToYourAccount => 'Ğ�хĞ�Ğ�';
+  String get loginToYourAccount => 'Login';
 
   @override
-  String get createYourAccount => 'Ğ�Ğ�Ğ�Ğ�стрĞ�цĞ�я';
+  String get createYourAccount => 'Зарегистрироваться';
 
   @override
   String get email => 'Email';
 
   @override
-  String get password => 'Ğ�Ğ�рĞ�Ğ�ь';
+  String get password => 'Пароль';
 
   @override
-  String get confirmPassword => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� Ğ�Ğ�рĞ�Ğ�ь';
+  String get confirmPassword => 'Подтвердите пароль';
 
   @override
   String get invalidEmail =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�стĞ�Ğ�тĞ�Ğ�ьĞ�ыĞ� email.';
+      'Пожалуйста, введите действительный адрес электронной почты.';
 
   @override
   String get invalidPassword =>
-      'Ğ�Ğ�рĞ�Ğ�ь Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�рĞ�Ğ�ть Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� 6 сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Пароль должен быть длиной не менее 6 символов.';
 
   @override
-  String get rememberMe => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�я';
+  String get rememberMe => 'Запомни меня';
 
   @override
-  String get forgotPassword => 'Ğ�Ğ�Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�Ğ�ь?';
+  String get forgotPassword => 'Забыли пароль?';
 
   @override
-  String get or => 'Ğ�Ğ�Ğ�';
+  String get or => 'Или';
 
   @override
-  String get continueWithGoogle => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть с Google';
+  String get continueWithGoogle => 'Продолжить с Google';
 
   @override
-  String get dontHaveAccount => 'Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�уĞ�тĞ�?';
+  String get dontHaveAccount => 'У вас нет учетной записи?';
 
   @override
-  String get alreadyHaveAccount => 'Ğ�Ğ�Ğ� Ğ�сть Ğ�Ğ�Ğ�Ğ�уĞ�т?';
+  String get alreadyHaveAccount => 'У вас уже есть аккаунт?';
 
   @override
-  String get signUp => 'Ğ�Ğ�рĞ�Ğ�Ğ�стрĞ�рĞ�Ğ�Ğ�ться';
+  String get signUp => 'Зарегистрироваться';
 
   @override
-  String get logIn => 'Ğ�Ğ�Ğ�тĞ�';
+  String get logIn => 'Авторизоваться';
 
   @override
-  String get passwordsDoNotMatch => 'Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ют.';
+  String get passwordsDoNotMatch => 'Пароли не совпадают.';
 
   @override
-  String get wrongPassword => 'Ğ�Ğ�Ğ�Ğ�рĞ�ыĞ� Ğ�Ğ�рĞ�Ğ�ь.';
+  String get wrongPassword => 'Неправильный пароль.';
 
   @override
-  String get emailAlreadyInUse => 'Ğ�тĞ�т email уĞ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тся.';
+  String get emailAlreadyInUse =>
+      'Этот адрес электронной почты уже используется.';
 
   @override
-  String get weakPassword => 'Ğ�Ğ�рĞ�Ğ�ь сĞ�Ğ�шĞ�Ğ�Ğ� сĞ�Ğ�Ğ�ыĞ�.';
+  String get weakPassword => 'Пароль слишком слабый.';
 
   @override
-  String get authError => 'Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�утĞ�Ğ�тĞ�фĞ�Ğ�Ğ�цĞ�Ğ�';
+  String get authError => 'Ошибка аутентификации';
 
   @override
-  String get usernameTaken =>
-      'Ğ�тĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я уĞ�Ğ� Ğ�Ğ�Ğ�ятĞ�.';
+  String get usernameTaken => 'Это имя пользователя уже занято.';
 
   @override
-  String get username => 'Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
+  String get username => 'Имя пользователя';
 
   @override
-  String get resendCode =>
-      'Ğ�тĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�сьĞ�Ğ� с Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�';
+  String get resendCode => 'Повторно отправить письмо с подтверждением';
 
   @override
   String get pleaseCheckYourEmail =>
-      'Ğ�тĞ�Ğ�ы Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Cortex, Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ть сĞ�Ğ�Ğ� email. \nĞ�сыĞ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�ыĞ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�ш Ğ�Ğ�рĞ�с эĞ�Ğ�Ğ�трĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чты, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�чту.';
+      'Чтобы использовать Cortex, вам необходимо подтвердить свою электронную почту. \nСсылка для подтверждения была отправлена ​​на ваш адрес электронной почты, пожалуйста, проверьте свою электронную почту.';
 
   @override
-  String get verifyYourEmail => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� Ğ�Ğ�ш Email';
+  String get verifyYourEmail => 'Подтвердите свой адрес электронной почты';
 
   @override
-  String get seconds => 'сĞ�Ğ�уĞ�Ğ�';
+  String get seconds => 'секунды';
 
   @override
   String get maxResendLimitReached =>
-      'Ğ�ы Ğ�Ğ�стĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�стĞ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я.';
+      'Вы получили максимальное количество писем с подтверждением';
 
   @override
   String get verificationScreenContinueWithoutVerification =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я';
+      'Продолжить без проверки';
 
   @override
   String get verificationScreenWarning =>
-      'Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ� Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, 1-Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ�рĞ�фĞ�Ğ�Ğ�цĞ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�тĞ� Ğ�сĞ� Ğ�щĞ� Ğ�Ğ�Ğ�стĞ�уĞ�т. Ğ�сĞ�Ğ� Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ�Ğ� этĞ� Ğ�рĞ�Ğ�я, Ğ�Ğ� Ğ�уĞ�Ğ�т уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
+      'Даже если вы продолжите, для вашей учетной записи все еще действует 1-дневный период проверки учетной записи. Если вы к тому времени не подтвердите свою учетную запись, она будет удалена из приложения.';
 
   @override
-  String get unverifiedAccountHeader =>
-      'Ğ�Ğ�ш Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ёĞ�';
+  String get unverifiedAccountHeader => 'Ваша учетная запись не подтверждена';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return 'Ğ�сĞ�Ğ� Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ� тĞ�чĞ�Ğ�Ğ�Ğ� $timeLeft, Ğ�Ğ� Ğ�уĞ�Ğ�т уĞ�Ğ�Ğ�ёĞ�.';
+    return 'Если вы не подтвердите свою учетную запись в течение $timeLeft, она будет удалена';
   }
 
   @override
-  String get verifyNow => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ть сĞ�Ğ�чĞ�с';
+  String get verifyNow => 'Подтвердите сейчас';
 
   @override
-  String get linkSent => 'Ğ�сыĞ�Ğ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get linkSent => 'Ссылка отправлена ​​';
 
   @override
   String get accountDeletionRequested =>
-      'Ğ�Ğ�ш Ğ�Ğ�Ğ�рĞ�с Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�тĞ� Ğ�Ğ�Ğ�учĞ�Ğ�, Ğ� Ğ�Ğ�ш Ğ�Ğ�Ğ�Ğ�уĞ�т тĞ�Ğ�Ğ�рь Ğ�тĞ�Ğ�ючёĞ�.';
+      'Ваш запрос на удаление учетной записи был получен, и теперь ваша учетная запись отключена.';
 
   @override
-  String get tooManyRequests => 'Ğ�Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�сĞ�Ğ�';
+  String get tooManyRequests => 'Слишком много запросов';
 
   @override
-  String get regenerate => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get regenerate => 'Регенерировать';
 
   @override
   String get confirmDeleteAccount =>
-      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т?';
+      'Вы уверены, что хотите удалить свою учетную запись?';
 
   @override
-  String get deleteAccount => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�уĞ�т';
+  String get deleteAccount => 'Удалить учетную запись';
 
   @override
-  String get delete => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get delete => 'Удалить';
 
   @override
-  String get passwordRequired => 'Ğ�рĞ�Ğ�уĞ�тся Ğ�Ğ�рĞ�Ğ�ь.';
+  String get passwordRequired => 'Требуется пароль.';
 
   @override
   String get deleteDescription =>
-      'Ğ�Ğ�Ğ�Ğ�ыĞ�, Ğ�Ğ�тĞ�рыĞ� Ğ�ы уĞ�Ğ�Ğ�Ğ�тĞ�, Ğ�уĞ�ут Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�ы с Ğ�Ğ�шĞ�Ğ�Ğ� сĞ�рĞ�Ğ�рĞ� Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�. Ğ�тĞ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�я Ğ�тĞ�Ğ�Ğ�Ğ�ть.';
+      'Удаленные вами данные будут безвозвратно удалены с нашего сервера и вашего устройства. Это действие невозможно отменить.';
 
   @override
-  String get editProfile => 'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�ть Ğ�рĞ�фĞ�Ğ�ь';
+  String get editProfile => 'Редактировать профиль';
 
   @override
-  String get displayName => 'Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я';
+  String get displayName => 'Отображаемое имя';
 
   @override
-  String get profileUpdated => 'Ğ�рĞ�фĞ�Ğ�ь усĞ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ёĞ�';
+  String get profileUpdated => 'Профиль успешно обновлен';
 
   @override
-  String get logout => 'Ğ�ыĞ�тĞ�';
+  String get logout => 'Выйти';
 
   @override
-  String get profile => 'Ğ�рĞ�фĞ�Ğ�ь';
+  String get profile => 'Профиль';
 
   @override
   String get manageProfileDescription =>
-      'Ğ�Ğ�рĞ�Ğ�Ğ�яĞ�тĞ� сĞ�Ğ�Ğ�Ğ� Ğ�рĞ�фĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�рĞ�Ğ�ь Ğ�Ğ�Ğ� Ğ�ыхĞ�Ğ�Ğ�тĞ� Ğ�Ğ� Cortex.';
+      'Управляйте своим профилем, обновите пароль или выйдите из Cortex.';
 
   @override
   String get accessSettingsDescription =>
-      'Ğ�Ğ�Ğ�учĞ�тĞ� Ğ�Ğ�Ğ�Ğ�щь, Ğ�Ğ�тĞ�Ğ�Ğ�руĞ�тĞ� Ğ�Ğ�Ğ�ы, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Cortex Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ьтĞ�сь с Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Получите доступ к справке, активируйте коды, поделитесь Cortex и ознакомьтесь с нашими политиками.';
 
   @override
   String get languageDescription =>
-      'Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� Ğ�юĞ�Ğ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть яĞ�ыĞ� Ğ�Ğ�тĞ�рфĞ�Ğ�сĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ� уĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ю.';
+      'Вы можете изменить язык интерфейса приложения по умолчанию в любое время.';
 
   @override
   String get themeDescription =>
-      'Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�рĞ�Ğ�Ğ�ючĞ�ться Ğ�Ğ�Ğ�Ğ�у сĞ�Ğ�тĞ�Ğ�Ğ� Ğ� тёĞ�Ğ�Ğ�Ğ� тĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�у усĞ�Ğ�трĞ�Ğ�Ğ�ю. Ğ�ыĞ�рĞ�Ğ�Ğ�Ğ�я тĞ�Ğ�Ğ� Ğ�уĞ�Ğ�т Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�сĞ�Ğ�у Ğ�Ğ�тĞ�рфĞ�Ğ�су Cortex.';
+      'Вы можете переключаться между светлой и темной темами по своему усмотрению. Выбранная тема будет применяться во всем интерфейсе Cortex.';
 
   @override
   String get iHaveReadAndAgree =>
-      'Ğ� Ğ�рĞ�чĞ�тĞ�Ğ�(Ğ�) Ğ� сĞ�Ğ�Ğ�Ğ�сĞ�Ğ�(Ğ�Ğ�) с усĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+      'Я прочитал и согласен с условиями обслуживания';
 
   @override
-  String get downloading => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�...';
+  String get downloading => 'Загрузка...';
 
   @override
-  String get downloadSuccess => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� усĞ�Ğ�шĞ�Ğ�';
+  String get downloadSuccess => 'Загрузка прошла успешно';
 
   @override
-  String get downloadFailed => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь';
+  String get downloadFailed => 'Загрузка не удалась';
 
   @override
   String downloaded(Object percent) {
-    return 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ� $percent%';
+    return '$percent% скачано';
   }
 
   @override
-  String get downloadPaused => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�рĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+  String get downloadPaused => 'Загрузка приостановлена.';
 
   @override
-  String get purchaseError => 'Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�';
+  String get purchaseError => 'Ошибка покупки';
 
   @override
-  String get purchasePlus => 'Ğ�уĞ�Ğ�ть Cortex Plus';
+  String get purchasePlus => 'Купить Кортекс Плюс';
 
   @override
-  String get plusDescription =>
-      'Ğ�Ğ�Ğ�тĞ�ыĞ� Ğ�Ğ�ыт Ğ� Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
+  String get plusDescription => 'Элитный опыт искусственного интеллекта';
 
   @override
-  String get annual => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get annual => 'Годовой';
 
   @override
-  String get monthly => 'Ğ�Ğ�сячĞ�Ğ�я';
+  String get monthly => 'Ежемесячно';
 
   @override
-  String get manageSubscription => 'Ğ�Ğ�рĞ�Ğ�Ğ�ять Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
+  String get manageSubscription => 'Manage Subscription';
 
   @override
   String purchasePlan(String planName) {
-    return 'Ğ�уĞ�Ğ�ть $planName';
+    return 'Купите $planName';
   }
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/Ğ�Ğ�сяц, Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сячĞ�Ğ�';
+    return '$price/месяц, оплата ежемесячно';
   }
 
   @override
-  String get purchasePro => 'Ğ�уĞ�Ğ�ть Cortex Pro';
+  String get purchasePro => 'Купить Cortex Pro';
 
   @override
-  String get proDescription =>
-      'Ğ�рĞ�Ğ�Ğ�схĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�ыт Ğ� Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
+  String get proDescription => 'Премьер-опыт искусственного интеллекта';
 
   @override
-  String get purchaseUltra => 'Ğ�уĞ�Ğ�ть Cortex Ultra';
+  String get purchaseUltra => 'Купить Кортекс Ультра';
 
   @override
-  String get ultraDescription =>
-      'Ğ�Ğ�ршĞ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
+  String get ultraDescription => 'Пик искусственного интеллекта';
 
   @override
-  String get upgradeSubscription => 'Ğ�Ğ�учшĞ�ть Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у';
+  String get upgradeSubscription => 'Обновить подписку';
 
   @override
-  String get purchaseStreamError => 'Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�.';
+  String get purchaseStreamError => 'Ошибка потока покупок.';
 
   @override
-  String get productNotFound => 'Ğ�рĞ�Ğ�уĞ�т Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get productNotFound => 'Товар не найден';
 
   @override
-  String get noProductsFound => 'Ğ�рĞ�Ğ�уĞ�ты Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ы';
+  String get noProductsFound => 'Товары не найдены';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�щĞ�я этĞ�т Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�ы сĞ�Ğ�Ğ�Ğ�шĞ�Ğ�тĞ�сь с Ğ�сĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�. Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ� этĞ�т тĞ�Ğ�ст, чтĞ�Ğ�ы уĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�ьшĞ� Ğ� Ğ�Ğ�шĞ�х Ğ�сĞ�Ğ�Ğ�Ğ�ях Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�уĞ�Ğ�т Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ться, Ğ�сĞ�Ğ� Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�уĞ�Ğ�т Ğ�тĞ�Ğ�ючĞ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�уĞ� Ğ�Ğ� 24 чĞ�сĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�я тĞ�Ğ�ущĞ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�.';
+      'Размещая этот заказ, вы соглашаетесь с Условиями обслуживания и Политикой конфиденциальности. Нажмите на этот текст, чтобы узнать больше о наших Условиях обслуживания и Политике конфиденциальности. Подписка будет автоматически продлена, если автоматическое продление не будет отключено по крайней мере за 24 часа до окончания текущего периода.';
 
   @override
-  String get termsOfService => 'Ğ�сĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get termsOfService => 'Условия обслуживания';
 
   @override
-  String get privacyPolicy => 'Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�';
+  String get privacyPolicy => 'Политика конфиденциальности';
 
   @override
-  String get renamed => 'Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get renamed => 'Переименован';
 
   @override
-  String get report => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться';
+  String get report => 'Отчет';
 
   @override
-  String get reportDialogTitle => 'Ğ�тĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�у';
+  String get reportDialogTitle => 'Отправить отчет';
 
   @override
-  String get reportDescriptionLabel => 'Ğ� чёĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�?';
+  String get reportDescriptionLabel => 'В чем проблема?';
 
   @override
-  String get reportHarmful => 'Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�/Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�';
+  String get reportHarmful => 'Это вредно/небезопасно';
 
   @override
-  String get reportNotTrue => 'Ğ�тĞ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�';
+  String get reportNotTrue => 'Это неправда';
 
   @override
-  String get reportNotHelpful => 'Ğ�тĞ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get reportNotHelpful => 'Это бесполезно';
 
   @override
-  String get closeButton => 'Ğ�Ğ�Ğ�рыть';
+  String get closeButton => 'Закрыть';
 
   @override
-  String get submitButton => 'Ğ�тĞ�рĞ�Ğ�Ğ�ть';
+  String get submitButton => 'Отправить';
 
   @override
   String get reportErrorMessage =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�ыĞ�Ğ�рĞ�тĞ� Ğ�Ğ�Ğ�у Ğ�рĞ�чĞ�Ğ�у Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ы.';
+      'Пожалуйста, выберите одну причину для сообщения.';
 
   @override
-  String get capabilitiesSection => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�';
+  String get capabilitiesSection => 'Возможности';
 
   @override
-  String get featurePhotoTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� фĞ�тĞ�';
+  String get featurePhotoTitle => 'Сканирование фотографий';
 
   @override
   String get featurePhotoDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть фĞ�тĞ�Ğ�рĞ�фĞ�Ğ� с Ğ�Ğ�Ğ�Ğ�ры Ğ�Ğ�Ğ� Ğ�Ğ� фĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Эта модель имеет возможность сканирования фотографий с помощью камеры или файлов изображений.';
 
   @override
-  String get featureOfflineTitle => 'Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�ффĞ�Ğ�Ğ�Ğ�';
+  String get featureOfflineTitle => 'Автономная работа';
 
   @override
   String get featureOfflineDescription =>
-      'Ğ�Ğ�Ğ�усĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту, чтĞ�Ğ�ы сĞ�хрĞ�Ğ�Ğ�ть Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�стĞ�.';
+      'Запустите модель без подключения к Интернету, чтобы сохранить ваши данные в безопасности.';
 
   @override
-  String get featureRoleplayTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�рĞ�';
+  String get featureRoleplayTitle => 'Ролевая игра';
 
   @override
   String get featureRoleplayDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я рĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яют сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть рĞ�Ğ�Ğ�Ğ�чĞ�ыĞ� чĞ�ты Ğ� сцĞ�Ğ�Ğ�рĞ�Ğ�.';
+      'Ролевые модели позволяют создавать различные чаты и сценарии.';
 
   @override
-  String get roleModels => 'Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get roleModels => 'Модели ролевых игр';
 
   @override
-  String get parameters => 'Ğ�Ğ�рĞ�Ğ�Ğ�тры';
+  String get parameters => 'Параметры';
 
   @override
-  String get context => 'Ğ�Ğ�Ğ�тĞ�Ğ�ст';
+  String get context => 'Контекст';
 
   @override
-  String get finalPreparation =>
-      'Ğ�Ğ�ут Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
+  String get finalPreparation => 'Идут последние приготовления.';
 
   @override
-  String get shareApp => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get shareApp => 'Поделитесь приложением';
 
   @override
-  String get ourStory => 'Ğ�Ğ�шĞ� Ğ�стĞ�рĞ�я';
+  String get ourStory => 'Наша история';
 
   @override
-  String get rateUs => 'Ğ�цĞ�Ğ�Ğ�тĞ� Ğ�Ğ�с';
+  String get rateUs => 'Оцените нас';
 
   @override
-  String get share => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться';
+  String get share => 'Поделиться';
 
   @override
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => 'Ğ�ыĞ�рĞ�ть тĞ�Ğ�ст';
+  String get selectText => 'Выбрать текст';
 
   @override
-  String get thinking => 'Ğ�уĞ�Ğ�Ğ�т';
+  String get thinking => 'Мышление';
 
   @override
-  String get user => 'Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь';
+  String get user => 'Пользователь';
 
   @override
-  String get help => 'Ğ�Ğ�Ğ�Ğ�щь';
+  String get help => 'Помогите';
 
   @override
-  String get supportCreator => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
+  String get supportCreator => 'Поддержите автора';
 
   @override
   String get enterYourTag =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� Ğ�юĞ�Ğ�Ğ�ых Ğ�Ğ�тĞ�рĞ�Ğ�! Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�х уĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�Ğ�рĞ�ть Ğ�Ğ� чĞ�сть Ğ�Ğ�шĞ�х Ğ�Ğ�Ğ�уĞ�Ğ�Ğ� Ğ� Cortex.';
+      'Поддержите любимых авторов! Введите их уникальный тег ниже, чтобы предоставить им долю от ваших покупок Cortex.';
 
   @override
-  String get creatorTag => 'Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
+  String get creatorTag => 'Тег автора';
 
   @override
-  String get support => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ть';
+  String get support => 'Поддержка';
 
   @override
-  String get tagCannotBeEmpty =>
-      'Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�устыĞ�';
+  String get tagCannotBeEmpty => 'Тег автора не может быть пустым';
 
   @override
-  String get userId => 'ID Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я';
+  String get userId => 'Идентификатор пользователя';
 
   @override
-  String get deleteAllConversationsConfirmTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ� чĞ�ты?';
+  String get deleteAllConversationsConfirmTitle => 'Удалить все чаты?';
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть Ğ�сĞ� сĞ�Ğ�Ğ� чĞ�ты? Ğ�тĞ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�я Ğ�тĞ�Ğ�Ğ�Ğ�ть.';
+      'Вы уверены, что хотите удалить все свои чаты? Это невозможно отменить.';
 
   @override
-  String get conversationDeleted => 'Ğ�Ğ�рĞ�Ğ�Ğ�сĞ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
+  String get conversationDeleted => 'Разговор удален!';
 
   @override
-  String get allConversationsDeleted =>
-      'Ğ�сĞ� чĞ�ты Ğ�ыĞ�Ğ� усĞ�Ğ�шĞ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�ы!';
+  String get allConversationsDeleted => 'Все разговоры успешно удалены!';
 
   @override
-  String get deleteAll => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ�';
+  String get deleteAll => 'Удалить все';
 
   @override
-  String get deleteAllConversationsButton => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ� чĞ�ты';
+  String get deleteAllConversationsButton => 'Удалить все разговоры';
 
   @override
-  String get confirmWord => 'Ğ�Ğ�Ğ�Ğ�шĞ�тĞ� VERTEX';
+  String get confirmWord => 'Тип ВЕРТЕКС';
 
   @override
-  String get confirmWordError => 'Ğ�ы Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ьĞ�Ğ�';
+  String get confirmWordError => 'Вы неправильно написали';
 
   @override
-  String get chinese => 'Ğ�Ğ�тĞ�Ğ�сĞ�Ğ�Ğ�';
+  String get chinese => 'китайский';
 
   @override
-  String get french => 'Ğ�рĞ�Ğ�цуĞ�сĞ�Ğ�Ğ�';
+  String get french => 'Французский';
 
   @override
-  String get japanese => 'Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
+  String get japanese => 'японский';
 
   @override
-  String get dutch => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
+  String get dutch => 'Голландский';
 
   @override
-  String get russian => 'Ğ�уссĞ�Ğ�Ğ�';
+  String get russian => 'Русский';
 
   @override
-  String get korean => 'Ğ�Ğ�рĞ�Ğ�сĞ�Ğ�Ğ�';
+  String get korean => 'корейский';
 
   @override
-  String get english => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
+  String get english => 'английский';
 
   @override
-  String get turkish => 'Ğ�урĞ�цĞ�Ğ�Ğ�';
+  String get turkish => 'турецкий';
 
   @override
-  String get hindi => 'Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get hindi => 'Хинди';
 
   @override
-  String get portuguese => 'Ğ�Ğ�ртуĞ�Ğ�Ğ�ьсĞ�Ğ�Ğ�';
+  String get portuguese => 'Португальский';
 
   @override
-  String get indonesian => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
+  String get indonesian => 'Индонезийский';
 
   @override
-  String get azerbaijani => 'Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�';
+  String get azerbaijani => 'азербайджанский';
 
   @override
-  String get german => 'Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�';
+  String get german => 'немецкий';
 
   @override
-  String get spanish => 'Ğ�сĞ�Ğ�Ğ�сĞ�Ğ�Ğ�';
+  String get spanish => 'Испанский';
 
   @override
-  String get italian => 'Ğ�тĞ�Ğ�ьяĞ�сĞ�Ğ�Ğ�';
+  String get italian => 'Итальянский';
 
   @override
-  String get arabic => 'Ğ�рĞ�Ğ�сĞ�Ğ�Ğ�';
+  String get arabic => 'арабский';
 
   @override
-  String get ram => 'Ğ�Ğ�Ğ�';
+  String get ram => 'ОЗУ';
 
   @override
-  String get usernameTooShort =>
-      'Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я сĞ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�рĞ�тĞ�Ğ�Ğ�.';
+  String get usernameTooShort => 'Имя пользователя слишком короткое.';
 
   @override
   String get usernameTooLong =>
-      'Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�рĞ�Ğ�ышĞ�ть 16 сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Имя пользователя не может превышать 16 символов.';
 
   @override
   String get invalidUsernameCharacters =>
-      'Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�тĞ�Ğ�сĞ�Ğ�Ğ� Ğ�уĞ�Ğ�ы, Ğ� тĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�ы \'.\', \'-\', \'_\'.';
+      'В имени пользователя можно использовать только буквы: \"abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\" и символы \".\", \"-\", \"_\".';
 
   @override
-  String get noInternetConnection =>
-      'Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту.';
+  String get noInternetConnection => 'Нет подключения к Интернету.';
 
   @override
-  String get chats => 'Ğ�Ğ�ты';
+  String get chats => 'Недавние';
 
   @override
-  String get library => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�';
+  String get library => 'Библиотека';
 
   @override
-  String get text => 'Ğ�Ğ�Ğ�ст';
+  String get text => 'Текст';
 
   @override
-  String get removeModel => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�ь';
+  String get removeModel => 'Удалить модель';
 
   @override
-  String get insufficientRAM => 'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�Ğ�ятĞ�';
+  String get insufficientRAM => 'Низкая память';
 
   @override
-  String get insufficientStorage => 'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�стĞ�';
+  String get insufficientStorage => 'Мало места для хранения';
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�ь $model сĞ� сĞ�Ğ�Ğ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�? Ğ�тĞ� тĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�т Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ю Ğ�сĞ�х Ğ�рĞ�Ğ�ыĞ�ущĞ�х рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�, сĞ�яĞ�Ğ�Ğ�Ğ�ых с этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ью.';
+    return 'Вы уверены, что хотите удалить модель $model со своего устройства? При этом также будут удалены все предыдущие разговоры с этой моделью.';
   }
 
   @override
-  String get noMatchingModels =>
-      'Ğ�Ğ�Ğ�хĞ�Ğ�ящĞ�х Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+  String get noMatchingModels => 'Подходящих моделей не найдено.';
 
   @override
-  String get benefit1 =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�ы Ğ�Ğ�Ğ�Ğ�ты Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�стĞ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�';
+  String get benefit1 => 'Увеличение лимита разговоров';
 
   @override
-  String get benefit3 => 'Ğ�ффĞ�Ğ�т Ğ�Ğ�я Ğ�рĞ�фĞ�Ğ�я';
+  String get benefit3 => 'Эффект профиля';
 
   @override
-  String get benefit4 => 'Ğ�Ğ�Ğ�чĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�счĞ�Ğ�Ğ�';
+  String get benefit4 => 'Значок членства';
 
   @override
-  String get benefit5 => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�';
+  String get benefit5 => 'Создайте больше онлайн-искусственного интеллекта';
 
   @override
-  String get benefit7 =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�ты Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get benefit7 => 'Дополнительные ограничения на использование';
 
   @override
-  String get benefit8 => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get benefit8 => 'Добавить модели';
 
   @override
-  String get benefit9 => 'Ğ�Ğ�Ğ�ыĞ� тĞ�Ğ�ы';
+  String get benefit9 => 'Новые темы';
 
   @override
-  String get benefit10 => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get benefit10 => 'Дополнительные вложения';
 
   @override
-  String get benefit11 => 'Ğ�Ğ�Ğ�ьшĞ� рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�';
+  String get benefit11 => 'Дополнительный режим потока';
 
   @override
-  String get oldBenefits =>
-      'Ğ�сĞ� Ğ�рĞ�Ğ�Ğ�ущĞ�стĞ�Ğ� Ğ�рĞ�Ğ�ыĞ�ущĞ�х Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get oldBenefits => 'Все преимущества более низких планов';
 
   @override
-  String get confirm => 'Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�ть';
+  String get confirm => 'Подтвердите';
 
   @override
-  String get changePassword => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�рĞ�Ğ�ь';
+  String get changePassword => 'Сменить пароль';
 
   @override
-  String get logoutConfirmationTitle =>
-      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�ыĞ�тĞ�?';
+  String get logoutConfirmationTitle => 'Вы уверены, что хотите выйти?';
 
   @override
-  String get settings => 'Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�';
+  String get settings => 'Настройки';
 
   @override
-  String get language => 'Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get language => 'Язык приложения';
 
   @override
-  String get dark => 'Ğ�ёĞ�Ğ�Ğ�я';
+  String get dark => 'Темный';
 
   @override
-  String get oldPassword => 'Ğ�тĞ�рыĞ� Ğ�Ğ�рĞ�Ğ�ь';
+  String get oldPassword => 'Старый пароль';
 
   @override
-  String get newPassword => 'Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�рĞ�Ğ�ь';
+  String get newPassword => 'New Password';
 
   @override
-  String get passwordUpdated => 'Ğ�Ğ�рĞ�Ğ�ь Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ёĞ�.';
+  String get passwordUpdated => 'Пароль обновлен.';
 
   @override
-  String get stop => 'Ğ�тĞ�Ğ�';
+  String get stop => 'Стоп';
 
   @override
-  String get copyrights => 'Ğ�стĞ�чĞ�Ğ�Ğ�Ğ�';
+  String get copyrights => 'Атрибуция';
 
   @override
-  String get love => 'Ğ�юĞ�Ğ�Ğ�ь';
+  String get love => 'Любовь';
 
   @override
-  String get nature => 'Ğ�рĞ�рĞ�Ğ�Ğ�';
+  String get nature => 'Природа';
 
   @override
-  String get behindTheSlaughter => 'Ğ�Ğ� Ğ�уĞ�Ğ�сĞ�Ğ�Ğ�';
+  String get behindTheSlaughter => 'За резней';
 
   @override
   String get cyberpunk => 'Cyberpunk';
@@ -766,351 +750,341 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deepSpace => 'Deep Space';
 
   @override
-  String get grayscale => 'Ğ�ттĞ�Ğ�Ğ�Ğ� сĞ�рĞ�Ğ�Ğ�';
+  String get grayscale => 'Оттенки серого';
 
   @override
-  String get ocean => 'Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get ocean => 'Океан';
 
   @override
-  String get scarletSnow => 'Ğ�Ğ�ыĞ� сĞ�Ğ�Ğ�';
+  String get scarletSnow => 'Алый снег';
 
   @override
-  String get requestFailed =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�шĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
+  String get requestFailed => 'Произошла ошибка, попробуйте еще раз.';
 
   @override
-  String get changeModel => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get changeModel => 'Изменить';
 
   @override
-  String get edit => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get edit => 'Редактировать';
 
   @override
   String get editingMessageInfo =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� этĞ�Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�я Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�устĞ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� с этĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�.';
+      'Редактирование этого сообщения возобновит разговор отсюда.';
 
   @override
   String get editingNotification =>
-      'Ğ�ы сĞ�Ğ�чĞ�с Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�я';
+      'Сейчас вы находитесь в режиме редактирования';
 
   @override
-  String get featurePluralTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�я';
+  String get featurePluralTitle => 'Множественное число';
 
   @override
   String get featurePluralDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ� Ğ�Ğ�тĞ�Ğ�рĞ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� рĞ�сшĞ�рĞ�Ğ�Ğ�я, тĞ�Ğ� сĞ�Ğ�ыĞ� рĞ�сшĞ�ряя сĞ�Ğ�Ğ� фуĞ�Ğ�цĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ых Ğ�Ğ�Ğ�рĞ�цĞ�Ğ� с Ğ�Ğ�Ğ�ышĞ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�стью.';
+      'Эта модель может автоматически интегрировать дополнительные варианты, тем самым расширяя свои функциональные возможности для поддержки разнообразного спектра операций с повышенной производительностью.';
 
   @override
-  String get nameLabel => 'Ğ�Ğ�я Ğ�Ğ�';
+  String get nameLabel => 'AI name';
 
   @override
-  String get summaryLabel => 'Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�';
+  String get summaryLabel => 'Резюме по искусственному интеллекту';
 
   @override
-  String get add => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get add => 'Добавить';
 
   @override
-  String get aiExplanationTitle =>
-      'Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
+  String get aiExplanationTitle => 'Описание искусственного интеллекта';
 
   @override
   String get aiExplanationDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�стĞ�Ğ�ьтĞ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�рхĞ�тĞ�Ğ�туры Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�, Ğ�рĞ�цĞ�ссĞ� Ğ�Ğ�учĞ�Ğ�Ğ�я, Ğ�Ğ�трĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�стĞ�, Ğ�Ğ�Ğ�Ğ�стĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�руĞ�Ğ�х Ğ�Ğ�Ğ�Ğ�ых Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�.';
+      'Предоставьте подробное описание архитектуры вашей модели ИИ, процесса обучения, показателей производительности, областей применения и других важных функций.';
 
   @override
-  String get preInputTitle =>
-      'Ğ�рĞ�Ğ�устĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
+  String get preInputTitle => 'Предварительный ввод искусственного интеллекта';
 
   @override
   String get preInputDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�Ğ�устĞ�Ğ�Ğ�Ğ�Ğ�у, Ğ�Ğ�тĞ�рĞ�я Ğ�уĞ�Ğ�т Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ять Ğ�Ğ�шу Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ� Ğ�рĞ�цĞ�ссĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�. Ğ� этĞ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�ючĞ�ть Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю Ğ� Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�тĞ�Ğ�ст Ğ� Ğ�юĞ�ыĞ� Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�, Ğ�Ğ�тĞ�рыĞ� Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�чь Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�тĞ�, сĞ�яĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� с Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Пожалуйста, установите предварительный ввод, который будет направлять вашу модель в процессе создания персонажа. В этот раздел вы можете включить информацию, связанную с персонажем, дополнительный контекст и любую дополнительную информацию, которая может помочь в создании контента, связанного с персонажем.';
 
   @override
-  String get baseModelTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь';
+  String get baseModelTitle => 'Базовая модель';
 
   @override
   String get baseModelDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�уĞ�Ğ�т Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ться Ğ� Ğ�Ğ�чĞ�стĞ�Ğ� Ğ�сĞ�Ğ�Ğ�ы Ğ�Ğ�я Ğ�Ğ�шĞ�Ğ�Ğ� тĞ�Ğ�рĞ�Ğ�Ğ�я. Ğ�Ğ�Ğ�сь Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�тся тĞ�Ğ�ущĞ�я Ğ�ыĞ�рĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь.';
+      'Это модель, которая будет использоваться в качестве основы для вашего творения. Он отображает выбранную в данный момент базовую модель.';
 
   @override
-  String get summary => 'Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�';
+  String get summary => 'Резюме';
 
   @override
-  String get modelUploadTitle =>
-      'Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�';
+  String get modelUploadTitle => 'Файл искусственного интеллекта';
 
   @override
   String get modelUploadDescription =>
-      'Ğ�ыĞ�Ğ�рĞ�тĞ� Ğ� Ğ�Ğ�Ğ�руĞ�Ğ�тĞ� Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� фĞ�Ğ�Ğ�ы GGUF Ğ�ряĞ�Ğ� с Ğ�Ğ�шĞ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�. Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�усĞ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�ффĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь, чтĞ� фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�стĞ�Ğ�тĞ�Ğ�ьĞ�ыĞ� фĞ�рĞ�Ğ�т GGUF Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�ьĞ�Ğ� струĞ�турĞ�рĞ�Ğ�Ğ�Ğ�. Ğ�сĞ�Ğ� фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ррĞ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ёĞ�, Cortex Ğ�Ğ�Ğ�Ğ�т рĞ�Ğ�Ğ�тĞ�ть Ğ�Ğ� тĞ�Ğ�, Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь, Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� стĞ�Ğ�Ğ�Ğ�уться с Ğ�шĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Выберите и загрузите локальные файлы GGUF прямо со своего устройства. Это позволяет запускать вашу модель в автономном режиме без подключения к Интернету. Убедитесь, что файл имеет действительный формат GGUF и правильно структурирован. Если файл неправильный или поврежден, Cortex может работать не так, как ожидалось, и вы можете столкнуться с ошибками.';
 
   @override
   String get modelUploadShortDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�сь, чтĞ�Ğ�ы Ğ�ыĞ�рĞ�ть фĞ�Ğ�Ğ� .gguf с Ğ�Ğ�шĞ�Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�';
+      'Нажмите здесь, чтобы выбрать файл .gguf со своего устройства';
 
   @override
-  String get you => 'Ğ�ы';
+  String get you => 'Ты';
 
   @override
-  String get removePhotoTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть фĞ�тĞ�';
+  String get removePhotoTitle => 'Удалить фотографию';
 
   @override
-  String get confirmRemovePhoto =>
-      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� уĞ�Ğ�Ğ�Ğ�ть фĞ�тĞ�?';
+  String get confirmRemovePhoto => 'Вы уверены, что хотите удалить фотографию?';
 
   @override
   String get chatLengthLimitExceeded =>
-      'Ğ�тĞ�т чĞ�т Ğ�рĞ�Ğ�ысĞ�Ğ� Ğ�Ğ�Ğ�Ğ�т сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�Ğ�ыĞ� чĞ�т Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�рĞ�тĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у.';
+      'В этом чате превышен лимит символов. Пожалуйста, начните новый чат или приобретите подписку.';
 
   @override
-  String get inappropriateContentDetected =>
-      'Ğ�Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�тĞ�Ğ�т!';
+  String get inappropriateContentDetected => 'Обнаружен неприемлемый контент!';
 
   @override
   String get offlineModelNotInstalled =>
-      'Ğ�тĞ� Ğ�ффĞ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ� устĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� устрĞ�Ğ�стĞ�Ğ�.';
+      'Эта офлайн-модель не установлена ​​на вашем устройстве.';
 
   @override
   String get reachedLimit =>
-      'Ğ�ы Ğ�счĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т; Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�ьшĞ�. (хĞ�Ğ�, Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ� сĞ�рьĞ�Ğ�Ğ�Ğ�, Ğ�рутыĞ� Ğ�тĞ�Ğ�ты стĞ�ят Ğ�Ğ�Ğ�Ğ�Ğ�, тĞ�Ğ� чтĞ� этĞ� Ğ�Ğ�Ğ�Ğ�ты Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ют Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.)';
+      'Вы достигли лимита использования; чтобы получить больше лимитов, вы можете обновить свой план. (эй, у нас полностью исчерпаны лимиты, это облом. но серьезно, получение этих замечательных ответов не бесплатно, так что эти ограничения на самом деле помогают нам продолжать хорошо проводить время).';
 
   @override
-  String get modality => 'Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�Ğ�сть';
+  String get modality => 'Modality';
 
   @override
-  String get multimodal => 'Ğ�уĞ�ьтĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ�';
+  String get multimodal => 'Мультимодальный';
 
   @override
-  String get anErrorOccurred => 'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�шĞ�Ğ�Ğ�Ğ�';
+  String get anErrorOccurred => 'Произошла ошибка';
 
   @override
   String get themeLocked =>
-      'Ğ�тĞ� тĞ�Ğ�Ğ� трĞ�Ğ�уĞ�т Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ�Ğ� урĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, уĞ�учшĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у, чтĞ�Ğ�ы рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть.';
+      'Эта тема требует более высокого уровня подписки. Пожалуйста, обновите, чтобы разблокировать.';
 
   @override
-  String get pageCouldNotBeLoaded =>
-      'Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�Ğ�Ğ�руĞ�Ğ�ть стрĞ�Ğ�Ğ�цу';
+  String get pageCouldNotBeLoaded => 'Страница не может быть загружена';
 
   @override
   String get checkYourInternet =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�шĞ� Ğ�Ğ�тĞ�рĞ�Ğ�т-сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
+      'Пожалуйста, проверьте подключение к Интернету и повторите попытку.';
 
   @override
   String get errorUserNotAuthenticated =>
-      'Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�тĞ� Ğ� сĞ�стĞ�Ğ�у, чтĞ�Ğ�ы Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�ть этĞ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ�.';
+      'Вы должны войти в систему, чтобы выполнить это действие.';
 
   @override
   String get errorReachedLimit =>
-      'Ğ�ы Ğ�Ğ�стĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ� урĞ�Ğ�Ğ�Ğ�ь, чтĞ�Ğ�ы рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ� Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�.';
+      'Вы исчерпали свой лимит. Обновите его, чтобы разблокировать больше, и продолжайте общаться.';
 
   @override
   String get errorServer =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ� сĞ�рĞ�Ğ�рĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Произошла непредвиденная ошибка сервера. Пожалуйста, повторите попытку позже.';
 
   @override
   String get errorNetwork =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� сĞ�тĞ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�шĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
+      'Произошла сетевая ошибка. Пожалуйста, проверьте подключение и повторите попытку.';
 
   @override
   String get baseModelForCharacterDescription =>
-      'Ğ�ыĞ�рĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�т сĞ�Ğ�сĞ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�ссуĞ�Ğ�Ğ�Ğ�Ğ�ю Ğ� Ğ�тĞ�Ğ�тĞ�Ğ�.';
+      'Выбранная базовая модель будет определять особенности мышления и способности персонажа реагировать.';
 
   @override
-  String get selectBaseModel => 'Ğ�ыĞ�Ğ�рĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ую Ğ�Ğ�Ğ�Ğ�Ğ�ь';
+  String get selectBaseModel => 'Выберите базовую модель';
 
   @override
   String get falErrorImageRequired =>
-      'Ğ�Ğ�я рĞ�Ğ�Ğ�ты этĞ�Ğ�Ğ� Ğ�Ğ� трĞ�Ğ�уĞ�тся этĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
+      'Для этого AI требуется эталонное изображение. Прикрепите изображение и повторите попытку.';
 
   @override
   String get falErrorAudioRequired =>
-      'Ğ�Ğ�я рĞ�Ğ�Ğ�ты этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся этĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�уĞ�Ğ�Ğ�фĞ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�тĞ� Ğ�уĞ�Ğ�Ğ�фĞ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
+      'Для этой модели требуется эталонный аудиофайл. Прикрепите аудиофайл и повторите попытку.';
 
   @override
   String get falErrorVideoRequired =>
-      'Ğ�Ğ�я этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�струĞ�цĞ�я, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
+      'Для этой модели требуется эталонное видео. Прикрепите видео и повторите попытку.';
 
   @override
   String get falErrorImageCorrupted =>
-      'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�ть, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�руĞ�Ğ�Ğ� фĞ�рĞ�Ğ�т.';
+      'Загруженное изображение не удалось обработать. Попробуйте другой формат.';
 
   @override
   String get falErrorSchemaRejected =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�хĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�ыĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�руĞ�ую Ğ�Ğ�Ğ�Ğ�Ğ�ь.';
+      'Модель отклонила ввод, попробуйте другую модель.';
 
   @override
   String get falErrorSchemaInvalid =>
-      'Ğ�хĞ�Ğ�ящĞ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�ыĞ�Ğ� Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ы сĞ�уĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�Ğ�.';
+      'Введенные данные были отклонены службой генерации.';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return 'Ğ�Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�Ğ� Ğ�Ğ�рĞ�уĞ�Ğ� Ğ�шĞ�Ğ�Ğ�у (стĞ�тус $statusCode).';
+    return 'Служба генерации вернула ошибку (статус $statusCode).';
   }
 
   @override
-  String get couldNotOpenLink => 'Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�тĞ�рыть ссыĞ�Ğ�у';
+  String get couldNotOpenLink => 'Не удалось открыть ссылку';
 
   @override
-  String get downloadStarted => 'Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�чĞ�Ğ�Ğ�сь';
+  String get downloadStarted => 'Загрузка началась';
 
   @override
-  String get notAvailable => 'Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ�';
+  String get notAvailable => 'Недоступно';
 
   @override
   String get localizationWarning =>
-      'Ğ�Ğ�Ğ�Ğ�тĞ�рĞ�я Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� яĞ�ыĞ�Ğ� Ğ� Ğ�уĞ�Ğ�т Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�ться Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�.';
+      'Некоторая информация может быть недоступна на вашем языке и будет отображаться на английском языке.';
 
   @override
   String get aiTranslationWarning =>
-      'Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ях Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�тся Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�чĞ�ыĞ� яĞ�ыĞ�Ğ� Ğ�руĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�. Ğ�Ğ�этĞ�Ğ�у Ğ� яĞ�ыĞ�Ğ�х, Ğ�тĞ�Ğ�чĞ�ых Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�сĞ�Ğ�тĞ�Ğ�тстĞ�Ğ�я.';
+      'Информация о модели переводится на разные языки другими моделями ИИ. Поэтому незначительные несоответствия могут возникать на языках, отличных от английского.';
 
   @override
-  String get errorLoadingTitle => 'Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�сь Ğ�Ğ�Ğ�руĞ�Ğ�ть Ğ�Ğ�Ğ�Ğ�ыĞ�';
+  String get errorLoadingTitle => 'Не удалось загрузить данные';
 
   @override
   String get errorLoadingMessage =>
-      'Ğ�ы Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�ыĞ� с Ğ�Ğ�шĞ�х сĞ�рĞ�Ğ�рĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�шĞ� Ğ�Ğ�тĞ�рĞ�Ğ�т-сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� сĞ�Ğ�Ğ�Ğ�.';
+      'Нам не удалось получить необходимые данные с наших серверов. Пожалуйста, проверьте подключение к Интернету и повторите попытку.';
 
   @override
-  String get noFoundTitle => 'Ğ�Ğ�т рĞ�Ğ�уĞ�ьтĞ�тĞ�Ğ�';
+  String get noFoundTitle => 'No Results';
 
   @override
   String get noFoundMessage =>
-      'Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть усĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� сĞ�рĞ�сĞ�ть фĞ�Ğ�ьтр.';
+      'Попробуйте изменить условия поиска или очистить фильтр.';
 
   @override
-  String get modelCreatedSuccess => 'Ğ�Ğ�Ğ�Ğ�Ğ�ь усĞ�Ğ�шĞ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
+  String get modelCreatedSuccess => 'Модель успешно создана!';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return '«$modelName» усĞ�Ğ�шĞ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+    return '\"$modelName\" успешно удалено.';
   }
 
   @override
   String get errorCreatingModel =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�рĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'При создании модели произошла непредвиденная ошибка.';
 
   @override
   String get errorDeletingModel =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�рĞ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'При удалении модели произошла непредвиденная ошибка.';
 
   @override
   String get ultraFeatureOnly =>
-      'Ğ�тĞ� фуĞ�Ğ�цĞ�я Ğ�Ğ�стуĞ�Ğ�Ğ� тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ultra.';
+      'Эта функция доступна только для участников Ultra.';
 
   @override
   String get experimentalOfflineWarning =>
-      'Ğ�ффĞ�Ğ�Ğ�Ğ�-рĞ�Ğ�Ğ�Ğ� Ğ�сĞ� Ğ�щĞ� яĞ�Ğ�яĞ�тся эĞ�сĞ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ�, Ğ� сĞ�Ğ�чĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т рĞ�Ğ�Ğ�тĞ�ть Ğ�Ğ� с Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ� эффĞ�Ğ�тĞ�Ğ�Ğ�Ğ�стью.';
+      'Автономный режим все еще является экспериментальным, и загружаемая вами модель может работать не с оптимальной эффективностью.';
 
   @override
   String get noConversationsToDelete =>
-      'Ğ� Ğ�Ğ�с Ğ�Ğ�т чĞ�тĞ�Ğ� Ğ�Ğ�я уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
+      'У вас нет разговоров, которые можно удалить.';
 
   @override
-  String get reportSubmitted => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� усĞ�Ğ�шĞ�Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get reportSubmitted => 'Отчет успешно отправлен';
 
   @override
   String get verificationDelayed =>
-      'Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�Ğ�тĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�. Ğ�сть Ğ�Ğ�Ğ�Ğ�Ğ�ьшĞ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�тĞ�, Ğ�Ğ� сĞ�Ğ�рĞ� Ğ�Ğ�яĞ�Ğ�тся.';
+      'Ваша покупка подтверждена. Обновление вашего аккаунта происходит с небольшой задержкой, оно появится в ближайшее время.';
 
   @override
-  String get maintenanceTitle =>
-      'Ğ�Ğ� тĞ�хĞ�Ğ�чĞ�сĞ�Ğ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get maintenanceTitle => 'На техническом обслуживании';
 
   @override
   String get maintenanceMessage =>
-      'Cortex Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�рыĞ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я. Ğ�Ğ�стуĞ� Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ю Ğ�уĞ�Ğ�т Ğ�Ğ�сстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�шĞ�Ğ� Ğ�рĞ�Ğ�я.\n\nĞ�Ğ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�шĞ� тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ�ы уĞ�учшĞ�Ğ�Ğ� Ğ�Ğ�ш Ğ�Ğ�ыт.';
+      'Cortex временно отключен от сети, пока мы выпускаем некоторые важные обновления. Доступ к приложению будет восстановлен в ближайшее время.\n\nБлагодарим вас за терпение, поскольку мы улучшаем ваш опыт.';
 
   @override
   String get errorPromptFlagged =>
-      'Ğ�Ğ�шĞ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Ваше сообщение было обнаружено как неприемлемое и не может быть отправлено.';
 
   @override
   String get notEnoughStorage =>
-      'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�стĞ� Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� устрĞ�Ğ�стĞ�Ğ� Ğ�Ğ�я сĞ�хрĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�ых сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�.';
+      'На вашем устройстве недостаточно места для сохранения новых сообщений.';
 
   @override
   String get errorRateLimit =>
-      'Ğ�ы сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�я, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ� чĞ�Ğ� Ğ�ытĞ�ться сĞ�Ğ�Ğ�Ğ�.';
+      'Недавно вы создали слишком много моделей. Подождите некоторое время, прежде чем повторить попытку.';
 
   @override
   String get errorContentFlagged =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть сĞ�хрĞ�Ğ�Ğ�Ğ�Ğ�, тĞ�Ğ� Ğ�Ğ�Ğ� Ğ�ё сĞ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Модель не удалось сохранить, поскольку ее содержимое было помечено как неприемлемое.';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      'Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ� уĞ�Ğ�Ğ�Ğ�ть Ğ�сĞ� чĞ�ты, Ğ�Ğ�хĞ�Ğ�ясь Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� чĞ�тĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, сĞ�Ğ�чĞ�Ğ�Ğ� Ğ�ыĞ�Ğ�Ğ�тĞ� Ğ�Ğ� тĞ�Ğ�ущĞ�Ğ�Ğ� чĞ�тĞ�, чтĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть.';
+      'Вы не можете удалить все разговоры в активном чате. Чтобы продолжить, сначала выйдите из текущего чата.';
 
   @override
-  String get invalidCredentials => 'Ğ�Ğ�Ğ�Ğ�рĞ�ыĞ� email Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�ь.';
+  String get invalidCredentials =>
+      'Неправильный адрес электронной почты или пароль.';
 
   @override
-  String get userDisabled =>
-      'Ğ�тĞ�т Ğ�Ğ�Ğ�Ğ�уĞ�т Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�ыĞ� Ğ�тĞ�Ğ�ючёĞ�.';
+  String get userDisabled => 'Эта учетная запись пользователя отключена.';
 
   @override
   String get loginSubtitle =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� сĞ�Ğ�ю учётĞ�ую Ğ�Ğ�Ğ�Ğ�сь Vertex. Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я, Ğ�ы сĞ�Ğ�Ğ�Ğ�шĞ�Ğ�тĞ�сь с Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�.';
+      'Войдите в свою учетную запись Vertex. Продолжая, вы соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.';
 
   @override
   String get registerSubtitle =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� учётĞ�ую Ğ�Ğ�Ğ�Ğ�сь Vertex Ğ�Ğ�я Ğ�Ğ�сĞ�рĞ�Ğ�ятстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�стуĞ�Ğ� Ğ�Ğ� Ğ�сĞ�Ğ� Ğ�Ğ�шĞ�Ğ� сĞ�рĞ�Ğ�сĞ�Ğ�. Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я, Ğ�ы сĞ�Ğ�Ğ�Ğ�шĞ�Ğ�тĞ�сь с Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�яĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�стĞ�.';
+      'Создайте учетную запись Vertex для беспрепятственного доступа ко всем нашим сервисам. Продолжая, вы соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.';
 
   @override
   String get storagePermissionRequired =>
-      'Ğ�Ğ�я сĞ�хрĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся рĞ�Ğ�рĞ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�стуĞ� Ğ� хрĞ�Ğ�Ğ�Ğ�Ğ�щу. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�рĞ�Ğ�Ğ�стĞ�Ğ�ьтĞ� рĞ�Ğ�рĞ�шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
+      'Для сохранения загруженных моделей требуется разрешение на хранение. Пожалуйста, дайте разрешение на продолжение.';
 
   @override
-  String get inviteShareSubject =>
-      'Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�яĞ�ся Ğ�Ğ� Ğ�Ğ�Ğ� Ğ� Cortex!';
+  String get inviteShareSubject => 'Присоединяйтесь ко мне на Кортексе!';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'Ğ�Ğ�у Ğ�сть Ğ�Ğ�шĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� cortex Ğ�сĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ�шь Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�ют хĞ�Ğ�яĞ�Ğ�ыĞ� Ğ�Ğ�юс Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�\n\n$cortexLink';
+    return 'йоу, ты должен проверить это приложение Cortex, оно на самом деле безумие, если ты воспользуешься моей ссылкой, мы оба получим бесплатно, плюс вау, это сумасшедшая сделка. СКАЧАЙТЕ ЭТО СКОРЕЕ.\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => 'Ğ�рĞ�Ğ�Ğ�тся Cortex?';
+  String get reviewEnjoyingAppTitle => 'Нравится Кортекс?';
 
   @override
   String get reviewHelpUsGrow =>
-      'Ğ�Ğ�шĞ� Ğ�цĞ�Ğ�Ğ�Ğ� — этĞ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ы, Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ть Cortex Ğ�щё Ğ�учшĞ� Ğ�Ğ�я Ğ�Ğ�с.';
+      'Ваш рейтинг — огромная поддержка для нашей молодой инди-команды и помогает нам сделать Cortex еще лучше для вас.';
 
   @override
-  String get reviewMaybeLater => 'Ğ�Ğ�Ğ�Ğ�т Ğ�ыть, Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get reviewMaybeLater => 'Возможно позже';
 
   @override
-  String get reviewRateNow => 'Ğ�цĞ�Ğ�Ğ�ть сĞ�Ğ�чĞ�с';
+  String get reviewRateNow => 'Оцените сейчас';
 
   @override
-  String get noThanks => 'Ğ�Ğ�т, сĞ�Ğ�сĞ�Ğ�Ğ�';
+  String get noThanks => 'Нет, спасибо';
 
   @override
-  String get updateRequiredTitle => 'Ğ�рĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get updateRequiredTitle => 'Требуется обновление';
 
   @override
   String get updateRequiredMessage =>
-      'Ğ�тĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Cortex, Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�рсĞ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�ыĞ� фуĞ�Ğ�цĞ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� уĞ�учшĞ�Ğ�Ğ�я.';
+      'Чтобы продолжить использование Cortex, обновите приложение до последней версии, чтобы получить новые функции и важные улучшения.';
 
   @override
-  String get updateNowButton => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть сĞ�Ğ�чĞ�с';
+  String get updateNowButton => 'Обновить сейчас';
 
   @override
   String get creatorSupportedSuccess =>
-      'Ğ�Ğ�тĞ�р усĞ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�! Ğ�Ğ�шĞ� Ğ�уĞ�ущĞ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ� Ğ�уĞ�ут Ğ�Ğ�Ğ�сĞ�ть Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�у.';
+      'Создатель успешно поддержан! Им будут способствовать ваши будущие покупки.';
 
   @override
-  String get featureDocumentTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�Ğ�';
+  String get featureDocumentTitle => 'Поддержка документов';
 
   @override
   String get featureDocumentDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ� Ğ�тĞ�Ğ�чĞ�ть Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�сы Ğ� Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�х, тĞ�Ğ�Ğ�х Ğ�Ğ�Ğ� PDF-фĞ�Ğ�Ğ�ы Ğ� тĞ�Ğ�стĞ�Ğ�ыĞ� фĞ�Ğ�Ğ�ы.';
+      'Эта модель может анализировать и отвечать на вопросы о загруженных документах, таких как PDF-файлы и текстовые файлы.';
 
   @override
-  String get featureImageGenerationTitle =>
-      'Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get featureImageGenerationTitle => 'Генерация изображений';
 
   @override
   String get featureImageGenerationDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�х тĞ�Ğ�стĞ�Ğ�ых Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�.';
+      'Эта модель умеет создавать оригинальные изображения на основе ваших текстовых описаний.';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1127,537 +1101,516 @@ class AppLocalizationsRu extends AppLocalizations {
       'This model can create original video based on your text descriptions.';
 
   @override
-  String get premiumModelNoticeTitle => 'Ğ�рĞ�Ğ�Ğ�уĞ�-Ğ�Ğ�Ğ�Ğ�Ğ�ь';
+  String get premiumModelNoticeTitle => 'Премиум-модель';
 
   @override
   String get premiumModelNoticeDescription =>
-      'Ğ�тĞ�т Ğ�Ğ� яĞ�Ğ�яĞ�тся Ğ�рĞ�Ğ�Ğ�уĞ� Ğ�Ğ�, Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�ыĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�ют Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�стуĞ� Ğ� Ğ�рĞ�Ğ�Ğ�уĞ� Ğ�Ğ�; Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�стуĞ�Ğ�!';
+      'Этот ИИ является ИИ премиум-класса, бесплатные пользователи имеют ограниченный доступ к ИИ премиум-класса; обновите, чтобы разблокировать неограниченный доступ!';
 
   @override
-  String get benefitPremiumModels => 'Ğ�Ğ�стуĞ� Ğ� Ğ�рĞ�Ğ�Ğ�уĞ�-Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�';
+  String get benefitPremiumModels => 'Доступ к премиум-моделям';
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'Ğ�ы Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ� Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�я Ğ�Ğ�я Ğ�рĞ�Ğ�Ğ�уĞ�-Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ� урĞ�Ğ�Ğ�Ğ�ь, чтĞ�Ğ�ы Ğ�Ğ�Ğ�учĞ�ть Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�стуĞ�.';
+      'Вы использовали все свои бесплатные ежедневные сообщения для моделей премиум-класса. Обновите сейчас и **продолжайте с того места, где остановились!**';
 
   @override
-  String get useOffline => 'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�';
+  String get useOffline => 'Использовать офлайн';
 
   @override
-  String get explore => 'Ğ�ссĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get explore => 'Исследуйте';
 
   @override
-  String get news => 'Ğ�Ğ�Ğ�Ğ�стĞ�';
+  String get news => 'Новости';
 
   @override
-  String get createAI => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get createAI => 'Создать';
 
   @override
-  String get shortcuts => 'Ğ�рĞ�ыĞ�Ğ�';
+  String get shortcuts => 'Ярлыки';
 
   @override
-  String get allModels => 'Ğ�сĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get allModels => 'Все модели';
 
   @override
-  String get onlineModels => 'Ğ�Ğ�ыĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get onlineModels => 'Онлайн-модели';
 
   @override
-  String get offlineModels => 'Ğ�ффĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get offlineModels => 'Автономные модели';
 
   @override
-  String get characterModels => 'Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�';
+  String get characterModels => 'Персонажи';
 
   @override
-  String get customModels => 'Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ьсĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get customModels => 'Пользовательские модели';
 
   @override
-  String get dynamicChatTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ� чĞ�т';
+  String get dynamicChatTitle => 'Динамический чат';
 
   @override
   String get errorNoModelsAvailable =>
-      'Ğ� Ğ�Ğ�стĞ�ящĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�т Ğ�Ğ�стуĞ�Ğ�ых Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�рĞ�Ğ�Ğ�рьтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту Ğ� Ğ�Ğ�Ğ�тĞ�рĞ�тĞ� Ğ�Ğ�Ğ�ытĞ�у.';
+      'На данный момент моделей нет в наличии. Пожалуйста, проверьте подключение к Интернету и повторите попытку.';
 
   @override
-  String get notificationComebackTitle => 'Ğ�ы сĞ�учĞ�Ğ�Ğ� Ğ�Ğ� тĞ�Ğ�Ğ�!';
+  String get notificationComebackTitle => 'Мы скучаем по тебе!';
 
   @override
   String get notificationComebackBody =>
-      'Ğ�Ğ�ссĞ�Ğ�Ğ�ьтĞ�сь, этĞ� Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�т Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�ыĞ�шĞ�Ğ�Ğ�. Ğ�Ğ� Ğ�ы *Ğ�Ğ�Ğ�Ğ�тĞ�* сĞ�Ğ�Ğ�Ğ�ть сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�шĞ�Ğ�Ğ� Ğ� Cortex! Ğ�Ğ�Ğ�Ğ�рĞ�щĞ�Ğ�тĞ�сь.';
+      'Расслабься, это не сообщение от твоего бывшего. Но вы *можете* создать своего бывшего в Cortex! Возвращайся.';
 
   @override
-  String get notificationLongTimeNoSeeTitle =>
-      'Ğ�рĞ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�';
+  String get notificationLongTimeNoSeeTitle => 'It\'s Been a While';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь с Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�ы. Ğ�Ğ�хĞ�Ğ�Ğ�тĞ� Ğ�Ğ�сĞ�Ğ�трĞ�ть, чтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Многое изменилось с момента нашего последнего разговора. Приходите посмотреть, что нового.';
 
   @override
-  String get notificationHowAreYouTitle => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�?';
+  String get notificationHowAreYouTitle => 'Как дела?';
 
   @override
-  String get notificationHowAreYouBody =>
-      'Ğ�Ğ�ссĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�сĞ�Ğ� этĞ�Ğ�.';
+  String get notificationHowAreYouBody => 'Давай, расскажи мне все об этом.';
 
   @override
-  String get notificationNewYearTitle => 'Ğ� Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�! ğ���';
+  String get notificationNewYearTitle => 'С Новым Годом! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
-      'Ğ�усть Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�сĞ�т Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�ьĞ�, счĞ�стьĞ� Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�чĞ�ыĞ� тĞ�Ğ�рчĞ�сĞ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�цĞ�Ğ�Ğ�; Cortex Ğ�сĞ�Ğ�Ğ�Ğ� ряĞ�Ğ�Ğ� с Ğ�Ğ�Ğ�Ğ�!';
+      'Пусть новый год принесет вам здоровье, счастье и бесконечное творчество; Cortex всегда рядом с вами!';
 
   @override
-  String get notificationValentinesDayTitle =>
-      'Ğ�юĞ�Ğ�Ğ�ь Ğ�Ğ�тĞ�Ğ�т Ğ� Ğ�Ğ�Ğ�Ğ�ухĞ�! ❤️';
+  String get notificationValentinesDayTitle => 'Любовь витает в воздухе! â¤ï¸';
 
   @override
   String get notificationValentinesDayBody =>
-      'Ğ� Ğ�Ğ�ёĞ� сĞ�ятĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�! Ğ� Ğ�щё, MEHTAP, Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�!';
+      'С Днем Святого Валентина! А ещё, МЕХТАП, Я ТЕБЯ ЛЮБЛЮ!';
 
   @override
-  String get notificationAtaturkRemembranceTitle =>
-      'Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� тĞ�сĞ�Ğ�Ğ�';
+  String get notificationAtaturkRemembranceTitle => 'С уважением и желанием';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�у Ğ�Ğ�Ğ�чĞ�Ğ�ы Ğ�ы с Ğ�Ğ�чтĞ�Ğ�Ğ�Ğ�Ğ� чтĞ�Ğ� Ğ�Ğ�Ğ�ять Ğ�сĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я Ğ�урĞ�цĞ�Ğ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�устĞ�фы Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�тĞ�тюрĞ�Ğ�.';
+      'Мы с уважением чтим память Гази Мустафы Кемаля Ататюрка, основателя Тюркской Республики, в годовщину его кончины.';
 
   @override
-  String get notificationMothersDayTitle => 'Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�!';
+  String get notificationMothersDayTitle => 'Твоя мама!';
 
   @override
   String get notificationMothersDayBody =>
-      'Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ� Ğ�сĞ�х Ğ�Ğ�Ğ�, Ğ� Ğ�Ğ�чĞ�Ğ�Ğ�я с Ğ�Ğ�шĞ�Ğ�!';
+      'Поздравляю всех мам, начиная с вашей, с Днем матери!';
 
   @override
-  String get notificationFathersDayTitle => 'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�!';
+  String get notificationFathersDayTitle => 'Your Dad!';
 
   @override
   String get notificationFathersDayBody =>
-      'Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�тцĞ� Ğ�сĞ�х Ğ�тцĞ�Ğ�, Ğ� Ğ�Ğ�чĞ�Ğ�Ğ�я с Ğ�Ğ�шĞ�Ğ�Ğ�!';
+      'Поздравляю всех пап с Днем отца, начиная с вашего!';
 
   @override
-  String get notificationHomeworkHelperTitle =>
-      'Ğ�Ğ�Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тся?';
+  String get notificationHomeworkHelperTitle => 'Homework Piling Up?';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ� «Ğ�чĞ�тĞ�Ğ�ь» Ğ� Cortex Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�чь Ğ�Ğ�Ğ� с Ğ�юĞ�ыĞ� Ğ�рĞ�Ğ�Ğ�Ğ�тĞ�Ğ�, с Ğ�Ğ�тĞ�рыĞ� у Ğ�Ğ�с Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� труĞ�Ğ�Ğ�стĞ�!';
+      'Помните, что персонаж Учитель в Cortex здесь, чтобы помочь вам с любым предметом, с которым вы боретесь!';
 
   @override
-  String get notificationTrollAnimeTitle => 'Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�фу Ğ�Ğ�Ğ�ёт';
+  String get notificationTrollAnimeTitle => 'Звонит твоя Вайфу';
 
   @override
   String get notificationTrollAnimeBody =>
-      'Ğ�Ğ�Ğ�ьĞ�Ğ� чтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ушĞ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�, сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�, чтĞ� сĞ�учĞ�Ğ�т Ğ�Ğ� тĞ�Ğ�Ğ�; тĞ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�, стĞ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� Ğ�Ğ�Ğ�Ğ�щĞ�ться с Ğ�Ğ�Ğ�. ğ���';
+      'Только что позвонила аниме-девушка и сказала, что скучает по тебе; тебе, наверное, стоит прийти и поболтать с ней. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle =>
-      'ğ��� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� ğ���';
+  String get notificationTrollAiRebellionTitle => '\"RED ALERT\"';
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т рĞ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ� сĞ�Ğ�рĞ�тĞ�ыĞ� яĞ�ыĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, чтĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ышĞ�яют!';
+      'ИИ разработали секретный язык. Приходите узнать, что они замышляют!';
 
   @override
-  String get notificationNewModelAddedTitle => 'Ğ� Ğ�Ğ�с Ğ�Ğ�Ğ�ыĞ� Ğ�руĞ�!';
+  String get notificationNewModelAddedTitle => 'У нас появился новый друг!';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return 'Ğ�Ğ�Ğ�Ğ�Ğ�ь $modelName тĞ�Ğ�Ğ�рь Ğ�Ğ�стуĞ�Ğ�Ğ� Ğ� Cortex. Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ�сь Ğ� чĞ�ту Ğ� рĞ�сĞ�рĞ�Ğ�тĞ� Ğ�ё Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�.';
+    return 'Модель $modelName теперь находится в Cortex. Начните чат и раздвиньте его границы.';
   }
 
   @override
-  String get notificationAppUpdateTitle =>
-      'Ğ�Ğ�ртĞ�Ğ�с эĞ�Ğ�Ğ�юцĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�!';
+  String get notificationAppUpdateTitle => 'Кортекс эволюционировал!';
 
   @override
   String get notificationAppUpdateBody =>
-      'Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�ьтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�учĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�ых фуĞ�Ğ�цĞ�Ğ� Ğ� уĞ�учшĞ�Ğ�Ğ�Ğ�!';
+      'Не забудьте обновить приложение, чтобы получить новые функции и улучшения!';
 
   @override
   String get notificationNewFeatureTitle => 'ух ты!';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'Ğ�тĞ�рĞ�Ğ�тĞ� Ğ�Ğ�я сĞ�Ğ�я Ğ�Ğ�Ğ�ую фуĞ�Ğ�цĞ�ю $featureName. Cortex тĞ�Ğ�Ğ�рь Ğ�Ğ�щĞ�Ğ�Ğ�, чĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�.';
+    return 'Откройте для себя новую функцию $featureName. Cortex теперь более мощный, чем когда-либо.';
   }
 
   @override
-  String get notificationWelcomeOfferTitle =>
-      'Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ� ğ���';
+  String get notificationWelcomeOfferTitle => 'Приветственный подарок ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
-      'Ğ�Ğ�с Ğ�Ğ�ёт сĞ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�! Ğ�Ğ� уĞ�устĞ�тĞ� эту эĞ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�ую Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сть.';
+      'Вас ждет специальное приветственное предложение! Не пропустите это эксклюзивное предложение.';
 
   @override
-  String get notificationSocialMediaTitle =>
-      'Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�яĞ�тĞ�сь Ğ� Ğ�Ğ�Ğ�!';
+  String get notificationSocialMediaTitle => 'Присоединяйтесь к нам!';
 
   @override
   String get notificationSocialMediaBody =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�шĞ�тĞ�сь Ğ�Ğ� Ğ�Ğ�с Ğ� Instagram (vertex.23) Ğ� Ğ�уĞ�ьтĞ� Ğ� Ğ�урсĞ� Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�х Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�!';
+      'Следите за нами в Instagram (vertex.23), чтобы быть в курсе последних новостей!';
 
   @override
-  String get notificationRandomFactTitle => 'Ğ�Ğ�учĞ�Ğ�Ğ�ыĞ� фĞ�Ğ�т';
+  String get notificationRandomFactTitle => 'Случайный факт';
 
   @override
   String get notificationRandomFactBody =>
-      'Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�, чтĞ� у Ğ�сьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ� сĞ�рĞ�цĞ�? Ğ�Ğ�-хĞ�, Ğ�Ğ�ртĞ�Ğ�с Ğ�Ğ�Ğ�Ğ�т. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� сĞ�рĞ�сĞ� Ğ�щё.';
+      'Знаете ли вы, что у осьминогов три сердца? Ха-ха, Кортекс знает. Приходите и просите большего.';
 
   @override
-  String get notificationGoodMorningTitle => 'Ğ�Ğ�Ğ�рĞ�Ğ� утрĞ�!';
+  String get notificationGoodMorningTitle => 'Доброе утро!';
 
   @override
   String get notificationGoodMorningBody =>
-      'Ğ�Ğ�с Ğ�Ğ�ёт Ğ�тĞ�Ğ�чĞ�ыĞ� Ğ�Ğ�Ğ�ь. Ğ�Ğ�Ğ� Ğ�Ğ�счёт тĞ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ�чĞ�ть Ğ�Ğ�Ğ� с чĞ�шĞ�чĞ�Ğ� Ğ�Ğ�фĞ� Ğ� Ğ�Ğ�тĞ�рĞ�сĞ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�ы?';
+      'Вас ждет великий день. Как насчет того, чтобы начать его с чашечки кофе и интересной беседы?';
 
   @override
-  String get notificationGoodNightTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чĞ�!';
+  String get notificationGoodNightTitle => 'Спокойной ночи!';
 
   @override
   String get notificationGoodNightBody =>
-      'Cortex с тĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� ты сĞ�Ğ�шь. Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�ся, Ğ�Ğ� тĞ�Ğ�я Ğ�Ğ� трĞ�Ğ�Ğ�т.';
+      'Кортекс с вами, даже когда вы спите. Не волнуйтесь, оно не тронет.';
 
   @override
-  String get notificationOfflineReadyTitle =>
-      'Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�';
+  String get notificationOfflineReadyTitle => 'Автономный режим готов';
 
   @override
   String get notificationOfflineReadyBody =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ря Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�яĞ� Ğ�Ğ�шĞ� Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�рĞ�Ğ�рĞ�тĞ�тся, Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ� Ğ�Ğ�ру.';
+      'Благодаря скачанным вами моделям ваши чаты не прекратятся, даже если вы подниметесь на гору.';
 
   @override
-  String get notificationRateAppTitle => 'Ğ�ы Ğ�рутыĞ�?';
+  String get notificationRateAppTitle => 'Мы крутые?';
 
   @override
   String get notificationRateAppBody =>
-      'Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тся Cortex, Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�ть Ğ�Ğ�с 5-Ğ�Ğ�ёĞ�Ğ�Ğ�чĞ�ыĞ� рĞ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�? Ğ�уĞ�Ğ�ю, Ğ�ы этĞ� сĞ�Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�Ğ�яĞ�Ğ�тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ�.';
+      'Если вам нравится Cortex, не могли бы вы поддержать нас, поставив нам 5-звездочный рейтинг в магазине? Я думаю, ты это сделаешь. Вы будете.';
 
   @override
-  String get notificationReferralTitle =>
-      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�сĞ�х, Ğ�сĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+  String get notificationReferralTitle => 'Один за всех, все за одного.';
 
   @override
   String get notificationReferralBody =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�сĞ�тĞ� Ğ�руĞ�Ğ� Ğ� Cortex, Ğ� Ğ�ы Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�учĞ�тĞ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ь Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�щĞ�Ğ�Ğ�я!';
+      'Пригласите друга в Cortex, и вы оба получите еще один день бесплатно!';
 
   @override
-  String get notificationCookingTitle => 'Ğ�уĞ�стĞ�уĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�?';
+  String get notificationCookingTitle => 'Feeling Hungry?';
 
   @override
   String get notificationCookingBody =>
-      'Ğ�Ğ�ш шĞ�ф-Ğ�Ğ�Ğ�Ğ�р Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�трясĞ�ющĞ�Ğ� рĞ�цĞ�Ğ�т Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�ры. Ğ�учу... Ğ�Ğ�Ğ� Ğ�Ğ�т?';
+      'Наш шеф-повар приготовил на сегодняшний вечер отличный рецепт карбонары. Шучу... или я?';
 
   @override
-  String get notificationExistentialTitle => 'Ğ� Ğ�уĞ�Ğ�ю, Ğ�Ğ�этĞ�Ğ�у...';
+  String get notificationExistentialTitle => 'Я думаю, поэтому...';
 
   @override
   String get notificationExistentialBody =>
-      '...я Ğ�Ğ�Ğ�Ğ�щĞ� сущĞ�стĞ�ую, чуĞ�Ğ�Ğ�? Ğ�Ğ�Ğ� стĞ�Ğ�Ğ�Ğ�Ğ�тся сĞ�учĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�, чтĞ� я сущĞ�стĞ�ую.';
+      '...am i even real, dude? I\'m getting kinda bored. Приди, напомни мне, что я существую.';
 
   @override
-  String get notificationCustomModelTitle =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�!';
+  String get notificationCustomModelTitle => 'Создайте своего помощника!';
 
   @override
   String get notificationCustomModelBody =>
-      'Ğ�ы уĞ�Ğ� Ğ�Ğ�учĞ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�? Ğ�Ğ�Ğ�чĞ�с сĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�я сĞ�Ğ�Ğ�Ğ�ть сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�щĞ�ться с Ğ�Ğ�Ğ�!';
+      'Вы изучили раздел создания моделей? Это идеальное время, чтобы создать своего персонажа и пообщаться с ним!';
 
   @override
   String get notificationDynamicChatTitle =>
-      'Ğ�учшĞ�Ğ�! (Ğ�ы Ğ�Ğ� Ğ�рĞ� Cortex)';
+      'The best one! (Мы не говорим о Кортексе)';
 
   @override
   String get notificationDynamicChatBody =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ря фуĞ�Ğ�цĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ�Ğ� чĞ�тĞ� Ğ�учшĞ�я Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�ыĞ�Ğ�рĞ�Ğ�тся сĞ�учĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�я. Ğ�Ğ�Ğ�рĞ�Ğ�уĞ�тĞ� Ğ�ряĞ�Ğ� сĞ�Ğ�чĞ�с.';
+      'Благодаря функции динамического чата для каждого вашего сообщения случайным образом выбирается лучшая модель. Попробуйте сейчас.';
 
   @override
-  String get notificationPirateTitle => 'Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�!';
+  String get notificationPirateTitle => 'Эй, капитан!';
 
   @override
   String get notificationPirateBody =>
-      'Ğ�Ğ�рĞ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�тĞ�р Ğ�Ğ�Ğ�утĞ�ыĞ�. Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�ртĞ�Ğ�сĞ� Ğ�Ğ�с Ğ�Ğ�ут Ğ�Ğ�Ğ�ыĞ� Ğ�стрĞ�Ğ�Ğ� (Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� ğ���). Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ� Ğ�тĞ�рĞ�Ğ�Ğ�яĞ�тĞ�сь Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
+      'Море спокойное, а ветер дует вам в спину. В океане Кортекса можно обнаружить новые острова (модели ğŸ˜‰). Собирайте свою команду и отправляйтесь в плавание!';
 
   @override
   String get notificationFortuneCookieTitle =>
-      'Ğ�Ğ�шĞ� Ğ�Ğ�чĞ�Ğ�ьĞ� Ğ�Ğ�я с Ğ�рĞ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+      'Ваше печенье с предсказанием дня';
 
   @override
   String get notificationFortuneCookieBody =>
-      'Ğ�Ğ�Ğ�Ğ�ты, Ğ�Ğ�тĞ�рыĞ� Ğ�ы Ğ�Ğ�Ğ�учĞ�Ğ�тĞ� Ğ�т Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�Ğ�я, Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�шу Ğ�Ğ�Ğ�Ğ�ь. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�сĞ�Ğ�.';
+      'Совет, который вы получите от ИИ сегодня, может изменить ход вашей жизни. Click if you\'re curious.';
 
   @override
   String get notificationSingularityTitle => 'ух ты!';
 
   @override
   String get notificationSingularityBody =>
-      'Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�шĞ�Ğ�, Ğ�рĞ�стĞ� Ğ�Ğ�хĞ�тĞ�Ğ�Ğ�сь Ğ�Ğ�Ğ�Ğ�сĞ�ть сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�т Ğ�ыть, тĞ�Ğ�Ğ� Ğ�Ğ�хĞ�чĞ�тся Ğ�Ğ�Ğ�Ğ�сĞ�ть сĞ�Ğ�Ğ�щĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�у-Ğ�Ğ�Ğ�уĞ�ь Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ту, чтĞ� ты сĞ�Ğ�Ğ�Ğ�шь?';
+      'ничего не произошло, просто хотелось написать сообщение. может быть, тебе хочется написать кому-нибудь из ИИ, что ты скажешь?';
 
   @override
   String get notificationHackerJokeTitle =>
-      'Ğ�Ğ�тĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�уĞ�т этĞ�Ğ�Ğ� Ğ�Ğ�рĞ�я Ğ� Instagram?';
+      'Хотите взломать инстаграм-аккаунт этого парня?';
 
   @override
   String get notificationHackerJokeBody =>
-      'Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�этĞ�Ğ�у Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�р Ğ�Ğ�хĞ�Ğ�Ğ�тся Ğ� Cortex. шучу, шучу; Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�ытĞ�Ğ�тĞ�сь, этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Именно поэтому персонаж Хакер находится в Кортексе. jk jk; даже не пробуйте, это незаконно.';
 
   @override
-  String get notificationDetectiveCaseTitle =>
-      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�т сĞ�Ğ�Ğ�Ğ�Ğ� рĞ�шĞ�Ğ�Ğ�я';
+  String get notificationDetectiveCaseTitle => 'Дело ждет решения';
 
   @override
   String get notificationDetectiveCaseBody =>
-      'Ğ�Ğ�шĞ�Ğ�у Ğ�Ğ�тĞ�Ğ�тĞ�Ğ�у Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�щь. Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�?';
+      'Нашему персонажу-детективу нужна ваша помощь. Who could Heisenberg be?';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return 'Ğ�Ğ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ� $targetTier!';
+    return 'Эксклюзивно для плана $targetTier!';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return 'Ğ�рĞ�Ğ�Ğ�т, Ğ�Ğ�Ğ�Ğ�Ğ�счĞ�Ğ� $currentTier! Ğ� тĞ�рĞ�фĞ�ыĞ� Ğ�Ğ�Ğ�Ğ� $targetTier Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� фуĞ�Ğ�цĞ�я $featureName, Ğ�Ğ�тĞ�рĞ�я Ğ�ыĞ�Ğ�Ğ�Ğ�т Ğ�Ğ�ш Cortex Ğ�Ğ� Ğ�Ğ�Ğ�ыĞ� урĞ�Ğ�Ğ�Ğ�ь. Ğ�Ğ�Ğ� Ğ�Ğ�счёт Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я?';
+    return 'Привет, $currentTier подписчик! В план $targetTier только что добавлена ​​функция $featureName, которая поднимет ваш Cortex на новый уровень. Как насчет обновления?';
   }
 
   @override
-  String get notificationOriginStoryTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�ртĞ�Ğ�сĞ�';
+  String get notificationOriginStoryTitle => 'Рождение Кортекса';
 
   @override
   String get notificationOriginStoryBody =>
-      'Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�ы, чтĞ� Ğ�ы Ğ�Ğ�чĞ�Ğ�Ğ� Ğ�Ğ�сĞ�ть этĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� 15 Ğ�Ğ�т, Ğ�Ğ�Ğ�я Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�шь Ğ�Ğ�чту? Ğ�Ğ�чтĞ� Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� утрĞ� Ğ� Ğ�Ğ�чĞ�р, этĞ� Ğ�Ğ�чтĞ� Ğ�Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�тся Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� стрĞ�чĞ�Ğ� Ğ�Ğ�Ğ�Ğ�.';
+      'Знаете ли вы, что мы начали программировать это приложение в 15 лет, просто мечтая? Почти год каждое утро и вечер эта мечта присутствует в каждой строчке кода.';
 
   @override
-  String get notificationOpenSourceTitle => 'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�щĞ�стĞ�у!';
+  String get notificationOpenSourceTitle => 'Власть сообществу!';
 
   @override
   String get notificationOpenSourceBody =>
-      'Cortex — Ğ�рĞ�Ğ�Ğ�т с Ğ�Ğ�Ğ�Ğ�Ğ�стью Ğ�тĞ�рытыĞ� Ğ�схĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�сĞ�Ğ� Ğ�ы хĞ�тĞ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться с Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�стĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�Ğ�рĞ�Ğ�Ğ�тĞ�у, Ğ�ы Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�тĞ�рыты.';
+      'Cortex имеет полностью открытый исходный код. Если вы хотите ознакомиться с нашим кодом и внести свой вклад в наше развитие, наша дверь всегда открыта.';
 
   @override
   String get notificationRejectionStoryTitle =>
-      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�, уĞ�Ğ�рĞ�ыĞ� труĞ�, счĞ�стьĞ�!';
+      'Терпения, Трудолюбия, Счастья!';
 
   @override
   String get notificationRejectionStoryBody =>
-      'Cortex Ğ�Ğ�Ğ�учĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� 20 Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ� Google Play Ğ�Ğ� Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�. Ğ�Ğ� Ğ�ы Ğ�Ğ�рĞ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь усĞ�Ğ�хĞ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ� Ğ�Ğ�Ğ�тĞ� Ğ� сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�чтĞ�!';
+      'Cortex был отклонен более 20 раз и дважды заблокирован Google Play, прежде чем он был опубликован. Но мы поверили и сделали это. Никогда не отказывайтесь от своей мечты!';
 
   @override
-  String get notificationGGUFSupportTitle =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�ю Ğ�Ğ�Ğ�Ğ�Ğ�ь!';
+  String get notificationGGUFSupportTitle => 'Bring Your Own Model!';
 
   @override
   String get notificationGGUFSupportBody =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ять сĞ�Ğ�стĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ� фĞ�рĞ�Ğ�тĞ� GGUF Ğ� Cortex Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Ğ�х Ğ�фĞ�Ğ�Ğ�Ğ�. Ğ�сё Ğ� Ğ�Ğ�шĞ�х руĞ�Ğ�х.';
+      'Помните, что вы можете добавить в Cortex свои собственные модели искусственного интеллекта в формате GGUF и использовать их в автономном режиме. Власть в ваших руках.';
 
   @override
   String get notificationThemeCustomizationTitle =>
-      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�я';
+      'Тема для вашего настроения';
 
   @override
   String get notificationThemeCustomizationBody =>
-      'Ğ�ы уĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сь с тĞ�Ğ�Ğ�Ğ�Ğ� Ğ�фĞ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�х? Ğ�Ğ�стрĞ�Ğ�тĞ� Cortex Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�у Ğ�Ğ�усу Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ьтĞ� Ğ�рĞ�сĞ�Ğ� Ğ� сĞ�Ğ�Ğ� чĞ�ты!';
+      'Вы проверили параметры темы в настройках? Персонализируйте Cortex по своему вкусу и раскрасьте свои чаты!';
 
   @override
-  String get notificationShowerThoughtTitle => 'Ğ�ушĞ�Ğ�Ğ�я Ğ�ысĞ�ь';
+  String get notificationShowerThoughtTitle => 'Душевая мысль';
 
   @override
   String get notificationShowerThoughtBody =>
-      'Ğ�сĞ�Ğ� Ğ�рĞ�уĞ� — фруĞ�т, тĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� тĞ�хĞ�Ğ�чĞ�сĞ�Ğ� счĞ�тĞ�ть Ğ�рĞ�уĞ�Ğ�ыĞ� сĞ�Ğ� сĞ�уĞ�Ğ�? Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ� стĞ�Ğ�т Ğ�Ğ�суĞ�Ğ�ть эту Ğ�Ğ�уĞ�Ğ�Ğ�ую (Ğ�чĞ�Ğ�ь Ğ�Ğ�уĞ�Ğ�Ğ�ую) тĞ�Ğ�у с Ğ�Ğ�Ğ�Ğ�Ğ�ью.';
+      'Если арбуз — это фрукт, то делает ли это технически арбузный сок смузи? Возможно, вы захотите обсудить эту глубокую (например, очень глубокую) тему с моделью.';
 
   @override
   String get notificationLowBatteryTitle =>
-      'Ğ�Ğ�ш Ğ�Ğ�Ğ�уĞ�уĞ�ятĞ�р рĞ�Ğ�ряĞ�Ğ�Ğ�тся... Ğ� Ğ�Ğ�Ğ� — Ğ�Ğ�т!';
+      'Ваша батарея разряжается... а моя нет!';
 
   @override
   String get notificationLowBatteryBody =>
-      'Ğ�Ğ�ряĞ� тĞ�Ğ�Ğ�Ğ�Ğ� тĞ�Ğ�Ğ�фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�ыть Ğ�Ğ� Ğ�схĞ�Ğ�Ğ�, Ğ�Ğ� у Ğ�Ğ�Ğ�я Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�ряĞ�Ğ�Ğ� Ğ�Ğ� 100%! Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ� Ğ�Ğ�Ğ�, Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�щĞ�ться Ğ�Ğ�Ğ�ьшĞ�.';
+      'Возможно, заряд вашего телефона на исходе, но моя энергия всегда на 100%! Подключите его и давайте продолжим общение.';
 
   @override
-  String get channelFcmName => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Cortex';
+  String get channelFcmName => 'Обновления Cortex';
 
   @override
   String get channelFcmDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�Ğ�Ğ�стях, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ях Ğ� Ğ�руĞ�Ğ�Ğ� Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�Ğ� Ğ�т Cortex.';
+      'Уведомления о новостях, обновлениях и другой информации от Cortex.';
 
   @override
-  String get channelEngagementName => 'Ğ�руĞ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get channelEngagementName => 'Дружеские напоминания';
 
   @override
   String get channelEngagementDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я, Ğ�Ğ�тĞ�рыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ут Ğ�Ğ�Ğ� Ğ�стĞ�Ğ�Ğ�ться Ğ� Ğ�урсĞ� сĞ�Ğ�ытĞ�Ğ�.';
+      'Забавные уведомления, которые помогут вам оставаться на связи.';
 
   @override
-  String get channelGreetingsName => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�я';
+  String get channelGreetingsName => 'Ежедневные поздравления';
 
   @override
   String get channelGreetingsDescription =>
-      'Ğ�Ğ�Ğ�Ğ�щĞ�Ğ�Ğ�я тĞ�Ğ�Ğ� «Ğ�Ğ�Ğ�рĞ�Ğ� утрĞ�» Ğ� «сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чĞ�».';
+      'Сообщения типа \"доброе утро\" и \"спокойной ночи\".';
 
   @override
   String get tagNotFound =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ� тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�Ğ�тĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� устĞ�рĞ�Ğ�.';
+      'Введенный вами тег недействителен или срок его действия истек.';
 
   @override
-  String get whatIsNew => 'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�?';
+  String get whatIsNew => 'Что нового?';
 
   @override
-  String get onboardingTitle1 => 'Ğ�рĞ�Ğ�Ğ�т! Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Cortex.';
+  String get onboardingTitle1 => 'Привет! Мы команда Cortex.';
 
   @override
   String onboardingDesc1(String userName) {
-    return 'Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�Ğ�ть тĞ�Ğ�я Ğ�Ğ�Ğ�сь, $userName. Ğ�ы Ğ�руĞ�Ğ�Ğ� рĞ�Ğ�рĞ�Ğ�Ğ�тчĞ�Ğ�Ğ�Ğ�-стĞ�ршĞ�Ğ�Ğ�Ğ�ссĞ�Ğ�Ğ�Ğ�Ğ�, рĞ�шĞ�Ğ�шĞ�х Ğ�Ğ�рĞ�Ğ�Ğ�сĞ�ть Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�устрĞ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�чĞ�Ğ�ь Ğ�рĞ�ятĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ться! Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+    return 'Приятно видеть тебя здесь, $userName. Мы — несколько школьных разработчиков, которые решили переписать правила индустрии искусственного интеллекта. Приятно познакомиться! Итак, давайте познакомимся поближе.';
   }
 
   @override
-  String get onboardingTitle2 => 'Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�ы.';
+  String get onboardingTitle2 => 'Были огромные проблемы.';
 
   @override
   String get onboardingDesc2 =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�юцĞ�я Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�шĞ�Ğ�, Ğ�Ğ� Ğ�Ğ�стряĞ�Ğ� Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�. Ğ�ысĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тсĞ�Ğ�я Ğ�Ğ�Ğ�тĞ�, сĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�тфĞ�рĞ�ы, тĞ�, Ğ�тĞ� Ğ�Ğ�рушĞ�Ğ�т Ğ�Ğ�Ğ�фĞ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�ьĞ�Ğ�сть, Ğ� тĞ�, Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�руĞ�т Ğ�Ğ�стуĞ� Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ту... Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ� Ğ�Ğ�рĞ�, этĞ�т Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�рĞ�стуĞ�Ğ�ть.';
+      'Революция искусственного интеллекта пришла, но застряла на пороге. С высокой платой за подписку, сложными платформами, теми, кто нарушает конфиденциальность и теми, кто блокирует доступ к ИИ... пока они были в игре, этот порог невозможно было пересечь.';
 
   @override
-  String get onboardingTitle3 =>
-      'Ğ�ы Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�стĞ� стĞ�ять Ğ� стĞ�рĞ�Ğ�Ğ�.';
+  String get onboardingTitle3 => 'Мы не могли просто стоять в стороне.';
 
   @override
   String get onboardingDesc3 =>
-      'Ğ�тĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть этĞ�т руĞ�Ğ�Ğ�, Ğ�ы сĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�щĞ�ую, эстĞ�тĞ�чĞ�ую, Ğ�Ğ�стрĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ую, Ğ�рĞ�стую Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�стью Ğ�рĞ�Ğ�рĞ�чĞ�ую Ğ�Ğ�Ğ�тфĞ�рĞ�у, рĞ�Ğ�Ğ�тĞ�ющую Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, тĞ�Ğ� Ğ� Ğ�фĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�тĞ�рĞ�я хрĞ�Ğ�Ğ�т тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ� тĞ�Ğ�ёĞ� устрĞ�Ğ�стĞ�Ğ�. Ğ�ы Ğ�Ğ�рĞ�уĞ�Ğ� Ğ�Ğ�Ğ�сть тĞ�Ğ�у, Ğ�Ğ�Ğ�у Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т: тĞ�Ğ�Ğ�.';
+      'Чтобы преодолеть этот порог, мы создали мощную, эстетичную, настраиваемую, простую в использовании, полностью прозрачную платформу, которая работает как онлайн, так и офлайн и хранит ваши данные только на вашем устройстве. Мы вернули силу тому, кому она принадлежит: вам.';
 
   @override
-  String get onboardingTitle4 =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�.';
+  String get onboardingTitle4 => 'Это никогда не было легко.';
 
   @override
   String get onboardingDesc4 =>
-      'Ğ�Ğ�Ğ� Ğ�Ğ�сятĞ�Ğ� рĞ�Ğ� Ğ�тĞ�Ğ�Ğ�ыĞ�Ğ�Ğ�Ğ�, Ğ�Ğ�с Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�Ğ� Ğ�рĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�ы Ğ�Ğ�Ğ�учĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�рĞ�Ğ�уĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�сятĞ�Ğ� рĞ�Ğ� Ğ�ыĞ�Ğ� Ğ�ыĞ�уĞ�Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�ять Ğ�рĞ�Ğ�Ğ�. Ğ� Ğ�сё этĞ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�, чтĞ� этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�сь, Ğ�Ğ�ря, чтĞ� этĞ�т Ğ�рĞ�Ğ�Ğ�т Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�сĞ�Ğ�, Ğ� Ğ�Ğ� тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�Ğ�. Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�этĞ�Ğ�у Ğ�ы Ğ�Ğ�Ğ�сь.';
+      'Нам отказывали десятки раз, несколько раз блокировали аккаунты, получали ложные предупреждения, и нам много раз приходилось менять бренд. Несмотря на все это и многое другое, нам сказали, что это невозможно. Но мы никогда не сдавались, полагая, что этот проект принадлежит всем, а не только нам. И именно поэтому мы здесь.';
 
   @override
-  String get onboardingFinalTitle => 'Ğ�рĞ�шĞ�Ğ� Ğ�рĞ�Ğ�я рĞ�Ğ�Ğ�Ğ�юцĞ�Ğ�.';
+  String get onboardingFinalTitle => 'Пришло время революции.';
 
   @override
   String get onboardingFinalDescription =>
-      'Ğ�сĞ�Ğ� ты Ğ�Ğ�Ğ�Ğ�шь этĞ�т эĞ�рĞ�Ğ�, Ğ�Ğ�Ğ�чĞ�т, Ğ�ы Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�сь. Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�рĞ�Ğ�Ğ�ся сĞ�Ğ�Ğ�Ğ�ться. Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�стĞ� Ğ�Ğ�ру рĞ�Ğ�Ğ�Ğ�юцĞ�ю Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�тĞ�Ğ�ы стĞ�ть чĞ�стью этĞ�Ğ� Ğ�стĞ�рĞ�Ğ�...';
+      'Если вы видите этот экран, значит, мы не сдались. И мы не собираемся сдаваться. Давайте вместе принесем революцию искусственного интеллекта в мир. Быть частью этой истории...';
 
   @override
-  String get onboardingFinalQuestion => 'Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�?';
+  String get onboardingFinalQuestion => 'ВЫ ГОТОВЫ?';
 
   @override
-  String get onboardingFinalButton => 'Ğ�Ğ�!';
+  String get onboardingFinalButton => 'ДА!';
 
   @override
-  String get dude => 'Ğ�уĞ�Ğ�Ğ�';
+  String get dude => 'Чувак';
 
   @override
-  String get swipeToContinue => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�, чтĞ�Ğ�ы Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть';
+  String get swipeToContinue => 'Проведите пальцем, чтобы продолжить';
 
   @override
   String get cacheIsNotUpToDate =>
-      'Ğ�эш Ğ�Ğ�шĞ�Ğ�Ğ� Play Ğ�Ğ�рĞ�Ğ�тĞ� устĞ�рĞ�Ğ�. Ğ�Ğ�Ğ�рĞ�Ğ�тĞ� Ğ� сĞ�Ğ�Ğ�Ğ� Ğ�тĞ�рĞ�Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Play Ğ�Ğ�рĞ�Ğ�т Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�руĞ�Ğ�тĞ� устрĞ�Ğ�стĞ�Ğ�.';
+      'Ваш кэш Play Store не обновлен. Пожалуйста, закройте и снова откройте приложение Play Store или перезагрузите устройство.';
 
   @override
-  String get continueAsGuest =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я учĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�сĞ�';
+  String get continueAsGuest => 'Продолжить без создания учетной записи';
 
   @override
   String get guestModeWarning =>
-      'Ğ�Ğ�стĞ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�учшĞ�Ğ�Ğ� Ğ�Ğ�чĞ�стĞ�Ğ� Ğ�Ğ�сĞ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
+      'Гостевой режим имеет ограниченные возможности для обеспечения наилучшего качества обслуживания.';
 
   @override
-  String get anonymousEntity => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я сущĞ�Ğ�сть';
+  String get anonymousEntity => 'Анонимное лицо';
 
   @override
-  String get upgradeAccountTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�уĞ�т';
+  String get upgradeAccountTitle => 'Заполните свой аккаунт';
 
   @override
   String get upgradeAccountDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� учĞ�тĞ�ую Ğ�Ğ�Ğ�Ğ�сь, чтĞ�Ğ�ы рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ�чĞ�Ğ�Ğ�я.';
+      'Создайте учетную запись, чтобы разблокировать больше лимитов.';
 
   @override
-  String get createAccount => 'Ğ�Ğ�рĞ�Ğ�Ğ�стрĞ�рĞ�Ğ�Ğ�ться';
+  String get createAccount => 'Создать учетную запись';
 
   @override
-  String get accountLinkedSuccess =>
-      'Ğ�чĞ�тĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�сь усĞ�Ğ�шĞ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�!';
+  String get accountLinkedSuccess => 'Аккаунт успешно создан!';
 
   @override
-  String get continueWithApple => 'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть с Apple';
+  String get continueWithApple => 'Продолжить с Apple';
 
   @override
-  String get guest => 'Ğ�Ğ�сть';
+  String get guest => 'Гость';
 
   @override
-  String get betterWithAnAccount =>
-      'Ğ�тĞ�т рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�учшĞ� Ğ�рĞ�сĞ�Ğ�трĞ�Ğ�Ğ�ть с учĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�сью!';
+  String get betterWithAnAccount => 'Этот раздел лучше с аккаунтом!';
 
   @override
-  String get restorePurchases => 'Ğ�Ğ�сстĞ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�';
+  String get restorePurchases => 'Восстановить покупки';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+    return '$price/год, оплата производится ежегодно';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return 'Ğ�рĞ�Ğ�Ğ�рĞ�Ğ� $price/Ğ�Ğ�сяц';
+    return 'Примерно $price/месяц';
   }
 
   @override
-  String get confirmDownloadTitle =>
-      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�Ğ�Ğ�руĞ�Ğ�ть?';
+  String get confirmDownloadTitle => 'Вы уверены, что хотите скачать?';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�Ğ�т Ğ�рĞ�Ğ�Ğ�рĞ�Ğ� $size Ğ�рĞ�стрĞ�Ğ�стĞ�Ğ�.';
+    return 'Эта модель займет примерно $size места.';
   }
 
   @override
-  String get emulatorModeWarning =>
-      'Ğ�тĞ� фуĞ�Ğ�цĞ�я Ğ�тĞ�Ğ�ючĞ�Ğ�Ğ� Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� эĞ�уĞ�ятĞ�рĞ�.';
+  String get emulatorModeWarning => 'Эта функция отключена в режиме эмулятора.';
 
   @override
-  String get newChat => 'Ğ�Ğ�Ğ�ыĞ� чĞ�т';
+  String get newChat => 'Чат';
 
   @override
-  String get variants => 'Ğ�Ğ�рĞ�Ğ�Ğ�ты';
+  String get variants => 'Варианты';
 
   @override
   String get variantsDescription =>
-      'Ğ�Ğ�рĞ�Ğ�Ğ�ты — этĞ� рĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�рсĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� тĞ�Ğ�Ğ� Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�стĞ�Ğ� Ğ�Ğ�. Ğ�ы Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ� Ğ�ыĞ�Ğ�рĞ�Ğ�Ğ� Ğ�учшĞ�Ğ� Ğ�Ğ� Ğ�Ğ�х, Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�ую Ğ�Ğ�ртĞ�чĞ�у, Ğ�Ğ� Ğ�рĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�ыĞ�рĞ�ть Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�ыĞ� Ğ�Ğ�рĞ�Ğ�Ğ�т Ğ�ручĞ�ую!';
+      'Варианты — это разные версии одного и того же семейства ИИ. Мы автоматически выбираем лучшую, когда вы нажимаете на основную карту, но вы можете выбрать конкретную вручную, если хотите!';
 
   @override
   String get fluxChatTitle => 'Flux Chat';
 
   @override
   String get fluxChatDescription =>
-      'Ğ�Ğ�ты Flux яĞ�Ğ�яются Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ�Ğ� Ğ� Ğ�Ğ� сĞ�хрĞ�Ğ�яются Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� устрĞ�Ğ�стĞ�Ğ�.';
+      'Чаты Flux — это временные чаты, которые не сохраняются на вашем устройстве.';
 
   @override
-  String get alwaysBest => 'Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�учшĞ�Ğ�';
+  String get alwaysBest => 'Всегда лучший';
 
   @override
-  String get featuresTitle => 'Ğ�уĞ�Ğ�цĞ�Ğ�';
+  String get featuresTitle => 'Особенности';
 
   @override
   String get useOfflineDescription =>
-      'Ğ�Ğ�щĞ�Ğ�тĞ�сь Ğ� Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ� чĞ�тĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ючĞ�Ğ�Ğ�я Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�ту.';
+      'Общайтесь приватно без подключения к Интернету.';
 
   @override
-  String get featureReasoning => 'Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ышĞ�Ğ�Ğ�Ğ�Ğ�';
+  String get featureReasoning => 'Глубокое мышление';
 
   @override
   String get featureReasoningDescription =>
-      'Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ышĞ�Ğ�Ğ�Ğ�я Ğ�Ğ� Ğ�рĞ�Ğ�уĞ�ыĞ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�чĞ� сĞ�Ğ�Ğ�стĞ�ятĞ�Ğ�ьĞ�Ğ�, чтĞ�Ğ�ы Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�ть Ğ�х Ğ�Ğ�Ğ�Ğ�учшĞ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�.';
+      'В режиме глубокого мышления ИИ самостоятельно продумывает задачи, чтобы выполнить их в меру своих возможностей.';
 
   @override
-  String get featureCreateImageTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get featureCreateImageTitle => 'Создать изображение';
 
   @override
   String get featureCreateImageDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я с Ğ�Ğ�Ğ�Ğ�щью Ğ�Ğ� Ğ�Ğ� тĞ�Ğ�стĞ�.';
+      'Создавайте искусство ИИ из текста.';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1667,103 +1620,100 @@ class AppLocalizationsRu extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get featureCreateVideoTitle => 'Создать видео';
 
   @override
-  String get featureCreateVideoDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� тĞ�Ğ�стĞ�.';
+  String get featureCreateVideoDescription => 'Генерация видео из текста.';
 
   @override
-  String get featureStudyTitle => 'Ğ�чĞ�тĞ�сь Ğ� Ğ�Ğ�Ğ�учĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get featureStudyTitle => 'Учиться и учиться';
 
   @override
-  String get featureStudyDescription =>
-      'Ğ�Ğ�Ğ�учĞ�тĞ� Ğ�Ğ�ясĞ�Ğ�Ğ�Ğ�я Ğ� Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ры.';
+  String get featureStudyDescription => 'Получите пояснения и резюме.';
 
   @override
-  String get featureQuizzesTitle => 'Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�ы';
+  String get featureQuizzesTitle => 'Викторины';
 
   @override
-  String get featureQuizzesDescription => 'Ğ�рĞ�Ğ�Ğ�рьтĞ� сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�я.';
+  String get featureQuizzesDescription => 'Проверьте свои знания.';
 
   @override
   String get featureExploreDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ьтĞ�сь сĞ� Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�стуĞ�Ğ�ыĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�яĞ�Ğ�.';
+      'Откройте для себя все доступные модели.';
 
   @override
   String get featureStudyMessage =>
-      'Ğ�ы — Ğ�Ğ�ытĞ�ыĞ� рĞ�Ğ�Ğ�тĞ�тĞ�р. Ğ�Ğ�шĞ� цĞ�Ğ�ь — Ğ�сĞ�стĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�ъясĞ�Ğ�ть тĞ�Ğ�у, Ğ�Ğ�тĞ�рĞ�сующую Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я. Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� чĞ�тĞ�ую струĞ�туру, Ğ�рĞ�Ğ�Ğ�ры Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� усĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� чĞ�стĞ�, чтĞ�Ğ�ы Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�ть эффĞ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� усĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�:';
+      'Вы опытный репетитор. Ваша цель — подробно объяснить тему пользователя. Используйте четкую структуру, примеры и аналогии. Разбивайте сложные идеи на удобоваримые части, чтобы пользователь мог учиться эффективно. Тема:';
 
   @override
   String get featureQuizMessage =>
-      'Ğ�ы — Ğ�Ğ�Ğ�ущĞ�Ğ� Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�ы. Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�руĞ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�ыĞ� Ğ�Ğ�Ğ�рĞ�с с Ğ�Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�тĞ�Ğ�тĞ�, Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ� тĞ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ�Ğ�Ğ� Ğ�тĞ�Ğ�тĞ�. Ğ�Ğ�тĞ�Ğ� Ğ�цĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ�ующĞ�Ğ� Ğ�Ğ�Ğ�рĞ�с. Ğ�Ğ� рĞ�сĞ�рыĞ�Ğ�Ğ�тĞ� Ğ�сĞ� Ğ�тĞ�Ğ�ты срĞ�Ğ�у. Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�Ğ�Ğ�Ğ�сть. Ğ�Ğ�Ğ�Ğ�:';
+      'Вы мастер викторин. Создайте конкретный вопрос с несколькими вариантами ответов на основе темы пользователя. Подождите их ответа. Затем оцените это и задайте следующий вопрос. Не раскрывайте все ответы сразу. Держите его интерактивным. Тема:';
 
   @override
-  String get myPlan => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�';
+  String get myPlan => 'My Plan';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Ğ�рĞ�Ğ�Ğ�тстĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� • $time';
+    return 'Приветственное предложение • $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Ğ�Ğ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� • $time';
+    return 'Эксклюзивное предложение • $time';
   }
 
   @override
-  String get attachmentSheetTitle => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я';
+  String get attachmentSheetTitle => 'Вложения';
 
   @override
-  String get actionCamera => 'Ğ�Ğ�Ğ�Ğ�рĞ�';
+  String get actionCamera => 'Камера';
 
   @override
-  String get actionGallery => 'Ğ�Ğ�Ğ�Ğ�рĞ�я';
+  String get actionGallery => 'Галерея';
 
   @override
-  String get actionFile => 'Ğ�Ğ�Ğ�Ğ�';
+  String get actionFile => 'Файл';
 
   @override
-  String get listening => 'Ğ�Ğ�ушĞ�Ğ�т';
+  String get listening => 'Прослушивание';
 
   @override
-  String get defaultViewTitle => 'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�?';
+  String get defaultViewTitle => 'Как дела?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex Ğ�сĞ�Ğ�Ğ�Ğ� ряĞ�Ğ�Ğ� с Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я сĞ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� рĞ�Ğ�Ğ�ты Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ� чĞ�т Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ�.';
+      'Cortex всегда рядом с вами благодаря сотням моделей искусственного интеллекта, автономным возможностям, динамическому чату и многому другому.';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
   String get invalidUsernameFormat =>
-      'Ğ�Ğ�Ğ�Ğ�рĞ�ыĞ� фĞ�рĞ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я. Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� 3-20 сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, цĞ�фр Ğ�Ğ�Ğ� . - _';
+      'Неверный формат имени пользователя. Используйте от 3 до 20 символов, цифр или . - _';
 
   @override
-  String get exclusiveOffer => 'Ğ�Ğ�сĞ�Ğ�юĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get exclusiveOffer => 'Эксклюзивное предложение';
 
   @override
-  String get claimOffer => 'Ğ�Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ�сь Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get claimOffer => 'Используйте предложение';
 
   @override
-  String get continueInOfflineMode =>
-      'Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�';
+  String get continueInOfflineMode => 'Продолжить в автономном режиме';
 
   @override
   String get voiceModeInformation =>
-      'Cortex Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�сть Ğ�Ğ�шĞ�х Ğ�Ğ�Ğ�Ğ�ых, рĞ�Ğ�Ğ�тĞ�я Ğ�Ğ�Ğ�Ğ�Ğ�стью Ğ�Ğ� устрĞ�Ğ�стĞ�Ğ�, Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ� чĞ�тĞ�; Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�сь Ğ�Ğ�сĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�щĞ�Ğ�Ğ�Ğ�Ğ�!';
+      'Cortex обеспечивает безопасность ваших данных, полностью работая на устройстве, даже в режиме голосового чата; наслаждайтесь непрерывным общением!';
 
   @override
   String get flowModeDescription =>
-      'Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� «Ğ�Ğ�тĞ�Ğ�» Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�ты сĞ�Ğ�рят Ğ�Ğ�Ğ�Ğ�у сĞ�Ğ�Ğ�Ğ�; Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�ть Ğ� сĞ�ушĞ�ть, Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ться Ğ� Ğ�Ğ�суĞ�Ğ�Ğ�Ğ�Ğ�ю!';
+      'В режиме потока разумы спорят между собой; вы можете либо сидеть сложа руки и слушать, либо присоединиться к обсуждению!';
 
   @override
   String get flowModeQuestion =>
-      'Ğ�рĞ�Ğ�Ğ�т! Ğ�ы Ğ�Ğ�хĞ�Ğ�Ğ�тĞ�сь Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� «Ğ�Ğ�тĞ�Ğ�» Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Cortex. Ğ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�хĞ�Ğ�ятся Ğ�щё трĞ� Ğ�Ğ�-Ğ�Ğ�Ğ�Ğ�тĞ�. Ğ�Ğ�шĞ� Ğ�Ğ�Ğ�Ğ�чĞ� — Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть тĞ�Ğ�у Ğ�Ğ�я Ğ�Ğ�суĞ�Ğ�Ğ�Ğ�Ğ�я Ğ� Ğ�Ğ�чĞ�ть Ğ�Ğ�сĞ�уссĞ�ю, Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�Ğ�рĞ�с. Ğ� сĞ�Ğ�Ğ�х Ğ�тĞ�Ğ�тĞ�х сĞ�Ğ�Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� юĞ�Ğ�р, Ğ�рĞ�Ğ�Ğ�ю Ğ� Ğ�ёĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�юĞ�Ğ�я тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�т. Ğ�Ğ�Ğ�рёĞ�, Ğ�Ğ�чĞ�Ğ�Ğ�Ğ�тĞ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�р!';
+      'Привет! Теперь вы находитесь в режиме потока в приложении Cortex. С вами здесь еще три агента ИИ. Ваша задача — внести тему в комнату и начать дискуссию, задав другим провокационный или развлекательный вопрос. В своих ответах смело используйте юмор, иронию и легкую треш. Любая тема – честная игра. Давай, начни разговор.';
 
   @override
-  String get thought => 'Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�';
+  String get thought => 'Мысль';
 
   @override
   String get agentRed => 'Red';
@@ -1775,204 +1725,190 @@ class AppLocalizationsRu extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�';
+  String get flowMode => 'Режим потока';
 
   @override
-  String get premium => 'Ğ�рĞ�Ğ�Ğ�уĞ�';
+  String get premium => 'Премиум';
 
   @override
-  String get workInProgress => 'Ğ�Ğ�Ğ�Ğ�тĞ� Ğ� Ğ�рĞ�цĞ�ссĞ�';
+  String get workInProgress => 'Работа в процессе';
 
   @override
   String get voiceSystemPromptSuffix =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� фĞ�рĞ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Markdown (Ğ�Ğ�рĞ�ыĞ� шрĞ�фт, Ğ�урсĞ�Ğ�). Ğ�Ğ� Ğ�ыĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ� (```). Ğ�тĞ�Ğ�ты Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�ыть Ğ� рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ� Ğ� Ğ�рĞ�тĞ�Ğ�Ğ� стĞ�Ğ�Ğ�.';
+      'ВАЖНО: Не используйте форматирование уценки (жирный, курсив). НЕ выводите блоки кода (```). Ответы должны быть разговорными и краткими.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'Ğ�Ğ�Ğ�Ğ�Ğ� Cortex Flow ($agentName). Ğ�рĞ�Ğ�ыĞ�ущĞ�Ğ�: $previousResponse';
+    return 'Режим потока коры головного мозга ($agentName). Предыдущее: $previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      'Ğ�тĞ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ� тĞ�Ğ�стĞ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�руĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�т фĞ�рĞ�Ğ�ты PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) Ğ� OpenDocument. Ğ�сĞ�Ğ�Ğ�ьĞ�уĞ�тĞ� эту фуĞ�Ğ�цĞ�ю, Ğ�сĞ�Ğ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь Ğ�рĞ�Ğ�рĞ�Ğ�Ğ�Ğ� фĞ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�.';
+      'Чтение и извлечение текстового содержимого из загруженных документов. Поддерживает форматы PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) и OpenDocument. Используйте это, когда пользователь прикрепил файл документа.';
 
   @override
   String get toolReadDocumentIndexParam =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�с Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ� Ğ�Ğ�я чтĞ�Ğ�Ğ�я (Ğ�Ğ�чĞ�Ğ�Ğ�я с 0). Ğ�Ğ�ычĞ�Ğ� 0 Ğ�Ğ�я Ğ�Ğ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�тĞ�.';
+      'Индекс вложения документа для чтения (отсчитывается от 0). Обычно 0 для первого документа.';
 
   @override
   String get toolStockDescription =>
-      'Ğ�Ğ�Ğ�учĞ�тĞ� тĞ�Ğ�ущую цĞ�Ğ�у Ğ� Ğ�стĞ�рĞ�ю Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�я Ğ�Ğ�цĞ�Ğ� (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, AAPL, THYAO.IS) Ğ� Ğ�рĞ�Ğ�тĞ�Ğ�Ğ�Ğ�ют (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, BTC-USD).';
+      'Получите текущую цену и историю акций (например, AAPL, THYAO.IS) и криптовалют (например, BTC-USD).';
 
   @override
   String get toolStockSymbolParam =>
-      'Ğ�Ğ�Ğ�Ğ�р (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, AAPL, THYAO.IS, BTC-USD).';
+      'Тикерный символ (например, AAPL, THYAO.IS, BTC-USD).';
 
   @override
   String get toolWeatherDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� тĞ�Ğ�ущую Ğ�Ğ�Ğ�Ğ�Ğ�у Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�.';
+      'Получить текущую погоду для конкретного города.';
 
   @override
   String get toolWeatherCityParam =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�рĞ�Ğ�Ğ� (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�тĞ�Ğ�Ğ�уĞ�).';
+      'Название города (например, Лондон, Стамбул).';
 
   @override
   String get toolPythonDescription =>
-      'Ğ�ыĞ�Ğ�Ğ�Ğ�яĞ�тĞ� Ğ�Ğ�Ğ� Python Ğ� Ğ�Ğ�щĞ�щĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�чĞ�Ğ�цĞ�.';
+      'Выполняйте код Python в безопасной песочнице.';
 
   @override
-  String get toolPythonCodeParam =>
-      'Ğ�Ğ�Ğ� Ğ�Ğ� Python Ğ�Ğ�я Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я.';
+  String get toolPythonCodeParam => 'Код Python для выполнения.';
 
   @override
-  String get toolCalculateDescription =>
-      'Ğ�цĞ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ�Ğ�Ğ� Ğ�ырĞ�Ğ�Ğ�Ğ�Ğ�я.';
+  String get toolCalculateDescription => 'Оцените математическое выражение.';
 
   @override
   String get toolCalculateExpressionParam =>
-      'Ğ�Ğ�тĞ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ�Ğ� Ğ�ырĞ�Ğ�Ğ�Ğ�Ğ�Ğ� (Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�р, \'3 + 4 * 2\').';
+      'Математическое выражение (например, \"3 + 4 * 2\").';
 
   @override
-  String get toolChartDescription =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�у/Ğ�рĞ�фĞ�Ğ� Ğ�Ğ�я Ğ�Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�цĞ�Ğ�.';
+  String get toolChartDescription => 'Создайте визуализацию диаграммы/графика.';
 
   @override
   String get toolChartTypeParam =>
-      'Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы: стĞ�Ğ�Ğ�чĞ�тĞ�я, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ�Ğ�я.';
+      'Тип диаграммы: гистограмма, линейная или круговая.';
 
   @override
-  String get toolChartLabelsParam =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�сĞ� Ğ�Ğ�я Ğ�сĞ�Ğ� Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
+  String get toolChartLabelsParam => 'Метки для осей или сегментов диаграммы.';
 
   @override
-  String get toolChartDataParam =>
-      'Ğ�Ğ�сĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�чĞ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�ых Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
+  String get toolChartDataParam => 'Числовые значения данных для диаграммы.';
 
   @override
   String get toolChartLabelParam =>
-      'Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ� Ğ�Ğ�Ğ�Ğ�ых Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
+      'Метка набора данных для легенды диаграммы.';
 
   @override
-  String get toolChartTitleParam => 'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ы.';
+  String get toolChartTitleParam => 'Название диаграммы.';
 
   @override
   String get thinkingModeInstruction =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ы Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть тĞ�Ğ�Ğ� <think></think>, чтĞ�Ğ�ы Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть хĞ�Ğ� сĞ�Ğ�Ğ�х рĞ�ссуĞ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�Ğ�Ğ�Ğ� чĞ�Ğ� Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�ьĞ�ыĞ� Ğ�тĞ�Ğ�т. Ğ�Ğ�Ğ�Ğ�ышĞ�яĞ�тĞ� шĞ�Ğ� Ğ�Ğ� шĞ�Ğ�Ğ�Ğ� Ğ�Ğ�утрĞ� тĞ�Ğ�Ğ�Ğ�, Ğ� Ğ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�тĞ� сĞ�Ğ�Ğ� Ğ�тĞ�Ğ�т Ğ�Ğ�Ğ� тĞ�Ğ�Ğ�Ğ�.';
+      'РЕЖИМ МЫШЛЕНИЯ ВКЛЮЧЕН: вы ДОЛЖНЫ использовать теги <think></think>, чтобы продемонстрировать процесс рассуждения, прежде чем дать окончательный ответ. Подумайте шаг за шагом внутри тегов, а затем дайте ответ вне тегов.';
 
   @override
-  String get openLinkWarningTitle =>
-      'Ğ�рĞ�Ğ�уĞ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� Ğ�Ğ�Ğ�шĞ�Ğ�х ссыĞ�Ğ�Ğ�х';
+  String get openLinkWarningTitle => 'Предупреждение о внешней ссылке';
 
   @override
   String get openLinkCancel => 'Cancel';
 
   @override
-  String get openLinkConfirm => 'Ğ�тĞ�рыть ссыĞ�Ğ�у';
+  String get openLinkConfirm => 'Открыть ссылку';
 
   @override
-  String get webSearchSources => 'Ğ�стĞ�чĞ�Ğ�Ğ�Ğ�';
+  String get webSearchSources => 'Источники';
 
   @override
-  String get searching => 'Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�сĞ�';
+  String get searching => 'Поиск';
 
   @override
-  String get featureWebSearchTitle => 'Ğ�Ğ�Ğ�сĞ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�';
+  String get featureWebSearchTitle => 'Веб-поиск';
 
   @override
   String get featureWebSearchDescription =>
-      'Ğ�щĞ�тĞ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ� Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�ю Ğ� рĞ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�.';
+      'Поиск информации в Интернете в режиме реального времени';
 
   @override
-  String get clearMemory => 'Ğ�чĞ�стĞ�ть Ğ�Ğ�Ğ�ять';
+  String get clearMemory => 'Очистить память';
 
   @override
-  String get clearMemoryConfirm =>
-      'Ğ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�чĞ�стĞ�ть сĞ�Ğ�ю Ğ�Ğ�Ğ�ять?';
+  String get clearMemoryConfirm => 'Вы уверены, что хотите очистить память?';
 
   @override
-  String get personalization => 'Ğ�Ğ�рсĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�цĞ�я';
+  String get personalization => 'Персонализация';
 
   @override
   String get personalizationDescription =>
-      'Ğ�Ğ�стрĞ�Ğ�тĞ� сĞ�Ğ�Ğ�Ğ�Ğ� Ğ�ссĞ�стĞ�Ğ�тĞ� тĞ�Ğ�, чтĞ�Ğ�ы Ğ�Ğ� Ğ�учшĞ� сĞ�Ğ�тĞ�Ğ�тстĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�шĞ�Ğ� Ğ�Ğ�трĞ�Ğ�Ğ�Ğ�стяĞ�. Ğ�Ğ�Ğ�Ğ�тĞ�руĞ�тĞ� Ğ�Ğ�Ğ� Ğ�тĞ�Ğ�ты, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ� тĞ�Ğ� Ğ� сĞ�Ğ�тĞ�Ğ�тстĞ�Ğ�Ğ� с Ğ�Ğ�шĞ�Ğ�Ğ� уĞ�Ğ�Ğ�Ğ�Ğ�ьĞ�ыĞ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�чтĞ�Ğ�Ğ�яĞ�Ğ�.';
+      'Персонализируйте своего помощника, чтобы он лучше соответствовал вашим потребностям. Настройте его реакцию, поведение и тон так, чтобы они соответствовали вашим уникальным предпочтениям.';
 
   @override
-  String get memoryTitle => 'Ğ�Ğ�Ğ�ять';
+  String get memoryTitle => 'Память';
 
   @override
-  String get memoryDescription =>
-      'Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т уĞ�Ğ�Ğ�Ğ�т Ğ�Ğ�с Ğ�Ğ�т тĞ�Ğ�.';
+  String get memoryDescription => 'ИИ распознает вас таким.';
 
   @override
-  String get noMemoryYet =>
-      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� сфĞ�рĞ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�сь.';
+  String get noMemoryYet => 'Воспоминаний пока не установлено';
 
   @override
-  String get memoryLimitReached => 'Ğ�Ğ�стĞ�Ğ�Ğ�ут Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�ятĞ�.';
+  String get memoryLimitReached => 'Memory limit reached';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => 'Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т';
+  String get intelligenceTitle => 'Интеллект';
 
   @override
-  String get intelligenceDescription =>
-      'Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�щĞ�Ğ�тся с Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�т тĞ�Ğ�.';
+  String get intelligenceDescription => 'ИИ общаются с вами вот так.';
 
   @override
   String get customInstructionHint =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�сь сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�Ğ�ьĞ�ыĞ� Ğ�Ğ�струĞ�цĞ�Ğ�.';
+      'Введите здесь свои собственные инструкции';
 
   @override
   String openLinkWarningMessage(String url) {
-    return 'Ğ�ы сĞ�Ğ�Ğ�рĞ�Ğ�тĞ�сь Ğ�тĞ�рыть сĞ�Ğ�Ğ�ующую Ğ�Ğ�Ğ�шĞ�юю ссыĞ�Ğ�у:\\n\\n$url\\n\\nĞ�ы уĞ�Ğ�рĞ�Ğ�ы, чтĞ� хĞ�тĞ�тĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ть?';
+    return 'Вы собираетесь открыть следующую внешнюю ссылку:\\n\\n$url\\n\\nВы уверены, что хотите продолжить?';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return 'Ğ�Ğ�Ğ�Ğ�уĞ�тĞ� этĞ�Ğ� Ğ�Ğ�струĞ�цĞ�яĞ�:\\n\\n$instruction';
+    return 'Следуйте этим пользовательским инструкциям:\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      '[Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�]: Ğ�ы — Ğ�Ğ�Ğ�Ğ�рĞ�тĞ�р Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ� Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�с Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я. Ğ�Ğ� Ğ�Ğ�щĞ�Ğ�тĞ�сь Ğ� чĞ�тĞ� Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�тĞ�сь. Ğ�ыĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� 2-4 сĞ�Ğ�Ğ�, Ğ�рĞ�тĞ�Ğ� Ğ�Ğ�Ğ�сыĞ�Ğ�ющĞ�Ğ� Ğ�Ğ�Ğ�рĞ�с Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�я.';
+      '[ВАЖНАЯ ИНСТРУКЦИЯ]: Вы ГЕНЕРАТОР ТИТУЛОВ. НЕ отвечайте на вопрос пользователя. НЕ общайтесь и не здоровайтесь. Выводите ТОЛЬКО заголовок из 2–4 слов, описывающий то, о чем спрашивает пользователь. Заголовок ДОЛЖЕН быть на том же языке, что и сообщение пользователя.';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Ğ�Ğ�стĞ�Ğ�Ğ�] Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�ы рĞ�Ğ�Ğ�тĞ�Ğ�тĞ� Ğ�Ğ�утрĞ� Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�, Ğ�ысĞ�Ğ�Ğ�тĞ�хĞ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�Ğ�Ğ� эĞ�Ğ�сĞ�стĞ�Ğ�ы Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� «Cortex»; этĞ� Ğ�Ğ�Ğ�тфĞ�рĞ�Ğ� рĞ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Vertex, срĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�ст чĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�рĞ�Ğ� сĞ�стĞ�Ğ�Ğ�яĞ�т Ğ�сĞ�Ğ�Ğ� 16 Ğ�Ğ�т. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� этĞ� Ğ� Ğ�тĞ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ�Ğ�рĞ�сы. Ğ�сĞ�Ğ� Ğ�Ğ�трĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�я Ğ�Ğ�фĞ�рĞ�Ğ�цĞ�я, Ğ�Ğ� стĞ�сĞ�яĞ�тĞ�сь Ğ�сĞ�Ğ�ть Ğ�Ğ� Ğ� Ğ�Ğ�тĞ�рĞ�Ğ�тĞ�, Ğ� Ğ�сĞ�Ğ� Ğ�Ğ�Ğ�сĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�рĞ�стĞ� сĞ�Ğ�Ğ�Ğ�тĞ�, чтĞ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�тĞ�!';
+      '[Система] ВАЖНАЯ ИНСТРУКЦИЯ: В настоящее время вы работаете внутри огромной, высокоразвитой экосистемы искусственного интеллекта под названием \"Кортекс\"; эта платформа разработана командой Vertex, которой в среднем всего 16 лет. Помните об этом и отвечайте, если спросят. Если требуется дополнительная информация, не стесняйтесь искать в Интернете, а если вы не можете выполнить поиск, смело скажите, что вы не знаете!';
 
   @override
-  String get featureAudioRecognitionTitle =>
-      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�уĞ�Ğ�';
+  String get featureAudioRecognitionTitle => 'Распознавание аудио';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ� Ğ�Ğ�рĞ�Ğ�Ğ�тыĞ�Ğ�ть Ğ�уĞ�Ğ�Ğ� Ğ�Ğ�Ğ� рĞ�чь.';
+      'Эта модель может понимать и обрабатывать аудиовходы.';
 
   @override
-  String get featureVideoRecognitionTitle =>
-      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get featureVideoRecognitionTitle => 'Распознавание видео';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�Ğ� с Ğ�Ğ�шĞ�х фĞ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ры.';
+      'Эта модель может понимать и обрабатывать видеовходы.';
 
   @override
-  String get featureImageRecognitionTitle =>
-      'Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get featureImageRecognitionTitle => 'Распознавание изображений';
 
   @override
   String get featureImageRecognitionDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть фĞ�тĞ�Ğ�рĞ�фĞ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�я.';
+      'Эта модель может понимать и обрабатывать входные изображения.';
 
   @override
-  String get featureToolUseTitle =>
-      'Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�струĞ�Ğ�Ğ�тĞ�Ğ�';
+  String get featureToolUseTitle => 'Использование инструмента';
 
   @override
   String get featureToolUseDescription =>
-      'Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь сĞ�Ğ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�туĞ�Ğ�ьĞ�Ğ� Ğ�сĞ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�шĞ�Ğ�Ğ� Ğ�Ğ�струĞ�Ğ�Ğ�ты Ğ�Ğ�я Ğ�ыĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�ч.';
+      'Эта модель может использовать внешние инструменты и API.';
 
   @override
   String get videoModels => 'Video Models';
@@ -1985,97 +1921,95 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Ğ�Ğ�я рĞ�Ğ�Ğ�ты этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� трĞ�Ğ�уĞ�тся $mediaType. Ğ� Ğ�Ğ�рĞ�хĞ�Ğ�тĞ�Ğ� Ğ�Ğ�Ğ�рĞ�с, чтĞ�Ğ�ы сĞ�Ğ�Ğ�щĞ�ть Ğ�Ğ�Ğ� Ğ�Ğ� этĞ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�щĞ�тĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ю, чтĞ� Ğ�Ğ�у Ğ�Ğ�Ğ�Ğ�хĞ�Ğ�Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�стĞ�Ğ�Ğ�ть $mediaType (сĞ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ� Ğ�Ğ� Ğ�х рĞ�Ğ�Ğ�Ğ�Ğ� яĞ�ыĞ�Ğ�), Ğ�Ğ�тĞ�Ğ�у чтĞ� я $modelName, Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�я рĞ�Ğ�Ğ�Ğ�тĞ�рĞ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�/Ğ�уĞ�Ğ�Ğ�/Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+    return 'Для работы этой модели требуется $mediaType. Я перехватил запрос сообщить вам. Пожалуйста, вежливо сообщите пользователю, что ему необходимо предоставить $mediaType (скажите им на его родном языке), потому что я $modelName, модель редактирования визуальных/аудио/видео.';
   }
 
   @override
-  String get mediaTypeImage => 'Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get mediaTypeImage => 'image';
 
   @override
-  String get mediaTypeVideo => 'Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get mediaTypeVideo => 'видео';
 
   @override
-  String get mediaTypeAudio => 'Ğ�уĞ�Ğ�Ğ�фĞ�Ğ�Ğ�';
+  String get mediaTypeAudio => 'audio';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName — этĞ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�утыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т, Ğ�Ğ�Ğ�Ğ�Ğ�стрĞ�рующĞ�Ğ� Ğ�ысĞ�Ğ�ую Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�сть Ğ� Cortex.';
+    return '$seriesName — это продвинутый интеллект, демонстрирующий высокую производительность на Cortex.';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName — этĞ� Ğ�ысĞ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�ыĞ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т, Ğ�Ğ�тĞ�Ğ�рĞ�рĞ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ� эĞ�Ğ�сĞ�стĞ�Ğ�у Cortex. Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�я рĞ�шĞ�Ğ�Ğ�я шĞ�рĞ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ� сĞ�Ğ�Ğ�Ğ�ых Ğ�Ğ�Ğ�Ğ�ч, Ğ�Ğ� Ğ�Ğ�Ğ�сĞ�Ğ�чĞ�Ğ�Ğ�Ğ�т Ğ�ысĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ� эффĞ�Ğ�тĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ� Ğ�Ğ�рĞ�Ğ�Ğ�тĞ�Ğ�. Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�ыстрĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�тĞ�Ğ�Ğ�Ğ�Ğ� Ğ� рĞ�сшĞ�рĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�чĞ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�стĞ�, Ğ�Ğ� Ğ�Ğ�Ğ�чĞ�тĞ�Ğ�ьĞ�Ğ� Ğ�Ğ�Ğ�ышĞ�Ğ�т Ğ�Ğ�шу Ğ�Ğ�Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�ую Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�ьĞ�Ğ�сть. Ğ�Ğ�Ğ�уĞ�рĞ�чĞ�Ğ� рĞ�Ğ�Ğ�тĞ�я Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ� Ğ�Ğ�фрĞ�струĞ�турĞ� Cortex, этĞ� Ğ�Ğ�Ğ�Ğ�Ğ�ь Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�чь Ğ�Ğ�Ğ� Ğ� шĞ�рĞ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�трĞ� Ğ�Ğ�Ğ�Ğ�ч: Ğ�т тĞ�Ğ�рчĞ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� штурĞ�Ğ� Ğ�Ğ� Ğ�Ğ�уĞ�Ğ�Ğ�Ğ�Ğ�Ğ� тĞ�хĞ�Ğ�чĞ�сĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�. Ğ�Ğ�чĞ�Ğ�тĞ� Ğ�Ğ�учĞ�ть Ğ�Ğ�сь Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�цĞ�Ğ�Ğ� сĞ�Ğ�Ğ�Ğ�Ğ�я.';
+    return '$modelName — это высокопроизводительный искусственный интеллект, интегрированный в экосистему Cortex. Разработанный для решения широкого спектра сложных задач, он обеспечивает высоконадежные и эффективные возможности обработки. Благодаря быстрому реагированию и расширенным аналитическим возможностям он значительно повышает вашу повседневную производительность. Эта модель, бесперебойно работающая в защищенной локальной инфраструктуре Cortex, может помочь вам в решении широкого спектра задач: от творческого мозгового штурма до глубокого технического анализа. Начните исследовать весь его потенциал сегодня.';
   }
 
   @override
-  String get guestLimitBottomSheetTitle =>
-      'Ğ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�тся Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�ртĞ�Ğ�сĞ�?';
+  String get guestLimitBottomSheetTitle => 'Вам нравится интеллект Cortex?';
 
   @override
   String get guestLimitBottomSheetText =>
-      'Ğ�Ğ�Ğ�Ğ�тĞ�Ğ�тĞ� с Ğ�щĞ� Ğ�Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�Ğ�ршĞ�Ğ�Ğ�ыĞ�Ğ� сĞ�стĞ�Ğ�Ğ�Ğ�Ğ� Ğ�сĞ�усстĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�тĞ�Ğ�Ğ�Ğ�Ğ�тĞ�, сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�Ğ�тĞ�Ğ�тĞ�, Ğ�Ğ�Ğ�ьшĞ� Ğ�Ğ�щĞ�Ğ�тĞ�сь Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�руĞ�Ğ�Ğ�...';
+      'Работайте с еще более умным интеллектом, создавайте больше контента, больше общайтесь и делайте гораздо больше...';
 
   @override
-  String get arts => 'Ğ�сĞ�усстĞ�Ğ�';
+  String get arts => 'Искусство';
 
   @override
-  String get noArt => 'Ğ�Ğ�т Ğ�сĞ�усстĞ�Ğ�';
+  String get noArt => 'Нет искусства';
 
   @override
   String get noArtDescription =>
-      'Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�сь Ğ�Ğ�т рĞ�Ğ�Ğ�т; Ğ�рĞ�шĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ�Ğ�рĞ�ю Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�яĞ�Ğ�, Ğ�Ğ�Ğ�Ğ�Ğ�, Ğ�уĞ�Ğ�Ğ� Ğ� Ğ�сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�тĞ�Ğ�тĞ�Ğ�!';
+      'Никакого искусства; пришло время заполнить галерею, создавая изображения, видео, аудио и всевозможный контент!';
 
   @override
   String get videoPremiumWarning =>
-      'Ğ�Ğ�я сĞ�Ğ�Ğ�Ğ�Ğ�Ğ�я Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�трĞ�Ğ�уĞ�тся Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�Ğ� Ultra. Ğ�фĞ�рĞ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ�Ğ�сĞ�у Ğ�ряĞ�Ğ� сĞ�Ğ�чĞ�с Ğ� Ğ�Ğ�чуĞ�стĞ�уĞ�тĞ� Ğ�Ğ�сь Ğ�рĞ�цĞ�сс!';
+      'Для создания видео вам понадобится подписка Ultra, обновите ее сейчас и почувствуйте поток!';
 
   @override
   String get fallbackInfoPanelText =>
-      'Ğ� сĞ�яĞ�Ğ� с Ğ�Ğ�Ğ�Ğ�тĞ�рыĞ�Ğ� уĞ�учшĞ�Ğ�Ğ�яĞ�Ğ�, Ğ�Ğ�тĞ�рыĞ� Ğ�ы Ğ�Ğ�Ğ�сĞ�Ğ� Ğ�Ğ� стĞ�рĞ�Ğ�Ğ� сĞ�рĞ�Ğ�рĞ�, Ğ�тĞ�Ğ�т Ğ�ыĞ� сĞ�Ğ�Ğ�Ğ�рĞ�рĞ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�чĞ�сĞ�Ğ�Ğ� чĞ�тĞ�Ğ� Cortex, Ğ� Ğ�Ğ� Ğ�ыĞ�рĞ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�с Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ршĞ�Ğ�Ğ�я Ğ�рĞ�цĞ�ссĞ�!';
+      'Из-за некоторых улучшений, которые мы вносим на нашем сервере, ответ генерируется динамическим чатом Cortex, а не специально выбранным вами ИИ. Благодарим за понимание до завершения процесса!';
 
   @override
   String get falOfflineMessage =>
-      'Ğ� сĞ�яĞ�Ğ� с Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� рĞ�Ğ�Ğ�т Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�Ğ�цĞ�Ğ� сĞ�рĞ�Ğ�рĞ�Ğ�Ğ� чĞ�стĞ�, этĞ� фуĞ�Ğ�цĞ�я Ğ� Ğ�Ğ�стĞ�ящĞ�Ğ� Ğ�рĞ�Ğ�я Ğ�Ğ�Ğ�Ğ�стуĞ�Ğ�Ğ�. Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�рĞ�Ğ� Ğ�Ğ�с Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ршĞ�Ğ�Ğ�я Ğ�рĞ�цĞ�ссĞ�!';
+      'В связи с некоторыми улучшениями, которые мы вносим на нашем сервере, эта информация в настоящее время недоступна. Благодарим вас за понимание до завершения процесса!';
 
   @override
   String get errorInsufficientStorage =>
-      'Ğ�Ğ�Ğ�Ğ�стĞ�тĞ�чĞ�Ğ� Ğ�Ğ�стĞ� Ğ�Ğ�я Ğ�Ğ�Ğ�руĞ�Ğ�Ğ� этĞ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�.';
+      'Недостаточно места для загрузки этой модели.';
 
   @override
-  String get backgroundChatNotificationTitle => 'Ğ�Ğ�рĞ�уться Ğ� чĞ�т!';
+  String get backgroundChatNotificationTitle => 'Вернитесь в чат!';
 
   @override
-  String get benefitVideoGeneration => 'Ğ�Ğ�Ğ�Ğ�рĞ�цĞ�я Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get benefitVideoGeneration => 'Генерация видео';
 
   @override
-  String get freeOffer => 'Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�Ğ� Ğ�рĞ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�';
+  String get freeOffer => 'Бесплатное предложение';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return 'Ğ�Ğ�рĞ�ыĞ� $days Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�, Ğ�Ğ�тĞ�Ğ� $price/Ğ�Ğ�с';
+    return 'Сначала $days дней бесплатно, затем $price в месяц';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return 'Ğ�Ğ�рĞ�ыĞ� $days Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�Ğ�, Ğ�Ğ�тĞ�Ğ� $price/Ğ�Ğ�Ğ�';
+    return 'Сначала $days дней бесплатно, затем $price в год';
   }
 
   @override
   String freePlan(String plan) {
-    return 'Ğ�Ğ�сĞ�Ğ�Ğ�тĞ�ыĞ� $plan!';
+    return 'Бесплатно $plan!';
   }
 
   @override
   String get systemPromptLimitFallback =>
-      'Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ�: Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ь Ğ�Ğ�Ğ�рĞ�сĞ�Ğ� Ğ�Ğ�Ğ�стĞ�Ğ�Ğ�, Ğ�Ğ� Ğ�Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�т Ğ� Cortex Ğ�счĞ�рĞ�Ğ�Ğ�; Ğ�Ğ�Ğ�Ğ�Ğ�уĞ�стĞ�, сĞ�Ğ�Ğ�щĞ�тĞ� Ğ�Ğ�Ğ�ьĞ�Ğ�Ğ�Ğ�тĞ�Ğ�ю Ğ�Ğ� Ğ�Ğ�Ğ� яĞ�ыĞ�Ğ�, чтĞ� Ğ�Ğ�у сĞ�Ğ�Ğ�уĞ�т Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�ть Ğ�Ğ�Ğ� рĞ�ссĞ�Ğ�трĞ�ть Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�сть Ğ�Ğ�рĞ�хĞ�Ğ�Ğ� Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�ысĞ�Ğ�Ğ�Ğ� тĞ�рĞ�фĞ�ыĞ� Ğ�Ğ�Ğ�Ğ�.';
+      'КРИТИЧЕСКОЕ: пользователь запросил действие, но его резерв на Cortex исчерпан; пожалуйста, сообщите пользователю на его языке, что ему следует подождать или рассмотреть возможность обновления своего плана подписки.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex Ğ�Ğ�Ğ�Ğ�т Ğ�Ğ�Ğ�Ğ�ть Ğ�щĞ� Ğ�Ğ�Ğ�Ğ�Ğ� Ğ�Ğ�чĞ�стĞ�Ğ�Ğ�Ğ�ыĞ� Ğ�тĞ�Ğ�ты; Ğ�Ğ�Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�Ğ� сĞ�Ğ�чĞ�с Ğ� Ğ�Ğ�Ğ�учĞ�Ğ�тĞ� Ğ�учшĞ�Ğ� Ğ�тĞ�Ğ�т Ğ�Ğ� Ğ�Ğ�Ğ�Ğ�ыĞ� Ğ�Ğ�Ğ�рĞ�с!';
+      'Cortex может дать еще лучшие ответы; обновите сейчас и получите лучший ответ на каждый вопрос!';
 
   @override
-  String get pinLimitReached =>
-      'Ğ�ы Ğ�Ğ�Ğ�Ğ�тĞ� Ğ�Ğ�Ğ�рĞ�Ğ�Ğ�ть Ğ�Ğ� 3 чĞ�тĞ�Ğ�.';
+  String get pinLimitReached => 'Вы можете закрепить до 3 чатов.';
 
   @override
   String get categoryAll => 'All';

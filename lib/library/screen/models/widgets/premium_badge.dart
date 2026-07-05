@@ -9,7 +9,8 @@ class PremiumBadge extends StatefulWidget {
   State<PremiumBadge> createState() => _PremiumBadgeState();
 }
 
-class _PremiumBadgeState extends State<PremiumBadge> with SingleTickerProviderStateMixin {
+class _PremiumBadgeState extends State<PremiumBadge>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnim;
 
@@ -20,7 +21,7 @@ class _PremiumBadgeState extends State<PremiumBadge> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    
+
     _opacityAnim = Tween<double>(begin: 0.6, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
@@ -42,22 +43,22 @@ class _PremiumBadgeState extends State<PremiumBadge> with SingleTickerProviderSt
           child: Container(
             padding: EdgeInsets.all(widget.size * 0.15),
             decoration: BoxDecoration(
-              color: AppColors.background,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.premium.withValues(alpha: 0.6),
-                width: 1.0,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.premium.withValues(alpha: 0.4 * _opacityAnim.value),
-                  blurRadius: 8.0,
-                  spreadRadius: 0.5,
-                )
-              ]
-            ),
+                color: AppColors.background,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.premium.withValues(alpha: 0.6),
+                  width: 1.0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.premium
+                        .withValues(alpha: 0.4 * _opacityAnim.value),
+                    blurRadius: 8.0,
+                    spreadRadius: 0.5,
+                  )
+                ]),
             child: Icon(
-              Icons.workspace_premium_rounded, 
+              Icons.workspace_premium_rounded,
               color: AppColors.premium,
               size: widget.size * 0.6,
             ),

@@ -20,13 +20,13 @@ class Message {
   String get displayableText {
     return text
         .replaceAll(
-        RegExp(r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
-            caseSensitive: false),
-        '')
+            RegExp(r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
+                caseSensitive: false),
+            '')
         .replaceAll(
-        RegExp(r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*',
-            caseSensitive: false),
-        '');
+            RegExp(r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*',
+                caseSensitive: false),
+            '');
   }
 
   /// The boolean variable for controlling the message type
@@ -162,7 +162,7 @@ class Message {
   }) {
     // Reuse existing notifier if text hasn't changed to save resources.
     final newNotifier =
-    (text != null && text != this.text) ? ValueNotifier(text) : notifier;
+        (text != null && text != this.text) ? ValueNotifier(text) : notifier;
 
     if (text != null) {
       newNotifier.value = text;
@@ -185,7 +185,7 @@ class Message {
       isError: isError ?? this.isError,
       opacity: opacity ?? this.opacity,
       isAttachmentUploading:
-      isAttachmentUploading ?? this.isAttachmentUploading,
+          isAttachmentUploading ?? this.isAttachmentUploading,
       parsedSpans: parsedSpans ?? this.parsedSpans,
       notifier: newNotifier,
       isVisible: isVisible ?? this.isVisible,
@@ -283,8 +283,8 @@ class Message {
       'isAttachmentUploading': isAttachmentUploading ? 1 : 0,
       'isVisible': isVisible ? 1 : 0,
       'isWebSearchActive': isWebSearchActive ? 1 : 0,
-      'webSearchSources': webSearchSources != null ? jsonEncode(
-          webSearchSources) : null,
+      'webSearchSources':
+          webSearchSources != null ? jsonEncode(webSearchSources) : null,
       'isServerFallback': isServerFallback ? 1 : 0,
     };
   }

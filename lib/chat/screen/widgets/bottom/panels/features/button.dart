@@ -29,30 +29,28 @@ class FeaturesSheetButton extends StatelessWidget {
     this.isDisabled = false,
     this.isSelected = false,
   }) : assert(iconPath != null || iconData != null,
-  'Provide either iconPath or iconData');
+            'Provide either iconPath or iconData');
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth >= 600;
 
     // Dimensions (Reduced for more compact look as requested by user)
     final double horizontalMargin = isTablet ? 24.0 : 16.0;
-    final double verticalMargin = isTablet ? 5.0 : 5.0; // breathing room between items
+    final double verticalMargin =
+        isTablet ? 5.0 : 5.0; // breathing room between items
     final double paddingVertical = isTablet ? 14.0 : 12.0;
     final double paddingHorizontal = isTablet ? 16.0 : 14.0;
     final double borderRadius = isTablet ? 16.0 : 14.0;
 
-    final double iconContainerSize = isTablet
-        ? screenWidth * 0.08
-        : screenWidth * 0.09; // reduced
+    final double iconContainerSize =
+        isTablet ? screenWidth * 0.08 : screenWidth * 0.09; // reduced
     final double innerIconSize = iconContainerSize * 0.5;
-    final double titleSize = isTablet ? screenWidth * 0.026 : screenWidth *
-        0.035; // reduced
-    final double descSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.03; // reduced
+    final double titleSize =
+        isTablet ? screenWidth * 0.026 : screenWidth * 0.035; // reduced
+    final double descSize =
+        isTablet ? screenWidth * 0.02 : screenWidth * 0.03; // reduced
 
     // --- COLOR ANIMATION LOGIC ---
     // Normal:   Bg = Background, Text = Inverted
@@ -64,8 +62,8 @@ class FeaturesSheetButton extends StatelessWidget {
     final Color targetFg = isSelected ? normalBg : normalFg;
 
     // Border disappears when selected to look cleaner
-    final Color targetBorder = isSelected ? Colors.transparent : AppColors
-        .border;
+    final Color targetBorder =
+        isSelected ? Colors.transparent : AppColors.border;
 
     final double opacity = isDisabled ? 0.4 : 1.0;
 
@@ -99,9 +97,9 @@ class FeaturesSheetButton extends StatelessWidget {
               onTap: isDisabled
                   ? null
                   : () {
-                HapticFeedback.lightImpact();
-                onTap?.call();
-              },
+                      HapticFeedback.lightImpact();
+                      onTap?.call();
+                    },
               borderRadius: BorderRadius.circular(borderRadius),
               splashColor: targetFg.withValues(alpha: 0.1),
               highlightColor: targetFg.withValues(alpha: 0.05),
@@ -130,19 +128,19 @@ class FeaturesSheetButton extends StatelessWidget {
                         // makes the switch look smooth enough.
                         child: iconPath != null
                             ? SvgPicture.asset(
-                          iconPath!,
-                          width: innerIconSize,
-                          height: innerIconSize,
-                          colorFilter: ColorFilter.mode(
-                            targetFg,
-                            BlendMode.srcIn,
-                          ),
-                        )
+                                iconPath!,
+                                width: innerIconSize,
+                                height: innerIconSize,
+                                colorFilter: ColorFilter.mode(
+                                  targetFg,
+                                  BlendMode.srcIn,
+                                ),
+                              )
                             : Icon(
-                          iconData,
-                          size: innerIconSize,
-                          color: targetFg,
-                        ),
+                                iconData,
+                                size: innerIconSize,
+                                color: targetFg,
+                              ),
                       ),
                     ),
                     SizedBox(width: paddingHorizontal * 0.8),
@@ -184,7 +182,8 @@ class FeaturesSheetButton extends StatelessWidget {
 
                     // 4. Navigation Arrow (Only for non-selectable actions like Explore)
                     // We REMOVED the Checkmark (Tick) as requested.
-                    if (!isDisabled && !isSelected &&
+                    if (!isDisabled &&
+                        !isSelected &&
                         (title == 'Explore' || title == 'Keşfet'))
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),

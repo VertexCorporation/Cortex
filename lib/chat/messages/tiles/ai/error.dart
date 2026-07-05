@@ -10,7 +10,8 @@ class _AiErrorWidget extends StatefulWidget {
   State<_AiErrorWidget> createState() => _AiErrorWidgetState();
 }
 
-class _AiErrorWidgetState extends State<_AiErrorWidget> with TickerProviderStateMixin {
+class _AiErrorWidgetState extends State<_AiErrorWidget>
+    with TickerProviderStateMixin {
   bool _isExpandedError = false;
   bool _showErrorText = false;
   late AnimationController _errorSlideCtl;
@@ -24,7 +25,9 @@ class _AiErrorWidgetState extends State<_AiErrorWidget> with TickerProviderState
     for (int i = 0; i < parts.length; i++) {
       spans.add(TextSpan(
         text: parts[i],
-        style: i % 2 == 1 ? baseStyle.copyWith(fontWeight: FontWeight.bold) : baseStyle,
+        style: i % 2 == 1
+            ? baseStyle.copyWith(fontWeight: FontWeight.bold)
+            : baseStyle,
       ));
     }
     return spans;
@@ -94,7 +97,8 @@ class _AiErrorWidgetState extends State<_AiErrorWidget> with TickerProviderState
             decoration: BoxDecoration(
                 color: AppColors.septenaryColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                border: Border.all(color: AppColors.septenaryColor, width: 0.5)),
+                border:
+                    Border.all(color: AppColors.septenaryColor, width: 0.5)),
             padding: EdgeInsets.all(screenWidth * 0.03),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -141,7 +145,8 @@ class _AiErrorWidgetState extends State<_AiErrorWidget> with TickerProviderState
                             child: SlideTransition(
                               position: _errorSlideAnim,
                               child: Padding(
-                                padding: EdgeInsets.only(top: screenWidth * 0.02),
+                                padding:
+                                    EdgeInsets.only(top: screenWidth * 0.02),
                                 child: SelectionArea(
                                   child: Text.rich(
                                     TextSpan(

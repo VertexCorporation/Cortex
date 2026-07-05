@@ -254,8 +254,10 @@ class ModelDefaults {
       'id': 'Asisten AI Tingkat Lanjut',
     },
     'description': {
-      'en': 'Cortex is a helpful and intelligent AI assistant designed to answer your questions and assist with tasks.',
-      'tr': 'Cortex, sorularınızı yanıtlamak ve görevlerinize yardımcı olmak için tasarlanmış zeki ve yardımsever bir yapay zekâ asistanıdır.',
+      'en':
+          'Cortex is a helpful and intelligent AI assistant designed to answer your questions and assist with tasks.',
+      'tr':
+          'Cortex, sorularınızı yanıtlamak ve görevlerinize yardımcı olmak için tasarlanmış zeki ve yardımsever bir yapay zekâ asistanıdır.',
     }
   };
 
@@ -321,7 +323,7 @@ class ModelDefaults {
     if (id.contains('llama-3') || id.contains('llama3')) {
       return _llama3Format;
     }
-    if (id.contains('gemma')) {
+    if (id.contains('gemma') || id.contains('next')) {
       return _gemmaFormat;
     }
     if (id.contains('phi-3') || id.contains('phi3')) {

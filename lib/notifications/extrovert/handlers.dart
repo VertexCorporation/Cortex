@@ -34,7 +34,7 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
       'Notifications about news and updates from Cortex.';
 
   final BigTextStyleInformation bigTextStyleInformation =
-  BigTextStyleInformation(
+      BigTextStyleInformation(
     body,
     htmlFormatBigText: false,
     contentTitle: title,
@@ -59,10 +59,7 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
       ));
 
   await FlutterLocalNotificationsPlugin().show(
-    DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toSigned(31),
+    DateTime.now().millisecondsSinceEpoch.toSigned(31),
     title,
     body,
     platformDetails,

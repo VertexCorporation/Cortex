@@ -12,7 +12,8 @@ extension FundsPurchase on FundsBackend {
 
     final user = _auth.currentUser;
     if (user == null) {
-      log('Purchase blocked: User is not authenticated.', name: FundsBackend._logName);
+      log('Purchase blocked: User is not authenticated.',
+          name: FundsBackend._logName);
       _setPurchasePending(false);
       return;
     }
@@ -31,8 +32,7 @@ extension FundsPurchase on FundsBackend {
       }
       if (response.productDetails.isEmpty) {
         throw Exception(
-            'Product with ID ${product
-                .id} not found on the store. It might have been removed.');
+            'Product with ID ${product.id} not found on the store. It might have been removed.');
       }
 
       freshProductDetails = response.productDetails.first;
@@ -57,19 +57,19 @@ extension FundsPurchase on FundsBackend {
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       final googlePlayProductDetails =
-      freshProductDetails as GooglePlayProductDetails;
+          freshProductDetails as GooglePlayProductDetails;
       final offerToken = googlePlayProductDetails.offerToken;
 
       final bool isSubscription =
-      FundsBackend._subscriptionIds.contains(googlePlayProductDetails.id);
+          FundsBackend._subscriptionIds.contains(googlePlayProductDetails.id);
 
       if (isSubscription) {
         if (offerToken == null || offerToken.isEmpty) {
-          log('Subscription ${googlePlayProductDetails
-              .id} is missing a valid offerToken.',
+          log('Subscription ${googlePlayProductDetails.id} is missing a valid offerToken.',
               name: FundsBackend._logName);
           _notificationService.showNotification(
-              message: _localizations?.cacheIsNotUpToDate ?? 'cacheIsNotUpToDate',
+              message:
+                  _localizations?.cacheIsNotUpToDate ?? 'cacheIsNotUpToDate',
               type: NotificationType.error,
               oneLine: false);
           _setPurchasePending(false);
@@ -80,8 +80,7 @@ extension FundsPurchase on FundsBackend {
 
         if (_activeSubscriptionProductId != null &&
             _activeSubscriptionProductId!.isNotEmpty) {
-          log(
-              'Detected active subscription: $_activeSubscriptionProductId. Attempting upgrade flow.',
+          log('Detected active subscription: $_activeSubscriptionProductId. Attempting upgrade flow.',
               name: FundsBackend._logName);
 
           GooglePlayPurchaseDetails? oldPurchase;
@@ -90,17 +89,16 @@ extension FundsPurchase on FundsBackend {
             final androidAddition = _inAppPurchase
                 .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
             final QueryPurchaseDetailsResponse pastPurchasesResponse =
-            await androidAddition.queryPastPurchases();
+                await androidAddition.queryPastPurchases();
 
             if (pastPurchasesResponse.error == null) {
               try {
                 oldPurchase = pastPurchasesResponse.pastPurchases
                     .map((e) => e)
                     .firstWhere((p) =>
-                p.productID == _activeSubscriptionProductId &&
-                    p.status == PurchaseStatus.purchased);
-              } catch (_) {
-              }
+                        p.productID == _activeSubscriptionProductId &&
+                        p.status == PurchaseStatus.purchased);
+              } catch (_) {}
             }
           } catch (e) {
             log('Failed to query past purchases for upgrade flow: $e',
@@ -108,21 +106,19 @@ extension FundsPurchase on FundsBackend {
           }
 
           if (oldPurchase != null) {
-            log(
-                'Found old purchase token. Configuring replacement mode (Upgrade).',
+            log('Found old purchase token. Configuring replacement mode (Upgrade).',
                 name: FundsBackend._logName);
             changeParam = ChangeSubscriptionParam(
               oldPurchaseDetails: oldPurchase,
               replacementMode: ReplacementMode.withTimeProration,
             );
           } else {
-            log(
-                'CRITICAL: Sync mismatch. DB says active sub, but local store has no token. Blocking to prevent double billing.',
+            log('CRITICAL: Sync mismatch. DB says active sub, but local store has no token. Blocking to prevent double billing.',
                 name: FundsBackend._logName);
 
             _notificationService.showNotification(
               message:
-              "Please tap 'Restore Purchases' first to sync your account.",
+                  "Please tap 'Restore Purchases' first to sync your account.",
               type: NotificationType.error,
               oneLine: false,
             );
@@ -157,7 +153,8 @@ extension FundsPurchase on FundsBackend {
         await _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
       }
     } catch (e, stack) {
-      log('Error initiating purchase flow: $e', name: FundsBackend._logName, error: e);
+      log('Error initiating purchase flow: $e',
+          name: FundsBackend._logName, error: e);
 
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('user canceled') ||
@@ -191,7 +188,8 @@ extension FundsPurchase on FundsBackend {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      log('Could not launch subscription management URL.', name: FundsBackend._logName);
+      log('Could not launch subscription management URL.',
+          name: FundsBackend._logName);
     }
   }
 
@@ -241,8 +239,9 @@ extension FundsPurchase on FundsBackend {
 
   void _handleFailedPurchase(PurchaseDetails purchaseDetails) {
     final errorCode = purchaseDetails.error?.code ?? '';
-    final errorMessage =
-        purchaseDetails.error?.message ?? _localizations?.purchaseStreamError ?? 'purchaseStreamError';
+    final errorMessage = purchaseDetails.error?.message ??
+        _localizations?.purchaseStreamError ??
+        'purchaseStreamError';
     final errorString = purchaseDetails.error?.toString().toLowerCase() ?? '';
 
     final isUserCancelled =
@@ -272,7 +271,8 @@ extension FundsPurchase on FundsBackend {
   }
 
   void _onPurchaseStreamError(dynamic error, StackTrace? stack) {
-    log('Purchase Stream Error: $error', name: FundsBackend._logName, error: error);
+    log('Purchase Stream Error: $error',
+        name: FundsBackend._logName, error: error);
     _notificationService.showNotification(
       message: _localizations?.purchaseStreamError ?? 'purchaseStreamError',
       type: NotificationType.error,

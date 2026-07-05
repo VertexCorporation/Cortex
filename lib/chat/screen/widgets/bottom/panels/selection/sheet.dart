@@ -33,8 +33,8 @@ Future<bool?> showModelSelectionSheet({
   final localStateProvider = context.read<ModelLocalStateProvider>();
 
   // Sync access for instant load check
-  final cachedModels = initialModels.isNotEmpty 
-      ? initialModels 
+  final cachedModels = initialModels.isNotEmpty
+      ? initialModels
       : modelService.getCachedModelsSync();
   final downloadMap = localStateProvider.downloadCompleted;
 
@@ -331,7 +331,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     return widget.currentModelId.startsWith('${series.id}-');
   }
 
-
   // Internal controller for the list content
   final ScrollController _internalScrollController = ScrollController();
 
@@ -409,101 +408,97 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                   child: _isLoading
                       ? const ModelSelectionSkeleton(key: ValueKey('skeleton'))
                       : ScrollFog(
-                              key: const ValueKey('content'),
-                              scrollController: _internalScrollController,
-                              topFogHeight: 20,
-                              bottomFogHeight: 50,
-                              child: CustomScrollView(
-                                controller: _internalScrollController,
-                                physics: const ClampingScrollPhysics(),
-                                slivers: [
-                                  // --- DYNAMIC CHAT (CORTEX) ---
-                                  if (cortexVisible) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.dynamicChatTitle),
-                                    SliverPadding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: sp16),
-                                      sliver: SliverToBoxAdapter(
-                                        child: Center(
-                                          child: SizedBox(
-                                            width:
-                                                (sw - (2 * sp16) - sp12) / 2,
-                                            height: sh * 0.085,
-                                            child: ModelCard(
-                                              title: 'Cortex',
-                                              imagePath: 'assets/cortex.svg',
-                                              isSelected:
-                                                  widget.currentModelId ==
-                                                      'cortex/auto',
-                                              onBodyTap: () => _handleSelection(
-                                                  'cortex/auto'),
-                                              showExpansionArrow: false,
-                                              backgroundGradient:
-                                                  LinearGradient(
-                                                begin: Alignment.centerLeft,
-                                                end: Alignment.centerRight,
-                                                stops: const [0.1, 1],
-                                                colors: [
-                                                  Colors.blueAccent
-                                                      .withValues(alpha: 0.0),
-                                                  Colors.blueAccent
-                                                      .withValues(alpha: 0.2),
-                                                ],
-                                              ),
-                                            ),
+                          key: const ValueKey('content'),
+                          scrollController: _internalScrollController,
+                          topFogHeight: 20,
+                          bottomFogHeight: 50,
+                          child: CustomScrollView(
+                            controller: _internalScrollController,
+                            physics: const ClampingScrollPhysics(),
+                            slivers: [
+                              // --- DYNAMIC CHAT (CORTEX) ---
+                              if (cortexVisible) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.dynamicChatTitle),
+                                SliverPadding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: sp16),
+                                  sliver: SliverToBoxAdapter(
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: (sw - (2 * sp16) - sp12) / 2,
+                                        height: sh * 0.085,
+                                        child: ModelCard(
+                                          title: 'Cortex',
+                                          imagePath: 'assets/cortex.svg',
+                                          isSelected: widget.currentModelId ==
+                                              'cortex/auto',
+                                          onBodyTap: () =>
+                                              _handleSelection('cortex/auto'),
+                                          showExpansionArrow: false,
+                                          backgroundGradient: LinearGradient(
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                            stops: const [0.1, 1],
+                                            colors: [
+                                              Colors.blueAccent
+                                                  .withValues(alpha: 0.0),
+                                              Colors.blueAccent
+                                                  .withValues(alpha: 0.2),
+                                            ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ],
-
-                                  if (_selfModels.isNotEmpty) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.customModels),
-                                    _buildSliverGrid(_selfModels),
-                                  ],
-                                  if (_offlineModels.isNotEmpty) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.offlineModels),
-                                    _buildOfflineSeriesList(_offlineModels),
-                                  ],
-                                  if (_onlineSeries.isNotEmpty) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.languageModels),
-                                    _buildSliverOnlineList(_onlineSeries),
-                                  ],
-                                  if (_videoSeries.isNotEmpty) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.videoModels),
-                                    _buildSliverOnlineList(_videoSeries),
-                                  ],
-                                  if (_imageSeries.isNotEmpty) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.imageModels),
-                                    _buildSliverOnlineList(_imageSeries),
-                                  ],
-                                  if (_audioSeries.isNotEmpty) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.audioModels),
-                                    _buildSliverOnlineList(_audioSeries),
-                                  ],
-                                  if (_characterModels.isNotEmpty) ...[
-                                    _buildSliverHeader(
-                                        widget.localizations.characterModels),
-                                    _buildSliverGrid(_characterModels),
-                                  ],
-
-                                  SliverPadding(
-                                    padding: EdgeInsets.only(
-                                      bottom:
-                                          MediaQuery.paddingOf(context).bottom +
-                                              20,
-                                    ),
                                   ),
-                                ],
+                                ),
+                              ],
+
+                              if (_selfModels.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.customModels),
+                                _buildSliverGrid(_selfModels),
+                              ],
+                              if (_offlineModels.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.offlineModels),
+                                _buildOfflineSeriesList(_offlineModels),
+                              ],
+                              if (_onlineSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.languageModels),
+                                _buildSliverOnlineList(_onlineSeries),
+                              ],
+                              if (_videoSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.videoModels),
+                                _buildSliverOnlineList(_videoSeries),
+                              ],
+                              if (_imageSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.imageModels),
+                                _buildSliverOnlineList(_imageSeries),
+                              ],
+                              if (_audioSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.audioModels),
+                                _buildSliverOnlineList(_audioSeries),
+                              ],
+                              if (_characterModels.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.characterModels),
+                                _buildSliverGrid(_characterModels),
+                              ],
+
+                              SliverPadding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.paddingOf(context).bottom + 20,
+                                ),
                               ),
-                            ),
+                            ],
+                          ),
+                        ),
                 ),
               ),
             ],

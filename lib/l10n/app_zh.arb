@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "聊天",
+  "branch": "分支",
   "chatLengthLimitExceeded": "此聊天已超出字符限制。请开始新的聊天或购买订阅。",
   "chatTitleCriticalInstruction": "【重要说明】：您是标题生成器。请勿回答用户的问题。请勿聊天或打招呼。仅输出一个 2-4 个字的标题，概括用户提出的问题。",
   "@chatTitleCriticalInstruction": {

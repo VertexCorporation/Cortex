@@ -13,6 +13,7 @@ class AxonMenu extends StatelessWidget {
   final VoidCallback onLibraryTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
+  final VoidCallback onRoleplayTap;
   final VoidCallback onNewsTap;
 
   const AxonMenu({
@@ -23,6 +24,7 @@ class AxonMenu extends StatelessWidget {
     required this.onLibraryTap,
     required this.onCreateAITap,
     required this.onArtsTap,
+    required this.onRoleplayTap,
     required this.onNewsTap,
   });
 

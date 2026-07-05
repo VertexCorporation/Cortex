@@ -97,12 +97,18 @@ class LlamaService : Service() {
                 "sendMessage" -> {
                     val message = it.getStringExtra("message") ?: ""
                     val photoPath = it.getStringExtra("photoPath")
-                    
+
                     val temp = it.getFloatExtra("temp", 0.7f)
                     val topP = it.getFloatExtra("topP", 0.95f)
                     val topK = it.getIntExtra("topK", 40)
-                    
-                    sendMessage(message, photoPath, temp, topP, topK)
+                    val repeatPenalty = it.getFloatExtra("repeatPenalty", 1.0f)
+                    val frequencyPenalty = it.getFloatExtra("frequencyPenalty", 0.0f)
+                    val presencePenalty = it.getFloatExtra("presencePenalty", 0.0f)
+                    val mirostatMode = it.getIntExtra("mirostatMode", 0)
+                    val mirostatTau = it.getFloatExtra("mirostatTau", 5.0f)
+                    val mirostatEta = it.getFloatExtra("mirostatEta", 0.1f)
+
+                    sendMessage(message, photoPath, temp, topP, topK, repeatPenalty, frequencyPenalty, presencePenalty, mirostatMode, mirostatTau, mirostatEta)
                 }
                 "stopGeneration" -> stopGeneration()
                 "releaseModel" -> releaseModel()
@@ -148,11 +154,17 @@ class LlamaService : Service() {
     }
 
     private fun sendMessage(
-        message: String?, 
+        message: String?,
         photoPath: String?,
         temp: Float,
         topP: Float,
-        topK: Int
+        topK: Int,
+        repeatPenalty: Float = 1.0f,
+        frequencyPenalty: Float = 0.0f,
+        presencePenalty: Float = 0.0f,
+        mirostatMode: Int = 0,
+        mirostatTau: Float = 5.0f,
+        mirostatEta: Float = 0.1f
     ) {
         val safeMessage = message ?: ""
         serviceScope.launch {
@@ -177,7 +189,7 @@ class LlamaService : Service() {
                 }
             }
             // Trigger the generation
-            viewModel.send(photoBase64, temp, topP, topK)
+            viewModel.send(photoBase64, temp, topP, topK, repeatPenalty, frequencyPenalty, presencePenalty, mirostatMode, mirostatTau, mirostatEta)
         }
     }
 

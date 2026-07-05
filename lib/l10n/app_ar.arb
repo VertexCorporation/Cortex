@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "محادثة",
+  "branch": "فرع",
   "chatLengthLimitExceeded": "لقد تجاوزت هذه المحادثة الحد الأقصى للحروف. يرجى بدء محادثة جديدة أو شراء اشتراك.",
   "chatTitleCriticalInstruction": "[تعليمات حاسمة]: أنت مُولِّد عناوين. لا تُجب على سؤال المستخدم. لا تُراسله أو تُلقي عليه التحية. فقط اعرض عنوانًا من كلمتين إلى أربع كلمات يُلخِّص ما يسأل عنه المستخدم.",
   "@chatTitleCriticalInstruction": {

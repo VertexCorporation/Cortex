@@ -19,7 +19,7 @@ class PromptCompressionEngine {
     'hello',
   ];
 
-  /// Compresses a message's text by stripping out excess whitespace, 
+  /// Compresses a message's text by stripping out excess whitespace,
   /// linebreaks, and unnecessary conversational filler words, while keeping the core semantic content.
   static String compressText(String text, {bool isSystem = false}) {
     if (text.isEmpty) return text;
@@ -36,9 +36,14 @@ class PromptCompressionEngine {
           final len = filler.length;
           if (cleaned.length > len) {
             final nextChar = cleaned[len];
-            if (nextChar == ',' || nextChar == '.' || nextChar == '!' || nextChar == ' ') {
+            if (nextChar == ',' ||
+                nextChar == '.' ||
+                nextChar == '!' ||
+                nextChar == ' ') {
               cleaned = cleaned.substring(len).trim();
-              if (cleaned.startsWith(',') || cleaned.startsWith('.') || cleaned.startsWith('!')) {
+              if (cleaned.startsWith(',') ||
+                  cleaned.startsWith('.') ||
+                  cleaned.startsWith('!')) {
                 cleaned = cleaned.substring(1).trim();
               }
             }
@@ -81,7 +86,9 @@ class PromptCompressionEngine {
           } else if (rawContent is List) {
             final List<Map<String, dynamic>> updatedContent = [];
             for (final item in rawContent) {
-              if (item is Map && item['type'] == 'text' && item['text'] is String) {
+              if (item is Map &&
+                  item['type'] == 'text' &&
+                  item['text'] is String) {
                 updatedContent.add({
                   ...Map<String, dynamic>.from(item),
                   'text': compressText(item['text'] as String, isSystem: false),

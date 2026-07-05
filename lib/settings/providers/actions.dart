@@ -24,8 +24,7 @@ class SettingsActionProvider with ChangeNotifier {
     required IntrovertNotificationService notificationService,
     required InternetProvider internetProvider,
     required AppInitializer appInitializer,
-  })
-      : _authService = authService,
+  })  : _authService = authService,
         _profileService = profileService,
         _notificationService = notificationService,
         _internetProvider = internetProvider,
@@ -65,8 +64,8 @@ class SettingsActionProvider with ChangeNotifier {
     return true;
   }
 
-  String _getLocalizedProfileError(AppLocalizations localizations,
-      String code) {
+  String _getLocalizedProfileError(
+      AppLocalizations localizations, String code) {
     switch (code) {
       case 'already-exists':
         return localizations.usernameTaken;
@@ -119,7 +118,8 @@ class SettingsActionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> changePassword(BuildContext context, {
+  Future<void> changePassword(
+    BuildContext context, {
     required String oldPassword,
     required String newPassword,
   }) async {
@@ -203,8 +203,7 @@ class SettingsActionProvider with ChangeNotifier {
     } catch (e) {
       debugPrint("SettingsActionProvider: An error occurred during logout: $e");
       _notificationService.showNotification(
-          message: localizations.anErrorOccurred,
-          type: NotificationType.error);
+          message: localizations.anErrorOccurred, type: NotificationType.error);
     } finally {
       _isLoggingOut = false;
       // We check mounted again because the navigator pops above might have unmounted us
@@ -240,8 +239,7 @@ class SettingsActionProvider with ChangeNotifier {
       if (context.mounted) {
         if (Navigator.of(context).canPop()) Navigator.of(context).pop();
         if (context.mounted && Navigator.of(context).canPop()) {
-          Navigator.of(
-              context).pop();
+          Navigator.of(context).pop();
         }
       }
     } on ProfileException catch (e) {

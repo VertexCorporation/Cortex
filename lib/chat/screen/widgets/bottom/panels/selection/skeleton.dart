@@ -9,7 +9,6 @@ class ModelSelectionSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final sw = MediaQuery.sizeOf(context).width;
     final sh = MediaQuery.sizeOf(context).height;
 
@@ -67,7 +66,7 @@ class ModelSelectionSkeleton extends StatelessWidget {
                   mainAxisSpacing: sp12,
                 ),
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                  (context, index) {
                     return Container(
                       decoration: BoxDecoration(
                         color: AppColors.shimmerBase,
@@ -93,7 +92,7 @@ class ModelSelectionSkeleton extends StatelessWidget {
                   mainAxisSpacing: sp12,
                 ),
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                  (context, index) {
                     return Container(
                       decoration: BoxDecoration(
                         color: AppColors.shimmerBase,

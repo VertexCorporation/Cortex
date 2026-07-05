@@ -31,10 +31,7 @@ class SectionContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -55,10 +52,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Text(
       title,
       style: TextStyle(
@@ -79,10 +73,7 @@ class SummarySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return SectionContainer(
       child: Column(
@@ -113,10 +104,7 @@ class DescriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final fullDescription = provider.displayDescription;
 
     final textStyle = TextStyle(
@@ -221,8 +209,8 @@ class _ParsedText extends StatelessWidget {
     // 1. **Bold** -> (\*\*(.*?)\*\*)
     // 2. [Label](url) -> (\[([^\]]+)\]\(([^)]+)\))
     // 3. Raw URL -> (https?://\S+)
-    final combinedRegExp =
-    RegExp(r'(\*\*(.*?)\*\*)|(\*(.*?)\*(?!\*))|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
+    final combinedRegExp = RegExp(
+        r'(\*\*(.*?)\*\*)|(\*(.*?)\*(?!\*))|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
 
     final spans = <TextSpan>[];
     int lastEnd = 0;
@@ -313,8 +301,7 @@ class BaseModelSelectionSection extends StatefulWidget {
       _BaseModelSelectionSectionState();
 }
 
-class _BaseModelSelectionSectionState
-    extends State<BaseModelSelectionSection> {
+class _BaseModelSelectionSectionState extends State<BaseModelSelectionSection> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -345,20 +332,17 @@ class _BaseModelSelectionSectionState
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    if (widget.provider.availableBaseModels.isEmpty) return const SizedBox.shrink();
+    if (widget.provider.availableBaseModels.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     final rawSelectedTitle = widget.provider.selectedBaseModel?.displayTitle;
     final selectedModelTitle =
-    (rawSelectedTitle == null || rawSelectedTitle
-        .trim()
-        .isEmpty)
-        ? localizations.selectBaseModel
-        : ModelDataUtils.cleanTitle(rawSelectedTitle);
+        (rawSelectedTitle == null || rawSelectedTitle.trim().isEmpty)
+            ? localizations.selectBaseModel
+            : ModelDataUtils.cleanTitle(rawSelectedTitle);
     final isPremium = widget.provider.selectedBaseModel?.isPremium ?? false;
 
     return SectionContainer(
@@ -407,8 +391,8 @@ class _BaseModelSelectionSectionState
                           'assets/icons/sparkle.svg',
                           width: screenWidth * 0.05,
                           colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor.inverted.withValues(
-                                alpha: 0.8),
+                            AppColors.primaryColor.inverted
+                                .withValues(alpha: 0.8),
                             BlendMode.srcIn,
                           ),
                         ),
@@ -550,8 +534,10 @@ class _BaseModelSelectionSectionState
               onTap: () {
                 HapticFeedback.lightImpact();
                 final userProvider = context.read<UserProvider>();
-                if (variantId != 'cortex/auto' && !userProvider.isSubscriptionActive) {
-                  final target = const UpgradeAccountScreen(showLoginFirst: false);
+                if (variantId != 'cortex/auto' &&
+                    !userProvider.isSubscriptionActive) {
+                  final target =
+                      const UpgradeAccountScreen(showLoginFirst: false);
                   navigateToScreen(target, direction: const Offset(0.0, 1.0));
                   return;
                 }

@@ -33,7 +33,9 @@ enum MessageOption {
   stop,
   changeModel,
   edit,
-  speak
+  speak,
+  delete,
+  branch,
 }
 
 const Duration _kShortAnimationDuration = Duration(milliseconds: 100);
@@ -75,12 +77,16 @@ class OptionsPanelViewModel {
         MessageOption.copy,
         MessageOption.edit,
         MessageOption.select,
-        MessageOption.speak
+        MessageOption.speak,
+        MessageOption.branch,
+        MessageOption.delete,
       ];
     } else {
       final options = [
         MessageOption.copy,
-        MessageOption.speak
+        MessageOption.speak,
+        MessageOption.branch,
+        MessageOption.delete,
       ];
       if (!message.isError) {
         options.addAll([MessageOption.regenerate, MessageOption.changeModel]);
@@ -94,11 +100,8 @@ class OptionsPanelViewModel {
     }
   }
 
-
   List<MessageOption> getVisibleOptions(BuildContext context) {
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
     final currentModelId = message.model ?? '';
 
     // LOGIC UPDATE: Iterate attachments to find user images only.
@@ -110,18 +113,14 @@ class OptionsPanelViewModel {
     final modelSeriesData = ModelDataUtils.findParentSeriesData(currentModelId,
         langCode: langCode, modelService: modelService);
     final currentModel =
-    modelService.getPreciseModelData(currentModelId, langCode: langCode);
+        modelService.getPreciseModelData(currentModelId, langCode: langCode);
 
     final isDynamicContext = session.isDynamicChat;
     final isOfflineModel = modelSeriesData?.isServerSide == false;
 
-
     // We check predits from the viewmodel directly
     final hasPreditsForPremium = session.isUserSubscribed ||
-        (context
-            .read<CreditsManager>()
-            .preditsNotifier
-            .value ?? 0) > 0;
+        (context.read<CreditsManager>().preditsNotifier.value ?? 0) > 0;
 
     final isCurrentModelPremium = currentModel.isPremium;
 
@@ -137,9 +136,7 @@ class OptionsPanelViewModel {
       }
 
       if (option == MessageOption.speak) {
-        if (message.hasAttachments && message.displayableText
-            .trim()
-            .isEmpty) {
+        if (message.hasAttachments && message.displayableText.trim().isEmpty) {
           return false;
         }
       }
@@ -157,7 +154,7 @@ class OptionsPanelViewModel {
         if (!isDynamicContext) {
           if (modelSeriesData != null) {
             final int validExtCount =
-            ModelDataUtils.validVariantCountForChangingModel(
+                ModelDataUtils.validVariantCountForChangingModel(
               parentSeries: modelSeriesData,
               conversationHasPhoto: conversationHasUserImages,
             );
@@ -253,9 +250,8 @@ class _AnimatedMessageOptionsPanelState
 
     // Smart copy: if the message is media-only, try to copy the image file.
     // If copying fails (e.g. unsupported platform), fallback to saving to gallery.
-    final bool isMediaOnly = message.hasAttachments && message.displayableText
-        .trim()
-        .isEmpty;
+    final bool isMediaOnly =
+        message.hasAttachments && message.displayableText.trim().isEmpty;
 
     if (isMediaOnly) {
       _dismissPanel();
@@ -266,10 +262,10 @@ class _AnimatedMessageOptionsPanelState
           if (!mounted) return;
           Provider.of<IntrovertNotificationService>(context, listen: false)
               .showNotification(
-              message: localizations.messageCopied,
-              type: NotificationType.success,
-              bottomOffset: 0.07,
-              isChatMode: true);
+                  message: localizations.messageCopied,
+                  type: NotificationType.success,
+                  bottomOffset: 0.07,
+                  isChatMode: true);
         } else {
           _saveFirstMediaToGallery(message, localizations);
         }
@@ -282,17 +278,17 @@ class _AnimatedMessageOptionsPanelState
     Clipboard.setData(ClipboardData(text: message.displayableText));
     Provider.of<IntrovertNotificationService>(context, listen: false)
         .showNotification(
-        message: localizations.messageCopied,
-        type: NotificationType.success,
-        bottomOffset: 0.07,
-        isChatMode: true);
+            message: localizations.messageCopied,
+            type: NotificationType.success,
+            bottomOffset: 0.07,
+            isChatMode: true);
     _dismissPanel();
   }
 
-  Future<void> _saveFirstMediaToGallery(Message message,
-      AppLocalizations localizations) async {
-    final notificationService = Provider.of<IntrovertNotificationService>(
-        context, listen: false);
+  Future<void> _saveFirstMediaToGallery(
+      Message message, AppLocalizations localizations) async {
+    final notificationService =
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     try {
       final firstPath = message.attachmentPaths.first;
       final ext = p.extension(firstPath).toLowerCase();
@@ -309,8 +305,8 @@ class _AnimatedMessageOptionsPanelState
         message: success == true
             ? localizations.downloadSuccess
             : localizations.downloadFailed,
-        type: success == true ? NotificationType.success : NotificationType
-            .error,
+        type:
+            success == true ? NotificationType.success : NotificationType.error,
         bottomOffset: 0.07,
         isChatMode: true,
       );
@@ -339,6 +335,26 @@ class _AnimatedMessageOptionsPanelState
     );
   }
 
+  void _onDeleteTapped() {
+    _dismissPanel();
+    final conv = context.read<ConversationProvider>();
+    final idx = conv.messages.indexWhere((m) => m.id == widget.message.id);
+    if (idx >= 0) {
+      conv.removeMessageAtIndex(idx);
+    }
+  }
+
+  void _onBranchTapped() {
+    _dismissPanel();
+    final conv = context.read<ConversationProvider>();
+    final idx = conv.messages.indexWhere((m) => m.id == widget.message.id);
+    if (idx >= 0 && widget.onRegenerate != null) {
+      final removeFrom = widget.message.isUserMessage ? idx + 1 : idx;
+      conv.removeMessagesAfter(removeFrom);
+      widget.onRegenerate!();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final sessionProvider = context.watch<ChatSessionProvider>();
@@ -347,10 +363,7 @@ class _AnimatedMessageOptionsPanelState
     final localizations = AppLocalizations.of(context)!;
     final modelService = context.read<ModelService>();
     final totalCredits =
-        context
-            .watch<CreditsManager>()
-            .totalCreditsNotifier
-            .value ?? 0;
+        context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0;
 
     final viewModel = OptionsPanelViewModel(
       session: sessionProvider,
@@ -362,20 +375,15 @@ class _AnimatedMessageOptionsPanelState
     );
 
     final List<MessageOption> visibleOptions =
-    viewModel.getVisibleOptions(context);
+        viewModel.getVisibleOptions(context);
 
     if (visibleOptions.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _dismissPanel());
       return const SizedBox.shrink();
     }
 
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
-    final keyboardHeight = MediaQuery
-        .of(context)
-        .viewInsets
-        .bottom;
+    final screenSize = MediaQuery.of(context).size;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final panelWidth = screenSize.width * _UIFactors.panelWidthFactor;
     final optionHeight = screenSize.height * _UIFactors.optionHeightFactor;
     final borderRadius = screenSize.width * _UIFactors.borderRadiusFactor;
@@ -518,6 +526,18 @@ class _AnimatedMessageOptionsPanelState
                                   _dismissPanel();
                                   widget.onSpeak?.call();
                                 },
+                                borderRadius: borderRadius);
+                          case MessageOption.delete:
+                            return OptionPanelItem(
+                                label: localizations.delete,
+                                iconAsset: 'assets/icons/delete.svg',
+                                onTap: _onDeleteTapped,
+                                borderRadius: borderRadius);
+                          case MessageOption.branch:
+                            return OptionPanelItem(
+                                label: localizations.branch,
+                                iconAsset: 'assets/icons/flow.svg',
+                                onTap: _onBranchTapped,
                                 borderRadius: borderRadius);
                         }
                       }).toList(),

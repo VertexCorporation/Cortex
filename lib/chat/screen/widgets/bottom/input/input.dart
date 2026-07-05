@@ -20,8 +20,6 @@ part 'attachments.dart';
 
 part 'field.dart';
 
-
-
 part 'send.dart';
 
 class InputField extends StatefulWidget {
@@ -301,47 +299,30 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     final double radius = isTablet ? screenWidth * 0.025 : 32.0;
 
     return Padding(
-          padding: EdgeInsets.fromLTRB(
-            screenWidth * 0.02,
-            0,
-            screenWidth * 0.02,
-            12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
+      padding: EdgeInsets.fromLTRB(
+        screenWidth * 0.02,
+        0,
+        screenWidth * 0.02,
+        12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
+      ),
+      child: Container(
+        key: _inputFieldKey,
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(radius),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 0.5,
           ),
-          child: Container(
-            key: _inputFieldKey,
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(radius),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.currentTheme == 'light' 
-                      ? Colors.black.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.6),
-                  blurRadius: 15,
-                  offset: const Offset(5, 5),
-                ),
-                BoxShadow(
-                  color: AppColors.currentTheme == 'light'
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.05),
-                  blurRadius: 15,
-                  offset: const Offset(-5, -5),
-                ),
-              ],
-              border: Border.all(
-                color: AppColors.currentTheme == 'light' 
-                    ? Colors.black.withValues(alpha: 0.15)
-                    : AppColors.border.withValues(alpha: 0.5),
-                width: AppColors.currentTheme == 'light' ? 1.0 : 0.5,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0), // Extra padding to make it bigger
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _AttachmentPreviewSection(
-                      screenWidth: screenWidth, isTablet: isTablet),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+              vertical: 8.0), // Extra padding to make it bigger
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _AttachmentPreviewSection(
+                  screenWidth: screenWidth, isTablet: isTablet),
 
               // Main Animated Area
               AnimatedBuilder(
@@ -376,42 +357,54 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                 children: [
                                   Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.only(
-                                      start: isTablet ? screenWidth * 0.02 : 12.0,
-                                    ),
-                                    child: AddPhotoButton(
-                                      isLimitExceeded: widget.isLimitExceeded,
-                                      isPhotoLoading: widget.isPhotoLoading,
-                                      localizations: widget.localizations,
-                                      controller: widget.controller,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: isTablet ? screenWidth * 0.02 : 8.0),
-                                      child: _TextFieldSection(
-                                        key: const ValueKey('textfield'),
-                                        controller: widget.controller,
-                                        focusNode: widget.textFieldFocusNode,
-                                        localizations: widget.localizations,
-                                        screenWidth: screenWidth,
-                                        isTablet: isTablet,
-                                        showHintText: true,
-                                        onEnterPressed: () {
-                                          if (isSendButtonEnabled) {
-                                            widget.onSend();
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ),
-
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsetsDirectional.only(
+                                              start: isTablet
+                                                  ? screenWidth * 0.02
+                                                  : 12.0,
+                                            ),
+                                            child: AddPhotoButton(
+                                              isLimitExceeded:
+                                                  widget.isLimitExceeded,
+                                              isPhotoLoading:
+                                                  widget.isPhotoLoading,
+                                              localizations:
+                                                  widget.localizations,
+                                              controller: widget.controller,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: isTablet
+                                                      ? screenWidth * 0.02
+                                                      : 8.0),
+                                              child: _TextFieldSection(
+                                                key:
+                                                    const ValueKey('textfield'),
+                                                controller: widget.controller,
+                                                focusNode:
+                                                    widget.textFieldFocusNode,
+                                                localizations:
+                                                    widget.localizations,
+                                                screenWidth: screenWidth,
+                                                isTablet: isTablet,
+                                                showHintText: true,
+                                                onEnterPressed: () {
+                                                  if (isSendButtonEnabled) {
+                                                    widget.onSend();
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
                                           Visibility(
                                             visible: false,
                                             maintainSize: true,
@@ -422,7 +415,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                               isTablet: isTablet,
                                               widget: widget,
                                               isEnabled: isSendButtonEnabled,
-                                              isActionPermitted: isActionPermitted,
+                                              isActionPermitted:
+                                                  isActionPermitted,
                                               controller: widget.controller,
                                             ),
                                           ),
@@ -475,6 +469,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
           ),
         ),
       ),
-       );
+    );
   }
 }

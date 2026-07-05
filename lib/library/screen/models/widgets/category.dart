@@ -66,7 +66,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
 
   // Debounce
   bool _canTriggerEdgeAction = true;
-  
+
   // Category state
   String _selectedCategory = 'categoryAll';
   bool _isMenuOpen = false;
@@ -105,7 +105,8 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
     return ModelsBackendUtils.calculateCategoryHeight(modelMaps, screenWidth);
   }
 
-  List<Widget> _buildModelColumns(BuildContext context, double screenWidth, List<ModelEntity> filteredModels) {
+  List<Widget> _buildModelColumns(BuildContext context, double screenWidth,
+      List<ModelEntity> filteredModels) {
     final List<Widget> columns = [];
     const int modelsPerColumn = 3;
     final int totalModels = filteredModels.length;
@@ -118,7 +119,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
           : startIndex + modelsPerColumn;
 
       final List<ModelEntity> columnModels =
-      filteredModels.sublist(startIndex, endIndex);
+          filteredModels.sublist(startIndex, endIndex);
 
       columns.add(
         Padding(
@@ -129,7 +130,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
             children: columnModels.map((model) {
               bool isDownloaded = widget.downloadedStates[model.id] ?? false;
               DownloadManager? manager =
-              model.isServerSide ? null : widget.downloadManagers[model.id];
+                  model.isServerSide ? null : widget.downloadManagers[model.id];
 
               // Offline Series Dashboard Logic: check variants for active metrics
               if (!model.isServerSide &&
@@ -171,20 +172,25 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                   HapticFeedback.mediumImpact();
                   await widget.onRemovePressed(model.id, model.displayTitle);
                 },
-                onChatPressed: () =>
-                    widget.onChatPressed(
-                      model.id,
-                      model.isServerSide,
-                      isCustomModel: model.isCustomModel,
-                      modelPath: null,
-                    ),
+                onChatPressed: () => widget.onChatPressed(
+                  model.id,
+                  model.isServerSide,
+                  isCustomModel: model.isCustomModel,
+                  modelPath: null,
+                ),
                 onDownloadPressed: () {
-                    final isOfflineSeries = !model.isServerSide && (model.variants?.isNotEmpty ?? false);
-                    widget.onDownloadPressed(
-                      id: isOfflineSeries ? (ModelDataUtils.getOptimalVariantId(model) ?? model.id) : model.id,
-                      url: isOfflineSeries ? ModelDataUtils.getOptimalDownloadUrl(model) : model.url,
-                      title: model.displayTitle,
-                    );
+                  final isOfflineSeries = !model.isServerSide &&
+                      (model.variants?.isNotEmpty ?? false);
+                  widget.onDownloadPressed(
+                    id: isOfflineSeries
+                        ? (ModelDataUtils.getOptimalVariantId(model) ??
+                            model.id)
+                        : model.id,
+                    url: isOfflineSeries
+                        ? ModelDataUtils.getOptimalDownloadUrl(model)
+                        : model.url,
+                    title: model.displayTitle,
+                  );
                 },
                 onCancelDownload: () {
                   if (!model.isServerSide &&
@@ -221,7 +227,6 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
     return columns;
   }
 
-
   String _getLocalizedCategory(String cat, AppLocalizations loc) {
     if (cat == 'categoryAll') return loc.categoryAll;
     if (cat == 'categoryFree') return loc.categoryFree;
@@ -247,32 +252,41 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
         if (_selectedCategory == 'categoryFree') return !m.isPremium;
         if (_selectedCategory == 'categoryPremium') return m.isPremium;
         if (_selectedCategory == 'categoryVideo') {
-           final t = m.displayTitle.toLowerCase();
-           final id = m.id.toLowerCase();
-           return t.contains('video') || id.contains('video') || t.contains('sora') || t.contains('kling') || t.contains('veo');
+          final t = m.displayTitle.toLowerCase();
+          final id = m.id.toLowerCase();
+          return t.contains('video') ||
+              id.contains('video') ||
+              t.contains('sora') ||
+              t.contains('kling') ||
+              t.contains('veo');
         }
         if (_selectedCategory == 'categoryPhoto') {
-           final t = m.displayTitle.toLowerCase();
-           final id = m.id.toLowerCase();
-           return t.contains('image') || id.contains('image') || t.contains('flux') || t.contains('stable') || t.contains('dall');
+          final t = m.displayTitle.toLowerCase();
+          final id = m.id.toLowerCase();
+          return t.contains('image') ||
+              id.contains('image') ||
+              t.contains('flux') ||
+              t.contains('stable') ||
+              t.contains('dall');
         }
         if (_selectedCategory == 'categoryMasculine') {
-           return m.role?.toLowerCase().contains('erkek') == true || m.role?.toLowerCase().contains('male') == true;
+          return m.role?.toLowerCase().contains('erkek') == true ||
+              m.role?.toLowerCase().contains('male') == true;
         }
         if (_selectedCategory == 'categoryFeminine') {
-           return m.role?.toLowerCase().contains('kadın') == true || m.role?.toLowerCase().contains('kız') == true || m.role?.toLowerCase().contains('female') == true;
+          return m.role?.toLowerCase().contains('kadın') == true ||
+              m.role?.toLowerCase().contains('kız') == true ||
+              m.role?.toLowerCase().contains('female') == true;
         }
         if (_selectedCategory == 'categoryInanimate') {
-           return m.role?.toLowerCase().contains('nesne') == true || m.role?.toLowerCase().contains('robot') == true;
+          return m.role?.toLowerCase().contains('nesne') == true ||
+              m.role?.toLowerCase().contains('robot') == true;
         }
         return true;
       }).toList();
     }
 
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenWidth = MediaQuery.of(context).size.width;
     const double horizontalPaddingRatio = 0.04;
     final double sectionHPad = screenWidth * horizontalPaddingRatio;
 
@@ -329,7 +343,8 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                           controller: _pageController,
                           padEnds: true,
                           physics: const ClampingScrollPhysics(),
-                          children: _buildModelColumns(context, screenWidth, filteredModels),
+                          children: _buildModelColumns(
+                              context, screenWidth, filteredModels),
                         ),
                       ),
                     ),
@@ -352,7 +367,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
           final double maxDesiredWidth =
               originalContentWidth + maxExpansionInPixels;
           final double targetWidth =
-          (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
+              (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
           final double maxTargetScale = (originalContentWidth > 0)
               ? targetWidth / originalContentWidth
               : 1.0;
@@ -387,7 +402,8 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
 
   Widget _buildHeader(double screenWidth) {
     return Padding(
-      padding: EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.03),
+      padding:
+          EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.03),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -411,13 +427,24 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: AppColors.border.withValues(alpha: 0.2)),
+                  side: BorderSide(
+                      color: AppColors.border.withValues(alpha: 0.2)),
                 ),
                 offset: const Offset(0, 30),
-                          onOpened: () { setState(() { _isMenuOpen = true; }); },
-                          onCanceled: () { setState(() { _isMenuOpen = false; }); },
-                          onSelected: (String cat) {
-                            setState(() { _isMenuOpen = false; });
+                onOpened: () {
+                  setState(() {
+                    _isMenuOpen = true;
+                  });
+                },
+                onCanceled: () {
+                  setState(() {
+                    _isMenuOpen = false;
+                  });
+                },
+                onSelected: (String cat) {
+                  setState(() {
+                    _isMenuOpen = false;
+                  });
                   setState(() {
                     _selectedCategory = cat;
                   });
@@ -434,37 +461,48 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                           Text(
                             _getLocalizedCategory(cat, loc),
                             style: TextStyle(
-                              color: isSelected ? AppColors.senaryColor : AppColors.primaryColor.inverted,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected
+                                  ? AppColors.senaryColor
+                                  : AppColors.primaryColor.inverted,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                               fontSize: 14,
                             ),
                           ),
                           if (isSelected) const Spacer(),
                           if (isSelected)
-                            Icon(Icons.check_rounded, color: AppColors.senaryColor, size: 18),
+                            Icon(Icons.check_rounded,
+                                color: AppColors.senaryColor, size: 18),
                         ],
                       ),
                     );
                   }).toList();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _getLocalizedCategory(_selectedCategory, AppLocalizations.of(context)!),
+                        _getLocalizedCategory(
+                            _selectedCategory, AppLocalizations.of(context)!),
                         style: TextStyle(
-                          color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                          color: AppColors.primaryColor.inverted
+                              .withValues(alpha: 0.7),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        _isMenuOpen ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                        _isMenuOpen
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
                         size: 20,
-                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.7),
                       ),
                     ],
                   ),

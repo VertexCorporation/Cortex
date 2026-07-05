@@ -16,10 +16,7 @@ class LoginBubbleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
     final localizations = AppLocalizations.of(context)!;
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenWidth = MediaQuery.of(context).size.width;
 
     final double scale = (screenWidth / 375.0).clamp(0.85, 1.2);
 

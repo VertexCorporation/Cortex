@@ -314,8 +314,8 @@ class FileDownloadHelper extends ChangeNotifier {
       );
 
       final tempFile = File(tempFilePath);
-      if (tempFile.existsSync()) {
-        tempFile.renameSync(taskInfo.filePath);
+      if (await tempFile.exists()) {
+        await tempFile.rename(taskInfo.filePath);
       }
 
       taskInfo.onProgress(taskId, 100);
@@ -351,7 +351,7 @@ class FileDownloadHelper extends ChangeNotifier {
         if (taskInfo != null) {
           taskInfo.isCancelledByUser = true;
           final tempFile = File("${taskInfo.filePath}.tmp");
-          if (tempFile.existsSync()) tempFile.deleteSync();
+          if (await tempFile.exists()) await tempFile.delete();
         }
         _dioCancelTokens.remove(taskId);
         _dioProgressUpdateMs.remove(taskId);

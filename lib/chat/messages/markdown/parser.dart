@@ -9,50 +9,86 @@ import 'utils.dart';
 import 'inline.dart';
 import 'blocks.dart';
 
+final _checkEmoji = RegExp(r'(?<=\n|^)\s*[✅❌✓✗]\s*(?=\n|$)');
+final _newlineGtNewline = RegExp(r'\n>\s*\n');
+final _brTag = RegExp(r'<\s*br\s*/?\s*>|<\s*/\s*br\s*>', caseSensitive: false);
+final _quadAsterisk = RegExp(r'\*{4,}([^*\r\n]+?)\*{4,}');
+final _quadUnderscore = RegExp(r'_{4,}([^_\r\n]+?)_{4,}');
+final _newlineBeforeWidget = RegExp(r'\n{2,}(?=<<<WIDGET)');
+final _newlineAfterWidgetEnd = RegExp(r'(?<=<<<END>>>)\n{2,}');
+final _memoryOpen = RegExp(r'\s*<memory[)>]?[\s\S]*?(?:</memory[)>]?|$)\s*',
+    caseSensitive: false);
+final _memoryPartial = RegExp(
+    r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:[)>][\s\S]*)?)?)?)?)?)?$',
+    caseSensitive: false);
+final _sourceHeader = RegExp(
+    r'(?:\n|^)#{1,6}\s*(?:Sources|References|Citations):?\s*$',
+    caseSensitive: false,
+    multiLine: true);
+final _closedThink = RegExp(r'<think>([\s\S]*?)</think>', multiLine: true);
+final _unclosedThink = RegExp(r'<think>([\s\S]*)$', multiLine: true);
+final _cleanThinkTags = RegExp(r'</?think>', caseSensitive: false);
+final _leadingColon = RegExp(r'^[\s:]+');
+final _trailingNewlines = RegExp(r'^\n+|\n+$');
+final _tableSeparator =
+    RegExp(r'^\s*\|(?:\s*:?-+:?\s*\|)+\s*$', multiLine: true);
+final _headingPrefix = RegExp(r'^#+\s*');
+final _horizontalRule = RegExp(r'^---$', multiLine: true);
+final _horizontalRuleAny = RegExp(r'^\s*([*\-_]){3,}\s*$', multiLine: true);
+final _latexDelimiters = RegExp(r'(\$\$|\\\[|\\\]|\\\(|\\\))');
+final _latexTextCmd = RegExp(r'\\text\{(.+?)\}');
+final _latexFrac = RegExp(r'\\frac\{(.+?)\}\{(.+?)\}');
+final _latexSqrtWithIdx = RegExp(r'\\sqrt\[(.+?)\]\{(.+?)\}');
+final _latexSqrt = RegExp(r'\\sqrt\{(.+?)\}');
+final _latexStyleCmd = RegExp(r'\\(mathbf|mathbb|mathcal)\{(.+?)\}');
+final _latexBraces = RegExp(r'[{}]');
+final _latexCmd = RegExp(r'\\([a-zA-Z]+)');
+final _markdownItalic = RegExp(r'[*_](.+?)[*_]', dotAll: true);
+final _emojiChars = RegExp(r'[✅❌✓✗]');
+final _multiSpaces = RegExp(r'[ \t]{2,}', multiLine: true);
+final _multiNewlines = RegExp(r'(\s*\n\s*){2,}');
+final _blockquotePrefix = RegExp(r'^\s*>\s?');
+
+final _functionTag = RegExp(
+    r'\s*<function(?:-call)?[)>]?[\s\S]*?(?:</function(?:-call)?[)>]?|$)\s*',
+    caseSensitive: false);
+final _partialFunctionTag = RegExp(
+    r'\s*<f(?:u(?:n(?:c(?:t(?:i(?:o(?:n(?:-?(?:c(?:a(?:l(?:l(?:[)>][\s\S]*)?)?)?)?)?)?)?)?)?)?)?)?)?$',
+    caseSensitive: false);
+
 List<InlineSpan> parseText(BuildContext context, String text,
     {double? fontSize, bool isFinished = false, List<dynamic>? citations}) {
   try {
     text = text.replaceAll(RegexPatterns.usingToolLine, '');
-    text = text.replaceAll(RegExp(r'(?<=\n|^)\s*[✅❌✓✗]\s*(?=\n|$)'), '');
-    text = text.replaceAll(RegExp(r'\n>\s*\n'), '\n');
+    text = text.replaceAll(_checkEmoji, '');
+    text = text.replaceAll(_newlineGtNewline, '\n');
     text = _replaceOutsideCode(
       text,
-      RegExp(r'<\s*br\s*/?\s*>|<\s*/\s*br\s*>', caseSensitive: false),
+      _brTag,
       (_) => '\n',
     );
     text = _stripTrailingHorizontalRule(text);
     text = _replaceOutsideCode(
       text,
-      RegExp(r'\*{4,}([^*\r\n]+?)\*{4,}'),
+      _quadAsterisk,
       (match) => '**${match.group(1)}**',
     );
     text = _replaceOutsideCode(
       text,
-      RegExp(r'_{4,}([^_\r\n]+?)_{4,}'),
+      _quadUnderscore,
       (match) => '__${match.group(1)}__',
     );
 
-    text = text.replaceAll(RegExp(r'\n{2,}(?=<<<WIDGET)'), '\n');
-    text = text.replaceAll(RegExp(r'(?<=<<<END>>>)\n{2,}'), '\n');
+    text = text.replaceAll(_newlineBeforeWidget, '\n');
+    text = text.replaceAll(_newlineAfterWidgetEnd, '\n');
 
     text = mergeFragmentedThinkingBlocks(text);
     text = _stripFunctionTagsOutsideCode(text);
 
-    text = text.replaceAll(
-        RegExp(r'\s*<memory[)>]?[\s\S]*?(?:</memory[)>]?|$)\s*',
-            caseSensitive: false),
-        '');
-    text = text.replaceAll(
-        RegExp(r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:[)>][\s\S]*)?)?)?)?)?)?$',
-            caseSensitive: false),
-        '');
-
+    text = text.replaceAll(_memoryOpen, '');
+    text = text.replaceAll(_memoryPartial, '');
     List<Source> sources = [];
-    final sourceHeaderRegex = RegExp(
-        r'(?:\n|^)#{1,6}\s*(?:Sources|References|Citations):?\s*$',
-        caseSensitive: false,
-        multiLine: true);
-    final match = sourceHeaderRegex.firstMatch(text);
+    final match = _sourceHeader.firstMatch(text);
 
     if (match != null) {
       int headerStart = match.start;
@@ -108,15 +144,15 @@ List<InlineSpan> parseText(BuildContext context, String text,
 
     final blockMatches = <MatchRange>[];
 
-    patterns.forEach((type, pattern) {
-      for (final match in pattern.allMatches(text)) {
+    for (final entry in patterns.entries) {
+      for (final match in entry.value.allMatches(text)) {
         blockMatches.add(MatchRange(
             start: match.start,
             end: match.end,
             text: match.group(0)!,
-            type: type));
+            type: entry.key));
       }
-    });
+    }
 
     blockMatches.sort((a, b) => a.start - b.start);
 
@@ -145,9 +181,9 @@ List<InlineSpan> parseText(BuildContext context, String text,
       }
 
       if (blockMatch.type == 'bulletList') {
-        final bulletMatch = RegExp(r'^\s*[*\-+]\s+(.+)$', multiLine: true)
-            .firstMatch(blockMatch.text);
-        final content = bulletMatch?.group(1) ?? '';
+        final content =
+            RegexPatterns.bulletList.firstMatch(blockMatch.text)?.group(1) ??
+                '';
         final inlineSpans = processInlineElements(
             context, content, inlinePatterns, fs,
             urlMap: urlMap, citations: activeCitations);
@@ -203,110 +239,90 @@ List<InlineSpan> parseText(BuildContext context, String text,
 }
 
 String mergeFragmentedThinkingBlocks(String text) {
-  final closedThinkPattern =
-      RegExp(r'<think>([\s\S]*?)</think>', multiLine: true);
-  final closedMatches = closedThinkPattern.allMatches(text).toList();
-
-  final unclosedThinkPattern = RegExp(r'<think>([\s\S]*)$', multiLine: true);
-  String? unclosedContent;
-  bool hasUnclosedBlock = false;
-
-  String textWithoutClosed = text.replaceAll(closedThinkPattern, '');
-  final unclosedMatch = unclosedThinkPattern.firstMatch(textWithoutClosed);
-  if (unclosedMatch != null) {
-    unclosedContent = unclosedMatch.group(1)?.trim();
-    hasUnclosedBlock = unclosedContent?.isNotEmpty ?? false;
+  final closedMatches = _closedThink.allMatches(text).toList();
+  if (closedMatches.isEmpty) {
+    final unclosedMatch = _unclosedThink.firstMatch(text);
+    if (unclosedMatch == null) return text;
+    final content = unclosedMatch.group(1)?.trim() ?? '';
+    if (content.isEmpty) return text;
+    final cleaned = content.replaceAll(_cleanThinkTags, '');
+    final cleanedText = text.replaceFirst(_unclosedThink, '');
+    return '<think>$cleaned\n$cleanedText';
   }
 
-  if (closedMatches.isEmpty && !hasUnclosedBlock) {
-    return text;
-  }
-
-  final List<String> thinkingContents = [];
-
-  String cleanNestedThinkTags(String content) {
-    return content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
-  }
+  final buf = StringBuffer();
+  bool hasUnclosed = false;
+  int lastEnd = 0;
 
   for (final match in closedMatches) {
-    var content = match.group(1)?.trim() ?? '';
-    content = cleanNestedThinkTags(content);
-    if (content.isNotEmpty) {
-      thinkingContents.add(content);
+    final content = match.group(1)?.trim() ?? '';
+    final cleaned = content.replaceAll(_cleanThinkTags, '');
+    if (cleaned.isNotEmpty) {
+      buf.write(cleaned);
+      buf.write('\n\n');
     }
+    lastEnd = match.end;
   }
 
-  if (hasUnclosedBlock &&
-      unclosedContent != null &&
-      unclosedContent.isNotEmpty) {
-    unclosedContent = cleanNestedThinkTags(unclosedContent);
-    thinkingContents.add(unclosedContent);
+  String remaining = text.substring(lastEnd);
+  final unclosedMatch = _unclosedThink.firstMatch(remaining);
+  if (unclosedMatch != null) {
+    final content = unclosedMatch.group(1)?.trim() ?? '';
+    if (content.isNotEmpty) {
+      final cleaned = content.replaceAll(_cleanThinkTags, '');
+      buf.write(cleaned);
+      hasUnclosed = true;
+    }
+    remaining = remaining.replaceFirst(_unclosedThink, '');
   }
 
-  if (thinkingContents.isEmpty) {
-    return text;
-  }
+  final merged = buf.toString().trim();
+  if (merged.isEmpty) return text;
 
-  String cleanedText = text;
-  cleanedText = cleanedText.replaceAll(closedThinkPattern, '');
-  cleanedText = cleanedText.replaceAll(unclosedThinkPattern, '');
+  remaining = remaining.replaceFirst(_leadingColon, '');
+  remaining = remaining.trim();
+  remaining = remaining.replaceFirst(_trailingNewlines, '');
 
-  // Clean up leading colons and whitespace that might leak from model outputs after thinking
-  cleanedText = cleanedText.replaceFirst(RegExp(r'^[\s:]+'), '');
-
-  final mergedThinking = thinkingContents.join('\n\n');
-
-  final thinkTag = hasUnclosedBlock
-      ? '<think>$mergedThinking'
-      : '<think>$mergedThinking</think>';
-
-  cleanedText = cleanedText.trim();
-  cleanedText = cleanedText.replaceAll(RegExp(r'^\n+|\n+$'), '');
-
-  final separator = cleanedText.isNotEmpty ? '\n' : '';
-
-  return '$thinkTag$separator$cleanedText';
+  final tag = hasUnclosed ? '<think>$merged' : '<think>$merged</think>';
+  final sep = remaining.isNotEmpty ? '\n' : '';
+  return '$tag$sep$remaining';
 }
 
 String stripMarkup(String text) {
   text = text.replaceAll(RegexPatterns.widget, '');
   text = text.replaceAllMapped(RegexPatterns.codeBlock, (m) => '\n');
-  text = text.replaceAll(
-      RegExp(r'^\s*\|(?:\s*:?-+:?\s*\|)+\s*$', multiLine: true), '');
+  text = text.replaceAll(_tableSeparator, '');
   text = text.replaceAll('|', '  ');
   text = text.replaceAllMapped(RegexPatterns.heading,
-      (m) => '${m.group(0)!.replaceFirst(RegExp(r"^#+\s*"), "")}\n');
+      (m) => '${m.group(0)!.replaceFirst(_headingPrefix, "")}\n');
   text =
       text.replaceAllMapped(RegexPatterns.bulletList, (m) => '${m.group(1)}\n');
   text = text.replaceAllMapped(RegexPatterns.blockquote,
       (m) => '${_stripBlockquotePrefix(m.group(0) ?? '')}\n');
-  text = text.replaceAll(RegExp(r'^---$', multiLine: true), '');
-  text = text.replaceAll(RegExp(r'^\s*([*\-_]){3,}\s*$', multiLine: true), '');
+  text = text.replaceAll(_horizontalRule, '');
+  text = text.replaceAll(_horizontalRuleAny, '');
 
-  text = text.replaceAll(RegExp(r'(\$\$|\\\[|\\\]|\\\(|\\\))'), '');
+  text = text.replaceAll(_latexDelimiters, '');
   text = text.replaceAll(r'$', '');
 
-  text = text.replaceAllMapped(RegExp(r'\\text\{(.+?)\}'), (m) => m.group(1)!);
+  text = text.replaceAllMapped(_latexTextCmd, (m) => m.group(1)!);
 
-  text = text.replaceAllMapped(RegExp(r'\\frac\{(.+?)\}\{(.+?)\}'),
-      (m) => '(${m.group(1)}/${m.group(2)})');
-  text = text.replaceAllMapped(RegExp(r'\\sqrt\[(.+?)\]\{(.+?)\}'),
-      (m) => '(${m.group(1)})√(${m.group(2)})');
+  text =
+      text.replaceAllMapped(_latexFrac, (m) => '(${m.group(1)}/${m.group(2)})');
   text = text.replaceAllMapped(
-      RegExp(r'\\sqrt\{(.+?)\}'), (m) => '√(${m.group(1)})');
+      _latexSqrtWithIdx, (m) => '(${m.group(1)})√(${m.group(2)})');
+  text = text.replaceAllMapped(_latexSqrt, (m) => '√(${m.group(1)})');
 
-  text = text.replaceAllMapped(
-      RegExp(r'\\(mathbf|mathbb|mathcal)\{(.+?)\}'), (m) => m.group(2)!);
+  text = text.replaceAllMapped(_latexStyleCmd, (m) => m.group(2)!);
 
-  text = text.replaceAll(RegExp(r'[{}]'), '');
-  text = text.replaceAll(RegExp(r'\\([a-zA-Z]+)'), '');
+  text = text.replaceAll(_latexBraces, '');
+  text = text.replaceAll(_latexCmd, '');
 
   text = text.replaceAllMapped(RegexPatterns.link, (m) => m.group(1) ?? '');
   text =
       text.replaceAllMapped(RegexPatterns.boldItalic, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(RegexPatterns.bold, (m) => m.group(1) ?? '');
-  text = text.replaceAllMapped(
-      RegExp(r'[*_](.+?)[*_]', dotAll: true), (m) => m.group(1) ?? '');
+  text = text.replaceAllMapped(_markdownItalic, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(
       RegexPatterns.strikethrough, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(
@@ -314,9 +330,9 @@ String stripMarkup(String text) {
 
   text = text.replaceAll(RegexPatterns.thinking, '');
   text = text.replaceAll(RegexPatterns.usingToolLine, '');
-  text = text.replaceAll(RegExp(r'[✅❌✓✗]'), '');
-  text = text.replaceAll(RegExp(r'[ \t]{2,}', multiLine: true), ' ');
-  text = text.replaceAll(RegExp(r'(\s*\n\s*){2,}'), '\n\n');
+  text = text.replaceAll(_emojiChars, '');
+  text = text.replaceAll(_multiSpaces, ' ');
+  text = text.replaceAll(_multiNewlines, '\n\n');
 
   return text.trim();
 }
@@ -325,7 +341,7 @@ String _stripBlockquotePrefix(String text) {
   return text
       .trimRight()
       .split('\n')
-      .map((line) => line.replaceFirst(RegExp(r'^\s*>\s?'), ''))
+      .map((line) => line.replaceFirst(_blockquotePrefix, ''))
       .join('\n');
 }
 
@@ -424,29 +440,18 @@ String _stripFunctionTagsOutsideCode(String text) {
   final StringBuffer result = StringBuffer();
   int lastMatchEnd = 0;
 
-  // Pattern to match <function> or <function-call> completely until closed or end of string
-  final functionPattern = RegExp(
-      r'\s*<function(?:-call)?[)>]?[\s\S]*?(?:</function(?:-call)?[)>]?|$)\s*',
-      caseSensitive: false);
-
-  // Pattern to match partial unclosed <function> at the very end of the string
-  final partialFunctionPattern = RegExp(
-      r'\s*<f(?:u(?:n(?:c(?:t(?:i(?:o(?:n(?:-?(?:c(?:a(?:l(?:l(?:[)>][\s\S]*)?)?)?)?)?)?)?)?)?)?)?)?)?$',
-      caseSensitive: false);
-
   for (final range in finalProtectedRanges) {
     final String beforeCode = text.substring(lastMatchEnd, range.start);
-    String processedBefore = beforeCode.replaceAll(functionPattern, '');
-    processedBefore = processedBefore.replaceAll(partialFunctionPattern, '');
+    String processedBefore = beforeCode.replaceAll(_functionTag, '');
+    processedBefore = processedBefore.replaceAll(_partialFunctionTag, '');
     result.write(processedBefore);
     result.write(range.text);
     lastMatchEnd = range.end;
   }
 
   final String remainingText = text.substring(lastMatchEnd);
-  String processedRemaining = remainingText.replaceAll(functionPattern, '');
-  processedRemaining =
-      processedRemaining.replaceAll(partialFunctionPattern, '');
+  String processedRemaining = remainingText.replaceAll(_functionTag, '');
+  processedRemaining = processedRemaining.replaceAll(_partialFunctionTag, '');
   result.write(processedRemaining);
 
   return result.toString();

@@ -102,6 +102,7 @@
     "description": "Filter button text for pre-defined role-playing characters"
   },
   "chat": "채팅",
+  "branch": "분기",
   "chatLengthLimitExceeded": "이 채팅이 글자 수 제한을 초과했습니다. 새 채팅을 시작하거나 구독을 구매해주세요.",
   "chatTitleCriticalInstruction": "[중요 지시사항]: 당신은 제목 생성기입니다. 사용자의 질문에 답하거나, 채팅을 하거나, 인사하지 마세요. 사용자가 묻는 내용을 요약하는 2~4단어 분량의 제목만 출력하세요.",
   "@chatTitleCriticalInstruction": {

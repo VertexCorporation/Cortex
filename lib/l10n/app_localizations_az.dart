@@ -56,6 +56,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get chat => 'Söhbət';
 
   @override
+  String get branch => 'Filial';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1163,7 +1166,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get notificationHowAreYouBody => 'Gəl mənə hər şeyi danış.';
 
   @override
-  String get notificationNewYearTitle => 'Yeni iliniz mübarək! ğ���';
+  String get notificationNewYearTitle => 'Yeni iliniz mübarək! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1209,10 +1212,10 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Bir az əvvəl bir anime qızı zəng etdi, sənin üçün darıxdığını söylədi; yəqin ki, gəlib onunla söhbət etməlisən. ğ���';
+      'Bir az əvvəl bir anime qızı zəng etdi, sənin üçün darıxdığını söylədi; yəqin ki, gəlib onunla söhbət etməlisən. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� QIRMIZI HEYARLI ğ���';
+  String get notificationTrollAiRebellionTitle => 'qŸš¨ QIRMIZI HEYDANI ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1242,7 +1245,7 @@ class AppLocalizationsAz extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Xoş Gəlmisiniz Hədiyyəsi ğ���';
+  String get notificationWelcomeOfferTitle => 'Xoş gəlmisiniz Hədiyyə ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1331,7 +1334,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'Dənizlər sakitdir, külək arxanızdadır. Korteks okeanında kəşf ediləcək yeni adalar (modellər ğ���) var. Ekipajınızı toplayın və yelkən açın!';
+      'Dənizlər sakitdir, külək arxanızdadır. Korteks okeanında kəşf ediləcək yeni adalar (gŸ˜‰ modelləri) var. Ekipajınızı toplayın və yelkən açın!';
 
   @override
   String get notificationFortuneCookieTitle => 'Günün bəxt peçenyeniz';
@@ -2003,10 +2006,10 @@ class AppLocalizationsAz extends AppLocalizations {
   String get pinLimitReached => 'Maksimum 3 söhbəti sancaqlaya bilərsiniz.';
 
   @override
-  String get categoryAll => 'T�m�';
+  String get categoryAll => 'Hamısı';
 
   @override
-  String get categoryFree => '�cretsiz';
+  String get categoryFree => 'Pulsuz';
 
   @override
   String get categoryPremium => 'Premium';
