@@ -45,7 +45,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode flutter.versionCode.toInteger()
-        versionName "Cortex 7.9.8"
+        versionName flutter.versionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

@@ -33,7 +33,7 @@ class ModelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
 
@@ -203,7 +203,6 @@ class ModelCard extends StatelessWidget {
                               ],
                             ),
                           ),
-
                         ],
                       ),
                     ),

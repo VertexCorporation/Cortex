@@ -21,13 +21,14 @@ class SearchHitTile extends StatelessWidget {
     // We want to extract a snippet around the match
     String snippet = hit.snippet.replaceAll('\n', ' ');
     int matchIndex = snippet.toLowerCase().indexOf(hit.query.toLowerCase());
-    
+
     // Safety check if the query is not literally in the snippet (e.g., tokenized search)
     if (matchIndex == -1) matchIndex = 0;
-    
+
     // Trim the snippet to be around the match
     int startIndex = (matchIndex - 30).clamp(0, snippet.length);
-    int endIndex = (matchIndex + hit.query.length + 30).clamp(0, snippet.length);
+    int endIndex =
+        (matchIndex + hit.query.length + 30).clamp(0, snippet.length);
     String displaySnippet = snippet.substring(startIndex, endIndex);
     if (startIndex > 0) displaySnippet = '...$displaySnippet';
     if (endIndex < snippet.length) displaySnippet = '$displaySnippet...';
@@ -57,7 +58,8 @@ class SearchHitTile extends StatelessWidget {
                   'assets/icons/search.svg',
                   width: 16,
                   height: 16,
-                  colorFilter: ColorFilter.mode(AppColors.secondaryColor, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      AppColors.secondaryColor, BlendMode.srcIn),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -75,7 +77,8 @@ class SearchHitTile extends StatelessWidget {
                 Text(
                   _formatTimestamp(hit.timestamp),
                   style: TextStyle(
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                    color:
+                        AppColors.primaryColor.inverted.withValues(alpha: 0.5),
                     fontSize: 12,
                   ),
                 ),
@@ -102,13 +105,13 @@ class SearchHitTile extends StatelessWidget {
 
   List<TextSpan> _highlightQuery(String text, String query) {
     if (query.isEmpty) return [TextSpan(text: text)];
-    
+
     final matches = query.toLowerCase().allMatches(text.toLowerCase());
     if (matches.isEmpty) return [TextSpan(text: text)];
 
     List<TextSpan> spans = [];
     int currentIndex = 0;
-    
+
     for (final match in matches) {
       if (match.start > currentIndex) {
         spans.add(TextSpan(text: text.substring(currentIndex, match.start)));
@@ -122,14 +125,14 @@ class SearchHitTile extends StatelessWidget {
       ));
       currentIndex = match.end;
     }
-    
+
     if (currentIndex < text.length) {
       spans.add(TextSpan(text: text.substring(currentIndex)));
     }
-    
+
     return spans;
   }
-  
+
   String _formatTimestamp(DateTime dt) {
     return DateFormat('MMM d, HH:mm').format(dt);
   }

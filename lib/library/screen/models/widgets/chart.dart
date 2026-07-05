@@ -22,7 +22,8 @@ class SystemInfoChart extends StatefulWidget {
   SystemInfoChartState createState() => SystemInfoChartState();
 }
 
-class SystemInfoChartState extends State<SystemInfoChart> with SingleTickerProviderStateMixin {
+class SystemInfoChartState extends State<SystemInfoChart>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _storageAnimation;
   late Animation<double> _memoryAnimation;
@@ -36,11 +37,15 @@ class SystemInfoChartState extends State<SystemInfoChart> with SingleTickerProvi
       vsync: this,
     );
 
-    _storageAnimation = Tween<double>(begin: 0, end: widget.usedStorage.toDouble())
-        .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    _storageAnimation =
+        Tween<double>(begin: 0, end: widget.usedStorage.toDouble()).animate(
+            CurvedAnimation(
+                parent: _animationController, curve: Curves.easeOut));
 
-    _memoryAnimation = Tween<double>(begin: 0, end: widget.usedMemory.toDouble())
-        .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    _memoryAnimation =
+        Tween<double>(begin: 0, end: widget.usedMemory.toDouble()).animate(
+            CurvedAnimation(
+                parent: _animationController, curve: Curves.easeOut));
 
     _animationController.forward();
   }

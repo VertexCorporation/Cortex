@@ -187,13 +187,9 @@ class ModelEntity {
     final rawTitleCandidate = getLocalizedFieldFromDetails('title') ??
         getStringOrLocalized(map['title']);
     final rawTitle =
-    rawTitleCandidate
-        ?.trim()
-        .isNotEmpty == true ? rawTitleCandidate : null;
+        rawTitleCandidate?.trim().isNotEmpty == true ? rawTitleCandidate : null;
     final hasUsableSeriesTitle = seriesSource != null &&
-        seriesSource
-            .trim()
-            .isNotEmpty &&
+        seriesSource.trim().isNotEmpty &&
         !_looksLikeRawId(seriesSource, id);
     final titleSource = _looksLikeRawId(rawTitle, id) && hasUsableSeriesTitle
         ? seriesSource
@@ -203,9 +199,9 @@ class ModelEntity {
       id: id,
       displayTitle: titleSource.isNotEmpty
           ? formatName(
-        titleSource,
-        isOfflineVariant: map['type'] == 'offline',
-      )
+              titleSource,
+              isOfflineVariant: map['type'] == 'offline',
+            )
           : 'Unknown Model',
       series: formatName(seriesSource),
       producer: formatName(getStringOrLocalized(map['producer'])) != ""
@@ -246,9 +242,7 @@ class ModelEntity {
   }
 
   static bool _looksLikeRawId(String? value, String id) {
-    if (value == null || value
-        .trim()
-        .isEmpty) {
+    if (value == null || value.trim().isEmpty) {
       return false;
     }
     String normalize(String input) =>
@@ -257,10 +251,7 @@ class ModelEntity {
   }
 
   static String _normalizedLangCode(String langCode) =>
-      langCode
-          .split(_langSplitter)
-          .first
-          .toLowerCase();
+      langCode.split(_langSplitter).first.toLowerCase();
 
   static List<String> _languageFallbackKeys(String langCode) {
     final normalized = _normalizedLangCode(langCode);
@@ -364,16 +355,32 @@ class ModelEntity {
 
   // --- Getters for convenience ---
 
-  bool get isCustomModel => source == 'user' || id.startsWith('self_') || id.startsWith('local_');
+  bool get isCustomModel =>
+      source == 'user' || id.startsWith('self_') || id.startsWith('local_');
 
   bool get isServerSide => type != 'offline';
 
   bool get isPremium {
     // Explicit list of premium models as requested by the user.
     final premiumKeywords = [
-      'claude', 'codex', 'elevenlabs', 'flux', 'gemini', 'grok', 'kimi',
-      'kling video', 'ling', 'nano banana', 'see dance', 'seedans',
-      'seedream', 'sonar', 'sora', 'stable', 'veo', 'z image'
+      'claude',
+      'codex',
+      'elevenlabs',
+      'flux',
+      'gemini',
+      'grok',
+      'kimi',
+      'kling video',
+      'ling',
+      'nano banana',
+      'see dance',
+      'seedans',
+      'seedream',
+      'sonar',
+      'sora',
+      'stable',
+      'veo',
+      'z image'
     ];
 
     final titleLower = displayTitle.toLowerCase();

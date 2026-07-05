@@ -19,8 +19,8 @@ class AppThemeSection extends StatelessWidget {
   const AppThemeSection({super.key});
 
   /// Returns the localized name for a given theme code.
-  String _getLocalizedThemeName(AppLocalizations localizations,
-      String themeCode) {
+  String _getLocalizedThemeName(
+      AppLocalizations localizations, String themeCode) {
     final Map<String, String> mapping = {
       'light': localizations.light,
       'dark': localizations.dark,
@@ -116,19 +116,12 @@ class AppThemeSection extends StatelessWidget {
     final appLocalizations = AppLocalizations.of(context)!;
 
     // --- DYNAMIC SCALING ---
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final double scale = screenWidth / 400.0;
 
-    final List<String> availableThemeCodes =
-    AppColors.overlayStyles.keys.toList();
-    List<Map<String, dynamic>> themesList = availableThemeCodes.map((code) {
+    List<Map<String, dynamic>> themesList =
+        AppColors.overlayStyles.keys.map((code) {
       return {
         'code': code,
         'name': _getLocalizedThemeName(appLocalizations, code),
@@ -186,17 +179,18 @@ class AppThemeSection extends StatelessWidget {
                             height: 1,
                             thickness: 0.5,
                             color:
-                            AppColors.quinaryColor.withValues(alpha: 0.7)),
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
 
                         // --- Themes List with Animations ---
                         ConstrainedBox(
                           constraints:
-                          BoxConstraints(maxHeight: screenHeight * 0.4),
+                              BoxConstraints(maxHeight: screenHeight * 0.4),
                           child: GridView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.symmetric(
                                 vertical: 10 * scale, horizontal: 10 * scale),
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: screenWidth > 600 ? 3 : 2,
                               crossAxisSpacing: 12 * scale,
                               mainAxisSpacing: 12 * scale,
@@ -207,16 +201,19 @@ class AppThemeSection extends StatelessWidget {
                               final theme = themesList[index];
                               final bool isEnabled = theme['enabled'] as bool;
                               final String themeCode = theme['code'] as String;
-                              final bool isSelected = (tempSelectedTheme == themeCode);
-                              
-                              final themeColors = AppColors.getThemeColors(themeCode);
+                              final bool isSelected =
+                                  (tempSelectedTheme == themeCode);
+
+                              final themeColors =
+                                  AppColors.getThemeColors(themeCode);
 
                               return GestureDetector(
                                 onTap: () {
                                   if (isEnabled) {
                                     if (!isSelected) {
                                       HapticFeedback.lightImpact();
-                                      setStateDialog(() => tempSelectedTheme = themeCode);
+                                      setStateDialog(
+                                          () => tempSelectedTheme = themeCode);
                                     }
                                   } else {
                                     HapticFeedback.lightImpact();
@@ -230,65 +227,90 @@ class AppThemeSection extends StatelessWidget {
                                   curve: Curves.easeInOut,
                                   decoration: BoxDecoration(
                                     color: themeColors.background,
-                                    borderRadius: BorderRadius.circular(12 * scale),
+                                    borderRadius:
+                                        BorderRadius.circular(12 * scale),
                                     border: Border.all(
-                                      color: isSelected 
+                                      color: isSelected
                                           ? AppColors.primaryColor.inverted
-                                          : AppColors.quinaryColor.withValues(alpha: 0.2),
+                                          : AppColors.quinaryColor
+                                              .withValues(alpha: 0.2),
                                       width: isSelected ? 3 * scale : 1 * scale,
                                     ),
-                                    boxShadow: isSelected 
-                                        ? [BoxShadow(color: AppColors.primaryColor.inverted.withValues(alpha: 0.3), blurRadius: 8 * scale)]
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                                color: AppColors
+                                                    .primaryColor.inverted
+                                                    .withValues(alpha: 0.3),
+                                                blurRadius: 8 * scale)
+                                          ]
                                         : [],
                                   ),
                                   child: Stack(
                                     children: [
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
                                         children: [
                                           Container(
                                             height: 24 * scale,
                                             decoration: BoxDecoration(
                                               color: themeColors.secondaryColor,
-                                              borderRadius: BorderRadius.vertical(top: Radius.circular(11 * scale)),
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      top: Radius.circular(
+                                                          11 * scale)),
                                             ),
                                           ),
                                           SizedBox(height: 8 * scale),
                                           Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8 * scale),
                                             child: Align(
                                               alignment: Alignment.centerLeft,
                                               child: Container(
                                                 width: 40 * scale,
                                                 height: 12 * scale,
                                                 decoration: BoxDecoration(
-                                                  color: themeColors.quaternaryColor,
-                                                  borderRadius: BorderRadius.circular(4 * scale),
+                                                  color: themeColors
+                                                      .quaternaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          4 * scale),
                                                 ),
                                               ),
                                             ),
                                           ),
                                           SizedBox(height: 6 * scale),
                                           Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8 * scale),
                                             child: Align(
                                               alignment: Alignment.centerRight,
                                               child: Container(
                                                 width: 50 * scale,
                                                 height: 12 * scale,
                                                 decoration: BoxDecoration(
-                                                  color: themeColors.senaryColor,
-                                                  borderRadius: BorderRadius.circular(4 * scale),
+                                                  color:
+                                                      themeColors.senaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          4 * scale),
                                                 ),
                                               ),
                                             ),
                                           ),
                                           const Spacer(),
                                           Container(
-                                            padding: EdgeInsets.symmetric(vertical: 6 * scale),
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 6 * scale),
                                             decoration: BoxDecoration(
-                                              color: themeColors.secondaryColor.withValues(alpha: 0.9),
-                                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(11 * scale)),
+                                              color: themeColors.secondaryColor
+                                                  .withValues(alpha: 0.9),
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      bottom: Radius.circular(
+                                                          11 * scale)),
                                             ),
                                             child: Text(
                                               theme['name'] as String,
@@ -296,7 +318,8 @@ class AppThemeSection extends StatelessWidget {
                                               style: TextStyle(
                                                 fontSize: 13 * scale,
                                                 fontWeight: FontWeight.bold,
-                                                color: themeColors.primaryColor.inverted,
+                                                color: themeColors
+                                                    .primaryColor.inverted,
                                               ),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -310,24 +333,33 @@ class AppThemeSection extends StatelessWidget {
                                           right: 4 * scale,
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              color: AppColors.primaryColor.inverted,
+                                              color: AppColors
+                                                  .primaryColor.inverted,
                                               shape: BoxShape.circle,
                                             ),
-                                            child: Icon(Icons.check_circle, color: themeColors.secondaryColor, size: 20 * scale),
+                                            child: Icon(Icons.check_circle,
+                                                color:
+                                                    themeColors.secondaryColor,
+                                                size: 20 * scale),
                                           ),
                                         ),
                                       if (!isEnabled)
                                         Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withValues(alpha: 0.6),
-                                            borderRadius: BorderRadius.circular(11 * scale),
+                                            color: Colors.black
+                                                .withValues(alpha: 0.6),
+                                            borderRadius: BorderRadius.circular(
+                                                11 * scale),
                                           ),
                                           child: Center(
                                             child: SvgPicture.asset(
                                               'assets/icons/lock.svg',
                                               width: 24 * scale,
                                               height: 24 * scale,
-                                              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                              colorFilter:
+                                                  const ColorFilter.mode(
+                                                      Colors.white,
+                                                      BlendMode.srcIn),
                                             ),
                                           ),
                                         ),
@@ -344,14 +376,14 @@ class AppThemeSection extends StatelessWidget {
                             height: 1,
                             thickness: 0.5,
                             color:
-                            AppColors.quinaryColor.withValues(alpha: 0.7)),
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
                             splashColor:
-                            AppColors.senaryColor.withValues(alpha: 0.1),
+                                AppColors.senaryColor.withValues(alpha: 0.1),
                             highlightColor:
-                            AppColors.senaryColor.withValues(alpha: 0.1),
+                                AppColors.senaryColor.withValues(alpha: 0.1),
                             onTap: () {
                               HapticFeedback.lightImpact();
                               Navigator.of(ctx).pop(tempSelectedTheme);
@@ -395,12 +427,9 @@ class AppThemeSection extends StatelessWidget {
     final appLocalizations = AppLocalizations.of(context)!;
     final themeProvider = context.watch<ThemeProvider>();
     final currentThemeName =
-    _getLocalizedThemeName(appLocalizations, themeProvider.currentTheme);
+        _getLocalizedThemeName(appLocalizations, themeProvider.currentTheme);
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final double scale = screenWidth / 400.0;
 
     return Column(

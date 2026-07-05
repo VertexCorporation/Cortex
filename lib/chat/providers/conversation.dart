@@ -34,11 +34,14 @@ class ConversationProvider with ChangeNotifier {
   String? _persistedModelTitle;
   String? _persistedModelImagePath;
 
+  int _lastCleanupToken = 0;
+
   // Streaming performance: throttle UI updates and use StringBuffer for memory efficiency
   Timer? _streamThrottleTimer;
   bool _hasPendingStreamUpdate = false;
   static const _streamThrottleDuration = Duration(milliseconds: 16); // ~60fps
   StringBuffer? _streamBuffer;
+  StreamSubscription? _authSub;
 
   // ===========================================================================
   // SECTION 1.5: INITIALIZATION
@@ -47,7 +50,8 @@ class ConversationProvider with ChangeNotifier {
   ConversationProvider() {
     try {
       if (Firebase.apps.isNotEmpty) {
-        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        _authSub =
+            FirebaseAuth.instance.authStateChanges().listen((User? user) {
           if (user == null) {
             resetForLogout();
           }
@@ -61,6 +65,7 @@ class ConversationProvider with ChangeNotifier {
   @override
   void dispose() {
     _streamThrottleTimer?.cancel();
+    _authSub?.cancel();
     super.dispose();
   }
 
@@ -306,10 +311,12 @@ class ConversationProvider with ChangeNotifier {
     await ChatStorageService.saveConversation(_conversationID!, title, [],
         modelId: _messages.first.model);
 
-    // Save existing messages
+    final futures = <Future>[];
     for (int i = 0; i < _messages.length; i++) {
-      await ChatStorageService.upsertMessage(_conversationID!, i, _messages[i]);
+      futures.add(
+          ChatStorageService.upsertMessage(_conversationID!, i, _messages[i]));
     }
+    await Future.wait(futures);
 
     _isEphemeral = false;
   }
@@ -482,6 +489,14 @@ class ConversationProvider with ChangeNotifier {
     }
   }
 
+  /// Removes all messages after [index] (inclusive).
+  void removeMessagesAfter(int index) {
+    if (index >= 0 && index < _messages.length) {
+      _messages = _messages.sublist(0, index);
+      notifyListeners();
+    }
+  }
+
   /// Finalizes the AI response at a specific index, marking it as complete.
   void finishBotResponse(int index) {
     // Guard against race conditions (e.g. StopService vs SendService completion)
@@ -575,7 +590,9 @@ class ConversationProvider with ChangeNotifier {
       _isWaitingForResponse = false;
       notifyListeners();
 
+      final cleanupToken = ++_lastCleanupToken;
       Future.delayed(const Duration(milliseconds: 250), () {
+        if (cleanupToken != _lastCleanupToken) return;
         if (index < _messages.length && _messages[index].opacity == 0.0) {
           _messages.removeAt(index);
           notifyListeners();

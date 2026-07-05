@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="flutter_downloader_notification_started">Daxistin dest pê kir</string>
-    <string name="flutter_downloader_notification_in_progress">Daxistin didome</string>
-    <string name="flutter_downloader_notification_canceled">Daxistin hat betalkirin</string>
-    <string name="flutter_downloader_notification_failed">Daxistin bi ser neket</string>
-    <string name="flutter_downloader_notification_complete">Daxistin qediya</string>
-    <string name="flutter_downloader_notification_paused">Daxistin hat sekinandin</string>
-</resources>

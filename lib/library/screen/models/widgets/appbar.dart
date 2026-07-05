@@ -29,8 +29,6 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
     final double iconSize = isTablet ? 18.0 : 15.0;
     final double buttonSize = isTablet ? 48.0 : 42.0;
 
-
-
     return CortexAppBar(
       // Hide leading button on desktop since sidebar is fixed
       leadingMode: isDesktop ? CortexLeadingMode.none : CortexLeadingMode.auto,

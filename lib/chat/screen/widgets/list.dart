@@ -45,7 +45,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
     if (!mounted) return;
     final controller = widget.scrollController;
     if (!controller.hasClients) return;
-    
+
     // Handle multiple scroll positions safely
     if (controller.positions.isEmpty) return;
     if (controller.positions.length > 1) {
@@ -97,8 +97,10 @@ class _ChatMessageListState extends State<ChatMessageList> {
       child: ScrollFog(
         scrollController: widget.scrollController,
         showBottom: true,
-        showTop: false,
-      color: AppColors.senaryColor,
+        showTop: true,
+        topFogHeight: MediaQuery.of(context).size.height * 0.05,
+        bottomFogHeight: MediaQuery.of(context).size.height * 0.05,
+        color: AppColors.background,
         child: Tiles.buildMessagesList(
           context: context,
           messages: messages,
@@ -109,9 +111,8 @@ class _ChatMessageListState extends State<ChatMessageList> {
           bottomPadding: widget.bottomPadding,
           onStop: context.read<StopService>().stopResponse,
           onEdit: (index) => widget.editService.startEditingMessage(index),
-          onFadeOutComplete: (index) => context
-              .read<ConversationProvider>()
-              .removeMessageAtIndex(index),
+          onFadeOutComplete: (index) =>
+              context.read<ConversationProvider>().removeMessageAtIndex(index),
           onRegenerate: (int index, {String? newModelId}) {
             _handleRegenerate(
                 context, index, newModelId, sessionProvider.isDynamicChat);

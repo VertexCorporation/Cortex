@@ -7,18 +7,22 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
 import 'app_localizations_az.dart';
+import 'app_localizations_cs.dart';
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
 import 'app_localizations_hi.dart';
+import 'app_localizations_hu.dart';
 import 'app_localizations_id.dart';
 import 'app_localizations_it.dart';
 import 'app_localizations_ja.dart';
 import 'app_localizations_ko.dart';
 import 'app_localizations_nl.dart';
+import 'app_localizations_no.dart';
 import 'app_localizations_pt.dart';
 import 'app_localizations_ru.dart';
+import 'app_localizations_sv.dart';
 import 'app_localizations_tr.dart';
 import 'app_localizations_zh.dart';
 
@@ -112,17 +116,21 @@ abstract class AppLocalizations {
     Locale('tr'),
     Locale('ar'),
     Locale('az'),
+    Locale('cs'),
     Locale('de'),
     Locale('es'),
     Locale('fr'),
     Locale('hi'),
+    Locale('hu'),
     Locale('id'),
     Locale('it'),
     Locale('ja'),
     Locale('ko'),
     Locale('nl'),
+    Locale('no'),
     Locale('pt'),
     Locale('ru'),
+    Locale('sv'),
     Locale('zh')
   ];
 
@@ -203,6 +211,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chat'**
   String get chat;
+
+  /// No description provided for @branch.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch'**
+  String get branch;
 
   /// No description provided for @locked.
   ///
@@ -3705,18 +3719,22 @@ class _AppLocalizationsDelegate
   bool isSupported(Locale locale) => <String>[
         'ar',
         'az',
+        'cs',
         'de',
         'en',
         'es',
         'fr',
         'hi',
+        'hu',
         'id',
         'it',
         'ja',
         'ko',
         'nl',
+        'no',
         'pt',
         'ru',
+        'sv',
         'tr',
         'zh'
       ].contains(locale.languageCode);
@@ -3732,6 +3750,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsAr();
     case 'az':
       return AppLocalizationsAz();
+    case 'cs':
+      return AppLocalizationsCs();
     case 'de':
       return AppLocalizationsDe();
     case 'en':
@@ -3742,6 +3762,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsFr();
     case 'hi':
       return AppLocalizationsHi();
+    case 'hu':
+      return AppLocalizationsHu();
     case 'id':
       return AppLocalizationsId();
     case 'it':
@@ -3752,10 +3774,14 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsKo();
     case 'nl':
       return AppLocalizationsNl();
+    case 'no':
+      return AppLocalizationsNo();
     case 'pt':
       return AppLocalizationsPt();
     case 'ru':
       return AppLocalizationsRu();
+    case 'sv':
+      return AppLocalizationsSv();
     case 'tr':
       return AppLocalizationsTr();
     case 'zh':

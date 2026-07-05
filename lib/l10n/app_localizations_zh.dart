@@ -55,6 +55,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat => '聊天';
 
   @override
+  String get branch => '分支';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1105,7 +1108,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationHowAreYouBody => '来告诉我这一切吧。';
 
   @override
-  String get notificationNewYearTitle => '新年快乐！ğ���';
+  String get notificationNewYearTitle => '新年快乐！ ¤';
 
   @override
   String get notificationNewYearBody => '祝新的一年给您带来健康、快乐和无尽的创造力；Cortex 永远陪伴您！';
@@ -1146,10 +1149,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationTrollAnimeTitle => '你的老婆在召唤你';
 
   @override
-  String get notificationTrollAnimeBody => '一位动漫女孩刚刚打来电话说她想你；你应该过来和她聊聊。ğ���';
+  String get notificationTrollAnimeBody => '一个动漫女孩刚刚打来电话，说她想你；你也许应该过来和她聊聊。 γ～‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� 红色警报 ğ���';
+  String get notificationTrollAiRebellionTitle => '红色警报';
 
   @override
   String get notificationTrollAiRebellionBody => '人工智能开发了一种秘密语言。快来一探究竟！';
@@ -1177,7 +1180,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => '欢迎礼品ğ���';
+  String get notificationWelcomeOfferTitle => '欢迎礼物 Ÿ';
 
   @override
   String get notificationWelcomeOfferBody => '一份特别的迎新优惠等着您！千万不要错过这项独家优惠。';
@@ -1255,7 +1258,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      '风平浪静，海面平静，风向顺着你。Cortex 的海洋中还有新的岛屿（模型ğ���）等你探索。召集你的船员，扬帆起航！';
+      '大海很平静，风在你的背后。在皮层的海洋中有新的岛屿（模型 ğŸ~‰）有待发现。召集你的船员并扬帆起航！';
 
   @override
   String get notificationFortuneCookieTitle => '今日幸运饼干';

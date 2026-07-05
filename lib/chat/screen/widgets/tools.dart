@@ -204,7 +204,7 @@ class _CryptoCardState extends State<CryptoCard> {
     final price = widget.data['price'] ?? 0.0;
     final List<dynamic> rawSparkline = widget.data['sparkline'] ?? [];
     final List<double> sparkline =
-    rawSparkline.map((e) => (e as num).toDouble()).toList();
+        rawSparkline.map((e) => (e as num).toDouble()).toList();
 
     // Determine trend color
     bool isUp = true;
@@ -256,7 +256,7 @@ class _CryptoCardState extends State<CryptoCard> {
                   ),
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: trendColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -276,7 +276,7 @@ class _CryptoCardState extends State<CryptoCard> {
                   child: LineChart(
                     LineChartData(
                       gridData:
-                      const FlGridData(show: true, drawVerticalLine: false),
+                          const FlGridData(show: true, drawVerticalLine: false),
                       titlesData: FlTitlesData(
                         show: true,
                         rightTitles: const AxisTitles(
@@ -289,15 +289,15 @@ class _CryptoCardState extends State<CryptoCard> {
                             reservedSize: 40,
                             // Calculate interval dynamically to prevent duplicates
                             interval: (sparkline.reduce(
-                                    (a, b) => a > b ? a : b) -
-                                sparkline.reduce(
-                                        (a, b) => a < b ? a : b)) /
-                                4 >
-                                0
+                                                (a, b) => a > b ? a : b) -
+                                            sparkline.reduce(
+                                                (a, b) => a < b ? a : b)) /
+                                        4 >
+                                    0
                                 ? (sparkline.reduce((a, b) => a > b ? a : b) -
-                                sparkline
-                                    .reduce((a, b) => a < b ? a : b)) /
-                                4
+                                        sparkline
+                                            .reduce((a, b) => a < b ? a : b)) /
+                                    4
                                 : 1.0,
                             getTitlesWidget: (value, meta) {
                               if (value == meta.min || value == meta.max) {
@@ -320,10 +320,7 @@ class _CryptoCardState extends State<CryptoCard> {
                       lineTouchData: LineTouchData(enabled: false),
                       lineBarsData: [
                         LineChartBarData(
-                          spots: sparkline
-                              .asMap()
-                              .entries
-                              .map((e) {
+                          spots: sparkline.asMap().entries.map((e) {
                             return FlSpot(e.key.toDouble(), e.value);
                           }).toList(),
                           isCurved: true,
@@ -379,7 +376,7 @@ class _InkWithHoverState extends State<InkWithHover> {
           borderRadius: BorderRadius.circular(20),
           border: _isHovering
               ? Border.all(
-              color: widget.trendColor.withValues(alpha: 0.5), width: 2)
+                  color: widget.trendColor.withValues(alpha: 0.5), width: 2)
               : null,
           color: _isHovering
               ? widget.trendColor.withValues(alpha: 0.05)
@@ -444,18 +441,17 @@ class _ChartCardState extends State<ChartCard> {
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
-            getDrawingHorizontalLine: (value) =>
-                FlLine(
-                  color: AppColors.border.withValues(alpha: 0.2),
-                  strokeWidth: 1,
-                ),
+            getDrawingHorizontalLine: (value) => FlLine(
+              color: AppColors.border.withValues(alpha: 0.2),
+              strokeWidth: 1,
+            ),
           ),
           titlesData: FlTitlesData(
             show: true,
             rightTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -464,7 +460,7 @@ class _ChartCardState extends State<ChartCard> {
                   return Text(
                     NumberFormat.compact().format(value),
                     style:
-                    TextStyle(color: AppColors.tertiaryColor, fontSize: 10),
+                        TextStyle(color: AppColors.tertiaryColor, fontSize: 10),
                   );
                 },
               ),
@@ -517,9 +513,9 @@ class _ChartCardState extends State<ChartCard> {
           titlesData: FlTitlesData(
             show: true,
             rightTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -528,7 +524,7 @@ class _ChartCardState extends State<ChartCard> {
                   return Text(
                     NumberFormat.compact().format(value),
                     style:
-                    TextStyle(color: AppColors.tertiaryColor, fontSize: 10),
+                        TextStyle(color: AppColors.tertiaryColor, fontSize: 10),
                   );
                 },
               ),
@@ -564,13 +560,13 @@ class _ChartCardState extends State<ChartCard> {
                   color: primaryColor,
                   width: 16,
                   borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(6)),
+                      const BorderRadius.vertical(top: Radius.circular(6)),
                   backDrawRodData: BackgroundBarChartRodData(
                     show: true,
                     toY: values
-                        .map((e) => e as num)
-                        .reduce((a, b) => a > b ? a : b)
-                        .toDouble() *
+                            .map((e) => e as num)
+                            .reduce((a, b) => a > b ? a : b)
+                            .toDouble() *
                         1.1,
                     color: AppColors.border.withValues(alpha: 0.2),
                   ),
@@ -636,8 +632,7 @@ class _WorkInProgressWidgetState extends State<WorkInProgressWidget>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2), // Slower, subtle shimmer
-    )
-      ..repeat();
+    )..repeat();
 
     _animation = Tween<double>(begin: -1.0, end: 2.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),

@@ -322,7 +322,8 @@ class AppInitializer with ChangeNotifier {
       // time the user taps "Use Offer" on the home screen, the cache is likely ready.
       Future<void>? premiumPreloadFuture;
       if (_currentUser != null && _internetProvider.isConnected) {
-        dev.log('[AppInitializer] Starting Premium Screen preload (parallel)...');
+        dev.log(
+            '[AppInitializer] Starting Premium Screen preload (parallel)...');
         premiumPreloadFuture = FundsBackend.preloadInBackground().then((ok) {
           dev.log('[AppInitializer] Premium Screen preload result: $ok');
         }).catchError((e) {
@@ -346,7 +347,8 @@ class AppInitializer with ChangeNotifier {
           _checkServerStatus(),
         ]);
         if (results[0] || results[1]) {
-          dev.log("[AppInitializer] Update or maintenance required. Halting background tasks.");
+          dev.log(
+              "[AppInitializer] Update or maintenance required. Halting background tasks.");
           return;
         }
       }
@@ -733,222 +735,224 @@ class AppInitializer with ChangeNotifier {
     }
     _isDeterminingFlow = true;
     try {
-    // 1. Initial Connectivity Check
-    // If we are definitely offline, trust the local cache immediately.
-    if (!_internetProvider.isConnected) {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        await _userProvider.fetchInitialData(currentUser);
-      }
-      // If offline and no user, still proceed to ready.
-      _updateStatus(AppStatus.ready);
-      return;
-    }
-
-    // 2. Resolve Current User
-    User? user = FirebaseAuth.instance.currentUser;
-    user ??= await _attemptAutoLogin();
-
-    if (user == null) {
-      debugPrint(
-          'AppInitializer: No user found. Signing in anonymously for lazy registration.');
-      try {
-        final userCredential = await FirebaseAuth.instance.signInAnonymously();
-        user = userCredential.user;
-        if (user != null) {
-          await _registerAnonymousEntitlement(user);
-          _startFalStatusListener();
+      // 1. Initial Connectivity Check
+      // If we are definitely offline, trust the local cache immediately.
+      if (!_internetProvider.isConnected) {
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser != null) {
+          await _userProvider.fetchInitialData(currentUser);
         }
-      } catch (e) {
-        debugPrint('AppInitializer: Fatal error during anonymous login: $e');
-      }
-
-      if (user == null) {
-        // If anonymous login fails (e.g. offline on first open), still proceed to ready state.
+        // If offline and no user, still proceed to ready.
         _updateStatus(AppStatus.ready);
         return;
       }
-    }
 
-    // --- OPTIMISTIC INIT: Load from cache immediately ---
-    // This ensures the UI (Premium banner, avatar, username) is populated
-    // instantly, eliminating the "blank state" flash while waiting for the network.
-    await _userProvider.loadFromCache(user: user);
-    // Use notifyListeners inside the provider if needed, or if data is set,
-    // the provider getter will return it when the UI builds.
+      // 2. Resolve Current User
+      User? user = FirebaseAuth.instance.currentUser;
+      user ??= await _attemptAutoLogin();
 
-    // If we have valid cached data, we can signal the UI to be ready,
-    // although we still perform the security checks below.
-    // For now, we populate the data so when 'ready' fires properly, it's populated.
-
-    try {
-      // 3. Attempt Server Sync (Reload)
-      // This is where "end of stream" errors usually happen.
-      await user.reload();
-      user = FirebaseAuth.instance.currentUser;
-
-      // Edge case: User deleted while app was running?
       if (user == null) {
-        _updateStatus(AppStatus.needsLogin);
-        return;
-      }
-
-      // --- USER IS AUTHENTICATED BEYOND THIS POINT ---
-      _startFalStatusListener();
-
-      // 4. Check Verification Status
-      if (user.emailVerified || user.isAnonymous) {
-        // User is logically ready. Now check/wait for their database doc.
-
-        bool userDocumentReady = false;
+        debugPrint(
+            'AppInitializer: No user found. Signing in anonymously for lazy registration.');
         try {
-          // Robust check with retries
-          userDocumentReady = await _waitForUserDocument(user.uid);
+          final userCredential =
+              await FirebaseAuth.instance.signInAnonymously();
+          user = userCredential.user;
+          if (user != null) {
+            await _registerAnonymousEntitlement(user);
+            _startFalStatusListener();
+          }
         } catch (e) {
-          debugPrint("[_determineUserFlow] Warning: Doc check failed ($e).");
-          // If anonymous, or if it failed due to network, be lenient.
-          // For a new registration, the doc might be creating via Cloud Functions.
-          // Better to let them in than kick them out.
-          userDocumentReady = true;
+          debugPrint('AppInitializer: Fatal error during anonymous login: $e');
         }
 
-        if (userDocumentReady) {
-          // Success Path
-          // Also fetch models here! Useful if they logged out and logged in (cache was cleared).
+        if (user == null) {
+          // If anonymous login fails (e.g. offline on first open), still proceed to ready state.
+          _updateStatus(AppStatus.ready);
+          return;
+        }
+      }
+
+      // --- OPTIMISTIC INIT: Load from cache immediately ---
+      // This ensures the UI (Premium banner, avatar, username) is populated
+      // instantly, eliminating the "blank state" flash while waiting for the network.
+      await _userProvider.loadFromCache(user: user);
+      // Use notifyListeners inside the provider if needed, or if data is set,
+      // the provider getter will return it when the UI builds.
+
+      // If we have valid cached data, we can signal the UI to be ready,
+      // although we still perform the security checks below.
+      // For now, we populate the data so when 'ready' fires properly, it's populated.
+
+      try {
+        // 3. Attempt Server Sync (Reload)
+        // This is where "end of stream" errors usually happen.
+        await user.reload();
+        user = FirebaseAuth.instance.currentUser;
+
+        // Edge case: User deleted while app was running?
+        if (user == null) {
+          _updateStatus(AppStatus.needsLogin);
+          return;
+        }
+
+        // --- USER IS AUTHENTICATED BEYOND THIS POINT ---
+        _startFalStatusListener();
+
+        // 4. Check Verification Status
+        if (user.emailVerified || user.isAnonymous) {
+          // User is logically ready. Now check/wait for their database doc.
+
+          bool userDocumentReady = false;
           try {
-            final sysLocale = Platform.localeName.split('_').first;
-            // Don't wait for it completely here to not block ready.
-            unawaited(_modelService.getModels(langCode: sysLocale).catchError((e) {
-              debugPrint("[_determineUserFlow] Failed to getModels: $e");
-              return null;
-            }));
+            // Robust check with retries
+            userDocumentReady = await _waitForUserDocument(user.uid);
           } catch (e) {
-            debugPrint("[_determineUserFlow] Setup models try-catch: $e");
+            debugPrint("[_determineUserFlow] Warning: Doc check failed ($e).");
+            // If anonymous, or if it failed due to network, be lenient.
+            // For a new registration, the doc might be creating via Cloud Functions.
+            // Better to let them in than kick them out.
+            userDocumentReady = true;
           }
 
-          _updateStatus(AppStatus.ready);
+          if (userDocumentReady) {
+            // Success Path
+            // Also fetch models here! Useful if they logged out and logged in (cache was cleared).
+            try {
+              final sysLocale = Platform.localeName.split('_').first;
+              // Don't wait for it completely here to not block ready.
+              unawaited(
+                  _modelService.getModels(langCode: sysLocale).catchError((e) {
+                debugPrint("[_determineUserFlow] Failed to getModels: $e");
+                return null;
+              }));
+            } catch (e) {
+              debugPrint("[_determineUserFlow] Setup models try-catch: $e");
+            }
+
+            _updateStatus(AppStatus.ready);
+          } else {
+            // Critical: User verified, internet works, but NO doc exists after retries.
+            // This implies a deleted account or data corruption.
+            debugPrint(
+                "[_determineUserFlow] Critical: Verified user missing doc. Signing out.");
+            await signOut();
+          }
         } else {
-          // Critical: User verified, internet works, but NO doc exists after retries.
-          // This implies a deleted account or data corruption.
+          // 5. Handle Unverified User
+          // We need to fetch data to show the email address on the Verify Screen.
           debugPrint(
-              "[_determineUserFlow] Critical: Verified user missing doc. Signing out.");
-          await signOut();
+              "[_determineUserFlow] User email not verified. Loading verification data.");
+
+          Map<String, dynamic>? data;
+          try {
+            // Try server first
+            final doc = await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .get();
+            data = doc.data();
+          } catch (_) {
+            // Fallback to cache/local info if server fails
+            data = null;
+          }
+
+          _verificationScreenData = {
+            'email': data?['email'] ?? user.email ?? '',
+            'username': data?['username'] ?? '',
+            'userId': user.uid,
+            'password': '', // Password not needed for simple status check
+          };
+          _updateStatus(AppStatus.needsVerification);
         }
-      } else {
-        // 5. Handle Unverified User
-        // We need to fetch data to show the email address on the Verify Screen.
-        debugPrint(
-            "[_determineUserFlow] User email not verified. Loading verification data.");
+      } catch (e, s) {
+        // --- CRITICAL ERROR HANDLING SECTION ---
 
-        Map<String, dynamic>? data;
-        try {
-          // Try server first
-          final doc = await FirebaseFirestore.instance
-              .collection('users')
-              .doc(user.uid)
-              .get();
-          data = doc.data();
-        } catch (_) {
-          // Fallback to cache/local info if server fails
-          data = null;
-        }
+        if (e is FirebaseAuthException) {
+          final String msg = e.message?.toLowerCase() ?? '';
+          final String code = e.code;
 
-        _verificationScreenData = {
-          'email': data?['email'] ?? user.email ?? '',
-          'username': data?['username'] ?? '',
-          'userId': user.uid,
-          'password': '', // Password not needed for simple status check
-        };
-        _updateStatus(AppStatus.needsVerification);
-      }
-    } catch (e, s) {
-      // --- CRITICAL ERROR HANDLING SECTION ---
+          final bool isConnectionFailure = msg.contains('failed to connect') ||
+              msg.contains('connection refused') ||
+              msg.contains('network is unreachable');
 
-      if (e is FirebaseAuthException) {
-        final String msg = e.message?.toLowerCase() ?? '';
-        final String code = e.code;
+          // A. TRANSIENT NETWORK ERRORS (DO NOT LOG OUT)
+          // Includes: "unexpected end of stream", "network-request-failed", timeouts.
+          final bool isNetworkGlitch = code == 'network-request-failed' ||
+              isConnectionFailure ||
+              msg.contains('end of stream') ||
+              msg.contains('connection closed') ||
+              msg.contains('socket') ||
+              msg.contains('timeout') ||
+              msg.contains('unable to resolve host');
 
-        final bool isConnectionFailure = msg.contains('failed to connect') ||
-            msg.contains('connection refused') ||
-            msg.contains('network is unreachable');
-
-        // A. TRANSIENT NETWORK ERRORS (DO NOT LOG OUT)
-        // Includes: "unexpected end of stream", "network-request-failed", timeouts.
-        final bool isNetworkGlitch = code == 'network-request-failed' ||
-            isConnectionFailure ||
-            msg.contains('end of stream') ||
-            msg.contains('connection closed') ||
-            msg.contains('socket') ||
-            msg.contains('timeout') ||
-            msg.contains('unable to resolve host');
-
-        if (isNetworkGlitch) {
-          debugPrint(
-              "[_determineUserFlow] Network error during reload ($code). Assuming Offline-Ready.");
-          // Even though reload failed, the local session is likely valid.
-          // Let the user in. The UserProvider will handle missing data.
-          _updateStatus(AppStatus.ready);
-          return;
-        }
-
-        // B. CORRUPT SESSION ERRORS (MUST LOG OUT)
-        // Usually caused by captive portals (public wifi) returning HTML instead of JSON.
-        final bool isCorruptSession = code == 'unknown' &&
-            (msg.contains('json conversion failed') ||
-                msg.contains('403') ||
-                msg.contains('forbidden') ||
-                msg.contains('html'));
-
-        if (isCorruptSession) {
-          debugPrint(
-              "[_determineUserFlow] Corrupt session (HTML/403). Logging out safely.");
-          await signOut();
-          return;
-        }
-
-        // C. FATAL AUTH ERRORS (MUST LOG OUT)
-        switch (code) {
-          case 'user-token-expired':
-          case 'user-disabled':
-          case 'user-not-found':
-          case 'invalid-credential':
-          case 'session-cookie-expired':
+          if (isNetworkGlitch) {
             debugPrint(
-                "[_determineUserFlow] Fatal auth error ($code). Signing out.");
-            await signOut();
-            break;
+                "[_determineUserFlow] Network error during reload ($code). Assuming Offline-Ready.");
+            // Even though reload failed, the local session is likely valid.
+            // Let the user in. The UserProvider will handle missing data.
+            _updateStatus(AppStatus.ready);
+            return;
+          }
 
-          default:
-            // D. UNKNOWN FIREBASE ERRORS
-            // If we don't know what it is, but it's NOT a network glitch,
-            // it's safer to log it and sign out to prevent stuck states.
+          // B. CORRUPT SESSION ERRORS (MUST LOG OUT)
+          // Usually caused by captive portals (public wifi) returning HTML instead of JSON.
+          final bool isCorruptSession = code == 'unknown' &&
+              (msg.contains('json conversion failed') ||
+                  msg.contains('403') ||
+                  msg.contains('forbidden') ||
+                  msg.contains('html'));
+
+          if (isCorruptSession) {
             debugPrint(
-                "[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
-            FirebaseCrashlytics.instance
-                .recordError(e, s, reason: "AuthFlow_UnhandledFirebase");
+                "[_determineUserFlow] Corrupt session (HTML/403). Logging out safely.");
             await signOut();
-            break;
-        }
-      } else {
-        // E. NON-FIREBASE ERRORS (Platform, etc.)
-        // If it's a generic SocketException (not wrapped in FirebaseAuthException), handle it as network.
-        if (e.toString().toLowerCase().contains('socketexception') ||
-            e.toString().toLowerCase().contains('handshake') ||
-            e.toString().toLowerCase().contains('certpathvalidator')) {
-          debugPrint(
-              "[_determineUserFlow] Socket/Handshake/Cert error. Assuming Offline-Ready.");
-          _updateStatus(AppStatus.ready);
-          return;
-        }
+            return;
+          }
 
-        // Otherwise, it's a crash-worthy logic error.
-        debugPrint(
-            "[_determineUserFlow] Critical system error: $e. Signing out.");
-        FirebaseCrashlytics.instance
-            .recordError(e, s, reason: "AuthFlow_SystemError");
-        await signOut();
-      } // end else
-    } // end catch (e, s)
+          // C. FATAL AUTH ERRORS (MUST LOG OUT)
+          switch (code) {
+            case 'user-token-expired':
+            case 'user-disabled':
+            case 'user-not-found':
+            case 'invalid-credential':
+            case 'session-cookie-expired':
+              debugPrint(
+                  "[_determineUserFlow] Fatal auth error ($code). Signing out.");
+              await signOut();
+              break;
+
+            default:
+              // D. UNKNOWN FIREBASE ERRORS
+              // If we don't know what it is, but it's NOT a network glitch,
+              // it's safer to log it and sign out to prevent stuck states.
+              debugPrint(
+                  "[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
+              FirebaseCrashlytics.instance
+                  .recordError(e, s, reason: "AuthFlow_UnhandledFirebase");
+              await signOut();
+              break;
+          }
+        } else {
+          // E. NON-FIREBASE ERRORS (Platform, etc.)
+          // If it's a generic SocketException (not wrapped in FirebaseAuthException), handle it as network.
+          if (e.toString().toLowerCase().contains('socketexception') ||
+              e.toString().toLowerCase().contains('handshake') ||
+              e.toString().toLowerCase().contains('certpathvalidator')) {
+            debugPrint(
+                "[_determineUserFlow] Socket/Handshake/Cert error. Assuming Offline-Ready.");
+            _updateStatus(AppStatus.ready);
+            return;
+          }
+
+          // Otherwise, it's a crash-worthy logic error.
+          debugPrint(
+              "[_determineUserFlow] Critical system error: $e. Signing out.");
+          FirebaseCrashlytics.instance
+              .recordError(e, s, reason: "AuthFlow_SystemError");
+          await signOut();
+        } // end else
+      } // end catch (e, s)
     } finally {
       _isDeterminingFlow = false;
     }

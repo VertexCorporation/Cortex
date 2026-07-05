@@ -101,9 +101,11 @@ class TileAvatar extends StatelessWidget {
     }
 
     return isAsset
-        ? Image.asset(imagePath, width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
+        ? Image.asset(imagePath,
+            width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
         : (!kIsWeb && file.existsSync()
-            ? Image.file(file, width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
+            ? Image.file(file,
+                width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
             : _buildFallbackIcon());
   }
 

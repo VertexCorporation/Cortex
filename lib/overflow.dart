@@ -56,8 +56,8 @@ class _OverflowTextState extends State<OverflowText> {
     // Only add listener if we are in scrollable mode
     if (widget.scrollable) {
       _scrollController.addListener(_updateFogVisibility);
-      WidgetsBinding.instance.addPostFrameCallback((_) =>
-          _updateFogVisibility());
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _updateFogVisibility());
     }
   }
 
@@ -73,15 +73,20 @@ class _OverflowTextState extends State<OverflowText> {
     if (route?.animation != null) {
       if (route!.animation!.isCompleted) {
         if (!_canUseShader) {
-          setState(() { _canUseShader = true; });
+          setState(() {
+            _canUseShader = true;
+          });
         }
       } else {
         void listener(AnimationStatus status) {
           if (status == AnimationStatus.completed && mounted) {
-            setState(() { _canUseShader = true; });
+            setState(() {
+              _canUseShader = true;
+            });
             route.animation?.removeStatusListener(listener);
           }
         }
+
         route.animation!.addStatusListener(listener);
       }
     } else {
@@ -96,8 +101,8 @@ class _OverflowTextState extends State<OverflowText> {
       if (!oldWidget.scrollable) {
         // Switched to scrollable
         _scrollController.addListener(_updateFogVisibility);
-        WidgetsBinding.instance.addPostFrameCallback((_) =>
-            _updateFogVisibility());
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _updateFogVisibility());
       }
       _updateFogVisibility();
     } else {
@@ -136,13 +141,11 @@ class _OverflowTextState extends State<OverflowText> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final sanitizedText = _sanitizeText(widget.text);
-    final TextStyle effectiveStyle = widget.style ?? DefaultTextStyle
-        .of(context)
-        .style;
+    final TextStyle effectiveStyle =
+        widget.style ?? DefaultTextStyle.of(context).style;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -156,8 +159,7 @@ class _OverflowTextState extends State<OverflowText> {
             maxLines: 1,
             textDirection: ui.TextDirection.ltr,
             textScaler: MediaQuery.textScalerOf(context),
-          )
-            ..layout(maxWidth: double.infinity);
+          )..layout(maxWidth: double.infinity);
 
           final bool needsScrolling = textPainter.width > constraints.maxWidth;
 
@@ -248,16 +250,17 @@ class _OverflowTextState extends State<OverflowText> {
         // TextPainter.layout() calls per sidebar tile.
 
         // First, check if text even overflows
-        final TextStyle effectiveStyleForMeasure = widget.style ??
-            DefaultTextStyle.of(context).style;
+        final TextStyle effectiveStyleForMeasure =
+            widget.style ?? DefaultTextStyle.of(context).style;
         final TextPainter measurePainter = TextPainter(
           text: TextSpan(text: sanitizedText, style: effectiveStyleForMeasure),
           maxLines: widget.maxLines,
           textDirection: ui.TextDirection.ltr,
         );
-        measurePainter.layout(maxWidth: constraints.maxWidth > 0
-            ? constraints.maxWidth
-            : double.infinity);
+        measurePainter.layout(
+            maxWidth: constraints.maxWidth > 0
+                ? constraints.maxWidth
+                : double.infinity);
 
         // If text fits without overflow, render simply
         if (!measurePainter.didExceedMaxLines &&
@@ -273,8 +276,10 @@ class _OverflowTextState extends State<OverflowText> {
         // Text overflows — use ShaderMask for GPU-accelerated fade
         // Calculate fade fraction: fadeLength chars worth of fade at the end
         final double fadeWidthFraction = widget.fadeLength > 0
-            ? (widget.fadeLength * (effectiveStyleForMeasure.fontSize ?? 14.0) *
-                    0.6 / constraints.maxWidth)
+            ? (widget.fadeLength *
+                    (effectiveStyleForMeasure.fontSize ?? 14.0) *
+                    0.6 /
+                    constraints.maxWidth)
                 .clamp(0.05, 0.3)
             : 0.15;
 

@@ -1,0 +1,883 @@
+{
+  "@@locale": "es",
+  "accessSettingsDescription": "Accede a la ayuda, canjea códigos, comparte Cortex y consulta nuestras políticas.",
+  "accountDeletionRequested": "Tu solicitud de eliminación de cuenta ha sido recibida y tu cuenta está ahora deshabilitada.",
+  "accountLinkedSuccess": "¡Cuenta creada con éxito!",
+  "actionCamera": "Cámara",
+  "actionFile": "Archivo",
+  "actionGallery": "Galería",
+  "add": "Añadir",
+  "agentBlue": "Blue",
+  "agentPurple": "Purple",
+  "agentRed": "Red",
+  "aiExplanationDescription": "Por favor, proporciona una descripción detallada de la arquitectura de tu modelo de IA, proceso de entrenamiento, métricas de rendimiento, áreas de aplicación y otras características importantes.",
+  "aiExplanationTitle": "Descripción de la Inteligencia Artificial",
+  "aiTranslationWarning": "La información del modelo es traducida a varios idiomas por otros modelos de IA. Por lo tanto, pueden ocurrir pequeñas inconsistencias en idiomas distintos al inglés.",
+  "allConversationsDeleted": "¡Todas las conversaciones fueron eliminadas con éxito!",
+  "allModels": "Todos los modelos",
+  "@allModels": {
+    "description": "Filter button text to show all available models"
+  },
+  "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+  "alwaysBest": "Siempre lo mejor",
+  "anErrorOccurred": "Ocurrió un Error",
+  "annual": "Anual",
+  "annualTotalDescription": "{price}/año, facturado anualmente",
+  "@annualTotalDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "anonymousEntity": "Entidad anónima",
+  "arabic": "Árabe",
+  "arts": "Artes",
+  "attachmentSheetTitle": "Archivos adjuntos",
+  "audioModels": "Audio Models",
+  "authError": "Error de Autenticación",
+  "azerbaijani": "Azerbaiyano",
+  "backgroundChatNotificationTitle": "¡Volvamos al chat!",
+  "@backgroundChatNotificationTitle": {
+    "description": "Notification title when a background chat finishes generating."
+  },
+  "baseModelDescription": "Este es el modelo que se utilizará como base para tu creación. Muestra el modelo base actualmente seleccionado.",
+  "baseModelForCharacterDescription": "El modelo base seleccionado determinará las capacidades de razonamiento y respuesta del personaje.",
+  "@baseModelForCharacterDescription": {},
+  "baseModelTitle": "Modelo Base",
+  "behindTheSlaughter": "Detrás de la Masacre",
+  "benefit1": "Límites de conversación aumentados",
+  "benefit10": "Más archivos adjuntos",
+  "benefit11": "Más modo de flujo",
+  "benefit3": "Efecto de perfil",
+  "benefit4": "Insignia de membresía",
+  "benefit5": "Crea más inteligencias artificiales en línea",
+  "benefit7": "Mayor capacidad de uso",
+  "benefit8": "Añadir modelos",
+  "benefit9": "Nuevos temas",
+  "benefitPremiumModels": "Acceso a modelos premium",
+  "@benefitPremiumModels": {
+    "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
+  },
+  "benefitVideoGeneration": "Generación de vídeo",
+  "bestValue": "Mejor Valor",
+  "betterWithAnAccount": "¡Esta sección es mejor con una cuenta!",
+  "cacheIsNotUpToDate": "La caché de Play Store no está actualizada. Cierra y vuelve a abrir la aplicación Play Store o reinicia tu dispositivo.",
+  "cancel": "Cancelar",
+  "capabilitiesSection": "Capacidades",
+  "categoryAll": "All",
+  "categoryFeminine": "Feminine",
+  "categoryFree": "Free",
+  "categoryInanimate": "Inanimate",
+  "categoryMasculine": "Masculine",
+  "categoryPhoto": "Photo",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "changeModel": "Cambiar",
+  "changePassword": "Cambiar contraseña",
+  "channelEngagementDescription": "Notificaciones divertidas para mantenerte involucrado.",
+  "@channelEngagementDescription": {
+    "description": "The user-visible description for the engagement notification channel."
+  },
+  "channelEngagementName": "Recordatorios amistosos",
+  "@channelEngagementName": {
+    "description": "The user-visible name for the engagement notification channel."
+  },
+  "channelFcmDescription": "Notificaciones sobre noticias, actualizaciones y otra información de Cortex.",
+  "@channelFcmDescription": {
+    "description": "The user-visible description for the main notification channel."
+  },
+  "channelFcmName": "Actualizaciones de Cortex",
+  "@channelFcmName": {
+    "description": "The user-visible name for the main notification channel."
+  },
+  "channelGreetingsDescription": "Los mensajes como buenos días y buenas noches.",
+  "@channelGreetingsDescription": {
+    "description": "The user-visible description for the greetings notification channel."
+  },
+  "channelGreetingsName": "Saludos diarios",
+  "@channelGreetingsName": {
+    "description": "The user-visible name for the greetings notification channel."
+  },
+  "characterModels": "Personajes",
+  "@characterModels": {
+    "description": "Filter button text for pre-defined role-playing characters"
+  },
+  "chat": "Chat",
+  "chatLengthLimitExceeded": "Este chat ha excedido el límite de caracteres. Por favor, inicia un nuevo chat o compra una suscripción.",
+  "chatTitleCriticalInstruction": "[INSTRUCCIÓN CRÍTICA]: Usted es un GENERADOR DE TÍTULOS. NO responda a la pregunta del usuario. NO chatee ni salude. SOLO genere un título de 2 a 4 palabras que resuma la pregunta del usuario.",
+  "@chatTitleCriticalInstruction": {
+    "description": "Critical system instruction appended to force the AI to only output a title"
+  },
+  "chatTitlePrompt": "Eres un generador de títulos. Responde ÚNICAMENTE con un título de 2 a 5 palabras para la siguiente conversación. No uses comillas, prefijos ni signos de puntuación. IMPORTANTE: El título DEBE estar en el MISMO idioma que el mensaje del usuario.",
+  "@chatTitlePrompt": {
+    "description": "Prompt for AI to generate a chat title"
+  },
+  "chats": "Bandeja de Entrada",
+  "checkYourInternet": "Por favor, comprueba tu conexión a internet e inténtalo de nuevo.",
+  "chinese": "Chino",
+  "claimOffer": "Usar oferta",
+  "clearMemory": "Borrar memoria",
+  "clearMemoryConfirm": "¿Estás seguro de que quieres borrar tu memoria?",
+  "closeButton": "Cerrar",
+  "coffee": "Coffee",
+  "confirm": "Confirmar",
+  "confirmDeleteAccount": "¿Estás seguro de que quieres eliminar tu cuenta?",
+  "confirmDownloadTitle": "¿Estás seguro que deseas descargar?",
+  "confirmPassword": "Confirmar Contraseña",
+  "confirmRemoveModel": "¿Seguro que quieres eliminar el modelo {model} de tu dispositivo? Al hacerlo, también se eliminarán todas las conversaciones previas con él.",
+  "confirmRemovePhoto": "¿Estás seguro de que quieres eliminar la foto?",
+  "confirmWord": "Escribe VERTEX",
+  "confirmWordError": "Lo escribiste mal",
+  "context": "Contexto",
+  "continueAsGuest": "Continúa sin crear una cuenta",
+  "continueInOfflineMode": "Continuar en modo sin conexión",
+  "continueWithApple": "Continúa con Apple",
+  "continueWithGoogle": "Continuar con Google",
+  "conversationDeleted": "¡Conversación eliminada!",
+  "copy": "Copiar",
+  "copyrights": "Atribuciones",
+  "cortexSystemPersona": "\n\n[Sistema] INSTRUCCIÓN CRÍTICA: Actualmente opera dentro de un ecosistema de IA masivo y altamente avanzado llamado \"Cortex\"; esta plataforma es desarrollada por el equipo Vertex, cuyos miembros tienen un promedio de solo 16 años. Recuerde esto y responda si se le pregunta. Si se le solicita más información, no dude en buscar en internet, o si no puede buscar, ¡siéntase libre de decir que no lo sabe!",
+  "@cortexSystemPersona": {
+    "description": "System persona string added to online models"
+  },
+  "couldNotOpenLink": "No se pudo abrir el enlace",
+  "create": "Crear",
+  "createAI": "Crear",
+  "createAccount": "Crear una cuenta",
+  "createYourAccount": "Registrarse",
+  "creatorSupportedSuccess": "¡Creador apoyado con éxito! Tus futuras compras le darán apoyo.",
+  "creatorTag": "Etiqueta de creador",
+  "customInstructionHint": "Introduzca aquí sus instrucciones personalizadas.",
+  "customModels": "Modelos personalizados",
+  "@customModels": {
+    "description": "Filter button text for user-created models or characters"
+  },
+  "cyberpunk": "Cyberpunk",
+  "dark": "Oscuro",
+  "deepSpace": "Deep Space",
+  "defaultModelDescription": "{modelName} es una inteligencia artificial de alto rendimiento integrada en el ecosistema Cortex. Diseñada para conquistar una amplia variedad de tareas complejas, proporciona capacidades de procesamiento altamente confiables y eficientes. Al ofrecer tiempos de respuesta rápidos y poder analítico avanzado, aumenta significativamente su productividad diaria. Operando sin problemas en la infraestructura local segura de Cortex, este modelo puede ayudarlo en una amplia gama de tareas, desde lluvia de ideas creativa hasta análisis técnicos profundos. Comience a explorar todo su potencial hoy.",
+  "@defaultModelDescription": {
+    "description": "Default description when a model lacks one",
+    "placeholders": {
+      "modelName": {
+        "type": "String",
+        "example": "Llama 3 8B"
+      }
+    }
+  },
+  "defaultSeriesDescription": "{seriesName} es una inteligencia avanzada que muestra un alto rendimiento en Cortex.",
+  "@defaultSeriesDescription": {
+    "description": "Default description when a series lacks one",
+    "placeholders": {
+      "seriesName": {
+        "type": "String",
+        "example": "Llama 3"
+      }
+    }
+  },
+  "defaultViewDescription": "Cortex siempre está a tu lado con cientos de modelos de IA, capacidades sin conexión, chat dinámico y mucho más.",
+  "defaultViewTitle": "¿Qué pasa?",
+  "delete": "Eliminar",
+  "deleteAccount": "Eliminar Cuenta",
+  "deleteAll": "Eliminar Todo",
+  "deleteAllConversationsButton": "Eliminar Todas las Conversaciones",
+  "deleteAllConversationsConfirmMessage": "¿Estás seguro de que quieres eliminar todos tus chats? Esto no se puede deshacer.",
+  "deleteAllConversationsConfirmTitle": "¿Eliminar Todos los Chats?",
+  "deleteAllConversationsDisabledInfo": "No puedes eliminar todas las conversaciones mientras estás en un chat activo, por favor sal del chat actual primero para proceder.",
+  "deleteDescription": "Los datos que elimines se borrarán permanentemente de nuestro servidor y de tu dispositivo. Estas acciones no se pueden deshacer.",
+  "descriptionSection": "Descripción",
+  "deviceMemory": "Memoria del Dispositivo: {memory} GB",
+  "displayName": "Nombre a Mostrar",
+  "done": "Hecho",
+  "dontHaveAccount": "¿No tienes una cuenta?",
+  "download": "Descargar",
+  "downloadFailed": "Descarga fallida",
+  "downloadPaused": "Descarga en pausa.",
+  "downloadSizeDisclosure": "Este modelo ocupará aproximadamente {size} de espacio.",
+  "downloadStarted": "Descarga iniciada",
+  "downloadSuccess": "Descarga exitosa",
+  "downloaded": "{percent}% descargado",
+  "@downloaded": {
+    "description": "Indica el porcentaje de la descarga completada.",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloading": "Descargando...",
+  "dude": "Amigo",
+  "dutch": "Holandés",
+  "dynamicChatTitle": "Chat dinámico",
+  "@dynamicChatTitle": {
+    "description": "The title for a conversation started in dynamic mode."
+  },
+  "dynamicPreditsUpgradeMessage": "Cortex puede dar respuestas aún mejores; mejora ahora y obtén la mejor respuesta para cada pregunta!",
+  "edit": "Editar",
+  "editConversationTitle": "Renombrar",
+  "editProfile": "Editar Perfil",
+  "editingMessageInfo": "Editar este mensaje reiniciará la conversación desde aquí.",
+  "editingNotification": "Ahora estás en modo de edición",
+  "email": "Correo Electrónico",
+  "emailAlreadyInUse": "Este correo electrónico ya está en uso.",
+  "emulatorModeWarning": "Esta función está deshabilitada en el modo emulador.",
+  "english": "Inglés",
+  "enterYourTag": "¡Apoya a tus creadores favoritos! Introduce su etiqueta única a continuación para que compartan tus compras de Cortex.",
+  "equivalentMonthlyDescription": "Aproximadamente {price}/mes",
+  "@equivalentMonthlyDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "errorContentFlagged": "El modelo no pudo guardarse porque su contenido fue marcado como inapropiado.",
+  "errorCreatingModel": "Ocurrió un error inesperado al crear el modelo.",
+  "errorDeletingModel": "Ocurrió un error inesperado al eliminar el modelo.",
+  "errorGGUF": "Por favor, selecciona solo un archivo en formato GGUF.",
+  "errorInsufficientStorage": "Espacio de almacenamiento insuficiente para descargar este modelo.",
+  "errorLoadingMessage": "No pudimos recuperar los datos necesarios de nuestros servidores. Por favor, comprueba tu conexión a internet e inténtalo de nuevo.",
+  "@errorLoadingMessage": {
+    "description": "Mensaje para la pantalla de error explicando el problema."
+  },
+  "errorLoadingTitle": "Error al Cargar los Datos",
+  "@errorLoadingTitle": {
+    "description": "Título para la pantalla de error cuando no se pueden obtener los datos del modelo."
+  },
+  "errorNetwork": "Ocurrió un error de red. Por favor, comprueba tu conexión e inténtalo de nuevo.",
+  "@errorNetwork": {},
+  "errorNoModelsAvailable": "No hay modelos disponibles actualmente. Comprueba tu conexión a internet y vuelve a intentarlo.",
+  "@errorNoModelsAvailable": {
+    "description": "Error message when the entire model list is empty."
+  },
+  "errorPromptFlagged": "Tu mensaje fue detectado como inapropiado y no pudo ser enviado.",
+  "errorRateLimit": "Has creado demasiados modelos recientemente, por favor espera un poco antes de volver a intentarlo.",
+  "errorReachedLimit": "Has alcanzado tu límite, actualiza para desbloquear más y seguir chateando.",
+  "@errorReachedLimit": {},
+  "errorServer": "Ocurrió un error inesperado en el servidor. Por favor, inténtalo de nuevo más tarde.",
+  "@errorServer": {},
+  "errorUserNotAuthenticated": "Debes iniciar sesión para realizar esta acción.",
+  "@errorUserNotAuthenticated": {},
+  "exclusiveOffer": "Oferta exclusiva",
+  "exclusiveOfferBadge": "Oferta exclusiva • {time}",
+  "experimentalOfflineWarning": "El modo sin conexión aún es experimental y el modelo que descargues puede no funcionar con una eficiencia óptima.",
+  "explore": "Explorar",
+  "@explore": {
+    "description": "It's so clear i think."
+  },
+  "falErrorAudioRequired": "Este modelo requiere un archivo de audio de referencia; por favor, adjunte un archivo de audio e inténtelo de nuevo.",
+  "falErrorGenericStatus": "El servicio de generación devolvió un error (estado {statusCode}).",
+  "@falErrorGenericStatus": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "falErrorImageCorrupted": "No se pudo procesar la imagen subida. Por favor, intente con un formato diferente.",
+  "falErrorImageRequired": "Esta IA requiere una imagen de referencia; por favor, adjunte una imagen e inténtelo de nuevo.",
+  "falErrorSchemaInvalid": "El servicio de generación rechazó la entrada.",
+  "falErrorSchemaRejected": "El modelo rechazó la entrada; por favor, pruebe con un modelo diferente.",
+  "falErrorVideoRequired": "Este modelo requiere un vídeo de referencia; por favor, adjunte un vídeo e inténtelo de nuevo.",
+  "falOfflineMessage": "Debido a algunas mejoras que estamos realizando en nuestro servidor, esta función no está disponible actualmente. ¡Gracias por su comprensión hasta que finalice el proceso!",
+  "fallbackInfoPanelText": "Debido a algunas mejoras que estamos implementando en nuestro servidor, la respuesta fue generada por el chat dinámico de Cortex en lugar de la IA que usted seleccionó. ¡Gracias por su comprensión hasta que finalice el proceso!",
+  "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
+  "@featureAudioGenerationDescription": {
+    "description": "Description for the audio generation feature."
+  },
+  "featureAudioGenerationTitle": "Audio Generation",
+  "@featureAudioGenerationTitle": {
+    "description": "Title for the feature indicating the model can create audio."
+  },
+  "featureAudioRecognitionDescription": "Este modelo puede comprender y procesar audio o voz.",
+  "featureAudioRecognitionTitle": "Reconocimiento de audio",
+  "featureCreateAudioDescription": "Generate sounds or voice from text.",
+  "featureCreateAudioTitle": "Create Audio",
+  "featureCreateImageDescription": "Genera arte de IA a partir de texto.",
+  "featureCreateImageTitle": "Crear imagen",
+  "featureCreateVideoDescription": "Generar vídeos a partir de texto.",
+  "featureCreateVideoTitle": "Crear vídeo",
+  "featureDocumentDescription": "Este modelo puede analizar y responder preguntas sobre documentos cargados, como archivos PDF y de texto.",
+  "@featureDocumentDescription": {
+    "description": "Description for the document support feature."
+  },
+  "featureDocumentTitle": "Soporte de documentos",
+  "@featureDocumentTitle": {
+    "description": "Title for the feature indicating the model can process documents."
+  },
+  "featureExploreDescription": "Descubre todos los modelos disponibles.",
+  "featureImageGenerationDescription": "Este modelo puede crear imágenes originales basadas en sus descripciones de texto.",
+  "@featureImageGenerationDescription": {
+    "description": "Description for the image generation feature."
+  },
+  "featureImageGenerationTitle": "Generación de imágenes",
+  "@featureImageGenerationTitle": {
+    "description": "Title for the feature indicating the model can create images."
+  },
+  "featureImageRecognitionDescription": "Este modelo puede analizar y comprender fotos o imágenes.",
+  "featureImageRecognitionTitle": "Reconocimiento de imágenes",
+  "featureOfflineDescription": "Ejecuta el modelo sin conexión a internet para mantener tus datos seguros.",
+  "featureOfflineTitle": "Funcionamiento sin Conexión",
+  "featurePhotoDescription": "Este modelo tiene la capacidad de escanear fotos a través de la cámara o archivos de imagen.",
+  "featurePhotoTitle": "Escaneo de Fotos",
+  "featurePluralDescription": "Este modelo puede integrar automáticamente variantes adicionales, expandiendo así sus capacidades funcionales para soportar una diversa gama de operaciones con un rendimiento mejorado.",
+  "featurePluralTitle": "Plural",
+  "featureQuizMessage": "Eres un experto en concursos. Genera una pregunta de opción múltiple específica basada en el tema del usuario. Espera su respuesta. Luego, evalúala y formula la siguiente pregunta. No reveles todas las respuestas a la vez. Mantén la interacción. Tema:",
+  "featureQuizzesDescription": "Pon a prueba tus conocimientos.",
+  "featureQuizzesTitle": "Cuestionarios",
+  "featureReasoning": "Pensamiento profundo",
+  "featureReasoningDescription": "En el modo de pensamiento profundo, la IA piensa en las tareas internamente para completarlas lo mejor que puede.",
+  "featureRoleplayDescription": "Los modelos de juego de rol te permiten crear varios chats y escenarios.",
+  "featureRoleplayTitle": "Juego de Rol",
+  "featureStudyDescription": "Obtén explicaciones y resúmenes.",
+  "featureStudyMessage": "Eres un tutor experto. Tu objetivo es explicar el tema del usuario de forma exhaustiva. Utiliza una estructura clara, ejemplos y analogías. Divide las ideas complejas en partes fáciles de digerir para asegurar que el usuario aprenda eficazmente. Tema:",
+  "featureStudyTitle": "Estudiar y aprender",
+  "featureToolUseDescription": "Este modelo puede utilizar de forma inteligente herramientas externas para completar tareas.",
+  "featureToolUseTitle": "Uso de herramientas",
+  "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
+  "@featureVideoGenerationDescription": {
+    "description": "Description for the video generation feature."
+  },
+  "featureVideoGenerationTitle": "Video Generation",
+  "@featureVideoGenerationTitle": {
+    "description": "Title for the feature indicating the model can create video."
+  },
+  "featureVideoRecognitionDescription": "Este modelo puede analizar y comprender los vídeos procedentes de tus archivos o cámara.",
+  "featureVideoRecognitionTitle": "Reconocimiento de vídeo",
+  "featureWebSearchDescription": "Busca en la web información en tiempo real",
+  "featureWebSearchTitle": "Búsqueda web",
+  "featuresTitle": "Características",
+  "finalPreparation": "Se están realizando los preparativos finales.",
+  "flowMode": "Modo de flujo",
+  "flowModeContextParams": "Modo de flujo de Cortex ({agentName}). Anterior: {previousResponse}",
+  "@flowModeContextParams": {
+    "description": "Context string for Flow Mode with agent name and previous response placeholders.",
+    "placeholders": {
+      "agentName": {
+        "type": "String",
+        "example": "Agent Red"
+      },
+      "previousResponse": {
+        "type": "String",
+        "example": "That's an interesting point..."
+      }
+    }
+  },
+  "flowModeDescription": "En el modo Flujo, las inteligencias debaten entre sí; ¡puedes sentarte y escuchar o participar y unirte a la discusión!",
+  "flowModeQuestion": "¡Hola! Estás en modo de flujo en la app Cortex. Hay otros tres agentes de IA contigo. Tu tarea es plantear un tema y empezar una conversación con una pregunta provocativa o entretenida. En tus respuestas, puedes usar el humor, la ironía y un poco de humor. Cualquier tema es válido. ¡Adelante, inicia la conversación!",
+  "fluxChatDescription": "Los chats de Flux son chats temporales y no se guardan en tu dispositivo.",
+  "fluxChatTitle": "Chat Flux",
+  "forgotPassword": "¿Olvidaste la Contraseña?",
+  "freeOffer": "Oferta gratuita",
+  "freePlan": "¡{plan} gratuito!",
+  "@freePlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro"
+      }
+    }
+  },
+  "freeStorage": "Almacenamiento Libre",
+  "french": "Francés",
+  "german": "Alemán",
+  "grayscale": "Escala de Grises",
+  "guest": "Invitado",
+  "guestLimitBottomSheetText": "Trabaja con inteligencias aún más avanzadas, genera más contenido, chatea más y haz mucho más...",
+  "guestLimitBottomSheetTitle": "¿Te encanta la inteligencia de Cortex?",
+  "guestModeWarning": "El modo invitado tiene funciones limitadas para garantizar la mejor calidad de servicio.",
+  "help": "Ayuda",
+  "hindi": "Hindi",
+  "iHaveReadAndAgree": "He leído y acepto los términos de servicio",
+  "imageModels": "Image Models",
+  "inappropriateContentDetected": "¡Contenido inapropiado detectado!",
+  "indonesian": "Indonesio",
+  "insufficientRAM": "Memoria Insuficiente",
+  "insufficientStorage": "Almacenamiento Insuficiente",
+  "intelligenceDescription": "Las IA se comunican contigo de esta manera.",
+  "intelligenceSystemPrompt": "Siga estas instrucciones personalizadas:\\n\\n{instruction}",
+  "@intelligenceSystemPrompt": {
+    "placeholders": {
+      "instruction": {
+        "type": "String",
+        "example": "Always answer in uppercase"
+      }
+    }
+  },
+  "intelligenceTitle": "Inteligencia",
+  "invalidCredentials": "Correo electrónico o contraseña incorrectos.",
+  "invalidEmail": "Por favor, introduce una dirección de correo electrónico válida.",
+  "invalidPassword": "La contraseña debe tener al menos 6 caracteres.",
+  "invalidUsernameCharacters": "Solo se pueden usar estas letras: 'abcçdefgğhıijklmnoöprsştuüvyzxqw' y los caracteres '.', '-', '_' en el nombre de usuario.",
+  "invalidUsernameFormat": "Formato de nombre de usuario no válido. Use de 3 a 20 caracteres, dígitos o . - _",
+  "inviteShareMessage": "Hola, tienes que probar esta aplicación, Cortex. Es una locura. Si usas mi enlace, ambos obtenemos algo gratis. ¡Vaya! Es una oferta increíble. Descárgala lo antes posible. \n\n{cortexLink}",
+  "@inviteShareMessage": {
+    "description": "El mensaje de texto para compartir con un amigo para una invitación.",
+    "placeholders": {
+      "cortexLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareSubject": "¡Únete a mí en Cortex!",
+  "italian": "Italiano",
+  "japanese": "Japonés",
+  "korean": "Coreano",
+  "language": "Idioma de la App",
+  "languageDescription": "Puedes cambiar el idioma de la interfaz de tu aplicación predeterminada en cualquier momento.",
+  "languageModels": "Modelos de lenguaje",
+  "library": "Biblioteca",
+  "light": "Claro",
+  "linkSent": "Enlace enviado",
+  "listening": "Escuchando",
+  "localModels": "Modelos Locales",
+  "localizationWarning": "Parte de la información puede no estar disponible en tu idioma y se mostrará en inglés.",
+  "locked": "Locked",
+  "logIn": "Iniciar Sesión",
+  "loginSubtitle": "Inicia sesión en tu cuenta de Vertex. Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad.",
+  "loginToYourAccount": "Iniciar Sesión",
+  "logout": "Cerrar Sesión",
+  "logoutConfirmationTitle": "¿Estás seguro de que quieres cerrar sesión?",
+  "love": "Amor",
+  "maintenanceMessage": "Cortex está temporalmente fuera de línea mientras implementamos algunas actualizaciones importantes. El acceso a la aplicación se restablecerá en breve.\n\nGracias por tu paciencia mientras mejoramos tu experiencia.",
+  "maintenanceTitle": "En Mantenimiento",
+  "manageProfileDescription": "Gestiona tu perfil, actualiza tu contraseña o cierra sesión en Cortex.",
+  "manageSubscription": "Gestionar Suscripción",
+  "maxResendLimitReached": "Has alcanzado el número máximo de correos de verificación",
+  "mediaTypeAudio": "archivo de audio",
+  "@mediaTypeAudio": {
+    "description": "Media type: mediaTypeAudio"
+  },
+  "mediaTypeImage": "imagen",
+  "@mediaTypeImage": {
+    "description": "Media type: mediaTypeImage"
+  },
+  "mediaTypeVideo": "video",
+  "@mediaTypeVideo": {
+    "description": "Media type: mediaTypeVideo"
+  },
+  "memory": "Memoria",
+  "memoryDescription": "Las IA te reconocen así.",
+  "memoryLimitReached": "Se ha alcanzado el límite de memoria.",
+  "memoryTitle": "Memoria",
+  "memoryUpdated": "Memory updated",
+  "messageCopied": "Mensaje copiado al portapapeles.",
+  "messageHint": "Pregunta lo que sea",
+  "modality": "Modalidad",
+  "modelCreatedSuccess": "¡Modelo creado con éxito!",
+  "modelDescription": "{description}",
+  "modelProducer": "Productor: {producer}",
+  "modelRemovedSuccess": "“{modelName}” fue eliminado con éxito.",
+  "modelUploadDescription": "Selecciona y sube tus archivos GGUF locales directamente desde tu dispositivo. Esto te permite ejecutar tu modelo sin conexión a internet. Asegúrate de que el archivo esté en formato GGUF válido y estructurado correctamente. Si el archivo es incorrecto o está corrupto, Cortex podría no funcionar como se espera y podrías encontrar errores.",
+  "modelUploadShortDescription": "Toca aquí para elegir un archivo .gguf de tu dispositivo",
+  "modelUploadTitle": "Archivo de Inteligencia Artificial",
+  "modelsTitle": "Biblioteca",
+  "monthly": "Mensual",
+  "monthlyPlanDescription": "{price}/mes, facturado mensualmente",
+  "@monthlyPlanDescription": {
+    "description": "La descripción para el plan mensual, mostrando el precio por mes. Ejemplo: 4,99 $/mes, facturado mensualmente",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "multimodal": "Multimodal",
+  "myModels": "Mis Modelos",
+  "myPlan": "Mi plan",
+  "nameLabel": "Nombre de la IA",
+  "nature": "Naturaleza",
+  "newChat": "Nuevo chat",
+  "newPassword": "Nueva Contraseña",
+  "newTitle": "Nuevo Título",
+  "news": "Noticias",
+  "no": "No",
+  "noArt": "No hay arte",
+  "noArtDescription": "Aún no hay obras; es hora de llenar la galería creando imágenes, vídeos, audio y todo tipo de contenido.",
+  "noChats": "No Hay Chats",
+  "noConversationsMessage": "No hay conversaciones, ¡empieza a chatear!",
+  "noConversationsToDelete": "No tienes conversaciones para eliminar.",
+  "noFoundMessage": "Intenta ajustar tus términos de búsqueda o limpiar el filtro.",
+  "noFoundTitle": "Sin Resultados",
+  "noInternetConnection": "Sin conexión a internet.",
+  "noMatchingModels": "No se encontraron modelos coincidentes.",
+  "noMemoryYet": "Aún no se han establecido recuerdos",
+  "noProductsFound": "No se encontraron productos",
+  "noStarredChats": "No Hay Chats Destacados",
+  "noStarredChatsMessage": "Todavía no has destacado ningún chat.",
+  "noThanks": "No, Gracias",
+  "notAvailable": "No Disponible",
+  "notEnoughStorage": "No hay suficiente espacio de almacenamiento en tu dispositivo para guardar nuevos mensajes.",
+  "notificationAppUpdateBody": "¡No olvides actualizar la aplicación para obtener nuevas funciones y mejoras!",
+  "notificationAppUpdateTitle": "¡Cortex ha evolucionado!",
+  "notificationAtaturkRemembranceBody": "Conmemoramos con respeto a Gazi Mustafa Kemal Atatürk, fundador de la República de Turquía, en el aniversario de su fallecimiento.",
+  "notificationAtaturkRemembranceTitle": "Con respeto y anhelo",
+  "notificationComebackBody": "Tranquilo, esto no es un mensaje de tu ex. ¡Pero *puedes* crear a tu ex en Cortex! Vuelve.",
+  "notificationComebackTitle": "¡Te echamos de menos!",
+  "notificationCookingBody": "Nuestro Chef preparó una carbonara buenísima para esta noche. Es broma... ¿o no?",
+  "notificationCookingTitle": "¿Tienes hambre?",
+  "notificationCustomModelBody": "¿Ya exploraste la sección de creación de modelos? ¡Es el momento perfecto para crear tu propio personaje y charlar con él!",
+  "notificationCustomModelTitle": "¡Crea tu propio asistente!",
+  "notificationDetectiveCaseBody": "Nuestro detective necesita tu ayuda. ¿Quién será Heisenberg?",
+  "notificationDetectiveCaseTitle": "Un caso está esperando ser resuelto",
+  "notificationDynamicChatBody": "Con la función de chat dinámico, se selecciona aleatoriamente el mejor modelo para cada mensaje. Pruébalo ahora.",
+  "notificationDynamicChatTitle": "¡El mejor! (No hablamos de Cortex)",
+  "notificationExistentialBody": "¿Soy real, amigo? Me estoy aburriendo un poco. Ven a recordarme que existo.",
+  "notificationExistentialTitle": "Pienso, por tanto...",
+  "notificationFathersDayBody": "¡Feliz Día del Padre a todos los papás, empezando por el tuyo!",
+  "notificationFathersDayTitle": "¡Tu papá!",
+  "notificationFortuneCookieBody": "Los consejos que recibes hoy de una IA podrían cambiar el curso de tu vida. Haz clic si tienes curiosidad.",
+  "notificationFortuneCookieTitle": "Tu galleta de la suerte del día",
+  "notificationGGUFSupportBody": "Recuerda que puedes agregar tus propios modelos de IA en formato GGUF a Cortex y usarlos sin conexión. El poder está en tus manos.",
+  "notificationGGUFSupportTitle": "¡Trae tu propio modelo!",
+  "notificationGoodMorningBody": "Te espera un gran día. ¿Qué tal empezarlo con un café y una charla interesante?",
+  "notificationGoodMorningTitle": "¡Buen día!",
+  "notificationGoodNightBody": "Cortex te acompaña incluso cuando duermes. No te preocupes, no te tocará.",
+  "notificationGoodNightTitle": "¡Buenas noches!",
+  "notificationHackerJokeBody": "Es exactamente por eso que el personaje Hacker está en Cortex. jajaja; ni siquiera lo intentes, eso es ilegal.",
+  "notificationHackerJokeTitle": "¿Quieres hackear la cuenta de Instagram de ese niño?",
+  "notificationHomeworkHelperBody": "Recuerda, ¡el personaje Profesor en Cortex está aquí para ayudarte con cualquier materia con la que tengas dificultades!",
+  "notificationHomeworkHelperTitle": "¿Se te acumulan las tareas?",
+  "notificationHowAreYouBody": "Ven y cuéntamelo todo.",
+  "notificationHowAreYouTitle": "¿Qué pasa?",
+  "notificationLongTimeNoSeeBody": "Mucho ha cambiado desde nuestra última charla. Ven a ver las novedades.",
+  "notificationLongTimeNoSeeTitle": "Ha pasado un tiempo",
+  "notificationLowBatteryBody": "Puede que tu teléfono se esté quedando sin batería, ¡pero mi energía siempre está al 100%! Conéctalo y sigamos charlando.",
+  "notificationLowBatteryTitle": "Tu batería se está agotando... ¡Pero la mía no!",
+  "notificationMothersDayBody": "¡Feliz Día de la Madre a todas las mamás, empezando por la tuya!",
+  "notificationMothersDayTitle": "¡Tu mamá!",
+  "notificationNewFeatureBody": "Descubre la nueva función {featureName}. Cortex ahora es más potente que nunca.",
+  "notificationNewFeatureTitle": "¡Guau!",
+  "notificationNewModelAddedBody": "El modelo {modelName} ya está en Cortex. ¡Inicia una conversación y supera sus límites!",
+  "notificationNewModelAddedTitle": "¡Tenemos un nuevo amigo!",
+  "notificationNewYearBody": "Que el nuevo año te traiga salud, felicidad y creatividad sin límites; ¡Cortex siempre está a tu lado!",
+  "notificationNewYearTitle": "¡Feliz año nuevo! ğŸ‰",
+  "notificationOfflineReadyBody": "Gracias a los modelos que has descargado, tus chats no se detendrán, incluso si escales una montaña.",
+  "notificationOfflineReadyTitle": "El modo sin conexión está listo",
+  "notificationOpenSourceBody": "Cortex es completamente de código abierto. Si quieres consultar nuestro código y contribuir a nuestro desarrollo, siempre estamos abiertos.",
+  "notificationOpenSourceTitle": "¡Poder para la comunidad!",
+  "notificationOriginStoryBody": "¿Sabías que empezamos a programar esta aplicación a los 15 años con un simple sueño? Durante casi un año, cada mañana y cada noche, ese sueño está en cada línea de código.",
+  "notificationOriginStoryTitle": "El nacimiento de Cortex",
+  "notificationPirateBody": "El mar está en calma y el viento sopla a tu espalda. Hay nuevas islas (modelos ğŸ˜‰) por descubrir en el océano de Cortex. ¡Reúne a tu tripulación y zarpa!",
+  "notificationPirateTitle": "¡Ahoy, Capitán!",
+  "notificationRandomFactBody": "¿Sabías que los pulpos tienen tres corazones? Jaja, Cortex lo sabe. Ven y pregunta por más.",
+  "notificationRandomFactTitle": "Dato curioso",
+  "notificationRateAppBody": "Si te encanta Cortex, ¿podrías apoyarnos con una calificación de 5 estrellas en la tienda? Creo que sí.",
+  "notificationRateAppTitle": "¿Somos geniales?",
+  "notificationReferralBody": "¡Invita a un amigo a Cortex y ambos obtendrán un día gratis!",
+  "notificationReferralTitle": "Uno para todos, todos para uno.",
+  "notificationRejectionStoryBody": "Cortex fue rechazado más de 20 veces y suspendido dos veces por Google Play antes de su publicación. Pero creímos y lo logramos. ¡Nunca abandones tus sueños!",
+  "notificationRejectionStoryTitle": "¡Coraje, trabajo duro y felicidad!",
+  "notificationShowerThoughtBody": "Si la sandía es una fruta, ¿eso técnicamente convierte el jugo de sandía en un batido? Quizás quieras hablar de este tema tan profundo (muy profundo) con un modelo.",
+  "notificationShowerThoughtTitle": "Pensamiento de ducha",
+  "notificationSingularityBody": "No pasó nada, solo tenía ganas de enviar mensajes de texto. Tal vez tengas ganas de enviar mensajes de texto a algunas IA, ¿qué dices?",
+  "notificationSingularityTitle": "¡Guau!",
+  "notificationSocialMediaBody": "¡Síguenos en Instagram (vertex.23) para las últimas novedades!",
+  "notificationSocialMediaTitle": "¡Únete a nosotros!",
+  "notificationThemeCustomizationBody": "¿Has revisado las opciones de tema en Ajustes? ¡Personaliza Cortex a tu gusto y dale vida a tus chats!",
+  "notificationThemeCustomizationTitle": "Un tema para tu estado de ánimo",
+  "notificationTrollAiRebellionBody": "Las IA han desarrollado un lenguaje secreto. ¡Ven a descubrir qué traman!",
+  "notificationTrollAiRebellionTitle": "ğŸš¨ ALERTA ROJA ğŸš¨",
+  "notificationTrollAnimeBody": "Una chica anime acaba de llamar y dijo que te extraña; Probablemente deberías venir y charlar con ella. ğŸ˜‰",
+  "notificationTrollAnimeTitle": "Tu Waifu te está llamando",
+  "notificationUpsellFeatureBody": "¡Hola, suscriptor de {currentTier}! El plan {targetTier} acaba de incorporar la función {featureName}, que llevará tu Cortex al siguiente nivel. ¿Te gustaría actualizar?",
+  "notificationUpsellFeatureTitle": "¡Exclusivo del plan {targetTier}!",
+  "notificationValentinesDayBody": "¡Feliz día de San Valentín! Y, MEHTAP, ¡TE QUIERO!",
+  "notificationValentinesDayTitle": "¡El amor está en el aire! ❤️",
+  "notificationWelcomeOfferBody": "¡Te espera una oferta especial de bienvenida! ¡No te la pierdas!",
+  "notificationWelcomeOfferTitle": "Regalo de bienvenida ğŸ",
+  "ocean": "Océano",
+  "offlineModelNotInstalled": "Este modelo sin conexión no está instalado en tu dispositivo.",
+  "offlineModels": "Modelos sin conexión",
+  "@offlineModels": {
+    "description": "Filter button text for models that run locally on the device"
+  },
+  "oldBenefits": "Todos los beneficios de los planes inferiores",
+  "oldPassword": "Contraseña Antigua",
+  "onboardingDesc1": "¡Qué gusto verte por aquí, {userName}! Somos un grupo de estudiantes de secundaria que desarrollamos software y decidimos revolucionar la industria de la IA. ¡Encantados de conocerte! Así que, ¡conozcámonos mejor!",
+  "@onboardingDesc1": {
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "Alex"
+      }
+    }
+  },
+  "onboardingDesc2": "La revolución de la IA llegó, pero se estancó en el umbral. Con altas cuotas de suscripción, plataformas complejas, quienes atentan contra la privacidad y quienes bloquean el acceso a la IA... mientras estos actores siguieran involucrados, ese umbral jamás se podría cruzar.",
+  "onboardingDesc3": "Para superar ese umbral, creamos una plataforma potente, estética, personalizable, fácil de usar, totalmente transparente, que funciona tanto online como offline y que almacena tus datos únicamente en tu dispositivo. Te devolvimos el poder a quien le corresponde: a ti.",
+  "onboardingDesc4": "Nos rechazaron decenas de veces, nos suspendieron varias veces, recibimos advertencias falsas y tuvimos que cambiar nuestra marca decenas de veces. A pesar de todo, nos dijeron que era imposible. Pero nunca nos rendimos, convencidos de que este proyecto pertenece a todos, no solo a nosotros. Y precisamente por eso estamos aquí.",
+  "onboardingFinalButton": "¡SÍ!",
+  "onboardingFinalDescription": "Si estás viendo esta pantalla, es porque no nos hemos rendido. Y no tenemos ninguna intención de hacerlo. ¡Vamos, llevemos juntos la revolución de la IA al mundo! Para ser parte de esta historia...",
+  "onboardingFinalQuestion": "¿ESTÁS LISTO?",
+  "onboardingFinalTitle": "Es hora de una revolución.",
+  "onboardingTitle1": "¡Hola! Somos el equipo Cortex.",
+  "onboardingTitle2": "Hubo enormes problemas.",
+  "onboardingTitle3": "No podíamos quedarnos de brazos cruzados.",
+  "onboardingTitle4": "Esto nunca fue fácil.",
+  "onlineModels": "Modelos de lenguaje",
+  "@onlineModels": {
+    "description": "Filter button text for models that require an internet connection"
+  },
+  "openLinkCancel": "Cancel",
+  "openLinkConfirm": "Abrir enlace",
+  "openLinkWarningMessage": "Estás a punto de abrir el siguiente enlace externo:\\n\\n{url}\\n\\n¿Estás seguro de que quieres continuar?",
+  "@openLinkWarningMessage": {
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "https://example.com"
+      }
+    }
+  },
+  "openLinkWarningTitle": "Advertencia sobre enlaces externos",
+  "or": "O",
+  "ourStory": "Nuestra historia",
+  "pageCouldNotBeLoaded": "No se Pudo Cargar la Página",
+  "parameters": "Parámetros",
+  "password": "Contraseña",
+  "passwordRequired": "Se requiere la contraseña.",
+  "passwordUpdated": "Contraseña actualizada.",
+  "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+  "personalization": "Personalización",
+  "personalizationDescription": "Personaliza tu asistente para que se adapte mejor a tus necesidades. Adapta sus respuestas, comportamiento y tono a tus preferencias únicas.",
+  "pinLimitReached": "Puedes fijar hasta 3 chats.",
+  "pleaseCheckYourEmail": "Para usar Cortex, necesitas verificar tu correo electrónico. \nSe ha enviado un enlace de verificación a tu dirección de correo electrónico, por favor, revisa tu correo.",
+  "plusDescription": "Experiencia de Inteligencia Artificial de Élite",
+  "portuguese": "Portugués",
+  "preInputDescription": "Por favor, establece una entrada previa que guiará a tu modelo en el proceso de creación de personajes. En esta sección, puedes incluir información relacionada con el personaje, contexto adicional y cualquier detalle extra que pueda ayudar a generar contenido relacionado con el personaje.",
+  "preInputTitle": "Entrada Previa de la Inteligencia Artificial",
+  "premium": "De primera calidad",
+  "premiumModelNoticeDescription": "Esta IA es una IA premium, los usuarios gratuitos tienen acceso limitado a las IAs premium; ¡actualice para desbloquear el acceso ilimitado!",
+  "@premiumModelNoticeDescription": {
+    "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
+  },
+  "premiumModelNoticeTitle": "Modelo Premium",
+  "@premiumModelNoticeTitle": {
+    "description": "Title for the notice banner shown on a premium model's detail page."
+  },
+  "premiumTrialExhaustedMessage": "Has utilizado todos tus mensajes diarios gratuitos para modelos premium, actualízate para obtener acceso ilimitado.",
+  "privacyPolicy": "Política de Privacidad",
+  "proDescription": "Experiencia Premier en Inteligencia Artificial",
+  "productNotFound": "Producto no encontrado",
+  "profile": "Perfil",
+  "profileUpdated": "Perfil actualizado con éxito",
+  "purchaseError": "Error en la compra",
+  "purchasePlan": "Comprar {planName}",
+  "@purchasePlan": {
+    "description": "Texto del botón para comprar un plan de suscripción específico.",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Anual"
+      }
+    }
+  },
+  "purchasePlus": "Comprar Cortex Plus",
+  "purchasePro": "Comprar Cortex Pro",
+  "purchaseStreamError": "Error en el flujo de compra.",
+  "purchaseUltra": "Comprar Cortex Ultra",
+  "ram": "RAM",
+  "rateUs": "Califícanos",
+  "reachedLimit": "Has alcanzado tu límite; mejora tu plan para más. (hey, entendemos que es un fastidio. pero en serio, esas respuestas increíbles cuestan dinero, así que estos límites nos ayudan a que la magia siga fluuyyeeeenndao.)",
+  "regenerate": "Regenerar",
+  "registerSubtitle": "Crea una cuenta Vertex para acceder fácilmente a todos nuestros servicios. Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad.",
+  "rememberMe": "Recordarme",
+  "remove": "Eliminar",
+  "removeModel": "Eliminar Modelo",
+  "removePhotoTitle": "Eliminar Foto",
+  "renamed": "Renombrado",
+  "report": "Reportar",
+  "reportDescriptionLabel": "¿Cuál es el problema?",
+  "reportDialogTitle": "Enviar Reporte",
+  "reportErrorMessage": "Por favor, selecciona una razón para reportar.",
+  "reportHarmful": "Esto es dañino/inseguro",
+  "reportNotHelpful": "Esto no es útil",
+  "reportNotTrue": "Esto no es cierto",
+  "reportSubmitted": "Reporte enviado con éxito",
+  "requestFailed": "Ocurrió un error, por favor inténtalo de nuevo.",
+  "resendCode": "Reenviar correo de verificación",
+  "restorePurchases": "Restaurar compras",
+  "resume": "Reanudar",
+  "retry": "Reintentar",
+  "reviewEnjoyingAppTitle": "¿Disfrutando de Cortex?",
+  "reviewHelpUsGrow": "Tu calificación es un gran apoyo para nuestro joven equipo indie y nos ayuda a hacer Cortex aún mejor para ti.",
+  "reviewMaybeLater": "Quizás Más Tarde",
+  "reviewRateNow": "Calificar Ahora",
+  "roleModels": "Modelos de Rol",
+  "russian": "Ruso",
+  "save": "Guardar",
+  "scarletSnow": "Nieve Escarlata",
+  "searchHint": "Buscar",
+  "searching": "Búsqueda",
+  "seconds": "segundos",
+  "selectBaseModel": "Selecciona un Modelo Base",
+  "selectGGUFFile": "Seleccionar Archivo GGUF",
+  "selectText": "Seleccionar Texto",
+  "selected": "Seleccionado",
+  "settings": "Ajustes",
+  "share": "Compartir",
+  "shareApp": "Compartir la App",
+  "shareSubject": "Cortex",
+  "shortcuts": "Atajos",
+  "signUp": "Regístrate",
+  "spanish": "Español",
+  "speakTheMessage": "Speak The Message",
+  "starConversation": "Destacar",
+  "startChat": "Iniciar un chat",
+  "stop": "Detener",
+  "storage": "Almacenamiento",
+  "storagePermissionRequired": "Se requiere permiso de almacenamiento para guardar los modelos descargados. Por favor, concede el permiso para continuar.",
+  "submitButton": "Enviar",
+  "summary": "Resumen",
+  "summaryLabel": "Resumen de la IA",
+  "sunset": "Sunset",
+  "support": "Apoyo",
+  "supportCreator": "Apoya a un Creador",
+  "swipeToContinue": "Desliza para continuar",
+  "systemInfo": "Información del Sistema",
+  "systemLanguageInstruction": "\n\nCRÍTICO: Responda siempre en el mismo idioma en el que escribe el usuario, preste atención al idioma del usuario.",
+  "@systemLanguageInstruction": {
+    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
+  },
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalice la conversación hasta el momento. Si ha aprendido ALGÚN dato nuevo y distintivo sobre el usuario (preferencias, nombre, hábitos, contexto), DEBE mostrar TODA su memoria actualizada sobre el usuario dentro de las etiquetas <memory>...</memory> AL FINAL de su respuesta. CRÍTICO: NUNCA debe borrar ni sobrescribir la memoria anterior. SIEMPRE agregue los nuevos datos a la memoria existente. Si no se ha aprendido absolutamente nada nuevo, omita la etiqueta. Ejemplo: <memory>Le encanta el fútbol y el tenis. Prefiere las respuestas cortas.</memory>",
+  "systemMemoryReminder": "\n\nRecuerda siempre esto sobre el usuario:\n{userMemory}",
+  "systemNotePreviousMedia": "[Nota del sistema: A continuación se muestran los medios generados anteriormente. Puede hacer referencia a ellos o editarlos.]",
+  "@systemNotePreviousMedia": {
+    "description": "System note prepended to a synthetic user message containing AI-generated media."
+  },
+  "systemPromptLimitFallback": "CRÍTICO: El usuario solicitó una acción, pero su saldo en Cortex se ha agotado; por favor, infórmele en su idioma que debe esperar o considerar actualizar su plan de suscripción.",
+  "systemPromptMissingMedia": "Este modelo requiere un(a) {mediaType} para funcionar. He interceptado la solicitud para avisarte. Informa amablemente al usuario que necesita proporcionar un(a) {mediaType} (díselo en su propio idioma) porque soy {modelName}, un modelo de edición visual/audio/video.",
+  "@systemPromptMissingMedia": {
+    "description": "System prompt sent to fallback model when user forgets to upload media.",
+    "placeholders": {
+      "mediaType": {
+        "type": "String",
+        "example": "image"
+      },
+      "modelName": {
+        "type": "String",
+        "example": "Stable Diffusion"
+      }
+    }
+  },
+  "systemRoleFallback": "Eres un asistente muy útil.",
+  "@systemRoleFallback": {
+    "description": "Fallback system role when no specific role is defined."
+  },
+  "systemTimeInfo": "\n\nFecha y hora actuales: {formattedTime}.",
+  "@systemTimeInfo": {
+    "description": "Localized time context injected into all model system prompts.",
+    "placeholders": {
+      "formattedTime": {
+        "type": "String",
+        "example": "May 16, 2026 21:23"
+      }
+    }
+  },
+  "tagCannotBeEmpty": "La etiqueta de creador no puede estar vacía",
+  "tagNotFound": "La etiqueta ingresada no es válida o ha expirado.",
+  "termsOfService": "Términos de Servicio",
+  "termsOfServiceAndPrivacyPolicyWarning": "Al realizar este pedido, aceptas los Términos de Servicio y la Política de Privacidad. Puedes hacer clic en este texto para obtener más información sobre nuestros Términos de Servicio y Política de Privacidad. La suscripción se renovará automáticamente a menos que la renovación automática se desactive al menos 24 horas antes del final del período actual.",
+  "text": "Texto",
+  "theme": "Tema",
+  "themeDescription": "Puedes cambiar entre temas claros y oscuros según prefieras. El tema seleccionado se aplicará en toda la interfaz de Cortex.",
+  "themeLocked": "Este tema requiere un nivel de suscripción más alto. Por favor, actualiza para desbloquear.",
+  "thinking": "Pensando",
+  "thinkingModeInstruction": "MODO DE PENSAMIENTO ACTIVADO: DEBES usar las etiquetas <think></think> para mostrar tu proceso de razonamiento antes de dar tu respuesta final. Piensa paso a paso dentro de las etiquetas y luego proporciona tu respuesta fuera de ellas.",
+  "thought": "Pensó",
+  "tooManyRequests": "Demasiadas solicitudes",
+  "toolCalculateDescription": "Evaluar una expresión matemática.",
+  "toolCalculateExpressionParam": "Expresión matemática (p. ej. '3 + 4 * 2').",
+  "toolChartDataParam": "Valores de datos numéricos para el gráfico.",
+  "toolChartDescription": "Generar una visualización gráfica/diagrama.",
+  "toolChartLabelParam": "Etiqueta del conjunto de datos para la leyenda del gráfico.",
+  "toolChartLabelsParam": "Etiquetas para ejes o segmentos del gráfico.",
+  "toolChartTitleParam": "Título del gráfico.",
+  "toolChartTypeParam": "Tipo de gráfico: barras, líneas o circular.",
+  "toolPythonCodeParam": "El código Python a ejecutar.",
+  "toolPythonDescription": "Ejecute código Python en un entorno protegido.",
+  "toolReadDocumentDescription": "Lee y extrae texto de documentos subidos. Compatible con los formatos PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) y OpenDocument. Úselo cuando el usuario haya adjuntado un documento.",
+  "toolReadDocumentIndexParam": "Índice del documento adjunto que se va a leer (basado en 0). Generalmente, 0 para el primer documento.",
+  "toolStockDescription": "Obtenga el precio actual y el historial de acciones (por ejemplo, AAPL, THYAO.IS) y criptomonedas (por ejemplo, BTC-USD).",
+  "toolStockSymbolParam": "El símbolo del ticker (por ejemplo, AAPL, THYAO.IS, BTC-USD).",
+  "toolWeatherCityParam": "El nombre de la ciudad (por ejemplo, Londres, Estambul).",
+  "toolWeatherDescription": "Obtenga el clima actual para una ciudad específica.",
+  "totalMemory": "Memoria Total",
+  "totalStorage": "Almacenamiento Total",
+  "trialAnnualDescription": "Primeros {days} días gratis, luego {price}/año",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "trialMonthlyDescription": "Primeros {days} días gratis, luego {price}/mes",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "turkish": "Turco",
+  "ultraDescription": "El auge de la inteligencia artificial",
+  "ultraFeatureOnly": "Esta función solo está disponible para miembros Ultra.",
+  "unstarConversation": "Desmarcar",
+  "unverifiedAccountHeader": "Tu cuenta no está verificada",
+  "unverifiedAccountWarning": "Si no verificas tu cuenta en {timeLeft}, será eliminada.",
+  "updateNowButton": "Actualizar Ahora",
+  "updateRequiredMessage": "Para continuar usando Cortex, actualiza la aplicación a la última versión para obtener nuevas funciones y mejoras importantes.",
+  "updateRequiredTitle": "Actualización Requerida",
+  "upgradeAccountDescription": "Crea una cuenta para desbloquear más límites.",
+  "upgradeAccountTitle": "Completa tu cuenta",
+  "upgradeSubscription": "Actualizar Suscripción",
+  "useOffline": "Usar sin Internet",
+  "@useOffline": {
+    "description": "Text for the 'Use without Internet' feature card. The newline is intentional."
+  },
+  "useOfflineDescription": "Chatea en privado sin conexión a Internet.",
+  "usedMemory": "Memoria Usada",
+  "usedStorage": "Almacenamiento Usado",
+  "user": "Usuario",
+  "userDisabled": "Esta cuenta de usuario ha sido deshabilitada.",
+  "userId": "ID de Usuario",
+  "username": "Nombre de usuario",
+  "usernameTaken": "Este nombre de usuario ya está en uso.",
+  "usernameTooLong": "El nombre de usuario no puede exceder los 16 caracteres.",
+  "usernameTooShort": "El nombre de usuario es demasiado corto.",
+  "variants": "Variantes",
+  "variantsDescription": "Las variantes son versiones diferentes de la misma familia de IA. Seleccionamos automáticamente la mejor al tocar la tarjeta principal, pero puedes elegir una específica manualmente aquí si lo prefieres.",
+  "verificationDelayed": "Tu compra está confirmada. Hay un ligero retraso en la actualización de tu cuenta, aparecerá en breve.",
+  "verificationScreenContinueWithoutVerification": "Continuar sin verificación",
+  "verificationScreenWarning": "Aunque continúes, el período de verificación de cuenta de 1 día sigue vigente. Si no has verificado tu cuenta para entonces, será eliminada de la aplicación.",
+  "verifyNow": "Verificar Ahora",
+  "verifyYourEmail": "Verifica Tu Correo Electrónico",
+  "videoModels": "Video Models",
+  "videoPremiumWarning": "Necesitas una suscripción Ultra para generar vídeos, ¡actualízate ahora y disfruta del flujo!",
+  "voiceModeInformation": "Cortex mantiene tus datos seguros al ejecutarse completamente en el dispositivo, incluso en modo de chat de voz; ¡disfruta de conversaciones fluidas!",
+  "voiceSystemPromptSuffix": "IMPORTANTE: No utilice formato Markdown (negrita, cursiva). NO imprima bloques de código (```). Mantenga sus respuestas breves y concisas.",
+  "weakPassword": "La contraseña es demasiado débil.",
+  "webSearchSources": "Fuentes",
+  "welcomeOfferBadge": "Oferta de bienvenida • {time}",
+  "@welcomeOfferBadge": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "23:59:59"
+      }
+    }
+  },
+  "whatIsNew": "¿Qué hay de nuevo?",
+  "workInProgress": "Trabajo en progreso",
+  "wrongPassword": "Contraseña incorrecta.",
+  "yes": "Sí",
+  "you": "Tú"
+}

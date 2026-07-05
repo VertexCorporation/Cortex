@@ -135,7 +135,7 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-       final fogColor = widget.color ?? AppColors.background;
+    final fogColor = widget.color ?? AppColors.background;
     return Stack(
       children: [
         // 1. Content defines the stack size

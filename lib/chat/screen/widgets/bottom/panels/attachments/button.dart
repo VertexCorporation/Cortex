@@ -21,7 +21,7 @@ class AttachmentSheetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // SCREEN METRICS
-    
+
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     // DYNAMIC DIMENSIONS
@@ -32,8 +32,8 @@ class AttachmentSheetButton extends StatelessWidget {
 
     final double iconSize = itemWidth * 0.35; // Icon size balanced
     final double borderRadius = screenWidth * 0.04; // Responsive radius
-    final double fontSize = screenWidth *
-        0.032; // Font size adjusted for internal fit
+    final double fontSize =
+        screenWidth * 0.032; // Font size adjusted for internal fit
     final double gapHeight = 8.0; // Fixed gap between icon and text
 
     return Material(

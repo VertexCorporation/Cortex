@@ -23,10 +23,7 @@ class BodyContent extends StatelessWidget {
           child: Text("Error: Model data could not be loaded."));
     }
 
-    final double horizontalPadding = MediaQuery
-        .of(context)
-        .size
-        .width * 0.04;
+    final double horizontalPadding = MediaQuery.of(context).size.width * 0.04;
 
     return SingleChildScrollView(
       key: const ValueKey('model_detail_scroll_view'),
@@ -34,24 +31,16 @@ class BodyContent extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
         horizontalPadding, // Left
-        MediaQuery
-            .of(context)
-            .padding
-            .top, // Top
+        MediaQuery.of(context).padding.top, // Top
         horizontalPadding, // Right
-        MediaQuery
-            .of(context)
-            .size
-            .height * 0.02,
+        MediaQuery.of(context).size.height * 0.02,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ModelHeader(provider: provider),
           const _Spacing(),
-          if (provider.displaySummary
-              .trim()
-              .isNotEmpty) ...[
+          if (provider.displaySummary.trim().isNotEmpty) ...[
             SummarySection(provider: provider),
             const _Spacing(),
           ],
@@ -59,9 +48,7 @@ class BodyContent extends StatelessWidget {
             BaseModelSelectionSection(provider: provider),
             const _Spacing(),
           ],
-          if (provider.displayDescription
-              .trim()
-              .isNotEmpty) ...[
+          if (provider.displayDescription.trim().isNotEmpty) ...[
             DescriptionSection(provider: provider),
             const _Spacing(),
           ],
@@ -80,9 +67,6 @@ class _Spacing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: MediaQuery
-        .of(context)
-        .size
-        .height * 0.015);
+    return SizedBox(height: MediaQuery.of(context).size.height * 0.015);
   }
 }

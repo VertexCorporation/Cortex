@@ -36,7 +36,8 @@ class NewsSearchBar extends StatelessWidget {
     // Dimensions
     final double iconSize = isDesktop ? 22.0 : (isTablet ? 36.0 : w * .06);
     final double borderRadius = isDesktop ? 16.0 : (isTablet ? 24.0 : 16.0);
-    final double maxBarWidth = isDesktop ? 500 : (isTablet ? 700 : double.infinity);
+    final double maxBarWidth =
+        isDesktop ? 500 : (isTablet ? 700 : double.infinity);
     final double? fontSize = isDesktop ? 16.0 : (isTablet ? 22.0 : null);
 
     final EdgeInsets contentPadding = isDesktop

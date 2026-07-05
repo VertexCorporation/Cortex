@@ -98,7 +98,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
   void _onTapDown(TapDownDetails details) {
     _holdTimer?.cancel();
-    
+
     final inboxViewModel = context.read<InboxViewModel>();
     if (inboxViewModel.isSelectionMode) {
       return;
@@ -219,7 +219,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     // even if it matches the currentConversationId.
     final inboxViewModel = context.watch<InboxViewModel>();
     final isSelectionMode = inboxViewModel.isSelectionMode;
-    final isSelected = inboxViewModel.selectedIDs.contains(widget.manager.conversationID);
+    final isSelected =
+        inboxViewModel.selectedIDs.contains(widget.manager.conversationID);
 
     final selectedTab =
         context.select<TabProvider, int>((p) => p.selectedIndex);
@@ -280,9 +281,13 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                       height: 20.0,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isSelected ? AppColors.senaryColor : Colors.transparent,
+                        color: isSelected
+                            ? AppColors.senaryColor
+                            : Colors.transparent,
                         border: Border.all(
-                          color: isSelected ? AppColors.senaryColor : AppColors.border.withValues(alpha: 0.5),
+                          color: isSelected
+                              ? AppColors.senaryColor
+                              : AppColors.border.withValues(alpha: 0.5),
                           width: 2.0,
                         ),
                       ),

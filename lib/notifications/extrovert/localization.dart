@@ -19,13 +19,10 @@ Future<Map<String, String>> _buildLocalizedContent(
 
   final locale = savedLocaleCode != null
       ? Locale(savedLocaleCode)
-      : Locale(Platform.localeName
-      .split('_')
-      .first);
+      : Locale(Platform.localeName.split('_').first);
 
   debugPrint(
-      "[Content Builder] Using '${locale
-          .languageCode}' for notification language.");
+      "[Content Builder] Using '${locale.languageCode}' for notification language.");
 
   final l10n = await AppLocalizations.delegate.load(locale);
 
@@ -33,7 +30,7 @@ Future<Map<String, String>> _buildLocalizedContent(
     // This maps your camelCase keys to the generated AppLocalizations properties.
     // It correctly handles both parameterized and non-parameterized strings.
     switch (key) {
-    // --- PARAMETERIZED STRINGS ---
+      // --- PARAMETERIZED STRINGS ---
       case 'notificationNewModelAddedBody':
         return l10n
             .notificationNewModelAddedBody(data['modelName'] ?? '[Model]');
@@ -51,7 +48,7 @@ Future<Map<String, String>> _buildLocalizedContent(
             data['targetTier'] ?? '[New Plan]',
             data['featureName'] ?? '[Feature]');
 
-    // --- NON-PARAMETERIZED STRINGS (unchanged from your original code) ---
+      // --- NON-PARAMETERIZED STRINGS (unchanged from your original code) ---
       case 'notificationComebackTitle':
         return l10n.notificationComebackTitle;
       case 'notificationComebackBody':

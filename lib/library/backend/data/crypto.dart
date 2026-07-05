@@ -11,7 +11,8 @@ class CryptoHelper {
   static enc.Key _generateKey(String userId) {
     final bytes = utf8.encode(userId); // Convert UID to bytes
     final digest = sha256.convert(bytes); // Hash it with SHA-256
-    return enc.Key.fromBase64(base64.encode(digest.bytes)); // Use the 32-byte hash as the key
+    return enc.Key.fromBase64(
+        base64.encode(digest.bytes)); // Use the 32-byte hash as the key
   }
 
   // Encrypts a plaintext string using the user's ID as the key source.
@@ -49,7 +50,8 @@ class CryptoHelper {
       return decrypted;
     } catch (e) {
       // This catch block is expected to fire when trying to decrypt another user's data.
-      debugPrint("[CryptoHelper] Decryption failed (likely wrong user key): $e");
+      debugPrint(
+          "[CryptoHelper] Decryption failed (likely wrong user key): $e");
       return null;
     }
   }

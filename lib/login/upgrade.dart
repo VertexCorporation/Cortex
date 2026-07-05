@@ -69,7 +69,9 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
       padding: EdgeInsets.symmetric(vertical: 10 * fontScale),
       child: Row(
         children: [
-          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1)),
+          Expanded(
+              child:
+                  Divider(color: Theme.of(context).dividerColor, thickness: 1)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12 * fontScale),
             child: Text(
@@ -81,14 +83,16 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
               ),
             ),
           ),
-          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1)),
+          Expanded(
+              child:
+                  Divider(color: Theme.of(context).dividerColor, thickness: 1)),
         ],
       ),
     );
   }
 
-  Widget _buildSocialButtons(AppLocalizations l10n, double screenHeight,
-      double fontScale) {
+  Widget _buildSocialButtons(
+      AppLocalizations l10n, double screenHeight, double fontScale) {
     final isRegisterMode = _controller.authMode == AuthMode.register;
     final bool isDisabled =
         _controller.isLoading || (isRegisterMode && !_controller.agreeToTerms);
@@ -155,15 +159,12 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
                       width: 16 * fontScale,
                       height: 16 * fontScale,
                     ),
-
                     SizedBox(width: 12 * fontScale),
-
                     Text(
                       l10n.continueWithGoogle,
                       style: TextStyle(
                           fontSize: 16 * fontScale,
-                          fontWeight: FontWeight.w600
-                      ),
+                          fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -175,8 +176,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
     );
   }
 
-  Widget _buildTermsAndConditions(
-      AppLocalizations l10n, double fontScale) {
+  Widget _buildTermsAndConditions(AppLocalizations l10n, double fontScale) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4.0 * fontScale),
       child: Row(
@@ -207,8 +207,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
             width: 24 * fontScale,
             child: Checkbox(
               value: _controller.agreeToTerms,
-              onChanged: (bool? value) =>
-                  _controller.toggleAgreeToTerms(),
+              onChanged: (bool? value) => _controller.toggleAgreeToTerms(),
               checkColor: AppColors.primaryColor,
               activeColor: AppColors.primaryColor.inverted,
               shape: RoundedRectangleBorder(
@@ -266,129 +265,125 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: false,
-      body: Builder(
-        builder: (context) {
-          final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-          return AnimatedPadding(
-            padding: EdgeInsets.only(bottom: bottomInset),
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-        child: SafeArea(
-          child: Stack(
-          children: [
-            Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: containerMaxWidth),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 30 * fontScale),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 40 * fontScale),
+      body: Builder(builder: (context) {
+        final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+        return AnimatedPadding(
+          padding: EdgeInsets.only(bottom: bottomInset),
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: containerMaxWidth),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: 30 * fontScale),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 40 * fontScale),
 
-                      // A) Forms — CrossFade between Login and Register
-                      AnimatedCrossFade(
-                        duration: const Duration(milliseconds: 300),
-                        firstCurve: Curves.easeInOut,
-                        secondCurve: Curves.easeInOut,
-                        sizeCurve: Curves.easeInOut,
-                        alignment: Alignment.topCenter,
-                        crossFadeState: _controller.authMode == AuthMode.login
-                            ? CrossFadeState.showFirst
-                            : CrossFadeState.showSecond,
-                        firstChild: LoginForm(
-                          key: const ValueKey('upgrade_login_form'),
-                          isLoading: _controller.isLoading,
-                          emailError: _controller.loginEmailError,
-                          passwordError: _controller.loginPasswordError,
-                          emailShakeController:
-                              _controller.loginEmailShakeController,
-                          passwordShakeController:
-                              _controller.loginPasswordShakeController,
-                          fontScale: fontScale,
-                          onSubmit: (email, password, rememberMe) =>
-                              _controller.submitLogin(
-                                  context, email, password, rememberMe),
-                          onForgotPassword: () =>
-                              _controller.launchResetPasswordURL(context),
-                          onInputChanged: _controller.clearErrorsOnInput,
-                        ),
-                        secondChild: RegisterForm(
-                          key: const ValueKey('upgrade_register_form'),
-                          isLoading: _controller.isLoading,
-                          agreeToTerms: _controller.agreeToTerms,
-                          usernameError: _controller.registerUsernameError,
-                          emailError: _controller.registerEmailError,
-                          passwordError: _controller.registerPasswordError,
-                          usernameShakeController:
-                              _controller.registerUsernameShakeController,
-                          emailShakeController:
-                              _controller.registerEmailShakeController,
-                          passwordShakeController:
-                              _controller.registerPasswordShakeController,
-                          fontScale: fontScale,
-                          onInputChanged: _controller.clearErrorsOnInput,
-                          onSubmit: (username, email, password) =>
-                              _controller.submitUpgrade(
-                                  context, username, email, password),
-                        ),
+                          // A) Forms — CrossFade between Login and Register
+                          AnimatedCrossFade(
+                            duration: const Duration(milliseconds: 300),
+                            firstCurve: Curves.easeInOut,
+                            secondCurve: Curves.easeInOut,
+                            sizeCurve: Curves.easeInOut,
+                            alignment: Alignment.topCenter,
+                            crossFadeState:
+                                _controller.authMode == AuthMode.login
+                                    ? CrossFadeState.showFirst
+                                    : CrossFadeState.showSecond,
+                            firstChild: LoginForm(
+                              key: const ValueKey('upgrade_login_form'),
+                              isLoading: _controller.isLoading,
+                              emailError: _controller.loginEmailError,
+                              passwordError: _controller.loginPasswordError,
+                              emailShakeController:
+                                  _controller.loginEmailShakeController,
+                              passwordShakeController:
+                                  _controller.loginPasswordShakeController,
+                              fontScale: fontScale,
+                              onSubmit: (email, password, rememberMe) =>
+                                  _controller.submitLogin(
+                                      context, email, password, rememberMe),
+                              onForgotPassword: () =>
+                                  _controller.launchResetPasswordURL(context),
+                              onInputChanged: _controller.clearErrorsOnInput,
+                            ),
+                            secondChild: RegisterForm(
+                              key: const ValueKey('upgrade_register_form'),
+                              isLoading: _controller.isLoading,
+                              agreeToTerms: _controller.agreeToTerms,
+                              usernameError: _controller.registerUsernameError,
+                              emailError: _controller.registerEmailError,
+                              passwordError: _controller.registerPasswordError,
+                              usernameShakeController:
+                                  _controller.registerUsernameShakeController,
+                              emailShakeController:
+                                  _controller.registerEmailShakeController,
+                              passwordShakeController:
+                                  _controller.registerPasswordShakeController,
+                              fontScale: fontScale,
+                              onInputChanged: _controller.clearErrorsOnInput,
+                              onSubmit: (username, email, password) =>
+                                  _controller.submitUpgrade(
+                                      context, username, email, password),
+                            ),
+                          ),
+
+                          // B) Divider
+                          _buildOrDivider(l10n, fontScale),
+
+                          // C) Social Buttons
+                          _buildSocialButtons(l10n, screenHeight, fontScale),
+
+                          // D) Terms Checkbox — Register mode only
+                          AnimatedSize(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            alignment: Alignment.topCenter,
+                            child: _controller.authMode == AuthMode.register
+                                ? Column(
+                                    children: [
+                                      SizedBox(height: 16 * fontScale),
+                                      _buildTermsAndConditions(l10n, fontScale),
+                                    ],
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
+
+                          SizedBox(height: 12 * fontScale),
+
+                          // E) Switch between Login / Register
+                          _buildSwitchAuthModeButton(l10n, fontScale),
+
+                          SizedBox(height: 20 * fontScale),
+                        ],
                       ),
-
-                      // B) Divider
-                      _buildOrDivider(l10n, fontScale),
-
-                      // C) Social Buttons
-                      _buildSocialButtons(l10n, screenHeight, fontScale),
-
-                      // D) Terms Checkbox — Register mode only
-                      AnimatedSize(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        alignment: Alignment.topCenter,
-                        child: _controller.authMode == AuthMode.register
-                            ? Column(
-                                children: [
-                                  SizedBox(height: 16 * fontScale),
-                                  _buildTermsAndConditions(l10n, fontScale),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-
-                      SizedBox(height: 12 * fontScale),
-
-                      // E) Switch between Login / Register
-                      _buildSwitchAuthModeButton(l10n, fontScale),
-
-                      SizedBox(height: 20 * fontScale),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-            // Close button
-            Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: EdgeInsets.only(top: 10 * fontScale),
-                child: AppBarButton(
-                  size: 40.0,
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Icon(
-                      Icons.close_rounded,
-                      color: AppColors.primaryColor.inverted,
-                      size: 20.0
+                // Close button
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10 * fontScale),
+                    child: AppBarButton(
+                      size: 40.0,
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Icon(Icons.close_rounded,
+                          color: AppColors.primaryColor.inverted, size: 20.0),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }),
     );
   }
-),
-);
-}
 }

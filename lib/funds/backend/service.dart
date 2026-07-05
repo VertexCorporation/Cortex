@@ -394,12 +394,12 @@ class FundsBackend with ChangeNotifier {
 
     _purchaseStreamSubscription = _inAppPurchase.purchaseStream
         .listen(_onPurchaseUpdated, onError: _onPurchaseStreamError);
-        
+
     _authSubscription?.cancel();
     _authSubscription = _auth.authStateChanges().listen((user) {
       _listenToUserChanges();
     });
-    
+
     _listenToUserChanges();
   }
 

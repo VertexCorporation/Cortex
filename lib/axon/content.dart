@@ -35,6 +35,7 @@ class AxonContent extends StatelessWidget {
   final VoidCallback onLibraryTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
+  final VoidCallback onRoleplayTap;
   final VoidCallback onNewsTap;
   final VoidCallback onSettingsTap;
   final VoidCallback onExitSearchTap;
@@ -54,6 +55,7 @@ class AxonContent extends StatelessWidget {
     required this.onLibraryTap,
     required this.onCreateAITap,
     required this.onArtsTap,
+    required this.onRoleplayTap,
     required this.onNewsTap,
     required this.onSettingsTap,
     required this.onExitSearchTap,
@@ -119,12 +121,16 @@ class AxonContent extends StatelessWidget {
             // × AnimatedSlide+AnimatedOpacity+AnimatedSize) into 3 total.
             // This reduces from 9 independent AnimationControllers to 3.
             AnimatedSlide(
-              offset: (isSearchActive || inboxViewModel.isSelectionMode) ? const Offset(0, -0.3) : Offset.zero,
+              offset: (isSearchActive || inboxViewModel.isSelectionMode)
+                  ? const Offset(0, -0.3)
+                  : Offset.zero,
               duration: const Duration(milliseconds: 150),
               curve: Curves.easeOut,
               child: AnimatedOpacity(
                 duration: const Duration(milliseconds: 100),
-                opacity: (isSearchActive || inboxViewModel.isSelectionMode) ? 0.0 : 1.0,
+                opacity: (isSearchActive || inboxViewModel.isSelectionMode)
+                    ? 0.0
+                    : 1.0,
                 child: AnimatedSize(
                   duration: const Duration(milliseconds: 150),
                   curve: Curves.easeInOutCubic,
@@ -178,6 +184,7 @@ class AxonContent extends StatelessWidget {
                               onLibraryTap: onLibraryTap,
                               onCreateAITap: onCreateAITap,
                               onArtsTap: onArtsTap,
+                              onRoleplayTap: onRoleplayTap,
                               onNewsTap: onNewsTap,
                             ),
                           ],
@@ -227,7 +234,8 @@ class AxonContent extends StatelessWidget {
                           // Select All / Deselect All
                           IconButton(
                             icon: Icon(
-                              inboxViewModel.selectedIDs.length == inboxViewModel.conversations.length
+                              inboxViewModel.selectedIDs.length ==
+                                      inboxViewModel.conversations.length
                                   ? Icons.deselect_rounded
                                   : Icons.select_all_rounded,
                               color: AppColors.primaryColor.inverted,
@@ -235,7 +243,8 @@ class AxonContent extends StatelessWidget {
                             ),
                             onPressed: () {
                               HapticFeedback.lightImpact();
-                              if (inboxViewModel.selectedIDs.length == inboxViewModel.conversations.length) {
+                              if (inboxViewModel.selectedIDs.length ==
+                                  inboxViewModel.conversations.length) {
                                 inboxViewModel.clearSelection();
                               } else {
                                 inboxViewModel.selectAllConversations();
@@ -247,7 +256,8 @@ class AxonContent extends StatelessWidget {
                             icon: Icon(
                               Icons.delete_outline_rounded,
                               color: inboxViewModel.selectedIDs.isEmpty
-                                  ? AppColors.primaryColor.inverted.withValues(alpha: 0.3)
+                                  ? AppColors.primaryColor.inverted
+                                      .withValues(alpha: 0.3)
                                   : Colors.redAccent,
                               size: referenceWidth * 0.055,
                             ),
@@ -259,37 +269,54 @@ class AxonContent extends StatelessWidget {
                                       context: context,
                                       builder: (BuildContext dialogContext) {
                                         return AlertDialog(
-                                          backgroundColor: AppColors.secondaryColor,
+                                          backgroundColor:
+                                              AppColors.secondaryColor,
                                           title: Text(
                                             localizations.localeName == 'tr'
                                                 ? 'Seçilenleri Sil?'
                                                 : 'Delete Selected?',
-                                            style: TextStyle(color: AppColors.primaryColor.inverted),
+                                            style: TextStyle(
+                                                color: AppColors
+                                                    .primaryColor.inverted),
                                           ),
                                           content: Text(
                                             localizations.localeName == 'tr'
                                                 ? 'Seçili ${inboxViewModel.selectedIDs.length} sohbeti silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'
                                                 : 'Are you sure you want to delete the selected ${inboxViewModel.selectedIDs.length} chats? This action cannot be undone.',
-                                            style: TextStyle(color: AppColors.primaryColor.inverted.withValues(alpha: 0.8)),
+                                            style: TextStyle(
+                                                color: AppColors
+                                                    .primaryColor.inverted
+                                                    .withValues(alpha: 0.8)),
                                           ),
                                           actions: [
                                             TextButton(
-                                              onPressed: () => Navigator.pop(dialogContext),
+                                              onPressed: () =>
+                                                  Navigator.pop(dialogContext),
                                               child: Text(
-                                                localizations.localeName == 'tr' ? 'Vazgeç' : 'Cancel',
-                                                style: TextStyle(color: AppColors.primaryColor.inverted),
+                                                localizations.localeName == 'tr'
+                                                    ? 'Vazgeç'
+                                                    : 'Cancel',
+                                                style: TextStyle(
+                                                    color: AppColors
+                                                        .primaryColor.inverted),
                                               ),
                                             ),
                                             TextButton(
                                               onPressed: () {
                                                 Navigator.pop(dialogContext);
-                                                inboxViewModel.deleteSelectedConversations();
-                                                Provider.of<IntrovertNotificationService>(context, listen: false)
+                                                inboxViewModel
+                                                    .deleteSelectedConversations();
+                                                Provider.of<IntrovertNotificationService>(
+                                                        context,
+                                                        listen: false)
                                                     .showNotification(
-                                                  message: localizations.localeName == 'tr'
+                                                  message: localizations
+                                                              .localeName ==
+                                                          'tr'
                                                       ? 'Seçili sohbetler silindi'
                                                       : 'Selected chats deleted',
-                                                  type: NotificationType.success,
+                                                  type:
+                                                      NotificationType.success,
                                                   isAxonMode: true,
                                                   axonWidth: referenceWidth,
                                                 );
@@ -330,8 +357,7 @@ class AxonContent extends StatelessWidget {
                                   right: horizontalPadding * 0.5),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF333333),
-                                borderRadius:
-                                    BorderRadius.circular(2.0),
+                                borderRadius: BorderRadius.circular(2.0),
                               ),
                             ),
                           ),

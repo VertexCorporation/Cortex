@@ -56,6 +56,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get branch => 'Ramificação';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1169,7 +1172,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notificationHowAreYouBody => 'Venha me contar tudo sobre isso.';
 
   @override
-  String get notificationNewYearTitle => 'Feliz Ano Novo! ğ���';
+  String get notificationNewYearTitle => 'Feliz Ano Novo! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1215,10 +1218,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Uma garota de anime acabou de ligar e disse que sente sua falta; você provavelmente deveria vir conversar com ela. ğ���';
+      'Uma garota de anime acabou de ligar, disse que sente sua falta; você provavelmente deveria vir conversar com ela. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� ALERTA VERMELHO ğ���';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ ALERTA VERMELHO ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1248,7 +1251,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Presente de boas-vindas ğ���';
+  String get notificationWelcomeOfferTitle => 'Presente de boas-vindas ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1337,7 +1340,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'O mar está calmo e o vento sopra a favor. Há novas ilhas (modelos ğ���) para descobrir no oceano de Cortex. Reúna sua tripulação e zarpe!';
+      'Os mares estão calmos e o vento está nas suas costas. Existem novas ilhas (modelos ğŸ˜‰) para descobrir no oceano do Cortex. Reúna sua tripulação e navegue!';
 
   @override
   String get notificationFortuneCookieTitle => 'Seu biscoito da sorte do dia';

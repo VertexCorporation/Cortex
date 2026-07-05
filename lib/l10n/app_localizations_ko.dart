@@ -56,6 +56,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chat => '채팅';
 
   @override
+  String get branch => '분기';
+
+  @override
   String get locked => 'Locked';
 
   @override
@@ -1135,7 +1138,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notificationHowAreYouBody => '와서 모든 것을 말해 보세요.';
 
   @override
-  String get notificationNewYearTitle => '새해 복 많이 받으세요! ğ���';
+  String get notificationNewYearTitle => '새해 복 많이 받으세요! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1180,10 +1183,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      '방금 애니메이션 소녀가 전화해서 보고 싶다고 했어요. 와서 이야기를 나눠보는 게 어떨까요? ğ���';
+      '방금 전화한 애니메이션 소녀가 당신이 보고 싶다고 말했습니다. 당신이 와서 그녀와 이야기를 나누는 것이 좋을 것 같습니다. 으으~‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => 'ğ��� 적색 경보 ğ���';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ 적색 경보 ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1213,7 +1216,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => '환영 선물 ğ���';
+  String get notificationWelcomeOfferTitle => '환영 선물 ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1301,7 +1304,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      '바다는 잔잔하고, 바람은 당신을 등지고 있습니다. 코르텍스 바다에는 새로운 섬들(모델 ğ���)이 있습니다. 선원들을 모아 항해를 시작하세요!';
+      '바다는 잔잔하고 바람은 등 뒤에서 불어옵니다. Cortex의 바다에서 발견할 수 있는 새로운 섬(모델 ğŸ~‰)이 있습니다. 승무원을 모아 항해를 시작하세요!';
 
   @override
   String get notificationFortuneCookieTitle => '오늘의 포춘 쿠키';

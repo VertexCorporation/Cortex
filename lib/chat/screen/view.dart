@@ -7,6 +7,7 @@ import 'package:cortex/chat/screen/widgets/player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:cortex/theme.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -303,7 +304,9 @@ class ChatViewState extends State<ChatView>
             briefingVisibleHeightNotifier,
           ]),
           builder: (context, child) {
-            final bottomPadding = bottomPanelHeightNotifier.value + briefingVisibleHeightNotifier.value + bottomSafe;
+            final bottomPadding = bottomPanelHeightNotifier.value +
+                briefingVisibleHeightNotifier.value +
+                bottomSafe;
             return Positioned(
               top: 0,
               left: 0,
@@ -312,7 +315,8 @@ class ChatViewState extends State<ChatView>
               child: AnimatedScale(
                 scale: isVoiceModeActive ? 0.5 : 1.0,
                 duration: const Duration(milliseconds: 300),
-                curve: isVoiceModeActive ? Curves.easeInBack : Curves.easeOutCubic,
+                curve:
+                    isVoiceModeActive ? Curves.easeInBack : Curves.easeOutCubic,
                 child: AnimatedOpacity(
                   opacity: isVoiceModeActive ? 0.0 : 1.0,
                   duration: const Duration(milliseconds: 300),
@@ -330,7 +334,8 @@ class ChatViewState extends State<ChatView>
                         ],
                       );
                     },
-                    transitionBuilder: (Widget child, Animation<double> animation) {
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
                       return FadeTransition(opacity: animation, child: child);
                     },
                     child: isLoadingMessages
@@ -353,6 +358,34 @@ class ChatViewState extends State<ChatView>
               ),
             );
           },
+        ),
+
+        // LAYER 2.5: Bottom Fog/Gradient Effect (darkening at bottom edge)
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: isVoiceModeActive ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: Container(
+                height: (screenHeight * 0.05),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      AppColors.background,
+                      AppColors.background.withValues(alpha: 0.8),
+                      AppColors.background.withValues(alpha: 0.0),
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
 
         // Bottom Panel (Slides Down)
@@ -555,9 +588,8 @@ class _BriefingOverlayWrapper extends StatelessWidget {
           modelMissing: modelMissing,
           limitReached: isLimitExceeded,
           isStorageSufficient: session.isStorageSufficient,
-          isPremiumModel: usesDynamicChatAllowance
-              ? false
-              : session.isCurrentModelPremium,
+          isPremiumModel:
+              usesDynamicChatAllowance ? false : session.isCurrentModelPremium,
           isVideoModel: usesDynamicChatAllowance ? false : isVideoModel,
           isSubscribed: session.isUserSubscribed,
           userTier: userProvider.activeSubscriptionLevel,

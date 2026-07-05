@@ -142,9 +142,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
   /// Builds the main content column that sits on top of the background image.
   Widget _buildContentColumn(BuildContext context, BoxConstraints constraints) {
     final l10n = AppLocalizations.of(context)!;
-    final safeArea = MediaQuery
-        .of(context)
-        .padding;
+    final safeArea = MediaQuery.of(context).padding;
     final screenHeight = constraints.maxHeight;
 
     return Padding(
@@ -175,8 +173,8 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
   }
 
   /// Builds the "Under Maintenance" title and descriptive message.
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n,
-      BoxConstraints constraints) {
+  Widget _buildHeader(
+      BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
 
@@ -210,8 +208,8 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
     );
   }
 
-  Widget _buildContinueButton(BuildContext context, AppLocalizations l10n,
-      BoxConstraints constraints) {
+  Widget _buildContinueButton(
+      BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
     return TextButton(
       onPressed: () {
         context.read<AppInitializer>().bypassMaintenanceMode();

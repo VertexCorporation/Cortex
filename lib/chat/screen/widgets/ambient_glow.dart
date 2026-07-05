@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
-import 'package:cortex/theme.dart';
-import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 
@@ -14,7 +12,8 @@ class AmbientGlow extends StatefulWidget {
   State<AmbientGlow> createState() => _AmbientGlowState();
 }
 
-class _AmbientGlowState extends State<AmbientGlow> with SingleTickerProviderStateMixin {
+class _AmbientGlowState extends State<AmbientGlow>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -22,7 +21,7 @@ class _AmbientGlowState extends State<AmbientGlow> with SingleTickerProviderStat
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 5),
     )..repeat(reverse: true);
   }
 
@@ -34,94 +33,69 @@ class _AmbientGlowState extends State<AmbientGlow> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final bool isChatActive =
+        context.watch<ConversationProvider>().messages.isNotEmpty;
+    final session = context.watch<ChatSessionProvider>();
+    final bool isFlux = session.isFluxMode;
+
     return AnimatedBuilder(
       animation: _controller,
-            builder: (context, child) {
-        // Smoother curved animation (Sine wave) to prevent robotic linear stops
-        final curve = Curves.easeInOutSine.transform(_controller.value);
-        
-        // Very subtle breathing scales and offsets (no layout changes)
-        final scale1 = 1.0 + (curve * 0.08); // 8% scale pulse
-        final scale2 = 1.0 + ((1 - curve) * 0.08);
-        
-        final offsetX1 = curve * 15.0;
-        final offsetY1 = curve * -10.0;
-        
-        final offsetX2 = (1 - curve) * -15.0;
-        final offsetY2 = (1 - curve) * -10.0;
+      builder: (context, child) {
+        final t = Curves.easeInOutSine.transform(_controller.value);
 
-        // Color & Visibility Logic
-        final bool isChatActive = context.watch<ConversationProvider>().messages.isNotEmpty;
-        final session = context.watch<ChatSessionProvider>();
-        
-        final double targetAlpha = 0.15;
-        
-        Color targetColor;
-        if (session.isFluxMode) {
-          targetColor = const Color(0xFFFFEBEE); 
+        Color baseColor;
+        if (isFlux) {
+          baseColor = const Color(0xFFFFCDD2);
         } else {
-          targetColor = AppColors.primaryColor.inverted;
+          baseColor = Colors.white;
         }
-        
-        final Color baseColor = targetColor.withValues(alpha: targetAlpha);
+
+        final alpha = (0.07 + (t * 0.03)).clamp(0.0, 1.0);
+        final fadeAlpha = (0.05 + ((1.0 - t) * 0.03)).clamp(0.0, 1.0);
 
         return SizedBox(
           width: double.infinity,
           height: widget.height,
           child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 1500),
+            duration: const Duration(milliseconds: 2000),
             opacity: isChatActive ? 0.0 : 1.0,
             child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 70.0, sigmaY: 70.0),
+              imageFilter: ImageFilter.blur(sigmaX: 120.0, sigmaY: 120.0),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Bottom Left Fog
                   Positioned(
-                    bottom: -150,
-                    left: -100,
-                    child: Transform.translate(
-                      offset: Offset(offsetX1, offsetY1),
-                      child: Transform.scale(
-                        scale: scale1,
-                        child: Container(
-                          width: 400.0,
-                          height: 400.0,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                baseColor,
-                                baseColor.withValues(alpha: 0.0),
-                              ],
-                              stops: const [0.0, 1.0],
-                            ),
-                          ),
+                    bottom: -80,
+                    left: -60,
+                    width: MediaQuery.of(context).size.width * 0.55,
+                    height: widget.height * 0.8,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                          colors: [
+                            baseColor.withValues(alpha: alpha),
+                            baseColor.withValues(alpha: 0.0),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  // Bottom Right Fog
                   Positioned(
-                    bottom: -150,
-                    right: -100,
-                    child: Transform.translate(
-                      offset: Offset(offsetX2, offsetY2),
-                      child: Transform.scale(
-                        scale: scale2,
-                        child: Container(
-                          width: 400.0,
-                          height: 400.0,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                baseColor,
-                                baseColor.withValues(alpha: 0.0),
-                              ],
-                              stops: const [0.0, 1.0],
-                            ),
-                          ),
+                    bottom: -80,
+                    right: -60,
+                    width: MediaQuery.of(context).size.width * 0.55,
+                    height: widget.height * 0.8,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomRight,
+                          end: Alignment.topLeft,
+                          colors: [
+                            baseColor.withValues(alpha: fadeAlpha),
+                            baseColor.withValues(alpha: 0.0),
+                          ],
                         ),
                       ),
                     ),

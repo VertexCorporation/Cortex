@@ -86,16 +86,22 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
     final currentMode = inputProvider.featureMode;
     final currentModel = sessionProvider.selectedModel;
     final bool isOfflineModelSelected = currentModel?.type == 'offline';
-    final bool isCurrentImageModel = currentModel?.outputs['image'] == true || currentModel?.category == 'image';
-    final bool isCurrentAudioModel = currentModel?.outputs['audio'] == true || currentModel?.category == 'audio';
-    final bool isCurrentVideoModel = currentModel?.outputs['video'] == true || currentModel?.category == 'video';
+    final bool isCurrentImageModel = currentModel?.outputs['image'] == true ||
+        currentModel?.category == 'image';
+    final bool isCurrentAudioModel = currentModel?.outputs['audio'] == true ||
+        currentModel?.category == 'audio';
+    final bool isCurrentVideoModel = currentModel?.outputs['video'] == true ||
+        currentModel?.category == 'video';
 
-    final imageGenModels = catalog.allModels.where((m) =>
-    m.outputs['image'] == true || m.category == 'image').toList();
-    final audioGenModels = catalog.allModels.where((m) =>
-    m.outputs['audio'] == true || m.category == 'audio').toList();
-    final videoGenModels = catalog.allModels.where((m) =>
-    m.outputs['video'] == true || m.category == 'video').toList();
+    final imageGenModels = catalog.allModels
+        .where((m) => m.outputs['image'] == true || m.category == 'image')
+        .toList();
+    final audioGenModels = catalog.allModels
+        .where((m) => m.outputs['audio'] == true || m.category == 'audio')
+        .toList();
+    final videoGenModels = catalog.allModels
+        .where((m) => m.outputs['video'] == true || m.category == 'video')
+        .toList();
 
     return Container(
       constraints: BoxConstraints(
@@ -132,134 +138,154 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                 physics: const ClampingScrollPhysics(),
                 // Removed BouncingScrollPhysics
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery
-                        .of(context)
-                        .padding
-                        .bottom + 16.0),
+                    bottom: MediaQuery.of(context).padding.bottom + 16.0),
                 child: Column(
                   children: [
-                     // --- ATTACHMENTS SECTION (Camera, Gallery, File) ---
-                     FutureBuilder<List<CameraDescription>>(
-                       future: availableCameras(),
-                       builder: (futureContext, snapshot) {
-                         final bool hasCamera = snapshot.hasData && snapshot.data!.isNotEmpty;
-                         final bool canHandleImages = sessionProvider.isDynamicChat ? true : sessionProvider.canHandleImage;
-                         final bool canHandleVideo = sessionProvider.isDynamicChat ? true : sessionProvider.canHandleVideo;
-                         final bool canHandleAudio = sessionProvider.isDynamicChat ? true : sessionProvider.canHandleAudio;
+                    // --- ATTACHMENTS SECTION (Camera, Gallery, File) ---
+                    FutureBuilder<List<CameraDescription>>(
+                      future: availableCameras(),
+                      builder: (futureContext, snapshot) {
+                        final bool hasCamera =
+                            snapshot.hasData && snapshot.data!.isNotEmpty;
+                        final bool canHandleImages =
+                            sessionProvider.isDynamicChat
+                                ? true
+                                : sessionProvider.canHandleImage;
+                        final bool canHandleVideo =
+                            sessionProvider.isDynamicChat
+                                ? true
+                                : sessionProvider.canHandleVideo;
+                        final bool canHandleAudio =
+                            sessionProvider.isDynamicChat
+                                ? true
+                                : sessionProvider.canHandleAudio;
 
-                         if (snapshot.connectionState == ConnectionState.waiting) {
-                           final double itemWidth = (screenWidth * 0.85) / 3;
-                           final double borderRadius = screenWidth * 0.04;
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          final double itemWidth = (screenWidth * 0.85) / 3;
+                          final double borderRadius = screenWidth * 0.04;
 
-                           return Padding(
-                             padding: EdgeInsets.symmetric(horizontal: contentHorizontalPadding),
-                             child: Shimmer.fromColors(
-                               baseColor: AppColors.shimmerBase,
-                               highlightColor: AppColors.shimmerHighlight,
-                               child: Row(
-                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                 children: List.generate(3, (index) {
-                                   return Container(
-                                     width: itemWidth,
-                                     height: itemWidth,
-                                     decoration: BoxDecoration(
-                                       color: AppColors.shimmerBase,
-                                       borderRadius: BorderRadius.circular(borderRadius),
-                                     ),
-                                   );
-                                 }),
-                               ),
-                             ),
-                           );
-                         }
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: contentHorizontalPadding),
+                            child: Shimmer.fromColors(
+                              baseColor: AppColors.shimmerBase,
+                              highlightColor: AppColors.shimmerHighlight,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: List.generate(3, (index) {
+                                  return Container(
+                                    width: itemWidth,
+                                    height: itemWidth,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.shimmerBase,
+                                      borderRadius:
+                                          BorderRadius.circular(borderRadius),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ),
+                          );
+                        }
 
-                         return Padding(
-                           padding: EdgeInsets.symmetric(horizontal: contentHorizontalPadding),
-                           child: Row(
-                             mainAxisAlignment: MainAxisAlignment.start,
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             children: [
-                               if (hasCamera && (canHandleImages || canHandleVideo)) ...[
-                                 Expanded(
-                                   child: AttachmentSheetButton(
-                                     iconPath: 'assets/icons/camera.svg',
-                                     label: l10n.actionCamera,
-                                     onTap: () {
-                                       Navigator.pop(context);
-                                       inputService.pickMediaAction(
-                                         context,
-                                         source: ImageSource.camera,
-                                         supportImage: canHandleImages,
-                                         supportVideo: canHandleVideo,
-                                         onSelectionComplete: () {},
-                                       );
-                                     },
-                                   ),
-                                 ),
-                                 SizedBox(width: itemGap),
-                               ],
-                               if (canHandleImages || canHandleVideo) ...[
-                                 Expanded(
-                                   child: AttachmentSheetButton(
-                                     iconPath: 'assets/icons/gallery.svg',
-                                     label: l10n.actionGallery,
-                                     onTap: () {
-                                       Navigator.pop(context);
-                                       inputService.pickMediaAction(
-                                         context,
-                                         source: ImageSource.gallery,
-                                         supportImage: canHandleImages,
-                                         supportVideo: canHandleVideo,
-                                         onSelectionComplete: () {},
-                                       );
-                                     },
-                                   ),
-                                 ),
-                                 SizedBox(width: itemGap),
-                               ],
-                               Expanded(
-                                 child: AttachmentSheetButton(
-                                   iconPath: 'assets/icons/attachment.svg',
-                                   label: l10n.actionFile,
-                                   onTap: () {
-                                     Navigator.pop(context);
-                                     inputService.pickFile(
-                                       context,
-                                       canHandleAudio: canHandleAudio,
-                                       canHandleVideo: canHandleVideo,
-                                     );
-                                   },
-                                 ),
-                               ),
-                             ],
-                           ),
-                         );
-                       },
-                     ),
-                     // --- DIVIDER between Attachments and Features ---
-                     Padding(
-                       padding: EdgeInsets.fromLTRB(contentHorizontalPadding, 20.0, contentHorizontalPadding, 4.0),
-                       child: Row(
-                         children: [
-                           Expanded(child: Divider(color: AppColors.border, thickness: 0.8)),
-                           Padding(
-                             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                             child: Text(
-                               l10n.featuresTitle,
-                               style: TextStyle(
-                                 fontFamily: 'Inter',
-                                 fontSize: 12.0,
-                                 fontWeight: FontWeight.w500,
-                                 color: AppColors.primaryColor.inverted.withValues(alpha: 0.4),
-                                 letterSpacing: 0.5,
-                               ),
-                             ),
-                           ),
-                           Expanded(child: Divider(color: AppColors.border, thickness: 0.8)),
-                         ],
-                       ),
-                     ),
-                     // --- /ATTACHMENTS ---
+                        return Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: contentHorizontalPadding),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (hasCamera &&
+                                  (canHandleImages || canHandleVideo)) ...[
+                                Expanded(
+                                  child: AttachmentSheetButton(
+                                    iconPath: 'assets/icons/camera.svg',
+                                    label: l10n.actionCamera,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      inputService.pickMediaAction(
+                                        context,
+                                        source: ImageSource.camera,
+                                        supportImage: canHandleImages,
+                                        supportVideo: canHandleVideo,
+                                        onSelectionComplete: () {},
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: itemGap),
+                              ],
+                              if (canHandleImages || canHandleVideo) ...[
+                                Expanded(
+                                  child: AttachmentSheetButton(
+                                    iconPath: 'assets/icons/gallery.svg',
+                                    label: l10n.actionGallery,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      inputService.pickMediaAction(
+                                        context,
+                                        source: ImageSource.gallery,
+                                        supportImage: canHandleImages,
+                                        supportVideo: canHandleVideo,
+                                        onSelectionComplete: () {},
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: itemGap),
+                              ],
+                              Expanded(
+                                child: AttachmentSheetButton(
+                                  iconPath: 'assets/icons/attachment.svg',
+                                  label: l10n.actionFile,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    inputService.pickFile(
+                                      context,
+                                      canHandleAudio: canHandleAudio,
+                                      canHandleVideo: canHandleVideo,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    // --- DIVIDER between Attachments and Features ---
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(contentHorizontalPadding,
+                          20.0, contentHorizontalPadding, 4.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: Divider(
+                                  color: AppColors.border, thickness: 0.8)),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: Text(
+                              l10n.featuresTitle,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.primaryColor.inverted
+                                    .withValues(alpha: 0.4),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                              child: Divider(
+                                  color: AppColors.border, thickness: 0.8)),
+                        ],
+                      ),
+                    ),
+                    // --- /ATTACHMENTS ---
 
                     // 1. USE OFFLINE
                     FeaturesSheetButton(
@@ -408,18 +434,20 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                         showModelSelectionSheet(
                           context: widget.parentContext,
                           localizations: l10n,
-                          currentModelId:
-                          widget.parentContext
+                          currentModelId: widget.parentContext
+                                  .read<ChatSessionProvider>()
+                                  .modelId ??
+                              '',
+                          initialModels: widget.parentContext
                               .read<ChatSessionProvider>()
-                              .modelId ?? '',
-                          initialModels: widget.parentContext.read<ChatSessionProvider>().allModels,
+                              .allModels,
                           onModelSelected: (String id) {
-                            final modelService = widget.parentContext.read<ModelService>();
+                            final modelService =
+                                widget.parentContext.read<ModelService>();
                             final selectionService =
-                            widget.parentContext.read<SelectionService>();
+                                widget.parentContext.read<SelectionService>();
                             final langCode =
-                                Localizations
-                                    .localeOf(widget.parentContext)
+                                Localizations.localeOf(widget.parentContext)
                                     .languageCode;
                             final model = modelService.getPreciseModelData(
                               id,
@@ -494,7 +522,7 @@ void _handleGenerationFeatureAction(BuildContext context,
 
   // Priority: Non-Premium (Free) first, otherwise Premium.
   final ModelEntity targetModel = candidates.firstWhere(
-        (m) => !m.isPremium,
+    (m) => !m.isPremium,
     orElse: () => candidates.first,
   );
 
@@ -507,10 +535,10 @@ void _handleGenerationFeatureAction(BuildContext context,
   final String currentText = controller.text.trim();
   if (currentText.isNotEmpty) {
     context.read<SendService>().sendMessage(
-      context: context,
-      localizations: AppLocalizations.of(context)!,
-      messageText: currentText,
-    );
+          context: context,
+          localizations: AppLocalizations.of(context)!,
+          messageText: currentText,
+        );
   }
 }
 

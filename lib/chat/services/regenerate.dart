@@ -22,21 +22,20 @@ class RegenerateService {
     required StopService stopService,
     required SendService sendService,
     required ScrollService scrollService,
-  })
-      : _conversationProvider = conversationProvider,
+  })  : _conversationProvider = conversationProvider,
         _stopService = stopService,
         _sendService = sendService,
         _scrollService = scrollService;
 
-  Future<void> onRegenerate(int messageIndex, {
+  Future<void> onRegenerate(
+    int messageIndex, {
     required BuildContext context,
     String? newModelId,
     bool isDynamicRegenerate = false,
   }) async {
     const String logPrefix = "[RegenerateService]";
     debugPrint(
-        "$logPrefix: onRegenerate called for index: $messageIndex. Override model: '${newModelId ??
-            'none'}'. Is Dynamic: $isDynamicRegenerate");
+        "$logPrefix: onRegenerate called for index: $messageIndex. Override model: '${newModelId ?? 'none'}'. Is Dynamic: $isDynamicRegenerate");
     final localizations = AppLocalizations.of(context)!;
     if (_conversationProvider.isWaitingForResponse) {
       debugPrint("$logPrefix: Operation already in progress. Aborting.");
@@ -58,8 +57,9 @@ class RegenerateService {
         return;
       }
 
-      final int triggerUserIndex =
-      messages.sublist(0, messageIndex).lastIndexWhere((m) => m.isUserMessage);
+      final int triggerUserIndex = messages
+          .sublist(0, messageIndex)
+          .lastIndexWhere((m) => m.isUserMessage);
       if (triggerUserIndex < 0) {
         debugPrint("$logPrefix: No preceding user message found. Aborting.");
         return;
@@ -118,7 +118,7 @@ class RegenerateService {
       debugPrint("$logPrefix: ERROR in onRegenerate: $e\nStack Trace: $s");
       if (_conversationProvider.isWaitingForResponse) {
         final thinkingIndex =
-        _conversationProvider.messages.lastIndexWhere((m) => m.isThinking);
+            _conversationProvider.messages.lastIndexWhere((m) => m.isThinking);
         if (thinkingIndex != -1) {
           _conversationProvider.setErrorMessage(
               thinkingIndex, localizations.anErrorOccurred, false);

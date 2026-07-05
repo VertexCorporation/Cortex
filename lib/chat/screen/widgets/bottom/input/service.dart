@@ -87,7 +87,8 @@ class InputService {
           final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
               .any((ext) => pathLower.endsWith(ext));
 
-          await _validateAndAddAttachment(inputProvider, file, isImage: isImage);
+          await _validateAndAddAttachment(inputProvider, file,
+              isImage: isImage);
         }
       } else {
         XFile? pickedFile;

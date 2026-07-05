@@ -161,7 +161,9 @@ class _ModelTileState extends State<ModelTile> {
     final isOfflineSeries =
         !model.isServerSide && (model.variants?.isNotEmpty ?? false);
 
-    if ((isMediaCategory || isOfflineSeries) && model.series != null && model.series!.isNotEmpty) {
+    if ((isMediaCategory || isOfflineSeries) &&
+        model.series != null &&
+        model.series!.isNotEmpty) {
       return model.series!;
     }
     return model.displayTitle;
@@ -217,9 +219,11 @@ class _ModelTileState extends State<ModelTile> {
         onPressed: () {
           HapticFeedback.lightImpact();
           // Check Premium Access
-          final isOnlineOrRP = widget.model.isServerSide || widget.model.category == 'roleplay';
-                          if (widget.model.isPremium || isOnlineOrRP) {
-            final userProvider = Provider.of<UserProvider>(context, listen: false);
+          final isOnlineOrRP =
+              widget.model.isServerSide || widget.model.category == 'roleplay';
+          if (widget.model.isPremium || isOnlineOrRP) {
+            final userProvider =
+                Provider.of<UserProvider>(context, listen: false);
             if (!userProvider.isSubscriptionActive) {
               showPremiumBottomSheet(context);
               return;
@@ -328,8 +332,8 @@ class _ModelTileState extends State<ModelTile> {
         ImageProvider provider = resolvedImagePath.startsWith('assets/')
             ? AssetImage(resolvedImagePath)
             : FileImage(File(resolvedImagePath));
-        
-        // PERF: Prevent GC Jank. Constrain the decoded image size in RAM. 
+
+        // PERF: Prevent GC Jank. Constrain the decoded image size in RAM.
         // Without this, scrolling past a 4K custom model image would stutter.
         // Multiply by 3 to keep it sharp on high-DPI Retina screens.
         final int cacheSize = (imgW * 3).toInt().clamp(100, 300);
@@ -361,7 +365,6 @@ class _ModelTileState extends State<ModelTile> {
           child: imageContent);
     }
 
-    
     return imageContent;
   }
 
