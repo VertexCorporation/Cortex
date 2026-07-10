@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 import '../../../../../providers/input.dart';
 import '../selection/sheet.dart';
 import 'button.dart';
+import 'grid_item.dart';
 import '../../../../../../fog.dart';
 
 import 'package:image_picker/image_picker.dart';
@@ -287,23 +288,111 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     ),
                     // --- /ATTACHMENTS ---
 
-                    // 1. USE OFFLINE
-                    FeaturesSheetButton(
-                      iconPath: 'assets/icons/context.svg',
-                      title: l10n.useOffline,
-                      description: l10n.useOfflineDescription,
-                      isSelected: currentMode == ChatInputMode.offline ||
-                          isOfflineModelSelected,
-                      onTap: () {
-                        if (currentMode == ChatInputMode.offline ||
-                            isOfflineModelSelected) {
-                          _selectDynamicModel(context);
-                        } else {
-                          _handleOfflineAction(context, l10n);
-                        }
-                        Navigator.pop(context);
-                      },
+                    // --- 2x2 GRID: Image, Video, Audio, Use Offline ---
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: contentHorizontalPadding),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: FeaturesSheetGridItem(
+                                  iconPath: 'assets/icons/make.svg',
+                                  title: "Image",
+                                  description: l10n.featureCreateImageDescription,
+                                  isDisabled: imageGenModels.isEmpty,
+                                  isSelected: isCurrentImageModel,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    if (isCurrentImageModel) {
+                                      _selectDynamicModel(context);
+                                    } else {
+                                      _handleGenerationFeatureAction(
+                                        context,
+                                        imageGenModels,
+                                        widget.controller,
+                                        targetType: 'image',
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: itemGap),
+                              Expanded(
+                                child: FeaturesSheetGridItem(
+                                  iconPath: 'assets/icons/transition.svg',
+                                  title: "Video",
+                                  description: l10n.featureCreateVideoDescription,
+                                  isDisabled: videoGenModels.isEmpty,
+                                  isSelected: isCurrentVideoModel,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    if (isCurrentVideoModel) {
+                                      _selectDynamicModel(context);
+                                    } else {
+                                      _handleGenerationFeatureAction(
+                                        context,
+                                        videoGenModels,
+                                        widget.controller,
+                                        targetType: 'video',
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: itemGap),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: FeaturesSheetGridItem(
+                                  iconPath: 'assets/icons/voice.svg',
+                                  title: "Audio",
+                                  description: l10n.featureCreateAudioDescription,
+                                  isDisabled: audioGenModels.isEmpty,
+                                  isSelected: isCurrentAudioModel,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    if (isCurrentAudioModel) {
+                                      _selectDynamicModel(context);
+                                    } else {
+                                      _handleGenerationFeatureAction(
+                                        context,
+                                        audioGenModels,
+                                        widget.controller,
+                                        targetType: 'audio',
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: itemGap),
+                              Expanded(
+                                child: FeaturesSheetGridItem(
+                                  iconPath: 'assets/icons/context.svg',
+                                  title: l10n.useOffline,
+                                  description: l10n.useOfflineDescription,
+                                  isSelected: currentMode == ChatInputMode.offline ||
+                                      isOfflineModelSelected,
+                                  onTap: () {
+                                    if (currentMode == ChatInputMode.offline ||
+                                        isOfflineModelSelected) {
+                                      _selectDynamicModel(context);
+                                    } else {
+                                      _handleOfflineAction(context, l10n);
+                                    }
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
+                    SizedBox(height: itemGap),
 
                     // 2. DEEP featureReasoning
                     FeaturesSheetButton(
@@ -329,72 +418,6 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                         _prepareForTextFeature(context);
                         inputProvider.toggleWebSearch();
                         Navigator.pop(context);
-                      },
-                    ),
-
-                    // 4. CREATE IMAGE (Make)
-                    FeaturesSheetButton(
-                      iconPath: 'assets/icons/make.svg',
-                      title: l10n.featureCreateImageTitle,
-                      description: l10n.featureCreateImageDescription,
-                      isDisabled: imageGenModels.isEmpty,
-                      isSelected: isCurrentImageModel,
-                      onTap: () {
-                        Navigator.pop(context);
-                        if (isCurrentImageModel) {
-                          _selectDynamicModel(context);
-                        } else {
-                          _handleGenerationFeatureAction(
-                            context,
-                            imageGenModels,
-                            widget.controller,
-                            targetType: 'image',
-                          );
-                        }
-                      },
-                    ),
-
-                    // 4. CREATE AUDIO
-                    FeaturesSheetButton(
-                      iconPath: 'assets/icons/voice.svg',
-                      title: l10n.featureCreateAudioTitle,
-                      description: l10n.featureCreateAudioDescription,
-                      isDisabled: audioGenModels.isEmpty,
-                      isSelected: isCurrentAudioModel,
-                      onTap: () {
-                        Navigator.pop(context);
-                        if (isCurrentAudioModel) {
-                          _selectDynamicModel(context);
-                        } else {
-                          _handleGenerationFeatureAction(
-                            context,
-                            audioGenModels,
-                            widget.controller,
-                            targetType: 'audio',
-                          );
-                        }
-                      },
-                    ),
-
-                    // 4.5. CREATE VIDEO
-                    FeaturesSheetButton(
-                      iconPath: 'assets/icons/transition.svg',
-                      title: l10n.featureCreateVideoTitle,
-                      description: l10n.featureCreateVideoDescription,
-                      isDisabled: videoGenModels.isEmpty,
-                      isSelected: isCurrentVideoModel,
-                      onTap: () {
-                        Navigator.pop(context);
-                        if (isCurrentVideoModel) {
-                          _selectDynamicModel(context);
-                        } else {
-                          _handleGenerationFeatureAction(
-                            context,
-                            videoGenModels,
-                            widget.controller,
-                            targetType: 'video',
-                          );
-                        }
                       },
                     ),
 

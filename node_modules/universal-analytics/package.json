@@ -1,0 +1,33 @@
+{
+  "name": "universal-analytics",
+  "version": "0.5.4",
+  "description": "A node module for Google's Universal Analytics tracking",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/peaksandpies/universal-analytics.git"
+  },
+  "keywords": [
+    "google",
+    "analytics",
+    "universal",
+    "tracking"
+  ],
+  "dependencies": {
+    "debug": "^4.3.1",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "sinon": "^1.17.7"
+  },
+  "author": "Jörg Tillmann <joerg@peaksandpies.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

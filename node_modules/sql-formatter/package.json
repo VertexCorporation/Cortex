@@ -1,0 +1,141 @@
+{
+  "name": "sql-formatter",
+  "version": "15.8.2",
+  "description": "Format whitespace in a SQL query to make it more readable",
+  "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "unpkg": "dist/sql-formatter.min.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "bin": {
+    "sql-formatter": "bin/sql-formatter-cli.cjs"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "keywords": [
+    "sql",
+    "formatter",
+    "format",
+    "n1ql",
+    "redshift",
+    "singlestoredb",
+    "spark",
+    "whitespace",
+    "mysql",
+    "mariadb",
+    "postgresql",
+    "pl/sql",
+    "transact-sql",
+    "db2",
+    "db2i",
+    "sqlite",
+    "tidb",
+    "trino",
+    "presto",
+    "prestosql",
+    "snowflake",
+    "duckdb",
+    "clickhouse"
+  ],
+  "files": [
+    "dist",
+    "bin",
+    "AUTHORS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sql-formatter-org/sql-formatter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sql-formatter-org/sql-formatter/issues"
+  },
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "nearley": "^2.20.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.4",
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-typescript": "^7.15.0",
+    "@jest/globals": "^29.7.0",
+    "@types/babel__core": "^7.1.15",
+    "@types/jest": "^29.5.14",
+    "@types/nearley": "^2.11.2",
+    "@types/node": "22.9.0",
+    "@typescript-eslint/eslint-plugin": "^5.21.0",
+    "@typescript-eslint/parser": "^5.21.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^29.7.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "babel-plugin-inline-import": "^3.0.0",
+    "dedent-js": "^1.0.1",
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^29.7.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.5",
+    "release-it": "^15.1.1",
+    "release-it-pnpm": "^4.6.6",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^29.2.6",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-merge": "^5.8.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "roots": [
+      "test"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ],
+    "moduleNameMapper": {
+      "^\\.(.+)\\.js": ".$1"
+    }
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.0.8+sha512.4c4097e1dd2d42372c4e7fa5a791ff28fc75a484c7ac192e64b1df0fdef17594ba982f9b4fed9adfb3c757846f565b799b2763fb3733d1de1bcb82cf46684912"
+    }
+  },
+  "scripts": {
+    "clean": "rimraf lib dist coverage",
+    "git:changes": "git diff --name-only --diff-filter d | xargs",
+    "ts:check": "tsc --noEmit",
+    "ts:changes": "tsc --noEmit --incremental",
+    "lint": "eslint --cache .",
+    "lint:changes": "sh -c 'eslint --cache $(pnpm run --silent git:changes)'",
+    "pretty": "prettier --write .",
+    "pretty:check": "prettier --check .",
+    "fix": "pnpm run pretty && eslint --fix .",
+    "test": "pnpm run grammar && jest",
+    "test:watch": "pnpm run test --watch",
+    "test:perf": "pnpm run grammar && jest --testMatch '<rootDir>/test/perftest.ts' --coverage=false",
+    "check": "pnpm run ts:check && pnpm run pretty:check && pnpm run lint && pnpm run test",
+    "pre-commit": "npm-run-all --parallel ts:changes lint:changes",
+    "grammar": "nearleyc src/parser/grammar.ne -o src/parser/grammar.ts",
+    "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:webpack": "webpack --config webpack.prod.js && cp dist/sql-formatter.min.cjs dist/sql-formatter.min.js",
+    "build": "pnpm run grammar && npm-run-all --parallel build:cjs build:esm build:webpack",
+    "release": "release-it"
+  }
+}

@@ -1,0 +1,103 @@
+import { expandPhrases } from '../../expandPhrases.js';
+import { functions } from './hive.functions.js';
+import { dataTypes, keywords } from './hive.keywords.js';
+const reservedSelect = expandPhrases(['SELECT [ALL | DISTINCT]']);
+const reservedClauses = expandPhrases([
+    // queries
+    'WITH',
+    'FROM',
+    'WHERE',
+    'GROUP BY',
+    'HAVING',
+    'WINDOW',
+    'PARTITION BY',
+    'ORDER BY',
+    'SORT BY',
+    'CLUSTER BY',
+    'DISTRIBUTE BY',
+    'LIMIT',
+    // Data manipulation
+    // - insert:
+    //   Hive does not actually support plain INSERT INTO, only INSERT INTO TABLE
+    //   but it's a nuisance to not support it, as all other dialects do.
+    'INSERT INTO [TABLE]',
+    'VALUES',
+    // - update:
+    'SET',
+    // - merge:
+    'MERGE INTO',
+    'WHEN [NOT] MATCHED [THEN]',
+    'UPDATE SET',
+    'INSERT [VALUES]',
+    // - insert overwrite directory:
+    //   https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DML#LanguageManualDML-Writingdataintothefilesystemfromqueries
+    'INSERT OVERWRITE [LOCAL] DIRECTORY',
+    // - load:
+    //   https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DML#LanguageManualDML-Loadingfilesintotables
+    'LOAD DATA [LOCAL] INPATH',
+    '[OVERWRITE] INTO TABLE',
+]);
+const standardOnelineClauses = expandPhrases([
+    'CREATE [TEMPORARY] [EXTERNAL] TABLE [IF NOT EXISTS]',
+]);
+const tabularOnelineClauses = expandPhrases([
+    // - create:
+    'CREATE [MATERIALIZED] VIEW [IF NOT EXISTS]',
+    // - update:
+    'UPDATE',
+    // - delete:
+    'DELETE FROM',
+    // - drop table:
+    'DROP TABLE [IF EXISTS]',
+    // - alter table:
+    'ALTER TABLE',
+    'RENAME TO',
+    // - truncate:
+    'TRUNCATE [TABLE]',
+    // other
+    'ALTER',
+    'CREATE',
+    'USE',
+    'DESCRIBE',
+    'DROP',
+    'FETCH',
+    'SHOW',
+    'STORED AS',
+    'STORED BY',
+    'ROW FORMAT',
+]);
+const reservedSetOperations = expandPhrases(['UNION [ALL | DISTINCT]']);
+const reservedJoins = expandPhrases([
+    'JOIN',
+    '{LEFT | RIGHT | FULL} [OUTER] JOIN',
+    '{INNER | CROSS} JOIN',
+    // non-standard joins
+    'LEFT SEMI JOIN',
+]);
+const reservedPhrases = expandPhrases(['{ROWS | RANGE} BETWEEN']);
+const reservedDataTypePhrases = expandPhrases([]);
+// https://cwiki.apache.org/confluence/display/Hive/LanguageManual
+export const hive = {
+    name: 'hive',
+    tokenizerOptions: {
+        reservedSelect,
+        reservedClauses: [...reservedClauses, ...standardOnelineClauses, ...tabularOnelineClauses],
+        reservedSetOperations,
+        reservedJoins,
+        reservedKeywordPhrases: reservedPhrases,
+        reservedDataTypePhrases,
+        reservedKeywords: keywords,
+        reservedDataTypes: dataTypes,
+        reservedFunctionNames: functions,
+        extraParens: ['[]'],
+        stringTypes: ['""-bs', "''-bs"],
+        identTypes: ['``'],
+        variableTypes: [{ quote: '{}', prefixes: ['$'], requirePrefix: true }],
+        operators: ['%', '~', '^', '|', '&', '<=>', '==', '!', '||'],
+    },
+    formatOptions: {
+        onelineClauses: [...standardOnelineClauses, ...tabularOnelineClauses],
+        tabularOnelineClauses,
+    },
+};
+//# sourceMappingURL=hive.formatter.js.map

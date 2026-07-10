@@ -1,0 +1,43 @@
+{
+  "name": "lsofi",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Find processes occupying a given port",
+  "files": [
+    "index.js",
+    "index.cjs"
+  ],
+  "main": "./index.cjs",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint .",
+    "start": "node --test --watch",
+    "test": "npm run lint && node --test"
+  },
+  "keywords": [
+    "tool",
+    "cli",
+    "ports",
+    "lsof",
+    "netstat"
+  ],
+  "author": "Mario Nebl <hello@mario-nebl.de>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/marionebl/lsofi.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "get-port": "7.1.0",
+    "oxlint": "1.50.0"
+  }
+}

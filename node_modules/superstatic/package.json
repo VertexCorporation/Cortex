@@ -1,0 +1,107 @@
+{
+  "name": "superstatic",
+  "version": "10.0.0",
+  "description": "A static file server for fancy apps",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rimraf lib",
+    "prepare": "npm run clean && npm run build -- --build tsconfig.publish.json",
+    "format": "npm run lint -- --fix --quiet",
+    "test": "npm run lint && npm run coverage",
+    "test-unit": "mocha \"test/unit/**\"",
+    "test-integration": "mocha \"test/integration/**\"",
+    "lint": "eslint",
+    "coverage": "nyc mocha \"test/unit/**\" \"test/integration/**\"",
+    "watch": "mocha -w \"test/unit/**\" \"test/integration/**\""
+  },
+  "author": "Firebase (https://www.firebase.com/)",
+  "license": "MIT",
+  "bin": {
+    "superstatic": "./lib/bin/server.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "templates"
+  ],
+  "engines": {
+    "node": "20 || 22 || 24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firebase/superstatic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/firebase/superstatic/issues"
+  },
+  "keywords": [
+    "static",
+    "server",
+    "firebase",
+    "hosting",
+    "pushstate",
+    "html5",
+    "router",
+    "file",
+    "directory",
+    "hash",
+    "hashbang"
+  ],
+  "dependencies": {
+    "basic-auth-connect": "^1.1.0",
+    "commander": "^10.0.0",
+    "compression": "^1.7.0",
+    "connect": "^3.7.0",
+    "destroy": "^1.0.4",
+    "glob-slasher": "^1.0.1",
+    "is-url": "^1.2.2",
+    "join-path": "^1.1.1",
+    "lodash": "^4.17.19",
+    "mime-types": "^2.1.35",
+    "minimatch": "^6.1.6",
+    "morgan": "^1.8.2",
+    "on-finished": "^2.2.0",
+    "on-headers": "^1.0.0",
+    "path-to-regexp": "^1.9.0",
+    "router": "^2.0.0",
+    "update-notifier-cjs": "^5.1.6"
+  },
+  "optionalDependencies": {
+    "re2": "^1.17.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@types/chai": "^4.3.3",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/connect": "^3.4.35",
+    "@types/lodash": "^4.14.186",
+    "@types/mime-types": "^2.1.1",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^24.3.1",
+    "@types/supertest": "^6.0.2",
+    "chai": "^4.4.1",
+    "chai-as-promised": "^7.1.2",
+    "concat-stream": "^2.0.0",
+    "eslint": "^9.35.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsdoc": "^55.0.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.3.0",
+    "mocha": "^11.7.2",
+    "nyc": "^17.0.0",
+    "prettier": "^3.1.1",
+    "rimraf": "^5.0.1",
+    "sinon": "^17.0.1",
+    "sinon-chai": "^3.7.0",
+    "source-map-support": "^0.5.21",
+    "std-mocks": "^1.0.1",
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0"
+  }
+}

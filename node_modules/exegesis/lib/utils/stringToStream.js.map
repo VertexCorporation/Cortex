@@ -1,0 +1,1 @@
+{"version":3,"file":"stringToStream.js","sourceRoot":"","sources":["../../src/utils/stringToStream.ts"],"names":[],"mappings":";;AAEA,iCAOC;AATD,mCAAkC;AAElC,SAAwB,cAAc,CAAC,GAAW,EAAE,WAA2B,OAAO;IAClF,OAAO,IAAI,iBAAQ,CAAC;QAChB,IAAI;YACA,IAAI,CAAC,IAAI,CAAC,GAAG,EAAE,QAAQ,CAAC,CAAC;YACzB,IAAI,CAAC,IAAI,CAAC,IAAI,CAAC,CAAC;QACpB,CAAC;KACJ,CAAC,CAAC;AACP,CAAC"}

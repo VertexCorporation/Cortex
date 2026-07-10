@@ -33,10 +33,8 @@ class ResponseService {
   void onMessageResponse(String token) {
     MetricsTracker().onTokenReceived();
     // Critical Guard: Ensure we are in a state to receive a response.
-    if (!_conversationProvider.isWaitingForResponse ||
-        _conversationProvider.wasResponseStopped) {
-      debugPrint(
-          "[ResponseService] Ignored token: state is not 'waiting' or response was stopped.");
+    if (!_conversationProvider.isWaitingForResponse || _conversationProvider.wasResponseStopped) {
+      debugPrint("[ResponseService] Ignored token: state is not 'waiting' or response was stopped.");
       return;
     }
 
@@ -58,8 +56,7 @@ class ResponseService {
     MetricsTracker().stopTracking();
     // Guard clause: If we're not expecting a response, there's nothing to finalize.
     if (!_conversationProvider.isWaitingForResponse) {
-      debugPrint(
-          "[ResponseService] Finalize called, but state was not 'waiting'. No action taken.");
+      debugPrint("[ResponseService] Finalize called, but state was not 'waiting'. No action taken.");
       return;
     }
 
@@ -69,8 +66,7 @@ class ResponseService {
 
     // Find the specific message that needs to be finalized. It should be the last
     // AI message that is still marked as "thinking".
-    final int targetIndex =
-        messages.lastIndexWhere((m) => m.isThinking && !m.isUserMessage);
+    final int targetIndex = messages.lastIndexWhere((m) => m.isThinking && !m.isUserMessage);
 
     if (targetIndex != -1) {
       // The `finishBotResponse` method within the provider handles all necessary state changes:
@@ -80,14 +76,13 @@ class ResponseService {
       // 4. Sets the global `isWaitingForResponse` to `false`.
       // 5. Notifies all listeners of the state change.
       _conversationProvider.finishBotResponse(targetIndex);
-      debugPrint(
-          "[ResponseService] Finalized message at index $targetIndex via provider.");
+      debugPrint("[ResponseService] Finalized message at index $targetIndex via provider.");
+
     } else {
       // Fallback: If no "thinking" message was found, we still need to
       // exit the "waiting" state to unlock the UI.
       _conversationProvider.finishBotResponse(-1);
-      debugPrint(
-          "[ResponseService] Could not find a 'thinking' message. Forcing state cleanup via finishBotResponse(-1).");
+      debugPrint("[ResponseService] Could not find a 'thinking' message. Forcing state cleanup via finishBotResponse(-1).");
     }
   }
 }

@@ -1,5 +1,0 @@
-"NSCameraUsageDescription" = "Cortex, yapay zeka modellerine görsel analiz için göndermek üzere fotoğraf çekmenizi sağlar. Fotoğraflarınız yalnızca siz paylaşmayı seçtiğinizde gönderilir.";
-"NSPhotoLibraryUsageDescription" = "Cortex, yapay zeka ile görsel sohbet için galerinizdeki fotoğrafları seçmenizi sağlar. Görseller yalnızca siz göndermeyi seçtiğinizde paylaşılır.";
-"NSPhotoLibraryAddUsageDescription" = "Cortex, yapay zeka tarafından oluşturulan görselleri ve sohbet dışa aktarımlarını indirmeyi seçtiğinizde galerinize kaydeder.";
-"NSMicrophoneUsageDescription" = "Cortex, yapay zeka ile sesli sohbet etmenizi sağlar. Sesiniz, sorularınızı anlamak ve gerçek zamanlı yanıtlar vermek için işlenir.";
-"NSSpeechRecognitionUsageDescription" = "Cortex, konuşma tanıma özelliğiyle söylediklerinizi metne dönüştürerek yapay zeka ile eller serbest sohbet etmenizi sağlar. Ses verileri doğru çeviri için güvenli şekilde işlenir.";

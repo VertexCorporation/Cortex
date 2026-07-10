@@ -1,0 +1,2 @@
+import{j as e}from"../chunk-QY3QWFKW.js";e();var s=async(n,t)=>({emscriptenOpts:t,bundlePath:new URL("../pg_hashids.tar.gz",import.meta.url)}),r={name:"pg_hashids",setup:s};export{r as pg_hashids};
+//# sourceMappingURL=index.js.map

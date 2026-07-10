@@ -80,8 +80,7 @@ class SelectionService {
         String? nonPremiumId;
         for (final entry in variantsMap.entries) {
           final variantData = entry.value;
-          if (variantData is Map<String, dynamic> &&
-              variantData['tier'] != 'premium') {
+          if (variantData is Map<String, dynamic> && variantData['tier'] != 'premium') {
             nonPremiumId = entry.key;
             break;
           }
@@ -101,10 +100,8 @@ class SelectionService {
     // 4. Update the session provider directly with the final ModelEntity.
     // IMPORTANT: savePreference is true by default, so this choice becomes the default for new chats.
     // However, roleplay and self (custom) models should not become the default for standard new chats.
-    final bool shouldSavePref = finalModelEntity.category != 'roleplay' &&
-        finalModelEntity.category != 'self';
-    _sessionProvider.selectModel(finalModelEntity,
-        savePreference: shouldSavePref);
+    final bool shouldSavePref = finalModelEntity.category != 'roleplay' && finalModelEntity.category != 'self';
+    _sessionProvider.selectModel(finalModelEntity, savePreference: shouldSavePref);
 
     // Log model selected event
     AnalyticsService().logModelSelected(

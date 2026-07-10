@@ -1,0 +1,58 @@
+{
+  "name": "install-artifact-from-github",
+  "version": "1.7.0",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "description": "Create binary artifacts hosted by github and install them without compiling.",
+  "homepage": "https://github.com/uhop/install-artifact-from-github",
+  "bugs": "https://github.com/uhop/install-artifact-from-github/issues",
+  "github": "https://github.com/uhop/install-artifact-from-github",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uhop/install-artifact-from-github.git"
+  },
+  "files": [
+    "/bin",
+    "LICENSE",
+    "README.md",
+    "llms.txt",
+    "llms-full.txt"
+  ],
+  "bin": {
+    "install-from-cache": "bin/install-from-cache.js",
+    "save-to-github-cache": "bin/save-to-github-cache.js",
+    "hash-github-cache": "bin/hash-github-cache.js"
+  },
+  "keywords": [
+    "helper",
+    "node addons"
+  ],
+  "author": "Eugene Lazutkin <eugene.lazutkin@gmail.com> (https://lazutkin.com/)",
+  "license": "BSD-3-Clause",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/uhop"
+  },
+  "scripts": {
+    "test": "tape6 --flags FO",
+    "test:seq": "tape6-seq --flags FO",
+    "dump-env": "node scripts/dump-env.js",
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write .",
+    "js-check": "tsc --project tsconfig.check.json",
+    "save-to-github": "node bin/save-to-github-cache --artifact package.json --format br,gz,none"
+  },
+  "tape6": {
+    "tests": [
+      "/tests/test-*.js"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^3.9.4",
+    "tape-six": "^1.14.0",
+    "typescript": "^6.0.3",
+    "@types/node": "^26.1.0"
+  }
+}

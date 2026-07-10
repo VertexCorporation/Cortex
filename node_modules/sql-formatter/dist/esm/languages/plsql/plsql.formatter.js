@@ -1,0 +1,137 @@
+import { expandPhrases } from '../../expandPhrases.js';
+import { EOF_TOKEN, isReserved, isToken, TokenType } from '../../lexer/token.js';
+import { dataTypes, keywords } from './plsql.keywords.js';
+import { functions } from './plsql.functions.js';
+const reservedSelect = expandPhrases(['SELECT [ALL | DISTINCT | UNIQUE]']);
+const reservedClauses = expandPhrases([
+    // queries
+    'WITH',
+    'FROM',
+    'WHERE',
+    'GROUP BY',
+    'HAVING',
+    'PARTITION BY',
+    'ORDER [SIBLINGS] BY',
+    'OFFSET',
+    'FETCH {FIRST | NEXT}',
+    'FOR UPDATE [OF]',
+    // Data manipulation
+    // - insert:
+    'INSERT [INTO | ALL INTO]',
+    'VALUES',
+    // - update:
+    'SET',
+    // - merge:
+    'MERGE [INTO]',
+    'WHEN [NOT] MATCHED [THEN]',
+    'UPDATE SET',
+    // other
+    'RETURNING',
+]);
+const standardOnelineClauses = expandPhrases([
+    'CREATE [GLOBAL TEMPORARY | PRIVATE TEMPORARY | SHARDED | DUPLICATED | IMMUTABLE BLOCKCHAIN | BLOCKCHAIN | IMMUTABLE] TABLE',
+]);
+const tabularOnelineClauses = expandPhrases([
+    // - create:
+    'CREATE [OR REPLACE] [NO FORCE | FORCE] [EDITIONING | EDITIONABLE | EDITIONABLE EDITIONING | NONEDITIONABLE] VIEW',
+    'CREATE MATERIALIZED VIEW',
+    // - update:
+    'UPDATE [ONLY]',
+    // - delete:
+    'DELETE FROM [ONLY]',
+    // - drop table:
+    'DROP TABLE',
+    // - alter table:
+    'ALTER TABLE',
+    'ADD',
+    'DROP {COLUMN | UNUSED COLUMNS | COLUMNS CONTINUE}',
+    'MODIFY',
+    'RENAME TO',
+    'RENAME COLUMN',
+    // - truncate:
+    'TRUNCATE TABLE',
+    // other
+    'SET SCHEMA',
+    'BEGIN',
+    'CONNECT BY',
+    'DECLARE',
+    'EXCEPT',
+    'EXCEPTION',
+    'LOOP',
+    'START WITH',
+]);
+const reservedSetOperations = expandPhrases(['UNION [ALL]', 'MINUS', 'INTERSECT']);
+const reservedJoins = expandPhrases([
+    'JOIN',
+    '{LEFT | RIGHT | FULL} [OUTER] JOIN',
+    '{INNER | CROSS} JOIN',
+    'NATURAL [INNER] JOIN',
+    'NATURAL {LEFT | RIGHT | FULL} [OUTER] JOIN',
+    // non-standard joins
+    '{CROSS | OUTER} APPLY',
+]);
+const reservedKeywordPhrases = expandPhrases([
+    'ON {UPDATE | DELETE} [SET NULL]',
+    'ON COMMIT',
+    '{ROWS | RANGE} BETWEEN',
+]);
+const reservedDataTypePhrases = expandPhrases([]);
+export const plsql = {
+    name: 'plsql',
+    tokenizerOptions: {
+        reservedSelect,
+        reservedClauses: [...reservedClauses, ...standardOnelineClauses, ...tabularOnelineClauses],
+        reservedSetOperations,
+        reservedJoins,
+        reservedKeywordPhrases,
+        reservedDataTypePhrases,
+        supportsXor: true,
+        reservedKeywords: keywords,
+        reservedDataTypes: dataTypes,
+        reservedFunctionNames: functions,
+        stringTypes: [
+            { quote: "''-qq", prefixes: ['N'] },
+            { quote: "q''", prefixes: ['N'] },
+        ],
+        // PL/SQL doesn't actually support escaping of quotes in identifiers,
+        // but for the sake of simpler testing we'll support this anyway
+        // as all other SQL dialects with "identifiers" do.
+        identTypes: [`""-qq`],
+        identChars: { rest: '$#' },
+        variableTypes: [{ regex: '&{1,2}[A-Za-z][A-Za-z0-9_$#]*' }],
+        paramTypes: { numbered: [':'], named: [':'] },
+        operators: [
+            '**',
+            ':=',
+            '%',
+            '~=',
+            '^=',
+            // '..', // Conflicts with float followed by dot (so "2..3" gets parsed as ["2.", ".", "3"])
+            '>>',
+            '<<',
+            '=>',
+            '@',
+            '||',
+        ],
+        postProcess,
+    },
+    formatOptions: {
+        alwaysDenseOperators: ['@'],
+        onelineClauses: [...standardOnelineClauses, ...tabularOnelineClauses],
+        tabularOnelineClauses,
+    },
+};
+function postProcess(tokens) {
+    let previousReservedToken = EOF_TOKEN;
+    return tokens.map(token => {
+        // BY [SET]
+        if (isToken.SET(token) && isToken.BY(previousReservedToken)) {
+            return Object.assign(Object.assign({}, token), { type: TokenType.RESERVED_KEYWORD });
+        }
+        if (isReserved(token.type)) {
+            previousReservedToken = token;
+        }
+        return token;
+    });
+}
+//# sourceMappingURL=plsql.formatter.js.map

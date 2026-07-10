@@ -1,0 +1,195 @@
+# install-artifact-from-github
+
+> A no-dependency micro helper for developers of binary Node addons. Three single-file bins integrated with GitHub Releases: `save-to-github-cache` uploads pre-built binary artifacts from CI; `install-from-cache` downloads the right artifact at install time, optionally verifies its SHA-256 against a hash bag pinned in the addon's `package.json`, and falls back to building from sources on any failure; `hash-github-cache` generates that hash bag at release time. Zero dependencies, ESM, Node >= 18.
+
+The package has no importable API — it is consumed entirely through the three bins, wired into a consuming addon's `package.json` scripts. The download path is a lossless optimization: every failure mode (missing asset, network error, failed verification, misconfiguration) degrades to `npm run rebuild`, the textbook `node-gyp` flow.
+
+## Install
+
+```bash
+npm install --save install-artifact-from-github
+```
+
+## Consumer setup
+
+In the addon's `package.json`:
+
+```json
+{
+  "scripts": {
+    "save-to-github": "save-to-github-cache --artifact build/Release/ABC.node",
+    "install": "install-from-cache --artifact build/Release/ABC.node",
+    "verify-build": "node scripts/verify-build.js",
+    "rebuild": "node-gyp rebuild"
+  }
+}
+```
+
+- `install` — runs on the user's machine during `npm install` of the addon.
+- `verify-build` — used by `install` to check the downloaded artifact works; if absent, `npm test` is used; if both are absent, the download is not trusted and the source build runs.
+- `rebuild` — used by `install` to build from sources when the download path fails; must be provided.
+- `save-to-github` — run from CI (GitHub Actions) after building the artifact on a tagged release.
+
+## install-from-cache
+
+Algorithm:
+
+1. Short-circuit to the source build if `DEVELOPMENT_SKIP_GETTING_ASSET` is set, a `.development` file exists in the project folder, or *(since 1.7.0)* a forced build is requested (`--force-build` / `DOWNLOAD_FORCE_BUILD`).
+2. Compute the asset URL (see "Asset URL format" below).
+3. Try downloading `${url}.br` (if the running Node supports brotli), then `${url}.gz`, then `${url}` uncompressed. Each failure falls through silently. HTTP 3xx redirects are followed; a host that is not `http(s)://` is read as a local filesystem path.
+4. *(since 1.7.0)* Integrity check: if the consumer ships an `artifactHashes` bag and the download came from the canonical source, the decompressed bytes' SHA-256 must match the bag entry for this slot before anything is written; a failure rejects the artifact and falls through to the source build (see "Artifact integrity verification" below).
+5. Decompress and write the artifact to the `--artifact` path (directories are created as needed).
+6. Verify: run `npm run verify-build` if the consumer defines it, else `npm test`, suppressing output unless `DEVELOPMENT_SHOW_VERIFICATION_RESULTS` is set. Exit code 0 means done.
+7. Any failure above ends in `npm run rebuild`.
+
+When any of the cross-build overrides (`npm_config_platform`, `npm_config_platform_arch`, `npm_config_platform_abi`) is set, the `verify-build` step is skipped — a foreign binary cannot be tested on the build machine. (Integrity verification, which only checks bytes, still runs.)
+
+### Command-line parameters
+
+- `--artifact path` — location to write the downloaded artifact. Required.
+- `--prefix prefix` — prefix for the generated artifact name. Default: `''`.
+- `--suffix suffix` — suffix for the generated artifact name. Default: `''`.
+- `--host host` — download host with optional path prefix, no trailing `/`. Default: `https://github.com`. A non-HTTP value (e.g. `/opt/third-party/re2`) serves artifacts from the local filesystem.
+- `--host-var ENVVAR` — name of the env var carrying the host. Default name: `DOWNLOAD_HOST`. Used only if `--host` is absent.
+- `--skip-path` — drop the `/${owner}/${repo}/releases/download` part of the URL (for mirrors with a flat layout).
+- `--skip-path-var ENVVAR` — env-var name for the same. Default name: `DOWNLOAD_SKIP_PATH`.
+- `--skip-ver` — drop the `/${version}` part of the URL.
+- `--skip-ver-var ENVVAR` — env-var name for the same. Default name: `DOWNLOAD_SKIP_VER`.
+- `--agent module-path` — path (resolved against `process.cwd()`) to a JS module whose default export is an `http.Agent` instance; used as the `agent` option for every download (proxy support). A load failure prints a warning and continues without a proxy.
+- `--agent-var ENVVAR` — env-var name for the agent module path. Default name: `DOWNLOAD_AGENT`.
+- `--napi level` — declare the N-API level of the published binaries; replaces the Node-ABI URL slot with `napi-v${level}`.
+- `--napi-var ENVVAR` — env-var name for the N-API level. Default name: `DOWNLOAD_NAPI`. (Also honors `npm_config_platform_napi` for cross-builds.)
+- *(since 1.7.0)* `--force-build` — skip the download entirely and go straight to `npm run rebuild`; nothing is fetched or verified. A clearly-named alias for the `DEVELOPMENT_SKIP_GETTING_ASSET` / `.development` short-circuit, for consumers who prefer to trust only npm plus their own toolchain.
+- *(since 1.7.0)* `--force-build-var ENVVAR` — env-var name for the forced build. Default name: `DOWNLOAD_FORCE_BUILD`.
+
+The `--flag` form always wins over `--flag-var`; the `--flag-var`-named env var wins over the default-named env var. Library authors should prefer `--xxx-var MYPKG_XXX` so consumers can configure one addon without affecting others.
+
+### Environment variables
+
+- `DEVELOPMENT_SKIP_GETTING_ASSET` — non-empty forces the source build (for development and CI builds).
+- `DEVELOPMENT_SHOW_VERIFICATION_RESULTS` — non-empty shows `verify-build` output.
+- `DOWNLOAD_HOST`, `DOWNLOAD_SKIP_PATH`, `DOWNLOAD_SKIP_VER`, `DOWNLOAD_AGENT`, `DOWNLOAD_NAPI` — defaults for the corresponding flags above.
+- *(since 1.7.0)* `DOWNLOAD_FORCE_BUILD` — non-empty forces the source build (default name for `--force-build-var`).
+- *(since 1.7.0)* `GITHUB_SERVER_URL` — the canonical GitHub host for the default (verified) source; defaults to `https://github.com`. Set by GitHub Actions automatically; also lets GitHub Enterprise point the verified download at its own instance. Distinct from `DOWNLOAD_HOST`: a `GITHUB_SERVER_URL` source is still integrity-checked, a `DOWNLOAD_HOST` mirror is not.
+
+### Recognized npm parameters (cross-platform builds)
+
+```bash
+npm install re2 --platform=linux --platform-arch=x64 --platform-abi=108
+```
+
+- `--platform=XXX` — `darwin`, `win32`, `linux`, `linux-musl`, ... Default: `process.platform` (with musl auto-detection).
+- `--platform-arch=XXX` — CPU architecture. Default: `process.arch`.
+- `--platform-abi=XXX` — Node ABI version. Default: `process.versions.modules`.
+
+With any override set, the `verify-build` step is skipped (the integrity check, below, still runs).
+
+## Artifact integrity verification (since 1.7.0)
+
+`install-from-cache` can verify that a downloaded binary is exactly the one the addon's author published, closing the "downloaded code with no integrity check" gap for the default GitHub path. It is opt-in per addon, source-scoped, and adds no dependency (`node:crypto`).
+
+The addon pins a **hash bag** in its own `package.json` — an `artifactHashes` object mapping each `${platform}-${arch}-${abiSlot}` slot to `sha256:<hex>` of the **decompressed** `.node`:
+
+```json
+{
+  "artifactHashes": {
+    "linux-x64-137": "sha256:9e68bb76…",
+    "darwin-arm64-137": "sha256:fe4fe40a…"
+  }
+}
+```
+
+Because it rides the addon's immutable, npm-published `package.json`, an attacker who swaps a GitHub release asset after publish cannot also rewrite the expected hash. Generate and maintain the bag with `hash-github-cache` (below).
+
+Behavior at install time:
+
+- **Canonical source + bag present + hash matches** → the artifact is written.
+- **Canonical source + bag present + hash mismatches, or the bag has no entry for this slot** → the artifact is rejected and the install falls through to `npm run rebuild` (strict: an uncovered slot is treated as a failure, since a complete bag means "anything unlisted should not exist").
+- **A `--host` / `DOWNLOAD_HOST` mirror** → never checked. A curated mirror legitimately serves the deployer's own build, whose bytes need not match the upstream bag; the mirror is the deployer's trust root.
+- **No `artifactHashes` in `package.json`** → nothing to check; installs exactly as before (non-breaking).
+
+The check compares the **decompressed** bytes (what actually runs), not the compressed wire bytes, so a mirror recompressing the same binary does not spuriously fail. "Canonical source" means the default host — `GITHUB_SERVER_URL` or `https://github.com` — with no `--host`/`--host-var`/`DOWNLOAD_HOST` override.
+
+## save-to-github-cache
+
+Runs in GitHub Actions on a tag build (or manually with a personal token). Reads `GITHUB_REPOSITORY` and `GITHUB_REF` to identify the release, authenticates with `GITHUB_TOKEN` (or `PERSONAL_TOKEN` when `GITHUB_TOKEN` is absent), resolves the release's upload URL via the GitHub REST API (`GITHUB_API_URL` overridable), compresses the artifact, and uploads each requested format in parallel. Appends `CREATED_ASSET_NAME=<name>` to `GITHUB_ENV` for downstream steps. Exits non-zero on failure (annotated as `::error::` for Actions logs).
+
+### Command-line parameters
+
+- `--artifact path` — the file to upload. Required.
+- `--prefix prefix` / `--suffix suffix` — artifact name decoration; must match the install side.
+- `--format list` — comma-separated compression formats to upload: `br` (brotli, max quality), `gz` (gzip, best compression), `none` (uncompressed). Default: `br`.
+- `--napi level` / `--napi-var ENVVAR` — same N-API slot convention as the install side. Default env-var name: `DOWNLOAD_NAPI`.
+
+## hash-github-cache (since 1.7.0)
+
+Generates or checks the `artifactHashes` integrity bag (see "Artifact integrity verification" above) in an addon's `package.json`. Run at release time, once all binaries exist for the version being published — typically from a `prepublishOnly` hook, so a plain `npm publish` stamps a fresh bag into the packed tarball. Zero dependencies (`node:crypto`).
+
+For each artifact it recovers the slot from the file name (`${prefix}${slot}${suffix}` minus any `.br`/`.gz`), decompresses, and records `sha256:<hex>` of the resulting `.node`. One entry per slot; all compression formats of a slot decode to the same bytes.
+
+### Command-line parameters
+
+- `--write` — compute the bag and write/refresh `artifactHashes` in `package.json`.
+- `--check` — compute the bag and compare it to `package.json`; exit non-zero with a per-slot diff (`missing:` / `mismatch:` / `stale:`) if it differs. Exactly one of `--write` / `--check` is required.
+- `--from-release [tag]` — hash the assets attached to the GitHub release (default tag: the `package.json` `version`). This is the default source; the repo is read from `package.json` `github` / `repository.url` or `GITHUB_REPOSITORY`. Honors `GITHUB_API_URL`, and `GITHUB_TOKEN` / `PERSONAL_TOKEN` for private repos (auth is dropped on the redirect to the asset CDN).
+- `--from dir` — hash slot-named artifacts in a local directory instead of the release.
+- `--prefix prefix` / `--suffix suffix` — artifact name decoration; must match the install / save sides.
+- `--package path` — the `package.json` to read/stamp. Default: `./package.json`.
+
+### Recommended release wiring
+
+```json
+{
+  "scripts": {
+    "prepublishOnly": "hash-github-cache --write"
+  }
+}
+```
+
+A plain `npm publish` then hashes the release, stamps `artifactHashes` into `package.json`, and packs the updated file — the write-on-every-publish is itself the guard, and the publish aborts if the release is incomplete. `--check` doubles as a post-publish tamper monitor: `hash-github-cache --check --from-release <version>` re-hashes the live release and fails if an asset changed after publish. Commit the stamped `package.json` after the release.
+
+## Asset URL format
+
+```
+${host}/${owner}/${repo}/releases/download/${version}/${prefix}${platform}-${arch}-${abiSlot}${suffix}${compression}
+```
+
+- `host` — `https://github.com` by default (or `GITHUB_SERVER_URL`, since 1.7.0); mirror or local path via `--host` / `DOWNLOAD_HOST`.
+- `owner` / `repo` — parsed from the consumer's `package.json` `github` field or `repository.url`.
+- `version` — the consumer's `package.json` version (equals the release tag).
+- `platform` — `process.platform`, with musl Linux reported as `linux-musl`.
+- `arch` — `process.arch`.
+- `abiSlot` — `process.versions.modules` (legacy Node ABI), or `napi-v${level}` when an N-API level is declared.
+- `compression` — `.br`, `.gz`, or empty.
+
+Example: `https://github.com/uhop/node-re2/releases/download/1.15.2/linux-x64-83.br`.
+
+With `--skip-path` the `/${owner}/${repo}/releases/download` segment is dropped; with `--skip-ver` the `/${version}` segment is dropped — both exist to simplify mirror layouts.
+
+## npm 12 and install scripts (July 2026)
+
+npm 12 stops running `preinstall` / `install` / `postinstall` scripts of dependencies by default (opt-in warnings since npm 11.16, February–May 2026). `install-from-cache` runs as the consuming addon's `install` script, so under npm 12 defaults a plain `npm install <addon>` runs neither the prebuilt download nor the `node-gyp` fallback — the addon ends up without a binary.
+
+What end users must do (once per addon):
+
+```bash
+npm install <addon>          # npm reports the addon's scripts were not run
+npm approve-scripts <addon>  # writes a version-pinned allowScripts entry to package.json
+npm rebuild <addon>          # runs the addon's install script
+```
+
+Or pre-approve before installing: add `"allowScripts": {"<addon>": true}` to the consuming project's `package.json`. Approvals are version-pinned by default (`<addon>@1.2.3`); `npm approve-scripts --no-allow-scripts-pin <addon>` approves all versions. `npm approve-scripts --allow-scripts-pending` lists packages awaiting review.
+
+What addon authors should do: document the approval step in the addon's install instructions; consider mentioning it in a `postinstall`-adjacent README section. Nothing in this package can bypass the gate — it is a consumer-side security decision.
+
+## Security model
+
+- Artifacts are downloaded over HTTPS from GitHub Releases — public, writable only by the addon's maintainers. No separate binary CDN.
+- *(since 1.7.0)* **Integrity verification.** When the addon pins an `artifactHashes` bag, a downloaded binary from the canonical GitHub source must match the pinned SHA-256 before it is written; a mismatch rebuilds from source. The bag lives in the addon's immutable, npm-published `package.json` — the one channel an attacker who can swap a mutable release asset cannot also rewrite — so it defends against a post-publish asset swap without any signing key, extra network call, or dependency. Opt-in per addon and source-scoped (mirrors excluded). See "Artifact integrity verification" above.
+- The downloader never executes downloaded content; it writes a file, and the consumer's own `verify-build` / `require()` path decides whether it works.
+- A failed verification (integrity or `verify-build`) discards the download and rebuilds from source. `--force-build` / `DOWNLOAD_FORCE_BUILD` skips the download entirely, collapsing trust to npm plus the local toolchain.
+- Corporate environments can mirror artifacts (`DOWNLOAD_HOST` + skip flags) or route through a proxy (`DOWNLOAD_AGENT`) without weakening any of the above; a mirror serves the deployer's own trust root and is intentionally not integrity-checked against the upstream bag.
+
+## Documentation
+
+Full docs, including local-mirror recipes, proxy setup, N-API guidance, and GitHub Actions workflow examples: https://github.com/uhop/install-artifact-from-github/wiki

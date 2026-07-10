@@ -1,0 +1,2 @@
+import{j as e}from"../chunk-QY3QWFKW.js";e();var n=async(s,t)=>({emscriptenOpts:t,bundlePath:new URL("../age.tar.gz",import.meta.url)}),r={name:"age",setup:n};export{r as age};
+//# sourceMappingURL=index.js.map

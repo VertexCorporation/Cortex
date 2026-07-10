@@ -1,0 +1,120 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const ext_apps_1 = require("@modelcontextprotocol/ext-apps");
+const app = new ext_apps_1.App({ name: "firebase-deploy", version: "1.0.0" });
+const deployBtn = document.getElementById("deploy-btn");
+const progressBar = document.getElementById("progress-bar");
+const progressContainer = document.getElementById("progress-container");
+const statusList = document.getElementById("status-list");
+function addLog(message, type = "info") {
+    const item = document.createElement("div");
+    item.className = `status-item ${type}`;
+    item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    statusList.appendChild(item);
+    statusList.scrollTop = statusList.scrollHeight;
+}
+function updateProgress(percentage) {
+    progressBar.value = percentage;
+}
+function pollStatus(jobId) {
+    let loggedCount = 0;
+    const interval = setInterval(async () => {
+        try {
+            const statusRes = await app.callServerTool({
+                name: "firebase_deploy_status",
+                arguments: { jobId },
+            });
+            if (statusRes.isError) {
+                addLog(`Failed to poll status: ${JSON.stringify(statusRes.content)}`, "error");
+                clearInterval(interval);
+                deployBtn.disabled = false;
+                deployBtn.textContent = "Deploy";
+                return;
+            }
+            const job = statusRes.structuredContent;
+            if (job) {
+                updateProgress(job.progress);
+                const newLogs = job.logs.slice(loggedCount);
+                newLogs.forEach((log) => addLog(log));
+                loggedCount = job.logs.length;
+                if (job.status === "success") {
+                    addLog("Deployment completed successfully!", "success");
+                    clearInterval(interval);
+                    deployBtn.disabled = false;
+                    deployBtn.textContent = "Deploy";
+                }
+                else if (job.status === "failed") {
+                    addLog(`Deployment failed: ${job.error || "Unknown error"}`, "error");
+                    clearInterval(interval);
+                    deployBtn.disabled = false;
+                    deployBtn.textContent = "Deploy";
+                }
+            }
+        }
+        catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            addLog(`Error during polling: ${message}`, "error");
+            clearInterval(interval);
+            deployBtn.disabled = false;
+            deployBtn.textContent = "Deploy";
+        }
+    }, 2000);
+}
+deployBtn.addEventListener("click", async () => {
+    const targets = [];
+    const checkboxes = document.querySelectorAll('.checkbox-grid input[type="checkbox"]:checked');
+    checkboxes.forEach((cb) => targets.push(cb.value));
+    if (targets.length === 0) {
+        addLog("Please select at least one service to deploy.", "error");
+        return;
+    }
+    deployBtn.disabled = true;
+    deployBtn.textContent = "Deploying...";
+    progressContainer.style.display = "block";
+    statusList.innerHTML = "";
+    updateProgress(10);
+    addLog(`Starting deployment for: ${targets.join(", ")}`);
+    try {
+        const onlyArg = targets.join(",");
+        addLog(`Calling firebase_deploy with only="${onlyArg}"...`);
+        const result = await app.callServerTool({
+            name: "firebase_deploy",
+            arguments: { only: onlyArg },
+        });
+        if (result.isError) {
+            addLog(`Deployment failed to start: ${JSON.stringify(result.content)}`, "error");
+            updateProgress(0);
+            deployBtn.disabled = false;
+            deployBtn.textContent = "Deploy";
+        }
+        else {
+            const jobId = result.structuredContent?.jobId;
+            if (jobId) {
+                addLog(`Deployment started with Job ID: ${jobId}. Polling status...`);
+                pollStatus(jobId);
+            }
+            else {
+                addLog("Failed to get Job ID from server.", "error");
+                deployBtn.disabled = false;
+                deployBtn.textContent = "Deploy";
+            }
+        }
+    }
+    catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        addLog(`Error calling deploy tool: ${message}`, "error");
+        updateProgress(0);
+        deployBtn.disabled = false;
+        deployBtn.textContent = "Deploy";
+    }
+});
+void (async () => {
+    try {
+        await app.connect();
+        addLog("Connected to host.", "info");
+    }
+    catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error("Failed to connect app:", message);
+    }
+})();

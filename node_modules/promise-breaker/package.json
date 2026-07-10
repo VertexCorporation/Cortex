@@ -1,0 +1,51 @@
+{
+    "name": "promise-breaker",
+    "version": "6.0.0",
+    "description": "Library to help write libraries that accept both promises and callbacks.",
+    "main": "index.js",
+    "types": "index.d.ts",
+    "directories": {
+        "test": "test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jwalton/node-promise-breaker"
+    },
+    "devDependencies": {
+        "@jwalton/semantic-release-config": "^1.0.0",
+        "@semantic-release/changelog": "^6.0.1",
+        "@semantic-release/git": "^10.0.1",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "coveralls": "^3.0.2",
+        "es6-promise": "^4.2.5",
+        "eslint": "^8.21.0",
+        "husky": "^8.0.1",
+        "istanbul": "^0.4.5",
+        "lint-staged": "^13.0.3",
+        "mocha": "^10.0.0",
+        "prettier": "^2.3.1",
+        "pretty-quick": "^3.1.1",
+        "semantic-release": "^19.0.3"
+    },
+    "scripts": {
+        "test": "eslint ./index.js && istanbul cover _mocha",
+        "semantic-release": "semantic-release",
+        "prepare": "husky install"
+    },
+    "lint-staged": {
+        "src/**/*.js": [
+            "eslint"
+        ],
+        "test/**/*.js": [
+            "tslint"
+        ]
+    },
+    "keywords": [
+        "promise",
+        "callback",
+        "library"
+    ],
+    "author": "Jason Walton <dev@lucid.thedreaming.org> (https://github.com/jwalton)",
+    "license": "MIT"
+}

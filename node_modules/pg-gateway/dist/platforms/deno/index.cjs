@@ -1,0 +1,2 @@
+"use strict";Object.defineProperty(exports, "__esModule", {value: true});var _chunkFCOSUQFUcjs = require('../../chunk-FCOSUQFU.cjs');async function r(o,t){return new (0, _chunkFCOSUQFUcjs.w)(o,t)}exports.fromDenoConn = r;
+//# sourceMappingURL=index.cjs.map

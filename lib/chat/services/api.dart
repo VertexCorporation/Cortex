@@ -202,29 +202,10 @@ class ApiService {
       }
 
       bool containsWebSearchToolCall(dynamic value) {
-        if (value is! Map) return false;
         try {
-          final map = value;
-          if (map.containsKey('need_web_search')) return true;
-          if (map.containsKey('tool_calls')) {
-            final calls = map['tool_calls'];
-            if (calls is List) {
-              for (final call in calls) {
-                if (call is Map) {
-                  final fn = call['function'];
-                  if (fn is Map) {
-                    final name = fn['name'];
-                    if (name is String &&
-                        (name.contains('web_search') ||
-                            name.contains('need_web_search'))) {
-                      return true;
-                    }
-                  }
-                }
-              }
-            }
-          }
-          return false;
+          final encoded = jsonEncode(value).toLowerCase();
+          return encoded.contains('need_web_search') ||
+              encoded.contains('web_search');
         } catch (_) {
           return false;
         }
@@ -732,55 +713,6 @@ class ApiService {
   }
 
   /// Silently generates a title for a new conversation using the backend's fast new title endpoint.
-  Future<String?> optimizeImagePrompt(String userInput) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return null;
-      final String? token = await user.getIdToken();
-
-      final options = Options(
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        receiveTimeout: const Duration(seconds: 15),
-      );
-
-      final payload = {
-        "messages": [
-          {
-            "role": "system",
-            "content":
-                "You are an expert prompt engineer for AI image generation. The user will provide a drawing request (likely in Turkish). Convert it into a highly descriptive, visually rich, optimized prompt in ENGLISH. IMPORTANT: Reply ONLY with the optimized english text, no markdown, no quotes, no conversational filler.",
-          },
-          {"role": "user", "content": userInput}
-        ],
-        "model": "meta-llama/llama-3-8b-instruct",
-        "stream": false,
-        "max_tokens": 100,
-      };
-
-      final response = await _titleDio.post(
-        _titleBaseUrl,
-        options: options,
-        data: payload,
-      );
-
-      if (response.statusCode == 200 && response.data != null) {
-        final data = response.data;
-        if (data['choices'] != null && data['choices'].isNotEmpty) {
-          final content = data['choices'][0]['message']['content'];
-          if (content != null && content.toString().trim().isNotEmpty) {
-            return content.toString().trim();
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('[PromptOpt] Error: $e');
-    }
-    return null;
-  }
-
   Future<String?> generateChatTitle(
       String userInput, String systemPrompt, String criticalInstruction,
       {bool isRetry = false}) async {
@@ -867,9 +799,8 @@ class ApiService {
         receiveTimeout: const Duration(seconds: 15),
       );
 
-      final systemPrompt =
-          "You are a memory extraction system. Extract explicit, permanent facts about the user from their message (e.g., 'I like apples' -> 'Kullanıcı elmaları sever'). Return ONLY a valid JSON array of strings in the user's language ($langCode). If there are no facts to remember, return an empty array []. Do not include markdown formatting or code blocks.";
-
+      final systemPrompt = "You are a memory extraction system. Extract explicit, permanent facts about the user from their message (e.g., 'I like apples' -> 'Kullanıcı elmaları sever'). Return ONLY a valid JSON array of strings in the user's language ($langCode). If there are no facts to remember, return an empty array []. Do not include markdown formatting or code blocks.";
+      
       final payload = {
         "messages": [
           {"role": "system", "content": systemPrompt},
@@ -887,12 +818,11 @@ class ApiService {
       if (data != null && data['title'] != null) {
         String result = data['title'].toString().trim();
         if (result.startsWith('```json')) {
-          result =
-              result.replaceAll('```json', '').replaceAll('```', '').trim();
+          result = result.replaceAll('```json', '').replaceAll('```', '').trim();
         } else if (result.startsWith('```')) {
           result = result.replaceAll('```', '').trim();
         }
-
+        
         final decoded = jsonDecode(result);
         if (decoded is List) {
           return decoded.map((e) => e.toString()).toList();

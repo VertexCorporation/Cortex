@@ -148,20 +148,12 @@ class ModelRepository {
           throw Exception("Failed to decrypt model data for '$modelId'.");
         }
 
-        try {
-          updatedJsonData = json.decode(decryptedJson);
-        } catch (_) {
-          throw Exception("Failed to parse decrypted JSON for '$modelId'.");
-        }
+        updatedJsonData = json.decode(decryptedJson);
         updatedJsonData['baseModelId'] = newBaseModelId;
         finalJsonToSave =
             CryptoHelper.encrypt(json.encode(updatedJsonData), currentUser.uid);
       } else {
-        try {
-          updatedJsonData = json.decode(rawJsonString);
-        } catch (_) {
-          throw Exception("Failed to parse raw JSON for '$modelId'.");
-        }
+        updatedJsonData = json.decode(rawJsonString);
         updatedJsonData['baseModelId'] = newBaseModelId;
         finalJsonToSave = json.encode(updatedJsonData);
       }
@@ -548,12 +540,7 @@ class ModelRepository {
 
     for (final modelMap in staleModels) {
       final modelId = modelMap['id'] as String;
-      Map<String, dynamic> rawJson;
-      try {
-        rawJson = json.decode(modelMap['raw_json'] as String);
-      } catch (_) {
-        continue;
-      }
+      final rawJson = json.decode(modelMap['raw_json'] as String);
       final imagePath = rawJson['imagePath'] as String?;
 
       if (imagePath != null && !imagePath.startsWith('assets/')) {
@@ -701,22 +688,18 @@ class ModelRepository {
         ? Map<String, dynamic>.from(rawData['producers'] as Map)
         : <String, dynamic>{};
 
-    for (final producerEntry in producers.entries) {
-      final producerName = producerEntry.key;
-      final seriesData = producerEntry.value;
-      if (seriesData is! Map) continue;
+    producers.forEach((producerName, seriesData) {
+      if (seriesData is! Map) return;
       final seriesDataMap = Map<String, dynamic>.from(seriesData);
-      for (final seriesEntry in seriesDataMap.entries) {
-        final seriesName = seriesEntry.key;
-        final seriesValue = seriesEntry.value;
-        if (seriesValue is! Map) continue;
+      seriesDataMap.forEach((seriesName, seriesValue) {
+        if (seriesValue is! Map) return;
         final seriesValueMap = Map<String, dynamic>.from(seriesValue);
 
         final cleanSeriesValue = _staticSanitizeRawData(seriesValueMap);
 
         final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
           ..remove('series_description');
-        if (variantsMap.isEmpty) continue;
+        if (variantsMap.isEmpty) return;
 
         final model =
             (variantsMap.length == 1 && variantsMap.containsKey('Default'))
@@ -726,8 +709,8 @@ class ModelRepository {
                     seriesName, producerName, cleanSeriesValue, langCode);
 
         if (model != null) finalList.add(model);
-      }
-    }
+      });
+    });
     return finalList;
   }
 
@@ -812,10 +795,8 @@ class ModelRepository {
     if (variantsMap.isEmpty) return null;
 
     final variants = <String, dynamic>{};
-    for (final variantEntry in variantsMap.entries) {
-      final variantKey = variantEntry.key;
-      final variantData = variantEntry.value;
-      if (variantData is! Map<String, dynamic>) continue;
+    variantsMap.forEach((variantKey, variantData) {
+      if (variantData is! Map<String, dynamic>) return;
 
       final cleanVariantData = _staticSanitizeRawData(variantData);
 
@@ -835,7 +816,7 @@ class ModelRepository {
         'description': localizedVariantDescription,
         'isFullyLocalized': isVariantLocalized,
       };
-    }
+    });
 
     if (variants.isEmpty) return null;
 
@@ -910,14 +891,13 @@ class ModelRepository {
 
   static List<String> _languageFallbackKeys(String langCode) {
     final normalized = _normalizedLangCode(langCode);
-    final seen = <String>{};
-    final result = <String>[
-      if (seen.add(normalized)) normalized,
-      if (normalized == 'zh' && seen.add('cn')) 'cn',
-      if (normalized == 'cn' && seen.add('zh')) 'zh',
-      if (seen.add('en')) 'en',
+    final keys = <String>[
+      normalized,
+      if (normalized == 'zh') 'cn',
+      if (normalized == 'cn') 'zh',
+      'en',
     ];
-    return result;
+    return keys.toSet().toList();
   }
 
   static Map<String, dynamic> _safeStringKeyMap(dynamic value) {

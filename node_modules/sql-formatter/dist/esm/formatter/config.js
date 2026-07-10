@@ -1,0 +1,20 @@
+// Utility functions for config options
+/**
+ * Creates a string to use for one step of indentation.
+ */
+export function indentString(cfg) {
+    if (cfg.indentStyle === 'tabularLeft' || cfg.indentStyle === 'tabularRight') {
+        return ' '.repeat(10);
+    }
+    if (cfg.useTabs) {
+        return '\t';
+    }
+    return ' '.repeat(cfg.tabWidth);
+}
+/**
+ * True when indentStyle is one of the tabular ones.
+ */
+export function isTabularStyle(cfg) {
+    return cfg.indentStyle === 'tabularLeft' || cfg.indentStyle === 'tabularRight';
+}
+//# sourceMappingURL=config.js.map

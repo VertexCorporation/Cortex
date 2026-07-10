@@ -1,0 +1,2 @@
+import{j as e}from"../chunk-QY3QWFKW.js";e();var n=async(s,t)=>({emscriptenOpts:t,bundlePath:new URL("../pg_uuidv7.tar.gz",import.meta.url)}),a={name:"pg_uuidv7",setup:n};export{a as pg_uuidv7};
+//# sourceMappingURL=index.js.map

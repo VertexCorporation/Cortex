@@ -68,15 +68,8 @@ class SendService {
   /// Replaces the old single boolean `_isSending`.
   final Set<String> _activeSendConversations = {};
 
-  /// Session-level circuit breaker for models that repeatedly fail.
-  /// Once a model fails and fallback succeeds, it's added here so
-  /// subsequent sends skip directly to the fallback.
-  static final Set<String> _failedModelCircuitBreaker = {};
-
   // PERF: Stateless moderator — create once, reuse on every offline send.
   final OfflineModeratorService _offlineModerator = OfflineModeratorService();
-
-  Timer? _retryTimer;
 
   SendService({
     required ConversationProvider conversationProvider,
@@ -141,38 +134,23 @@ class SendService {
   bool _isMemoryWorthy(String text) {
     if (text.length < 4 || text.length > 500) return false;
     final lower = text.toLowerCase();
-
+    
     // English indicators
-    if (lower.contains("i am") ||
-        lower.contains("i'm") ||
-        lower.contains("i like") ||
-        lower.contains("i love") ||
-        lower.contains("i hate") ||
-        lower.contains("my name") ||
-        lower.contains("my favorite") ||
-        lower.contains("call me") ||
-        lower.contains("i prefer") ||
-        lower.contains("i have") ||
-        lower.contains("my ") ||
-        lower.contains("about me")) {
+    if (lower.contains("i am") || lower.contains("i'm") || lower.contains("i like") || 
+        lower.contains("i love") || lower.contains("i hate") || lower.contains("my name") || 
+        lower.contains("my favorite") || lower.contains("call me") || lower.contains("i prefer") ||
+        lower.contains("i have") || lower.contains("my ") || lower.contains("about me")) {
       return true;
     }
-
+    
     // Turkish indicators
-    if (lower.contains("benim") ||
-        lower.contains(" adım") ||
-        lower.contains("bana ") ||
-        lower.contains("severim") ||
-        lower.contains("nefret") ||
-        lower.contains("favori") ||
-        lower.contains("yaşındayım") ||
-        lower.contains("hoşlanırım") ||
-        lower.contains("ben ") ||
-        lower.contains("yapmayı") ||
-        lower.contains("olmayı")) {
+    if (lower.contains("benim") || lower.contains(" adım") || lower.contains("bana ") || 
+        lower.contains("severim") || lower.contains("nefret") || lower.contains("favori") || 
+        lower.contains("yaşındayım") || lower.contains("hoşlanırım") || lower.contains("ben ") ||
+        lower.contains("yapmayı") || lower.contains("olmayı")) {
       return true;
     }
-
+    
     return false;
   }
 
@@ -353,9 +331,7 @@ class SendService {
       final hasInternet = await InternetConnection().hasInternetAccess;
 
       final originalUiModelId = overrideModelId ??
-          (sessionProvider.isDynamicChat
-              ? 'cortex/auto'
-              : sessionProvider.modelId) ??
+          (sessionProvider.isDynamicChat ? 'cortex/auto' : sessionProvider.modelId) ??
           'cortex/auto';
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
@@ -473,19 +449,11 @@ class SendService {
       if (apiModelIdForSend == null) {
         throw ApiException(errorMessage);
       }
-
+      
       if (apiModelIdForSend == 'dynamic') {
         apiModelIdForSend = 'cortex/auto';
       }
-
-      // Circuit breaker: skip models that have repeatedly failed this session
-      if (apiModelIdForSend != 'cortex/auto' &&
-          _failedModelCircuitBreaker.contains(apiModelIdForSend)) {
-        debugPrint(
-            "SendService: Circuit breaker triggered for '$apiModelIdForSend'. Skipping to cortex/auto.");
-        apiModelIdForSend = 'cortex/auto';
-      }
-
+      
       targetModelIdForSend = apiModelIdForSend;
 
       final isAutoRouter = apiModelIdForSend == 'cortex/auto';
@@ -613,10 +581,7 @@ class SendService {
       _inputProvider.clearAttachments();
 
       // 🚀 ASYNC AI MEMORY EXTRACTION
-      if (isServerSide &&
-          text.isNotEmpty &&
-          !isHidden &&
-          _isMemoryWorthy(text)) {
+      if (isServerSide && text.isNotEmpty && !isHidden && _isMemoryWorthy(text)) {
         debugPrint("🚀 Triggering Memory Extraction...");
         _apiService.extractUserMemory(text, langCode).then((facts) async {
           if (facts != null && facts.isNotEmpty) {
@@ -660,14 +625,13 @@ class SendService {
         // Offline Flow
         if (_offlineModerator.isPromptAcceptable(textForApi)) {
           await _offlineService.sendMessage(
-              textForApi, currentAttachmentPaths.firstOrNull, activeMode);
+              textForApi, currentAttachmentPaths.firstOrNull);
         } else {
           throw ApiException(localizations.errorPromptFlagged);
         }
       } else {
         // Server Flow (with Tool Loop & featureReasoning)
         final String convId = targetConvId!;
-        final String preFallbackModelId = apiModelIdForSend;
         int attempt = 0;
         bool success = false;
         String? dynamicFallbackNotice;
@@ -694,11 +658,11 @@ class SendService {
 
           if (_isConversationActive(convId)) {
             _conversationProvider.fadeOutMessage(aiMessageIndex);
-            await _delayed(const Duration(milliseconds: 300));
+            await Future.delayed(const Duration(milliseconds: 300));
             _conversationProvider.prepareForRegeneration(
                 aiMessageIndex, 'cortex/auto');
           }
-          await _delayed(const Duration(milliseconds: 100));
+          await Future.delayed(const Duration(milliseconds: 100));
         }
 
         while (attempt < 3 && !success) {
@@ -739,7 +703,7 @@ class SendService {
                 _conversationProvider.updateMessageAtIndex(
                     aiMessageIndex, currentMsg.copyWith(text: ""));
               }
-              await _delayed(const Duration(milliseconds: 500));
+              await Future.delayed(const Duration(milliseconds: 500));
             } else if (e is ApiException && (e.code ?? '').startsWith('FAL_')) {
               final failedModelId = apiModelIdForSend ?? 'cortex/auto';
               final failedModel = _modelService.getPreciseModelData(
@@ -776,11 +740,11 @@ class SendService {
 
                 if (_isConversationActive(convId)) {
                   _conversationProvider.fadeOutMessage(aiMessageIndex);
-                  await _delayed(const Duration(milliseconds: 300));
+                  await Future.delayed(const Duration(milliseconds: 300));
                   _conversationProvider.prepareForRegeneration(
                       aiMessageIndex, imageToImageFallback.id);
                 }
-                await _delayed(const Duration(milliseconds: 100));
+                await Future.delayed(const Duration(milliseconds: 100));
                 continue;
               }
 
@@ -806,15 +770,6 @@ class SendService {
               rethrow;
             }
           }
-        }
-
-        // Circuit breaker: if the original model failed and fallback succeeded,
-        // remember the failure so we skip the failing model next time.
-        if (preFallbackModelId != (apiModelIdForSend ?? 'cortex/auto') &&
-            preFallbackModelId != 'cortex/auto') {
-          _failedModelCircuitBreaker.add(preFallbackModelId);
-          debugPrint(
-              "SendService: Added '$preFallbackModelId' to circuit breaker.");
         }
 
         // Only update UI provider if user is still on this conversation.
@@ -978,19 +933,11 @@ class SendService {
       }
       return false;
     } finally {
-      _retryTimer?.cancel();
       if (targetConvId != null) {
         _activeSendConversations.remove(targetConvId);
         _backgroundTaskService.markComplete(targetConvId);
       }
     }
-  }
-
-  Future<void> _delayed(Duration duration) {
-    _retryTimer?.cancel();
-    final completer = Completer<void>();
-    _retryTimer = Timer(duration, () => completer.complete());
-    return completer.future;
   }
 
   /// Manages the full conversation loop:
@@ -1374,24 +1321,6 @@ class SendService {
         final isMediaModel = modelData.category == 'image' ||
             modelData.category == 'video' ||
             modelData.category == 'audio';
-
-        // --- [PROMPT OPTIMIZATION FOR IMAGE GENERATION] ---
-        if (modelData.category == 'image' && contextMessages.isNotEmpty) {
-          final lastMsg = contextMessages.last;
-          if (lastMsg['role'] == 'user' && lastMsg['content'] is String) {
-            final originalText = lastMsg['content'] as String;
-            // Optimize to English using the cheap pipeline
-            onMediaGenerating('image');
-            final optimizedPrompt =
-                await _apiService.optimizeImagePrompt(originalText);
-            if (optimizedPrompt != null && optimizedPrompt.isNotEmpty) {
-              debugPrint("[SendService] Optimized Prompt: $optimizedPrompt");
-              contextMessages.last['content'] = optimizedPrompt;
-            }
-          }
-        }
-        // --------------------------------------------------
-
         final enableWebSearch = !isMediaModel && _inputProvider.enableWebSearch;
         if (enableWebSearch) {
           setWebSearchActive(true);
@@ -1535,29 +1464,29 @@ class SendService {
     }
 
     // Extract memory updates if any
-    final memoryExp = RegExp(r'<memory[)>]?([\s\S]*?)(?:</memory[)>]?|$)',
-        caseSensitive: false);
-    final memoryMatch = memoryExp.firstMatch(finalResponseText);
-    if (memoryMatch != null) {
-      final newMemory = memoryMatch.group(1)?.trim();
-      if (newMemory != null && newMemory.isNotEmpty) {
-        final lines = newMemory.split('\n').where((s) => s.trim().isNotEmpty);
-        for (final line in lines) {
-          await _userMemoryProvider.addMemory(line);
-        }
-        try {
-          final semanticMemService = SemanticMemoryService();
-          await semanticMemService.saveFromMemoryBlock(newMemory);
-          debugPrint('[Memory] Saved memory block to SQLite semantic memory.');
-        } catch (e) {
-          debugPrint('[Memory] Error saving to SQLite semantic memory: $e');
-        }
-        debugPrint(
-            '[Memory] Successfully extracted and updated memory from response.');
+  final memoryExp = RegExp(r'<memory[)>]?([\s\S]*?)(?:</memory[)>]?|$)',
+      caseSensitive: false);
+  final memoryMatch = memoryExp.firstMatch(finalResponseText);
+  if (memoryMatch != null) {
+    final newMemory = memoryMatch.group(1)?.trim();
+    if (newMemory != null && newMemory.isNotEmpty) {
+      final lines = newMemory.split('\n').where((s) => s.trim().isNotEmpty);
+      for (final line in lines) {
+        await _userMemoryProvider.addMemory(line);
       }
+      try {
+        final semanticMemService = SemanticMemoryService();
+        await semanticMemService.saveFromMemoryBlock(newMemory);
+        debugPrint('[Memory] Saved memory block to SQLite semantic memory.');
+      } catch (e) {
+        debugPrint('[Memory] Error saving to SQLite semantic memory: $e');
+      }
+      debugPrint(
+          '[Memory] Successfully extracted and updated memory from response.');
     }
+  }
 
-    // CHECK FOR EMPTY RESPONSE
+ // CHECK FOR EMPTY RESPONSE
     final cleanResponse = finalResponseText.replaceAll(memoryExp, '').trim();
     if (cleanResponse.isEmpty && !hasGeneratedMedia) {
       throw ApiException(localizations.errorServer, code: 'EMPTY_RESPONSE');
@@ -1781,32 +1710,7 @@ class SendService {
   }
 
   bool _containsAny(String value, Iterable<String> needles) {
-    for (final needle in needles) {
-      final regExp = RegExp(r'' + RegExp.escape(needle.trim()) + r'',
-          caseSensitive: false);
-      if (regExp.hasMatch(' $value ')) return true;
-    }
-    return false;
-  }
-
-  bool _isNegativeIntent(String value) {
-    final negatives = [
-      'istemiyorum',
-      'yapma',
-      'cizme',
-      'atma',
-      'gonderme',
-      'hayir',
-      'yok',
-      'degil',
-      'yaz',
-      'resim atma',
-      'gorsel atma'
-    ];
-    for (final neg in negatives) {
-      if (value.contains(neg)) return true;
-    }
-    return false;
+    return needles.any((needle) => value.contains(needle));
   }
 
   _MediaIntent _inferMediaIntentFromText({
@@ -1817,7 +1721,6 @@ class SendService {
   }) {
     final normalized = _normalizeIntentText(text);
     if (normalized.trim().isEmpty) return _MediaIntent.none;
-    if (_isNegativeIntent(normalized)) return _MediaIntent.none;
 
     const editTerms = [
       'edit',
@@ -1938,9 +1841,9 @@ class SendService {
     if (hasAudio && (edits || (generates && mentionsAudio))) {
       return _MediaIntent.editAudio;
     }
+    if (generates && mentionsImage) return _MediaIntent.generateImage;
     if (generates && mentionsVideo) return _MediaIntent.generateVideo;
     if (generates && mentionsAudio) return _MediaIntent.generateAudio;
-    if (generates) return _MediaIntent.generateImage;
     if (_containsAny(normalized, understandTerms)) {
       return _MediaIntent.understand;
     }
@@ -2051,7 +1954,7 @@ class SendService {
     required String langCode,
     required bool isUserSubscribed,
   }) {
-    if (text.trim().isEmpty) return null;
+    if (attachments.isEmpty || text.trim().isEmpty) return null;
     if (currentModelId != 'cortex/auto' && currentModelId != 'dynamic') {
       return null;
     }
@@ -2059,8 +1962,7 @@ class SendService {
     final hasImage = attachments.any(_isImageFile);
     final hasVideo = attachments.any(_isVideoFile);
     final hasAudio = attachments.any(_isAudioFile);
-
-    // We do NOT block empty attachments anymore, because text-only can ask for generation.
+    if (!hasImage && !hasVideo && !hasAudio) return null;
 
     final intent = _inferMediaIntentFromText(
       text: text,
