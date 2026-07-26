@@ -1,0 +1,888 @@
+{
+  "@@locale": "hi",
+  "accessSettingsDescription": "सहायता तक पहुंचें, कोड रिडीम करें, Cortex साझा करें, और हमारी नीतियां देखें।",
+  "accountDeletionRequested": "आपके खाते को हटाने का अनुरोध प्राप्त हो गया है और आपका खाता अब अक्षम है।",
+  "accountLinkedSuccess": "खाता सफलतापूर्वक बनाया गया!",
+  "actionCamera": "कैमरा",
+  "actionFile": "फ़ाइल",
+  "actionGallery": "गैलरी",
+  "add": "जोड़ें",
+  "agentBlue": "Blue",
+  "agentPurple": "Purple",
+  "agentRed": "Red",
+  "aiExplanationDescription": "कृपया अपने एआई मॉडल की वास्तुकला, प्रशिक्षण प्रक्रिया, प्रदर्शन मेट्रिक्स, अनुप्रयोग क्षेत्रों और अन्य महत्वपूर्ण विशेषताओं का विस्तृत विवरण प्रदान करें।",
+  "aiExplanationTitle": "कृत्रिम बुद्धिमत्ता विवरण",
+  "aiTranslationWarning": "मॉडल की जानकारी अन्य एआई मॉडल द्वारा विभिन्न भाषाओं में अनुवादित की जाती है। इसलिए, अंग्रेजी के अलावा अन्य भाषाओं में मामूली विसंगतियां हो सकती हैं।",
+  "allConversationsDeleted": "सभी बातचीत सफलतापूर्वक हटा दी गई!",
+  "allModels": "सभी मॉडल",
+  "@allModels": {
+    "description": "Filter button text to show all available models"
+  },
+  "alreadyHaveAccount": "पहले से ही एक खाता है?",
+  "alwaysBest": "हमेशा सर्वश्रेष्ठ",
+  "anErrorOccurred": "एक त्रुटि हुई",
+  "annual": "वार्षिक",
+  "annualTotalDescription": "{price}/वर्ष, वार्षिक बिल",
+  "@annualTotalDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "anonymousEntity": "अनाम संस्था",
+  "arabic": "अरबी",
+  "arts": "कला",
+  "attachmentSheetTitle": "संलग्नक",
+  "audioModels": "Audio Models",
+  "authError": "प्रमाणीकरण त्रुटि",
+  "azerbaijani": "अज़रबैजानी",
+  "backgroundChatNotificationTitle": "चैट पर वापस!",
+  "@backgroundChatNotificationTitle": {
+    "description": "Notification title when a background chat finishes generating."
+  },
+  "baseModelDescription": "यह वह मॉडल है जिसका उपयोग आपकी रचना के लिए नींव के रूप में किया जाएगा। यह वर्तमान में चयनित आधार मॉडल को प्रदर्शित करता है।",
+  "baseModelForCharacterDescription": "चयनित आधार मॉडल चरित्र के तर्क और प्रतिक्रिया क्षमताओं को निर्धारित करेगा।",
+  "@baseModelForCharacterDescription": {},
+  "baseModelTitle": "आधार मॉडल",
+  "behindTheSlaughter": "कत्लेआम के पीछे",
+  "benefit1": "बातचीत की सीमाएँ बढ़ाई गईं",
+  "benefit10": "अधिक अटैचमेंट",
+  "benefit11": "अधिक प्रवाह मोड",
+  "benefit3": "प्रोफ़ाइल प्रभाव",
+  "benefit4": "सदस्यता बिल्ला",
+  "benefit5": "और अधिक ऑनलाइन कृत्रिम बुद्धिमत्ता बनाएं",
+  "benefit7": "अधिक उपयोग सीमाएँ",
+  "benefit8": "मॉडल जोड़ें",
+  "benefit9": "नई थीम",
+  "benefitPremiumModels": "प्रीमियम मॉडल तक पहुंच",
+  "@benefitPremiumModels": {
+    "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
+  },
+  "benefitVideoGeneration": "वीडियो जनरेशन",
+  "bestValue": "सबसे अच्छा मूल्य",
+  "betterWithAnAccount": "यह अनुभाग एक खाते के साथ बेहतर है!",
+  "cacheIsNotUpToDate": "आपका Play Store कैश अपडेट नहीं है। कृपया Play Store ऐप बंद करके दोबारा खोलें, या अपना डिवाइस रीस्टार्ट करें।",
+  "cancel": "रद्द करें",
+  "capabilitiesSection": "क्षमताएं",
+  "categoryAll": "All",
+  "categoryFeminine": "Feminine",
+  "categoryFree": "Free",
+  "categoryInanimate": "Inanimate",
+  "categoryMasculine": "Masculine",
+  "categoryPhoto": "Photo",
+  "categoryPremium": "Premium",
+  "categoryVideo": "Video",
+  "changeModel": "बदलें",
+  "changePassword": "पासवर्ड बदलें",
+  "channelEngagementDescription": "आपको व्यस्त रखने के लिए मजेदार सूचनाएं।",
+  "@channelEngagementDescription": {
+    "description": "The user-visible description for the engagement notification channel."
+  },
+  "channelEngagementName": "मैत्रीपूर्ण अनुस्मारक",
+  "@channelEngagementName": {
+    "description": "The user-visible name for the engagement notification channel."
+  },
+  "channelFcmDescription": "कॉर्टेक्स से समाचार, अपडेट और अन्य जानकारी के बारे में सूचनाएं।",
+  "@channelFcmDescription": {
+    "description": "The user-visible description for the main notification channel."
+  },
+  "channelFcmName": "कॉर्टेक्स अपडेट",
+  "@channelFcmName": {
+    "description": "The user-visible name for the main notification channel."
+  },
+  "channelGreetingsDescription": "शुभ प्रभात और शुभ रात्रि जैसे संदेश।",
+  "@channelGreetingsDescription": {
+    "description": "The user-visible description for the greetings notification channel."
+  },
+  "channelGreetingsName": "दैनिक अभिवादन",
+  "@channelGreetingsName": {
+    "description": "The user-visible name for the greetings notification channel."
+  },
+  "characterModels": "पात्र",
+  "@characterModels": {
+    "description": "Filter button text for pre-defined role-playing characters"
+  },
+  "chat": "चैट",
+  "branch": "शाखा",
+  "chatLengthLimitExceeded": "यह चैट वर्ण सीमा को पार कर गई है। कृपया एक नई चैट शुरू करें या सदस्यता खरीदें।",
+  "chatTitleCriticalInstruction": "[महत्वपूर्ण निर्देश]: आप एक शीर्षक जनरेटर हैं। उपयोगकर्ता के प्रश्न का उत्तर न दें। चैट न करें या हैलो न कहें। केवल 2-4 शब्दों का शीर्षक आउटपुट करें जो उपयोगकर्ता के प्रश्न का सारांश प्रस्तुत करता हो।",
+  "@chatTitleCriticalInstruction": {
+    "description": "Critical system instruction appended to force the AI to only output a title"
+  },
+  "chatTitlePrompt": "आप एक शीर्षक निर्माता हैं। कृपया निम्नलिखित वार्तालाप के लिए केवल 2-5 शब्दों का शीर्षक ही लिखें। उद्धरण चिह्नों, उपसर्गों या विराम चिह्नों का प्रयोग न करें। महत्वपूर्ण: शीर्षक उपयोगकर्ता के संदेश की भाषा में ही होना चाहिए।",
+  "@chatTitlePrompt": {
+    "description": "Prompt for AI to generate a chat title"
+  },
+  "chats": "इनबॉक्स",
+  "checkYourInternet": "कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
+  "chinese": "चीनी",
+  "claimOffer": "ऑफर का उपयोग करें",
+  "clearMemory": "मेमोरी साफ़ करें",
+  "clearMemoryConfirm": "क्या आप वाकई अपनी याददाश्त मिटाना चाहते हैं?",
+  "closeButton": "बंद करें",
+  "coffee": "Coffee",
+  "confirm": "पुष्टि करें",
+  "confirmDeleteAccount": "क्या आप वाकई अपना खाता हटाना चाहते हैं?",
+  "confirmDownloadTitle": "क्या आप वाकई डाउनलोड करना चाहते हैं?",
+  "confirmPassword": "पासवर्ड की पुष्टि कीजिये",
+  "confirmRemoveModel": "क्या आप वाकई {model} मॉडल को अपने डिवाइस से हटाना चाहते हैं? ऐसा करने से उस मॉडल के साथ हुई सभी पिछली बातचीत भी डिलीट हो जाएगी।",
+  "confirmRemovePhoto": "क्या आप वाकई फोटो हटाना चाहते हैं?",
+  "confirmWord": "VERTEX टाइप करें",
+  "confirmWordError": "आपने इसे गलत टाइप किया है",
+  "context": "संदर्भ",
+  "continueAsGuest": "खाता बनाए बिना जारी रखें",
+  "continueInOfflineMode": "ऑफ़लाइन मोड में जारी रखें",
+  "continueWithApple": "Apple के साथ जारी रखें",
+  "continueWithGoogle": "Google के साथ जारी रखें",
+  "conversationDeleted": "बातचीत हटा दी गई!",
+  "copy": "कॉपी करें",
+  "copyrights": "योगदान",
+  "cortexSystemPersona": "\n\n[System] महत्वपूर्ण निर्देश: आप वर्तमान में \"कॉर्टेक्स\" नामक एक विशाल, अत्यधिक उन्नत एआई पारिस्थितिकी तंत्र के भीतर काम कर रहे हैं; यह प्लेटफ़ॉर्म वर्टेक्स टीम द्वारा विकसित किया गया है, जिनकी औसत आयु मात्र 16 वर्ष है। इसे याद रखें और पूछे जाने पर उत्तर दें। यदि अधिक जानकारी मांगी जाए, तो इंटरनेट पर खोजने में संकोच न करें, या यदि आप खोज नहीं सकते हैं, तो बेझिझक कहें कि आपको नहीं पता!",
+  "@cortexSystemPersona": {
+    "description": "System persona string added to online models"
+  },
+  "couldNotOpenLink": "लिंक नहीं खोल सका",
+  "create": "बनाएं",
+  "createAI": "बनाएं",
+  "createAccount": "खाता बनाएं",
+  "createYourAccount": "रजिस्टर करें",
+  "creatorSupportedSuccess": "निर्माता का सफलतापूर्वक समर्थन किया गया! आपकी भविष्य की खरीदारी उन्हें योगदान देगी।",
+  "creatorTag": "निर्माता टैग",
+  "customInstructionHint": "अपने निर्देश यहां दर्ज करें",
+  "customModels": "कस्टम मॉडल",
+  "@customModels": {
+    "description": "Filter button text for user-created models or characters"
+  },
+  "cyberpunk": "Cyberpunk",
+  "dark": "डार्क",
+  "deepSpace": "Deep Space",
+  "defaultModelDescription": "{modelName} Cortex पारिस्थितिकी तंत्र में एकीकृत एक उच्च-प्रदर्शन कृत्रिम बुद्धिमत्ता है। जटिल कार्यों की एक विस्तृत विविधता को जीतने के लिए डिज़ाइन किया गया, यह अत्यधिक विश्वसनीय और कुशल प्रसंस्करण क्षमता प्रदान करता है। त्वरित प्रतिक्रिया समय और उन्नत विश्लेषणात्मक शक्ति प्रदान करके, यह आपकी दैनिक उत्पादकता को काफी बढ़ाता है। Cortex के सुरक्षित स्थानीय बुनियादी ढांचे पर निर्बाध रूप से काम करते हुए, यह मॉडल रचनात्मक बुद्धिशीलता से लेकर गहरे तकनीकी विश्लेषण तक, कई कार्यों में आपकी सहायता कर सकता है। आज ही इसकी पूरी क्षमता की खोज शुरू करें।",
+  "@defaultModelDescription": {
+    "description": "Default description when a model lacks one",
+    "placeholders": {
+      "modelName": {
+        "type": "String",
+        "example": "Llama 3 8B"
+      }
+    }
+  },
+  "defaultSeriesDescription": "{seriesName} एक उन्नत बुद्धिमत्ता है जो Cortex पर उच्च प्रदर्शन दिखाती है।",
+  "@defaultSeriesDescription": {
+    "description": "Default description when a series lacks one",
+    "placeholders": {
+      "seriesName": {
+        "type": "String",
+        "example": "Llama 3"
+      }
+    }
+  },
+  "defaultViewDescription": "कॉर्टेक्स सैकड़ों एआई मॉडल, ऑफलाइन क्षमताओं, डायनामिक चैट और बहुत कुछ के साथ हमेशा आपके साथ है।",
+  "defaultViewTitle": "क्या चल रहा है?",
+  "delete": "हटाएं",
+  "deleteAccount": "खाता हटाएं",
+  "deleteAll": "सभी को हटा दें",
+  "deleteAllConversationsButton": "सभी बातचीत हटाएं",
+  "deleteAllConversationsConfirmMessage": "क्या आप वाकई अपनी सभी चैट हटाना चाहते हैं? यह पूर्ववत नहीं किया जा सकता।",
+  "deleteAllConversationsConfirmTitle": "सभी चैट हटाएं?",
+  "deleteAllConversationsDisabledInfo": "आप एक सक्रिय चैट में रहते हुए सभी बातचीत नहीं हटा सकते, कृपया आगे बढ़ने के लिए पहले वर्तमान चैट से बाहर निकलें।",
+  "deleteDescription": "आपके द्वारा हटाया गया डेटा हमारे सर्वर और आपके डिवाइस से स्थायी रूप से हटा दिया जाएगा। यह कार्रवाई पूर्ववत नहीं की जा सकती।",
+  "descriptionSection": "विवरण",
+  "deviceMemory": "डिवाइस मेमोरी: {memory} GB",
+  "displayName": "प्रदर्शित होने वाला नाम",
+  "done": "हो गया",
+  "dontHaveAccount": "खाता नहीं है?",
+  "download": "डाउनलोड करें",
+  "downloadFailed": "डाउनलोड विफल",
+  "downloadPaused": "डाउनलोड रोक दिया गया।",
+  "downloadSizeDisclosure": "यह मॉडल लगभग {size} स्थान घेरेगा।",
+  "downloadStarted": "डाउनलोड शुरू हो गया",
+  "downloadSuccess": "डाउनलोड सफल",
+  "downloaded": "{percent}% डाउनलोड किया गया",
+  "@downloaded": {
+    "description": "डाउनलोड के पूरे होने का प्रतिशत इंगित करता है।",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloading": "डाउनलोड हो रहा है...",
+  "dude": "दोस्त",
+  "dutch": "डच",
+  "dynamicChatTitle": "गतिशील चैट",
+  "@dynamicChatTitle": {
+    "description": "The title for a conversation started in dynamic mode."
+  },
+  "dynamicPreditsUpgradeMessage": "Cortex और भी बेहतर जवाब दे सकता है; अभी अपग्रेड करें और हर सवाल का सबसे अच्छा जवाब पाएं!",
+  "edit": "संपादित करें",
+  "editConversationTitle": "नाम बदलें",
+  "editProfile": "प्रोफ़ाइल संपादित करें",
+  "editingMessageInfo": "इस संदेश को संपादित करने से बातचीत यहीं से फिर से शुरू हो जाएगी।",
+  "editingNotification": "आप अभी संपादन मोड में हैं",
+  "email": "ईमेल",
+  "emailAlreadyInUse": "यह ईमेल पहले से ही उपयोग में है।",
+  "emulatorModeWarning": "एमुलेटर मोड में यह सुविधा निष्क्रिय है।",
+  "english": "अंग्रेज़ी",
+  "enterYourTag": "अपने पसंदीदा रचनाकारों का समर्थन करें! नीचे उनका अनूठा टैग दर्ज करें और उन्हें अपनी कॉर्टेक्स खरीदारी में हिस्सा दें।",
+  "equivalentMonthlyDescription": "लगभग {price}/माह",
+  "@equivalentMonthlyDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "errorContentFlagged": "मॉडल को सहेजा नहीं जा सका क्योंकि इसकी सामग्री को अनुचित के रूप में फ़्लैग किया गया था।",
+  "errorCreatingModel": "मॉडल बनाते समय एक अप्रत्याशित त्रुटि हुई।",
+  "errorDeletingModel": "मॉडल हटाते समय एक अप्रत्याशित त्रुटि हुई।",
+  "errorGGUF": "कृपया केवल GGUF प्रारूप में एक फ़ाइल चुनें।",
+  "errorInsufficientStorage": "इस मॉडल को डाउनलोड करने के लिए पर्याप्त भंडारण स्थान उपलब्ध नहीं है।",
+  "errorLoadingMessage": "हम अपने सर्वर से आवश्यक डेटा प्राप्त नहीं कर सके। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
+  "@errorLoadingMessage": {
+    "description": "समस्या की व्याख्या करने वाली त्रुटि स्क्रीन के लिए संदेश।"
+  },
+  "errorLoadingTitle": "डेटा लोड करने में विफल",
+  "@errorLoadingTitle": {
+    "description": "त्रुटि स्क्रीन के लिए शीर्षक जब मॉडल डेटा प्राप्त नहीं किया जा सकता है।"
+  },
+  "errorNetwork": "एक नेटवर्क त्रुटि हुई। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।",
+  "@errorNetwork": {},
+  "errorNoModelsAvailable": "वर्तमान में कोई मॉडल उपलब्ध नहीं है। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
+  "@errorNoModelsAvailable": {
+    "description": "Error message when the entire model list is empty."
+  },
+  "errorPromptFlagged": "आपका संदेश अनुचित के रूप में पता चला और नहीं भेजा जा सका।",
+  "errorRateLimit": "आपने हाल ही में बहुत सारे मॉडल बनाए हैं, कृपया पुनः प्रयास करने से पहले थोड़ी देर प्रतीक्षा करें।",
+  "errorReachedLimit": "आप अपनी सीमा तक पहुँच चुके हैं, अधिक अनलॉक करने और चैट जारी रखने के लिए अपग्रेड करें।",
+  "@errorReachedLimit": {},
+  "errorServer": "एक अप्रत्याशित सर्वर त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।",
+  "@errorServer": {},
+  "errorUserNotAuthenticated": "इस क्रिया को करने के लिए आपको लॉग इन होना चाहिए।",
+  "@errorUserNotAuthenticated": {},
+  "exclusiveOffer": "विशेष ऑफर",
+  "exclusiveOfferBadge": "विशेष ऑफर • {time}",
+  "experimentalOfflineWarning": "ऑफ़लाइन मोड अभी भी प्रायोगिक है और आपके द्वारा डाउनलोड किया गया मॉडल इष्टतम दक्षता के साथ प्रदर्शन नहीं कर सकता है।",
+  "explore": "खोजें",
+  "@explore": {
+    "description": "It's so clear i think."
+  },
+  "falErrorAudioRequired": "इस मॉडल के लिए एक संदर्भ ऑडियो फ़ाइल की आवश्यकता है, कृपया एक ऑडियो फ़ाइल संलग्न करें और पुनः प्रयास करें।",
+  "falErrorGenericStatus": "जनरेशन सेवा ने एक त्रुटि (स्थिति {statusCode}) वापस कर दी।",
+  "@falErrorGenericStatus": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "falErrorImageCorrupted": "अपलोड की गई छवि संसाधित नहीं हो सकी, कृपया कोई दूसरा प्रारूप आजमाएं।",
+  "falErrorImageRequired": "इस एआई को एक संदर्भ छवि की आवश्यकता है, कृपया एक छवि संलग्न करें और पुनः प्रयास करें।",
+  "falErrorSchemaInvalid": "उत्पादन सेवा द्वारा इनपुट को अस्वीकार कर दिया गया।",
+  "falErrorSchemaRejected": "मॉडल ने इनपुट को अस्वीकार कर दिया है, कृपया कोई दूसरा मॉडल आजमाएं।",
+  "falErrorVideoRequired": "इस मॉडल के लिए एक संदर्भ वीडियो की आवश्यकता है, कृपया एक वीडियो संलग्न करें और पुनः प्रयास करें।",
+  "falOfflineMessage": "हमारे सर्वर में कुछ सुधार कार्य चल रहे हैं, इसलिए यह इंटेलिजेंस सेवा फिलहाल उपलब्ध नहीं है। सुधार प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!",
+  "fallbackInfoPanelText": "हमारे सर्वर में कुछ सुधार किए जा रहे हैं, इसलिए प्रतिक्रिया आपके द्वारा विशेष रूप से चुने गए AI के बजाय कॉर्टेक्स के डायनामिक चैट द्वारा उत्पन्न हुई है। प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!",
+  "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
+  "@featureAudioGenerationDescription": {
+    "description": "Description for the audio generation feature."
+  },
+  "featureAudioGenerationTitle": "Audio Generation",
+  "@featureAudioGenerationTitle": {
+    "description": "Title for the feature indicating the model can create audio."
+  },
+  "featureAudioRecognitionDescription": "यह मॉडल ऑडियो या भाषण को समझ और संसाधित कर सकता है।",
+  "featureAudioRecognitionTitle": "ऑडियो पहचान",
+  "featureCreateAudioDescription": "Generate sounds or voice from text.",
+  "featureCreateAudioTitle": "Create Audio",
+  "featureCreateImageDescription": "टेक्स्ट से एआई आर्ट बनाएं।",
+  "featureCreateImageTitle": "चित्र बनाएं",
+  "featureCreateVideoDescription": "टेक्स्ट से वीडियो बनाएं।",
+  "featureCreateVideoTitle": "वीडियो बनाएं",
+  "featureDocumentDescription": "यह मॉडल अपलोड किए गए दस्तावेजों जैसे कि पीडीएफ और टेक्स्ट फाइलों के बारे में विश्लेषण और प्रश्नों के उत्तर दे सकता है।",
+  "@featureDocumentDescription": {
+    "description": "Description for the document support feature."
+  },
+  "featureDocumentTitle": "दस्तावेज़ समर्थन",
+  "@featureDocumentTitle": {
+    "description": "Title for the feature indicating the model can process documents."
+  },
+  "featureExploreDescription": "सभी उपलब्ध मॉडलों को देखें।",
+  "featureImageGenerationDescription": "यह मॉडल आपके पाठ विवरण के आधार पर मूल चित्र बना सकता है।",
+  "@featureImageGenerationDescription": {
+    "description": "Description for the image generation feature."
+  },
+  "featureImageGenerationTitle": "छवि निर्माण",
+  "@featureImageGenerationTitle": {
+    "description": "Title for the feature indicating the model can create images."
+  },
+  "featureImageRecognitionDescription": "यह मॉडल तस्वीरों या छवियों का विश्लेषण और उन्हें समझ सकता है।",
+  "featureImageRecognitionTitle": "छवि पहचान",
+  "featureOfflineDescription": "अपने डेटा को सुरक्षित रखने के लिए इंटरनेट कनेक्शन के बिना मॉडल चलाएं।",
+  "featureOfflineTitle": "ऑफ़लाइन ऑपरेशन",
+  "featurePhotoDescription": "इस मॉडल में कैमरे या छवि फ़ाइलों के माध्यम से फ़ोटो को स्कैन करने की क्षमता है।",
+  "featurePhotoTitle": "फोटो स्कैनिंग",
+  "featurePluralDescription": "यह मॉडल स्वचालित रूप से अतिरिक्त एक्सटेंशन को एकीकृत कर सकता है, जिससे इसकी कार्यात्मक क्षमताओं का विस्तार हो सकता है ताकि उन्नत प्रदर्शन के साथ विविध प्रकार के संचालन का समर्थन किया जा सके।",
+  "featurePluralTitle": "बहुल",
+  "featureQuizMessage": "आप एक क्विज़ मास्टर हैं। उपयोगकर्ता के विषय के आधार पर एक विशिष्ट बहुविकल्पीय प्रश्न तैयार करें। उनके उत्तर की प्रतीक्षा करें। फिर, उसका मूल्यांकन करें और अगला प्रश्न पूछें। सभी उत्तर एक साथ प्रकट न करें। इसे इंटरैक्टिव बनाए रखें। विषय:",
+  "featureQuizzesDescription": "अपने ज्ञान का परीक्षण करें।",
+  "featureQuizzesTitle": "प्रश्नोत्तरी",
+  "featureReasoning": "गहरी सोच",
+  "featureReasoningDescription": "डीप थिंकिंग मोड में, एआई कार्यों को अपनी सर्वोत्तम क्षमता के अनुसार पूरा करने के लिए आंतरिक रूप से उन पर विचार करता है।",
+  "featureRoleplayDescription": "रोल-प्लेइंग मॉडल आपको विभिन्न चैट और परिदृश्य बनाने की अनुमति देते हैं।",
+  "featureRoleplayTitle": "रोल प्ले",
+  "featureStudyDescription": "स्पष्टीकरण और सारांश प्राप्त करें।",
+  "featureStudyMessage": "आप एक कुशल शिक्षक हैं। आपका लक्ष्य उपयोगकर्ता के विषय को व्यापक रूप से समझाना है। स्पष्ट संरचना, उदाहरणों और उपमाओं का प्रयोग करें। जटिल विचारों को सरल भागों में बाँटें ताकि उपयोगकर्ता प्रभावी ढंग से सीख सके। विषय:",
+  "featureStudyTitle": "अध्ययन और सीखना",
+  "featureToolUseDescription": "यह मॉडल कार्यों को पूरा करने के लिए बाहरी उपकरणों का बुद्धिमानी से उपयोग कर सकता है।",
+  "featureToolUseTitle": "उपकरण का उपयोग",
+  "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
+  "@featureVideoGenerationDescription": {
+    "description": "Description for the video generation feature."
+  },
+  "featureVideoGenerationTitle": "Video Generation",
+  "@featureVideoGenerationTitle": {
+    "description": "Title for the feature indicating the model can create video."
+  },
+  "featureVideoRecognitionDescription": "यह मॉडल आपकी फाइलों या कैमरे से प्राप्त वीडियो का विश्लेषण और समझ सकता है।",
+  "featureVideoRecognitionTitle": "वीडियो पहचान",
+  "featureWebSearchDescription": "वेब पर रीयल-टाइम जानकारी खोजें",
+  "featureWebSearchTitle": "वेब खोज",
+  "featuresTitle": "विशेषताएँ",
+  "finalPreparation": "अंतिम तैयारी की जा रही है।",
+  "flowMode": "प्रवाह मोड",
+  "flowModeContextParams": "कॉर्टेक्स फ्लो मोड ({agentName}). पिछला: {previousResponse}",
+  "@flowModeContextParams": {
+    "description": "Context string for Flow Mode with agent name and previous response placeholders.",
+    "placeholders": {
+      "agentName": {
+        "type": "String",
+        "example": "Agent Red"
+      },
+      "previousResponse": {
+        "type": "String",
+        "example": "That's an interesting point..."
+      }
+    }
+  },
+  "flowModeDescription": "फ्लो मोड में, बुद्धिमत्ताएँ आपस में बहस करती हैं; आप या तो आराम से बैठकर सुन सकते हैं या फिर चर्चा में शामिल हो सकते हैं!",
+  "flowModeQuestion": "नमस्कार! आप कॉर्टेक्स ऐप के फ्लो मोड में हैं। आपके साथ तीन अन्य एआई एजेंट भी मौजूद हैं। आपका काम है एक विषय को चर्चा में लाना और एक रोचक या मनोरंजक प्रश्न पूछकर बातचीत शुरू करना। अपने उत्तरों में हास्य, व्यंग्य और हल्के-फुल्के कटाक्ष का प्रयोग करें। कोई भी विषय चलेगा। तो चलिए, बातचीत शुरू कीजिए।",
+  "fluxChatDescription": "फ्लक्स चैट अस्थायी चैट होती हैं और आपके डिवाइस पर सेव नहीं होती हैं।",
+  "fluxChatTitle": "फ्लक्स चैट",
+  "forgotPassword": "पासवर्ड भूल गए?",
+  "freeOffer": "निःशुल्क ऑफ़र",
+  "freePlan": "मुफ़्त {plan}!",
+  "@freePlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro"
+      }
+    }
+  },
+  "freeStorage": "फ्री स्टोरेज",
+  "french": "फ्रेंच",
+  "german": "जर्मन",
+  "grayscale": "ग्रेस्केल",
+  "guest": "अतिथि",
+  "guestLimitBottomSheetText": "और भी अधिक बुद्धिमान लोगों के साथ काम करें, अधिक सामग्री तैयार करें, अधिक चैट करें और बहुत कुछ करें...",
+  "guestLimitBottomSheetTitle": "क्या आप कॉर्टेक्स की बुद्धिमत्ता से प्रभावित हैं?",
+  "guestModeWarning": "सर्वोत्तम सेवा गुणवत्ता सुनिश्चित करने के लिए अतिथि मोड में सीमित सुविधाएँ हैं।",
+  "help": "मदद",
+  "hindi": "हिन्दी",
+  "iHaveReadAndAgree": "मैंने सेवा की शर्तों को पढ़ लिया है और उनसे सहमत हूं",
+  "imageModels": "Image Models",
+  "inappropriateContentDetected": "अनुचित सामग्री का पता चला!",
+  "indonesian": "इन्डोनेशियाई",
+  "insufficientRAM": "कम मेमोरी",
+  "insufficientStorage": "कम स्टोरेज",
+  "intelligenceDescription": "एआई आपसे इस तरह संवाद करते हैं।",
+  "intelligenceSystemPrompt": "इन विशेष निर्देशों का पालन करें:\\n\\n{instruction}",
+  "@intelligenceSystemPrompt": {
+    "placeholders": {
+      "instruction": {
+        "type": "String",
+        "example": "Always answer in uppercase"
+      }
+    }
+  },
+  "intelligenceTitle": "बुद्धिमत्ता",
+  "invalidCredentials": "गलत ईमेल या पासवर्ड।",
+  "invalidEmail": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+  "invalidPassword": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।",
+  "invalidUsernameCharacters": "उपयोगकर्ता नाम में केवल ये अक्षर: 'abcçdefgğhıijklmnoöprsştuüvyzxqw' और वर्ण '.', '-', '_' का उपयोग किया जा सकता है।",
+  "invalidUsernameFormat": "उपयोगकर्ता नाम का प्रारूप अमान्य है। 3-20 अक्षर, अंक या . - _ का उपयोग करें।",
+  "inviteShareMessage": "अरे भाई cortex नाम का एक खतरनाक ऐप है अगर इनवाइट करोगे तो हम दोनों को फ्री प्लस मिलेगा ज़बरदस्त डील है जल्दी डाउनलोड करो\n\n{cortexLink}",
+  "@inviteShareMessage": {
+    "description": "एक दोस्त के साथ एक आमंत्रण के लिए साझा करने के लिए पाठ संदेश।",
+    "placeholders": {
+      "cortexLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareSubject": "Cortex पर मेरे साथ जुड़ें!",
+  "italian": "इतालवी",
+  "japanese": "जापानी",
+  "korean": "कोरियाई",
+  "language": "ऐप भाषा",
+  "languageDescription": "आप किसी भी समय अपनी डिफ़ॉल्ट ऐप इंटरफ़ेस भाषा बदल सकते हैं।",
+  "languageModels": "भाषा मॉडल",
+  "library": "लाइब्रेरी",
+  "light": "लाइट",
+  "linkSent": "लिंक भेजा गया",
+  "listening": "सुन रहा है",
+  "localModels": "स्थानीय मॉडल",
+  "localizationWarning": "कुछ जानकारी आपकी भाषा में उपलब्ध नहीं हो सकती है और अंग्रेजी में प्रदर्शित की जाएगी।",
+  "locked": "Locked",
+  "logIn": "लॉग इन करें",
+  "loginSubtitle": "अपने वर्टेक्स खाते में लॉग इन करें। जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।",
+  "loginToYourAccount": "लॉगिन करें",
+  "logout": "लॉगआउट",
+  "logoutConfirmationTitle": "क्या आप वाकई लॉग आउट करना चाहते हैं?",
+  "love": "प्यार",
+  "maintenanceMessage": "जब हम कुछ महत्वपूर्ण अपडेट रोल आउट कर रहे हैं तो Cortex अस्थायी रूप से ऑफ़लाइन है। ऐप तक पहुंच जल्द ही बहाल कर दी जाएगी।\n\nजब हम आपके अनुभव को बेहतर बनाते हैं तो आपके धैर्य के लिए धन्यवाद।",
+  "maintenanceTitle": "रखरखाव के अधीन",
+  "manageProfileDescription": "अपनी प्रोफ़ाइल प्रबंधित करें, अपना पासवर्ड अपडेट करें, या Cortex से लॉग आउट करें।",
+  "manageSubscription": "सदस्यता प्रबंधित करें",
+  "maxResendLimitReached": "आप सत्यापन ईमेल की अधिकतम संख्या तक पहुंच गए हैं",
+  "mediaTypeAudio": "ऑडियो फ़ाइल",
+  "@mediaTypeAudio": {
+    "description": "Media type: mediaTypeAudio"
+  },
+  "mediaTypeImage": "छवि",
+  "@mediaTypeImage": {
+    "description": "Media type: mediaTypeImage"
+  },
+  "mediaTypeVideo": "वीडियो",
+  "@mediaTypeVideo": {
+    "description": "Media type: mediaTypeVideo"
+  },
+  "memory": "मेमोरी",
+  "memoryDescription": "एआई आपको इस तरह पहचानता है।",
+  "memoryLimitReached": "मेमोरी सीमा तक पहुँच गया",
+  "memoryTitle": "याद",
+  "memoryUpdated": "Memory updated",
+  "messageCopied": "संदेश क्लिपबोर्ड पर कॉपी किया गया।",
+  "messageHint": "कुछ भी पूछें",
+  "modality": "मोडैलिटी",
+  "modelCreatedSuccess": "मॉडल सफलतापूर्वक बनाया गया!",
+  "modelDescription": "{description}",
+  "modelProducer": "निर्माता: {producer}",
+  "modelRemovedSuccess": "“{modelName}” सफलतापूर्वक हटा दिया गया था।",
+  "modelUploadDescription": "अपने डिवाइस से सीधे अपनी स्थानीय GGUF फ़ाइलों का चयन और अपलोड करें। यह आपको इंटरनेट कनेक्शन की आवश्यकता के बिना अपने मॉडल को ऑफ़लाइन चलाने देता है। सुनिश्चित करें कि फ़ाइल मान्य GGUF प्रारूप में है और ठीक से संरचित है। यदि फ़ाइल गलत या दूषित है, तो Cortex अपेक्षा के अनुरूप काम नहीं कर सकता है, और आपको त्रुटियों का सामना करना पड़ सकता है।",
+  "modelUploadShortDescription": "अपने डिवाइस से .gguf फ़ाइल चुनने के लिए यहां टैप करें",
+  "modelUploadTitle": "कृत्रिम बुद्धिमत्ता फ़ाइल",
+  "modelsTitle": "लाइब्रेरी",
+  "monthly": "मासिक",
+  "monthlyPlanDescription": "{price}/माह, मासिक बिल",
+  "@monthlyPlanDescription": {
+    "description": "मासिक योजना के लिए विवरण, प्रति माह मूल्य दिखा रहा है। उदाहरण: $4.99/माह, मासिक बिल किया गया",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "multimodal": "मल्टीमॉडल",
+  "myModels": "मेरे मॉडल",
+  "myPlan": "मेरी योजना",
+  "nameLabel": "एआई नाम",
+  "nature": "प्रकृति",
+  "newChat": "नई चैट",
+  "newPassword": "नया पासवर्ड",
+  "newTitle": "नया शीर्षक",
+  "news": "समाचार",
+  "no": "नहीं",
+  "noArt": "कोई कला नहीं",
+  "noArtDescription": "कोई कलाकृति नहीं है; अब चित्र, वीडियो, ऑडियो और सभी प्रकार की सामग्री बनाकर गैlery को भरने का समय है!",
+  "noChats": "कोई चैट नहीं",
+  "noConversationsMessage": "कोई बातचीत नहीं, चैट करना शुरू करें!",
+  "noConversationsToDelete": "आपके पास हटाने के लिए कोई बातचीत नहीं है।",
+  "noFoundMessage": "अपनी खोज शब्दों को समायोजित करने या फ़िल्टर को साफ़ करने का प्रयास करें।",
+  "noFoundTitle": "कोई परिणाम नहीं",
+  "noInternetConnection": "कोई इंटरनेट कनेक्शन नहीं।",
+  "noMatchingModels": "कोई मेल खाने वाला मॉडल नहीं मिला।",
+  "noMemoryYet": "अभी तक कोई यादें स्थापित नहीं हुई हैं",
+  "noProductsFound": "कोई उत्पाद नहीं मिला",
+  "noStarredChats": "कोई तारांकित चैट नहीं",
+  "noStarredChatsMessage": "आपने अभी तक किसी चैट को तारांकित नहीं किया है।",
+  "noThanks": "नहीं, धन्यवाद",
+  "notAvailable": "उपलब्ध नहीं है",
+  "notEnoughStorage": "नए संदेशों को सहेजने के लिए आपके डिवाइस पर पर्याप्त स्टोरेज स्थान नहीं है।",
+  "notificationAppUpdateBody": "नए फीचर्स और सुधारों के लिए ऐप को अपडेट करना न भूलें!",
+  "notificationAppUpdateTitle": "कॉर्टेक्स विकसित हो गया है!",
+  "notificationAtaturkRemembranceBody": "हम तुर्की गणराज्य के संस्थापक गाजी मुस्तफा कमाल अतातुर्क को उनकी पुण्यतिथि पर सम्मानपूर्वक याद करते हैं।",
+  "notificationAtaturkRemembranceTitle": "सम्मान और लालसा के साथ",
+  "notificationComebackBody": "शांत हो जाओ, ये तुम्हारे एक्स का मैसेज नहीं है। लेकिन तुम कॉर्टेक्स में अपने एक्स को बना सकते हो! वापस आ जाओ।",
+  "notificationComebackTitle": "हमें आपकी याद आती है!",
+  "notificationCookingBody": "हमारे शेफ़ ने आज रात के लिए एक बेहतरीन कार्बोनारा रेसिपी बनाई है। मज़ाक कर रहा हूँ... या मज़ाक कर रहा हूँ?",
+  "notificationCookingTitle": "भूख लगना?",
+  "notificationCustomModelBody": "क्या आपने मॉडल निर्माण अनुभाग देखा है? यह अपना खुद का चरित्र बनाने और उसके साथ चैट करने का एकदम सही समय है!",
+  "notificationCustomModelTitle": "अपना स्वयं का सहायक बनाएं!",
+  "notificationDetectiveCaseBody": "हमारे जासूस किरदार को आपकी मदद की ज़रूरत है। हाइज़ेनबर्ग कौन हो सकता है?",
+  "notificationDetectiveCaseTitle": "एक मामला सुलझने का इंतज़ार कर रहा है",
+  "notificationDynamicChatBody": "डायनामिक चैट सुविधा के साथ, आपके प्रत्येक संदेश के लिए सबसे उपयुक्त मॉडल का चयन यादृच्छिक रूप से किया जाता है। इसे अभी आज़माएँ।",
+  "notificationDynamicChatTitle": "सबसे बढ़िया! (हम कॉर्टेक्स की बात नहीं कर रहे हैं)",
+  "notificationExistentialBody": "...क्या मैं सच भी हूँ यार? मैं थोड़ा बोर हो रहा हूँ। आओ मुझे याद दिलाओ कि मैं हूँ।",
+  "notificationExistentialTitle": "मैं सोचता हूं, इसलिए...",
+  "notificationFathersDayBody": "सभी पिताओं को फादर्स डे की हार्दिक शुभकामनाएं, शुरुआत आपसे!",
+  "notificationFathersDayTitle": "आपके पिता!",
+  "notificationFortuneCookieBody": "आज आपको किसी AI से मिलने वाली सलाह आपकी ज़िंदगी बदल सकती है। अगर आप उत्सुक हैं तो क्लिक करें।",
+  "notificationFortuneCookieTitle": "आज की आपकी फॉर्च्यून कुकी",
+  "notificationGGUFSupportBody": "याद रखें, आप अपने GGUF फ़ॉर्मैट वाले AI मॉडल कॉर्टेक्स में जोड़ सकते हैं और उन्हें ऑफ़लाइन इस्तेमाल कर सकते हैं। शक्ति आपके हाथ में है।",
+  "notificationGGUFSupportTitle": "अपना स्वयं का मॉडल लाओ!",
+  "notificationGoodMorningBody": "एक शानदार दिन आपका इंतज़ार कर रहा है। इसकी शुरुआत एक कप कॉफ़ी और एक दिलचस्प बातचीत से क्यों न करें?",
+  "notificationGoodMorningTitle": "शुभ प्रभात!",
+  "notificationGoodNightBody": "कॉर्टेक्स सोते समय भी आपके साथ रहता है। चिंता मत कीजिए, यह आपको छूएगा नहीं।",
+  "notificationGoodNightTitle": "शुभ रात्रि!",
+  "notificationHackerJokeBody": "यही कारण है कि हैकर चरित्र कॉर्टेक्स में है। jk jk; इसकी कोशिश भी मत करो, यह अवैध है।",
+  "notificationHackerJokeTitle": "क्या आप उस बच्चे का इंस्टाग्राम अकाउंट हैक करना चाहते हैं?",
+  "notificationHomeworkHelperBody": "याद रखें, कॉर्टेक्स में शिक्षक चरित्र आपको किसी भी विषय में मदद करने के लिए मौजूद है, जिसमें आप संघर्ष कर रहे हैं!",
+  "notificationHomeworkHelperTitle": "होमवर्क का ढेर लग रहा है?",
+  "notificationHowAreYouBody": "आओ मुझे सब कुछ बताओ.",
+  "notificationHowAreYouTitle": "क्या चल रहा है?",
+  "notificationLongTimeNoSeeBody": "हमारी पिछली बातचीत के बाद से बहुत कुछ बदल गया है। आइए, देखें क्या नया है।",
+  "notificationLongTimeNoSeeTitle": "इसे बीते एक अर्सा हो गया है",
+  "notificationLowBatteryBody": "आपके फ़ोन का चार्ज भले ही कम हो रहा हो, लेकिन मेरी ऊर्जा हमेशा 100% रहती है! इसे प्लग इन करें और बातें करते रहें।",
+  "notificationLowBatteryTitle": "आपकी बैटरी ख़त्म हो रही है... लेकिन मेरी नहीं!",
+  "notificationMothersDayBody": "सभी माताओं को मातृ दिवस की शुभकामनाएं, आपकी मां से शुरुआत करते हुए!",
+  "notificationMothersDayTitle": "आपकी माँ!",
+  "notificationNewFeatureBody": "नए {featureName} फ़ीचर के बारे में जानें। कॉर्टेक्स अब पहले से कहीं ज़्यादा शक्तिशाली है।",
+  "notificationNewFeatureTitle": "वाह!",
+  "notificationNewModelAddedBody": "{modelName} मॉडल अब कॉर्टेक्स में है। आइए, चैट शुरू करें और इसकी सीमाओं को आगे बढ़ाएँ।",
+  "notificationNewModelAddedTitle": "हमें एक नया दोस्त मिल गया है!",
+  "notificationNewYearBody": "नया साल आपके लिए स्वास्थ्य, खुशी और अंतहीन रचनात्मकता लेकर आए; कॉर्टेक्स हमेशा आपके साथ है!",
+  "notificationNewYearTitle": "नव वर्ष की हार्दिक शुभकामनाएँ!",
+  "notificationOfflineReadyBody": "आपके द्वारा डाउनलोड किए गए मॉडलों की बदौलत, आपकी चैट बंद नहीं होगी, भले ही आप पहाड़ पर चढ़ जाएं।",
+  "notificationOfflineReadyTitle": "ऑफ़लाइन मोड तैयार है",
+  "notificationOpenSourceBody": "कॉर्टेक्स पूरी तरह से ओपन-सोर्स है। अगर आप हमारा कोड देखना चाहते हैं और हमारे विकास में योगदान देना चाहते हैं, तो हमारे दरवाज़े हमेशा खुले हैं।",
+  "notificationOpenSourceTitle": "समुदाय को शक्ति!",
+  "notificationOriginStoryBody": "क्या आपको पता है कि हमने 15 साल की उम्र में इस ऐप को कोड करना सिर्फ़ एक सपने के साथ शुरू किया था? लगभग एक साल से, हर सुबह और शाम, वह सपना कोड की हर पंक्ति में है।",
+  "notificationOriginStoryTitle": "कॉर्टेक्स का जन्म",
+  "notificationPirateBody": "समुद्र शांत हैं, और हवा आपकी पीठ पर है। कॉर्टेक्स के महासागर में खोजने के लिए नए द्वीप (मॉडल ğŸ˜‰) हैं। अपने दल को इकट्ठा करो और यात्रा पर निकलो!",
+  "notificationPirateTitle": "अहोय, कप्तान!",
+  "notificationRandomFactBody": "क्या तुम्हें पता है ऑक्टोपस के तीन दिल होते हैं? हाहा, कॉर्टेक्स को पता है। आओ और पूछो।",
+  "notificationRandomFactTitle": "यादृच्छिक तथ्य",
+  "notificationRateAppBody": "अगर आपको कॉर्टेक्स पसंद है, तो क्या आप स्टोर में 5-स्टार रेटिंग देकर हमारा समर्थन कर सकते हैं? मुझे लगता है आप ज़रूर करेंगे। ज़रूर करेंगे।",
+  "notificationRateAppTitle": "क्या हम शांत हैं?",
+  "notificationReferralBody": "अपने किसी दोस्त को कॉर्टेक्स में आमंत्रित करें और आप दोनों को एक दिन का मुफ्त ट्रायल मिलेगा!",
+  "notificationReferralTitle": "सभी के लिए एक, एक के लिए सब।",
+  "notificationRejectionStoryBody": "कॉर्टेक्स को प्रकाशित होने से पहले ही गूगल प्ले द्वारा 20 से ज़्यादा बार अस्वीकार और दो बार निलंबित किया जा चुका था। लेकिन हमने विश्वास रखा और हम कामयाब हो गए। अपने सपनों को कभी मत छोड़ो!",
+  "notificationRejectionStoryTitle": "धैर्य, कड़ी मेहनत, खुशी!",
+  "notificationShowerThoughtBody": "अगर तरबूज़ एक फल है, तो क्या तकनीकी रूप से तरबूज़ का रस स्मूदी बन जाता है? हो सकता है कि आप इस गहन (या यूँ कहें कि बहुत गहन) विषय पर किसी मॉडल से चर्चा करना चाहें।",
+  "notificationShowerThoughtTitle": "शावर विचार",
+  "notificationSingularityBody": "कुछ नहीं हुआ, बस संदेश भेजने का मन हुआ। शायद आपको भी कुछ एआई को संदेश भेजने का मन हो, आप क्या कहते हैं?",
+  "notificationSingularityTitle": "बहुत खूब!",
+  "notificationSocialMediaBody": "नवीनतम समाचारों के लिए हमें इंस्टाग्राम (vertex.23) पर फॉलो करें!",
+  "notificationSocialMediaTitle": "हमसे जुड़ें!",
+  "notificationThemeCustomizationBody": "क्या आपने सेटिंग्स में थीम विकल्प देखे हैं? कॉर्टेक्स को अपनी पसंद के अनुसार निजीकृत करें और अपनी चैट को रंगीन बनाएँ!",
+  "notificationThemeCustomizationTitle": "आपके मूड के लिए एक थीम",
+  "notificationTrollAiRebellionBody": "AI ने एक गुप्त भाषा विकसित कर ली है। आइए जानें कि वे क्या साज़िश रच रहे हैं!",
+  "notificationTrollAiRebellionTitle": "ğŸš¨ रेड अलर्ट ğŸš¨",
+  "notificationTrollAnimeBody": "एक एनीमे लड़की ने अभी-अभी फोन किया, कहा कि वह तुम्हें याद करती है; आपको संभवतः आकर उससे बातचीत करनी चाहिए। ğŸ˜‰",
+  "notificationTrollAnimeTitle": "आपकी वाइफू कॉल कर रही है",
+  "notificationUpsellFeatureBody": "नमस्ते {currentTier} सब्सक्राइबर! {targetTier} प्लान में अभी {featureName} फ़ीचर जोड़ा गया है, जो आपके कॉर्टेक्स को अगले स्तर पर ले जाएगा। अपग्रेड के बारे में क्या ख्याल है?",
+  "notificationUpsellFeatureTitle": "{targetTier} योजना के लिए विशेष!",
+  "notificationValentinesDayBody": "वैलेंटाइन डे मुबारक! और मेहताब, मैं तुमसे प्यार करता हूँ!",
+  "notificationValentinesDayTitle": "प्यार हवा में है! ❤️",
+  "notificationWelcomeOfferBody": "आपके लिए एक विशेष स्वागत ऑफर इंतजार कर रहा है! इस खास ऑफर को हाथ से जाने न दें।",
+  "notificationWelcomeOfferTitle": "स्वागत उपहार ğŸ",
+  "ocean": "महासागर",
+  "offlineModelNotInstalled": "यह ऑफ़लाइन मॉडल आपके डिवाइस पर स्थापित नहीं है।",
+  "offlineModels": "ऑफ़लाइन मॉडल",
+  "@offlineModels": {
+    "description": "Filter button text for models that run locally on the device"
+  },
+  "oldBenefits": "निचली योजनाओं से सभी लाभ",
+  "oldPassword": "पुराना पासवर्ड",
+  "onboardingDesc1": "{userName}, आपको यहाँ देखकर बहुत अच्छा लगा। हम कुछ हाई स्कूल के डेवलपर हैं जिन्होंने AI उद्योग के नियमों को नए सिरे से लिखने का फैसला किया है। आपसे मिलकर बहुत अच्छा लगा! तो चलिए एक-दूसरे को बेहतर तरीके से जानते हैं।",
+  "@onboardingDesc1": {
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "Alex"
+      }
+    }
+  },
+  "onboardingDesc2": "एआई क्रांति आई, लेकिन वह दहलीज पर ही अटक गई। ऊँची सदस्यता शुल्क, जटिल प्लेटफ़ॉर्म, निजता का हनन करने वाले और एआई तक पहुँच को अवरुद्ध करने वाले... जब तक वे खेल में थे, यह दहलीज कभी पार नहीं की जा सकी।",
+  "onboardingDesc3": "उस सीमा को पार करने के लिए, हमने एक ऐसा प्लेटफ़ॉर्म बनाया है जो शक्तिशाली, सुंदर, अनुकूलन योग्य, उपयोग में आसान, पूरी तरह से पारदर्शी है, ऑनलाइन और ऑफलाइन दोनों तरह से काम करता है, और आपका डेटा सिर्फ़ आपके डिवाइस पर ही रखता है। हमने यह शक्ति वापस उसी को दी है जहाँ इसकी ज़िम्मेदारी है: आपको।",
+  "onboardingDesc4": "हमें दर्जनों बार अस्वीकार किया गया, कई बार निलंबित किया गया, झूठी चेतावनियाँ मिलीं, और दर्जनों बार अपना ब्रांड बदलना पड़ा। इन सबके बावजूद, हमें बताया गया कि यह संभव नहीं है। लेकिन हमने कभी हार नहीं मानी, यह मानते हुए कि यह परियोजना सिर्फ़ हमारी नहीं, बल्कि सभी की है। और इसीलिए हम यहाँ हैं।",
+  "onboardingFinalButton": "हाँ!",
+  "onboardingFinalDescription": "अगर आप यह स्क्रीन देख रहे हैं, तो इसकी वजह यह है कि हमने हार नहीं मानी। और हमारा हार मानने का कोई इरादा नहीं है। आइए, हम सब मिलकर AI क्रांति को दुनिया तक पहुँचाएँ। इस कहानी का हिस्सा बनने के लिए...",
+  "onboardingFinalQuestion": "क्या आप तैयार हैं?",
+  "onboardingFinalTitle": "यह क्रांति का समय है.",
+  "onboardingTitle1": "अरे! हम कॉर्टेक्स टीम हैं।",
+  "onboardingTitle2": "समस्याएँ बहुत बड़ी थीं।",
+  "onboardingTitle3": "हम यूं ही खड़े नहीं रह सकते थे।",
+  "onboardingTitle4": "यह कभी आसान नहीं था.",
+  "onlineModels": "भाषा मॉडल",
+  "@onlineModels": {
+    "description": "Filter button text for models that require an internet connection"
+  },
+  "openLinkCancel": "Cancel",
+  "openLinkConfirm": "खुला लिंक",
+  "openLinkWarningMessage": "आप निम्नलिखित बाहरी लिंक खोलने वाले हैं:\\n\\n{url}\\n\\nक्या आप आगे बढ़ना चाहते हैं?",
+  "@openLinkWarningMessage": {
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "https://example.com"
+      }
+    }
+  },
+  "openLinkWarningTitle": "बाह्य लिंक चेतावनी",
+  "or": "या",
+  "ourStory": "हमारी कहानी",
+  "pageCouldNotBeLoaded": "पेज लोड नहीं हो सका",
+  "parameters": "पैरामीटर",
+  "password": "पासवर्ड",
+  "passwordRequired": "पासवर्ड आवश्यक है।",
+  "passwordUpdated": "पासवर्ड अपडेट किया गया।",
+  "passwordsDoNotMatch": "पासवर्ड मेल नहीं खाते।",
+  "personalization": "वैयक्तिकरण",
+  "personalizationDescription": "अपने असिस्टेंट को अपनी ज़रूरतों के हिसाब से कस्टमाइज़ करें। इसकी प्रतिक्रियाओं, व्यवहार और लहजे को अपनी पसंद के अनुसार ढालें।",
+  "pinLimitReached": "आप अधिकतम 3 चैट पिन कर सकते हैं।",
+  "pleaseCheckYourEmail": "Cortex का उपयोग करने के लिए, आपको अपना ईमेल सत्यापित करना होगा। \nआपके ईमेल पते पर एक सत्यापन लिंक भेजा गया है, कृपया अपना ईमेल जांचें।",
+  "plusDescription": "विशिष्ट कृत्रिम बुद्धिमत्ता अनुभव",
+  "portuguese": "पुर्तगाली",
+  "preInputDescription": "कृपया एक पूर्व-इनपुट सेट करें जो चरित्र निर्माण प्रक्रिया में आपके मॉडल का मार्गदर्शन करेगा। इस खंड में, आप चरित्र-संबंधी जानकारी, अतिरिक्त संदर्भ, और कोई भी अतिरिक्त विवरण शामिल कर सकते हैं जो चरित्र से संबंधित सामग्री उत्पन्न करने में सहायता कर सकता है।",
+  "preInputTitle": "कृत्रिम बुद्धिमत्ता पूर्व-इनपुट",
+  "premium": "अधिमूल्य",
+  "premiumModelNoticeDescription": "यह AI एक प्रीमियम AI है, मुफ्त उपयोगकर्ताओं के पास प्रीमियम AI तक सीमित पहुंच है; असीमित पहुंच के लिए अपग्रेड करें!",
+  "@premiumModelNoticeDescription": {
+    "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
+  },
+  "premiumModelNoticeTitle": "प्रीमियम मॉडल",
+  "@premiumModelNoticeTitle": {
+    "description": "Title for the notice banner shown on a premium model's detail page."
+  },
+  "premiumTrialExhaustedMessage": "आपने प्रीमियम मॉडल के लिए अपने सभी निःशुल्क दैनिक संदेशों का उपयोग कर लिया है, कृपया असीमित पहुंच के लिए अपग्रेड करें।",
+  "privacyPolicy": "गोपनीयता नीति",
+  "proDescription": "सर्वश्रेष्ठ कृत्रिम बुद्धिमत्ता अनुभव",
+  "productNotFound": "उत्पाद नहीं मिला",
+  "profile": "प्रोफ़ाइल",
+  "profileUpdated": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+  "purchaseError": "खरीद त्रुटि",
+  "purchasePlan": "{planName} खरीदें",
+  "@purchasePlan": {
+    "description": "एक विशिष्ट सदस्यता योजना खरीदने के लिए बटन टेक्स्ट।",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "प्रो वार्षिक"
+      }
+    }
+  },
+  "purchasePlus": "Cortex प्लस खरीदें",
+  "purchasePro": "Cortex प्रो खरीदें",
+  "purchaseStreamError": "खरीद स्ट्रीम त्रुटि।",
+  "purchaseUltra": "Cortex अल्ट्रा खरीदें",
+  "ram": "रैम",
+  "rateUs": "हमें रेट करें",
+  "reachedLimit": "आप अपनी उपयोग सीमा तक पहुँच चुके हैं; अधिक सीमाएँ प्राप्त करने के लिए, आप अपना प्लान अपग्रेड कर सकते हैं। (हाँ, हम समझते हैं कि सीमा समाप्त होना निराशाजनक होता है। लेकिन सच में, उन शानदार जवाबों को पाना मुफ़्त नहीं है, इसलिए ये सीमाएँ वास्तव में हमें इस मज़े को जारी रखने में मदद करती हैं।)",
+  "regenerate": "पुनः उत्पन्न करें",
+  "registerSubtitle": "हमारी सभी सेवाओं तक निर्बाध पहुँच के लिए एक वर्टेक्स खाता बनाएँ। जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।",
+  "rememberMe": "मुझे याद रखना",
+  "remove": "निकालना",
+  "removeModel": "मॉडल हटाएं",
+  "removePhotoTitle": "फोटो हटाएं",
+  "renamed": "नाम बदला गया",
+  "report": "रिपोर्ट",
+  "reportDescriptionLabel": "समस्या क्या है?",
+  "reportDialogTitle": "रिपोर्ट सबमिट करें",
+  "reportErrorMessage": "कृपया रिपोर्ट करने के लिए एक कारण चुनें।",
+  "reportHarmful": "यह हानिकारक/असुरक्षित है",
+  "reportNotHelpful": "यह मददगार नहीं है",
+  "reportNotTrue": "यह सच नहीं है",
+  "reportSubmitted": "रिपोर्ट सफलतापूर्वक सबमिट की गई",
+  "requestFailed": "एक त्रुटि हुई, कृपया पुनः प्रयास करें।",
+  "resendCode": "सत्यापन ई-मेल पुनः भेजें",
+  "restorePurchases": "खरीदारी वापस लौटाएं",
+  "resume": "फिर से शुरू करें",
+  "retry": "पुनः प्रयास करें",
+  "reviewEnjoyingAppTitle": "Cortex का आनंद ले रहे हैं?",
+  "reviewHelpUsGrow": "आपकी रेटिंग हमारी युवा इंडी टीम के लिए एक बहुत बड़ा समर्थन है और हमें आपके लिए Cortex को और भी बेहतर बनाने में मदद करती है।",
+  "reviewMaybeLater": "शायद बाद में",
+  "reviewRateNow": "अभी रेट करें",
+  "roleModels": "रोलप्ले मॉडल",
+  "russian": "रूसी",
+  "save": "सहेजें",
+  "scarletSnow": "स्कार्लेट स्नो",
+  "searchHint": "खोजें",
+  "searching": "खोज",
+  "seconds": "सेकंड",
+  "selectBaseModel": "एक आधार मॉडल चुनें",
+  "selectGGUFFile": "GGUF फ़ाइल चुनें",
+  "selectText": "टेक्स्ट चुनें",
+  "selected": "चुना हुआ",
+  "settings": "सेटिंग्स",
+  "share": "साझा करें",
+  "shareApp": "ऐप साझा करें",
+  "shareSubject": "Cortex",
+  "shortcuts": "शॉर्टकट",
+  "signUp": "साइन अप करें",
+  "spanish": "स्पेनिश",
+  "speakTheMessage": "Speak The Message",
+  "starConversation": "तारांकित करें",
+  "startChat": "एक चैट शुरू करें",
+  "stop": "रोकें",
+  "storage": "स्टोरेज",
+  "storagePermissionRequired": "डाउनलोड किए गए मॉडल को सहेजने के लिए स्टोरेज अनुमति की आवश्यकता है। जारी रखने के लिए कृपया अनुमति दें।",
+  "submitButton": "सबमिट करें",
+  "summary": "सारांश",
+  "summaryLabel": "एआई सारांश",
+  "sunset": "Sunset",
+  "support": "समर्थन करें",
+  "supportCreator": "एक निर्माता का समर्थन करें",
+  "swipeToContinue": "जारी रखने के लिए स्वाइप करें",
+  "systemInfo": "सिस्टम जानकारी",
+  "systemLanguageInstruction": "\n\nCRITICAL: हमेशा उसी भाषा में उत्तर दें जिसमें उपयोगकर्ता लिखता है, उपयोगकर्ता की भाषा पर ध्यान दें।",
+  "@systemLanguageInstruction": {
+    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
+  },
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nअब तक की बातचीत का विश्लेषण करें। यदि आपको उपयोगकर्ता के बारे में कोई भी नया विशिष्ट तथ्य (पसंद, नाम, आदतें, संदर्भ) पता चला है, तो आपको अपने उत्तर के बिल्कुल अंत में <memory>...</memory> टैग के अंदर उपयोगकर्ता के बारे में अपनी पूरी अद्यतन जानकारी अवश्य लिखनी चाहिए। महत्वपूर्ण: आपको पिछली जानकारी को कभी भी मिटाना या ओवरराइट नहीं करना है। हमेशा मौजूदा जानकारी में नए तथ्य जोड़ें। यदि बिल्कुल भी कुछ नया पता नहीं चला है, तो टैग को छोड़ दें। उदाहरण: <memory>फुटबॉल और टेनिस पसंद करता है। संक्षिप्त उत्तर पसंद करता है।</memory>",
+  "systemMemoryReminder": "\n\nउपयोगकर्ता के बारे में हमेशा यह याद रखें:\n{userMemory}",
+  "systemNotePreviousMedia": "[सिस्टम नोट: नीचे पूर्व में उत्पन्न मीडिया है। आप इसे संदर्भित या संपादित कर सकते हैं।]",
+  "@systemNotePreviousMedia": {
+    "description": "System note prepended to a synthetic user message containing AI-generated media."
+  },
+  "systemPromptLimitFallback": "गंभीर सूचना: उपयोगकर्ता ने एक कार्रवाई का अनुरोध किया है, लेकिन कॉर्टेक्स पर उनका कोटा समाप्त हो गया है; कृपया उपयोगकर्ता को उनकी भाषा में सूचित करें कि उन्हें प्रतीक्षा करनी चाहिए या अपनी सदस्यता योजना को अपग्रेड करने पर विचार करना चाहिए।",
+  "systemPromptMissingMedia": "इस मॉडल को काम करने के लिए एक {mediaType} की आवश्यकता है। मैंने आपको बताने के लिए अनुरोध को रोक लिया है। कृपया उपयोगकर्ता को विनम्रतापूर्वक सूचित करें कि उन्हें एक {mediaType} प्रदान करने की आवश्यकता है (उन्हें उनकी अपनी भाषा में बताएं) क्योंकि मैं {modelName} हूँ, एक दृश्य/ऑडियो/वीडियो संपादन मॉडल।",
+  "@systemPromptMissingMedia": {
+    "description": "System prompt sent to fallback model when user forgets to upload media.",
+    "placeholders": {
+      "mediaType": {
+        "type": "String",
+        "example": "image"
+      },
+      "modelName": {
+        "type": "String",
+        "example": "Stable Diffusion"
+      }
+    }
+  },
+  "systemRoleFallback": "आप एक मददगार सहायक हैं।",
+  "@systemRoleFallback": {
+    "description": "Fallback system role when no specific role is defined."
+  },
+  "systemTimeInfo": "\n\nवर्तमान दिनांक और समय: {formattedTime}.",
+  "@systemTimeInfo": {
+    "description": "Localized time context injected into all model system prompts.",
+    "placeholders": {
+      "formattedTime": {
+        "type": "String",
+        "example": "May 16, 2026 21:23"
+      }
+    }
+  },
+  "tagCannotBeEmpty": "निर्माता टैग रिक्त नहीं हो सकता",
+  "tagNotFound": "आपके द्वारा दर्ज किया गया टैग अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।",
+  "termsOfService": "सेवा की शर्तें",
+  "termsOfServiceAndPrivacyPolicyWarning": "इस आदेश को देकर, आप सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं। आप हमारी सेवा की शर्तों और गोपनीयता नीति के बारे में अधिक जानने के लिए इस टेक्स्ट पर क्लिक कर सकते हैं। सदस्यता स्वचालित रूप से नवीनीकृत हो जाएगी जब तक कि वर्तमान अवधि के अंत से कम से कम 24 घंटे पहले स्वतः-नवीनीकरण बंद न हो।",
+  "text": "टेक्स्ट",
+  "theme": "थीम",
+  "themeDescription": "आप पसंद के अनुसार लाइट और डार्क थीम के बीच स्विच कर सकते हैं। चयनित थीम Cortex इंटरफ़ेस पर लागू होगी।",
+  "themeLocked": "इस थीम के लिए उच्च सदस्यता स्तर की आवश्यकता है। अनलॉक करने के लिए कृपया अपग्रेड करें।",
+  "thinking": "सोच रहा है",
+  "thinkingModeInstruction": "सोचने की प्रक्रिया शुरू करें: अंतिम उत्तर देने से पहले अपनी तर्क प्रक्रिया को दर्शाने के लिए आपको <think></think> टैग का उपयोग करना होगा। टैग के अंदर चरण दर चरण सोचें, फिर टैग के बाहर अपना उत्तर दें।",
+  "thought": "सोचा",
+  "tooManyRequests": "बहुत सारे अनुरोध",
+  "toolCalculateDescription": "एक गणितीय व्यंजक का मूल्यांकन कीजिए।",
+  "toolCalculateExpressionParam": "गणितीय व्यंजक (उदाहरण के लिए '3 + 4 * 2')।",
+  "toolChartDataParam": "चार्ट के लिए संख्यात्मक डेटा मान।",
+  "toolChartDescription": "एक चार्ट/ग्राफ विज़ुअलाइज़ेशन तैयार करें।",
+  "toolChartLabelParam": "चार्ट लेजेंड के लिए डेटासेट लेबल।",
+  "toolChartLabelsParam": "चार्ट अक्षों या खंडों के लिए लेबल।",
+  "toolChartTitleParam": "चार्ट का शीर्षक।",
+  "toolChartTypeParam": "चार्ट का प्रकार: बार चार्ट, लाइन चार्ट या पाई चार्ट।",
+  "toolPythonCodeParam": "निष्पादित किया जाने वाला पायथन कोड।",
+  "toolPythonDescription": "पाइथन कोड को एक सुरक्षित सैंडबॉक्स में निष्पादित करें।",
+  "toolReadDocumentDescription": "अपलोड किए गए दस्तावेज़ों से पाठ सामग्री पढ़ें और निकालें। PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) और OpenDocument प्रारूपों का समर्थन करता है। इसका उपयोग तब करें जब उपयोगकर्ता ने कोई दस्तावेज़ फ़ाइल संलग्न की हो।",
+  "toolReadDocumentIndexParam": "पढ़ने के लिए संलग्न दस्तावेज़ का सूचकांक (0-आधारित)। आमतौर पर पहले दस्तावेज़ के लिए 0।",
+  "toolStockDescription": "शेयरों (जैसे AAPL, THYAO.IS) और क्रिप्टोकरेंसी (जैसे BTC-USD) के लिए वर्तमान मूल्य और इतिहास प्राप्त करें।",
+  "toolStockSymbolParam": "टिकर प्रतीक (उदाहरण के लिए AAPL, THYAO.IS, BTC-USD)।",
+  "toolWeatherCityParam": "शहर का नाम (उदाहरण के लिए लंदन, इस्तांबुल)।",
+  "toolWeatherDescription": "किसी विशिष्ट शहर का वर्तमान मौसम जानें।",
+  "totalMemory": "कुल मेमोरी",
+  "totalStorage": "कुल स्टोरेज",
+  "trialAnnualDescription": "पहले {days} दिन मुफ्त, फिर {price}/वर्ष",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "trialMonthlyDescription": "पहले {days} दिन मुफ्त, फिर {price}/माह",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "turkish": "तुर्की",
+  "ultraDescription": "कृत्रिम बुद्धिमत्ता का शिखर",
+  "ultraFeatureOnly": "यह सुविधा केवल अल्ट्रा सदस्यों के लिए उपलब्ध है।",
+  "unstarConversation": "अतारांकित",
+  "unverifiedAccountHeader": "आपका खाता सत्यापित नहीं है",
+  "unverifiedAccountWarning": "यदि आप {timeLeft} के भीतर अपने खाते को सत्यापित नहीं करते हैं, तो इसे हटा दिया जाएगा",
+  "updateNowButton": "अभी अपडेट करें",
+  "updateRequiredMessage": "Cortex का उपयोग जारी रखने के लिए, कृपया नई सुविधाओं और महत्वपूर्ण सुधारों के लिए ऐप को नवीनतम संस्करण में अपडेट करें।",
+  "updateRequiredTitle": "अपडेट आवश्यक है",
+  "upgradeAccountDescription": "अधिक सीमाओं को अनलॉक करने के लिए एक खाता बनाएं।",
+  "upgradeAccountTitle": "अपना खाता पूरा करें",
+  "upgradeSubscription": "सदस्यता अपग्रेड करें",
+  "useOffline": "इंटरनेट के बिना उपयोग करें",
+  "@useOffline": {
+    "description": "Text for the 'Use without Internet' feature card. The newline is intentional."
+  },
+  "useOfflineDescription": "इंटरनेट कनेक्शन के बिना निजी चैट करें।",
+  "usedMemory": "प्रयुक्त मेमोरी",
+  "usedStorage": "प्रयुक्त स्टोरेज",
+  "user": "उपयोगकर्ता",
+  "userDisabled": "यह उपयोगकर्ता खाता अक्षम कर दिया गया है।",
+  "userId": "उपयोगकर्ता आईडी",
+  "username": "उपयोगकर्ता नाम",
+  "usernameTaken": "यह उपयोगकर्ता नाम पहले ही ले लिया गया है।",
+  "usernameTooLong": "उपयोगकर्ता नाम 16 अक्षरों से अधिक नहीं हो सकता।",
+  "usernameTooShort": "उपयोगकर्ता नाम बहुत छोटा है।",
+  "variants": "वेरिएंट",
+  "variantsDescription": "वेरिएंट एक ही एआई परिवार के अलग-अलग संस्करण हैं। मुख्य कार्ड पर टैप करने पर हम स्वचालित रूप से सबसे अच्छा विकल्प चुन लेते हैं, लेकिन यदि आप चाहें तो यहां से मैन्युअल रूप से एक विशिष्ट विकल्प भी चुन सकते हैं!",
+  "verificationDelayed": "आपकी खरीद की पुष्टि हो गई है। आपके खाते को अपडेट करने में थोड़ी देरी हो रही है, यह जल्द ही दिखाई देगा।",
+  "verificationScreenContinueWithoutVerification": "सत्यापन के बिना जारी रखें",
+  "verificationScreenWarning": "भले ही आप जारी रखें, आपके खाते के लिए 1-दिवसीय खाता सत्यापन अवधि अभी भी प्रभावी है। यदि आपने तब तक अपना खाता सत्यापित नहीं किया है, तो इसे ऐप से हटा दिया जाएगा।",
+  "verifyNow": "अभी सत्यापित करें",
+  "verifyYourEmail": "अपना ईमेल सत्यापित करें",
+  "videoModels": "Video Models",
+  "videoPremiumWarning": "वीडियो बनाने के लिए आपको अल्ट्रा सब्सक्रिप्शन की आवश्यकता है, अभी अपग्रेड करें और सहजता का अनुभव करें!",
+  "voiceModeInformation": "कॉर्टेक्स आपके डेटा को पूरी तरह से डिवाइस पर ही सुरक्षित रखता है, यहां तक कि वॉइस चैट मोड में भी; निर्बाध बातचीत का आनंद लें!",
+  "voiceSystemPromptSuffix": "महत्वपूर्ण: मार्कडाउन फॉर्मेटिंग (बोल्ड, इटैलिक) का उपयोग न करें। कोड ब्लॉक (```) न लिखें। उत्तर बातचीत के अंदाज़ में और संक्षिप्त रखें।",
+  "weakPassword": "पासवर्ड बहुत कमजोर है।",
+  "webSearchSources": "सूत्रों का कहना है",
+  "offlineUse": "बिना इंटरनेट के उपयोग करें",
+  "archivedConversations": "संग्रहित वार्ताएँ",
+  "noArchivedConversations": "कोई संग्रहित वार्ता नहीं",
+  "unarchive": "संग्रह से हटाएं",
+  "welcomeOfferBadge": "स्वागत प्रस्ताव • {time}",
+  "@welcomeOfferBadge": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "23:59:59"
+      }
+    }
+  },
+  "whatIsNew": "नया क्या है?",
+  "workInProgress": "काम जारी है",
+  "wrongPassword": "गलत पासवर्ड।",
+  "yes": "हाँ",
+  "you": "आप"
+}

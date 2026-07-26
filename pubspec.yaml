@@ -1,0 +1,166 @@
+name: cortex
+description: "Core of Artificial Intelligence"
+
+publish_to: 'none'
+
+version: 8.0.2+802
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # --- CORE FLUTTER & UI ---
+  provider: ^6.1.2
+  flutter_svg: ^2.0.15
+  shimmer: ^3.0.0
+  cached_network_image: ^3.4.1
+  flutter_math_fork: ^0.7.4
+  font_awesome_flutter: ^11.0.0
+  fl_chart: ^1.1.1
+  intl: ^0.20.2
+  collection: ^1.18.0
+
+  # --- FIREBASE ---
+  firebase_core: ^4.1.1
+  firebase_auth: ^6.1.0
+  cloud_firestore: 6.2.0
+  firebase_analytics: ^12.0.2
+  firebase_remote_config: ^6.0.2
+  cloud_functions: ^6.0.2
+  firebase_crashlytics: ^5.0.2
+  google_sign_in: ^7.2.0
+  firebase_messaging: ^16.0.2
+
+  # --- IN-APP PURCHASE ---
+  in_app_purchase: ^3.2.3
+  in_app_purchase_android: ^0.4.0+8
+  in_app_purchase_storekit: ^0.4.6+2
+  in_app_review: ^2.0.10
+
+  # --- DEVICE & UTILITIES ---
+  url_launcher: ^6.3.1
+  path_provider: ^2.0.11
+  shared_preferences: ^2.3.2
+  permission_handler: ^12.0.1
+  speech_to_text: ^7.0.0
+  device_info_plus: ^12.1.0
+  uuid: ^4.5.1
+  mutex: ^3.1.0
+  retry: ^3.1.2
+  dio: ^5.9.0
+  dio_smart_retry: ^7.0.1
+  internet_connection_checker_plus: ^2.9.1
+  upgrader: ^12.3.0
+  package_info_plus: ^9.0.0
+  version: ^3.0.2
+  pasteboard: ^0.5.0
+
+  # --- FILE & DATA HANDLING ---
+  sqflite: ^2.4.1
+  path: ^1.9.1
+  file_picker: ^10.3.3
+  image_picker: ^1.1.2
+  gallery_saver_plus: ^3.2.1
+  mime: ^2.0.0
+  share_plus: ^12.0.0
+  flutter_downloader: ^1.11.8
+
+  # --- SECURITY & MISC ---
+  flutter_secure_storage: ^9.2.4
+  crypto: ^3.0.6
+  encrypt: ^5.0.3
+  email_validator: ^3.0.0
+  safe_text: ^1.0.7
+  visibility_detector: ^0.4.0+2
+
+  # --- NATIVE INTEGRATIONS ---
+  flutter_native_splash: ^2.4.4
+  webview_flutter: ^4.13.0
+  flutter_local_notifications: ^19.4.2
+  play_install_referrer: ^0.5.0
+  battery_plus: ^7.0.0
+
+  # --- SYNTAX HIGHLIGHTING ---
+  flutter_highlight: ^0.7.0
+  highlight: ^0.7.0
+
+  # --- CONFETTI ---
+  confetti: ^0.8.0
+
+  # --- TIMEZONE ---
+  timezone: ^0.10.1
+  flutter_tts: ^4.2.5
+  camera: ^0.11.3
+  math_expressions: ^3.1.0
+  universal_io: ^2.3.1
+  audioplayers: ^6.6.0
+  video_player: ^2.9.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  argos_translator_offline: ^1.2.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_lints: ^6.0.0
+  mockito: ^5.6.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/cortexlogo.png"
+  image_path: "assets/cortexlogo.png"
+
+flutter_native_splash:
+  # —─────────── Global light-mode splash (required) ───────────—
+  color: "#FFFFFF"              # Light-mode background
+  image: assets/cortex/black.png
+
+  # —────────────── Dark-mode splash overrides ───────────────—
+  color_dark: "#000000"         # Dark-mode background
+  image_dark: assets/cortex/white.png
+
+  # —────────── Android 12+ specific settings ─────────—
+  android_12:
+    # Light-mode icon & window color
+    image: assets/cortex/black.png
+    icon_background_color: "#FFFFFF"
+
+    # Dark-mode overrides for Android 12+
+    image_dark: assets/cortex/white.png
+    icon_background_color_dark: "#000000"
+
+flutter:
+  config:
+    enable-swift-package-manager: false
+  uses-material-design: true
+  generate: true
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/inter/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/inter/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/inter/Inter-Bold.ttf
+          weight: 700
+  assets:
+    - assets/icons/
+    - assets/icons/on/
+    - assets/icons/off/
+    - assets/characters/
+    - assets/cortex/
+    - assets/models/
+    - assets/producers/
+    - assets/neuro/
+    - assets/
+
+# wow
+# this
+# pubspec.yaml
+# is so good
