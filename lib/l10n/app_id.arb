@@ -864,7 +864,7 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Anda memerlukan langganan Ultra untuk membuat video, tingkatkan sekarang dan rasakan kemudahannya!",
   "voiceModeInformation": "Cortex menjaga keamanan data Anda dengan berjalan sepenuhnya di perangkat, bahkan dalam mode obrolan suara; nikmati percakapan tanpa hambatan!",
-  "voiceSystemPromptSuffix": "PENTING: Jangan gunakan format markdown (tebal, miring). JANGAN keluarkan blok kode (```). Jaga agar respons tetap bersifat percakapan dan singkat.",
+  "voiceSystemPrompt": "PENTING: Jangan gunakan format markdown (tebal, miring). JANGAN keluarkan blok kode (```). Jaga agar respons tetap bersifat percakapan dan singkat.",
   "weakPassword": "Kata sandi terlalu lemah.",
   "webSearchSources": "Sumber",
   "offlineUse": "Gunakan tanpa Internet",

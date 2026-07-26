@@ -864,7 +864,7 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Vous avez besoin d'un abonnement Ultra pour générer des vidéos, passez à la version supérieure dès maintenant et profitez d'une expérience optimale !",
   "voiceModeInformation": "Cortex protège vos données en fonctionnant entièrement sur l'appareil, même en mode de chat vocal ; profitez de conversations fluides !",
-  "voiceSystemPromptSuffix": "IMPORTANT : N’utilisez pas la mise en forme Markdown (gras, italique). N’affichez PAS de blocs de code (```). Rédigez des réponses concises et conversationnelles.",
+  "voiceSystemPrompt": "IMPORTANT : N’utilisez pas la mise en forme Markdown (gras, italique). N’affichez PAS de blocs de code (```). Rédigez des réponses concises et conversationnelles.",
   "weakPassword": "Le mot de passe est trop faible.",
   "webSearchSources": "Sources",
   "offlineUse": "Utiliser sans Internet",

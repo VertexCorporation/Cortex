@@ -2,7 +2,9 @@
 // It's good practice to have a more generic name if it might handle more than just login in the future.
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as dev;
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -112,6 +114,20 @@ class LoginBackendService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _googleSignInInitialized = false;
+
+  Future<void> _ensureGoogleSignInInitialized() async {
+    if (_googleSignInInitialized) return;
+    _googleSignInInitialized = true;
+    final nonceRaw = List<int>.generate(32, (_) => Random.secure().nextInt(256));
+    final nonce = base64Url.encode(nonceRaw);
+    await _googleSignIn.initialize(
+      serverClientId:
+          '561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com',
+      nonce: nonce,
+    );
+  }
+
   final FirebaseFunctions _functions =
       FirebaseFunctions.instanceFor(region: 'europe-west1');
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
@@ -312,12 +328,8 @@ class LoginBackendService {
         context.read<ExtrovertNotificationService>();
 
     try {
-      // Step 0: Initialize GoogleSignIn with the required serverClientId.
-      // This is the new, correct way to configure the sign-in process before starting.
-      await _googleSignIn.initialize(
-        serverClientId:
-            '561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com',
-      );
+      // Step 0: Initialize GoogleSignIn exactly once.
+      await _ensureGoogleSignInInitialized();
 
       // Step 1: Initiate the user-interactive sign-in process using authenticate().
       // This shows the Google account picker UI.
@@ -381,11 +393,10 @@ class LoginBackendService {
           name: 'LoginBackend');
       return GoogleSignInSuccess(user);
     } catch (e, st) {
-      // Only sign out if this was a fresh Google sign-in, not an anonymous link
       final wasAnonymousLink = _auth.currentUser?.isAnonymous == true;
 
       if (e is PlatformException && e.code == 'network_error') {
-        dev.log('[Auth.Google] A network error occurred during Google Sign-In',
+        dev.log('[Auth.Google] Network error during Google Sign-In',
             name: 'LoginBackend', error: e, stackTrace: st);
         notificationService.showNotification(
             message: l10n.noInternetConnection, type: NotificationType.error);
@@ -394,29 +405,35 @@ class LoginBackendService {
           await _auth.signOut().catchError((_) {});
         }
         return GoogleSignInNetworkError();
-      } else if ((e is GoogleSignInException &&
+      }
+
+      if (e is GoogleSignInException &&
+          e.code == GoogleSignInExceptionCode.unknownError) {
+        dev.log(
+            '[Auth.Google] Credential Manager framework error (${e.description}). '
+            'User may retry.',
+            name: 'LoginBackend');
+        notificationService.showNotification(
+            message: l10n.authError, type: NotificationType.error);
+        return GoogleSignInFailure();
+      }
+
+      if ((e is GoogleSignInException &&
               e.code == GoogleSignInExceptionCode.canceled) ||
           (e is PlatformException && e.code == 'sign_in_canceled') ||
           (e is FirebaseAuthException && e.code == 'canceled')) {
-        dev.log('[Auth.Google] Sign-in process was cancelled by the user.',
+        dev.log('[Auth.Google] Sign-in cancelled by the user.',
             name: 'LoginBackend');
-        await _googleSignIn.disconnect().catchError((_) {});
-        if (!wasAnonymousLink) {
-          await _auth.signOut().catchError((_) {});
-        }
         return GoogleSignInCancelled();
-      } else {
-        dev.log(
-            '[Auth.Google] An unexpected error occurred during Google Sign-In',
-            name: 'LoginBackend',
-            error: e,
-            stackTrace: st);
-        notificationService.showNotification(
-            message: l10n.authError, type: NotificationType.error);
       }
 
-      await _googleSignIn.disconnect().catchError((_) {});
-
+      dev.log(
+          '[Auth.Google] Unexpected error during Google Sign-In',
+          name: 'LoginBackend',
+          error: e,
+          stackTrace: st);
+      notificationService.showNotification(
+          message: l10n.authError, type: NotificationType.error);
       return GoogleSignInFailure();
     }
   }

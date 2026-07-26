@@ -71,6 +71,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get theme => 'Tema';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'Nej';
 
   @override

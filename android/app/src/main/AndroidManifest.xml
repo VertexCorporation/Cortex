@@ -135,6 +135,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <!-- Enable Impeller rendering engine for smooth 120Hz GPU performance -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="true" />
+
         <!-- ========================================== -->
         <!-- CUSTOM SERVICES -->
         <!-- ========================================== -->

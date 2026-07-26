@@ -327,7 +327,10 @@ class _ModelTileState extends State<ModelTile> {
     } else {
       if (variant == '.svg') {
         imageContent = SvgPicture.asset(resolvedImagePath,
-            fit: BoxFit.contain, placeholderBuilder: (_) => fallbackImage);
+            fit: BoxFit.contain,
+            colorFilter: ColorFilter.mode(
+                AppColors.primaryColor.inverted, BlendMode.srcIn),
+            placeholderBuilder: (_) => fallbackImage);
       } else {
         ImageProvider provider = resolvedImagePath.startsWith('assets/')
             ? AssetImage(resolvedImagePath)

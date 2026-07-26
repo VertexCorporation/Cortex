@@ -71,6 +71,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get theme => 'テーマ';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'いいえ';
 
   @override

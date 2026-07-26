@@ -864,7 +864,7 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Videolar yaratmaq, indi təkmilləşdirmək və axını hiss etmək üçün Ultra abunəliyinə ehtiyacınız var!",
   "voiceModeInformation": "Cortex, səsli söhbət rejimində belə cihazınızda tam işləyərək məlumatlarınızı təhlükəsiz saxlayır; problemsiz söhbətlərdən zövq alın!",
-  "voiceSystemPromptSuffix": "VACİBDİR: Markdown formatlamasından (qalın, kursiv) istifadə etməyin. Kod bloklarını (```) ÇIXARMAYIN. Cavabları danışıq xarakterli və qısa saxlayın.",
+  "voiceSystemPrompt": "VACİBDİR: Markdown formatlamasından (qalın, kursiv) istifadə etməyin. Kod bloklarını (```) ÇIXARMAYIN. Cavabları danışıq xarakterli və qısa saxlayın.",
   "weakPassword": "Şifrə çox zəifdir.",
   "webSearchSources": "Mənbələr",
   "offlineUse": "İnternetsiz istifadə",

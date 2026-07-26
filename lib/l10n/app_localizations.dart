@@ -242,6 +242,18 @@ abstract class AppLocalizations {
   /// **'Theme'**
   String get theme;
 
+  /// No description provided for @lightTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Light theme'**
+  String get lightTheme;
+
+  /// No description provided for @darkTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark theme'**
+  String get darkTheme;
+
   /// No description provided for @no.
   ///
   /// In en, this message translates to:
@@ -3231,11 +3243,10 @@ abstract class AppLocalizations {
   /// **'Work In Progress'**
   String get workInProgress;
 
-  /// Voice mode system prompt. Instructs the AI to respond in very short,
-  /// conversational sentences without any markdown formatting.
+  /// No description provided for @voiceSystemPrompt.
   ///
   /// In en, this message translates to:
-  /// **'You are in VOICE MODE. Rules: 1) Respond in 1-2 short sentences maximum. 2) DO NOT use ANY markdown formatting (no bold, italic, headings, lists, code blocks, or tables). 3) Be conversational, natural, and extremely intelligent. 4) Never invoke tools, widgets, or structured data — just pure speech.'**
+  /// **'IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.'**
   String get voiceSystemPrompt;
 
   /// Context string for Flow Mode with agent name and previous response placeholders.

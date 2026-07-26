@@ -15,46 +15,49 @@ void main() {
       AppColors.currentTheme = originalTheme;
     });
 
-    test('AppColors returns valid theme definitions', () {
+    test('AppColors returns only light and dark themes', () {
       final defs = AppColors.themeDefinitions;
-      expect(defs.containsKey('light'), true);
-      expect(defs.containsKey('dark'), true);
-      expect(defs.containsKey('ocean'), true);
+      expect(defs.keys, {AppTheme.light, AppTheme.dark});
     });
 
     test('Theme fallback logic', () {
-      final colors = AppColors.getThemeColors('non_existent_theme');
-      // Should fallback to light
+      final colors = AppColors.getThemeColors('grayscale');
       expect(
-          colors.background, AppColors.themeDefinitions['light']!.background);
+          colors.background, AppColors.themeDefinitions[AppTheme.light]!.background);
     });
 
-    test('Specific theme parameter verification', () {
-      final dark = AppColors.themeDefinitions['dark']!;
-      expect(dark.primaryColor, Colors.black);
+    test('Legacy theme names normalize to light', () {
+      expect(AppTheme.normalize('love'), AppTheme.light);
+      expect(AppTheme.normalize('grayscale'), AppTheme.light);
+      expect(AppTheme.normalize('cyberpunk'), AppTheme.light);
+    });
+
+    test('Dark theme parameter verification', () {
+      final dark = AppColors.themeDefinitions[AppTheme.dark]!;
+      expect(dark.primaryColor, const Color(0xFF121212));
       expect(dark.statusBarIconBrightness, Brightness.light);
     });
 
     test('Overlay styles map generation', () {
       final styles = AppColors.overlayStyles;
-      expect(styles['light']!['navigationBarColor'], Colors.white);
-      expect(styles['dark']!['statusBarIconBrightness'], Brightness.light);
+      expect(styles[AppTheme.light]!['navigationBarColor'],
+          const Color(0xFFFFFFFF));
+      expect(styles[AppTheme.dark]!['statusBarIconBrightness'], Brightness.light);
     });
 
     test('Darken utility', () {
-      final color = const Color(0xFFFFFFFF); // White
+      final color = const Color(0xFFFFFFFF);
       final darker = AppColors.darken(color, 0.5);
 
-      // Should be darker (closer to black)
       expect(darker.computeLuminance() < color.computeLuminance(), true);
     });
 
     test('Static getters use currentTheme', () {
-      AppColors.currentTheme = 'dark';
-      expect(AppColors.background, const Color(0xFF090909)); // Dark background
+      AppColors.currentTheme = AppTheme.dark;
+      expect(AppColors.background, const Color(0xFF000000));
 
-      AppColors.currentTheme = 'light';
-      expect(AppColors.background, const Color(0xFFFFFFFF)); // Light background
+      AppColors.currentTheme = AppTheme.light;
+      expect(AppColors.background, const Color(0xFFFFFFFF));
     });
   });
 }

@@ -510,7 +510,7 @@
   "flowMode": "Flödesläge",
   "premium": "Premium",
   "workInProgress": "Arbete pågår",
-  "voiceSystemPromptSuffix": "VIKTIGT: Använd inte markdown-formatering (fet, kursiv stil). Mata INTE ut kodblock (```). Håll svaren konverserande och korta.",
+  "voiceSystemPrompt": "VIKTIGT: Använd inte markdown-formatering (fet, kursiv stil). Mata INTE ut kodblock (```). Håll svaren konverserande och korta.",
   "flowModeContextParams": "Cortex Flow Mode ({agentName}). Föregående: {previousResponse}",
   "toolReadDocumentDescription": "Läs och extrahera textinnehåll från uppladdade dokument. Stöder PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) och OpenDocument-format. Använd detta när användaren har bifogat en dokumentfil.",
   "toolReadDocumentIndexParam": "Indexet för dokumentbilagan som ska läsas (0-baserat). Vanligtvis 0 för det första dokumentet.",

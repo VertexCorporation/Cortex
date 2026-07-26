@@ -108,7 +108,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
+              Material(
+                color: Colors.transparent,
+                child: ListTile(
                 leading: Icon(Icons.share_rounded,
                     color: AppColors.primaryColor.inverted),
                 title: Text(l10n.download,
@@ -120,8 +122,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                   SharePlus.instance
                       .share(ShareParams(files: [XFile(widget.audioPath)]));
                 },
-              ),
-            ],
+                ),
+                ), // Material
+              ],
           ),
         ));
       },

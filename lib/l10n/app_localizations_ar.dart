@@ -71,6 +71,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get theme => 'السمة';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'لا';
 
   @override
@@ -1731,10 +1737,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get voiceSystemPrompt =>
-      'أنت في وضع الصوت. القواعد: 1) الرد في جملة إلى جملتين كحد أقصى. '
-      '2) لا تستخدم أي تنسيق Markdown (غامق، مائل، عناوين، قوائم، كتل برمجية، جداول). '
-      '3) كن طبيعياً ومحادثياً وذكياً جداً. '
-      '4) لا تستخدم الأدوات أو البيانات المنظمة. فقط كلام طبيعي.';
+      'هام: تجنب استخدام تنسيق Markdown (الخط العريض والمائل). لا تُدرج كتلًا برمجية (```). اجعل الردود موجزة وبسيطة.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {

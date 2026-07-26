@@ -71,6 +71,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get theme => 'Theme';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'No';
 
   @override
@@ -1742,10 +1748,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceSystemPrompt =>
-      'You are in VOICE MODE. Rules: 1) Respond in 1-2 short sentences maximum. '
-      '2) DO NOT use ANY markdown formatting (no bold, italic, headings, lists, code blocks, or tables). '
-      '3) Be conversational, natural, and extremely intelligent. '
-      '4) Never invoke tools, widgets, or structured data. Just pure natural speech.';
+      'IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {

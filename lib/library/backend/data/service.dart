@@ -154,6 +154,7 @@ class ModelService with ChangeNotifier {
     allOnlineVariantIds.add('cortex/auto');
 
     for (final model in allModels) {
+      if (model.id == 'cortex/auto' || model.id == 'cortex/roleplay') continue;
       if (model.category == 'roleplay' || model.category == 'self') {
         String? currentBaseId = model.baseModelId;
         bool requiresRepair = (currentBaseId == null ||

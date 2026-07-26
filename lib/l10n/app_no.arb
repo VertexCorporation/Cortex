@@ -540,7 +540,7 @@
   "flowMode": "Flytmodus",
   "premium": "Premium",
   "workInProgress": "Arbeid pågår",
-  "voiceSystemPromptSuffix": "VIKTIG: Ikke bruk markdown-formatering (fet, kursiv). IKKE skriv ut kodeblokker (```). Hold svarene konverserende og korte.",
+  "voiceSystemPrompt": "VIKTIG: Ikke bruk markdown-formatering (fet, kursiv). IKKE skriv ut kodeblokker (```). Hold svarene konverserende og korte.",
   "flowModeContextParams": "Cortex Flow Mode ({agentName}). Forrige: {previousResponse}",
   "toolReadDocumentDescription": "Les og trekk ut tekstinnhold fra opplastede dokumenter. Støtter formatene PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) og OpenDocument. Bruk denne når brukeren har lagt ved en dokumentfil.",
   "toolReadDocumentIndexParam": "Indeksen til dokumentvedlegget som skal leses (0-basert). Vanligvis 0 for første dokument.",
