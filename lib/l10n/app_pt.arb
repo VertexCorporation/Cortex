@@ -864,7 +864,7 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Você precisa de uma assinatura Ultra para gerar vídeos. Atualize agora e sinta a fluidez!",
   "voiceModeInformation": "O Cortex protege seus dados, funcionando totalmente no dispositivo, mesmo no modo de bate-papo por voz; desfrute de conversas perfeitas!",
-  "voiceSystemPromptSuffix": "IMPORTANTE: Não utilize formatação Markdown (negrito, itálico). NÃO insira blocos de código (```). Mantenha as respostas em um tom conversacional e conciso.",
+  "voiceSystemPrompt": "IMPORTANTE: Não utilize formatação Markdown (negrito, itálico). NÃO insira blocos de código (```). Mantenha as respostas em um tom conversacional e conciso.",
   "weakPassword": "A palavra-passe é demasiado fraca.",
   "webSearchSources": "Fontes",
   "offlineUse": "Usar sem Internet",

@@ -71,6 +71,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get theme => 'Téma';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'Ne';
 
   @override
@@ -1744,10 +1750,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get voiceSystemPrompt =>
-      'JSTE V HLASOVÉM REŽIMU. Pravidla: 1) Odpovídejte maximálně 1-2 větami. '
-      '2) NEPOUŽÍVEJTE žádné formátování Markdown (tučné, kurzíva, nadpisy, seznamy, bloky kódu, tabulky). '
-      '3) Buďte přirození, konverzační a mimořádně inteligentní. '
-      '4) Nikdy nevolejte nástroje, widgety nebo strukturovaná data. Pouze přirozená řeč.';
+      'DŮLEŽITÉ: Nepoužívejte formátování markdown (tučné, kurzíva). NEVYSTUPUJTE bloky kódu (```). Udržujte odpovědi konverzační a stručné.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {

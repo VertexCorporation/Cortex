@@ -71,6 +71,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get theme => '테마';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => '아니요';
 
   @override

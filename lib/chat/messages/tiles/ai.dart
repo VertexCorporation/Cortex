@@ -66,7 +66,7 @@ class AIMessageTile extends StatefulWidget {
 }
 
 class _AIMessageTileState extends State<AIMessageTile>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _entryFadeCtl;
   late final Animation<double> _entryFadeAnim;
   late final AnimationController _thinkAnimCtl;

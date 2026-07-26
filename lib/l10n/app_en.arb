@@ -39,6 +39,8 @@
   "languageModels": "Language Models",
   "light": "Light",
   "theme": "Theme",
+  "lightTheme": "Light theme",
+  "darkTheme": "Dark theme",
   "no": "No",
   "yes": "Yes",
   "done": "Done",
@@ -692,7 +694,7 @@
   "flowMode": "Flow Mode",
   "premium": "Premium",
   "workInProgress": "Work In Progress",
-  "voiceSystemPromptSuffix": "IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.",
+  "voiceSystemPrompt": "IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.",
   "flowModeContextParams": "Cortex Flow Mode ({agentName}). Previous: {previousResponse}",
   "@flowModeContextParams": {
     "description": "Context string for Flow Mode with agent name and previous response placeholders.",

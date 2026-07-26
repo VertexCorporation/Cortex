@@ -71,6 +71,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get theme => 'Tema';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'Tidak';
 
   @override
@@ -1753,10 +1759,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get voiceSystemPrompt =>
-      'ANDA DALAM MODE SUARA. Aturan: 1) Balas maksimal 1-2 kalimat pendek. '
-      '2) JANGAN gunakan format Markdown apa pun (tebal, miring, judul, daftar, blok kode, tabel). '
-      '3) Bersikaplah alami, seperti percakapan, dan sangat cerdas. '
-      '4) Jangan pernah memanggil alat, widget, atau data terstruktur. Hanya bicara alami.';
+      'PENTING: Jangan gunakan format markdown (tebal, miring). JANGAN keluarkan blok kode (```). Jaga agar respons tetap bersifat percakapan dan singkat.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {

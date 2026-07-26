@@ -204,7 +204,9 @@ class AppLanguageSection extends StatelessWidget {
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: ListTile(
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: ListTile(
                                   title: Text(
                                     lang['name']!,
                                     style: TextStyle(
@@ -238,8 +240,9 @@ class AppLanguageSection extends StatelessWidget {
                                   ),
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: screenWidth * 0.02),
-                                ),
-                              );
+                                  ),
+                                  ), // Material
+                                );
                             },
                           ),
                         ),

@@ -71,6 +71,12 @@ class AppLocalizationsAz extends AppLocalizations {
   String get theme => 'Mövzu';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'Xeyr';
 
   @override
@@ -1746,10 +1752,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get voiceSystemPrompt =>
-      'SƏS REJİMİNDƏSİNİZ. Qaydalar: 1) Maksimum 1-2 cümlə ilə cavab verin. '
-      '2) Heç bir Markdown formatı istifadə etməyin (qalın, kursiv, başlıq, siyahı, kod bloku, cədvəl qadağandır). '
-      '3) Təbii, söhbət üslubunda və son dərəcə ağıllı olun. '
-      '4) Alətləri, vidjetləri və ya strukturlaşdırılmış məlumatı çağırmayın. Yalnız təbii danışıq.';
+      'VACİBDİR: Markdown formatlamasından (qalın, kursiv) istifadə etməyin. Kod bloklarını (```) ÇIXARMAYIN. Cavabları danışıq xarakterli və qısa saxlayın.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {

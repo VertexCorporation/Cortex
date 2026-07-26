@@ -71,6 +71,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get theme => 'Téma';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'Nem';
 
   @override

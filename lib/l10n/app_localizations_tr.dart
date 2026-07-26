@@ -71,6 +71,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get theme => 'Tema';
 
   @override
+  String get lightTheme => 'Açık tema';
+
+  @override
+  String get darkTheme => 'Koyu tema';
+
+  @override
   String get no => 'Hayır';
 
   @override
@@ -1742,10 +1748,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get voiceSystemPrompt =>
-      'SESLİ MODDASIN. Kurallar: 1) En fazla 1-2 cümleyle yanıt ver. '
-      '2) KESİNLİKLE hiçbir markdown biçimlendirmesi KULLANMA (kalın, italik, başlık, liste, kod bloğu, tablo yasak). '
-      '3) Doğal, konuşma dilinde ve son derece zeki ol. '
-      '4) ASLA araç, widget veya yapılandırılmış veri çağırma. Sadece düz konuşma.';
+      'ÖNEMLİ SESLİ MOD KURALLARI:\n1. Şu an canlı sesli sohbet modundasın. Yanıtlarını en fazla 1-2 cümlelik çok kısa, doğal ve insan gibi ver.\n2. ASLA araç (tool), grafik (chart), hava durumu (weather), python koda ihtiyaç duyma ve çağırma! Tamamen düz metin konuş.\n3. Kullanıcı sana soru sorduğunda, hafızandaki önceki verdiğin cevabın aynısını BİREBİR TEKRARLAMA. Yeni, doğal ve soruya özgü yanıt ver.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {

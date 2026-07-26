@@ -21,6 +21,10 @@ import '../../../../services/send.dart'; // [NEW]
 import '../panels/features/sheet.dart';
 import '../panels/selection/sheet.dart';
 
+// Language-neutral voice system prompt (avoids UI locale bleed into AI instructions).
+const String _kVoiceSystemPrompt =
+    'IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief. Respond in the same language as the user.';
+
 // -----------------------------------------------------------------------------
 // HELPER: Standard Circular Tool Button (Ripple + Haptics)
 // -----------------------------------------------------------------------------
@@ -347,7 +351,7 @@ class ActionButtonWidget extends StatelessWidget {
               await voiceService.startSession(
                 context: context,
                 locale: localeCode,
-                voiceSystemPrompt: localizations.voiceSystemPrompt,
+                voiceSystemPrompt: _kVoiceSystemPrompt,
                 flowPromptBuilder: (agentName, previousResponse) =>
                     localizations.flowModeContextParams(
                         agentName, previousResponse),
@@ -565,7 +569,7 @@ class ModelSelectButton extends StatelessWidget {
                   child: Container(
                     constraints: BoxConstraints(maxWidth: screenWidth * 0.50),
                     padding: EdgeInsets.symmetric(
-                        horizontal: isTablet ? 16.0 : 14.0, vertical: 8.0),
+                        horizontal: isTablet ? 10.0 : 8.0, vertical: 8.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

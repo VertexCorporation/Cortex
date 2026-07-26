@@ -71,6 +71,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get theme => 'Thema';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'Nee';
 
   @override

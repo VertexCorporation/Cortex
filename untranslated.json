@@ -1,5 +1,7 @@
 {
   "ar": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -9,6 +11,8 @@
   ],
 
   "az": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -18,6 +22,8 @@
   ],
 
   "cs": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -27,6 +33,8 @@
   ],
 
   "de": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -36,6 +44,8 @@
   ],
 
   "es": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -45,6 +55,8 @@
   ],
 
   "fr": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -54,6 +66,8 @@
   ],
 
   "hi": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -63,6 +77,8 @@
   ],
 
   "hu": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -72,6 +88,8 @@
   ],
 
   "id": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -81,6 +99,8 @@
   ],
 
   "it": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -90,6 +110,8 @@
   ],
 
   "ja": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -99,6 +121,8 @@
   ],
 
   "ko": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -108,6 +132,8 @@
   ],
 
   "nl": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -117,6 +143,8 @@
   ],
 
   "no": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -126,6 +154,8 @@
   ],
 
   "pt": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -135,6 +165,8 @@
   ],
 
   "ru": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -144,6 +176,8 @@
   ],
 
   "sv": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",
@@ -162,6 +196,8 @@
   ],
 
   "zh": [
+    "lightTheme",
+    "darkTheme",
     "renameConversation",
     "conversationName",
     "deleteConversation",

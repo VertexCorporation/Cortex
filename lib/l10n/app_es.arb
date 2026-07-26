@@ -864,7 +864,7 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Necesitas una suscripción Ultra para generar vídeos, ¡actualízate ahora y disfruta del flujo!",
   "voiceModeInformation": "Cortex mantiene tus datos seguros al ejecutarse completamente en el dispositivo, incluso en modo de chat de voz; ¡disfruta de conversaciones fluidas!",
-  "voiceSystemPromptSuffix": "IMPORTANTE: No utilice formato Markdown (negrita, cursiva). NO imprima bloques de código (```). Mantenga sus respuestas breves y concisas.",
+  "voiceSystemPrompt": "IMPORTANTE: No utilice formato Markdown (negrita, cursiva). NO imprima bloques de código (```). Mantenga sus respuestas breves y concisas.",
   "weakPassword": "La contraseña es demasiado débil.",
   "webSearchSources": "Fuentes",
   "offlineUse": "Usar sin Internet",

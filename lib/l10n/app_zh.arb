@@ -864,7 +864,7 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "您需要 Ultra 会员资格才能生成视频，立即升级，体验流畅体验！",
   "voiceModeInformation": "Cortex 完全在设备端运行，即使在语音聊天模式下也能确保您的数据安全；享受流畅的对话体验！",
-  "voiceSystemPromptSuffix": "重要提示：请勿使用 Markdown 格式（粗体、斜体）。请勿输出代码块（```）。请保持回复简洁明了，如同日常对话。",
+  "voiceSystemPrompt": "重要提示：请勿使用 Markdown 格式（粗体、斜体）。请勿输出代码块（```）。请保持回复简洁明了，如同日常对话。",
   "weakPassword": "密码太弱。",
   "webSearchSources": "来源",
   "offlineUse": "无网络使用",

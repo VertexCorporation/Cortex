@@ -38,6 +38,12 @@ class Cortex extends StatelessWidget {
     final ThemeData baseTheme = ThemeData(
       brightness: isDark ? Brightness.dark : Brightness.light,
       fontFamily: 'Inter',
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
+        },
+      ),
     );
 
     _cachedThemeName = currentTheme;
@@ -62,22 +68,22 @@ class Cortex extends StatelessWidget {
       primaryColor: AppColors.background,
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: baseTheme.colorScheme.copyWith(
-        primary: AppColors.primaryColor.inverted,
-        onPrimary: AppColors.primaryColor,
+        primary: AppColors.primaryColor,
+        onPrimary: AppColors.primaryColor.inverted,
         secondary: AppColors.border,
         onSecondary: AppColors.quaternaryColor,
         surface: AppColors.background,
         onSurface: AppColors.primaryColor.inverted,
         error: AppColors.septenaryColor,
+        onError: AppColors.primaryColor.inverted,
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: AppColors.primaryColor.inverted,
-        selectionColor:
-            AppColors.secondaryColor.inverted.withValues(alpha: 0.3),
+        selectionColor: AppColors.senaryColor.withValues(alpha: 0.3),
         selectionHandleColor: AppColors.primaryColor.inverted,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        focusColor: AppColors.primaryColor.inverted,
+        focusColor: AppColors.senaryColor,
         hintStyle: TextStyle(color: AppColors.tertiaryColor),
         labelStyle: TextStyle(color: AppColors.tertiaryColor),
       ),
@@ -125,21 +131,17 @@ class Cortex extends StatelessWidget {
   }
 }
 
-/// Helper variant to make color inversion cleaner and reusable.
+/// Soft luminance-based color inversion.
+/// Light colors return a warm dark; dark colors return a warm light.
+/// This avoids harsh arithmetic inversion and keeps the monochrome harmony.
 extension InvertedColor on Color {
-  /// Returns the inverted version of this color.
   Color get inverted {
-    final int a = (this.a * 255).round();
-    final int r = (this.r * 255).round();
-    final int g = (this.g * 255).round();
-    final int b = (this.b * 255).round();
-
-    return Color.fromARGB(
-      a,
-      255 - r,
-      255 - g,
-      255 - b,
-    );
+    final l = computeLuminance();
+    if (l > 0.5) {
+      return const Color(0xFF2D2A26);
+    } else {
+      return const Color(0xFFE8E3DC);
+    }
   }
 }
 

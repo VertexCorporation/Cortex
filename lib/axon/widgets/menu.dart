@@ -93,7 +93,7 @@ class AxonMenu extends StatelessWidget {
 
           // --- 5. ARCHIVED ---
           AxonItem(
-            label: 'Archive - arşif',
+            label: localizations.archive,
             iconPath: 'assets/icons/download.svg',
             onTap: onArchivedTap,
             screenHeight: screenHeight,

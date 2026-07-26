@@ -510,7 +510,7 @@
   "flowMode": "Režim průtoku",
   "premium": "Premium",
   "workInProgress": "Probíhající práce",
-  "voiceSystemPromptSuffix": "DŮLEŽITÉ: Nepoužívejte formátování markdown (tučné, kurzíva). NEVYSTUPUJTE bloky kódu (```). Udržujte odpovědi konverzační a stručné.",
+  "voiceSystemPrompt": "DŮLEŽITÉ: Nepoužívejte formátování markdown (tučné, kurzíva). NEVYSTUPUJTE bloky kódu (```). Udržujte odpovědi konverzační a stručné.",
   "flowModeContextParams": "Režim Cortex Flow ({agentName}). Předchozí: {previousResponse}",
   "toolReadDocumentDescription": "Čtěte a extrahujte textový obsah z nahraných dokumentů. Podporuje formáty PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) a OpenDocument. Toto použijte, když uživatel připojil soubor dokumentu.",
   "toolReadDocumentIndexParam": "Index přílohy dokumentu ke čtení (založený na 0). Obvykle 0 pro první dokument.",

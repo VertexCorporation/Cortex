@@ -232,10 +232,12 @@ class AppBootstrap {
 
     // 6. Determine Theme.
     final savedTheme = activePrefs.getString('selectedTheme');
-    final String initialTheme = savedTheme ??
-        (PlatformDispatcher.instance.platformBrightness == Brightness.dark
-            ? 'dark'
-            : 'light');
+    final String initialTheme = AppTheme.normalize(
+      savedTheme ??
+          (PlatformDispatcher.instance.platformBrightness == Brightness.dark
+              ? AppTheme.dark
+              : AppTheme.light),
+    );
 
     final String? savedLanguage = activePrefs.getString('language_code');
 
@@ -253,8 +255,13 @@ class AppBootstrap {
         : (activePrefs.getString('cortex_title') ?? '');
 
     // 8. Preload User Data for synchronous startup (Fixes Guest flash)
-    final String? initialUserDataJson =
-        activePrefs.getString('cached_user_data');
+    // Try the uid-specific key first, fall back to legacy key.
+    String? initialUserDataJson;
+    if (initialUser != null) {
+      initialUserDataJson =
+          activePrefs.getString('cached_user_data_${initialUser.uid}');
+    }
+    initialUserDataJson ??= activePrefs.getString('cached_user_data');
 
     debugPrint(
         "[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus");
