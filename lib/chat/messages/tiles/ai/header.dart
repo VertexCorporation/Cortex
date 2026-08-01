@@ -4,7 +4,8 @@ class _AiHeader extends StatelessWidget {
   final Message message;
   final String avatarPath;
   final double scale;
-  final Animation<double> thinkAnim;
+  final Animation<double> thinkPulseAnim;
+  final Animation<double> thinkRotateAnim;
   final Animation<double> headerEntryAnim;
   final String textToDisplay;
   final bool isCortexDynamic;
@@ -15,7 +16,8 @@ class _AiHeader extends StatelessWidget {
     required this.message,
     required this.avatarPath,
     required this.scale,
-    required this.thinkAnim,
+    required this.thinkPulseAnim,
+    required this.thinkRotateAnim,
     required this.headerEntryAnim,
     required this.textToDisplay,
     required this.isCortexDynamic,
@@ -128,15 +130,18 @@ class _AiHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ScaleTransition(
-          scale: thinkAnim,
-          child: RepaintBoundary(
-            child: SvgPicture.asset(
-              'assets/cortex.svg',
-              width: 16 * scale,
-              height: 16 * scale,
-              colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.inverted,
-                BlendMode.srcIn,
+          scale: thinkPulseAnim,
+          child: RotationTransition(
+            turns: thinkRotateAnim,
+            child: RepaintBoundary(
+              child: SvgPicture.asset(
+                'assets/cortex.svg',
+                width: 16 * scale,
+                height: 16 * scale,
+                colorFilter: ColorFilter.mode(
+                  AppColors.primaryColor.inverted,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),

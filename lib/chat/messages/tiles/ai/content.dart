@@ -9,6 +9,7 @@ class _AiBodyContent extends StatelessWidget {
   final bool mediaAboveText;
   final String stableText;
   final String animatingText;
+  final AnimationController textAnimCtl;
   final double scale;
   final Map<String, List<InlineSpan>> parseCache;
 
@@ -18,6 +19,7 @@ class _AiBodyContent extends StatelessWidget {
     required this.mediaAboveText,
     required this.stableText,
     required this.animatingText,
+    required this.textAnimCtl,
     required this.scale,
     required this.parseCache,
   });
@@ -123,7 +125,7 @@ class _AiBodyContent extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    if (animatingText.isEmpty) {
+    if (!textAnimCtl.isAnimating && animatingText.isEmpty) {
       return RepaintBoundary(
         child: SelectionArea(
           child: Text.rich(
@@ -136,24 +138,33 @@ class _AiBodyContent extends StatelessWidget {
     final md = _rebalanceMarkdownBoundary(stableText, animatingText);
     return RepaintBoundary(
       child: SelectionArea(
-        child: Text.rich(
-          TextSpan(
-            style: baseStyle,
-            children: [
-              ..._getParsedSpans(context, md.stable, s),
-              if (md.animating.isNotEmpty)
-                ..._getAnimatingSpans(context, md.animating, s),
-            ],
-          ),
+        child: AnimatedBuilder(
+          animation: textAnimCtl,
+          builder: (context, child) {
+            final animValue = textAnimCtl.value;
+            final opacity = animValue.clamp(0.0, 1.0);
+
+            return Text.rich(
+              TextSpan(
+                style: baseStyle,
+                children: [
+                  ..._getParsedSpans(context, md.stable, s),
+                  if (md.animating.isNotEmpty)
+                    ..._getAnimatingSpans(context, md.animating, s, opacity),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  List<InlineSpan> _getAnimatingSpans(BuildContext context, String text, double s) {
+  List<InlineSpan> _getAnimatingSpans(
+      BuildContext context, String text, double s, double opacity) {
     if (text.isEmpty) return [];
     final spans = _getParsedSpans(context, text, s);
-    return spans.map((span) => _applyOpacity(span, 0.6)).toList(growable: false);
+    return spans.map((span) => _applyOpacity(span, opacity)).toList(growable: false);
   }
 
   List<InlineSpan> _getParsedSpans(BuildContext context, String text, double s) {
