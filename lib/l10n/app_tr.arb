@@ -342,6 +342,38 @@
   "featureVideoRecognitionTitle": "Video Tanıma",
   "featureWebSearchDescription": "Gerçek zamanlı bilgi için internette arama yapın.",
   "featureWebSearchTitle": "Web Araması",
+  "ragFeatureTitle": "Belgeler",
+  "ragFeatureDescription": "Kendi belgelerin hakkında gizli şekilde sohbet et",
+  "ragScreenTitle": "Belge Sohbeti",
+  "ragAddDocuments": "Belge ekle",
+  "ragEmptyTitle": "Henüz belge yok",
+  "ragEmptyDescription": "PDF, Word, Excel, PowerPoint veya metin dosyaları ekleyerek onlar hakkında sohbet edin.",
+  "ragStatusReady": "Hazır",
+  "ragStatusIndexing": "Dizinleniyor…",
+  "ragStatusFailed": "Başarısız",
+  "ragSelected": "{count} seçili",
+  "@ragSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragEnableChat": "Belge sohbetini etkinleştir",
+  "ragDisableChat": "Belge sohbetini kapat",
+  "ragActiveDocs": "{count} belge",
+  "@ragActiveDocs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragNoSelectionHint": "Sohbet için belge seçin",
+  "ragDeleteConfirm": "Bu belge kütüphaneden silinsin mi?",
+  "ragFileTooBig": "Bu dosya 10 MB'tan büyük.",
+  "ragUnsupportedType": "Bu dosya türü desteklenmiyor.",
+  "ragAddedToChat": "Belge sohbetine eklendi",
   "featuresTitle": "Özellikler",
   "finalPreparation": "Son hazırlıklar yapılıyor.",
   "flowMode": "Akış Modu",

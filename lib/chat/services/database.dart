@@ -11,7 +11,7 @@ class DbHelper {
   DbHelper._internal();
 
   Database? _db;
-  static const int _latestVersion = 10; // Define the latest version here
+  static const int _latestVersion = 11; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -79,6 +79,33 @@ class DbHelper {
  importance INTEGER DEFAULT 3
  );
  ''');
+    await d.execute('''
+      CREATE TABLE rag_documents (
+        id          TEXT PRIMARY KEY,
+        title       TEXT,
+        filePath    TEXT,
+        sizeBytes   INTEGER DEFAULT 0,
+        mimeType    TEXT DEFAULT '',
+        status      TEXT DEFAULT 'pending',
+        chunkCount  INTEGER DEFAULT 0,
+        createdAt   INTEGER DEFAULT 0,
+        updatedAt   INTEGER DEFAULT 0
+      );
+    ''');
+    await d.execute('''
+      CREATE TABLE rag_chunks (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        documentId  TEXT,
+        chunkIndex  INTEGER,
+        text        TEXT,
+        charStart   INTEGER DEFAULT 0,
+        charEnd     INTEGER DEFAULT 0
+      );
+    ''');
+    await d.execute('''
+      CREATE INDEX IF NOT EXISTS idx_rag_chunks_doc
+      ON rag_chunks(documentId);
+    ''');
   }
 
   // This function is called when a user with an OLDER database version opens the app.
@@ -142,6 +169,35 @@ class DbHelper {
         case 10:
           batch.execute(
               "ALTER TABLE conversations ADD COLUMN isArchived INTEGER DEFAULT 0;");
+          break;
+        case 11:
+          batch.execute('''
+            CREATE TABLE rag_documents (
+              id          TEXT PRIMARY KEY,
+              title       TEXT,
+              filePath    TEXT,
+              sizeBytes   INTEGER DEFAULT 0,
+              mimeType    TEXT DEFAULT '',
+              status      TEXT DEFAULT 'pending',
+              chunkCount  INTEGER DEFAULT 0,
+              createdAt   INTEGER DEFAULT 0,
+              updatedAt   INTEGER DEFAULT 0
+            );
+          ''');
+          batch.execute('''
+            CREATE TABLE rag_chunks (
+              id          INTEGER PRIMARY KEY AUTOINCREMENT,
+              documentId  TEXT,
+              chunkIndex  INTEGER,
+              text        TEXT,
+              charStart   INTEGER DEFAULT 0,
+              charEnd     INTEGER DEFAULT 0
+            );
+          ''');
+          batch.execute('''
+            CREATE INDEX IF NOT EXISTS idx_rag_chunks_doc
+            ON rag_chunks(documentId);
+          ''');
           break;
       }
     }

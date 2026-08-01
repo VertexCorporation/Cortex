@@ -11,6 +11,7 @@ class AxonMenu extends StatelessWidget {
   final double screenHeight;
   final int activeTab;
   final VoidCallback onLibraryTap;
+  final VoidCallback onDocumentsTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
   final VoidCallback onRoleplayTap;
@@ -23,6 +24,7 @@ class AxonMenu extends StatelessWidget {
     required this.screenHeight,
     required this.activeTab,
     required this.onLibraryTap,
+    required this.onDocumentsTap,
     required this.onCreateAITap,
     required this.onArtsTap,
     required this.onRoleplayTap,
@@ -52,6 +54,18 @@ class AxonMenu extends StatelessWidget {
             referenceWidth: referenceWidth,
             reduceIconSize: true,
             isActive: activeTab == 1,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 1.5 DOCUMENT CHAT (RAG) ---
+          AxonItem(
+            label: localizations.ragFeatureTitle,
+            iconPath: 'assets/icons/attachment.svg',
+            onTap: onDocumentsTap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: false,
           ),
           SizedBox(height: verticalSpacing),
 
