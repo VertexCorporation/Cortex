@@ -18,6 +18,7 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/processor.dart';
 import 'package:cortex/chat/services/response.dart';
 import 'package:cortex/chat/services/speculative.dart';
+import 'package:cortex/rag/chat.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../../library/backend/data/entity.dart';
@@ -109,6 +110,7 @@ class OfflineService {
   final ChatSessionProvider _sessionProvider;
   final ModelService _modelService;
   final ContextService _contextService;
+  final RagChatService _ragChat;
 
   ChatFormatProcessor? _currentProcessor;
   SpeculativeDecodingConfig _speculativeConfig =
@@ -139,10 +141,12 @@ class OfflineService {
     required ChatSessionProvider sessionProvider,
     required ModelService modelService,
     required ContextService contextService,
+    required RagChatService ragChat,
   })  : _responseService = responseService,
         _sessionProvider = sessionProvider,
         _modelService = modelService,
-        _contextService = contextService {
+        _contextService = contextService,
+        _ragChat = ragChat {
     _llamaChannel.setMethodCallHandler(methodCallHandler);
   }
 
@@ -371,8 +375,14 @@ class OfflineService {
     _singleLoadAttemptCompleter = null;
   }
 
-  Future<void> sendMessage(String text, String? photoPath,
-      [ChatInputMode? activeMode]) async {
+  Future<void> sendMessage(
+    String text,
+    String? photoPath, [
+    ChatInputMode? activeMode,
+    List<String> attachmentPaths = const [],
+    bool ragEnabled = false,
+    List<String> ragDocumentIds = const [],
+  ]) async {
     final String? modelId = _sessionProvider.modelId;
     if (modelId == null) {
       _responseService.onMessageResponse("[Error: No model selected.]");
@@ -406,12 +416,22 @@ class OfflineService {
         activeMode == ChatInputMode.featureReasoning;
     final langCode = _sessionProvider.getLocale().languageCode;
 
+    // RAG (Document Chat): retrieve relevant passages before building the
+    // prompt so the offline model can answer from attached documents.
+    final String? ragContext = await _ragChat.buildContext(
+      queryText: text,
+      toggleEnabled: ragEnabled,
+      toggleDocumentIds: ragDocumentIds,
+      attachmentPaths: attachmentPaths,
+    );
+
     // Prepare Prompt
     final String finalPrompt = await _buildFormattedPrompt(
       model: model,
       latestMessage: text,
       enableThinkingMode: enableThinkingMode,
       langCode: langCode,
+      ragContext: ragContext,
     );
     if (finalPrompt.isEmpty) {
       _responseService.finalizeResponse();
@@ -550,6 +570,7 @@ class OfflineService {
     required String latestMessage,
     bool enableThinkingMode = false,
     String langCode = 'en',
+    String? ragContext,
   }) async {
     // 1. Fallback to default ChatML if no format is provided (safety net).
     // Use ModelDefaults.defaultChatFormat if model.chatFormat is null.
@@ -621,10 +642,13 @@ class OfflineService {
     }
 
     // Last User Message
+    final String effectiveLatest = (ragContext != null && ragContext.isNotEmpty)
+        ? '$ragContext\n\n$latestMessage'
+        : latestMessage;
     _appendTurn(sb,
         start: effectiveTokens.userStart ?? '',
         end: effectiveTokens.userEnd,
-        content: latestMessage);
+        content: effectiveLatest);
 
     // Assistant Primer (consistent with _appendTurn — adds newline after start token)
     if (effectiveTokens.assistantStart?.isNotEmpty ?? false) {

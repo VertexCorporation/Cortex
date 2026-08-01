@@ -737,6 +737,38 @@
   "searching": "Searching",
   "featureWebSearchTitle": "Web Search",
   "featureWebSearchDescription": "Search the web for real-time information",
+  "ragFeatureTitle": "Documents",
+  "ragFeatureDescription": "Chat about your own documents privately",
+  "ragScreenTitle": "Document Chat",
+  "ragAddDocuments": "Add documents",
+  "ragEmptyTitle": "No documents yet",
+  "ragEmptyDescription": "Add PDF, Word, Excel, PowerPoint or text files to chat about them.",
+  "ragStatusReady": "Ready",
+  "ragStatusIndexing": "Indexing…",
+  "ragStatusFailed": "Failed",
+  "ragSelected": "{count} selected",
+  "@ragSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragEnableChat": "Enable document chat",
+  "ragDisableChat": "Disable document chat",
+  "ragActiveDocs": "{count} documents",
+  "@ragActiveDocs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragNoSelectionHint": "Select documents to chat about",
+  "ragDeleteConfirm": "Delete this document from the library?",
+  "ragFileTooBig": "This file is larger than 10 MB.",
+  "ragUnsupportedType": "This file type is not supported.",
+  "ragAddedToChat": "Added to document chat",
   "clearMemory": "Clear Memory",
   "clearMemoryConfirm": "Are you sure you want to clear your memory?",
   "personalization": "Personalization",

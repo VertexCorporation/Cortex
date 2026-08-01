@@ -58,6 +58,11 @@ import 'chat/services/speech.dart';
 import 'chat/services/stop.dart';
 import 'chat/services/voice.dart';
 import 'funds/backend.dart';
+import 'rag/chat.dart';
+import 'rag/ingestion.dart';
+import 'rag/providers/rag_provider.dart';
+import 'rag/retrieval.dart';
+import 'rag/storage.dart';
 import 'initialization.dart';
 import 'internet.dart';
 import 'language.dart';
@@ -699,12 +704,32 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
         modelService: context.read<ModelService>(),
       ),
     ),
+    Provider<RagChatService>(
+      create: (_) {
+        final storage = RagStorageService();
+        return RagChatService(
+          retrievalEngine: Bm25RetrievalEngine(storage: storage),
+          ingestion: RagIngestionService(storage: storage),
+          storage: storage,
+        );
+      },
+    ),
+    ChangeNotifierProvider<RagProvider>(
+      create: (_) {
+        final storage = RagStorageService();
+        return RagProvider(
+          storage: storage,
+          ingestion: RagIngestionService(storage: storage),
+        );
+      },
+    ),
     Provider<OfflineService>(
       create: (BuildContext context) => OfflineService(
         responseService: context.read<ResponseService>(),
         sessionProvider: context.read<ChatSessionProvider>(),
         modelService: context.read<ModelService>(),
         contextService: context.read<ContextService>(),
+        ragChat: context.read<RagChatService>(),
       ),
     ),
     ProxyProvider4<ChatSessionProvider, ConversationProvider, ModelService,
@@ -751,6 +776,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
         voiceService: context.read<VoiceService>(),
         userMemoryProvider: context.read<UserMemoryProvider>(),
         backgroundTaskService: context.read<BackgroundTaskService>(),
+        ragChat: context.read<RagChatService>(),
       ),
     ),
     Provider<StopService>(

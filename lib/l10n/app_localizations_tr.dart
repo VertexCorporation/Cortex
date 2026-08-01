@@ -1851,6 +1851,66 @@ class AppLocalizationsTr extends AppLocalizations {
       'Gerçek zamanlı bilgi için internette arama yapın.';
 
   @override
+  String get ragFeatureTitle => 'Belgeler';
+
+  @override
+  String get ragFeatureDescription =>
+      'Kendi belgelerin hakkında gizli şekilde sohbet et';
+
+  @override
+  String get ragScreenTitle => 'Belge Sohbeti';
+
+  @override
+  String get ragAddDocuments => 'Belge ekle';
+
+  @override
+  String get ragEmptyTitle => 'Henüz belge yok';
+
+  @override
+  String get ragEmptyDescription =>
+      'PDF, Word, Excel, PowerPoint veya metin dosyaları ekleyerek onlar hakkında sohbet edin.';
+
+  @override
+  String get ragStatusReady => 'Hazır';
+
+  @override
+  String get ragStatusIndexing => 'Dizinleniyor…';
+
+  @override
+  String get ragStatusFailed => 'Başarısız';
+
+  @override
+  String ragSelected(int count) {
+    return '$count seçili';
+  }
+
+  @override
+  String get ragEnableChat => 'Belge sohbetini etkinleştir';
+
+  @override
+  String get ragDisableChat => 'Belge sohbetini kapat';
+
+  @override
+  String ragActiveDocs(int count) {
+    return '$count belge';
+  }
+
+  @override
+  String get ragNoSelectionHint => 'Sohbet için belge seçin';
+
+  @override
+  String get ragDeleteConfirm => 'Bu belge kütüphaneden silinsin mi?';
+
+  @override
+  String get ragFileTooBig => 'Bu dosya 10 MB\'tan büyük.';
+
+  @override
+  String get ragUnsupportedType => 'Bu dosya türü desteklenmiyor.';
+
+  @override
+  String get ragAddedToChat => 'Belge sohbetine eklendi';
+
+  @override
   String get clearMemory => 'Hafızayı Temizle';
 
   @override

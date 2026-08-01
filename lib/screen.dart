@@ -31,6 +31,8 @@ import 'news/view.dart';
 import 'arts/screen.dart';
 import 'roleplay/screens/discover_screen.dart';
 import 'notifications/introvert.dart';
+import 'navigation.dart';
+import 'rag/screens/document_library_screen.dart';
 
 enum MainScreenView {
   chat,
@@ -136,6 +138,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return _cachedAxonWidget = Axon(
       onNewChatTap: () => startNewConversation(),
       onLibraryTap: switchToLibrary,
+      onDocumentsTap: _openDocumentLibrary,
       onCreateAITap: switchToCreate,
       onArtsTap: openArtsScreen,
       onRoleplayTap: openRoleplayScreen,
@@ -278,6 +281,14 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (context) => const ArchivedConversationsDialog(),
+    );
+  }
+
+  void _openDocumentLibrary() {
+    closeAxon();
+    navigateToScreen(
+      const DocumentLibraryScreen(),
+      direction: const Offset(1.0, 0.0),
     );
   }
 
