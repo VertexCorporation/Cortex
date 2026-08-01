@@ -9,18 +9,25 @@ class _AiErrorWidget extends StatefulWidget {
   State<_AiErrorWidget> createState() => _AiErrorWidgetState();
 }
 
-class _AiErrorWidgetState extends State<_AiErrorWidget> with SingleTickerProviderStateMixin {
+class _AiErrorWidgetState extends State<_AiErrorWidget>
+    with TickerProviderStateMixin {
   bool _isExpandedError = false;
-  late AnimationController _animCtl;
-  late Animation<double> _fadeAnim;
-  late Animation<Offset> _slideAnim;
+  bool _showErrorText = false;
+  late AnimationController _errorSlideCtl;
+  late Animation<Offset> _errorSlideAnim;
+  late AnimationController _errorFadeOutCtl;
+  late Animation<double> _errorFadeOutAnim;
 
   List<InlineSpan> _buildBoldSpans(String text, TextStyle baseStyle) {
     final parts = text.split('**');
     final spans = <InlineSpan>[];
     for (int i = 0; i < parts.length; i++) {
-      spans.add(TextSpan(text: parts[i],
-          style: i % 2 == 1 ? baseStyle.copyWith(fontWeight: FontWeight.bold) : baseStyle));
+      spans.add(TextSpan(
+        text: parts[i],
+        style: i % 2 == 1
+            ? baseStyle.copyWith(fontWeight: FontWeight.bold)
+            : baseStyle,
+      ));
     }
     return spans;
   }
@@ -28,16 +35,34 @@ class _AiErrorWidgetState extends State<_AiErrorWidget> with SingleTickerProvide
   @override
   void initState() {
     super.initState();
-    _animCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animCtl, curve: Curves.easeOut));
-    _slideAnim = Tween<Offset>(begin: const Offset(0, -0.5), end: Offset.zero).animate(
-      CurvedAnimation(parent: _animCtl, curve: Curves.easeOutQuad));
-    _animCtl.forward();
+    _errorSlideCtl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _errorSlideAnim = Tween<Offset>(
+      begin: const Offset(0, -0.5),
+      end: Offset.zero,
+    ).animate(
+        CurvedAnimation(parent: _errorSlideCtl, curve: Curves.easeOutQuad));
+
+    _errorFadeOutCtl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _errorFadeOutAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _errorFadeOutCtl, curve: Curves.easeOut),
+    );
+
+    // Initial fade in
+    _errorFadeOutCtl.forward();
   }
 
   @override
-  void dispose() { _animCtl.dispose(); super.dispose(); }
+  void dispose() {
+    _errorSlideCtl.dispose();
+    _errorFadeOutCtl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +71,25 @@ class _AiErrorWidgetState extends State<_AiErrorWidget> with SingleTickerProvide
     final iconSize = screenWidth * 0.06;
 
     return GestureDetector(
-      onTap: () => setState(() => _isExpandedError = !_isExpandedError),
+      onTap: () => setState(() {
+        if (_isExpandedError) {
+          _errorSlideCtl.reverse().then((_) {
+            if (mounted) {
+              setState(() {
+                _isExpandedError = false;
+                _showErrorText = false;
+              });
+            }
+          });
+        } else {
+          _isExpandedError = true;
+          _errorSlideCtl.forward().whenComplete(() {
+            if (mounted) setState(() => _showErrorText = true);
+          });
+        }
+      }),
       child: FadeTransition(
-        opacity: _fadeAnim,
+        opacity: _errorFadeOutAnim,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
           child: Container(
@@ -85,10 +126,10 @@ class _AiErrorWidgetState extends State<_AiErrorWidget> with SingleTickerProvide
                       ? const SizedBox.shrink()
                       : ClipRect(
                           child: AnimatedOpacity(
-                            opacity: _isExpandedError ? 1.0 : 0.0,
+                            opacity: _showErrorText ? 1.0 : 0.0,
                             duration: const Duration(milliseconds: 200),
                             child: SlideTransition(
-                              position: _slideAnim,
+                              position: _errorSlideAnim,
                               child: Padding(
                                 padding: EdgeInsets.only(top: screenWidth * 0.02),
                                 child: SelectionArea(

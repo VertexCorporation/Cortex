@@ -36,7 +36,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
 
     _scaleAnimation = CurvedAnimation(
       parent: _entranceController,
-      curve: Curves.easeOutCubic,
+      curve: Curves.easeOutBack,
     );
 
     _slideAnimation = Tween<Offset>(
@@ -44,7 +44,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _entranceController,
-      curve: Curves.easeOutCubic,
+      curve: Curves.easeOutBack,
     ));
 
     // Ensure keyboard is dismissed
