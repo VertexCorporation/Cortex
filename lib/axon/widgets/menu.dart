@@ -69,19 +69,7 @@ class AxonMenu extends StatelessWidget {
           ),
           SizedBox(height: verticalSpacing),
 
-          // --- 2. CREATE AI ---
-          AxonItem(
-            label: localizations.createAI,
-            iconPath: 'assets/icons/intelligence.svg',
-            onTap: onCreateAITap,
-            screenHeight: screenHeight,
-            referenceWidth: referenceWidth,
-            reduceIconSize: true,
-            isActive: activeTab == 3,
-          ),
-          SizedBox(height: verticalSpacing),
-
-          // --- 3. ARTS ---
+          // --- 2. ARTS ---
           AxonItem(
             label: localizations.arts,
             iconPath: 'assets/icons/art.svg',
@@ -90,6 +78,18 @@ class AxonMenu extends StatelessWidget {
             referenceWidth: referenceWidth,
             reduceIconSize: true,
             isActive: activeTab == 4,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 3. CREATE AI ---
+          AxonItem(
+            label: localizations.createAI,
+            iconPath: 'assets/icons/intelligence.svg',
+            onTap: onCreateAITap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: activeTab == 3,
           ),
           SizedBox(height: verticalSpacing),
 

@@ -237,12 +237,10 @@ class AppBootstrap {
 
     // 6. Determine Theme.
     final savedTheme = activePrefs.getString('selectedTheme');
-    final String initialTheme = AppTheme.normalize(
-      savedTheme ??
-          (PlatformDispatcher.instance.platformBrightness == Brightness.dark
-              ? AppTheme.dark
-              : AppTheme.light),
-    );
+    final String initialTheme = savedTheme ??
+        (PlatformDispatcher.instance.platformBrightness == Brightness.dark
+            ? 'dark'
+            : 'light');
 
     final String? savedLanguage = activePrefs.getString('language_code');
 
