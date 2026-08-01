@@ -37,7 +37,8 @@ class _DocumentLibraryScreenView extends StatefulWidget {
       _DocumentLibraryScreenViewState();
 }
 
-class _DocumentLibraryScreenViewState extends State<_DocumentLibraryScreenView> {
+class _DocumentLibraryScreenViewState
+    extends State<_DocumentLibraryScreenView> {
   static const int _maxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
 
   @override
@@ -48,8 +49,7 @@ class _DocumentLibraryScreenViewState extends State<_DocumentLibraryScreenView> 
       final ragProvider = context.read<RagProvider>();
       final inputProvider = context.read<InputProvider>();
       // Reflect the currently active document chat selection (if any).
-      if (inputProvider.ragEnabled &&
-          inputProvider.ragDocumentIds.isNotEmpty) {
+      if (inputProvider.ragEnabled && inputProvider.ragDocumentIds.isNotEmpty) {
         ragProvider.setSelection(inputProvider.ragDocumentIds.toSet());
       }
       ragProvider.loadDocuments();
@@ -252,7 +252,7 @@ class _DocumentLibraryScreenViewState extends State<_DocumentLibraryScreenView> 
                 : documents.isEmpty
                     ? _EmptyState(
                         icon: SvgPicture.asset(
-                          'assets/icons/library.svg',
+                          'assets/icons/attachment.svg',
                           width: 64,
                           height: 64,
                           colorFilter: ColorFilter.mode(
@@ -273,9 +273,8 @@ class _DocumentLibraryScreenViewState extends State<_DocumentLibraryScreenView> 
                           final doc = documents[index];
                           return _DocumentTile(
                             document: doc,
-                            isSelected:
-                                selectedIds.contains(doc.id) &&
-                                    doc.status == RagDocumentStatus.indexed,
+                            isSelected: selectedIds.contains(doc.id) &&
+                                doc.status == RagDocumentStatus.indexed,
                             isIndexing: ragProvider.isIndexing(doc.filePath),
                             onTap: () {
                               if (doc.status != RagDocumentStatus.indexed) {

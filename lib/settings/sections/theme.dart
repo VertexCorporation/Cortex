@@ -7,34 +7,128 @@ import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../darkener.dart';
 import '../../l10n/app_localizations.dart';
+import '../../notifications/introvert.dart';
 import '../../theme.dart';
+import '../providers/general.dart';
 
-/// Theme selection section in settings.
+/// A widget that manages the app theme selection section in the settings screen.
+///
+/// This component adapts its internal dialog UI to the screen size, ensuring
+/// comfortable interaction targets on both phones and tablets.
 class AppThemeSection extends StatelessWidget {
   const AppThemeSection({super.key});
 
+  /// Returns the localized name for a given theme code.
   String _getLocalizedThemeName(
       AppLocalizations localizations, String themeCode) {
-    return switch (themeCode) {
-      AppTheme.dark => localizations.darkTheme,
-      _ => localizations.lightTheme,
+    final Map<String, String> mapping = {
+      'light': localizations.light,
+      'dark': localizations.dark,
+      'love': localizations.love,
+      'nature': localizations.nature,
+      'behindTheSlaughter': localizations.behindTheSlaughter,
+      'grayscale': localizations.grayscale,
+      'ocean': localizations.ocean,
+      'scarletSnow': localizations.scarletSnow,
+      'cyberpunk': localizations.cyberpunk,
+      'sunset': localizations.sunset,
+      'coffee': localizations.coffee,
+      'deepSpace': localizations.deepSpace,
     };
+    return mapping[themeCode] ?? themeCode;
   }
 
+  /// Determines the minimum subscription level required to unlock a theme.
+  int _getRequiredSubscriptionLevelForTheme(String themeCode) {
+    switch (themeCode) {
+      case 'light':
+      case 'dark':
+      case 'grayscale':
+        return 0; // Free
+      case 'nature':
+      case 'ocean':
+      case 'behindTheSlaughter':
+      case 'scarletSnow':
+      case 'love':
+      case 'cyberpunk':
+      case 'sunset':
+      case 'coffee':
+      case 'deepSpace':
+        return 1; // Requires at least Plus
+      default:
+        return 99; // Unknown themes are locked by default
+    }
+  }
+
+  /// Checks if a specific theme is enabled based on the user's active subscription status.
+  bool _isThemeEnabled(SettingsGeneralProvider provider, String themeCode) {
+    final int activeUserLevel = provider.activeSubscriptionLevel;
+    final int requiredLevel = _getRequiredSubscriptionLevelForTheme(themeCode);
+
+    return activeUserLevel >= requiredLevel;
+  }
+
+  /// Sorts themes: Base > Enabled Alphabetical > Locked.
+  List<Map<String, dynamic>> _sortThemes(List<Map<String, dynamic>> themes) {
+    themes.sort((a, b) {
+      final bool aEnabled = a['enabled'] as bool;
+      final bool bEnabled = b['enabled'] as bool;
+      final String aCode = a['code'] as String;
+      final String bCode = b['code'] as String;
+      final String aName = a['name'] as String;
+      final String bName = b['name'] as String;
+
+      const List<String> baseThemeOrder = ['light', 'dark', 'grayscale'];
+      final int aBaseIndex = baseThemeOrder.indexOf(aCode);
+      final int bBaseIndex = baseThemeOrder.indexOf(bCode);
+
+      if (aBaseIndex != -1 && bBaseIndex != -1) {
+        return aBaseIndex.compareTo(bBaseIndex);
+      }
+      if (aBaseIndex != -1) return -1;
+      if (bBaseIndex != -1) return 1;
+
+      if (aEnabled && !bEnabled) return -1;
+      if (!aEnabled && bEnabled) return 1;
+
+      if (aEnabled && bEnabled) {
+        return aName.toLowerCase().compareTo(bName.toLowerCase());
+      }
+
+      if (!aEnabled && !bEnabled) {
+        final int aRequiredLevel = _getRequiredSubscriptionLevelForTheme(aCode);
+        final int bRequiredLevel = _getRequiredSubscriptionLevelForTheme(bCode);
+        if (aRequiredLevel != bRequiredLevel) {
+          return aRequiredLevel.compareTo(bRequiredLevel);
+        }
+        return aName.toLowerCase().compareTo(bName.toLowerCase());
+      }
+      return 0;
+    });
+    return themes;
+  }
+
+  /// Displays the theme selection dialog with responsive scaling.
   Future<void> _showThemeSelectionDialog(BuildContext context) async {
+    final generalProvider = context.read<SettingsGeneralProvider>();
     final themeProvider = context.read<ThemeProvider>();
+    final notificationService = context.read<IntrovertNotificationService>();
     final appLocalizations = AppLocalizations.of(context)!;
 
+    // --- DYNAMIC SCALING ---
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final double scale = screenWidth / 400.0;
 
-    final themesList = AppTheme.all
-        .map((code) => {
-              'code': code,
-              'name': _getLocalizedThemeName(appLocalizations, code),
-            })
-        .toList();
+    List<Map<String, dynamic>> themesList =
+        AppColors.overlayStyles.keys.map((code) {
+      return {
+        'code': code,
+        'name': _getLocalizedThemeName(appLocalizations, code),
+        'enabled': _isThemeEnabled(generalProvider, code),
+      };
+    }).toList();
+    themesList = _sortThemes(themesList);
 
     String tempSelectedTheme = themeProvider.currentTheme;
     final RestoreCallback restoreNavBar = Darkener.darken(factor: 0.5);
@@ -49,6 +143,7 @@ class AppThemeSection extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: Container(
+              // Cap width for tablets so it doesn't look too stretched
               width: (screenWidth * 0.8).clamp(0, 500 * scale),
               decoration: BoxDecoration(
                   color: AppColors.secondaryColor,
@@ -61,6 +156,7 @@ class AppThemeSection extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        // --- Dialog Header with Icon ---
                         SizedBox(height: 20 * scale),
                         SvgPicture.asset(
                           'assets/icons/theme.svg',
@@ -84,6 +180,8 @@ class AppThemeSection extends StatelessWidget {
                             thickness: 0.5,
                             color:
                                 AppColors.quinaryColor.withValues(alpha: 0.7)),
+
+                        // --- Themes List with Animations ---
                         ConstrainedBox(
                           constraints:
                               BoxConstraints(maxHeight: screenHeight * 0.4),
@@ -93,7 +191,7 @@ class AppThemeSection extends StatelessWidget {
                                 vertical: 10 * scale, horizontal: 10 * scale),
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                              crossAxisCount: screenWidth > 600 ? 3 : 2,
                               crossAxisSpacing: 12 * scale,
                               mainAxisSpacing: 12 * scale,
                               childAspectRatio: 0.9,
@@ -101,18 +199,27 @@ class AppThemeSection extends StatelessWidget {
                             itemCount: themesList.length,
                             itemBuilder: (context, index) {
                               final theme = themesList[index];
+                              final bool isEnabled = theme['enabled'] as bool;
                               final String themeCode = theme['code'] as String;
                               final bool isSelected =
-                                  tempSelectedTheme == themeCode;
+                                  (tempSelectedTheme == themeCode);
+
                               final themeColors =
                                   AppColors.getThemeColors(themeCode);
 
                               return GestureDetector(
                                 onTap: () {
-                                  if (!isSelected) {
+                                  if (isEnabled) {
+                                    if (!isSelected) {
+                                      HapticFeedback.lightImpact();
+                                      setStateDialog(
+                                          () => tempSelectedTheme = themeCode);
+                                    }
+                                  } else {
                                     HapticFeedback.lightImpact();
-                                    setStateDialog(
-                                        () => tempSelectedTheme = themeCode);
+                                    notificationService.showNotification(
+                                        message: appLocalizations.themeLocked,
+                                        type: NotificationType.error);
                                   }
                                 },
                                 child: AnimatedContainer(
@@ -236,6 +343,26 @@ class AppThemeSection extends StatelessWidget {
                                                 size: 20 * scale),
                                           ),
                                         ),
+                                      if (!isEnabled)
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black
+                                                .withValues(alpha: 0.6),
+                                            borderRadius: BorderRadius.circular(
+                                                11 * scale),
+                                          ),
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              'assets/icons/lock.svg',
+                                              width: 24 * scale,
+                                              height: 24 * scale,
+                                              colorFilter:
+                                                  const ColorFilter.mode(
+                                                      Colors.white,
+                                                      BlendMode.srcIn),
+                                            ),
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ),
@@ -243,6 +370,8 @@ class AppThemeSection extends StatelessWidget {
                             },
                           ),
                         ),
+
+                        // --- Dialog Footer with "Done" Button ---
                         Divider(
                             height: 1,
                             thickness: 0.5,

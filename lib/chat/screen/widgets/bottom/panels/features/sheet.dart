@@ -147,6 +147,8 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     FutureBuilder<List<CameraDescription>>(
                       future: availableCameras(),
                       builder: (futureContext, snapshot) {
+                        final bool hasCamera =
+                            snapshot.hasData && snapshot.data!.isNotEmpty;
                         final bool canHandleImages =
                             sessionProvider.isDynamicChat
                                 ? true
@@ -155,6 +157,10 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                             sessionProvider.isDynamicChat
                                 ? true
                                 : sessionProvider.canHandleVideo;
+                        final bool canHandleAudio =
+                            sessionProvider.isDynamicChat
+                                ? true
+                                : sessionProvider.canHandleAudio;
 
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -186,100 +192,65 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                           );
                         }
 
-                        final double gridGap = itemGap;
-                        final double buttonHeight = (screenWidth * 0.85) / 3 * 0.85;
-
                         return Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: contentHorizontalPadding),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Top Row: Görsel (Gallery / Camera) - Video
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: AttachmentSheetButton(
-                                      iconPath: 'assets/icons/gallery.svg',
-                                      label: l10n.categoryPhoto,
-                                      height: buttonHeight,
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        inputService.pickMediaAction(
-                                          context,
-                                          source: ImageSource.gallery,
-                                          supportImage: canHandleImages,
-                                          supportVideo: canHandleVideo,
-                                          onSelectionComplete: () {},
-                                        );
-                                      },
-                                    ),
+                              if (hasCamera &&
+                                  (canHandleImages || canHandleVideo)) ...[
+                                Expanded(
+                                  child: AttachmentSheetButton(
+                                    iconPath: 'assets/icons/camera.svg',
+                                    label: l10n.actionCamera,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      inputService.pickMediaAction(
+                                        context,
+                                        source: ImageSource.camera,
+                                        supportImage: canHandleImages,
+                                        supportVideo: canHandleVideo,
+                                        onSelectionComplete: () {},
+                                      );
+                                    },
                                   ),
-                                  SizedBox(width: gridGap),
-                                  Expanded(
-                                    child: AttachmentSheetButton(
-                                      iconPath: 'assets/icons/transition.svg',
-                                      label: l10n.categoryVideo,
-                                      height: buttonHeight,
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        if (isCurrentVideoModel) {
-                                          _selectDynamicModel(context);
-                                        } else {
-                                          _handleGenerationFeatureAction(
-                                            context,
-                                            videoGenModels,
-                                            widget.controller,
-                                            targetType: 'video',
-                                          );
-                                        }
-                                      },
-                                    ),
+                                ),
+                                SizedBox(width: itemGap),
+                              ],
+                              if (canHandleImages || canHandleVideo) ...[
+                                Expanded(
+                                  child: AttachmentSheetButton(
+                                    iconPath: 'assets/icons/gallery.svg',
+                                    label: l10n.actionGallery,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      inputService.pickMediaAction(
+                                        context,
+                                        source: ImageSource.gallery,
+                                        supportImage: canHandleImages,
+                                        supportVideo: canHandleVideo,
+                                        onSelectionComplete: () {},
+                                      );
+                                    },
                                   ),
-                                ],
-                              ),
-                              SizedBox(height: gridGap),
-                              // Bottom Row: Ses - İnternetsiz
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: AttachmentSheetButton(
-                                      iconPath: 'assets/icons/voice.svg',
-                                      label: l10n.featureCreateAudioTitle,
-                                      height: buttonHeight,
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        if (isCurrentAudioModel) {
-                                          _selectDynamicModel(context);
-                                        } else {
-                                          _handleGenerationFeatureAction(
-                                            context,
-                                            audioGenModels,
-                                            widget.controller,
-                                            targetType: 'audio',
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(width: gridGap),
-                                  Expanded(
-                                    child: AttachmentSheetButton(
-                                      iconPath: 'assets/icons/context.svg',
-                                      label: l10n.useOffline,
-                                      height: buttonHeight,
-                                      onTap: () {
-                                        if (currentMode == ChatInputMode.offline ||
-                                            isOfflineModelSelected) {
-                                          _selectDynamicModel(context);
-                                        } else {
-                                          _handleOfflineAction(context, l10n);
-                                        }
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ),
-                                ],
+                                ),
+                                SizedBox(width: itemGap),
+                              ],
+                              Expanded(
+                                child: AttachmentSheetButton(
+                                  iconPath: 'assets/icons/attachment.svg',
+                                  label: l10n.actionFile,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    inputService.pickFile(
+                                      context,
+                                      canHandleAudio: canHandleAudio,
+                                      canHandleVideo: canHandleVideo,
+                                    );
+                                  },
+                                ),
                               ),
                             ],
                           ),
@@ -370,7 +341,6 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       description: l10n.ragFeatureDescription,
                       isSelected: inputProvider.ragEnabled,
                       onTap: () {
-                        _prepareForTextFeature(context);
                         Navigator.pop(context);
                         navigateToScreen(
                           const DocumentLibraryScreen(),
