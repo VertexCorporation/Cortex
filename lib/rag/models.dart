@@ -114,7 +114,8 @@ class RagChunk {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      // SQLite owns this autoincrement key for newly created chunks.
+      if (id > 0) 'id': id,
       'documentId': documentId,
       'chunkIndex': chunkIndex,
       'text': text,
