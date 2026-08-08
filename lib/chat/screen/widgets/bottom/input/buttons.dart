@@ -353,7 +353,7 @@ class ActionButtonWidget extends StatelessWidget {
         await voiceService.startSession(
           context: context,
           locale: localeCode,
-          voiceSystemPromptSuffix: localizations.voiceSystemPromptSuffix,
+          voiceSystemPrompt: localizations.voiceSystemPrompt,
           flowPromptBuilder: (agentName, previousResponse) =>
               localizations.flowModeContextParams(
                   agentName, previousResponse),

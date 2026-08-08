@@ -10,7 +10,7 @@ import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/main.dart';
 import 'package:cortex/navigation.dart';
-import 'package:cortex/rag/screens/document_library_screen.dart';
+import 'package:cortex/rag/screens/documents.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';

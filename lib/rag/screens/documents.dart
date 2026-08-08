@@ -13,7 +13,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/rag/chat.dart';
 import 'package:cortex/rag/models.dart';
-import 'package:cortex/rag/providers/rag_provider.dart';
+import 'package:cortex/rag/provider.dart';
 import 'package:cortex/theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';

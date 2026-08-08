@@ -39,6 +39,12 @@ import 'axon/inbox/logic/general.dart';
 import 'arts/provider.dart';
 import 'roleplay/provider.dart';
 
+import 'package:cortex/rag/storage.dart';
+import 'package:cortex/rag/ingestion.dart';
+import 'package:cortex/rag/retrieval.dart';
+import 'package:cortex/rag/injector.dart';
+import 'package:cortex/rag/chat.dart';
+import 'package:cortex/rag/provider.dart';
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
 import 'chat/providers/session.dart';
@@ -703,6 +709,34 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             modelService: context.read<ModelService>(),
           ),
     ),
+    Provider<RagStorageService>(
+      create: (_) => RagStorageService(),
+    ),
+    Provider<RagIngestionService>(
+      create: (BuildContext context) =>
+          RagIngestionService(storage: context.read<RagStorageService>()),
+    ),
+    Provider<RetrievalEngine>(
+      create: (BuildContext context) =>
+          Bm25RetrievalEngine(storage: context.read<RagStorageService>()),
+    ),
+    Provider<RagContextInjector>(
+      create: (_) => RagContextInjector(),
+    ),
+    Provider<RagChatService>(
+      create: (BuildContext context) => RagChatService(
+        retrievalEngine: context.read<RetrievalEngine>(),
+        ingestion: context.read<RagIngestionService>(),
+        storage: context.read<RagStorageService>(),
+        injector: context.read<RagContextInjector>(),
+      ),
+    ),
+    ChangeNotifierProvider<RagProvider>(
+      create: (BuildContext context) => RagProvider(
+        storage: context.read<RagStorageService>(),
+        ingestion: context.read<RagIngestionService>(),
+      ),
+    ),
     Provider<OfflineService>(
       create: (BuildContext context) =>
           OfflineService(
@@ -710,6 +744,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             sessionProvider: context.read<ChatSessionProvider>(),
             modelService: context.read<ModelService>(),
             contextService: context.read<ContextService>(),
+            ragChat: context.read<RagChatService>(),
           ),
     ),
     ProxyProvider4<ChatSessionProvider,
@@ -761,6 +796,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             voiceService: context.read<VoiceService>(),
             userMemoryProvider: context.read<UserMemoryProvider>(),
             backgroundTaskService: context.read<BackgroundTaskService>(),
+            ragChat: context.read<RagChatService>(),
           ),
     ),
     Provider<StopService>(

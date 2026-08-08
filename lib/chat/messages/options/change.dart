@@ -20,7 +20,6 @@ import '../../../server/credits.dart';
 
 // --- UI Metrics (Constants) ---
 class _UIFactors {
-  static const double dialogWidthFactor = 0.70;
   static const double borderRadiusFactor = 0.03;
   static const double iconSizeFactor = 0.08;
   static const double titleFontSizeFactor = 0.04;

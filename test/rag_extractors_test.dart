@@ -22,7 +22,7 @@ Uint8List _buildDocx(List<String> paragraphs) {
       sb.length,
       utf8.encode(sb.toString()),
     ));
-  return Uint8List.fromList(ZipEncoder().encode(archive)!);
+  return Uint8List.fromList(ZipEncoder().encode(archive) ?? <int>[]);
 }
 
 void main() {

@@ -64,3 +64,6 @@ android/llama/.cxx/
 android/key.properties
 android/app/Cortex.jks
 android_signing_keys.zip
+
+# Tools
+.cursor/

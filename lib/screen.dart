@@ -32,7 +32,7 @@ import 'arts/screen.dart';
 import 'roleplay/screens/discover_screen.dart';
 import 'notifications/introvert.dart';
 import 'navigation.dart';
-import 'rag/screens/document_library_screen.dart';
+import 'rag/screens/documents.dart';
 
 enum MainScreenView {
   chat,

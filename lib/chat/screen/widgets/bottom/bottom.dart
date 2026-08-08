@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'package:cortex/chat/screen/widgets/ambient_glow.dart';
+import 'package:cortex/chat/screen/widgets/glow.dart';
 import 'package:cortex/chat/screen/widgets/bottom/panels/edit.dart';
 import 'package:flutter/material.dart';
 

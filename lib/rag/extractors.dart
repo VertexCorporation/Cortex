@@ -47,12 +47,16 @@ class DocTextExtractor {
 
   /// Extracts plain text from [path]. Returns `null` if extraction failed or
   /// the format is unsupported.
-  Future<String?> extractText(String path, {ServerDocParser? serverFallback}) async {
+  Future<String?> extractText(String path,
+      {ServerDocParser? serverFallback}) async {
     try {
       final file = File(path);
       if (!await file.exists()) return null;
 
-      final extension = path.split('.').last.toLowerCase();
+      final extension = path
+          .split('.')
+          .last
+          .toLowerCase();
 
       // 1. Text files.
       if (textExtensions.contains(extension)) {
@@ -171,8 +175,7 @@ class DocTextExtractor {
     }
   }
 
-  Future<String?> _extractOoxmlText(
-    List<int> bytes, {
+  Future<String?> _extractOoxmlText(List<int> bytes, {
     required String targetEntry,
     required String paragraphTag,
     required String textTag,
@@ -192,8 +195,7 @@ class DocTextExtractor {
     }
   }
 
-  String _parseOoxmlText(
-    String xmlString, {
+  String _parseOoxmlText(String xmlString, {
     required String paragraphTag,
     required String textTag,
   }) {
@@ -213,7 +215,9 @@ class DocTextExtractor {
             .map((e) => e.innerText)
             .toList();
         final line = texts.join();
-        if (line.trim().isNotEmpty) {
+        if (line
+            .trim()
+            .isNotEmpty) {
           sb.writeln(line.trim());
         }
       }

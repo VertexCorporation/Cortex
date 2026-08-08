@@ -14,7 +14,7 @@ import 'package:cortex/chat/screen/widgets/bottom/input/service.dart';
 import 'package:cortex/fog.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/navigation.dart';
-import 'package:cortex/rag/screens/document_library_screen.dart';
+import 'package:cortex/rag/screens/documents.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 part 'waveform.dart';
