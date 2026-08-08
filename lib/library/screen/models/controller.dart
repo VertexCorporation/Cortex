@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:cortex/library/screen/models/skeleton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../l10n/app_localizations.dart';
@@ -267,7 +268,8 @@ class LibraryScreenState extends State<LibraryScreen>
         hasError: catalog.loadError,
         models: catalog.allModels,
         downloadedStates: local.downloadCompleted,
-        downloadManagers: Map.from(local.downloadManagers),
+        downloadManagers: local.downloadManagers, // Do not copy, pass reference
+        downloadUpdateVersion: local.downloadUpdateVersion,
         systemInfo: local.systemInfo,
       ),
       builder: (context, state, _) {
@@ -339,6 +341,7 @@ class _CatalogState {
   final List<ModelEntity> models;
   final Map<String, bool> downloadedStates;
   final Map<String, DownloadManager> downloadManagers;
+  final int downloadUpdateVersion;
   final SystemInfoData? systemInfo;
 
   const _CatalogState({
@@ -347,6 +350,7 @@ class _CatalogState {
     required this.models,
     required this.downloadedStates,
     required this.downloadManagers,
+    required this.downloadUpdateVersion,
     this.systemInfo,
   });
 
@@ -357,8 +361,15 @@ class _CatalogState {
           isLoading == other.isLoading &&
           hasError == other.hasError &&
           models.length == other.models.length &&
-          downloadedStates.length == other.downloadedStates.length;
+          mapEquals(downloadedStates, other.downloadedStates) &&
+          downloadUpdateVersion == other.downloadUpdateVersion;
 
   @override
-  int get hashCode => Object.hash(isLoading, hasError, models.length, downloadedStates.length);
+  int get hashCode => Object.hash(
+        isLoading,
+        hasError,
+        models.length,
+        Object.hashAll(downloadedStates.keys),
+        downloadUpdateVersion,
+      );
 }

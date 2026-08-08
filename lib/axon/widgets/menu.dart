@@ -16,7 +16,6 @@ class AxonMenu extends StatelessWidget {
   final VoidCallback onArtsTap;
   final VoidCallback onRoleplayTap;
   final VoidCallback onNewsTap;
-  final VoidCallback onArchivedTap;
 
   const AxonMenu({
     super.key,
@@ -29,7 +28,6 @@ class AxonMenu extends StatelessWidget {
     required this.onArtsTap,
     required this.onRoleplayTap,
     required this.onNewsTap,
-    required this.onArchivedTap,
   });
 
   @override
@@ -102,18 +100,6 @@ class AxonMenu extends StatelessWidget {
             referenceWidth: referenceWidth,
             reduceIconSize: true,
             isActive: activeTab == 2,
-          ),
-          SizedBox(height: verticalSpacing),
-
-          // --- 5. ARCHIVED ---
-          AxonItem(
-            label: localizations.archive,
-            iconPath: 'assets/icons/download.svg',
-            onTap: onArchivedTap,
-            screenHeight: screenHeight,
-            referenceWidth: referenceWidth,
-            reduceIconSize: true,
-            isActive: false,
           ),
 
           // Bottom Spacing before the list starts

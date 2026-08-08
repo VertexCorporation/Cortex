@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
-import 'package:cortex/axon/inbox/archived.dart';
 
 import 'package:flutter/material.dart';
 import 'main.dart';
@@ -144,7 +143,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       onArtsTap: openArtsScreen,
       onRoleplayTap: openRoleplayScreen,
       onNewsTap: openNewsScreen,
-      onArchivedTap: _showArchivedConversations,
       onCloseAxon: closeAxon,
       onOpenAxon: () => _animateAxonTo(1.0),
       referenceWidth: standardAxonWidth,
@@ -278,12 +276,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
   }
 
-  void _showArchivedConversations() {
-    showDialog(
-      context: context,
-      builder: (context) => const ArchivedConversationsDialog(),
-    );
-  }
 
   void _openDocumentLibrary() {
     closeAxon();

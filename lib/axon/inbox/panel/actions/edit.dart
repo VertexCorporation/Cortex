@@ -75,158 +75,152 @@ Future<String?> showEditTitleDialog({
                 padding: EdgeInsets.only(bottom: verticalOffset),
                 child: Center(
                   child: Material(
-                    // This allows InkWell splashes to be visible on top of the color.
-                    color: AppColors.background,
-                    elevation: 10,
-                    shadowColor: Colors.black.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(16),
-                    clipBehavior: Clip.antiAlias,
-                    // Ensures splashes don't bleed out
-                    child: SizedBox(
-                      // --- WIDTH LOGIC ---
-                      width: isTablet ? 400 : screenWidth * 0.88,
-                      // No decoration here, handled by Material above
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // --- Header + TextField ---
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(
-                              screenWidth * 0.05,
-                              screenWidth * 0.05,
-                              screenWidth * 0.05,
-                              screenWidth * 0.03,
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  localizations.editConversationTitle,
-                                  style: TextStyle(
-                                    color: AppColors.primaryColor.inverted,
-                                    fontSize:
-                                        isTablet ? 18 : screenWidth * 0.045,
-                                    fontWeight: FontWeight.bold,
+                    color: Colors.transparent,
+                    child: Container(
+                      width: isTablet ? 400 : screenWidth * 0.8,
+                      decoration: BoxDecoration(
+                          color: AppColors.secondaryColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // --- Header + TextField ---
+                            Padding(
+                              padding: EdgeInsets.all(screenWidth * 0.05),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    localizations.editConversationTitle,
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor.inverted,
+                                      fontSize: screenWidth * 0.045,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: screenWidth * 0.04),
-                                TextField(
-                                  controller: controller,
-                                  autofocus: true,
-                                  maxLength: 32, // Enforce limit
-                                  decoration: InputDecoration(
-                                    labelText: localizations.newTitle,
-                                    labelStyle: TextStyle(
-                                      color: AppColors.tertiaryColor,
-                                      fontSize: 14,
-                                    ),
-                                    isDense: true,
-                                    counterText: "", // Hide character counter
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                      horizontal: 12,
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: AppColors.border),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
+                                  SizedBox(height: screenWidth * 0.05),
+                                  TextField(
+                                    controller: controller,
+                                    autofocus: true,
+                                    maxLength: 32,
+                                    decoration: InputDecoration(
+                                      labelText: localizations.newTitle,
+                                      labelStyle: TextStyle(
                                         color: AppColors.primaryColor.inverted,
-                                        width: 1.5,
+                                        fontSize: 14,
                                       ),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  style: TextStyle(
-                                    color: AppColors.primaryColor.inverted,
-                                    fontSize: 15,
-                                  ),
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) => submitTitle(ctx,
-                                      trigger: 'keyboard_done'),
-                                  onChanged: (_) => setStateDialog(() {}),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // --- Divider ---
-                          Divider(
-                              color: AppColors.quinaryColor,
-                              thickness: 0.5,
-                              height: 1),
-
-                          // --- Actions ---
-                          SizedBox(
-                            height: isTablet ? 50 : screenWidth * 0.12,
-                            child: Row(
-                              children: [
-                                // Cancel
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () {
-                                      HapticFeedback.lightImpact();
-                                      Navigator.of(ctx).pop();
-                                    },
-                                    // Splash color visible now thanks to Material parent
-                                    splashColor: AppColors.septenaryColor
-                                        .withValues(alpha: 0.1),
-                                    highlightColor: AppColors.septenaryColor
-                                        .withValues(alpha: 0.05),
-                                    child: Center(
-                                      child: Text(
-                                        localizations.cancel,
-                                        style: TextStyle(
-                                          fontSize: isTablet
-                                              ? 15
-                                              : screenWidth * 0.038,
-                                          color: AppColors.septenaryColor,
-                                          fontWeight: FontWeight.w500,
+                                      isDense: true,
+                                      counterText: "",
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                        horizontal: 12,
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: AppColors.quinaryColor),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: AppColors.primaryColor.inverted,
+                                          width: 1.0,
                                         ),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                     ),
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor.inverted,
+                                      fontSize: screenWidth * 0.04,
+                                    ),
+                                    textInputAction: TextInputAction.done,
+                                    onSubmitted: (_) => submitTitle(ctx,
+                                        trigger: 'keyboard_done'),
+                                    onChanged: (_) => setStateDialog(() {}),
                                   ),
-                                ),
-                                VerticalDivider(
-                                    color: AppColors.quinaryColor,
-                                    thickness: 0.5,
-                                    width: 1),
-                                // Save
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: isChanged
-                                        ? () => submitTitle(ctx,
-                                            trigger: 'save_button')
-                                        : null,
-                                    splashColor: AppColors.senaryColor
-                                        .withValues(alpha: 0.1),
-                                    highlightColor: AppColors.senaryColor
-                                        .withValues(alpha: 0.05),
-                                    child: Center(
-                                      child: AnimatedOpacity(
-                                        duration:
-                                            const Duration(milliseconds: 250),
-                                        opacity: isChanged ? 1.0 : 0.5,
-                                        child: Text(
-                                          localizations.save,
-                                          style: TextStyle(
-                                            fontSize: isTablet
-                                                ? 15
-                                                : screenWidth * 0.038,
-                                            color: AppColors.senaryColor,
-                                            fontWeight: FontWeight.w600,
+                                ],
+                              ),
+                            ),
+                            // --- Divider ---
+                            Divider(
+                                color: AppColors.quinaryColor,
+                                thickness: 0.5,
+                                height: 1),
+                            // --- Actions ---
+                            IntrinsicHeight(
+                              child: Row(
+                                children: [
+                                  // Cancel
+                                  Expanded(
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          Navigator.of(ctx).pop();
+                                        },
+                                        splashColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        highlightColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: screenWidth * 0.04),
+                                          child: Text(
+                                            localizations.cancel,
+                                            style: TextStyle(
+                                              fontSize: screenWidth * 0.04,
+                                              color: AppColors.senaryColor,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  VerticalDivider(
+                                      width: 1,
+                                      thickness: 0.5,
+                                      color: AppColors.quinaryColor),
+                                  // Save
+                                  Expanded(
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: isChanged
+                                            ? () => submitTitle(ctx,
+                                                trigger: 'save_button')
+                                            : null,
+                                        splashColor: AppColors.primaryColor.inverted
+                                            .withValues(alpha: 0.1),
+                                        highlightColor: AppColors.primaryColor.inverted
+                                            .withValues(alpha: 0.1),
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: screenWidth * 0.04),
+                                          child: AnimatedOpacity(
+                                            duration: const Duration(
+                                                milliseconds: 250),
+                                            opacity: isChanged ? 1.0 : 0.5,
+                                            child: Text(
+                                              localizations.save,
+                                              style: TextStyle(
+                                                fontSize: screenWidth * 0.04,
+                                                color: AppColors.primaryColor.inverted,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

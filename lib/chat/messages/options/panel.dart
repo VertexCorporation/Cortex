@@ -78,15 +78,11 @@ class OptionsPanelViewModel {
         MessageOption.edit,
         MessageOption.select,
         MessageOption.speak,
-        MessageOption.branch,
-        MessageOption.delete,
       ];
     } else {
       final options = [
         MessageOption.copy,
         MessageOption.speak,
-        MessageOption.branch,
-        MessageOption.delete,
       ];
       if (!message.isError) {
         options.addAll([MessageOption.regenerate, MessageOption.changeModel]);

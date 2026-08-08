@@ -82,6 +82,20 @@ class _ModelTileState extends State<ModelTile> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(ModelTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.manager != widget.manager) {
+      oldWidget.manager?.removeListener(_onDownloadStateChanged);
+      widget.manager?.addListener(_onDownloadStateChanged);
+      if (widget.manager?.isDownloading ?? false) {
+        if (_timer == null || !_timer!.isActive) _startTimer();
+      } else {
+        _stopTimer();
+      }
+    }
+  }
+
   void _onDownloadStateChanged() {
     if (mounted) {
       final manager = widget.manager;

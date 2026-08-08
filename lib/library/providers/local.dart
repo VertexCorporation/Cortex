@@ -105,6 +105,7 @@ class ModelLocalStateProvider extends ChangeNotifier
   List<ModelEntity> _currentModels = [];
   bool isInitialized = false;
   bool _isRequestingPermission = false;
+  int downloadUpdateVersion = 0;
 
   //================================================================================
   // Public Getters for UI consumption
@@ -137,7 +138,10 @@ class ModelLocalStateProvider extends ChangeNotifier
       managers: _downloadManagers,
       downloadCompleted: _downloadCompleted,
       getFilePathById: getFilePathById,
-      onStateChange: notifyListeners,
+      onStateChange: () {
+        downloadUpdateVersion++;
+        notifyListeners();
+      },
     );
 
     _downloadedModelsManagerListener = _onDownloadedModelsChanged;

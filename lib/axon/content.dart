@@ -38,7 +38,6 @@ class AxonContent extends StatelessWidget {
   final VoidCallback onArtsTap;
   final VoidCallback onRoleplayTap;
   final VoidCallback onNewsTap;
-  final VoidCallback onArchivedTap;
   final VoidCallback onSettingsTap;
   final VoidCallback onExitSearchTap;
   final VoidCallback onCloseAxon;
@@ -60,7 +59,6 @@ class AxonContent extends StatelessWidget {
     required this.onArtsTap,
     required this.onRoleplayTap,
     required this.onNewsTap,
-    required this.onArchivedTap,
     required this.onSettingsTap,
     required this.onExitSearchTap,
     required this.onCloseAxon,
@@ -191,7 +189,6 @@ class AxonContent extends StatelessWidget {
                               onArtsTap: onArtsTap,
                               onRoleplayTap: onRoleplayTap,
                               onNewsTap: onNewsTap,
-                              onArchivedTap: onArchivedTap,
                             ),
                           ],
                         ),

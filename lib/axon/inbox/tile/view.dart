@@ -195,16 +195,6 @@ class _AxonConversationTileState extends State<AxonConversationTile>
           },
         ),
         ActionPanelButton(
-          iconAsset: 'assets/icons/download.svg',
-          iconColor: AppColors.primaryColor.inverted,
-          text: l10n.archive,
-          textColor: AppColors.primaryColor.inverted,
-          onPressed: () {
-            _panelController?.close();
-            inboxViewModel.archiveConversation(manager.conversationID);
-          },
-        ),
-        ActionPanelButton(
           iconAsset: 'assets/icons/select.svg',
           iconColor: AppColors.primaryColor.inverted,
           text: l10n.multiSelect,
@@ -224,7 +214,11 @@ class _AxonConversationTileState extends State<AxonConversationTile>
           textColor: AppColors.septenaryColor,
           onPressed: () {
             _panelController?.close();
-            _showDeleteConfirmation(manager);
+            _deleteController.reverse().then((_) {
+              if (mounted) {
+                widget.onDelete();
+              }
+            });
           },
         ),
       ],
@@ -281,35 +275,6 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     );
   }
 
-  void _showDeleteConfirmation(ConversationManager manager) {
-    final l10n = AppLocalizations.of(context)!;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog.adaptive(
-        title: Text(l10n.deleteConversation),
-        content: Text(l10n.deleteConversationConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.quinaryColor,
-            ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              context.read<InboxViewModel>().deleteConversation(
-                    manager.conversationID,
-                  );
-            },
-            child: Text(l10n.delete),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

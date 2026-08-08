@@ -33,7 +33,8 @@ class RagChatService {
     required RagIngestionService ingestion,
     required RagStorageService storage,
     RagContextInjector? injector,
-  })  : _retrievalEngine = retrievalEngine,
+  })
+      : _retrievalEngine = retrievalEngine,
         _ingestion = ingestion,
         _storage = storage,
         _injector = injector ?? const RagContextInjector();
@@ -81,10 +82,10 @@ class RagChatService {
 
     List<RagRetrievalResult> results = query.isNotEmpty
         ? await _retrievalEngine.query(
-            query: query,
-            documentIds: documentIds.toList(),
-            topK: topK,
-          )
+      query: query,
+      documentIds: documentIds.toList(),
+      topK: topK,
+    )
         : const [];
 
     // Fallback: the query matched nothing but documents are attached — feed
@@ -103,7 +104,9 @@ class RagChatService {
   Future<RagDocument?> _ensureIndexed(String path) async {
     try {
       final existing = await _storage.getAllDocuments();
-      final prior = existing.where((d) => d.filePath == path).firstOrNull;
+      final prior = existing
+          .where((d) => d.filePath == path)
+          .firstOrNull;
       if (prior != null && prior.status == RagDocumentStatus.indexed) {
         return prior;
       }
@@ -114,12 +117,10 @@ class RagChatService {
     }
   }
 
-  Future<List<RagRetrievalResult>> _firstChunks(
-    Set<String> documentIds,
-    int topK,
-  ) async {
+  Future<List<RagRetrievalResult>> _firstChunks(Set<String> documentIds,
+      int topK,) async {
     final chunksByDoc =
-        await _storage.getChunksByDocument(documentIds.toList());
+    await _storage.getChunksByDocument(documentIds.toList());
     final results = <RagRetrievalResult>[];
     for (final entry in chunksByDoc.entries) {
       final doc = await _storage.getDocument(entry.key);

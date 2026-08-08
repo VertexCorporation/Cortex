@@ -103,8 +103,8 @@ class ChatFormatProcessor {
       if (_generationStopped) break;
       final codeUnit = tokenStr.codeUnitAt(i);
 
-      if (codeUnit < 128 && controlStartChars.contains(codeUnit)) {
-        // This char might start a control sequence
+      if (_pendingControl.isNotEmpty || (codeUnit < 128 && controlStartChars.contains(codeUnit))) {
+        // This char might start or continue a control sequence
         _processChar(String.fromCharCode(codeUnit), tokens, visibleBuffer);
         i++;
       } else if (codeUnit & 0xFC00 == 0xD800) {

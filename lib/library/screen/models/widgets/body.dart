@@ -323,12 +323,6 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.roleModels,
               models: role,
-              subCategories: const [
-                'categoryAll',
-                'categoryMasculine',
-                'categoryFeminine',
-                'categoryInanimate'
-              ],
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
               getCompatibilityStatus: getCompatibilityStatus,

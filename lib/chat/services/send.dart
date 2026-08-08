@@ -1067,15 +1067,21 @@ class SendService {
       attachmentPaths: attachments,
     );
     final bool ragActive = ragContext != null && ragContext.isNotEmpty;
+    
+    String combinedText = "";
     if (ragActive) {
       final safeContext = LocalPiiRedactionFilter.redact(ragContext);
       if (safeContext.isNotEmpty) {
-        userContent.add({"type": "text", "text": safeContext});
+        combinedText += "$safeContext\n\n";
       }
     }
 
     if (initialText.isNotEmpty) {
-      userContent.add({"type": "text", "text": initialText});
+      combinedText += initialText;
+    }
+    
+    if (combinedText.isNotEmpty) {
+      userContent.add({"type": "text", "text": combinedText.trim()});
     }
     for (var path in attachments) {
       final block = await Utils.processAttachment(path);
@@ -1418,15 +1424,37 @@ class SendService {
         // --- [PROMPT OPTIMIZATION FOR IMAGE GENERATION] ---
         if (modelData.category == 'image' && contextMessages.isNotEmpty) {
           final lastMsg = contextMessages.last;
-          if (lastMsg['role'] == 'user' && lastMsg['content'] is String) {
-            final originalText = lastMsg['content'] as String;
-            // Optimize to English using the cheap pipeline
-            onMediaGenerating('image');
-            final optimizedPrompt =
-                await _apiService.optimizeImagePrompt(originalText);
-            if (optimizedPrompt != null && optimizedPrompt.isNotEmpty) {
-              debugPrint("[SendService] Optimized Prompt: $optimizedPrompt");
-              contextMessages.last['content'] = optimizedPrompt;
+          if (lastMsg['role'] == 'user') {
+            String? originalText;
+            final content = lastMsg['content'];
+            if (content is String) {
+              originalText = content;
+            } else if (content is List) {
+              final textBlock = content.firstWhere(
+                  (b) => b is Map && b['type'] == 'text',
+                  orElse: () => null);
+              if (textBlock != null) originalText = textBlock['text'];
+            }
+
+            if (originalText != null && originalText.isNotEmpty) {
+              // Optimize to English using the cheap pipeline
+              onMediaGenerating('image');
+              final optimizedPrompt =
+                  await _apiService.optimizeImagePrompt(originalText);
+              if (optimizedPrompt != null && optimizedPrompt.isNotEmpty) {
+                debugPrint("[SendService] Optimized Prompt: $optimizedPrompt");
+
+                if (content is String) {
+                  contextMessages.last['content'] = optimizedPrompt;
+                } else if (content is List) {
+                  for (var i = 0; i < content.length; i++) {
+                    if (content[i] is Map && content[i]['type'] == 'text') {
+                      content[i]['text'] = optimizedPrompt;
+                      break;
+                    }
+                  }
+                }
+              }
             }
           }
         }

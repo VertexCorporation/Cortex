@@ -303,7 +303,6 @@ class ApiService {
             "tool_choice": (tools != null) ? "auto" : null,
             "enableReasoning": enablefeatureReasoning,
             "enableWebSearch": enableWebSearch,
-            "enableRag": enableRag,
             "isCharacterModel": isCharacterModel,
             "systemPromptLimitFallback":
                 localizations.systemPromptLimitFallback,

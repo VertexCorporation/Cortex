@@ -422,12 +422,26 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
 
-    // Match the Mic/Send button styling:
-    // Background: AppColors.secondaryColor.withValues(alpha: 0.5)
-    // Icon: AppColors.primaryColor.inverted
-    // No border.
-    final Color backgroundColor = AppColors.secondaryColor;
-    final Color iconColor = AppColors.primaryColor.inverted;
+    final sessionProvider = context.watch<ChatSessionProvider>();
+    final currentModel = sessionProvider.selectedModel;
+
+    final bool isFeatureActive = inputProvider.featureMode != ChatInputMode.none ||
+        inputProvider.enableWebSearch ||
+        inputProvider.ragEnabled ||
+        currentModel?.type == 'offline' ||
+        currentModel?.outputs['image'] == true ||
+        currentModel?.outputs['audio'] == true ||
+        currentModel?.outputs['video'] == true ||
+        currentModel?.category == 'image' ||
+        currentModel?.category == 'audio' ||
+        currentModel?.category == 'video';
+
+    final Color backgroundColor = isFeatureActive 
+        ? AppColors.primaryColor.inverted 
+        : AppColors.secondaryColor;
+    final Color iconColor = isFeatureActive 
+        ? AppColors.background 
+        : AppColors.primaryColor.inverted;
 
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
     final bool buttonDisabled =
@@ -452,7 +466,7 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: backgroundColor.withValues(alpha: buttonDisabled ? 0.3 : 0.5),
+          color: backgroundColor.withValues(alpha: buttonDisabled ? 0.3 : (isFeatureActive ? 1.0 : 0.5)),
           shape: BoxShape.circle,
         ),
         child: Center(

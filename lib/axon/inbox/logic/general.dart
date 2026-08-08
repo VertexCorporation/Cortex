@@ -217,8 +217,8 @@ class InboxViewModel extends ChangeNotifier {
     if (a.isStarred && b.isStarred) {
       final dateA = a.starredDate ?? DateTime(0);
       final dateB = b.starredDate ?? DateTime(0);
-      // Compare dateB to dateA for descending (newest first)
-      final comparison = dateB.compareTo(dateA);
+      // Compare dateA to dateB for ascending (oldest first)
+      final comparison = dateA.compareTo(dateB);
       if (comparison != 0) return comparison;
     }
 
@@ -630,39 +630,6 @@ class InboxViewModel extends ChangeNotifier {
     _sortConversations();
     _updateConversationCache();
     return true;
-  }
-
-  Future<void> archiveConversation(String conversationID) async {
-    final manager = _conversationManagers[conversationID];
-    if (manager == null) return;
-
-    await ChatStorageService.archiveConversation(conversationID);
-
-    _allConversationIDs.remove(conversationID);
-    _filteredConversationIDs.remove(conversationID);
-    manager.setDeleted(true);
-
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 350));
-
-    _conversationManagers.remove(conversationID);
-    manager.dispose();
-    _updateConversationCache();
-
-    final ctx = mainScreenKey.currentContext;
-    if (ctx != null && ctx.mounted) {
-      final l10n = AppLocalizations.of(ctx);
-      _notificationService.showNotification(
-          message: l10n?.archive ?? "Archived",
-          type: NotificationType.success);
-    }
-  }
-
-  Future<void> unarchiveConversation(String conversationID) async {
-    await ChatStorageService.unarchiveConversation(conversationID);
-    _updateConversationCache();
-    await loadConversations(langCode: _currentLangCode, isReload: true);
   }
 
   void _updateConversationCache() {

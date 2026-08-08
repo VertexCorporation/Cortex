@@ -47,7 +47,7 @@ ActionPanelController showActionPanel({
 
   // Dynamic panel width based on device type
   // Tablet needs wider panel because buttons have larger touch targets
-  final double panelWidth = isTablet ? 200.0 : 160.0;
+  final double panelWidth = isTablet ? 260.0 : 230.0;
   final double estimatedHeight =
       (buttons.length * (isTablet ? 56.0 : 50.0)) + 20.0;
 

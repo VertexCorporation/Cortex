@@ -18,7 +18,6 @@ class Axon extends StatefulWidget {
   final VoidCallback onArtsTap;
   final VoidCallback onNewsTap;
   final VoidCallback onRoleplayTap;
-  final VoidCallback onArchivedTap;
   final VoidCallback onCloseAxon;
   final VoidCallback onOpenAxon;
   final double referenceWidth;
@@ -34,7 +33,6 @@ class Axon extends StatefulWidget {
     required this.onArtsTap,
     required this.onRoleplayTap,
     required this.onNewsTap,
-    required this.onArchivedTap,
     required this.onCloseAxon,
     required this.onOpenAxon,
     required this.referenceWidth,
@@ -178,7 +176,6 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
           onArtsTap: widget.onArtsTap,
           onRoleplayTap: widget.onRoleplayTap,
           onNewsTap: widget.onNewsTap,
-          onArchivedTap: widget.onArchivedTap,
           onSettingsTap: _handleSettingsTap,
           onSearchChanged: _handleSearchQueryChanged,
           onExitSearchTap: _handleExitSearchMode,

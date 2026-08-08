@@ -106,15 +106,26 @@ class ActionPanelButton extends StatelessWidget {
               ),
             ),
           SizedBox(width: iconGap),
-          // Use Flexible to ensure the text wraps if it's too long, preventing overflow.
           Flexible(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: fontSize,
-                fontWeight: FontWeight.w500, // Medium weight for clarity
-              ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                    child: Text(
+                      text,
+                      maxLines: 2,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w500, // Medium weight for clarity
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
