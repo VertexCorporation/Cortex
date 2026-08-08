@@ -10,7 +10,7 @@ import '../../input/service.dart';
 import 'button.dart';
 
 import 'package:camera/camera.dart';
-import 'package:cortex/scaled_bottom_sheet.dart';
+import 'package:cortex/sheet.dart';
 
 void showAttachmentSheet({
   required BuildContext context,

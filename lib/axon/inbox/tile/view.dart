@@ -163,7 +163,9 @@ class _AxonConversationTileState extends State<AxonConversationTile>
       },
       buttons: [
         ActionPanelButton(
-          iconAsset: 'assets/icons/sparkle.svg',
+          customIcon: Icon(manager.isStarred ? Icons.star_rounded : Icons.star_outline_rounded,
+                           color: manager.isStarred ? Colors.amber : AppColors.primaryColor.inverted,
+                           size: 22),
           iconColor: manager.isStarred ? Colors.amber : AppColors.primaryColor.inverted,
           text: manager.isStarred ? l10n.unstarConversation : l10n.starConversation,
           textColor: AppColors.primaryColor.inverted,
@@ -217,9 +219,9 @@ class _AxonConversationTileState extends State<AxonConversationTile>
         ),
         ActionPanelButton(
           iconAsset: 'assets/icons/delete.svg',
-          iconColor: AppColors.quinaryColor,
+          iconColor: AppColors.septenaryColor,
           text: l10n.delete,
-          textColor: AppColors.quinaryColor,
+          textColor: AppColors.septenaryColor,
           onPressed: () {
             _panelController?.close();
             _showDeleteConfirmation(manager);

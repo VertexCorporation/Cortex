@@ -2,7 +2,7 @@
 //
 // Detailed character profile before starting a chat.
 
-import 'package:cortex/roleplay/screens/roleplay_chat_screen.dart';
+import 'package:cortex/roleplay/screens/roleplay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

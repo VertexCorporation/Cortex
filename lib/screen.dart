@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
-import 'package:cortex/axon/inbox/archived_dialog.dart';
+import 'package:cortex/axon/inbox/archived.dart';
 
 import 'package:flutter/material.dart';
 import 'main.dart';
@@ -29,9 +29,9 @@ import 'library/screen/models/controller.dart';
 import 'library/screen/new/controller.dart';
 import 'news/view.dart';
 import 'arts/screen.dart';
-import 'roleplay/screens/discover_screen.dart';
+import 'roleplay/screens/discover.dart';
 import 'notifications/introvert.dart';
-import 'navigation.dart';
+
 import 'rag/screens/documents.dart';
 
 enum MainScreenView {
@@ -41,6 +41,7 @@ enum MainScreenView {
   create,
   arts,
   roleplay,
+  documents,
 }
 
 class FadeIndexedStack extends StatelessWidget {
@@ -286,10 +287,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   void _openDocumentLibrary() {
     closeAxon();
-    navigateToScreen(
-      const DocumentLibraryScreen(),
-      direction: const Offset(1.0, 0.0),
-    );
+    _updateCurrentView(MainScreenView.documents);
   }
 
   void _closeAxonWithAnimation() {
@@ -776,6 +774,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         return 4;
       case MainScreenView.roleplay:
         return 5;
+      case MainScreenView.documents:
+        return 6;
     }
   }
 
@@ -815,6 +815,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         // Index 5: Roleplay / Discover
         const RepaintBoundary(
           child: DiscoverScreen(),
+        ),
+        // Index 6: Documents
+        const RepaintBoundary(
+          child: DocumentLibraryScreen(),
         ),
       ],
     );

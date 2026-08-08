@@ -229,7 +229,7 @@ class ScrollFogHorizontal extends StatefulWidget {
   final bool showStart;
   final bool showEnd;
   final double edgeOverflow;
-  final Color color;
+  final Color? color;
 
   const ScrollFogHorizontal({
     super.key,
@@ -241,7 +241,7 @@ class ScrollFogHorizontal extends StatefulWidget {
     this.showStart = true,
     this.showEnd = true,
     this.edgeOverflow = 0.0,
-    this.color = const Color(0xFF0D0D0D),
+    this.color,
   });
 
   @override
@@ -345,6 +345,7 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
   @override
   Widget build(BuildContext context) {
     final overflow = widget.edgeOverflow;
+    final fogColor = widget.color ?? AppColors.background;
 
     return Stack(
       clipBehavior: Clip.none,
@@ -374,9 +375,9 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
                       end: Alignment.centerRight,
                       stops: const [0.0, 0.4, 1.0],
                       colors: [
-                        widget.color,
-                        widget.color.withValues(alpha: 0.8),
-                        widget.color.withValues(alpha: 0),
+                        fogColor,
+                        fogColor.withValues(alpha: 0.8),
+                        fogColor.withValues(alpha: 0),
                       ],
                     ),
                   ),
@@ -408,9 +409,9 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
                       end: Alignment.centerLeft,
                       stops: const [0.0, 0.4, 1.0],
                       colors: [
-                        widget.color,
-                        widget.color.withValues(alpha: 0.8),
-                        widget.color.withValues(alpha: 0),
+                        fogColor,
+                        fogColor.withValues(alpha: 0.8),
+                        fogColor.withValues(alpha: 0),
                       ],
                     ),
                   ),

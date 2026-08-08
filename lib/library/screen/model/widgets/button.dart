@@ -12,7 +12,7 @@ import '../../../providers/details.dart';
 import '../../../providers/local.dart';
 import '../../models/widgets/cancel.dart';
 import '../../../../../server/user.dart';
-import '../../models/widgets/premium_bottom_sheet.dart';
+import '../../models/widgets/sheet.dart';
 
 /// The bottom navigation bar for the Model Detail screen, handling all user actions.
 ///

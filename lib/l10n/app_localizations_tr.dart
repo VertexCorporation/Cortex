@@ -194,20 +194,20 @@ class AppLocalizationsTr extends AppLocalizations {
   String get unstarConversation => 'Unstar';
 
   @override
-  String get renameConversation => 'Rename Conversation';
+  String get renameConversation => 'Sohbeti Yeniden Adlandır';
 
   @override
-  String get conversationName => 'Conversation name';
+  String get conversationName => 'Sohbet Adı';
 
   @override
   String get deleteConversation => 'Delete Conversation';
 
   @override
   String get deleteConversationConfirm =>
-      'Are you sure you want to delete this conversation? This action cannot be undone.';
+      'Bu sohbeti silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.';
 
   @override
-  String get archive => 'Archive';
+  String get archive => 'Arşivle';
 
   @override
   String get multiSelect => 'Select Multiple';

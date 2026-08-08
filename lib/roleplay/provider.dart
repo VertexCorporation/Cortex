@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-import 'data/featured_characters.dart';
+import 'data/characters.dart';
 import 'models/character.dart';
 
 const _kSessionsKey = 'rp_sessions_v1';

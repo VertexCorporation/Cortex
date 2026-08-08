@@ -1,7 +1,7 @@
 import 'package:cortex/app.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-import 'package:cortex/scaled_bottom_sheet.dart';
+import 'package:cortex/sheet.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

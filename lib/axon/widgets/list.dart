@@ -13,7 +13,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 // Components
 import 'package:cortex/axon/inbox/empty.dart';
 import 'package:cortex/axon/inbox/tile/view.dart';
-import 'package:cortex/axon/widgets/search_hit_tile.dart';
+import 'package:cortex/axon/widgets/search.dart';
 import 'package:cortex/axon/inbox/logic/search_hit.dart';
 import '../../main.dart';
 

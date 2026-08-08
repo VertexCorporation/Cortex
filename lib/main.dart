@@ -724,18 +724,20 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
       create: (_) => RagContextInjector(),
     ),
     Provider<RagChatService>(
-      create: (BuildContext context) => RagChatService(
-        retrievalEngine: context.read<RetrievalEngine>(),
-        ingestion: context.read<RagIngestionService>(),
-        storage: context.read<RagStorageService>(),
-        injector: context.read<RagContextInjector>(),
-      ),
+      create: (BuildContext context) =>
+          RagChatService(
+            retrievalEngine: context.read<RetrievalEngine>(),
+            ingestion: context.read<RagIngestionService>(),
+            storage: context.read<RagStorageService>(),
+            injector: context.read<RagContextInjector>(),
+          ),
     ),
     ChangeNotifierProvider<RagProvider>(
-      create: (BuildContext context) => RagProvider(
-        storage: context.read<RagStorageService>(),
-        ingestion: context.read<RagIngestionService>(),
-      ),
+      create: (BuildContext context) =>
+          RagProvider(
+            storage: context.read<RagStorageService>(),
+            ingestion: context.read<RagIngestionService>(),
+          ),
     ),
     Provider<OfflineService>(
       create: (BuildContext context) =>
@@ -771,7 +773,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             backgroundTaskService: context.read<BackgroundTaskService>(),
           ),
     ),
-    // Speech and Voice services (Must be before SendService)
+    // Speech and Voice services
     ChangeNotifierProvider<SpeechService>(
       create: (_) => SpeechService(),
     ),

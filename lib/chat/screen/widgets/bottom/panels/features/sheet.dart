@@ -15,6 +15,7 @@ import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:cortex/server/user.dart';
 
 import '../../../../../providers/input.dart';
 import '../selection/sheet.dart';
@@ -81,7 +82,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
     final double itemGap = screenWidth * 0.03;
     final l10n = AppLocalizations.of(context)!;
     final inputService = InputService();
-
+    final userProvider = context.watch<UserProvider>();
     final catalog = context.watch<ModelCatalogProvider>();
     final sessionProvider = context.watch<ChatSessionProvider>();
     final inputProvider = context.watch<InputProvider>();
@@ -442,7 +443,8 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     ),
 
                     // 7. EXPLORE
-                    FeaturesSheetButton(
+                    if (userProvider.isSubscriptionActive)
+                      FeaturesSheetButton(
                       iconData: Icons.visibility,
                       title: l10n.explore,
                       description: l10n.featureExploreDescription,

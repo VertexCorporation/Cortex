@@ -9,7 +9,7 @@ import '../../../../navigation.dart';
 import '../../../../funds/funds.dart';
 import '../../../../app.dart';
 import 'dart:async';
-import 'package:cortex/scaled_bottom_sheet.dart';
+import 'package:cortex/sheet.dart';
 
 void showPremiumBottomSheet(BuildContext context) {
   HapticFeedback.lightImpact();

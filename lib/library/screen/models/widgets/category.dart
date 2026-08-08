@@ -11,6 +11,9 @@ import '../../../backend/data/entity.dart';
 import '../../../backend/download/download.dart';
 import '../../../backend/utils.dart';
 import 'package:cortex/library/utils.dart';
+import 'package:cortex/axon/inbox/panel/view.dart';
+import 'package:cortex/axon/inbox/panel/buttons.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'cards.dart';
 
 class ModelCategorySection extends StatefulWidget {
@@ -417,95 +420,66 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
             ),
           ),
           if (widget.subCategories != null && widget.subCategories!.isNotEmpty)
-            Theme(
-              data: Theme.of(context).copyWith(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-              ),
-              child: PopupMenuButton<String>(
-                color: AppColors.background,
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                      color: AppColors.border.withValues(alpha: 0.2)),
-                ),
-                offset: const Offset(0, 30),
-                onOpened: () {
-                  setState(() {
-                    _isMenuOpen = true;
-                  });
-                },
-                onCanceled: () {
-                  setState(() {
-                    _isMenuOpen = false;
-                  });
-                },
-                onSelected: (String cat) {
-                  setState(() {
-                    _isMenuOpen = false;
-                  });
-                  setState(() {
-                    _selectedCategory = cat;
-                  });
-                  HapticFeedback.lightImpact();
-                },
-                itemBuilder: (BuildContext context) {
-                  final loc = AppLocalizations.of(context)!;
-                  return widget.subCategories!.map((String cat) {
-                    final isSelected = _selectedCategory == cat;
-                    return PopupMenuItem<String>(
-                      value: cat,
-                      child: Row(
-                        children: [
-                          Text(
-                            _getLocalizedCategory(cat, loc),
-                            style: TextStyle(
-                              color: isSelected
-                                  ? AppColors.senaryColor
-                                  : AppColors.primaryColor.inverted,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              fontSize: 14,
-                            ),
-                          ),
-                          if (isSelected) const Spacer(),
-                          if (isSelected)
-                            Icon(Icons.check_rounded,
-                                color: AppColors.senaryColor, size: 18),
-                        ],
-                      ),
-                    );
-                  }).toList();
-                },
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _getLocalizedCategory(
-                            _selectedCategory, AppLocalizations.of(context)!),
-                        style: TextStyle(
-                          color: AppColors.primaryColor.inverted
-                              .withValues(alpha: 0.7),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        _isMenuOpen
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        size: 20,
+            GestureDetector(
+              onTapDown: (details) {
+                setState(() {
+                  _isMenuOpen = true;
+                });
+                final loc = AppLocalizations.of(context)!;
+                final List<ActionPanelButton> buttons = widget.subCategories!.map((cat) {
+                  final isSelected = _selectedCategory == cat;
+                  return ActionPanelButton(
+                    customIcon: isSelected 
+                      ? SvgPicture.asset('assets/icons/checkmark.svg', width: 18, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn))
+                      : const SizedBox(width: 18),
+                    iconColor: AppColors.primaryColor.inverted,
+                    text: _getLocalizedCategory(cat, loc),
+                    textColor: AppColors.primaryColor.inverted,
+                    onPressed: () {
+                      ActionPanelController.closeCurrent();
+                      setState(() {
+                        _selectedCategory = cat;
+                        _isMenuOpen = false;
+                      });
+                      HapticFeedback.lightImpact();
+                    },
+                  );
+                }).toList();
+
+                showActionPanel(
+                  context: context,
+                  touchPosition: details.globalPosition,
+                  onClosed: () {
+                    if (mounted) setState(() => _isMenuOpen = false);
+                  },
+                  buttons: buttons,
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _getLocalizedCategory(
+                          _selectedCategory, AppLocalizations.of(context)!),
+                      style: TextStyle(
                         color: AppColors.primaryColor.inverted
                             .withValues(alpha: 0.7),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _isMenuOpen
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 20,
+                      color: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.7),
+                    ),
+                  ],
                 ),
               ),
             ),

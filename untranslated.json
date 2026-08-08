@@ -493,11 +493,7 @@
   ],
 
   "tr": [
-    "renameConversation",
-    "conversationName",
     "deleteConversation",
-    "deleteConversationConfirm",
-    "archive",
     "multiSelect"
   ],
 

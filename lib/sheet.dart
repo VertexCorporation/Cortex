@@ -16,7 +16,7 @@ class ScaledBottomSheet extends StatelessWidget {
       animation: route.animation!,
       builder: (context, childWidget) {
         final double curvedValue =
-            Curves.easeOutQuart.transform(route.animation!.value);
+        Curves.easeOutQuart.transform(route.animation!.value);
         final double scale = 0.92 + (0.08 * curvedValue);
 
         return Transform.scale(

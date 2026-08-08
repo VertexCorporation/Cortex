@@ -12,7 +12,7 @@ import '../../theme.dart';
 import '../models/character.dart';
 import '../provider.dart';
 import '../service.dart';
-import 'character_profile_screen.dart';
+import 'screen.dart';
 
 class RoleplayChatScreen extends StatefulWidget {
   final RoleplayCharacter character;

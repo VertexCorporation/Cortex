@@ -17,7 +17,7 @@ import '../../../backend/data/entity.dart';
 import '../../../backend/download/download.dart';
 import '../../../backend/utils.dart';
 import 'cancel.dart';
-import 'premium_bottom_sheet.dart';
+import 'sheet.dart';
 import '../../../../server/user.dart';
 
 /// This widget is now a cleaner, more focused component.

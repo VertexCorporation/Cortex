@@ -19,7 +19,7 @@ import '../main.dart';
 import '../notifications/extrovert.dart';
 import '../notifications/introvert.dart';
 import '../referral.dart';
-import 'anonymous_device_entitlement.dart';
+import 'anonymous.dart';
 import 'package:flutter/services.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/server/credits.dart';

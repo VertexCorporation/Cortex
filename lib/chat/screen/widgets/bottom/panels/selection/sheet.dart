@@ -17,8 +17,8 @@ import '../../../../../../fog.dart';
 import 'cards/main.dart';
 import 'cards/variant.dart';
 
-import 'package:cortex/scaled_bottom_sheet.dart';
-import 'package:cortex/library/screen/models/widgets/premium_bottom_sheet.dart';
+import 'package:cortex/sheet.dart';
+import 'package:cortex/library/screen/models/widgets/sheet.dart';
 
 Future<bool?> showModelSelectionSheet({
   required BuildContext context,

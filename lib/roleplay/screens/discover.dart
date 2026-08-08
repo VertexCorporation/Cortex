@@ -2,8 +2,8 @@
 //
 // Character AI "Keşfet" (Discover) screen — full-featured discover + my bots.
 
-import 'package:cortex/roleplay/screens/create_character_screen.dart';
-import 'package:cortex/roleplay/screens/roleplay_chat_screen.dart';
+import 'package:cortex/roleplay/screens/character.dart';
+import 'package:cortex/roleplay/screens/roleplay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';

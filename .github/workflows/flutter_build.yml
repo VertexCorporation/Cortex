@@ -1,12 +1,6 @@
 name: Flutter Build & Release
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
@@ -87,6 +81,8 @@ jobs:
         run: |
           flutter clean
           flutter pub get
+          chmod +x scripts/download_llama.sh
+          ./scripts/download_llama.sh
           rm -rf ios/Pods ios/Podfile.lock
           cd ios
           pod install --repo-update

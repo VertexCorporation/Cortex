@@ -30,7 +30,7 @@ import 'chat/services/moderator.dart';
 import 'internet.dart';
 import 'l10n/app_localizations.dart';
 import 'library/backend/download/download.dart';
-import 'login/anonymous_device_entitlement.dart';
+import 'login/anonymous.dart';
 import 'maintenance.dart';
 import 'notifications/extrovert.dart';
 import 'notifications/introvert.dart';

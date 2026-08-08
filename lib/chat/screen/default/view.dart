@@ -207,8 +207,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     }
 
     if (startWithButtons) {
-      _swapController.reverse(from: 1.0).catchError((_) {});
-      _sequenceTimer = Timer(const Duration(seconds: 4), tick);
+      _sequenceTimer = Timer(const Duration(seconds: 8), tick);
     } else {
       _sequenceTimer = Timer(const Duration(seconds: 4), tick);
     }
@@ -1299,8 +1298,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                 height: verticalSpacing * 0.3),
 
                                             // Description <-> Buttons (Timed, smooth crossfade, same position)
-                                            SizedBox(
-                                              height: buttonsAreaHeight,
+                                            Container(
+                                              constraints: BoxConstraints(minHeight: buttonsAreaHeight),
                                               child: AnimatedBuilder(
                                                 animation: _swapController,
                                                 builder: (context, _) {

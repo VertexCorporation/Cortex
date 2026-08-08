@@ -220,7 +220,7 @@ class _DocumentLibraryScreenViewState
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: CortexAppBar(
-        leadingMode: CortexLeadingMode.back,
+        leadingMode: CortexLeadingMode.axon,
         titleText: l10n.ragScreenTitle,
         actions: [
           IconButton(

@@ -918,5 +918,9 @@
   "workInProgress": "Çalışmalar Devam Ediyor",
   "wrongPassword": "Yanlış şifre.",
   "yes": "Evet",
-  "you": "Siz"
+  "you": "Siz",
+  "renameConversation": "Sohbeti Yeniden Adlandır",
+  "conversationName": "Sohbet Adı",
+  "deleteConversationConfirm": "Bu sohbeti silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+  "archive": "Arşivle"
 }

@@ -316,7 +316,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
           color: AppColors.background,
           borderRadius: BorderRadius.circular(radius),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: AppColors.border.withValues(alpha: 0.5),
             width: 0.5,
           ),
         ),

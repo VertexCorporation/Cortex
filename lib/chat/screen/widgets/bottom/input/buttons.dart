@@ -1,9 +1,8 @@
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
-import 'package:cortex/chat/providers/conversation.dart'; // [NEW]
+import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,13 +10,11 @@ import 'package:provider/provider.dart';
 import '../../../../../internet.dart';
 import '../../../../../library/backend/data/service.dart';
 import '../../../../../theme.dart';
-import '../../../../../main.dart'; // [FIX] Import main.dart for mainScreenKey
-
+import '../../../../../main.dart';
 import '../../../../services/select.dart';
 import '../../../../services/speech.dart';
-import '../../../../services/voice.dart'; // [NEW]
-import '../../../../services/send.dart'; // [NEW]
-
+import '../../../../services/voice.dart';
+import '../../../../services/send.dart';
 import '../panels/features/sheet.dart';
 import '../panels/selection/sheet.dart';
 
@@ -317,7 +314,7 @@ class ActionButtonWidget extends StatelessWidget {
             .getLocale()
             .languageCode;
         final conversationProvider = context
-            .read<ConversationProvider>(); // [FIX] Restore variable
+            .read<ConversationProvider>(); // Restore variable
 
         // [NEW] LOGIC: If chat is not empty, start a new conversation automatically
         if (conversationProvider.messages.isNotEmpty) {
@@ -575,41 +572,42 @@ class ModelSelectButton extends StatelessWidget {
                   constraints: BoxConstraints(maxWidth: screenWidth * 0.55),
                   padding: EdgeInsets.symmetric(
                       horizontal: isTablet ? 16.0 : 14.0, vertical: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                                opacity: animation,
-                                child: SizeTransition(
-                                    sizeFactor: animation,
-                                    axis: Axis.horizontal,
-                                    axisAlignment: 0.0,
-                                    child: child));
-                          },
-                          child: Text(
-                            displayText,
-                            key: ValueKey<String>(displayText),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: AppColors.primaryColor.inverted,
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.w500),
+                  child: AnimatedSize(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 250),
+                            transitionBuilder:
+                                (Widget child, Animation<double> animation) {
+                              return FadeTransition(
+                                  opacity: animation,
+                                  child: child);
+                            },
+                            child: Text(
+                              displayText,
+                              key: ValueKey<String>(displayText),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: AppColors.primaryColor.inverted,
+                                  fontSize: fontSize,
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Transform.rotate(
-                          angle: -1.5708,
-                          child: Icon(Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primaryColor.inverted,
-                              size: fontSize * 1.2)),
-                    ],
+                        const SizedBox(width: 4),
+                        Transform.rotate(
+                            angle: -1.5708,
+                            child: Icon(Icons.keyboard_arrow_down_rounded,
+                                color: AppColors.primaryColor.inverted,
+                                size: fontSize * 1.2)),
+                      ],
+                    ),
                   ),
                 ),
               ),
