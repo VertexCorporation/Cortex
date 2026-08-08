@@ -63,7 +63,7 @@ TrialInfo? getTrialInfo(ProductDetails? product) {
       }
     }
   } catch (e) {
-    debugPrint("Trial info parse error: \$e");
+    debugPrint("Trial info parse error: $e");
   }
   return null;
 }

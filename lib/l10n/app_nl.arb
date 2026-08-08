@@ -864,9 +864,13 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Je hebt een Ultra-abonnement nodig om video's te maken. Upgrade nu en ervaar de voordelen!",
   "voiceModeInformation": "Cortex houdt je gegevens veilig doordat het volledig lokaal op je apparaat draait, zelfs in de spraakchatmodus; geniet van naadloze gesprekken!",
-  "voiceSystemPromptSuffix": "BELANGRIJK: Gebruik geen markdown-opmaak (vetgedrukt, cursief). Geef GEEN codeblokken (```) weer. Houd de antwoorden informeel en kort.",
+  "voiceSystemPrompt": "BELANGRIJK: Gebruik geen markdown-opmaak (vetgedrukt, cursief). Geef GEEN codeblokken (```) weer. Houd de antwoorden informeel en kort.",
   "weakPassword": "Het wachtwoord is te zwak.",
   "webSearchSources": "Bronnen",
+  "offlineUse": "Gebruik zonder Internet",
+  "archivedConversations": "Gearchiveerde gesprekken",
+  "noArchivedConversations": "Geen gearchiveerde gesprekken",
+  "unarchive": "Archivering ongedaan maken",
   "welcomeOfferBadge": "Welkomstaanbieding • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {

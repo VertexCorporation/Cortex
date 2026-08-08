@@ -103,6 +103,7 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
       } else if (widget.code.length < _maxAutoDetectLength) {
         final code = widget.code;
         Future(() {
+          if (!mounted) return;
           final result = highlight.highlight.parse(code, autoDetection: true);
           _autoDetectCache[code] = result.language;
           if (_autoDetectCache.length > 200) {

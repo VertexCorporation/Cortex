@@ -362,15 +362,12 @@ class _ModelSelectionDialogContentState
 
     return Center(
       child: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: screenWidth * _UIFactors.dialogWidthFactor,
-          decoration: BoxDecoration(
-            color: AppColors.secondaryColor,
-            borderRadius: BorderRadius.circular(
-                screenWidth * _UIFactors.borderRadiusFactor),
-          ),
-          child: ClipRRect(
+        color: AppColors.secondaryColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+              screenWidth * _UIFactors.borderRadiusFactor),
+        ),
+        child: ClipRRect(
             borderRadius: BorderRadius.circular(
                 screenWidth * _UIFactors.borderRadiusFactor),
             child: Column(
@@ -501,7 +498,6 @@ class _ModelSelectionDialogContentState
             ),
           ),
         ),
-      ),
     );
   }
 }

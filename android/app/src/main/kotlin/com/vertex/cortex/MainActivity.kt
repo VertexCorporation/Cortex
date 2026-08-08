@@ -122,7 +122,7 @@ class MainActivity : FlutterFragmentActivity() {
                     "cacheModel"    -> {
                         val path = call.argument<String>("path")
                         val nCtx = call.argument<Int>("nCtx") ?: 2048
-                        val nGpu = call.argument<Int>("nGpu") ?: 0
+                        val nGpu = call.argument<Int>("nGpu") ?: 99
                         val nThreads = call.argument<Int>("nThreads") ?: 4
 
                         if (path.isNullOrBlank()) {

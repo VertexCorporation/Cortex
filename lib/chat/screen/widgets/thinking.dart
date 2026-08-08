@@ -258,7 +258,7 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
               parent: _contentController,
               curve: Curves.easeInOut,
             ),
-            alignment: Alignment.centerLeft,
+            axisAlignment: -1.0,
             child: FadeTransition(
               opacity: _contentFade,
               child: SlideTransition(

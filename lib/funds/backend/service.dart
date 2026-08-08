@@ -144,7 +144,7 @@ class FundsBackend with ChangeNotifier {
 
   Stream<String> get onPurchaseCompleted => _purchaseCompletedController.stream;
 
-  late IntrovertNotificationService _notificationService;
+  IntrovertNotificationService? _notificationService;
   AppLocalizations? _localizations;
 
   static final List<ProductDetails> _mockProducts = [
@@ -197,7 +197,6 @@ class FundsBackend with ChangeNotifier {
   static VoidCallback? onPreloadComplete;
 
   FundsBackend() {
-    _startListeningToPurchases();
     // Pre-populate state from cache so synchronous UI renders correctly before fetch
     loadFromCache();
     // Re-load if a background preload finishes after the instance is created
@@ -377,6 +376,9 @@ class FundsBackend with ChangeNotifier {
 
   void setNotificationService(IntrovertNotificationService service) {
     _notificationService = service;
+    if (!_initialized) {
+      _startListeningToPurchases();
+    }
   }
 
   Future<void> updateLocalizationAndRefresh({

@@ -4,19 +4,24 @@ import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../../internet.dart';
-import '../../../../../theme.dart';
+import 'package:cortex/internet.dart';
+import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import '../../../../services/speech.dart';
-import '../../wave.dart';
-import 'buttons.dart';
-import 'service.dart';
-import '../../../../../../fog.dart';
+import 'package:cortex/chat/services/speech.dart';
+import 'package:cortex/chat/screen/widgets/wave.dart';
+import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
+import 'package:cortex/chat/screen/widgets/bottom/input/service.dart';
+import 'package:cortex/fog.dart';
 import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/navigation.dart';
+import 'package:cortex/rag/screens/document_library_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 part 'waveform.dart';
 
 part 'attachments.dart';
+
+part 'rag.dart';
 
 part 'field.dart';
 
@@ -323,6 +328,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
             children: [
               _AttachmentPreviewSection(
                   screenWidth: screenWidth, isTablet: isTablet),
+
+              _RagStatusChip(screenWidth: screenWidth),
 
               // Main Animated Area
               AnimatedBuilder(

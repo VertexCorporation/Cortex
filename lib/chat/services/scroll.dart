@@ -169,7 +169,7 @@ class ScrollService {
         curve: Curves.easeOut,
       );
     } catch (e) {
-      // wow
+      // safe catch
     }
   }
 

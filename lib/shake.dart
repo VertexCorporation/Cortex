@@ -30,7 +30,7 @@ class ShakeWidgetState extends State<ShakeWidget> {
     return AnimatedBuilder(
       animation: _offsetAnimation,
       builder: (context, child) {
-        final dx = sin(pi * _offsetAnimation.value * 1) * 8;
+        final dx = sin(2 * pi * _offsetAnimation.value) * 8;
         return Transform.translate(offset: Offset(dx, 0), child: child);
       },
       child: widget.child,

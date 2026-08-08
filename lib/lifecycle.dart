@@ -40,6 +40,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
   AppStatus? _previousStatus;
   bool _splashRemoved = false;
   bool _firstLaunchConversationStarted = false;
+  AppInitializer? _lastInitializer;
 
   @override
   void initState() {
@@ -48,9 +49,9 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
     final initializer = Provider.of<AppInitializer>(context, listen: false);
     _previousStatus = initializer.status;
+    _lastInitializer = initializer;
 
-    // Kick off the initialization.
-    // Since 'initialize()' is now non-blocking/fast, this will return almost instantly.
+    // Kick off the initialization on first run.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       initializer.initialize();
@@ -76,6 +77,18 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
   @override
   Widget build(BuildContext context) {
+    // On hot reload, initState is not called but providers are re-created.
+    // Ensure initialization (auth listener, Firestore listener) is re-attached
+    // when a new AppInitializer instance appears.
+    final appInit = Provider.of<AppInitializer>(context, listen: false);
+    if (_lastInitializer != appInit) {
+      _lastInitializer = appInit;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        appInit.initialize();
+      });
+    }
+
     return Consumer<AppInitializer>(
       builder: (BuildContext context, AppInitializer initializer, Widget? _) {
         final AppStatus currentStatus = initializer.status;

@@ -71,6 +71,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get theme => 'Tema';
 
   @override
+  String get lightTheme => 'Açık tema';
+
+  @override
+  String get darkTheme => 'Koyu tema';
+
+  @override
   String get no => 'Hayır';
 
   @override
@@ -186,6 +192,25 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
+
+  @override
+  String get renameConversation => 'Rename Conversation';
+
+  @override
+  String get conversationName => 'Conversation name';
+
+  @override
+  String get deleteConversation => 'Delete Conversation';
+
+  @override
+  String get deleteConversationConfirm =>
+      'Are you sure you want to delete this conversation? This action cannot be undone.';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get multiSelect => 'Select Multiple';
 
   @override
   String get loginToYourAccount => 'Giriş Yap';
@@ -1722,8 +1747,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get workInProgress => 'Çalışmalar Devam Ediyor';
 
   @override
-  String get voiceSystemPromptSuffix =>
-      'ÖNEMLİ: Markdown biçimlendirmesi (kalın, italik) kullanmayın. Kod blokları (```) çıktısı vermeyin. Yanıtlarınızı konuşma diline yakın ve kısa tutun.';
+  String get voiceSystemPrompt =>
+      'ÖNEMLİ SESLİ MOD KURALLARI:\n1. Şu an canlı sesli sohbet modundasın. Yanıtlarını en fazla 1-2 cümlelik çok kısa, doğal ve insan gibi ver.\n2. ASLA araç (tool), grafik (chart), hava durumu (weather), python koda ihtiyaç duyma ve çağırma! Tamamen düz metin konuş.\n3. Kullanıcı sana soru sorduğunda, hafızandaki önceki verdiğin cevabın aynısını BİREBİR TEKRARLAMA. Yeni, doğal ve soruya özgü yanıt ver.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1804,6 +1829,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get webSearchSources => 'Kaynaklar';
 
   @override
+  String get offlineUse => 'İnternetsiz Kullan';
+
+  @override
+  String get archivedConversations => 'Arşivlenmiş Sohbetler';
+
+  @override
+  String get noArchivedConversations => 'Arşivlenmiş sohbet yok';
+
+  @override
+  String get unarchive => 'Arşivden Çıkar';
+
+  @override
   String get searching => 'Aranıyor';
 
   @override
@@ -1812,6 +1849,66 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get featureWebSearchDescription =>
       'Gerçek zamanlı bilgi için internette arama yapın.';
+
+  @override
+  String get ragFeatureTitle => 'Belgeler';
+
+  @override
+  String get ragFeatureDescription =>
+      'Kendi belgelerin hakkında gizli şekilde sohbet et';
+
+  @override
+  String get ragScreenTitle => 'Belge Sohbeti';
+
+  @override
+  String get ragAddDocuments => 'Belge ekle';
+
+  @override
+  String get ragEmptyTitle => 'Henüz belge yok';
+
+  @override
+  String get ragEmptyDescription =>
+      'PDF, Word, Excel, PowerPoint veya metin dosyaları ekleyerek onlar hakkında sohbet edin.';
+
+  @override
+  String get ragStatusReady => 'Hazır';
+
+  @override
+  String get ragStatusIndexing => 'Dizinleniyor…';
+
+  @override
+  String get ragStatusFailed => 'Başarısız';
+
+  @override
+  String ragSelected(int count) {
+    return '$count seçili';
+  }
+
+  @override
+  String get ragEnableChat => 'Belge sohbetini etkinleştir';
+
+  @override
+  String get ragDisableChat => 'Belge sohbetini kapat';
+
+  @override
+  String ragActiveDocs(int count) {
+    return '$count belge';
+  }
+
+  @override
+  String get ragNoSelectionHint => 'Sohbet için belge seçin';
+
+  @override
+  String get ragDeleteConfirm => 'Bu belge kütüphaneden silinsin mi?';
+
+  @override
+  String get ragFileTooBig => 'Bu dosya 10 MB\'tan büyük.';
+
+  @override
+  String get ragUnsupportedType => 'Bu dosya türü desteklenmiyor.';
+
+  @override
+  String get ragAddedToChat => 'Belge sohbetine eklendi';
 
   @override
   String get clearMemory => 'Hafızayı Temizle';
@@ -1867,7 +1964,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zeka ekosisteminin içinde çalışıyorsunuz; bu platform, ortalama 16 yaşında olan Vertex ekibi tarafından geliştirilmiştir. Bunu hatırlayın ve sorulursa cevap verin. Daha fazla bilgi istenirse, internette arama yapmaktan çekinmeyin veya arama yapamıyorsanız, bilmiyorum demekten çekinmeyin!';
+      '\n\n[Sistem] KULLANICI TALİMATLARI: Sen Cortex gelişmiş yapay zeka ekosisteminde çalışan bilge, doğrudan ve yardımsever bir asistansın. Kullanıcı istemediği sürece ASLA belge ekleme, grafik/chart çizme, tablo oluşturma veya gereksiz araçlar önerme. Yalnızca kullanıcının sorusuna doğrudan, akıcı ve net cevap ver.';
 
   @override
   String get featureAudioRecognitionTitle => 'Ses Tanıma';

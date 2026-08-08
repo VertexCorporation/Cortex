@@ -24,19 +24,28 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
     with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   late Animation<double> _scaleAnimation;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     _entranceController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 350),
     );
 
     _scaleAnimation = CurvedAnimation(
       parent: _entranceController,
       curve: Curves.easeOutBack,
     );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _entranceController,
+      curve: Curves.easeOutBack,
+    ));
 
     // Ensure keyboard is dismissed
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -67,10 +76,50 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
     double level = speechService.soundLevel;
 
     return Scaffold(
-      backgroundColor:
-          Colors.transparent, // Transparent to allow morph effect from below
-      body: Stack(
+      backgroundColor: Colors.transparent,
+      body: SlideTransition(
+        position: _slideAnimation,
+        child: Stack(
         children: [
+          // 0. Top Live Speech Text (Smooth text only, no box/icon)
+          if (voiceService.liveTranscript.isNotEmpty)
+            Positioned(
+              top: MediaQuery.paddingOf(context).top + 72,
+              left: 32,
+              right: 32,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.2),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  );
+                },
+                child: Text(
+                  voiceService.liveTranscript,
+                  key: ValueKey<String>(voiceService.liveTranscript),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.2,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ),
+
           // 1. Central Visualizer (The Core Experience)
           // Animated from small to full size on entrance
           Center(
@@ -240,6 +289,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
             ),
           )
         ],
+      ),
       ),
     );
   }

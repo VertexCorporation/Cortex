@@ -144,7 +144,34 @@ class ChatStorageService {
       // We just need to fetch the snippet text reliably.
       // A correlated subquery is clean enough for SQLite.
 
-      final results = await db.rawQuery('''
+      try {
+        final results = await db.rawQuery('''
+        SELECT 
+          c.id, 
+          c.title, 
+          c.modelId, 
+          c.modelTitle,
+          c.modelImagePath,
+          c.isStarred, 
+          c.starredDate, 
+          c.lastMessageDate,
+          m.text as lastMessageText,
+          m.photoPath as lastMessagePhoto,
+          m.ts as realLastMessageTs
+        FROM conversations c
+        LEFT JOIN messages m ON m.idx = (
+            SELECT idx FROM messages 
+            WHERE conversationId = c.id 
+              AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))
+            ORDER BY idx DESC LIMIT 1
+        )
+        WHERE c.isArchived = 0
+      ''');
+        return results;
+      } catch (e) {
+        // Fallback for databases that haven't been migrated yet (isArchived column missing)
+        debugPrint("[Storage] Fallback: isArchived column not found, using legacy query");
+        final results = await db.rawQuery('''
         SELECT 
           c.id, 
           c.title, 
@@ -165,8 +192,8 @@ class ChatStorageService {
             ORDER BY idx DESC LIMIT 1
         )
       ''');
-
-      return results;
+        return results;
+      }
     } catch (e) {
       debugPrint("[Storage] Error fetching optimized conversations: $e");
       return [];
@@ -647,6 +674,59 @@ class ChatStorageService {
       AppDataState().markUserDataAsChanged();
     } catch (e) {
       _handleDiskError(e, 'setStarred');
+    }
+  }
+
+  static Future<void> archiveConversation(String id) async {
+    try {
+      final db = await DbHelper().db;
+      await db.update(
+        'conversations',
+        {'isArchived': 1},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      CacheService.invalidateConversationCache();
+      AppDataState().markUserDataAsChanged();
+    } catch (e) {
+      _handleDiskError(e, 'archiveConversation');
+    }
+  }
+
+  static Future<void> unarchiveConversation(String id) async {
+    try {
+      final db = await DbHelper().db;
+      await db.update(
+        'conversations',
+        {'isArchived': 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      CacheService.invalidateConversationCache();
+      AppDataState().markUserDataAsChanged();
+    } catch (e) {
+      _handleDiskError(e, 'unarchiveConversation');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getArchivedConversations() async {
+    try {
+      final db = await DbHelper().db;
+      return await db.rawQuery('''
+        SELECT 
+          c.id, 
+          c.title, 
+          c.modelId, 
+          c.modelTitle,
+          c.lastMessageDate
+        FROM conversations c
+        WHERE c.isArchived = 1
+        ORDER BY c.lastMessageDate DESC
+      ''');
+    } catch (e) {
+      // Column doesn't exist yet (migration hasn't run)
+      debugPrint("[Storage] getArchivedConversations: isArchived column not found");
+      return [];
     }
   }
 

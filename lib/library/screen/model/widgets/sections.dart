@@ -239,9 +239,9 @@ class _ParsedText extends StatelessWidget {
         spans.add(TextSpan(text: content, style: italicStyle));
       } else if (matchText.startsWith('[')) {
         // --- MARKDOWN LINK HANDLING ---
-        // Group 4 is label, Group 5 is URL
-        final label = match.group(4) ?? "";
-        final href = match.group(5) ?? "";
+        // Group 6 is label, Group 7 is URL
+        final label = match.group(6) ?? "";
+        final href = match.group(7) ?? "";
 
         spans.add(TextSpan(
             text: label,
@@ -250,8 +250,8 @@ class _ParsedText extends StatelessWidget {
               ..onTap = () async => _launchUrl(href)));
       } else {
         // --- RAW URL HANDLING ---
-        // Group 6 is the raw URL
-        final url = match.group(6) ?? matchText;
+        // Group 8 is the raw URL
+        final url = match.group(8) ?? matchText;
         spans.add(TextSpan(
             text: url,
             style: linkStyle,

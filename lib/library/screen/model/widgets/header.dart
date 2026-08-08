@@ -147,7 +147,7 @@ class ModelHeader extends StatelessWidget {
       if (!kIsWeb && file.existsSync()) {
         return Padding(
           padding: const EdgeInsets.all(12.0),
-          child: SvgPicture.file(file as dynamic,
+          child: SvgPicture.file(file,
               fit: BoxFit.contain, colorFilter: svgColorFilter),
         );
       }

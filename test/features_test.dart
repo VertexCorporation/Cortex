@@ -24,9 +24,7 @@ class MockChatSessionProvider extends Mock implements ChatSessionProvider {
 }
 
 class MockConversationProvider extends Mock implements ConversationProvider {
-  final bool _cleared = false;
-
-  bool get cleared => _cleared;
+  bool cleared = false;
 }
 
 class MockModelService extends Mock implements ModelService {}

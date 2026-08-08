@@ -3,6 +3,7 @@
 #include <jni.h>
 #include <iomanip>
 #include <math.h>
+#include <mutex>
 #include <string>
 #include <unistd.h>
 #include "llama.h"
@@ -31,15 +32,16 @@
 #define LOGi(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 #define LOGe(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 
-jclass la_int_var;
-jmethodID la_int_var_value;
-jmethodID la_int_var_inc;
+jclass la_int_var = nullptr;
+jmethodID la_int_var_value = nullptr;
+jmethodID la_int_var_inc = nullptr;
 
 std::string cached_token_chars;
 
 static std::atomic<bool> g_stop_requested(false);
 
 static std::vector<uint8_t> g_image_bytes;
+static std::mutex g_image_mutex;
 
 bool is_valid_utf8(const char * string) {
     if (!string) {
@@ -136,13 +138,16 @@ LOGe("set_image() called with empty imageBytes");
 return;
 }
 
-g_image_bytes.resize(static_cast<size_t>(length));
-env->GetByteArrayRegion(
-        imageBytes,
-0,
-length,
-reinterpret_cast<jbyte *>(g_image_bytes.data())
-);
+{
+    std::lock_guard<std::mutex> lock(g_image_mutex);
+    g_image_bytes.resize(static_cast<size_t>(length));
+    env->GetByteArrayRegion(
+            imageBytes,
+    0,
+    length,
+    reinterpret_cast<jbyte *>(g_image_bytes.data())
+    );
+}
 
 LOGi("set_image() stored %d bytes in global image buffer", length);
 }
@@ -218,6 +223,11 @@ jint pp,
 jint pl,
         jint nr
 ) {
+if (!context_pointer || !model_pointer || !batch_pointer) {
+    LOGe("bench_model() called with null pointer(s)");
+    return env->NewStringUTF("");
+}
+
 auto pp_avg = 0.0;
 auto tg_avg = 0.0;
 auto pp_std = 0.0;
@@ -500,9 +510,19 @@ const auto sampler = reinterpret_cast<llama_sampler *>(sampler_pointer);
 const auto model = llama_get_model(context);
 const auto vocab = llama_model_get_vocab(model);
 
-if (!la_int_var) la_int_var = env->GetObjectClass(intvar_ncur);
+if (!la_int_var) {
+    jclass localClass = env->GetObjectClass(intvar_ncur);
+    la_int_var = static_cast<jclass>(env->NewGlobalRef(localClass));
+    env->DeleteLocalRef(localClass);
+}
 if (!la_int_var_value) la_int_var_value = env->GetMethodID(la_int_var, "getValue", "()I");
 if (!la_int_var_inc) la_int_var_inc = env->GetMethodID(la_int_var, "inc", "()V");
+
+// check that batch has tokens before sampling
+if (batch->n_tokens == 0) {
+    LOGe("completion_loop() called with empty batch");
+    return nullptr;
+}
 
 // sample the most likely token
 const auto new_token_id = llama_sampler_sample(sampler, context, -1);
@@ -529,11 +549,11 @@ return nullptr;
 
 jstring new_token = nullptr;
 if (is_valid_utf8(cached_token_chars.c_str())) {
-new_token = env->NewStringUTF(cached_token_chars.c_str());
-LOGi("cached: %s, new_token_chars: `%s`, id: %d", cached_token_chars.c_str(), new_token_chars.c_str(), new_token_id);
-cached_token_chars.clear();
+    new_token = env->NewStringUTF(cached_token_chars.c_str());
+    LOGi("cached: %s, new_token_chars: `%s`, id: %d", cached_token_chars.c_str(), new_token_chars.c_str(), new_token_id);
+    cached_token_chars.clear();
 } else {
-new_token = env->NewStringUTF("");
+    new_token = env->NewStringUTF("");
 }
 
 common_batch_clear(*batch);
@@ -541,8 +561,17 @@ common_batch_add(*batch, new_token_id, n_cur, { 0 }, true);
 
 env->CallVoidMethod(intvar_ncur, la_int_var_inc);
 
+if (env->ExceptionCheck()) {
+    LOGe("JNI exception after CallVoidMethod, cleaning up");
+    if (new_token) env->DeleteLocalRef(new_token);
+    env->ExceptionClear();
+    return nullptr;
+}
+
 if (llama_decode(context, *batch) != 0) {
-LOGe("llama_decode() returned null");
+    LOGe("llama_decode() returned null");
+    if (new_token) env->DeleteLocalRef(new_token);
+    return nullptr;
 }
 
 return new_token;
@@ -550,19 +579,19 @@ return new_token;
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_android_llama_cpp_LLamaAndroid_clear_1image(JNIEnv *, jobject) {
+    std::lock_guard<std::mutex> lock(g_image_mutex);
+    g_image_bytes.clear();
+    g_image_bytes.shrink_to_fit();
+    LOGi("clear_image() released image buffer");
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_android_llama_cpp_LLamaAndroid_kv_1cache_1clear(JNIEnv *, jobject, jlong context) {
 if (context == 0) {
-__android_log_print(ANDROID_LOG_WARN, "llama-android", "clearKv() received null context, retrying...");
-
-int retries = 20;
-while (context == 0 && retries-- > 0) {
-usleep(10000);
-}
-
-if (context == 0) {
-__android_log_print(ANDROID_LOG_ERROR, "llama-android", "clearKv() FAILED: context pointer still null.");
+__android_log_print(ANDROID_LOG_ERROR, "llama-android", "clearKv() FAILED: context pointer is null.");
 return;
-}
 }
 
 auto ctx = reinterpret_cast<llama_context *>(context);

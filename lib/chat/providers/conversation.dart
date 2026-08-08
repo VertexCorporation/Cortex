@@ -379,34 +379,25 @@ class ConversationProvider with ChangeNotifier {
     if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
       final lastMessage = _messages.last;
 
-      // Trim leading newlines if this is the very beginning of the message
       String textToAppend = chunk;
       if (lastMessage.text.isEmpty && textToAppend.trimLeft().isEmpty) {
-        // If message is empty and chunk is only whitespace/newline, ignore it
         return;
       }
       if (lastMessage.text.isEmpty && textToAppend.startsWith('\n')) {
         textToAppend = textToAppend.trimLeft();
       }
-      // PERF: Use StringBuffer instead of string concatenation (lastMessage.text + textToAppend)
-      // which creates thousands of abandoned String objects and forces heavy Garbage Collection.
       _streamBuffer ??= StringBuffer(lastMessage.text);
       _streamBuffer!.write(textToAppend);
 
-      _messages[_messages.length - 1] = lastMessage.copyWith(
-        text: _streamBuffer!.toString(),
-      );
+      _messages[_messages.length - 1] = lastMessage.copyWithText(_streamBuffer!.toString());
     } else {
-      // This case handles a stream starting before the thinking bubble is in place.
       String initialText = chunk;
       if (initialText.startsWith('\n')) {
         initialText = initialText.trimLeft();
       }
-      _messages.add(
-          Message(text: initialText, isUserMessage: false, isThinking: true));
+      _messages.add(Message(text: initialText, isUserMessage: false, isThinking: true));
     }
 
-    // Throttle UI updates for better streaming performance
     _scheduleStreamUpdate();
   }
 

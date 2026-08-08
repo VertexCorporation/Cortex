@@ -60,7 +60,7 @@
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="false"
         tools:replace="android:requestLegacyExternalStorage"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="false"
         android:enableOnBackInvokedCallback="true"
         android:theme="@style/LaunchTheme">
 
@@ -134,6 +134,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Enable Impeller rendering engine for smooth 120Hz GPU performance -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="true" />
 
         <!-- ========================================== -->
         <!-- CUSTOM SERVICES -->

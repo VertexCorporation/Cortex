@@ -187,21 +187,6 @@ class ModelRemoveService {
             name: logName);
       }
 
-      // 0. Get the canonical path from UserModels (The Source of Truth)
-      // This is crucial because if we rely only on the ID, we might miss the file
-      // if it was saved with a custom name or in a different location (though unlikely now).
-      final userModels = await UserModels.loadDownloadedModelPaths();
-      final recordedPath = userModels[modelId];
-
-      if (recordedPath != null && await File(recordedPath).exists()) {
-        final file = File(recordedPath);
-        final size = await file.length();
-        await file.delete();
-        dev.log(
-            '[Cleanup] Deleted file from UserModels record: $recordedPath (freed ${(size / 1024 / 1024).toStringAsFixed(2)} MB)',
-            name: logName);
-      }
-
       final filesDir = await ModelsBackendUtils.initializeDirectory();
 
       // PRIMARY PATH: Use the canonical ID-based path (current standard)

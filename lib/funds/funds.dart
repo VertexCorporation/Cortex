@@ -729,7 +729,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                         backend.isPurchasePending ? 0.98 : 1.0,
                         backend.isPurchasePending ? 0.98 : 1.0,
                         backend.isPurchasePending ? 0.98 : 1.0,
-                        backend.isPurchasePending ? 0.98 : 1.0,
+                        1.0,
                       ),
                     child: ElevatedButton(
                       onPressed: (backend.isPurchasePending || _isEmulator)
@@ -905,7 +905,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       transitionBuilder: (child, animation) {
         return SizeTransition(
           sizeFactor: animation,
-          alignment: Alignment.center,
+          axisAlignment: 0.0,
           child: FadeTransition(
             opacity: animation,
             child: child,

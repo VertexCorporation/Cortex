@@ -118,8 +118,7 @@ class _AiHeader extends StatelessWidget {
       }
     }
 
-    return _HeaderData(
-        textToDisplay: textToDisplay, isCortexDynamic: isCortexDynamic);
+    return _HeaderData(textToDisplay: textToDisplay, isCortexDynamic: isCortexDynamic);
   }
 
   @override
@@ -170,15 +169,13 @@ class _AiHeader extends StatelessWidget {
         SizeTransition(
           sizeFactor: headerEntryAnim,
           axis: Axis.horizontal,
-          alignment: Alignment.centerLeft,
+          axisAlignment: -1.0,
           child: FadeTransition(
             opacity: headerEntryAnim,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(width: 8 * scale),
-                // Hide the avatar when in dynamic/Cortex mode to avoid
-                // showing two identical cortex.svg icons side by side.
                 if (!isCortexDynamic) _buildAvatar(scale * 0.7),
                 if (textToDisplay.isNotEmpty) ...[
                   if (!isCortexDynamic) SizedBox(width: 6 * scale),
@@ -193,8 +190,7 @@ class _AiHeader extends StatelessWidget {
                   Text(
                     ModelDataUtils.formatModelName(textToDisplay),
                     style: TextStyle(
-                        color: AppColors.primaryColor.inverted
-                            .withValues(alpha: 0.7),
+                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
                         fontSize: 12 * scale,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5),
@@ -212,11 +208,8 @@ class _AiHeader extends StatelessWidget {
     final containerSize = 30 * s;
     final iconSize = 24 * s;
     final fallbackWidget = SvgPicture.asset('assets/icons/self.svg',
-        width: iconSize,
-        height: iconSize,
-        fit: BoxFit.contain,
-        colorFilter:
-            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
+        width: iconSize, height: iconSize, fit: BoxFit.contain,
+        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
     Widget imageWidget;
     if (avatarPath.isEmpty || avatarPath.endsWith('self.svg')) {
       imageWidget = fallbackWidget;
@@ -225,37 +218,21 @@ class _AiHeader extends StatelessWidget {
       final isAsset = avatarPath.startsWith('assets/');
       if (isSvg) {
         imageWidget = isAsset
-            ? SvgPicture.asset(avatarPath,
-                width: iconSize,
-                height: iconSize,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-                fit: BoxFit.contain,
-                placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(avatarPath),
-                width: iconSize,
-                height: iconSize,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-                fit: BoxFit.contain,
-                placeholderBuilder: (_) => fallbackWidget);
+            ? SvgPicture.asset(avatarPath, width: iconSize, height: iconSize,
+                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget)
+            : SvgPicture.file(File(avatarPath), width: iconSize, height: iconSize,
+                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget);
       } else {
         ImageProvider imageProvider = isAsset
             ? AssetImage(avatarPath) as ImageProvider
             : FileImage(File(avatarPath));
-
-        // PERF: Prevent GC Jank on scrolling chat history.
-        // Limit decode size of high-res custom model avatars in chat.
         final int cacheSize = (containerSize * 3).toInt().clamp(50, 200);
-        imageProvider =
-            ResizeImage(imageProvider, width: cacheSize, height: cacheSize);
-
+        imageProvider = ResizeImage(imageProvider, width: cacheSize, height: cacheSize);
         imageWidget = Image(
-            image: imageProvider,
-            width: containerSize,
-            height: containerSize,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => fallbackWidget);
+            image: imageProvider, width: containerSize, height: containerSize,
+            fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallbackWidget);
       }
     }
     return Container(
@@ -263,44 +240,33 @@ class _AiHeader extends StatelessWidget {
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-              color: AppColors.primaryColor.inverted.withValues(alpha: 0.2),
-              width: 1.0)),
+              color: AppColors.primaryColor.inverted.withValues(alpha: 0.2), width: 1.0)),
       child: Container(
-          width: containerSize,
-          height: containerSize,
+          width: containerSize, height: containerSize,
           clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-              color: AppColors.secondaryColor, shape: BoxShape.circle),
-          alignment: Alignment.center,
-          child: imageWidget),
+          decoration: BoxDecoration(color: AppColors.secondaryColor, shape: BoxShape.circle),
+          alignment: Alignment.center, child: imageWidget),
     );
   }
 }
 
 class _SearchingLabel extends StatelessWidget {
   final double scale;
-
   const _SearchingLabel({super.key, required this.scale});
 
   @override
   Widget build(BuildContext context) {
     final text = AppLocalizations.of(context)!.searching;
-
     return Padding(
       padding: EdgeInsets.only(left: 8 * scale),
       child: Shimmer.fromColors(
         baseColor: AppColors.primaryColor.inverted.withValues(alpha: 0.38),
         highlightColor: AppColors.primaryColor.inverted.withValues(alpha: 0.90),
         period: const Duration(milliseconds: 1250),
-        child: Text(
-          text,
+        child: Text(text,
           style: TextStyle(
             color: AppColors.primaryColor.inverted.withValues(alpha: 0.55),
-            fontSize: 14 * scale,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0,
-          ),
-        ),
+            fontSize: 14 * scale, fontWeight: FontWeight.w700, letterSpacing: 0)),
       ),
     );
   }
@@ -309,9 +275,5 @@ class _SearchingLabel extends StatelessWidget {
 class _HeaderData {
   final String textToDisplay;
   final bool isCortexDynamic;
-
-  const _HeaderData({
-    required this.textToDisplay,
-    required this.isCortexDynamic,
-  });
+  const _HeaderData({required this.textToDisplay, required this.isCortexDynamic});
 }

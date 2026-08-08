@@ -318,7 +318,7 @@ class AppColors {
 
   static Color get border => _cachedColors.border;
 
-  // Yeni Getter
+  // Accent color reserved for premium/subscription highlights.
   static Color get premium => _cachedColors.premium;
 
   static Map<String, Map<String, dynamic>> get overlayStyles {

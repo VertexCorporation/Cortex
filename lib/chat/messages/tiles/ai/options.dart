@@ -78,7 +78,8 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
       return;
     }
 
-    Clipboard.setData(ClipboardData(text: message.displayableText));
+    await Clipboard.setData(ClipboardData(text: message.displayableText));
+    if (!mounted) return;
     Provider.of<IntrovertNotificationService>(context, listen: false)
         .showNotification(
             message: localizations.messageCopied,

@@ -37,6 +37,8 @@ import 'package:cortex/chat/screen/widgets/bottom/guest.dart';
 import '../messages/messages.dart';
 import 'package:cortex/chat/providers/memory.dart';
 import 'package:cortex/chat/services/memory_store.dart';
+import 'package:cortex/chat/services/pii_filter.dart';
+import 'package:cortex/rag/chat.dart';
 import 'tools.dart';
 
 enum _MediaIntent {
@@ -63,6 +65,7 @@ class SendService {
   final VoiceService _voiceService;
   final UserMemoryProvider _userMemoryProvider;
   final BackgroundTaskService _backgroundTaskService;
+  final RagChatService _ragChat;
 
   /// Track which conversations are currently sending.
   /// Replaces the old single boolean `_isSending`.
@@ -90,6 +93,7 @@ class SendService {
     required VoiceService voiceService,
     required UserMemoryProvider userMemoryProvider,
     required BackgroundTaskService backgroundTaskService,
+    required RagChatService ragChat,
   })  : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
         _apiService = apiService,
@@ -99,7 +103,8 @@ class SendService {
         _modelService = modelService,
         _voiceService = voiceService,
         _userMemoryProvider = userMemoryProvider,
-        _backgroundTaskService = backgroundTaskService;
+        _backgroundTaskService = backgroundTaskService,
+        _ragChat = ragChat;
 
   /// Returns true if the given conversation is the one currently being viewed.
   bool _isConversationActive(String convId) {
@@ -660,7 +665,13 @@ class SendService {
         // Offline Flow
         if (_offlineModerator.isPromptAcceptable(textForApi)) {
           await _offlineService.sendMessage(
-              textForApi, currentAttachmentPaths.firstOrNull, activeMode);
+            textForApi,
+            currentAttachmentPaths.firstOrNull,
+            activeMode,
+            currentAttachmentPaths,
+            _inputProvider.ragEnabled,
+            _inputProvider.ragDocumentIds,
+          );
         } else {
           throw ApiException(localizations.errorPromptFlagged);
         }
@@ -993,6 +1004,20 @@ class SendService {
     return completer.future;
   }
 
+  /// Builds the RAG context block for the current message, or returns null
+  /// when RAG is not active or nothing relevant was found.
+  Future<String?> _buildRagContext({
+    required String queryText,
+    required List<String> attachmentPaths,
+  }) {
+    return _ragChat.buildContext(
+      queryText: queryText,
+      toggleEnabled: _inputProvider.ragEnabled,
+      toggleDocumentIds: _inputProvider.ragDocumentIds,
+      attachmentPaths: attachmentPaths,
+    );
+  }
+
   /// Manages the full conversation loop:
   /// 1. Sends Request
   /// 2. Streams Text/featureReasoning
@@ -1034,6 +1059,21 @@ class SendService {
     // 2. Add Current User Message to Context (Manual Construction)
     // We do this manually because attachments need to be processed into base64 blocks
     final List<Map<String, dynamic>> userContent = [];
+
+    // RAG (Document Chat): retrieve relevant passages for this message and
+    // prepend them as reference material. PII-safe before going online.
+    final String? ragContext = await _buildRagContext(
+      queryText: initialText,
+      attachmentPaths: attachments,
+    );
+    final bool ragActive = ragContext != null && ragContext.isNotEmpty;
+    if (ragActive) {
+      final safeContext = LocalPiiRedactionFilter.redact(ragContext);
+      if (safeContext.isNotEmpty) {
+        userContent.add({"type": "text", "text": safeContext});
+      }
+    }
+
     if (initialText.isNotEmpty) {
       userContent.add({"type": "text", "text": initialText});
     }
@@ -1407,6 +1447,7 @@ class SendService {
           langCode: langCode,
           enablefeatureReasoning: enablefeatureReasoning,
           enableWebSearch: enableWebSearch,
+          enableRag: ragActive,
           useTools: !isMediaModel && !_voiceService.isFlowActive,
           // Disable tools in Flow Mode
           onTextChunk: onTextChunk,

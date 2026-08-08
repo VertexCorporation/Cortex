@@ -9,6 +9,8 @@ import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/main.dart';
+import 'package:cortex/navigation.dart';
+import 'package:cortex/rag/screens/document_library_screen.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -329,6 +331,21 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                         _prepareForTextFeature(context);
                         inputProvider.toggleWebSearch();
                         Navigator.pop(context);
+                      },
+                    ),
+
+                    // 3.5 DOCUMENT CHAT (RAG)
+                    FeaturesSheetButton(
+                      iconPath: 'assets/icons/attachment.svg',
+                      title: l10n.ragFeatureTitle,
+                      description: l10n.ragFeatureDescription,
+                      isSelected: inputProvider.ragEnabled,
+                      onTap: () {
+                        Navigator.pop(context);
+                        navigateToScreen(
+                          const DocumentLibraryScreen(),
+                          direction: const Offset(1.0, 0.0),
+                        );
                       },
                     ),
 

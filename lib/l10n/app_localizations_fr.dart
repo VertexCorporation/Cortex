@@ -71,6 +71,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get theme => 'Thème';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'Non';
 
   @override
@@ -189,6 +195,25 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
+
+  @override
+  String get renameConversation => 'Rename Conversation';
+
+  @override
+  String get conversationName => 'Conversation name';
+
+  @override
+  String get deleteConversation => 'Delete Conversation';
+
+  @override
+  String get deleteConversationConfirm =>
+      'Are you sure you want to delete this conversation? This action cannot be undone.';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get multiSelect => 'Select Multiple';
 
   @override
   String get loginToYourAccount => 'Connexion';
@@ -1747,7 +1772,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get workInProgress => 'Travaux en cours';
 
   @override
-  String get voiceSystemPromptSuffix =>
+  String get voiceSystemPrompt =>
       'IMPORTANT : N’utilisez pas la mise en forme Markdown (gras, italique). N’affichez PAS de blocs de code (```). Rédigez des réponses concises et conversationnelles.';
 
   @override
@@ -1834,6 +1859,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get webSearchSources => 'Sources';
 
   @override
+  String get offlineUse => 'Utiliser sans Internet';
+
+  @override
+  String get archivedConversations => 'Conversations archivées';
+
+  @override
+  String get noArchivedConversations => 'Aucune conversation archivée';
+
+  @override
+  String get unarchive => 'Désarchiver';
+
+  @override
   String get searching => 'Recherche';
 
   @override
@@ -1842,6 +1879,65 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get featureWebSearchDescription =>
       'Recherchez sur le Web des informations en temps réel';
+
+  @override
+  String get ragFeatureTitle => 'Documents';
+
+  @override
+  String get ragFeatureDescription => 'Chat about your own documents privately';
+
+  @override
+  String get ragScreenTitle => 'Document Chat';
+
+  @override
+  String get ragAddDocuments => 'Add documents';
+
+  @override
+  String get ragEmptyTitle => 'No documents yet';
+
+  @override
+  String get ragEmptyDescription =>
+      'Add PDF, Word, Excel, PowerPoint or text files to chat about them.';
+
+  @override
+  String get ragStatusReady => 'Ready';
+
+  @override
+  String get ragStatusIndexing => 'Indexing…';
+
+  @override
+  String get ragStatusFailed => 'Failed';
+
+  @override
+  String ragSelected(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get ragEnableChat => 'Enable document chat';
+
+  @override
+  String get ragDisableChat => 'Disable document chat';
+
+  @override
+  String ragActiveDocs(int count) {
+    return '$count documents';
+  }
+
+  @override
+  String get ragNoSelectionHint => 'Select documents to chat about';
+
+  @override
+  String get ragDeleteConfirm => 'Delete this document from the library?';
+
+  @override
+  String get ragFileTooBig => 'This file is larger than 10 MB.';
+
+  @override
+  String get ragUnsupportedType => 'This file type is not supported.';
+
+  @override
+  String get ragAddedToChat => 'Added to document chat';
 
   @override
   String get clearMemory => 'Mémoire claire';

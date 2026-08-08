@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import '../../../../app.dart';
-import '../../../../theme.dart';
+import 'package:cortex/app.dart';
+import 'package:cortex/theme.dart';
 
 class DefaultCard extends StatelessWidget {
   final String text;

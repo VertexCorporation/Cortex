@@ -116,7 +116,7 @@ void main() {
     await voiceService.startSession(
       locale: 'en-US',
       onFinalSentence: (text) {},
-      voiceSystemPromptSuffix: "SUFFIX",
+      voiceSystemPrompt: "SUFFIX",
       flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev",
     );
     // Context is null in test, so we need to manually start listening
@@ -130,7 +130,7 @@ void main() {
     await voiceService.startSession(
         locale: 'en-US',
         onFinalSentence: (_) {},
-        voiceSystemPromptSuffix: "SUFFIX",
+        voiceSystemPrompt: "SUFFIX",
         flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
 
     // 2. Simulate AI Streaming text
@@ -160,14 +160,14 @@ void main() {
     await voiceService.startSession(
         locale: 'en-US',
         onFinalSentence: (_) {},
-        voiceSystemPromptSuffix: "SUFFIX",
+        voiceSystemPrompt: "SUFFIX",
         flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
     await voiceService.stopSession(); // Reset
 
     await voiceService.startSession(
         locale: 'en-US',
         onFinalSentence: (_) {},
-        voiceSystemPromptSuffix: "SUFFIX",
+        voiceSystemPrompt: "SUFFIX",
         flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
 
     voiceService.onAiStreamCallback("Hello.");

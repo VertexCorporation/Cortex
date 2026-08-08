@@ -154,6 +154,7 @@ class ModelService with ChangeNotifier {
     allOnlineVariantIds.add('cortex/auto');
 
     for (final model in allModels) {
+      if (model.id == 'cortex/auto' || model.id == 'cortex/roleplay') continue;
       if (model.category == 'roleplay' || model.category == 'self') {
         String? currentBaseId = model.baseModelId;
         bool requiresRepair = (currentBaseId == null ||
@@ -266,11 +267,21 @@ class ModelService with ChangeNotifier {
     List<Map<String, dynamic>> rawModels,
     String langCode,
   ) {
-    var finalEntities = rawModels.map((rawMap) {
+    var finalEntities = <ModelEntity>[];
+    for (int i = 0; i < rawModels.length; i++) {
+      final rawMap = rawModels[i];
       final tempEntity = ModelEntity.fromMap(rawMap, langCode);
       final resolvedPath = getModelImagePath(tempEntity);
-      return tempEntity.copyWith(imagePath: resolvedPath);
-    }).toList();
+      finalEntities.add(tempEntity.copyWith(imagePath: resolvedPath));
+
+      // Inject cortexRoleplayData
+      if (i == 0) {
+        final roleplayEntity =
+            ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
+        final roleplayPath = getModelImagePath(roleplayEntity);
+        finalEntities.add(roleplayEntity.copyWith(imagePath: roleplayPath));
+      }
+    }
 
     const int minOfflineSizeMb = 300;
     const int maxOfflineRamMb = 32000;

@@ -13,10 +13,12 @@ import 'content.dart';
 class Axon extends StatefulWidget {
   final VoidCallback onNewChatTap;
   final VoidCallback onLibraryTap;
+  final VoidCallback onDocumentsTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
   final VoidCallback onNewsTap;
   final VoidCallback onRoleplayTap;
+  final VoidCallback onArchivedTap;
   final VoidCallback onCloseAxon;
   final VoidCallback onOpenAxon;
   final double referenceWidth;
@@ -27,10 +29,12 @@ class Axon extends StatefulWidget {
     super.key,
     required this.onNewChatTap,
     required this.onLibraryTap,
+    required this.onDocumentsTap,
     required this.onCreateAITap,
     required this.onArtsTap,
     required this.onRoleplayTap,
     required this.onNewsTap,
+    required this.onArchivedTap,
     required this.onCloseAxon,
     required this.onOpenAxon,
     required this.referenceWidth,
@@ -169,10 +173,12 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
           isSearchActive: _isSearchActive,
           onNewChatTap: widget.onNewChatTap,
           onLibraryTap: widget.onLibraryTap,
+          onDocumentsTap: widget.onDocumentsTap,
           onCreateAITap: widget.onCreateAITap,
           onArtsTap: widget.onArtsTap,
           onRoleplayTap: widget.onRoleplayTap,
           onNewsTap: widget.onNewsTap,
+          onArchivedTap: widget.onArchivedTap,
           onSettingsTap: _handleSettingsTap,
           onSearchChanged: _handleSearchQueryChanged,
           onExitSearchTap: _handleExitSearchMode,

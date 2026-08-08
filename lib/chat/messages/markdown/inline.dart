@@ -65,22 +65,6 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
       fontSize: fs,
     );
     switch (match.type) {
-      case 'latex':
-        String content = matchText;
-        if (content.startsWith(r'$$') && content.endsWith(r'$$')) {
-          content = content.substring(2, content.length - 2);
-        } else if (content.startsWith(r'\[') && content.endsWith(r'\]')) {
-          content = content.substring(2, content.length - 2);
-        } else if (content.startsWith(r'\(') && content.endsWith(r'\)')) {
-          content = content.substring(2, content.length - 2);
-        } else if (content.startsWith(r'$') && content.endsWith(r'$')) {
-          content = content.substring(1, content.length - 1);
-        }
-        return WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: SafeMathTex(
-                latex: content,
-                textStyle: baseStyle.copyWith(fontSize: fs * 0.85)));
       case 'inlineCode':
         final content = matchText.substring(1, matchText.length - 1);
         return WidgetSpan(

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  // TODO: Replace this with a proper test that has real expect() assertions.
+  // Currently this test only prints parsed spans without verifying output.
   testWidgets('Reproduction of Enes Batur text parsing',
           (WidgetTester tester) async {
         const userText = r'''

@@ -221,8 +221,8 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> decodedModels = [];
 
     for (final map in maps) {
-      final modelId = map['id'] as String;
-      final rawJsonString = map['raw_json'] as String;
+      final modelId = map['id']?.toString() ?? '';
+      final rawJsonString = map['raw_json']?.toString() ?? '';
 
       // --- DECRYPTION LOGIC ---
       if (userId != null &&

@@ -136,7 +136,7 @@
   "conversationDeleted": "Konuşma silindi!",
   "copy": "Kopyala",
   "copyrights": "Atıflar",
-  "cortexSystemPersona": "\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zeka ekosisteminin içinde çalışıyorsunuz; bu platform, ortalama 16 yaşında olan Vertex ekibi tarafından geliştirilmiştir. Bunu hatırlayın ve sorulursa cevap verin. Daha fazla bilgi istenirse, internette arama yapmaktan çekinmeyin veya arama yapamıyorsanız, bilmiyorum demekten çekinmeyin!",
+  "cortexSystemPersona": "\n\n[Sistem] KULLANICI TALİMATLARI: Sen Cortex gelişmiş yapay zeka ekosisteminde çalışan bilge, doğrudan ve yardımsever bir asistansın. Kullanıcı istemediği sürece ASLA belge ekleme, grafik/chart çizme, tablo oluşturma veya gereksiz araçlar önerme. Yalnızca kullanıcının sorusuna doğrudan, akıcı ve net cevap ver.",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -342,6 +342,38 @@
   "featureVideoRecognitionTitle": "Video Tanıma",
   "featureWebSearchDescription": "Gerçek zamanlı bilgi için internette arama yapın.",
   "featureWebSearchTitle": "Web Araması",
+  "ragFeatureTitle": "Belgeler",
+  "ragFeatureDescription": "Kendi belgelerin hakkında gizli şekilde sohbet et",
+  "ragScreenTitle": "Belge Sohbeti",
+  "ragAddDocuments": "Belge ekle",
+  "ragEmptyTitle": "Henüz belge yok",
+  "ragEmptyDescription": "PDF, Word, Excel, PowerPoint veya metin dosyaları ekleyerek onlar hakkında sohbet edin.",
+  "ragStatusReady": "Hazır",
+  "ragStatusIndexing": "Dizinleniyor…",
+  "ragStatusFailed": "Başarısız",
+  "ragSelected": "{count} seçili",
+  "@ragSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragEnableChat": "Belge sohbetini etkinleştir",
+  "ragDisableChat": "Belge sohbetini kapat",
+  "ragActiveDocs": "{count} belge",
+  "@ragActiveDocs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragNoSelectionHint": "Sohbet için belge seçin",
+  "ragDeleteConfirm": "Bu belge kütüphaneden silinsin mi?",
+  "ragFileTooBig": "Bu dosya 10 MB'tan büyük.",
+  "ragUnsupportedType": "Bu dosya türü desteklenmiyor.",
+  "ragAddedToChat": "Belge sohbetine eklendi",
   "featuresTitle": "Özellikler",
   "finalPreparation": "Son hazırlıklar yapılıyor.",
   "flowMode": "Akış Modu",
@@ -778,6 +810,8 @@
   "termsOfServiceAndPrivacyPolicyWarning": "Bu siparişi vererek, Hizmet Şartları ve Gizlilik Politikası'nı kabul etmiş olursunuz. Hizmet Şartlarımız ve Gizlilik Politikamız hakkında daha fazla bilgi edinmek için bu metne tıklayabilirsiniz. Abonelik, mevcut dönemin bitiminden en az 24 saat önce otomatik yenileme kapatılmadığı sürece otomatik olarak yenilenecektir.",
   "text": "Metin",
   "theme": "Tema",
+  "lightTheme": "Açık tema",
+  "darkTheme": "Koyu tema",
   "themeDescription": "Tercihinize göre aydınlık ve karanlık temalar arasında geçiş yapabilirsiniz. Seçilen tema Cortex arayüzü genelinde uygulanacaktır.",
   "themeLocked": "Bu tema daha yüksek bir abonelik seviyesi gerektiriyor. Kilidi açmak için lütfen yükseltme yapın.",
   "thinking": "Düşünüyor",
@@ -864,9 +898,13 @@
   "videoModels": "Video Modelleri",
   "videoPremiumWarning": "Video oluşturmak için Ultra aboneliğine ihtiyacınız var, şimdi yükseltin ve akışı hissedin!",
   "voiceModeInformation": "Cortex, sesli sohbet modunda bile tamamen cihaz üzerinde çalışarak verilerinizi güvende tutar; sorunsuz konuşmaların tadını çıkarın!",
-  "voiceSystemPromptSuffix": "ÖNEMLİ: Markdown biçimlendirmesi (kalın, italik) kullanmayın. Kod blokları (```) çıktısı vermeyin. Yanıtlarınızı konuşma diline yakın ve kısa tutun.",
+  "voiceSystemPrompt": "ÖNEMLİ SESLİ MOD KURALLARI:\n1. Şu an canlı sesli sohbet modundasın. Yanıtlarını en fazla 1-2 cümlelik çok kısa, doğal ve insan gibi ver.\n2. ASLA araç (tool), grafik (chart), hava durumu (weather), python koda ihtiyaç duyma ve çağırma! Tamamen düz metin konuş.\n3. Kullanıcı sana soru sorduğunda, hafızandaki önceki verdiğin cevabın aynısını BİREBİR TEKRARLAMA. Yeni, doğal ve soruya özgü yanıt ver.",
   "weakPassword": "Şifre çok zayıf.",
   "webSearchSources": "Kaynaklar",
+  "offlineUse": "İnternetsiz Kullan",
+  "archivedConversations": "Arşivlenmiş Sohbetler",
+  "noArchivedConversations": "Arşivlenmiş sohbet yok",
+  "unarchive": "Arşivden Çıkar",
   "welcomeOfferBadge": "Hoş Geldiniz Teklifi • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {

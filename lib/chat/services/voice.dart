@@ -4,6 +4,7 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/server/credits.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/chat/services/speech.dart';
@@ -37,6 +38,13 @@ class VoiceService with ChangeNotifier {
   bool isFlowMode = false; // "Setup" mode (Flow selected but not started)
   bool isFlowActive = false; // "Active" mode (Flow loop running)
   int currentFlowAgentIndex = 0; // 0, 1, 2 for the 3 agents
+
+  // Live Transcript for UI Top Card
+  String _liveTranscript = "";
+  bool _isLiveUserMessage = true;
+
+  String get liveTranscript => _liveTranscript;
+  bool get isLiveUserMessage => _isLiveUserMessage;
 
   // Queue for TTS to speak text as it streams in from AI
   final List<String> _sentenceQueue = [];
@@ -82,6 +90,7 @@ class VoiceService with ChangeNotifier {
 
   Future<void> _initTts() async {
     debugPrint("[VoiceService] Initializing TTS...");
+    await _flutterTts.setVolume(1.0); // Maximum volume
     await _flutterTts.setSharedInstance(true);
     await _flutterTts.setIosAudioCategory(
         IosTextToSpeechAudioCategory.playAndRecord,
@@ -100,9 +109,6 @@ class VoiceService with ChangeNotifier {
       _updateState(VoiceState.speaking);
     });
 
-    // We use awaitSpeakCompletion(true) and loop in _processQueue,
-    // so we don't strictly need a completion handler for chaining.
-    // However, for safety if `await` returns early on some OS, we can keep it blank or log.
     _flutterTts.setCompletionHandler(() {
       debugPrint("[VoiceService] Native TTS Completion Callback fired.");
     });
@@ -240,6 +246,11 @@ class VoiceService with ChangeNotifier {
   /// Get the current voice system prompt for API calls
   String? get voiceSystemPrompt => _voiceSystemPrompt;
 
+  /// Set a complete voice system prompt (replaces any existing)
+  void setVoiceSystemPrompt(String? prompt) {
+    _voiceSystemPrompt = prompt;
+  }
+
   void _updateVoiceParams(int index) async {
     // 0: Normal
     // 1: Deeper/Slower
@@ -272,8 +283,7 @@ class VoiceService with ChangeNotifier {
     required String locale,
     required Function(String) onFinalSentence,
     String? systemPrompt,
-    // [NEW] Localized strings passed from UI
-    required String voiceSystemPromptSuffix,
+    required String voiceSystemPrompt,
     required String Function(String agentName, String previousResponse)
         flowPromptBuilder,
   }) async {
@@ -287,8 +297,9 @@ class VoiceService with ChangeNotifier {
 
     // Store localized builders
     _flowPromptBuilder = flowPromptBuilder;
-    _voiceSystemPrompt = "${systemPrompt ?? ""}\n$voiceSystemPromptSuffix";
+    _voiceSystemPrompt = voiceSystemPrompt;
     _isSpeaking = false;
+    _liveTranscript = "";
     _sentenceQueue.clear();
     _incomingTextBuffer.clear();
     _fullAiResponseBuffer.clear();
@@ -301,6 +312,8 @@ class VoiceService with ChangeNotifier {
     }
 
     if (context != null && context.mounted) {
+      FocusScope.of(context).unfocus();
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
       startListening(context: context);
     }
   }
@@ -403,6 +416,9 @@ class VoiceService with ChangeNotifier {
 
   void _resetSilenceTimer(String recognizedText, BuildContext? context) {
     _lastRecognizedText = recognizedText;
+    _liveTranscript = recognizedText;
+    _isLiveUserMessage = true;
+    notifyListeners();
     _silenceTimer?.cancel();
     _silenceTimer = Timer(const Duration(seconds: 2), () {
       _finalizeUserSpeech(context);
@@ -481,15 +497,24 @@ class VoiceService with ChangeNotifier {
 
   // --- TTS Logic (Streaming) ---
 
+  /// Helper to clean raw streaming response for UI and TTS
+  String _cleanResponseText(String text) {
+    String cleaned = text;
+    cleaned = cleaned.replaceAll(RegExp(r'<function[\s\S]*?</function>[\s:]*'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'<function[\s\S]*?>[\s:]*'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'<tool_call>[\s\S]*?</tool_call>[\s:]*'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
+    return cleaned;
+  }
+
   /// Called by SendService when AI streams text chunks.
   void onAiStreamCallback(String chunk) {
-    // [FIX] Filter out Code Block markers ```python etc from stream
-    // This is a naive stream filter. Better to filter sentence-level?
-    // Stream filtering is hard because ``` might be split across chunks.
-    // For now, let's just buffer raw, and clean in _checkForSentences.
-
     _incomingTextBuffer.write(chunk);
     _fullAiResponseBuffer.write(chunk);
+    _liveTranscript = _cleanResponseText(_fullAiResponseBuffer.toString());
+    _isLiveUserMessage = false;
+    notifyListeners();
     _checkForSentences();
   }
 
@@ -497,19 +522,7 @@ class VoiceService with ChangeNotifier {
   void onAiResponseFinished() {
     // Speak any remaining text in buffer
     if (_incomingTextBuffer.isNotEmpty) {
-      // Logic fix: Ensure we don't drop text if it doesn't end with punctuation
-      String text = _incomingTextBuffer.toString();
-
-      // Clean remaining block tags
-      text = text.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
-      text = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
-      // If broken/unclosed tags remain, cut them off
-      if (text.contains('<memory>')) {
-        text = text.substring(0, text.indexOf('<memory>'));
-      }
-      if (text.contains('<think>')) {
-        text = text.substring(0, text.indexOf('<think>'));
-      }
+      String text = _cleanResponseText(_incomingTextBuffer.toString());
 
       if (text.trim().isNotEmpty) {
         _enqueueSentence(text);
@@ -520,30 +533,20 @@ class VoiceService with ChangeNotifier {
   }
 
   void _checkForSentences() {
-    String currentText = _incomingTextBuffer.toString();
+    String currentText = _cleanResponseText(_incomingTextBuffer.toString());
 
-    // First strip out any fully formed <memory>...</memory> and <think>...</think> blocks
-    currentText =
-        currentText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
-    currentText =
-        currentText.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
-
-    // If there is an open tag that hasn't closed yet, wait for more chunks.
-    if (currentText.contains('<memory>') || currentText.contains('<think>')) {
+    // If there is an unclosed tag wait for more chunks
+    if (currentText.contains('<function') ||
+        currentText.contains('<memory>') ||
+        currentText.contains('<think>')) {
       _incomingTextBuffer.clear();
       _incomingTextBuffer.write(currentText);
       return;
     }
 
-    // [FIX] Naive code block removal for TTS
-    // If we detect a code block start, we might want to mute until end?
-    // Or just replace ``` with "Code Block".
-    // Doing it on stream is tricky.
-    // Let's just strip ``` if found in the current buffer segment.
     currentText = currentText.replaceAll("```", "");
 
     // Pattern: any of .?! followed by a space or new line
-    // Including Chinese/Japanese punctuation
     RegExp delimiter = RegExp(r'[.?!：。](?=\s|$)');
 
     if (delimiter.hasMatch(currentText)) {
@@ -560,7 +563,6 @@ class VoiceService with ChangeNotifier {
         // Recursively check
         _checkForSentences();
       } else {
-        // If empty sentence before punctuation, just clear it
         _incomingTextBuffer.clear();
         _incomingTextBuffer.write(remaining);
       }
@@ -568,10 +570,11 @@ class VoiceService with ChangeNotifier {
   }
 
   void _enqueueSentence(String sentence) {
-    // [FIX] Final cleanliness check
-    String speechText = sentence.replaceAll(
-        RegExp(r'\`\`\`.*'), ''); // Remove markdown code fence residue
-    speechText = speechText.replaceAll('*', ''); // Remove bold/italic markers
+    String speechText = _cleanResponseText(sentence);
+    speechText = speechText.replaceAll(RegExp(r'\`\`\`.*'), '');
+    speechText = speechText.replaceAll('*', '');
+
+    if (speechText.trim().isEmpty) return;
 
     debugPrint(
         "[VoiceService] Enqueuing Sentence: ${speechText.substring(0, speechText.length > 20 ? 20 : speechText.length)}...");

@@ -202,7 +202,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
             currentPlanLevel;
 
     return ScrollFog(
-      scrollController: widget.scrollController!,
+      scrollController: widget.scrollController ?? ScrollController(),
       topFogHeight: screenHeight * 0.04,
       bottomFogHeight: screenHeight * 0.07,
       child: NotificationListener<ScrollMetricsNotification>(

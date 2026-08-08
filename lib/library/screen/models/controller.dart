@@ -16,6 +16,9 @@ import 'widgets/appbar.dart';
 import '../../../server/user.dart';
 import '../../../funds/funds.dart';
 import '../../../navigation.dart';
+import '../../../library/backend/data/entity.dart';
+import '../../../library/backend/download/download.dart';
+import '../../../library/backend/system.dart';
 import 'package:flutter/services.dart';
 
 const _kWarningPanelDelay = Duration(milliseconds: 700);
@@ -258,14 +261,20 @@ class LibraryScreenState extends State<LibraryScreen>
       );
     }
 
-    return Consumer2<ModelCatalogProvider, ModelLocalStateProvider>(
-      builder: (context, catalog, localState, child) {
-        final bool showLoadingSkeleton = catalog.isLoading;
-
-        if (!showLoadingSkeleton) {
-          _searchCtrl!.updateModels(catalog.allModels);
-          _searchCtrl!.downloadManagers = Map.from(localState.downloadManagers);
-          _searchCtrl!.downloadedFileStates = localState.downloadCompleted;
+    return Selector2<ModelCatalogProvider, ModelLocalStateProvider, _CatalogState>(
+      selector: (_, catalog, local) => _CatalogState(
+        isLoading: catalog.isLoading,
+        hasError: catalog.loadError,
+        models: catalog.allModels,
+        downloadedStates: local.downloadCompleted,
+        downloadManagers: Map.from(local.downloadManagers),
+        systemInfo: local.systemInfo,
+      ),
+      builder: (context, state, _) {
+        if (!state.isLoading) {
+          _searchCtrl!.updateModels(state.models);
+          _searchCtrl!.downloadManagers = state.downloadManagers;
+          _searchCtrl!.downloadedFileStates = state.downloadedStates;
         }
 
         return Scaffold(
@@ -274,10 +283,9 @@ class LibraryScreenState extends State<LibraryScreen>
           extendBodyBehindAppBar: true,
           appBar: ModelsAppBar(
             title: localizations.modelsTitle,
-            // UPDATED: Pass the controller so the title fades!
             scrollController: _scrollController,
             onOpenCreateScreen: () => _navigateAndHandleFocus(
-                () => catalog.openCreateScreen(context)),
+                () => _catalogProvider!.openCreateScreen(context)),
           ),
           body: Builder(builder: (context) {
             final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
@@ -287,36 +295,33 @@ class LibraryScreenState extends State<LibraryScreen>
               curve: Curves.easeOutCubic,
               child: ModelsBody(
                 scrollController: _scrollController,
-                isLoading: showLoadingSkeleton,
-                hasError: catalog.loadError,
-                allModels: catalog.allModels,
+                isLoading: state.isLoading,
+                hasError: state.hasError,
+                allModels: state.models,
                 pulseAnimation: _pulseAnimation,
-                onRetry: () => catalog.refreshCatalog(),
-                systemInfo: localState.systemInfo,
-                downloadedStates: localState.downloadCompleted,
-                downloadManagers: Map.from(localState.downloadManagers),
-                getCompatibilityStatus: localState.getCompatibilityStatus,
+                onRetry: () => _catalogProvider!.refreshCatalog(),
+                systemInfo: state.systemInfo,
+                downloadedStates: state.downloadedStates,
+                downloadManagers: state.downloadManagers,
+                getCompatibilityStatus: _localStateProvider!.getCompatibilityStatus,
                 searchController: _searchCtrl!,
                 showLocalizationWarning: _showLocalizationWarning,
                 onDismissWarningPanel: _dismissWarningPanel,
                 onRemovePressed: (id, title) async {
                   final modelToRemove =
-                      catalog.allModels.firstWhere((m) => m.id == id);
-                  await catalog.removeModel(context, modelToRemove);
-                  // FIX: Prevent keyboard from popping up after model removal
+                      _catalogProvider!.allModels.firstWhere((m) => m.id == id);
+                  await _catalogProvider!.removeModel(context, modelToRemove);
                   FocusManager.instance.primaryFocus?.unfocus();
                 },
-                onChatPressed: (id, _,
-                        {String? modelPath, isCustomModel = false}) =>
+                onChatPressed: (id, _, {String? modelPath, isCustomModel = false}) =>
                     _handleChatPress(id),
-                onDownloadPressed: (
-                        {required id, required url, required title}) =>
-                    localState.requestPermissionAndStartDownload(
+                onDownloadPressed: ({required id, required url, required title}) =>
+                    _localStateProvider!.requestPermissionAndStartDownload(
                         context: context, id: id, url: url),
-                onCancelDownload: localState.cancelDownload,
-                onResumeDownload: localState.resumeDownload,
+                onCancelDownload: _localStateProvider!.cancelDownload,
+                onResumeDownload: _localStateProvider!.resumeDownload,
                 openModelDetail: (id) => _navigateAndHandleFocus(
-                    () => catalog.openModelDetail(context, id)),
+                    () => _catalogProvider!.openModelDetail(context, id)),
                 onTriggerAxon: _handleOverscrollStart,
                 onTriggerCreateScreen: _handleOverscrollEnd,
               ),
@@ -326,4 +331,34 @@ class LibraryScreenState extends State<LibraryScreen>
       },
     );
   }
+}
+
+class _CatalogState {
+  final bool isLoading;
+  final bool hasError;
+  final List<ModelEntity> models;
+  final Map<String, bool> downloadedStates;
+  final Map<String, DownloadManager> downloadManagers;
+  final SystemInfoData? systemInfo;
+
+  const _CatalogState({
+    required this.isLoading,
+    required this.hasError,
+    required this.models,
+    required this.downloadedStates,
+    required this.downloadManagers,
+    this.systemInfo,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _CatalogState &&
+          isLoading == other.isLoading &&
+          hasError == other.hasError &&
+          models.length == other.models.length &&
+          downloadedStates.length == other.downloadedStates.length;
+
+  @override
+  int get hashCode => Object.hash(isLoading, hasError, models.length, downloadedStates.length);
 }

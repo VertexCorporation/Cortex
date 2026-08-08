@@ -71,6 +71,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get theme => '테마';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => '아니요';
 
   @override
@@ -186,6 +192,25 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get unstarConversation => '언스타';
+
+  @override
+  String get renameConversation => 'Rename Conversation';
+
+  @override
+  String get conversationName => 'Conversation name';
+
+  @override
+  String get deleteConversation => 'Delete Conversation';
+
+  @override
+  String get deleteConversationConfirm =>
+      'Are you sure you want to delete this conversation? This action cannot be undone.';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get multiSelect => 'Select Multiple';
 
   @override
   String get loginToYourAccount => '로그인';
@@ -1684,7 +1709,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get workInProgress => '작업 진행 중';
 
   @override
-  String get voiceSystemPromptSuffix =>
+  String get voiceSystemPrompt =>
       '중요: 마크다운 서식(굵게, 기울임체)을 사용하지 마세요. 코드 블록(```)을 출력하지 마세요. 답변은 대화체로 간결하게 작성하세요.';
 
   @override
@@ -1760,6 +1785,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get webSearchSources => '출처';
 
   @override
+  String get offlineUse => '인터넷 없이 사용';
+
+  @override
+  String get archivedConversations => '보관된 대화';
+
+  @override
+  String get noArchivedConversations => '보관된 대화가 없습니다';
+
+  @override
+  String get unarchive => '보관 해제';
+
+  @override
   String get searching => '수색';
 
   @override
@@ -1767,6 +1804,65 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get featureWebSearchDescription => '웹에서 실시간 정보를 검색하세요.';
+
+  @override
+  String get ragFeatureTitle => 'Documents';
+
+  @override
+  String get ragFeatureDescription => 'Chat about your own documents privately';
+
+  @override
+  String get ragScreenTitle => 'Document Chat';
+
+  @override
+  String get ragAddDocuments => 'Add documents';
+
+  @override
+  String get ragEmptyTitle => 'No documents yet';
+
+  @override
+  String get ragEmptyDescription =>
+      'Add PDF, Word, Excel, PowerPoint or text files to chat about them.';
+
+  @override
+  String get ragStatusReady => 'Ready';
+
+  @override
+  String get ragStatusIndexing => 'Indexing…';
+
+  @override
+  String get ragStatusFailed => 'Failed';
+
+  @override
+  String ragSelected(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get ragEnableChat => 'Enable document chat';
+
+  @override
+  String get ragDisableChat => 'Disable document chat';
+
+  @override
+  String ragActiveDocs(int count) {
+    return '$count documents';
+  }
+
+  @override
+  String get ragNoSelectionHint => 'Select documents to chat about';
+
+  @override
+  String get ragDeleteConfirm => 'Delete this document from the library?';
+
+  @override
+  String get ragFileTooBig => 'This file is larger than 10 MB.';
+
+  @override
+  String get ragUnsupportedType => 'This file type is not supported.';
+
+  @override
+  String get ragAddedToChat => 'Added to document chat';
 
   @override
   String get clearMemory => '메모리 지우기';

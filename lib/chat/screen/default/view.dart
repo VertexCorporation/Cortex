@@ -18,7 +18,7 @@ import 'package:cortex/main.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/login/upgrade.dart';
-import '../../../../app.dart';
+import 'package:cortex/app.dart';
 
 class ChatEmptyState extends StatefulWidget {
   final double bottomPadding;
@@ -128,7 +128,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     super.didChangeDependencies();
 
     // TickerMode Visibility Handling
-    final bool isAnimationEnabled = TickerMode.valuesOf(context).enabled;
+    final bool isAnimationEnabled = TickerMode.of(context);
     if (_isVisible != isAnimationEnabled) {
       _isVisible = isAnimationEnabled;
       if (!isAnimationEnabled) {
@@ -270,62 +270,91 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         right: horizontalPadding,
         top: buttonHeight * 0.15,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: _buildBoxButton(
-              context,
-              width: null,
-              height: buttonHeight,
-              iconSize: iconSize,
-              fontSize: fontSize,
-              borderRadius: borderRadius,
-              buttonSpacing: buttonSpacing,
-              iconPath: 'assets/icons/make.svg',
-              title: l10n.featureCreateImageTitle,
-              iconColor:
-                  AppColors.background.inverted.withValues(alpha: 0.2),
-              isDisabled: !hasImage,
-              onTap: () => _handleGeneration(context, 'image'),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/make.svg',
+                  title: l10n.featureCreateImageTitle,
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: !hasImage,
+                  onTap: () => _handleGeneration(context, 'image'),
+                ),
+              ),
+              SizedBox(width: buttonSpacing),
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/transition.svg',
+                  title: l10n.featureCreateVideoTitle,
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: !hasVideo,
+                  isAnimatedRainbowBorder: !isUltra,
+                  onTap: () => _handleGeneration(context, 'video'),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: buttonSpacing),
-          Expanded(
-            child: _buildBoxButton(
-              context,
-              width: null,
-              height: buttonHeight,
-              iconSize: iconSize,
-              fontSize: fontSize,
-              borderRadius: borderRadius,
-              buttonSpacing: buttonSpacing,
-              iconPath: 'assets/icons/transition.svg',
-              title: l10n.featureCreateVideoTitle,
-              iconColor:
-                  AppColors.background.inverted.withValues(alpha: 0.2),
-              isDisabled: !hasVideo,
-              isAnimatedRainbowBorder: !isUltra,
-              onTap: () => _handleGeneration(context, 'video'),
-            ),
-          ),
-          SizedBox(width: buttonSpacing),
-          Expanded(
-            child: _buildBoxButton(
-              context,
-              width: null,
-              height: buttonHeight,
-              iconSize: iconSize,
-              fontSize: fontSize,
-              borderRadius: borderRadius,
-              buttonSpacing: buttonSpacing,
-              iconPath: 'assets/icons/voice.svg',
-              title: l10n.featureCreateAudioTitle,
-              iconColor:
-                  AppColors.background.inverted.withValues(alpha: 0.2),
-              isDisabled: !hasAudio,
-              onTap: () => _handleGeneration(context, 'audio'),
-            ),
+          SizedBox(height: rowSpacing),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/voice.svg',
+                  title: l10n.featureCreateAudioTitle,
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: !hasAudio,
+                  onTap: () => _handleGeneration(context, 'audio'),
+                ),
+              ),
+              SizedBox(width: buttonSpacing),
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/world.svg',
+                  title: l10n.offlineUse,
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: false,
+                  onTap: () {
+                    final inputProvider = context.read<InputProvider>();
+                    inputProvider.toggleWebSearch();
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -521,7 +550,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       context: context,
       builder: (ctx) => AlertDialog.adaptive(
         title: Text(l10n.noInternetConnection),
-        content: const Text('İnternet bağlantınız yok. İndirdiğiniz modellerden biriyle çevrimdışı sohbet etmek ister misiniz?'),
+        content: Text(l10n.useOfflineDescription),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -532,7 +561,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
               Navigator.of(ctx).pop();
               _handleOfflineAction(context);
             },
-            child: const Text('Çevrimdışı Kullan'),
+            child: Text(l10n.useOffline),
           ),
         ],
       ),

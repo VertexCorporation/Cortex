@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 7.9.9+799
+version: 8.0.2+802
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
@@ -62,6 +62,12 @@ dependencies:
   # --- FILE & DATA HANDLING ---
   sqflite: ^2.4.1
   path: ^1.9.1
+
+  # --- RAG / DOCUMENT CHAT ---
+  pdfrx: ^1.0.0
+  excel: ^4.0.6
+  archive: ^3.6.1
+  xml: ^6.5.0
   file_picker: ^10.3.3
   image_picker: ^1.1.2
   gallery_saver_plus: ^3.2.1
@@ -107,6 +113,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.3
   flutter_lints: ^6.0.0
   mockito: ^5.6.3
+  sqflite_common_ffi: ^2.3.3
 
 flutter_launcher_icons:
   android: true
@@ -148,7 +155,7 @@ flutter:
         - asset: assets/fonts/inter/Inter-Medium.ttf
           weight: 500
         - asset: assets/fonts/inter/Inter-Bold.ttf
-          weight: 600
+          weight: 700
   assets:
     - assets/icons/
     - assets/icons/on/

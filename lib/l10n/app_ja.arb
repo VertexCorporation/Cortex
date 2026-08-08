@@ -864,9 +864,13 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "動画を作成するにはUltraプランへのアップグレードが必要です。今すぐアップグレードして、スムーズな操作感を体験してください！",
   "voiceModeInformation": "Cortex は、音声チャット モードでもデバイス上で完全に実行することでデータを安全に保ち、シームレスな会話をお楽しみいただけます。",
-  "voiceSystemPromptSuffix": "重要：マークダウン形式（太字、斜体）は使用しないでください。コードブロック（```）は出力しないでください。回答は会話形式で簡潔にしてください。",
+  "voiceSystemPrompt": "重要：マークダウン形式（太字、斜体）は使用しないでください。コードブロック（```）は出力しないでください。回答は会話形式で簡潔にしてください。",
   "weakPassword": "パスワードが弱すぎます。",
   "webSearchSources": "情報源",
+  "offlineUse": "インターネットなしで使用",
+  "archivedConversations": "アーカイブされた会話",
+  "noArchivedConversations": "アーカイブされた会話はありません",
+  "unarchive": "アーカイブ解除",
   "welcomeOfferBadge": "ウェルカムオファー • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {

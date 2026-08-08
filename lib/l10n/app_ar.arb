@@ -864,9 +864,13 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "أنت بحاجة إلى اشتراك Ultra لإنشاء مقاطع الفيديو، قم بالترقية الآن واستمتع بالتجربة!",
   "voiceModeInformation": "يحافظ برنامج Cortex على أمان بياناتك من خلال تشغيله بالكامل على الجهاز، حتى في وضع الدردشة الصوتية؛ استمتع بمحادثات سلسة!",
-  "voiceSystemPromptSuffix": "هام: تجنب استخدام تنسيق Markdown (الخط العريض والمائل). لا تُدرج كتلًا برمجية (```). اجعل الردود موجزة وبسيطة.",
+  "voiceSystemPrompt": "هام: تجنب استخدام تنسيق Markdown (الخط العريض والمائل). لا تُدرج كتلًا برمجية (```). اجعل الردود موجزة وبسيطة.",
   "weakPassword": "كلمة المرور ضعيفة جدًا.",
   "webSearchSources": "مصادر",
+  "offlineUse": "استخدام بدون إنترنت",
+  "archivedConversations": "المحادثات المؤرشفة",
+  "noArchivedConversations": "لا توجد محادثات مؤرشفة",
+  "unarchive": "إلغاء الأرشفة",
   "welcomeOfferBadge": "عرض ترحيبي • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {

@@ -82,10 +82,11 @@ class Variants {
 
   void animateVariantChange(String newFullModelId) {
     if (displayedVariantLabel == newFullModelId) return;
+    if (variantFadeOutController == null || variantFadeInController == null) return;
 
-    variantFadeOutController?.forward(from: 0.0).then((_) {
+    variantFadeOutController!.forward(from: 0.0).then((_) {
       displayedVariantLabel = newFullModelId;
-      variantFadeInController?.forward(from: 0.0);
+      variantFadeInController!.forward(from: 0.0);
     });
   }
 

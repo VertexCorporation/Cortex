@@ -15,18 +15,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// A custom ScrollPhysics to prevent swiping back in a PageView.
 class NoGoBackScrollPhysics extends BouncingScrollPhysics {
-  const NoGoBackScrollPhysics({super.parent});
+  final TextDirection textDirection;
+
+  const NoGoBackScrollPhysics({super.parent, this.textDirection = TextDirection.ltr});
 
   @override
   NoGoBackScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return NoGoBackScrollPhysics(parent: buildParent(ancestor));
+    return NoGoBackScrollPhysics(
+      parent: buildParent(ancestor),
+      textDirection: textDirection,
+    );
   }
 
   @override
   double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
-    // If the user tries to swipe back (offset is positive for PageView from left to right),
-    // we block the movement by returning 0.0.
-    if (offset > 0) {
+    // In LTR, a positive offset means swiping back (right-to-left in PageView).
+    // In RTL, the direction is reversed: negative offset means swiping back.
+    final isBackSwipe = textDirection == TextDirection.ltr ? offset > 0 : offset < 0;
+    if (isBackSwipe) {
       return 0.0;
     }
     return super.applyPhysicsToUserOffset(position, offset);
@@ -172,7 +178,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             PageView.builder(
               controller: _pageController,
               physics: _isPageReady
-                  ? const NoGoBackScrollPhysics()
+                  ? NoGoBackScrollPhysics(textDirection: Directionality.of(context))
                   : const NeverScrollableScrollPhysics(),
               onPageChanged: (int page) {
                 setState(() {

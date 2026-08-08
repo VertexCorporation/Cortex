@@ -118,53 +118,54 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     // This timer periodically checks if the user's email has been verified.
     // This is where the network call happens and where the error must be handled.
     _emailCheckTimer =
-        Timer.periodic(const Duration(seconds: 3), (timer) async {
+        Timer.periodic(const Duration(seconds: 3), (timer) {
       // THE FIX IS IMPLEMENTED HERE:
       // We wrap the entire network-dependent logic in a try-catch block
       // to gracefully handle potential network failures without crashing the app.
-      try {
-        final user = FirebaseAuth.instance.currentUser;
+      Future(() async {
+        try {
+          final user = FirebaseAuth.instance.currentUser;
 
-        // Safety check: If for some reason the user is no longer signed in,
-        // stop the timer to prevent further errors.
-        if (user == null) {
-          dev.log(
-              '[EmailVerification] User is null, stopping verification check.',
-              name: 'EmailVerification');
-          timer.cancel();
-          return;
-        }
+          // Safety check: If for some reason the user is no longer signed in,
+          // stop the timer to prevent further errors.
+          if (user == null) {
+            dev.log(
+                '[EmailVerification] User is null, stopping verification check.',
+                name: 'EmailVerification');
+            timer.cancel();
+            return;
+          }
 
-        // This is the network request that was causing the crash.
-        // It fetches the latest user data from Firebase servers.
-        await user.reload();
+          // This is the network request that was causing the crash.
+          // It fetches the latest user data from Firebase servers.
+          await user.reload();
 
-        // After reload(), we need to get the updated user object instance.
-        final freshUser = FirebaseAuth.instance.currentUser;
+          // After reload(), we need to get the updated user object instance.
+          final freshUser = FirebaseAuth.instance.currentUser;
 
-        // Check the verification status on the fresh user object.
-        if (freshUser != null && freshUser.emailVerified) {
-          dev.log(
-              '[EmailVerification] Email has been successfully verified for ${freshUser.email}.',
-              name: 'EmailVerification');
-          _handleVerified(); // Trigger navigation to the main app
-          timer.cancel(); // Stop this timer as its job is done.
-        }
-      } on FirebaseAuthException catch (e) {
-        // This block specifically catches Firebase-related exceptions.
-        if (e.code == 'network-request-failed') {
-          // This is the expected error when the device is offline.
-          // We log it for debugging but do not crash the app. The timer will simply try again.
-          dev.log(
-              '[EmailVerification] Network request failed while checking email status. Will retry.',
-              name: 'EmailVerification');
-        } else {
-          // Log other potential Firebase errors (e.g., 'user-token-expired') for diagnostics.
-          dev.log(
-              '[EmailVerification] A Firebase error occurred during verification check: ${e.code}',
-              name: 'EmailVerification',
-              error: e);
-        }
+          // Check the verification status on the fresh user object.
+          if (freshUser != null && freshUser.emailVerified) {
+            dev.log(
+                '[EmailVerification] Email has been successfully verified for ${freshUser.email}.',
+                name: 'EmailVerification');
+            _handleVerified(); // Trigger navigation to the main app
+            timer.cancel(); // Stop this timer as its job is done.
+          }
+        } on FirebaseAuthException catch (e) {
+          // This block specifically catches Firebase-related exceptions.
+          if (e.code == 'network-request-failed') {
+            // This is the expected error when the device is offline.
+            // We log it for debugging but do not crash the app. The timer will simply try again.
+            dev.log(
+                '[EmailVerification] Network request failed while checking email status. Will retry.',
+                name: 'EmailVerification');
+          } else {
+            // Log other potential Firebase errors (e.g., 'user-token-expired') for diagnostics.
+            dev.log(
+                '[EmailVerification] A Firebase error occurred during verification check: ${e.code}',
+                name: 'EmailVerification',
+                error: e);
+          }
       } catch (e) {
         // This is a general catch-all for any other unexpected errors,
         // ensuring the application remains stable under all circumstances.
@@ -173,6 +174,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             name: 'EmailVerification',
             error: e);
       }
+    });
     });
   }
 

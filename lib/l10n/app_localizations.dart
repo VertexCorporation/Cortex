@@ -242,6 +242,18 @@ abstract class AppLocalizations {
   /// **'Theme'**
   String get theme;
 
+  /// No description provided for @lightTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Light theme'**
+  String get lightTheme;
+
+  /// No description provided for @darkTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark theme'**
+  String get darkTheme;
+
   /// No description provided for @no.
   ///
   /// In en, this message translates to:
@@ -463,6 +475,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unstar'**
   String get unstarConversation;
+
+  /// No description provided for @renameConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Conversation'**
+  String get renameConversation;
+
+  /// No description provided for @conversationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation name'**
+  String get conversationName;
+
+  /// No description provided for @deleteConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Conversation'**
+  String get deleteConversation;
+
+  /// No description provided for @deleteConversationConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this conversation? This action cannot be undone.'**
+  String get deleteConversationConfirm;
+
+  /// No description provided for @archive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archive;
+
+  /// No description provided for @multiSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Multiple'**
+  String get multiSelect;
 
   /// No description provided for @loginToYourAccount.
   ///
@@ -3195,11 +3243,11 @@ abstract class AppLocalizations {
   /// **'Work In Progress'**
   String get workInProgress;
 
-  /// No description provided for @voiceSystemPromptSuffix.
+  /// No description provided for @voiceSystemPrompt.
   ///
   /// In en, this message translates to:
   /// **'IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.'**
-  String get voiceSystemPromptSuffix;
+  String get voiceSystemPrompt;
 
   /// Context string for Flow Mode with agent name and previous response placeholders.
   ///
@@ -3333,6 +3381,30 @@ abstract class AppLocalizations {
   /// **'Sources'**
   String get webSearchSources;
 
+  /// No description provided for @offlineUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Use without Internet'**
+  String get offlineUse;
+
+  /// No description provided for @archivedConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived Conversations'**
+  String get archivedConversations;
+
+  /// No description provided for @noArchivedConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived conversations'**
+  String get noArchivedConversations;
+
+  /// No description provided for @unarchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchive'**
+  String get unarchive;
+
   /// No description provided for @searching.
   ///
   /// In en, this message translates to:
@@ -3350,6 +3422,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search the web for real-time information'**
   String get featureWebSearchDescription;
+
+  /// No description provided for @ragFeatureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get ragFeatureTitle;
+
+  /// No description provided for @ragFeatureDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat about your own documents privately'**
+  String get ragFeatureDescription;
+
+  /// No description provided for @ragScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Chat'**
+  String get ragScreenTitle;
+
+  /// No description provided for @ragAddDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Add documents'**
+  String get ragAddDocuments;
+
+  /// No description provided for @ragEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents yet'**
+  String get ragEmptyTitle;
+
+  /// No description provided for @ragEmptyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add PDF, Word, Excel, PowerPoint or text files to chat about them.'**
+  String get ragEmptyDescription;
+
+  /// No description provided for @ragStatusReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get ragStatusReady;
+
+  /// No description provided for @ragStatusIndexing.
+  ///
+  /// In en, this message translates to:
+  /// **'Indexing…'**
+  String get ragStatusIndexing;
+
+  /// No description provided for @ragStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get ragStatusFailed;
+
+  /// No description provided for @ragSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String ragSelected(int count);
+
+  /// No description provided for @ragEnableChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable document chat'**
+  String get ragEnableChat;
+
+  /// No description provided for @ragDisableChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable document chat'**
+  String get ragDisableChat;
+
+  /// No description provided for @ragActiveDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} documents'**
+  String ragActiveDocs(int count);
+
+  /// No description provided for @ragNoSelectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select documents to chat about'**
+  String get ragNoSelectionHint;
+
+  /// No description provided for @ragDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this document from the library?'**
+  String get ragDeleteConfirm;
+
+  /// No description provided for @ragFileTooBig.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is larger than 10 MB.'**
+  String get ragFileTooBig;
+
+  /// No description provided for @ragUnsupportedType.
+  ///
+  /// In en, this message translates to:
+  /// **'This file type is not supported.'**
+  String get ragUnsupportedType;
+
+  /// No description provided for @ragAddedToChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to document chat'**
+  String get ragAddedToChat;
 
   /// No description provided for @clearMemory.
   ///

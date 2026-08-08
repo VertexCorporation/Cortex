@@ -22,7 +22,6 @@ class LocaleProvider extends ChangeNotifier {
     'nl', // Dutch
     'ru', // Russian
     'ko', // Korean
-    'ar', // Arabic
   ];
 
   LocaleProvider() : _locale = const Locale('en') {

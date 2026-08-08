@@ -40,7 +40,7 @@ class SkeletonScreen extends StatelessWidget {
                 width: double.infinity,
                 height: screenWidth * 0.1,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.shimmerBase,
                   borderRadius: BorderRadius.circular(screenWidth * 0.05),
                 ),
               ),
@@ -69,7 +69,7 @@ class SkeletonScreen extends StatelessWidget {
                     width: screenWidth * 0.3,
                     height: screenWidth * 0.06,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.shimmerBase,
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                   ),
@@ -87,7 +87,7 @@ class SkeletonScreen extends StatelessWidget {
                   width: screenWidth * 0.12,
                   height: screenWidth * 0.12,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.shimmerBase,
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
@@ -100,7 +100,7 @@ class SkeletonScreen extends StatelessWidget {
                         width: double.infinity,
                         height: screenWidth * 0.04,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.shimmerBase,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
@@ -109,7 +109,7 @@ class SkeletonScreen extends StatelessWidget {
                         width: double.infinity,
                         height: screenWidth * 0.03,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.shimmerBase,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
@@ -118,7 +118,7 @@ class SkeletonScreen extends StatelessWidget {
                         width: screenWidth * 0.25,
                         height: screenWidth * 0.03,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.shimmerBase,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
@@ -130,7 +130,7 @@ class SkeletonScreen extends StatelessWidget {
                   width: screenWidth * 0.18,
                   height: screenWidth * 0.07,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.shimmerBase,
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),

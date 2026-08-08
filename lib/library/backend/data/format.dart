@@ -188,11 +188,7 @@ String formatName(String? name, {bool isOfflineVariant = false}) {
     // First apply basic title case (first letter uppercase, rest untouched)
     String w = word[0].toUpperCase() + word.substring(1);
 
-    // Special rules for AI:
     if (w.toLowerCase() == "ai") return "AI";
-    if (w.toLowerCase().endsWith("ai") && w.length > 2) {
-      w = '${w.substring(0, w.length - 2)}AI';
-    }
     return w;
   });
 

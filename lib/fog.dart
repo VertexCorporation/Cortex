@@ -223,16 +223,13 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
 class ScrollFogHorizontal extends StatefulWidget {
   final Widget child;
   final ScrollController scrollController;
-
   final double startFogWidth;
   final double endFogWidth;
   final double scrollThreshold;
   final bool showStart;
   final bool showEnd;
-
-  /// Extra offset to extend fog beyond the widget bounds (useful for tablets)
-  /// Positive values extend the fog outward from the edges
   final double edgeOverflow;
+  final Color color;
 
   const ScrollFogHorizontal({
     super.key,
@@ -244,6 +241,7 @@ class ScrollFogHorizontal extends StatefulWidget {
     this.showStart = true,
     this.showEnd = true,
     this.edgeOverflow = 0.0,
+    this.color = const Color(0xFF0D0D0D),
   });
 
   @override
@@ -376,9 +374,9 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
                       end: Alignment.centerRight,
                       stops: const [0.0, 0.4, 1.0],
                       colors: [
-                        AppColors.background,
-                        AppColors.background.withValues(alpha: 0.8),
-                        AppColors.background.withValues(alpha: 0),
+                        widget.color,
+                        widget.color.withValues(alpha: 0.8),
+                        widget.color.withValues(alpha: 0),
                       ],
                     ),
                   ),
@@ -410,9 +408,9 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
                       end: Alignment.centerLeft,
                       stops: const [0.0, 0.4, 1.0],
                       colors: [
-                        AppColors.background,
-                        AppColors.background.withValues(alpha: 0.8),
-                        AppColors.background.withValues(alpha: 0),
+                        widget.color,
+                        widget.color.withValues(alpha: 0.8),
+                        widget.color.withValues(alpha: 0),
                       ],
                     ),
                   ),

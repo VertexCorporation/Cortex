@@ -49,13 +49,13 @@ class ChatViewState extends State<ChatView>
   late final OfflineService _offlineService;
   late final ModelService _modelService;
 
-  // --- UI Notifiers ---
   final ValueNotifier<bool> showScrollDownButtonNotifier =
       ValueNotifier<bool>(false);
   final ValueNotifier<double> bottomPanelHeightNotifier =
       ValueNotifier<double>(0.0);
   final ValueNotifier<double> briefingVisibleHeightNotifier =
       ValueNotifier<double>(0.0);
+  late final Listenable _combinedLayoutNotifier;
 
   // Constants
   static const double _briefingBottomOffset = 8.0;
@@ -104,6 +104,12 @@ class ChatViewState extends State<ChatView>
       focusNode: FocusNode(),
       panelController: editPanelController,
     );
+
+    _combinedLayoutNotifier = Listenable.merge([
+      showScrollDownButtonNotifier,
+      bottomPanelHeightNotifier,
+      briefingVisibleHeightNotifier,
+    ]);
 
     // Cache session provider and add listener for model changes
     _sessionProvider = sessionProvider;
@@ -294,198 +300,13 @@ class ChatViewState extends State<ChatView>
 
     final mainStack = Stack(
       children: [
-        // LAYER 1: Main Content
-        // PERFORMANCE: By placing ChatMessageList and ChatInputPanel in separate layers
-        // within a Stack, we prevent the heavy scroll list from relayouting when the
-        // keyboard opens and closes. Scaffold natively resizes the body.
-        AnimatedBuilder(
-          animation: Listenable.merge([
-            bottomPanelHeightNotifier,
-            briefingVisibleHeightNotifier,
-          ]),
-          builder: (context, child) {
-            final bottomPadding = bottomPanelHeightNotifier.value +
-                briefingVisibleHeightNotifier.value +
-                bottomSafe;
-            return Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: AnimatedScale(
-                scale: isVoiceModeActive ? 0.5 : 1.0,
-                duration: const Duration(milliseconds: 300),
-                curve:
-                    isVoiceModeActive ? Curves.easeInBack : Curves.easeOutCubic,
-                child: AnimatedOpacity(
-                  opacity: isVoiceModeActive ? 0.0 : 1.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 600),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    layoutBuilder:
-                        (Widget? currentChild, List<Widget> previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: <Widget>[
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
-                      );
-                    },
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: isLoadingMessages
-                        ? const MessageListSkeleton(key: ValueKey('skeleton'))
-                        : isMessagesEmpty
-                            ? Container(
-                                key: const ValueKey('empty'),
-                                child: ChatEmptyState(
-                                  bottomPadding: bottomPadding,
-                                ),
-                              )
-                            : ChatMessageList(
-                                key: const ValueKey('list'),
-                                scrollController: scrollController,
-                                editService: editService,
-                                bottomPadding: bottomPadding,
-                              ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-
-        // LAYER 2.5: Bottom Fog/Gradient Effect (darkening at bottom edge)
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: IgnorePointer(
-            child: AnimatedOpacity(
-              opacity: isVoiceModeActive ? 0.0 : 1.0,
-              duration: const Duration(milliseconds: 300),
-              child: Container(
-                height: (screenHeight * 0.05),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      AppColors.background,
-                      AppColors.background.withValues(alpha: 0.8),
-                      AppColors.background.withValues(alpha: 0.0),
-                    ],
-                    stops: const [0.0, 0.5, 1.0],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        // Bottom Panel (Slides Down)
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: AnimatedSlide(
-            offset: isVoiceModeActive ? const Offset(0, 1) : Offset.zero,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: SafeArea(
-              top: false,
-              bottom: true,
-              child: NotificationListener<SizeChangedLayoutNotification>(
-                onNotification: (notification) {
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _updateBottomPanelHeight());
-                  return true;
-                },
-                child: SizeChangedLayoutNotifier(
-                  child: SizedBox(
-                    key: _bottomPanelKey,
-                    width: double.infinity,
-                    child: ChatInputPanel(
-                      editService: editService,
-                      scrollService: _scrollService,
-                      editPanelController: editPanelController,
-                      slideAnimation: slideAnimation,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        // LAYER 2: Briefing Overlay
-        AnimatedBuilder(
-          animation: bottomPanelHeightNotifier,
-          builder: (context, _) {
-            final basePanelHeight = bottomPanelHeightNotifier.value;
-            const horizontalPadding = 16.0;
-
-            return Positioned(
-              left: horizontalPadding,
-              right: horizontalPadding,
-              bottom: basePanelHeight + bottomSafe + _briefingBottomOffset,
-              child: AnimatedSlide(
-                offset: isVoiceModeActive
-                    ? const Offset(0, 1.5) // Slide deeper
-                    : Offset.zero,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: _BriefingOverlayWrapper(
-                  onVisibleHeightChanged: (h) {
-                    if (briefingVisibleHeightNotifier.value != h) {
-                      briefingVisibleHeightNotifier.value = h;
-                    }
-                  },
-                ),
-              ),
-            );
-          },
-        ),
-
-        // LAYER 3: Scroll Down Button
-        AnimatedBuilder(
-          animation: Listenable.merge([
-            showScrollDownButtonNotifier,
-            bottomPanelHeightNotifier,
-            briefingVisibleHeightNotifier,
-          ]),
-          builder: (context, child) {
-            final bool showButton = showScrollDownButtonNotifier.value;
-            final double basePanel = bottomPanelHeightNotifier.value;
-            final double briefingH = briefingVisibleHeightNotifier.value;
-            final double combinedPanelHeight =
-                basePanel + briefingH + _briefingBottomOffset + bottomSafe;
-
-            return _scrollService.buildScrollDownButton(
-              screenWidth: screenWidth,
-              screenHeight: screenHeight,
-              bottomPanelHeight: combinedPanelHeight,
-              showScrollDownButton: showButton,
-              isKeyboardOpen: false, // Handled by Scaffold
-              keyboardHeight: 0.0, // Handled by Scaffold
-              slideOffset: isVoiceModeActive ? const Offset(0, 2) : Offset.zero,
-            );
-          },
-        ),
-
-        // LAYER 4: TTS Player Overlay (Below AppBar)
-        const Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: TtsPlayerOverlay(),
-        ),
-
-        // LAYER 5: Voice Overlay (Topmost)
-        if (isVoiceModeActive) const VoiceSessionOverlay(), // Covers everything
+        Positioned.fill(child: _buildMainContent(isLoadingMessages, isMessagesEmpty, isVoiceModeActive)),
+        if (!isVoiceModeActive) _buildBottomFog(screenHeight),
+        _buildBottomPanel(isVoiceModeActive, bottomSafe),
+        _buildBriefingOverlay(bottomSafe, isVoiceModeActive),
+        _buildScrollDownButton(isVoiceModeActive, bottomSafe, screenWidth, screenHeight),
+        const Positioned(top: 0, left: 0, right: 0, child: TtsPlayerOverlay()),
+        if (isVoiceModeActive) const VoiceSessionOverlay(),
       ],
     );
 
@@ -509,6 +330,125 @@ class ChatViewState extends State<ChatView>
       ),
     );
   }
+
+  Widget _buildMainContent(bool isLoading, bool isEmpty, bool isVoiceMode) {
+    return AnimatedScale(
+      scale: isVoiceMode ? 0.5 : 1.0,
+      duration: const Duration(milliseconds: 300),
+      curve: isVoiceMode ? Curves.easeInBack : Curves.easeOutCubic,
+      child: AnimatedOpacity(
+        opacity: isVoiceMode ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: AnimatedBuilder(
+          animation: _combinedLayoutNotifier,
+          builder: (context, _) {
+            final bottomPadding = bottomPanelHeightNotifier.value +
+                briefingVisibleHeightNotifier.value +
+                MediaQuery.paddingOf(context).bottom;
+            if (isLoading) {
+              return const MessageListSkeleton(key: ValueKey('skeleton'));
+            }
+            if (isEmpty) {
+              return ChatEmptyState(key: const ValueKey('empty'), bottomPadding: bottomPadding);
+            }
+            return ChatMessageList(
+              key: const ValueKey('list'),
+              scrollController: scrollController,
+              editService: editService,
+              bottomPadding: bottomPadding,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomFog(double screenHeight) {
+    return Positioned(
+      left: 0, right: 0, bottom: 0,
+      child: IgnorePointer(
+        child: Container(
+          height: screenHeight * 0.05,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter, end: Alignment.topCenter,
+              colors: [
+                AppColors.background,
+                AppColors.background.withValues(alpha: 0.8),
+                AppColors.background.withValues(alpha: 0.0),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomPanel(bool isVoiceMode, double bottomSafe) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: AnimatedSlide(
+        offset: isVoiceMode ? const Offset(0, 1) : Offset.zero,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: SafeArea(
+          top: false, bottom: true,
+          child: NotificationListener<SizeChangedLayoutNotification>(
+            onNotification: (_) {
+              WidgetsBinding.instance.addPostFrameCallback((_) => _updateBottomPanelHeight());
+              return true;
+            },
+            child: SizeChangedLayoutNotifier(
+              child: SizedBox(
+                key: _bottomPanelKey, width: double.infinity,
+                child: ChatInputPanel(
+                  editService: editService, scrollService: _scrollService,
+                  editPanelController: editPanelController, slideAnimation: slideAnimation,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBriefingOverlay(double bottomSafe, bool isVoiceMode) {
+    return Positioned(
+      left: 16, right: 16,
+      bottom: bottomPanelHeightNotifier.value + bottomSafe + _briefingBottomOffset,
+      child: AnimatedSlide(
+        offset: isVoiceMode ? const Offset(0, 1.5) : Offset.zero,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: _BriefingOverlayWrapper(
+          onVisibleHeightChanged: (h) {
+            if (briefingVisibleHeightNotifier.value != h) {
+              briefingVisibleHeightNotifier.value = h;
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScrollDownButton(bool isVoiceMode, double bottomSafe, double screenWidth, double screenHeight) {
+    return AnimatedBuilder(
+      animation: _combinedLayoutNotifier,
+      builder: (context, _) {
+        final combined = bottomPanelHeightNotifier.value +
+            briefingVisibleHeightNotifier.value + _briefingBottomOffset + bottomSafe;
+        return _scrollService.buildScrollDownButton(
+          screenWidth: screenWidth, screenHeight: screenHeight,
+          bottomPanelHeight: combined,
+          showScrollDownButton: showScrollDownButtonNotifier.value,
+          isKeyboardOpen: false, keyboardHeight: 0.0,
+          slideOffset: isVoiceMode ? const Offset(0, 2) : Offset.zero,
+        );
+      },
+    );
+  }
 }
 
 class _BriefingOverlayWrapper extends StatelessWidget {
@@ -526,23 +466,21 @@ class _BriefingOverlayWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final creditsManager = context.read<CreditsManager>();
+    final modelService = context.read<ModelService>();
     final session = context.watch<ChatSessionProvider>();
     final conv = context.watch<ConversationProvider>();
-    final input = context.watch<InputProvider>();
+    final input = context.read<InputProvider>();
     final appInitializer = context.watch<AppInitializer>();
-    final modelService = context.read<ModelService>();
     final userProvider = context.watch<UserProvider>();
 
     final langCode = Localizations.localeOf(context).languageCode;
 
     final isOffline = !Utils.isServerSideModel(
-      session.modelId,
-      langCode: langCode,
-      modelService: modelService,
+      session.modelId, langCode: langCode, modelService: modelService,
     );
 
     final isDownloaded = context
-            .watch<ModelLocalStateProvider>()
+            .read<ModelLocalStateProvider>()
             .downloadCompleted[session.modelId] ??
         false;
     final modelMissing = !session.isDynamicChat && isOffline && !isDownloaded;

@@ -65,6 +65,10 @@ class InputProvider with ChangeNotifier {
   // --- Web Search ---
   bool _enableWebSearch = false;
 
+  // --- RAG (Document Chat) ---
+  bool _ragEnabled = false;
+  final List<String> _ragDocumentIds = [];
+
   // --- Global Draft (Persist across chats) ---
   String _globalDraft = '';
 
@@ -122,6 +126,12 @@ class InputProvider with ChangeNotifier {
   // Web Search
   bool get enableWebSearch => _enableWebSearch;
 
+  // RAG (Document Chat)
+  bool get ragEnabled => _ragEnabled;
+
+  /// Document ids selected for toggle-mode retrieval.
+  List<String> get ragDocumentIds => List.unmodifiable(_ragDocumentIds);
+
   // ===========================================================================
   // SECTION 3: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
@@ -175,6 +185,38 @@ class InputProvider with ChangeNotifier {
       _enableWebSearch = false;
       notifyListeners();
     }
+  }
+
+  // -------------------- RAG (Document Chat) State --------------------
+
+  void toggleRag() {
+    _ragEnabled = !_ragEnabled;
+    if (_ragEnabled && _featureMode != ChatInputMode.none) {
+      _featureMode = ChatInputMode.none;
+    }
+    notifyListeners();
+  }
+
+  void setRagEnabled(bool enabled) {
+    if (_ragEnabled == enabled) return;
+    _ragEnabled = enabled;
+    notifyListeners();
+  }
+
+  void setRagDocuments(List<String> documentIds) {
+    _ragDocumentIds
+      ..clear()
+      ..addAll(documentIds);
+    if (_ragDocumentIds.isEmpty) {
+      _ragEnabled = false;
+    }
+    notifyListeners();
+  }
+
+  void clearRag() {
+    _ragEnabled = false;
+    _ragDocumentIds.clear();
+    notifyListeners();
   }
 
   // -------------------- Attachment Management --------------------
@@ -289,6 +331,8 @@ class InputProvider with ChangeNotifier {
     _isAttachmentLoading = false;
     _featureMode = ChatInputMode.none;
     _enableWebSearch = false;
+    _ragEnabled = false;
+    _ragDocumentIds.clear();
     // NOTE: We do NOT clear _globalDraft here.
     // This allows maintaining text when switching chats.
     notifyListeners();

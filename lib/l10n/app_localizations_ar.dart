@@ -71,6 +71,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get theme => 'السمة';
 
   @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get no => 'لا';
 
   @override
@@ -186,6 +192,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unstarConversation => 'أنستار';
+
+  @override
+  String get renameConversation => 'Rename Conversation';
+
+  @override
+  String get conversationName => 'Conversation name';
+
+  @override
+  String get deleteConversation => 'Delete Conversation';
+
+  @override
+  String get deleteConversationConfirm =>
+      'Are you sure you want to delete this conversation? This action cannot be undone.';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get multiSelect => 'Select Multiple';
 
   @override
   String get loginToYourAccount => 'تسجيل الدخول';
@@ -1711,7 +1736,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get workInProgress => 'العمل قيد التنفيذ';
 
   @override
-  String get voiceSystemPromptSuffix =>
+  String get voiceSystemPrompt =>
       'هام: تجنب استخدام تنسيق Markdown (الخط العريض والمائل). لا تُدرج كتلًا برمجية (```). اجعل الردود موجزة وبسيطة.';
 
   @override
@@ -1793,6 +1818,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webSearchSources => 'مصادر';
 
   @override
+  String get offlineUse => 'استخدام بدون إنترنت';
+
+  @override
+  String get archivedConversations => 'المحادثات المؤرشفة';
+
+  @override
+  String get noArchivedConversations => 'لا توجد محادثات مؤرشفة';
+
+  @override
+  String get unarchive => 'إلغاء الأرشفة';
+
+  @override
   String get searching => 'البحث';
 
   @override
@@ -1800,6 +1837,65 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get featureWebSearchDescription => 'ابحث في الإنترنت عن معلومات آنية';
+
+  @override
+  String get ragFeatureTitle => 'Documents';
+
+  @override
+  String get ragFeatureDescription => 'Chat about your own documents privately';
+
+  @override
+  String get ragScreenTitle => 'Document Chat';
+
+  @override
+  String get ragAddDocuments => 'Add documents';
+
+  @override
+  String get ragEmptyTitle => 'No documents yet';
+
+  @override
+  String get ragEmptyDescription =>
+      'Add PDF, Word, Excel, PowerPoint or text files to chat about them.';
+
+  @override
+  String get ragStatusReady => 'Ready';
+
+  @override
+  String get ragStatusIndexing => 'Indexing…';
+
+  @override
+  String get ragStatusFailed => 'Failed';
+
+  @override
+  String ragSelected(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get ragEnableChat => 'Enable document chat';
+
+  @override
+  String get ragDisableChat => 'Disable document chat';
+
+  @override
+  String ragActiveDocs(int count) {
+    return '$count documents';
+  }
+
+  @override
+  String get ragNoSelectionHint => 'Select documents to chat about';
+
+  @override
+  String get ragDeleteConfirm => 'Delete this document from the library?';
+
+  @override
+  String get ragFileTooBig => 'This file is larger than 10 MB.';
+
+  @override
+  String get ragUnsupportedType => 'This file type is not supported.';
+
+  @override
+  String get ragAddedToChat => 'Added to document chat';
 
   @override
   String get clearMemory => 'ذاكرة صافية';

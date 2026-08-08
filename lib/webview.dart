@@ -72,17 +72,15 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
         CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
 
     // --- CACHE LOGIC ---
-    // Check if a controller for this URL already exists in our cache.
-    if (_controllerCache.containsKey(widget.url)) {
+    // Only use cached controller if it's at the same URL.
+    final cachedController = _controllerCache[widget.url];
+    if (cachedController != null) {
       if (kDebugMode) {
         print(
             '[WebViewModalContent] Found cached controller for ${widget.url}');
       }
-      // If it exists, use the cached controller.
-      _controller = _controllerCache[widget.url]!;
-      // Since it's cached, it's already loaded.
+      _controller = cachedController;
       _isLoading = false;
-      // We still need to update the navigation state (e.g., if the user navigated back/forward before).
       _updateNavigationState();
     } else {
       if (kDebugMode) {

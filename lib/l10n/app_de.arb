@@ -864,9 +864,13 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Sie benötigen ein Ultra-Abonnement, um Videos zu erstellen. Jetzt upgraden und den Flow erleben!",
   "voiceModeInformation": "Cortex schützt Ihre Daten, indem es vollständig auf dem Gerät ausgeführt wird, sogar im Sprachchat-Modus; genießen Sie reibungslose Gespräche!",
-  "voiceSystemPromptSuffix": "WICHTIG: Bitte keine Markdown-Formatierung (fett, kursiv) verwenden. Codeblöcke (```) nicht ausgeben. Antworten sollten kurz und in einem lockeren, natürlichen Stil verfasst sein.",
+  "voiceSystemPrompt": "WICHTIG: Bitte keine Markdown-Formatierung (fett, kursiv) verwenden. Codeblöcke (```) nicht ausgeben. Antworten sollten kurz und in einem lockeren, natürlichen Stil verfasst sein.",
   "weakPassword": "Das Passwort ist zu schwach.",
   "webSearchSources": "Quellen",
+  "offlineUse": "Ohne Internet nutzen",
+  "archivedConversations": "Archivierte Gespräche",
+  "noArchivedConversations": "Keine archivierten Gespräche",
+  "unarchive": "Archivierung aufheben",
   "welcomeOfferBadge": "Willkommensangebot • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {

@@ -10,7 +10,6 @@ import 'package:cortex/chat/screen/appbar/login.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/funds/funds.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/login/upgrade.dart';
 import 'package:cortex/navigation.dart';
 
@@ -21,10 +20,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 // Theme & Global Widgets
-import '../../../../theme.dart';
-import '../../../../main.dart';
-import '../../../appbar.dart';
-import '../widgets/bottom/input/buttons.dart';
+import 'package:cortex/theme.dart';
+import 'package:cortex/main.dart';
+import 'package:cortex/appbar.dart';
+import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
 
 class Appbar extends StatefulWidget implements PreferredSizeWidget {
   const Appbar({
@@ -108,11 +107,6 @@ class AppbarState extends State<Appbar> {
     final bool showCenterButton =
         isUserStateReady && !isChatActive && (isAnonymous || !isSubscribed);
 
-    final modelService = context.read<ModelService>();
-    final resolvedImagePath = session.selectedModel != null
-        ? modelService.getModelImagePath(session.selectedModel!)
-        : null;
-
     final currentId = session.modelId;
     if (currentId != _lastModelId) {
       _lastModelId = currentId;
@@ -167,11 +161,7 @@ class AppbarState extends State<Appbar> {
                     },
                   )
                 : _buildOfferOrPremiumButton(context))
-            : _ModelInfoChip(
-                key: const ValueKey('ModelInfo'),
-                modelTitle: session.modelTitle,
-                imagePath: resolvedImagePath,
-              ),
+            : const SizedBox.shrink(),
       ),
 
       // 3. Right Action: The Dual-Action Pill
@@ -230,97 +220,4 @@ class AppbarState extends State<Appbar> {
   }
 }
 
-class _ModelInfoChip extends StatelessWidget {
-  final String? modelTitle;
-  final String? imagePath;
 
-  const _ModelInfoChip({
-    super.key,
-    this.modelTitle,
-    this.imagePath,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final title = modelTitle;
-    if (title == null || title.isEmpty) return const SizedBox.shrink();
-
-    context.watch<ThemeProvider>();
-    final iconSize = 26.0;
-    final fontSize = 15.0;
-
-    Widget icon;
-    if (imagePath != null && imagePath!.isNotEmpty) {
-      final isSvg = imagePath!.toLowerCase().endsWith('.svg');
-      if (isSvg) {
-        icon = SvgPicture.asset(
-          imagePath!,
-          width: iconSize,
-          height: iconSize,
-          colorFilter: ColorFilter.mode(
-            AppColors.primaryColor.inverted,
-            BlendMode.srcIn,
-          ),
-          fit: BoxFit.contain,
-        );
-      } else {
-        icon = Image.asset(
-          imagePath!,
-          width: iconSize,
-          height: iconSize,
-          fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => _buildLetterIcon(title, iconSize),
-        );
-      }
-    } else {
-      icon = _buildLetterIcon(title, iconSize);
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 2),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryColor.inverted,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLetterIcon(String title, double size) {
-    final letter = title.isNotEmpty ? title[0].toUpperCase() : 'M';
-    final hue = letter.codeUnitAt(0) * 37 % 360;
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: HSLColor.fromAHSL(1, hue.toDouble(), 0.5, 0.5).toColor(),
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        letter,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: size * 0.55,
-          fontWeight: FontWeight.w700,
-          height: 1,
-        ),
-      ),
-    );
-  }
-}

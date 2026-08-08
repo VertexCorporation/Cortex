@@ -39,6 +39,12 @@ struct SamplerParams {
     let temp: Float
     let topP: Float
     let topK: Int32
+    let repeatPenalty: Float
+    let frequencyPenalty: Float
+    let presencePenalty: Float
+    let mirostatMode: Int32
+    let mirostatTau: Float
+    let mirostatEta: Float
 }
 
 // MARK: - LlamaContext Actor
@@ -79,14 +85,29 @@ actor LlamaContext {
         let sparams = llama_sampler_chain_default_params()
         self.sampling = llama_sampler_chain_init(sparams)
 
-        // Add samplers in correct order (same as Android): TopK -> TopP -> Temp -> Dist
-        llama_sampler_chain_add(self.sampling, llama_sampler_init_top_k(params.topK))
-        llama_sampler_chain_add(self.sampling, llama_sampler_init_top_p(params.topP, 1))
+        // Add samplers in correct order (same as Android)
+        // 0) Repetition / Frequency / Presence penalties
+        if params.repeatPenalty != 1.0 || params.frequencyPenalty != 0.0 || params.presencePenalty != 0.0 {
+            llama_sampler_chain_add(self.sampling, llama_sampler_init_penalties(64, params.repeatPenalty, params.frequencyPenalty, params.presencePenalty))
+        }
+        // 1) Top-K
+        if params.topK > 0 {
+            llama_sampler_chain_add(self.sampling, llama_sampler_init_top_k(params.topK))
+        }
+        // 2) Top-P
+        if params.topP > 0.0 && params.topP < 1.0 {
+            llama_sampler_chain_add(self.sampling, llama_sampler_init_top_p(params.topP, 1))
+        }
+        // 3) Temperature
         llama_sampler_chain_add(self.sampling, llama_sampler_init_temp(params.temp))
-        // Use time-based seed for better randomness (matching Android's LLAMA_DEFAULT_SEED)
+        // 4) Mirostat V2
+        if params.mirostatMode == 2 {
+            llama_sampler_chain_add(self.sampling, llama_sampler_init_mirostat_v2(LLAMA_DEFAULT_SEED, params.mirostatTau, params.mirostatEta))
+        }
+        // 5) Final distribution sampler
         llama_sampler_chain_add(self.sampling, llama_sampler_init_dist(UInt32(time(nil))))
 
-        print("[LlamaContext] Initialized with nCtx=\(nCtx), Temp=\(params.temp), TopP=\(params.topP), TopK=\(params.topK)")
+        print("[LlamaContext] Initialized with nCtx=\(nCtx)")
     }
 
     deinit {
@@ -95,7 +116,6 @@ actor LlamaContext {
         llama_batch_free(batch)
         llama_free(context)
         llama_model_free(model)
-        llama_backend_free()
         print("[LlamaContext] Memory released.")
     }
 
@@ -135,7 +155,7 @@ actor LlamaContext {
         }
 
         // Use default params initially, will be updated per-message
-        let params = SamplerParams(temp: 0.7, topP: 0.9, topK: 40)
+        let params = SamplerParams(temp: 0.7, topP: 0.9, topK: 40, repeatPenalty: 1.0, frequencyPenalty: 0.0, presencePenalty: 0.0, mirostatMode: 0, mirostatTau: 5.0, mirostatEta: 0.1)
         // Pass nCtx to init so batch size matches context size
         return LlamaContext(model: model, context: context, params: params, nCtx: nCtx)
     }
@@ -147,7 +167,7 @@ actor LlamaContext {
     }
     
     /// Updates the sampler with new parameters from Dart (per-message)
-    func updateSampler(temp: Float, topP: Float, topK: Int32) {
+    func updateSampler(temp: Float, topP: Float, topK: Int32, repeatPenalty: Float = 1.0, frequencyPenalty: Float = 0.0, presencePenalty: Float = 0.0, mirostatMode: Int32 = 0, mirostatTau: Float = 5.0, mirostatEta: Float = 0.1) {
         // Free old sampler
         llama_sampler_free(sampling)
         
@@ -155,14 +175,23 @@ actor LlamaContext {
         let sparams = llama_sampler_chain_default_params()
         sampling = llama_sampler_chain_init(sparams)
         
-        // Add samplers in correct order (same as Android): TopK -> TopP -> Temp -> Dist
-        llama_sampler_chain_add(sampling, llama_sampler_init_top_k(topK))
-        llama_sampler_chain_add(sampling, llama_sampler_init_top_p(topP, 1))
+        // Add samplers in correct order (same as Android)
+        if repeatPenalty != 1.0 || frequencyPenalty != 0.0 || presencePenalty != 0.0 {
+            llama_sampler_chain_add(sampling, llama_sampler_init_penalties(64, repeatPenalty, frequencyPenalty, presencePenalty))
+        }
+        if topK > 0 {
+            llama_sampler_chain_add(sampling, llama_sampler_init_top_k(topK))
+        }
+        if topP > 0.0 && topP < 1.0 {
+            llama_sampler_chain_add(sampling, llama_sampler_init_top_p(topP, 1))
+        }
         llama_sampler_chain_add(sampling, llama_sampler_init_temp(temp))
-        // Use time-based seed for variety (matching Android's LLAMA_DEFAULT_SEED behavior)
+        if mirostatMode == 2 {
+            llama_sampler_chain_add(sampling, llama_sampler_init_mirostat_v2(LLAMA_DEFAULT_SEED, mirostatTau, mirostatEta))
+        }
         llama_sampler_chain_add(sampling, llama_sampler_init_dist(UInt32(time(nil))))
         
-        print("[LlamaContext] Sampler updated: temp=\(temp), topP=\(topP), topK=\(topK)")
+        print("[LlamaContext] Sampler updated")
     }
 
     func clear() {

@@ -206,29 +206,33 @@ class InboxViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  static int compareConversationManagers(
+      ConversationManager a, ConversationManager b) {
+    // 1. Starred items go to top
+    if (a.isStarred != b.isStarred) {
+      return a.isStarred ? -1 : 1;
+    }
+
+    // 1.1 If both are starred, sort by 'Recently Starred' (Newest Starred First)
+    if (a.isStarred && b.isStarred) {
+      final dateA = a.starredDate ?? DateTime(0);
+      final dateB = b.starredDate ?? DateTime(0);
+      // Compare dateB to dateA for descending (newest first)
+      final comparison = dateB.compareTo(dateA);
+      if (comparison != 0) return comparison;
+    }
+
+    // 2. Then sort by Date (Newest first)
+    return b.lastMessageDate.compareTo(a.lastMessageDate);
+  }
+
   void _sortConversations() {
     // Only sort the all list; filter is derived from it.
     _allConversationIDs.sort((a, b) {
       final managerA = _conversationManagers[a];
       final managerB = _conversationManagers[b];
       if (managerA == null || managerB == null) return 0;
-
-      // 1. Pinned items go to top
-      if (managerA.isStarred != managerB.isStarred) {
-        return managerA.isStarred ? -1 : 1;
-      }
-
-      // 1.1 If both are starred, sort by 'Recently Starred' (Newest Starred First)
-      if (managerA.isStarred && managerB.isStarred) {
-        final dateA = managerA.starredDate ?? DateTime(0);
-        final dateB = managerB.starredDate ?? DateTime(0);
-        // Compare dateB to dateA for descending (newest first)
-        final comparison = dateB.compareTo(dateA);
-        if (comparison != 0) return comparison;
-      }
-
-      // 2. Then sort by Date (Newest first)
-      return managerB.lastMessageDate.compareTo(managerA.lastMessageDate);
+      return compareConversationManagers(managerA, managerB);
     });
 
     // Re-apply filter immediately to reflect sort order changes
@@ -626,6 +630,39 @@ class InboxViewModel extends ChangeNotifier {
     _sortConversations();
     _updateConversationCache();
     return true;
+  }
+
+  Future<void> archiveConversation(String conversationID) async {
+    final manager = _conversationManagers[conversationID];
+    if (manager == null) return;
+
+    await ChatStorageService.archiveConversation(conversationID);
+
+    _allConversationIDs.remove(conversationID);
+    _filteredConversationIDs.remove(conversationID);
+    manager.setDeleted(true);
+
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 350));
+
+    _conversationManagers.remove(conversationID);
+    manager.dispose();
+    _updateConversationCache();
+
+    final ctx = mainScreenKey.currentContext;
+    if (ctx != null && ctx.mounted) {
+      final l10n = AppLocalizations.of(ctx);
+      _notificationService.showNotification(
+          message: l10n?.archive ?? "Archived",
+          type: NotificationType.success);
+    }
+  }
+
+  Future<void> unarchiveConversation(String conversationID) async {
+    await ChatStorageService.unarchiveConversation(conversationID);
+    _updateConversationCache();
+    await loadConversations(langCode: _currentLangCode, isReload: true);
   }
 
   void _updateConversationCache() {

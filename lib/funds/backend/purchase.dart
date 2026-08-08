@@ -41,7 +41,7 @@ extension FundsPurchase on FundsBackend {
     } catch (e) {
       log('Could not refresh product details before purchase: $e',
           name: FundsBackend._logName, error: e);
-      _notificationService.showNotification(
+      _notificationService?.showNotification(
         message: _localizations?.productNotFound ?? 'productNotFound',
         type: NotificationType.error,
         oneLine: false,
@@ -56,8 +56,18 @@ extension FundsPurchase on FundsBackend {
     PurchaseParam purchaseParam;
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      final googlePlayProductDetails =
-          freshProductDetails as GooglePlayProductDetails;
+      if (freshProductDetails is! GooglePlayProductDetails) {
+        log('Product details are not GooglePlayProductDetails.',
+            name: FundsBackend._logName);
+        _notificationService?.showNotification(
+          message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
+          type: NotificationType.error,
+          oneLine: false,
+        );
+        _setPurchasePending(false);
+        return;
+      }
+      final googlePlayProductDetails = freshProductDetails;
       final offerToken = googlePlayProductDetails.offerToken;
 
       final bool isSubscription =
@@ -67,7 +77,7 @@ extension FundsPurchase on FundsBackend {
         if (offerToken == null || offerToken.isEmpty) {
           log('Subscription ${googlePlayProductDetails.id} is missing a valid offerToken.',
               name: FundsBackend._logName);
-          _notificationService.showNotification(
+          _notificationService?.showNotification(
               message:
                   _localizations?.cacheIsNotUpToDate ?? 'cacheIsNotUpToDate',
               type: NotificationType.error,
@@ -116,7 +126,7 @@ extension FundsPurchase on FundsBackend {
             log('CRITICAL: Sync mismatch. DB says active sub, but local store has no token. Blocking to prevent double billing.',
                 name: FundsBackend._logName);
 
-            _notificationService.showNotification(
+            _notificationService?.showNotification(
               message:
                   "Please tap 'Restore Purchases' first to sync your account.",
               type: NotificationType.error,
@@ -161,7 +171,7 @@ extension FundsPurchase on FundsBackend {
           errorString.contains('canceled') ||
           errorString.contains('storekiterror')) {
       } else {
-        _notificationService.showNotification(
+        _notificationService?.showNotification(
             message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
             type: NotificationType.error);
         await _crashlytics.recordError(e, stack,
@@ -209,7 +219,7 @@ extension FundsPurchase on FundsBackend {
       });
     } catch (e) {
       log('Restore failed: $e', name: FundsBackend._logName, error: e);
-      _notificationService.showNotification(
+      _notificationService?.showNotification(
         message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
         type: NotificationType.error,
       );
@@ -257,7 +267,7 @@ extension FundsPurchase on FundsBackend {
           name: FundsBackend._logName, error: purchaseDetails.error);
     }
 
-    _notificationService.showNotification(
+    _notificationService?.showNotification(
       message: isUserCancelled ? "Cancelled" : errorMessage,
       type: isUserCancelled ? NotificationType.neutral : NotificationType.error,
       oneLine: false,
@@ -273,7 +283,7 @@ extension FundsPurchase on FundsBackend {
   void _onPurchaseStreamError(dynamic error, StackTrace? stack) {
     log('Purchase Stream Error: $error',
         name: FundsBackend._logName, error: error);
-    _notificationService.showNotification(
+    _notificationService?.showNotification(
       message: _localizations?.purchaseStreamError ?? 'purchaseStreamError',
       type: NotificationType.error,
       oneLine: false,

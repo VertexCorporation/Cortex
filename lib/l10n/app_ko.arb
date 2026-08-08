@@ -864,9 +864,13 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "동영상 제작을 위해서는 Ultra 구독이 필요합니다. 지금 업그레이드하고 원활한 콘텐츠 제작을 경험해 보세요!",
   "voiceModeInformation": "Cortex는 음성 채팅 모드에서도 기기 내에서 완벽하게 실행되어 데이터를 안전하게 보호합니다. 끊김 없는 대화를 즐겨보세요!",
-  "voiceSystemPromptSuffix": "중요: 마크다운 서식(굵게, 기울임체)을 사용하지 마세요. 코드 블록(```)을 출력하지 마세요. 답변은 대화체로 간결하게 작성하세요.",
+  "voiceSystemPrompt": "중요: 마크다운 서식(굵게, 기울임체)을 사용하지 마세요. 코드 블록(```)을 출력하지 마세요. 답변은 대화체로 간결하게 작성하세요.",
   "weakPassword": "비밀번호가 너무 약합니다.",
   "webSearchSources": "출처",
+  "offlineUse": "인터넷 없이 사용",
+  "archivedConversations": "보관된 대화",
+  "noArchivedConversations": "보관된 대화가 없습니다",
+  "unarchive": "보관 해제",
   "welcomeOfferBadge": "환영 혜택 • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {

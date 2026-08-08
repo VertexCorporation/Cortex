@@ -3,6 +3,9 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:cortex/axon/inbox/panel/view.dart';
+import 'package:cortex/axon/inbox/panel/buttons.dart';
+import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/notifications/introvert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -104,14 +107,10 @@ class _AxonConversationTileState extends State<AxonConversationTile>
       return;
     }
 
-    // 350ms threshold for "Long Press"
+    // 350ms threshold for "Long Press" -> Show Context Menu
     _holdTimer = Timer(const Duration(milliseconds: 350), () {
       HapticFeedback.lightImpact();
-      final inboxViewModel = context.read<InboxViewModel>();
-      inboxViewModel.setSelectionMode(true);
-      if (!inboxViewModel.selectedIDs.contains(widget.manager.conversationID)) {
-        inboxViewModel.toggleSelectConversation(widget.manager.conversationID);
-      }
+      _showContextMenu(details.globalPosition);
     });
   }
 
@@ -144,10 +143,6 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     inputProvider.clearFeatureModeIfOffline();
 
     if (_panelController != null) {
-      // Panel was open, we already hapticed on opening.
-      // Closing it might deserve a light impact?
-      // "click anywhere to close" logic in panel/view.dart has it.
-      // _panelController.close() is just a manual call.
       _panelController!.close();
       return;
     }
@@ -155,12 +150,171 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     mainScreenKey.currentState?.openConversation(widget.manager);
   }
 
+  void _showContextMenu(Offset touchPosition) {
+    final inboxViewModel = context.read<InboxViewModel>();
+    final l10n = AppLocalizations.of(context)!;
+    final manager = widget.manager;
+
+    _panelController = showActionPanel(
+      context: context,
+      touchPosition: touchPosition,
+      onClosed: () {
+        _panelController = null;
+      },
+      buttons: [
+        ActionPanelButton(
+          iconAsset: 'assets/icons/sparkle.svg',
+          iconColor: manager.isStarred ? Colors.amber : AppColors.primaryColor.inverted,
+          text: manager.isStarred ? l10n.unstarConversation : l10n.starConversation,
+          textColor: AppColors.primaryColor.inverted,
+          onPressed: () async {
+            _panelController?.close();
+            final success = await inboxViewModel.togglePinStatus(manager.conversationID);
+            if (!success && mounted) {
+              final ctx = mainScreenKey.currentContext;
+              if (ctx != null && ctx.mounted) {
+                final notifCtx = Provider.of<IntrovertNotificationService>(ctx, listen: false);
+                notifCtx.showNotification(
+                   message: l10n.pinLimitReached,
+                  type: NotificationType.error,
+                );
+              }
+            }
+          },
+        ),
+        ActionPanelButton(
+          iconAsset: 'assets/icons/edit.svg',
+          iconColor: AppColors.primaryColor.inverted,
+          text: l10n.renameConversation,
+          textColor: AppColors.primaryColor.inverted,
+          onPressed: () {
+            _panelController?.close();
+            _showRenameDialog(manager);
+          },
+        ),
+        ActionPanelButton(
+          iconAsset: 'assets/icons/download.svg',
+          iconColor: AppColors.primaryColor.inverted,
+          text: l10n.archive,
+          textColor: AppColors.primaryColor.inverted,
+          onPressed: () {
+            _panelController?.close();
+            inboxViewModel.archiveConversation(manager.conversationID);
+          },
+        ),
+        ActionPanelButton(
+          iconAsset: 'assets/icons/select.svg',
+          iconColor: AppColors.primaryColor.inverted,
+          text: l10n.multiSelect,
+          textColor: AppColors.primaryColor.inverted,
+          onPressed: () {
+            _panelController?.close();
+            inboxViewModel.setSelectionMode(true);
+            if (!inboxViewModel.selectedIDs.contains(manager.conversationID)) {
+              inboxViewModel.toggleSelectConversation(manager.conversationID);
+            }
+          },
+        ),
+        ActionPanelButton(
+          iconAsset: 'assets/icons/delete.svg',
+          iconColor: AppColors.quinaryColor,
+          text: l10n.delete,
+          textColor: AppColors.quinaryColor,
+          onPressed: () {
+            _panelController?.close();
+            _showDeleteConfirmation(manager);
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showRenameDialog(ConversationManager manager) {
+    final l10n = AppLocalizations.of(context)!;
+    final TextEditingController controller = TextEditingController(
+      text: manager.conversationTitle,
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog.adaptive(
+        title: Text(l10n.renameConversation),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: l10n.conversationName,
+            border: const OutlineInputBorder(),
+          ),
+          onSubmitted: (value) {
+            if (value.trim().isNotEmpty) {
+              context.read<InboxViewModel>().editConversation(
+                    manager.conversationID,
+                    value.trim(),
+                  );
+              Navigator.of(ctx).pop();
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = controller.text.trim();
+              if (value.isNotEmpty) {
+                context.read<InboxViewModel>().editConversation(
+                      manager.conversationID,
+                      value,
+                    );
+                Navigator.of(ctx).pop();
+              }
+            },
+            child: Text(l10n.save),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(ConversationManager manager) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog.adaptive(
+        title: Text(l10n.deleteConversation),
+        content: Text(l10n.deleteConversationConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.quinaryColor,
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<InboxViewModel>().deleteConversation(
+                    manager.conversationID,
+                  );
+            },
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Wrap the entire tile content in animations for deletion
     return SizeTransition(
       sizeFactor: _sizeAnimation,
-      alignment: Alignment.centerLeft,
+      axisAlignment: -1.0,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: _buildTileContent(),

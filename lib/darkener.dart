@@ -11,7 +11,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../theme.dart'; // ↖ adjust the relative path if needed
+import 'package:cortex/theme.dart';
 
 /// Signature of the callback returned by [Darkener.darken].
 typedef RestoreCallback = void Function();

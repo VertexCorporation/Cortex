@@ -67,7 +67,6 @@ class AIMessageTile extends StatefulWidget {
 
 class _AIMessageTileState extends State<AIMessageTile>
     with TickerProviderStateMixin {
-  // Animation controllers
   late final AnimationController _entryCtl;
   late final Animation<double> _entryScaleAnim;
   late final AnimationController _fadeCtl;
@@ -81,7 +80,6 @@ class _AIMessageTileState extends State<AIMessageTile>
 
   String _stableText = "";
   String _animatingText = "";
-
   final Map<String, List<InlineSpan>> _parseCache = {};
 
   late bool _isInitialLoad;
@@ -151,8 +149,7 @@ class _AIMessageTileState extends State<AIMessageTile>
 
     if (!widget.message.isThinking &&
         (widget.message.displayableText.isNotEmpty ||
-            widget.message.hasAttachments ||
-            widget.embeddedMedia != null)) {
+            widget.message.hasAttachments || widget.embeddedMedia != null)) {
       _stableText = widget.message.displayableText;
       _headerEntryCtl.value = 1.0;
       _entryCtl.value = 1.0;
@@ -313,7 +310,7 @@ class _AIMessageTileState extends State<AIMessageTile>
       _textAnimCtl.value = 1.0;
     }
 
-    // 5. Opacity Updates
+    // Opacity Updates
     if (old.message.opacity != widget.message.opacity &&
         !widget.message.isError) {
       if (widget.message.opacity == 1.0) {
@@ -372,10 +369,7 @@ class _AIMessageTileState extends State<AIMessageTile>
                 alignment: Alignment.topLeft,
                 child: Padding(
                   padding: EdgeInsets.only(top: 8 * scale),
-                  child: _AiErrorWidget(
-                    message: widget.message,
-                    scale: scale,
-                  ),
+                  child: _AiErrorWidget(message: widget.message, scale: scale),
                 ),
               ),
             ],

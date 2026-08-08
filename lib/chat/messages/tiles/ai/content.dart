@@ -41,7 +41,7 @@ class _AiBodyContent extends StatelessWidget {
       thinkContent = fullText.substring(contentStart, contentEnd).trim();
 
       final blockEnd =
-          thinkEnd != -1 ? thinkEnd + '</$_thinkTag>'.length : fullText.length;
+      thinkEnd != -1 ? thinkEnd + '</$_thinkTag>'.length : fullText.length;
 
       final beforeThink = fullText.substring(0, thinkStart);
       final afterThink = fullText.substring(blockEnd);
@@ -71,31 +71,31 @@ class _AiBodyContent extends StatelessWidget {
 
     final thinkBlock = hasThink
         ? Padding(
-            padding: EdgeInsets.only(
-                top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
-            child:
-                ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
-          )
+      padding: EdgeInsets.only(
+          top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
+      child:
+      ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
+    )
         : const SizedBox.shrink();
 
     final mediaBlock = hasMedia
         ? Padding(
-            padding: EdgeInsets.only(
-                top: 8 * scale, left: 2.0 * scale, right: 2.0 * scale),
-            child: AnimatedSize(
-              duration: const Duration(milliseconds: 320),
-              curve: Curves.easeOutCubic,
-              alignment: Alignment.centerLeft,
-              child: embeddedMedia!,
-            ),
-          )
+      padding: EdgeInsets.only(
+          top: 8 * scale, left: 2.0 * scale, right: 2.0 * scale),
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.centerLeft,
+        child: embeddedMedia!,
+      ),
+    )
         : const SizedBox.shrink();
 
     final textBlock = hasMainText
         ? Padding(
-            padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale),
-            child: _buildContent(context, scale, mainStable, mainAnimating),
-          )
+      padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale),
+      child: _buildContent(context, scale, mainStable, mainAnimating),
+    )
         : const SizedBox.shrink();
 
     return Column(
@@ -110,8 +110,8 @@ class _AiBodyContent extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(
-      BuildContext context, double s, String stableText, String animatingText) {
+  Widget _buildContent(BuildContext context, double s, String stableText,
+      String animatingText) {
     final baseStyle = TextStyle(
         fontSize: 17 * s, height: 1.38, color: AppColors.primaryColor.inverted);
 
@@ -186,8 +186,8 @@ class _AiBodyContent extends StatelessWidget {
     );
   }
 
-  List<InlineSpan> _getAnimatingSpans(
-      BuildContext context, String text, double s, double opacity) {
+  List<InlineSpan> _getAnimatingSpans(BuildContext context, String text,
+      double s, double opacity) {
     if (text.isEmpty) return [];
     final spans = _getParsedSpans(context, text, s);
     return spans
@@ -195,8 +195,8 @@ class _AiBodyContent extends StatelessWidget {
         .toList(growable: false);
   }
 
-  List<InlineSpan> _getParsedSpans(
-      BuildContext context, String text, double s) {
+  List<InlineSpan> _getParsedSpans(BuildContext context, String text,
+      double s) {
     if (text.isEmpty) return [];
     final colorKey = AppColors.primaryColor.inverted.toARGB32();
     final citationKey = message.webSearchSources?.length ?? 0;
@@ -225,9 +225,9 @@ class _AiBodyContent extends StatelessWidget {
             ?.map((child) => _applyOpacity(child, opacity))
             .toList(growable: false),
         style: span.style?.copyWith(
-              color: baseColor.withValues(alpha: opacity),
-              foreground: null,
-            ) ??
+          color: baseColor.withValues(alpha: opacity),
+          foreground: null,
+        ) ??
             TextStyle(color: baseColor.withValues(alpha: opacity)),
       );
     } else if (span is WidgetSpan) {
@@ -239,10 +239,8 @@ class _AiBodyContent extends StatelessWidget {
     return span;
   }
 
-  _MarkdownTextParts _rebalanceMarkdownBoundary(
-    String stable,
-    String animating,
-  ) {
+  _MarkdownTextParts _rebalanceMarkdownBoundary(String stable,
+      String animating,) {
     if (stable.isEmpty || animating.isEmpty) {
       return _MarkdownTextParts(stable: stable, animating: animating);
     }
@@ -372,7 +370,11 @@ class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
   }
 
   void _toggleExpand() {
-    if (widget.thinkContent.trim().isEmpty) return;
+    if (widget.thinkContent
+        .trim()
+        .isEmpty) {
+      return;
+    }
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
@@ -449,7 +451,7 @@ class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
               parent: _contentController,
               curve: Curves.easeInOut,
             ),
-            alignment: Alignment.centerLeft,
+            axisAlignment: -1.0,
             child: FadeTransition(
               opacity: _contentFade,
               child: SlideTransition(

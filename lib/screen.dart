@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
+import 'package:cortex/axon/inbox/archived_dialog.dart';
 
 import 'package:flutter/material.dart';
 import 'main.dart';
@@ -30,6 +31,8 @@ import 'news/view.dart';
 import 'arts/screen.dart';
 import 'roleplay/screens/discover_screen.dart';
 import 'notifications/introvert.dart';
+import 'navigation.dart';
+import 'rag/screens/document_library_screen.dart';
 
 enum MainScreenView {
   chat,
@@ -54,25 +57,26 @@ class FadeIndexedStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final idx = index;
+    final list = children;
     return Stack(
       fit: StackFit.expand,
-      children: List<Widget>.generate(children.length, (int i) {
+      children: List<Widget>.generate(list.length, (int i) {
+        final isActive = idx == i;
         return IgnorePointer(
-          ignoring: index != i,
+          ignoring: !isActive,
           child: AnimatedOpacity(
-            opacity: index == i ? 1.0 : 0.0,
+            opacity: isActive ? 1.0 : 0.0,
             duration: duration,
             child: TickerMode(
-              enabled: index == i,
-              child: index == i
-                  ? children[i]
-                  // PERFORMANCE: Strip viewInsets from background tabs so they don't
-                  // do massive 60fps relayouts when the keyboard opens on the active tab.
+              enabled: isActive,
+              child: isActive
+                  ? list[i]
                   : MediaQuery(
                       data: MediaQuery.of(context).copyWith(
                         viewInsets: EdgeInsets.zero,
                       ),
-                      child: children[i],
+                      child: list[i],
                     ),
             ),
           ),
@@ -134,10 +138,12 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return _cachedAxonWidget = Axon(
       onNewChatTap: () => startNewConversation(),
       onLibraryTap: switchToLibrary,
+      onDocumentsTap: _openDocumentLibrary,
       onCreateAITap: switchToCreate,
       onArtsTap: openArtsScreen,
       onRoleplayTap: openRoleplayScreen,
       onNewsTap: openNewsScreen,
+      onArchivedTap: _showArchivedConversations,
       onCloseAxon: closeAxon,
       onOpenAxon: () => _animateAxonTo(1.0),
       referenceWidth: standardAxonWidth,
@@ -269,6 +275,21 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     if (_axonController.value > 0.0) {
       _closeAxonWithAnimation();
     }
+  }
+
+  void _showArchivedConversations() {
+    showDialog(
+      context: context,
+      builder: (context) => const ArchivedConversationsDialog(),
+    );
+  }
+
+  void _openDocumentLibrary() {
+    closeAxon();
+    navigateToScreen(
+      const DocumentLibraryScreen(),
+      direction: const Offset(1.0, 0.0),
+    );
   }
 
   void _closeAxonWithAnimation() {

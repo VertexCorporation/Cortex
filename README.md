@@ -379,3 +379,4 @@ Follow the repository and our website for the latest news, updates, and feature 
   <b>Thank you for exploring Cortex. Together, we are building the future of AI.</b>
 </div>
 ```
+

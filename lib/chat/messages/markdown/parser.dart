@@ -1,9 +1,9 @@
 import 'package:cortex/chat/screen/widgets/sources.dart';
+import 'package:cortex/chat/screen/widgets/bottom/sources.dart';
 import 'package:cortex/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/theme.dart';
-import 'package:cortex/chat/screen/widgets/bottom/sources.dart';
 import 'patterns.dart';
 import 'utils.dart';
 import 'inline.dart';
@@ -12,14 +12,7 @@ import 'blocks.dart';
 final _checkEmoji = RegExp(r'(?<=\n|^)\s*[✅❌✓✗]\s*(?=\n|$)');
 final _newlineGtNewline = RegExp(r'\n>\s*\n');
 final _brTag = RegExp(r'<\s*br\s*/?\s*>|<\s*/\s*br\s*>', caseSensitive: false);
-final _quadAsterisk = RegExp(r'\*{4,}([^*\r\n]+?)\*{4,}');
-final _quadUnderscore = RegExp(r'_{4,}([^_\r\n]+?)_{4,}');
-final _newlineBeforeWidget = RegExp(r'\n{2,}(?=<<<WIDGET)');
-final _newlineAfterWidgetEnd = RegExp(r'(?<=<<<END>>>)\n{2,}');
 final _memoryOpen = RegExp(r'\s*<memory[)>]?[\s\S]*?(?:</memory[)>]?|$)\s*',
-    caseSensitive: false);
-final _memoryPartial = RegExp(
-    r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:[)>][\s\S]*)?)?)?)?)?)?$',
     caseSensitive: false);
 final _sourceHeader = RegExp(
     r'(?:\n|^)#{1,6}\s*(?:Sources|References|Citations):?\s*$',
@@ -35,14 +28,6 @@ final _tableSeparator =
 final _headingPrefix = RegExp(r'^#+\s*');
 final _horizontalRule = RegExp(r'^---$', multiLine: true);
 final _horizontalRuleAny = RegExp(r'^\s*([*\-_]){3,}\s*$', multiLine: true);
-final _latexDelimiters = RegExp(r'(\$\$|\\\[|\\\]|\\\(|\\\))');
-final _latexTextCmd = RegExp(r'\\text\{(.+?)\}');
-final _latexFrac = RegExp(r'\\frac\{(.+?)\}\{(.+?)\}');
-final _latexSqrtWithIdx = RegExp(r'\\sqrt\[(.+?)\]\{(.+?)\}');
-final _latexSqrt = RegExp(r'\\sqrt\{(.+?)\}');
-final _latexStyleCmd = RegExp(r'\\(mathbf|mathbb|mathcal)\{(.+?)\}');
-final _latexBraces = RegExp(r'[{}]');
-final _latexCmd = RegExp(r'\\([a-zA-Z]+)');
 final _markdownItalic = RegExp(r'[*_](.+?)[*_]', dotAll: true);
 final _emojiChars = RegExp(r'[✅❌✓✗]');
 final _multiSpaces = RegExp(r'[ \t]{2,}', multiLine: true);
@@ -52,41 +37,29 @@ final _blockquotePrefix = RegExp(r'^\s*>\s?');
 final _functionTag = RegExp(
     r'\s*<function(?:-call)?[)>]?[\s\S]*?(?:</function(?:-call)?[)>]?|$)\s*',
     caseSensitive: false);
-final _partialFunctionTag = RegExp(
-    r'\s*<f(?:u(?:n(?:c(?:t(?:i(?:o(?:n(?:-?(?:c(?:a(?:l(?:l(?:[)>][\s\S]*)?)?)?)?)?)?)?)?)?)?)?)?)?$',
+
+final _widgetBlock = RegExp(
+    r'<<<WIDGET:[\s\S]*?<<<END>>>',
     caseSensitive: false);
+
+final _usingToolLine = RegExp(
+    r'\n?\*Using [^*]+\.\.\.[^*]*\*\s*[✅❌✓✗]?\s*\n?');
 
 List<InlineSpan> parseText(BuildContext context, String text,
     {double? fontSize, bool isFinished = false, List<dynamic>? citations}) {
   try {
-    text = text.replaceAll(RegexPatterns.usingToolLine, '');
+    text = text.replaceAll(_usingToolLine, '');
     text = text.replaceAll(_checkEmoji, '');
     text = text.replaceAll(_newlineGtNewline, '\n');
-    text = _replaceOutsideCode(
-      text,
-      _brTag,
-      (_) => '\n',
-    );
-    text = _stripTrailingHorizontalRule(text);
-    text = _replaceOutsideCode(
-      text,
-      _quadAsterisk,
-      (match) => '**${match.group(1)}**',
-    );
-    text = _replaceOutsideCode(
-      text,
-      _quadUnderscore,
-      (match) => '__${match.group(1)}__',
-    );
-
-    text = text.replaceAll(_newlineBeforeWidget, '\n');
-    text = text.replaceAll(_newlineAfterWidgetEnd, '\n');
+    text = text.replaceAllMapped(_brTag, (_) => '\n');
+    text = text.replaceAll(_widgetBlock, '');
+    text = text.replaceAll(_memoryOpen, '');
 
     text = mergeFragmentedThinkingBlocks(text);
-    text = _stripFunctionTagsOutsideCode(text);
+    text = text.replaceAllMapped(_functionTag, (_) => '');
+    text = text.replaceAll(_tableSeparator, '');
+    text = _stripTrailingHorizontalRule(text);
 
-    text = text.replaceAll(_memoryOpen, '');
-    text = text.replaceAll(_memoryPartial, '');
     List<Source> sources = [];
     final match = _sourceHeader.firstMatch(text);
 
@@ -289,7 +262,7 @@ String mergeFragmentedThinkingBlocks(String text) {
 }
 
 String stripMarkup(String text) {
-  text = text.replaceAll(RegexPatterns.widget, '');
+  text = text.replaceAll(_widgetBlock, '');
   text = text.replaceAllMapped(RegexPatterns.codeBlock, (m) => '\n');
   text = text.replaceAll(_tableSeparator, '');
   text = text.replaceAll('|', '  ');
@@ -302,22 +275,6 @@ String stripMarkup(String text) {
   text = text.replaceAll(_horizontalRule, '');
   text = text.replaceAll(_horizontalRuleAny, '');
 
-  text = text.replaceAll(_latexDelimiters, '');
-  text = text.replaceAll(r'$', '');
-
-  text = text.replaceAllMapped(_latexTextCmd, (m) => m.group(1)!);
-
-  text =
-      text.replaceAllMapped(_latexFrac, (m) => '(${m.group(1)}/${m.group(2)})');
-  text = text.replaceAllMapped(
-      _latexSqrtWithIdx, (m) => '(${m.group(1)})√(${m.group(2)})');
-  text = text.replaceAllMapped(_latexSqrt, (m) => '√(${m.group(1)})');
-
-  text = text.replaceAllMapped(_latexStyleCmd, (m) => m.group(2)!);
-
-  text = text.replaceAll(_latexBraces, '');
-  text = text.replaceAll(_latexCmd, '');
-
   text = text.replaceAllMapped(RegexPatterns.link, (m) => m.group(1) ?? '');
   text =
       text.replaceAllMapped(RegexPatterns.boldItalic, (m) => m.group(1) ?? '');
@@ -329,7 +286,7 @@ String stripMarkup(String text) {
       RegexPatterns.inlineCode, (m) => m.group(0)!.replaceAll('`', ''));
 
   text = text.replaceAll(RegexPatterns.thinking, '');
-  text = text.replaceAll(RegexPatterns.usingToolLine, '');
+  text = text.replaceAll(_usingToolLine, '');
   text = text.replaceAll(_emojiChars, '');
   text = text.replaceAll(_multiSpaces, ' ');
   text = text.replaceAll(_multiNewlines, '\n\n');
@@ -346,113 +303,9 @@ String _stripBlockquotePrefix(String text) {
 }
 
 String _stripTrailingHorizontalRule(String text) {
-  return _replaceOutsideCode(
-    text,
-    RegExp(r'(?:^|\n)[ \t]*([*\-_]){3,}[ \t]*$'),
-    (_) => '',
-  ).trimRight();
-}
-
-String _replaceOutsideCode(
-  String text,
-  RegExp pattern,
-  String Function(Match match) replace,
-) {
-  final protectedRanges = <MatchRange>[];
-
-  for (final match in RegexPatterns.codeBlock.allMatches(text)) {
-    protectedRanges.add(MatchRange(
-        start: match.start,
-        end: match.end,
-        text: match.group(0)!,
-        type: 'codeBlock'));
+  final m = RegExp(r'(?:^|\n)[ \t]*([*\-_]){3,}[ \t]*$').firstMatch(text);
+  if (m != null) {
+    return text.substring(0, m.start).trimRight();
   }
-  for (final match in RegexPatterns.inlineCode.allMatches(text)) {
-    protectedRanges.add(MatchRange(
-        start: match.start,
-        end: match.end,
-        text: match.group(0)!,
-        type: 'inlineCode'));
-  }
-
-  protectedRanges.sort((a, b) => a.start - b.start);
-
-  final mergedRanges = <MatchRange>[];
-  for (final range in protectedRanges) {
-    if (mergedRanges.isEmpty || range.start >= mergedRanges.last.end) {
-      mergedRanges.add(range);
-    }
-  }
-
-  final buffer = StringBuffer();
-  var cursor = 0;
-  for (final range in mergedRanges) {
-    if (range.start > cursor) {
-      buffer.write(text.substring(cursor, range.start).replaceAllMapped(
-            pattern,
-            replace,
-          ));
-    }
-    buffer.write(range.text);
-    cursor = range.end;
-  }
-
-  if (cursor < text.length) {
-    buffer.write(text.substring(cursor).replaceAllMapped(pattern, replace));
-  }
-
-  return buffer.toString();
-}
-
-String _stripFunctionTagsOutsideCode(String text) {
-  final codeBlockRegex = RegexPatterns.codeBlock;
-  final inlineCodeRegex = RegexPatterns.inlineCode;
-
-  final protectedRanges = <MatchRange>[];
-
-  for (final match in codeBlockRegex.allMatches(text)) {
-    protectedRanges.add(MatchRange(
-        start: match.start,
-        end: match.end,
-        text: match.group(0)!,
-        type: 'codeBlock'));
-  }
-  for (final match in inlineCodeRegex.allMatches(text)) {
-    protectedRanges.add(MatchRange(
-        start: match.start,
-        end: match.end,
-        text: match.group(0)!,
-        type: 'inlineCode'));
-  }
-
-  protectedRanges.sort((a, b) => a.start - b.start);
-
-  final finalProtectedRanges = <MatchRange>[];
-  if (protectedRanges.isNotEmpty) {
-    finalProtectedRanges.add(protectedRanges.first);
-    for (int i = 1; i < protectedRanges.length; i++) {
-      if (protectedRanges[i].start >= finalProtectedRanges.last.end) {
-        finalProtectedRanges.add(protectedRanges[i]);
-      }
-    }
-  }
-
-  final StringBuffer result = StringBuffer();
-  int lastMatchEnd = 0;
-
-  for (final range in finalProtectedRanges) {
-    final String beforeCode = text.substring(lastMatchEnd, range.start);
-    String processedBefore = beforeCode.replaceAll(_functionTag, '');
-    processedBefore = processedBefore.replaceAll(_partialFunctionTag, '');
-    result.write(processedBefore);
-    result.write(range.text);
-    lastMatchEnd = range.end;
-  }
-
-  final String remainingText = text.substring(lastMatchEnd);
-  String processedRemaining = remainingText.replaceAll(_functionTag, '');
-  processedRemaining = processedRemaining.replaceAll(_partialFunctionTag, '');
-  result.write(processedRemaining);
-
-  return result.toString();
+  return text;
 }

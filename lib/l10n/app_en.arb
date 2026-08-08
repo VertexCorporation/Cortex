@@ -39,6 +39,8 @@
   "languageModels": "Language Models",
   "light": "Light",
   "theme": "Theme",
+  "lightTheme": "Light theme",
+  "darkTheme": "Dark theme",
   "no": "No",
   "yes": "Yes",
   "done": "Done",
@@ -76,6 +78,12 @@
   "noStarredChatsMessage": "You didn't starred a chat yet.",
   "starConversation": "Star",
   "unstarConversation": "Unstar",
+  "renameConversation": "Rename Conversation",
+  "conversationName": "Conversation name",
+  "deleteConversation": "Delete Conversation",
+  "deleteConversationConfirm": "Are you sure you want to delete this conversation? This action cannot be undone.",
+  "archive": "Archive",
+  "multiSelect": "Select Multiple",
   "loginToYourAccount": "Login",
   "createYourAccount": "Register",
   "email": "Email",
@@ -686,7 +694,7 @@
   "flowMode": "Flow Mode",
   "premium": "Premium",
   "workInProgress": "Work In Progress",
-  "voiceSystemPromptSuffix": "IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.",
+  "voiceSystemPrompt": "IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.",
   "flowModeContextParams": "Cortex Flow Mode ({agentName}). Previous: {previousResponse}",
   "@flowModeContextParams": {
     "description": "Context string for Flow Mode with agent name and previous response placeholders.",
@@ -722,9 +730,45 @@
   "openLinkCancel": "Cancel",
   "openLinkConfirm": "Open Link",
   "webSearchSources": "Sources",
+  "offlineUse": "Use without Internet",
+  "archivedConversations": "Archived Conversations",
+  "noArchivedConversations": "No archived conversations",
+  "unarchive": "Unarchive",
   "searching": "Searching",
   "featureWebSearchTitle": "Web Search",
   "featureWebSearchDescription": "Search the web for real-time information",
+  "ragFeatureTitle": "Documents",
+  "ragFeatureDescription": "Chat about your own documents privately",
+  "ragScreenTitle": "Document Chat",
+  "ragAddDocuments": "Add documents",
+  "ragEmptyTitle": "No documents yet",
+  "ragEmptyDescription": "Add PDF, Word, Excel, PowerPoint or text files to chat about them.",
+  "ragStatusReady": "Ready",
+  "ragStatusIndexing": "Indexing…",
+  "ragStatusFailed": "Failed",
+  "ragSelected": "{count} selected",
+  "@ragSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragEnableChat": "Enable document chat",
+  "ragDisableChat": "Disable document chat",
+  "ragActiveDocs": "{count} documents",
+  "@ragActiveDocs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ragNoSelectionHint": "Select documents to chat about",
+  "ragDeleteConfirm": "Delete this document from the library?",
+  "ragFileTooBig": "This file is larger than 10 MB.",
+  "ragUnsupportedType": "This file type is not supported.",
+  "ragAddedToChat": "Added to document chat",
   "clearMemory": "Clear Memory",
   "clearMemoryConfirm": "Are you sure you want to clear your memory?",
   "personalization": "Personalization",

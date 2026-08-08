@@ -104,7 +104,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
       }
       for (int i = 0; i < leadingActions!.length; i++) {
         leftWidgets.add(leadingActions![i]);
-        calculatedLeadingWidth += buttonSize;
+        calculatedLeadingWidth += buttonSize * 2;
         if (i < leadingActions!.length - 1) {
           leftWidgets.add(SizedBox(width: gapSize));
           calculatedLeadingWidth += gapSize;
@@ -188,11 +188,16 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       leading: leftWidgets.isNotEmpty
-          ? Padding(
-              padding: EdgeInsetsDirectional.only(start: horizontalPadding),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: leftWidgets,
+          ? OverflowBox(
+              alignment: Alignment.centerLeft,
+              minWidth: 0,
+              maxWidth: double.infinity,
+              child: Padding(
+                padding: EdgeInsetsDirectional.only(start: horizontalPadding),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: leftWidgets,
+                ),
               ),
             )
           : null,

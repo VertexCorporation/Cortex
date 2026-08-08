@@ -864,9 +864,13 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Per creare video è necessario un abbonamento Ultra. Effettua l'upgrade ora e scopri tutte le potenzialità!",
   "voiceModeInformation": "Cortex protegge i tuoi dati funzionando completamente sul dispositivo, anche in modalità chat vocale: goditi conversazioni fluide!",
-  "voiceSystemPromptSuffix": "IMPORTANTE: non utilizzare la formattazione markdown (grassetto, corsivo). NON generare blocchi di codice (```). Mantieni le risposte brevi e colloquiali.",
+  "voiceSystemPrompt": "IMPORTANTE: non utilizzare la formattazione markdown (grassetto, corsivo). NON generare blocchi di codice (```). Mantieni le risposte brevi e colloquiali.",
   "weakPassword": "La password è troppo debole.",
   "webSearchSources": "Fonti",
+  "offlineUse": "Usa senza Internet",
+  "archivedConversations": "Conversazioni archiviate",
+  "noArchivedConversations": "Nessuna conversazione archiviata",
+  "unarchive": "Ripristina",
   "welcomeOfferBadge": "Offerta di benvenuto • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {

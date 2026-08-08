@@ -11,10 +11,12 @@ class AxonMenu extends StatelessWidget {
   final double screenHeight;
   final int activeTab;
   final VoidCallback onLibraryTap;
+  final VoidCallback onDocumentsTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
   final VoidCallback onRoleplayTap;
   final VoidCallback onNewsTap;
+  final VoidCallback onArchivedTap;
 
   const AxonMenu({
     super.key,
@@ -22,10 +24,12 @@ class AxonMenu extends StatelessWidget {
     required this.screenHeight,
     required this.activeTab,
     required this.onLibraryTap,
+    required this.onDocumentsTap,
     required this.onCreateAITap,
     required this.onArtsTap,
     required this.onRoleplayTap,
     required this.onNewsTap,
+    required this.onArchivedTap,
   });
 
   @override
@@ -53,19 +57,19 @@ class AxonMenu extends StatelessWidget {
           ),
           SizedBox(height: verticalSpacing),
 
-          // --- 2. CREATE AI ---
+          // --- 1.5 DOCUMENT CHAT (RAG) ---
           AxonItem(
-            label: localizations.createAI,
-            iconPath: 'assets/icons/intelligence.svg',
-            onTap: onCreateAITap,
+            label: localizations.ragFeatureTitle,
+            iconPath: 'assets/icons/attachment.svg',
+            onTap: onDocumentsTap,
             screenHeight: screenHeight,
             referenceWidth: referenceWidth,
             reduceIconSize: true,
-            isActive: activeTab == 3,
+            isActive: false,
           ),
           SizedBox(height: verticalSpacing),
 
-          // --- 3. ARTS ---
+          // --- 2. ARTS ---
           AxonItem(
             label: localizations.arts,
             iconPath: 'assets/icons/art.svg',
@@ -74,6 +78,18 @@ class AxonMenu extends StatelessWidget {
             referenceWidth: referenceWidth,
             reduceIconSize: true,
             isActive: activeTab == 4,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 3. CREATE AI ---
+          AxonItem(
+            label: localizations.createAI,
+            iconPath: 'assets/icons/intelligence.svg',
+            onTap: onCreateAITap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: activeTab == 3,
           ),
           SizedBox(height: verticalSpacing),
 
@@ -86,6 +102,18 @@ class AxonMenu extends StatelessWidget {
             referenceWidth: referenceWidth,
             reduceIconSize: true,
             isActive: activeTab == 2,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 5. ARCHIVED ---
+          AxonItem(
+            label: localizations.archive,
+            iconPath: 'assets/icons/download.svg',
+            onTap: onArchivedTap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: false,
           ),
 
           // Bottom Spacing before the list starts

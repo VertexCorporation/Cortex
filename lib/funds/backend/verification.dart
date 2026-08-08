@@ -10,7 +10,7 @@ extension FundsVerification on FundsBackend {
 
       if (verificationData == null) {
         log('iOS receipt is NULL. Cannot verify.', name: FundsBackend._logName);
-        _notificationService.showNotification(
+        _notificationService?.showNotification(
           message:
               "Receipt missing. Please restart app or try Restore Purchases.",
           type: NotificationType.error,
@@ -36,7 +36,7 @@ extension FundsVerification on FundsBackend {
         verificationData.trim() == "[]") {
       log('Invalid verification data for ${purchaseDetails.productID}',
           name: FundsBackend._logName);
-      _notificationService.showNotification(
+      _notificationService?.showNotification(
         message: "Validation failed. Please Restore Purchases.",
         type: NotificationType.error,
         oneLine: false,
@@ -56,7 +56,7 @@ extension FundsVerification on FundsBackend {
       await callable.call<dynamic>({
         'receiptData': verificationData,
         'productId': purchaseDetails.productID,
-        'platform': defaultTargetPlatform.name.toLowerCase(),
+        'platform': defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
         'packageName': FundsBackend.appPackageName,
         'transactionId': purchaseDetails.purchaseID,
       });
@@ -107,13 +107,13 @@ extension FundsVerification on FundsBackend {
         if (purchaseDetails.pendingCompletePurchase) {
           await _inAppPurchase.completePurchase(purchaseDetails);
         }
-        _notificationService.showNotification(
+        _notificationService?.showNotification(
           message: _localizations?.purchaseError ?? 'purchaseError',
           type: NotificationType.error,
           oneLine: false,
         );
       } else {
-        _notificationService.showNotification(
+        _notificationService?.showNotification(
           message: _localizations?.verificationDelayed ?? 'verificationDelayed',
           type: NotificationType.error,
           oneLine: false,
@@ -126,7 +126,7 @@ extension FundsVerification on FundsBackend {
     } catch (e, stack) {
       log('Unexpected client verification error: $e',
           name: FundsBackend._logName);
-      _notificationService.showNotification(
+      _notificationService?.showNotification(
         message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
         type: NotificationType.error,
         oneLine: false,

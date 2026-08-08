@@ -1,5 +1,6 @@
 // lib/library/backend/data/entity.dart
 
+import 'dart:convert';
 import 'format.dart';
 
 /// Represents a unified, type-safe model entity in the application.
@@ -266,7 +267,7 @@ class ModelEntity {
 
   static Map<String, dynamic> _safeStringKeyMap(dynamic value) {
     if (value is! Map) return {};
-    return Map<String, dynamic>.from(value);
+    return jsonDecode(jsonEncode(value));
   }
 
   /// Creates a copy of this [ModelEntity] but with the given fields replaced.
@@ -387,7 +388,8 @@ class ModelEntity {
     final idLower = id.toLowerCase();
 
     for (final keyword in premiumKeywords) {
-      if (titleLower.contains(keyword) || idLower.contains(keyword)) {
+      final pattern = RegExp('\\b${RegExp.escape(keyword)}\\b');
+      if (pattern.hasMatch(titleLower) || pattern.hasMatch(idLower)) {
         return true;
       }
     }

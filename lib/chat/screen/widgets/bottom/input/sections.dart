@@ -23,13 +23,15 @@ class WaveformSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenWidth = MediaQuery
+        .sizeOf(context)
+        .width;
     final bool isDesktop = screenWidth >= 800;
     final bool isTablet = screenWidth >= 600;
 
     final double buttonSize = isDesktop ? 40.0 : (isTablet ? 40.0 : 36.0);
     final double buttonPadding =
-        isDesktop ? 16.0 : (isTablet ? screenWidth * 0.02 : 16.0);
+    isDesktop ? 16.0 : (isTablet ? screenWidth * 0.02 : 16.0);
     final double rightPadding = buttonPadding + (buttonSize / 2);
 
     return Padding(
@@ -57,9 +59,9 @@ class AttachmentPreviewSection extends StatelessWidget {
     final bool isDesktop = screenWidth >= 800;
 
     final double itemSize =
-        isDesktop ? 80.0 : (isTablet ? screenWidth * 0.15 : screenWidth * 0.20);
+    isDesktop ? 80.0 : (isTablet ? screenWidth * 0.15 : screenWidth * 0.20);
     final double padding =
-        isDesktop ? 12.0 : (isTablet ? screenWidth * 0.02 : 12.0);
+    isDesktop ? 12.0 : (isTablet ? screenWidth * 0.02 : 12.0);
 
     return AttachmentListWithFog(
       attachments: attachments,
@@ -138,7 +140,7 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog>
           _displayedItems.removeAt(i);
           _listKey.currentState?.removeItem(
             i,
-            (context, animation) =>
+                (context, animation) =>
                 _buildItem(removedItem, animation, i, isRemoving: true),
             duration: const Duration(milliseconds: 300),
           );
@@ -171,12 +173,11 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog>
     super.dispose();
   }
 
-  Widget _buildItem(
-    InputAttachment attachment,
-    Animation<double> animation,
-    int index, {
-    bool isRemoving = false,
-  }) {
+  Widget _buildItem(InputAttachment attachment,
+      Animation<double> animation,
+      int index, {
+        bool isRemoving = false,
+      }) {
     return FadeTransition(
       opacity: animation,
       child: SizeTransition(
@@ -235,25 +236,25 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog>
         width: double.infinity,
         child: widget.attachments.isNotEmpty
             ? ScrollFogHorizontal(
-                scrollController: _scrollController,
-                child: AnimatedList(
-                  key: _listKey,
-                  controller: _scrollController,
-                  clipBehavior: Clip.none,
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: widget.padding,
-                    vertical: widget.padding,
-                  ),
-                  initialItemCount: _displayedItems.length,
-                  itemBuilder: (context, index, animation) {
-                    if (index >= _displayedItems.length) {
-                      return const SizedBox.shrink();
-                    }
-                    return _buildItem(_displayedItems[index], animation, index);
-                  },
-                ),
-              )
+          scrollController: _scrollController,
+          child: AnimatedList(
+            key: _listKey,
+            controller: _scrollController,
+            clipBehavior: Clip.none,
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.padding,
+              vertical: widget.padding,
+            ),
+            initialItemCount: _displayedItems.length,
+            itemBuilder: (context, index, animation) {
+              if (index >= _displayedItems.length) {
+                return const SizedBox.shrink();
+              }
+              return _buildItem(_displayedItems[index], animation, index);
+            },
+          ),
+        )
             : const SizedBox.shrink(),
       ),
     );
@@ -457,7 +458,9 @@ class SendButtonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context.watch<InternetProvider>().isConnected;
+    final bool isConnected = context
+        .watch<InternetProvider>()
+        .isConnected;
     final inputProvider = context.watch<InputProvider>();
     final speechService = context.watch<SpeechService>();
 
@@ -488,7 +491,9 @@ class SendButtonSection extends StatelessWidget {
         isActionPermitted: isActionPermitted,
         isSending: widget.isSending,
         isRecording: inputProvider.isVoiceRecording,
-        isTextEmpty: controller.text.trim().isEmpty,
+        isTextEmpty: controller.text
+            .trim()
+            .isEmpty,
         onSend: widget.onSend,
         onStop: effectiveOnStop,
         controller: controller,
@@ -574,7 +579,7 @@ class _SequencedToolsTransitionState extends State<SequencedToolsTransition>
         return SizeTransition(
           sizeFactor: _sizeAnimation,
           axis: Axis.vertical,
-          alignment: Alignment.bottomCenter,
+          axisAlignment: 1.0,
           child: FadeTransition(
             opacity: _opacityAnimation,
             child: widget.child,

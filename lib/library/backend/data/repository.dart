@@ -77,7 +77,11 @@ class ModelRepository {
     if (_syncCompleter != null) {
       debugPrint(
           "[ModelRepository] A sync process is already running. Awaiting its completion.");
-      await _syncCompleter!.future;
+      try {
+        await _syncCompleter!.future;
+      } catch (_) {
+        return _rawModelsCache;
+      }
       return _rawModelsCache;
     }
 
@@ -129,7 +133,7 @@ class ModelRepository {
         return false;
       }
 
-      final rawJsonString = results.first['raw_json'] as String;
+      final rawJsonString = results.first['raw_json']?.toString() ?? '';
       final isCustomModel =
           modelId.startsWith('self_') || modelId.startsWith('local_');
 
@@ -323,7 +327,7 @@ class ModelRepository {
       await prefs.setString('fallback', json.encode(parsedFallbackModels));
 
       final validServerIds =
-          parsedServerModels.map((m) => m['id'] as String).toSet();
+          parsedServerModels.map((m) => m['id']?.toString() ?? '').toSet();
 
       // Filter out local/custom models just in case the server sent something weird.
       final modelsToInsert = parsedServerModels.where((modelData) {
@@ -562,9 +566,7 @@ class ModelRepository {
           final file = File(fileToDeletePath);
           if (await file.exists()) {
             try {
-              if (await file.exists()) {
-                await file.delete();
-              }
+              await file.delete();
             } catch (e) {
               debugPrint(
                   "[ModelRepository] Error deleting stale image file: $e");

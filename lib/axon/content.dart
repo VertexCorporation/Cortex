@@ -33,10 +33,12 @@ class AxonContent extends StatelessWidget {
   final bool isSearchActive;
   final VoidCallback onNewChatTap;
   final VoidCallback onLibraryTap;
+  final VoidCallback onDocumentsTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
   final VoidCallback onRoleplayTap;
   final VoidCallback onNewsTap;
+  final VoidCallback onArchivedTap;
   final VoidCallback onSettingsTap;
   final VoidCallback onExitSearchTap;
   final VoidCallback onCloseAxon;
@@ -53,10 +55,12 @@ class AxonContent extends StatelessWidget {
     required this.isSearchActive,
     required this.onNewChatTap,
     required this.onLibraryTap,
+    required this.onDocumentsTap,
     required this.onCreateAITap,
     required this.onArtsTap,
     required this.onRoleplayTap,
     required this.onNewsTap,
+    required this.onArchivedTap,
     required this.onSettingsTap,
     required this.onExitSearchTap,
     required this.onCloseAxon,
@@ -182,10 +186,12 @@ class AxonContent extends StatelessWidget {
                               screenHeight: screenHeight,
                               activeTab: activeTab,
                               onLibraryTap: onLibraryTap,
+                              onDocumentsTap: onDocumentsTap,
                               onCreateAITap: onCreateAITap,
                               onArtsTap: onArtsTap,
                               onRoleplayTap: onRoleplayTap,
                               onNewsTap: onNewsTap,
+                              onArchivedTap: onArchivedTap,
                             ),
                           ],
                         ),

@@ -150,6 +150,10 @@ class _ReportDialogState extends State<ReportDialog>
         return;
       }
 
+      final localizationsBeforePop = localizations;
+      final notificationServiceBeforePop =
+          Provider.of<IntrovertNotificationService>(context, listen: false);
+
       await _submitReportToFirebase();
 
       if (mounted) {
@@ -158,6 +162,10 @@ class _ReportDialogState extends State<ReportDialog>
         }
         Navigator.of(context).pop();
       }
+
+      notificationServiceBeforePop.showNotification(
+          message: localizationsBeforePop.reportSubmitted,
+          type: NotificationType.success);
     } catch (e) {
       if (kDebugMode) {
         debugPrint("$logPrefix An error occurred during submission: $e");
@@ -176,9 +184,6 @@ class _ReportDialogState extends State<ReportDialog>
   }
 
   Future<void> _submitReportToFirebase() async {
-    final notificationService =
-        Provider.of<IntrovertNotificationService>(context, listen: false);
-
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       if (kDebugMode) {
@@ -207,14 +212,6 @@ class _ReportDialogState extends State<ReportDialog>
           "[ReportDialog] Called onReportSuccess callback to update parent UI.");
     }
 
-    if (mounted) {
-      final localizations = AppLocalizations.of(context);
-      if (localizations != null) {
-        notificationService.showNotification(
-            message: localizations.reportSubmitted,
-            type: NotificationType.success);
-      }
-    }
   }
 
   @override

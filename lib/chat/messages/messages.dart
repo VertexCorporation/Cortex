@@ -160,32 +160,25 @@ class Message {
     MediaGenerationType? pendingMediaType,
     bool? isServerFallback,
   }) {
-    // Reuse existing notifier if text hasn't changed to save resources.
-    final newNotifier =
-        (text != null && text != this.text) ? ValueNotifier(text) : notifier;
-
-    if (text != null) {
-      newNotifier.value = text;
-    }
-
+    final String? newText = text;
+    final newNotifier = (newText != null && newText != this.text)
+        ? ValueNotifier<String>(newText)
+        : notifier;
+    if (text != null) newNotifier.value = text;
     final String? finalId = forceNewId ? const Uuid().v4() : (id ?? this.id);
 
     return Message._private(
       id: finalId,
       text: text ?? this.text,
       isUserMessage: isUserMessage ?? this.isUserMessage,
-      // List.from creates a copy of the list to ensure immutability
-      attachmentPaths: attachmentPaths != null
-          ? List.from(attachmentPaths)
-          : this.attachmentPaths,
+      attachmentPaths: attachmentPaths ?? this.attachmentPaths,
       model: model ?? this.model,
       includeInContext: includeInContext ?? this.includeInContext,
       isReported: isReported ?? this.isReported,
       isThinking: isThinking ?? this.isThinking,
       isError: isError ?? this.isError,
       opacity: opacity ?? this.opacity,
-      isAttachmentUploading:
-          isAttachmentUploading ?? this.isAttachmentUploading,
+      isAttachmentUploading: isAttachmentUploading ?? this.isAttachmentUploading,
       parsedSpans: parsedSpans ?? this.parsedSpans,
       notifier: newNotifier,
       isVisible: isVisible ?? this.isVisible,
@@ -193,6 +186,20 @@ class Message {
       webSearchSources: webSearchSources ?? this.webSearchSources,
       pendingMediaType: pendingMediaType ?? this.pendingMediaType,
       isServerFallback: isServerFallback ?? this.isServerFallback,
+    );
+  }
+
+  Message copyWithText(String newText) {
+    notifier.value = newText;
+    return Message._private(
+      id: id, text: newText, isUserMessage: isUserMessage,
+      attachmentPaths: attachmentPaths, model: model,
+      includeInContext: includeInContext, isReported: isReported,
+      isThinking: isThinking, isError: isError, opacity: opacity,
+      isAttachmentUploading: isAttachmentUploading, parsedSpans: parsedSpans,
+      notifier: notifier, isVisible: isVisible,
+      isWebSearchActive: isWebSearchActive, webSearchSources: webSearchSources,
+      pendingMediaType: pendingMediaType, isServerFallback: isServerFallback,
     );
   }
 

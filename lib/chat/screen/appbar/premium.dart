@@ -1,11 +1,10 @@
 // lib/chat/screen/premium.dart
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import '../../../theme.dart';
-
-import 'dart:async'; // Add this import
+import 'package:cortex/theme.dart';
 
 class PremiumButton extends StatefulWidget {
   final VoidCallback onTap;

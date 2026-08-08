@@ -159,8 +159,10 @@ class LLamaAndroid {
                         if (str.isNotEmpty()) emit(str)
                     }
                 } finally {
-                    // Don't clear KV cache on exit — keep context between messages
-                    // for prompt caching benefits. Only explicit resetKv() clears it.
+                    // Keep KV cache in consistent state after generation.
+                    // Not clearing here allows prompt caching across messages.
+                    // Explicit resetKv() is the only way to fully clear.
+                    Log.d(tag, "send() completed, KV cache preserved for next call.")
                 }
             }
             else -> Log.e(tag, "send() called but model is not loaded.")

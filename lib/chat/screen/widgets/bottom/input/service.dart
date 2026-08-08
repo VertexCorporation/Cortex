@@ -270,12 +270,14 @@ class InputService {
     required bool isPremium,
     required int attachmentCount, // New Parameter: Number of files
     required bool isSearchEnabled, // Included web search cost
+    bool isRagEnabled = false, // Included document-chat (RAG) cost
   }) {
     if (!isServerSide) return 0;
 
     // Define Costs
     const int attachmentCostPerUnit = 30;
     const int searchCost = 5;
+    const int ragCost = 5;
 
     // Determine Base Cost
     int baseCost = 5; // Standard
@@ -285,6 +287,10 @@ class InputService {
 
     if (isSearchEnabled) {
       baseCost += searchCost;
+    }
+
+    if (isRagEnabled) {
+      baseCost += ragCost;
     }
 
     // Formula: Base + (N * 30)
@@ -351,6 +357,7 @@ class InputService {
       isPremium: isPremiumModel,
       attachmentCount: attachmentCount,
       isSearchEnabled: inputProvider.enableWebSearch,
+      isRagEnabled: inputProvider.ragEnabled,
     );
 
     if (!isDynamicChatMode &&
@@ -425,6 +432,7 @@ class InputService {
       isPremium: isPremiumModel,
       attachmentCount: attachmentCount,
       isSearchEnabled: inputProvider.enableWebSearch,
+      isRagEnabled: inputProvider.ragEnabled,
     );
 
     if (!isDynamicChatMode &&
