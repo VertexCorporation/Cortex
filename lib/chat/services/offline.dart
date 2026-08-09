@@ -226,6 +226,7 @@ class OfflineService {
     if (!await File(path).exists()) {
       debugPrint(
           "[OfflineService] Critical Error: Model file not found at $path");
+      await _autoRemoveSelectedOfflineModel();
       return false;
     }
 
@@ -249,8 +250,12 @@ class OfflineService {
 
     // DYNAMIC THREADS based on RAM (proxy for CPU power)
     const memoryChannel = MethodChannel('com.vertex.cortex/memory');
-    final int ramMB =
-        await memoryChannel.invokeMethod<int>('getDeviceMemory') ?? 4096;
+    int ramMB = 4096;
+    try {
+      ramMB = await memoryChannel.invokeMethod<int>('getDeviceMemory') ?? 4096;
+    } catch (e) {
+      debugPrint("[OfflineService] Failed to getDeviceMemory for threads: $e");
+    }
     final int nThreads = _computeOptimalThreads(ramMB);
 
     debugPrint(
@@ -258,10 +263,13 @@ class OfflineService {
 
     try {
       for (var attempt = 1; attempt <= _maxModelLoadRetries; attempt++) {
+        // Fallback to CPU-only on retry if GPU fails (vital for Simulators/older devices)
+        int currentGpu = attempt == 1 ? nGpu : 0;
+
         loaded = await _runSingleModelLoadAttempt(
           path: path,
           nCtx: nCtx,
-          nGpu: nGpu,
+          nGpu: currentGpu,
           nThreads: nThreads,
           attempt: attempt,
         );
@@ -351,6 +359,9 @@ class OfflineService {
         id: selected.id,
         title: selected.displayTitle,
       );
+      if (removed) {
+        _sessionProvider.removeDownloadedModel(selected.id);
+      }
       debugPrint(
           "[OfflineService] Auto-uninstall after failed loads for ${selected.id}: $removed");
     } catch (e) {

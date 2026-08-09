@@ -357,6 +357,10 @@ class ModelLocalStateProvider extends ChangeNotifier
 
   void resumeDownload(String id) => _dl.resumeDownload(id);
 
+  void removeDownloadedModel(String id) {
+    _downloadedModelsManager.notifyListenersOfChange();
+  }
+
   //================================================================================
   // Public Helpers
   //================================================================================

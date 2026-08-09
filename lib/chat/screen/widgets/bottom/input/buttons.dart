@@ -523,12 +523,10 @@ class ModelSelectButton extends StatelessWidget {
     final double borderRadius = 30.0;
     final double fontSize = isTablet ? screenWidth * 0.02 : 13.0;
 
-    return Flexible(
-      fit: FlexFit.loose,
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          Material(
+    return Stack(
+      alignment: Alignment.centerLeft,
+      children: [
+        Material(
             color: AppColors.background,
             borderRadius: BorderRadius.circular(borderRadius),
             child: Ink(
@@ -646,7 +644,6 @@ class ModelSelectButton extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
+      );
   }
 }

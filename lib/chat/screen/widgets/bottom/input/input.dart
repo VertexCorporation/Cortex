@@ -181,6 +181,16 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         if (mounted) setState(() {});
       });
     }
+
+    final wasShowing = oldWidget.isModelSelected || oldWidget.isDynamicChatMode;
+    final isShowing = widget.isModelSelected || widget.isDynamicChatMode;
+    
+    if (wasShowing && !isShowing) {
+      // Clear focus when the input field is hidden to prevent semantics crashes
+      if (widget.textFieldFocusNode.hasFocus) {
+        widget.textFieldFocusNode.unfocus();
+      }
+    }
   }
 
   @override
@@ -297,13 +307,13 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
     _syncAnimationWithState(isRecording);
 
-    if (!widget.isModelSelected && !widget.isDynamicChatMode) {
-      return const SizedBox.shrink();
-    }
+    final bool shouldShow = widget.isModelSelected || widget.isDynamicChatMode;
 
     final double radius = isTablet ? screenWidth * 0.025 : 32.0;
 
-    return Padding(
+    return Offstage(
+      offstage: !shouldShow,
+      child: Padding(
       padding: EdgeInsets.fromLTRB(
         screenWidth * 0.02,
         0,
@@ -473,6 +483,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                 },
               ),
             ],
+          ),
           ),
         ),
       ),

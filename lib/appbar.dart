@@ -104,7 +104,8 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
       }
       for (int i = 0; i < leadingActions!.length; i++) {
         leftWidgets.add(leadingActions![i]);
-        calculatedLeadingWidth += buttonSize * 2;
+        // Increased from buttonSize * 2 to buttonSize * 4.5 to prevent hit-testing clip on ModelSelectButton
+        calculatedLeadingWidth += buttonSize * 4.5;
         if (i < leadingActions!.length - 1) {
           leftWidgets.add(SizedBox(width: gapSize));
           calculatedLeadingWidth += gapSize;
@@ -163,7 +164,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
     final double availableCenteredSpace = screenWidth - (maxSideWidth * 2);
     final double targetWidth = screenWidth * 0.70;
     final double finalTitleMaxWidth =
-        math.min(targetWidth, availableCenteredSpace);
+        math.max(0.0, math.min(targetWidth, availableCenteredSpace));
 
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -203,30 +204,32 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
           : null,
       leadingWidth: leftWidgets.isNotEmpty ? calculatedLeadingWidth : null,
       actions: rightWidgets,
-      title: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: finalTitleMaxWidth),
-        child: _AnimatedTitleWrapper(
-          controller: scrollController,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.center,
-            child: title ??
-                (titleText != null
-                    ? Text(
-                        titleText!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                          color: AppColors.primaryColor.inverted,
-                        ),
-                        maxLines: 1,
-                      )
-                    : const SizedBox.shrink()),
-          ),
-        ),
-      ),
+      title: finalTitleMaxWidth > 0
+          ? ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: finalTitleMaxWidth),
+              child: _AnimatedTitleWrapper(
+                controller: scrollController,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.center,
+                  child: title ??
+                      (titleText != null
+                          ? Text(
+                              titleText!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                                color: AppColors.primaryColor.inverted,
+                              ),
+                              maxLines: 1,
+                            )
+                          : const SizedBox.shrink()),
+                ),
+              ),
+            )
+          : const SizedBox.shrink(),
     );
   }
 }

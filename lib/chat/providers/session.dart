@@ -468,8 +468,8 @@ class ChatSessionProvider with ChangeNotifier {
   /// Initializes the session based on the user's last selected preference.
   /// This is called when the app starts or "New Chat" is clicked.
   Future<void> initializeDefaultSession() async {
-    // Always default to Cortex Roleplay for new chats as requested
-    String savedId = 'cortex/roleplay';
+    final prefs = await _sharedPrefs;
+    String savedId = prefs.getString(_prefDefaultModelKey) ?? 'cortex/auto';
     final langCode = _currentLocale.languageCode;
     try {
       final bool isCacheEmpty = _modelService.getCachedModelsSync().isEmpty;
@@ -607,7 +607,17 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   void setDependencies(ModelLocalStateProvider localStateProvider) {
+    final wasResolved = _hasResolvedLocalModelState;
     _localStateProvider = localStateProvider;
+    
+    // If the file system has just finished resolving, we MUST notify listeners
+    // so that the ChatScreen can fetch the correct modelPath and start caching.
+    if (!wasResolved && _hasResolvedLocalModelState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
+    
     unawaited(_reconcileSelectedModelAvailability());
   }
 
@@ -632,6 +642,10 @@ class ChatSessionProvider with ChangeNotifier {
 
     final path = localState.getFilePathById(id);
     return localState.isModelOnDisk(path);
+  }
+
+  void removeDownloadedModel(String id) {
+    _localStateProvider?.removeDownloadedModel(id);
   }
 
   bool _canUseRestoredModel(ModelEntity entity) {
