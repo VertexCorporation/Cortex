@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class DownloadManager extends ChangeNotifier {
   bool isDownloading = false;
@@ -223,17 +224,28 @@ class FileDownloadHelper extends ChangeNotifier {
       String? taskId;
       bool useDioFallback = false;
 
-      try {
-        taskId = await FlutterDownloader.enqueue(
-          url: url,
-          savedDir: savedDir,
-          fileName: fileName,
-          showNotification: showNotification,
-          openFileFromNotification: false,
-        );
-      } catch (e) {
-        debugPrint(
-            '[FileDownloadHelper] FlutterDownloader enqueue failed: $e, falling back to Dio');
+      if (Platform.isIOS) {
+        final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+        final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        if (!iosInfo.isPhysicalDevice) {
+          useDioFallback = true;
+          debugPrint('[FileDownloadHelper] Forcing Dio fallback on iOS Simulator');
+        }
+      }
+
+      if (!useDioFallback) {
+        try {
+          taskId = await FlutterDownloader.enqueue(
+            url: url,
+            savedDir: savedDir,
+            fileName: fileName,
+            showNotification: showNotification,
+            openFileFromNotification: false,
+          );
+        } catch (e) {
+          debugPrint(
+              '[FileDownloadHelper] FlutterDownloader enqueue failed: $e, falling back to Dio');
+        }
       }
 
       if (taskId == null) {
