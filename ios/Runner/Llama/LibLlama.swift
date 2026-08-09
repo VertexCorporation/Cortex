@@ -201,8 +201,8 @@ actor LlamaContext {
         
         // CRITICAL FIX: Clear native KV cache to match Android behavior
         // Without this, old context bleeds into new generations causing gibberish
-        // New llama.cpp API: llama_memory_clear(llama_get_memory(ctx), clear_data)
-        llama_memory_clear(llama_get_memory(context), true)
+        // New llama.cpp API: llama_kv_self_clear(ctx)
+        llama_kv_self_clear(context)
         
         print("[LlamaContext] Context and KV cache cleared.")
     }
@@ -225,8 +225,8 @@ actor LlamaContext {
         n_decode = 0
         
         // CRITICAL: Clear KV cache before new generation (matching Android behavior)
-        // New llama.cpp API: llama_memory_clear(llama_get_memory(ctx), clear_data)
-        llama_memory_clear(llama_get_memory(context), true)
+        // New llama.cpp API: llama_kv_self_clear(ctx)
+        llama_kv_self_clear(context)
 
         // Tokenize with special token parsing enabled (CRITICAL for chat formats!)
         // This ensures tokens like <|im_start|>, <|im_end|>, <|eot_id|> are parsed correctly
