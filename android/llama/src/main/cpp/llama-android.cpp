@@ -254,7 +254,7 @@ common_batch_add(*batch, 0, i, { 0 }, false);
 }
 
 batch->logits[batch->n_tokens - 1] = true;
-llama_kv_self_clear(context);
+llama_memory_clear(llama_get_memory(context), false);
 
 const auto t_pp_start = ggml_time_us();
 if (llama_decode(context, *batch) != 0) {
@@ -266,7 +266,7 @@ const auto t_pp_end = ggml_time_us();
 
 LOGi("Benchmark text generation (tg)");
 
-llama_kv_self_clear(context);
+llama_memory_clear(llama_get_memory(context), false);
 const auto t_tg_start = ggml_time_us();
 for (i = 0; i < tg; i++) {
 
@@ -276,17 +276,14 @@ common_batch_add(*batch, 0, i, { j }, true);
 }
 
 LOGi("llama_decode() text generation: %d", i);
-const auto t_step_start = ggml_time_us();
 if (llama_decode(context, *batch) != 0) {
 LOGi("llama_decode() failed during text generation");
 }
-const auto t_step_end = ggml_time_us();
-
-LOGi("llama_decode() text generation: %d done", i);
 }
+
 const auto t_tg_end = ggml_time_us();
 
-llama_kv_self_clear(context);
+llama_memory_clear(llama_get_memory(context), false);
 
 const auto t_pp = double(t_pp_end - t_pp_start) / 1000000.0;
 const auto t_tg = double(t_tg_end - t_tg_start) / 1000000.0;
@@ -598,6 +595,6 @@ return;
 }
 
 auto ctx = reinterpret_cast<llama_context *>(context);
-llama_kv_self_clear(ctx);
+llama_memory_clear(llama_get_memory(ctx), true);
 __android_log_print(ANDROID_LOG_INFO, "llama-android", "KV cache successfully cleared.");
 }
