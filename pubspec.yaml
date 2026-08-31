@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 8.1.0+810
+version: 8.1.1+811
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
@@ -36,9 +36,9 @@ dependencies:
   firebase_messaging: ^16.0.2
 
   # --- IN-APP PURCHASE ---
-  in_app_purchase: ^3.2.3
-  in_app_purchase_android: ^0.4.0+8
-  in_app_purchase_storekit: ^0.4.6+2
+  in_app_purchase: ^3.3.0
+  in_app_purchase_android: ^0.5.3
+  in_app_purchase_storekit: ^0.4.11+2
   in_app_review: ^2.0.10
 
   # --- DEVICE & UTILITIES ---
