@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/chat/services/speech.dart';
+import 'package:cortex/chat/services/tts_remote.dart';
 
 enum VoiceState {
   listening,
@@ -49,6 +50,21 @@ class VoiceService with ChangeNotifier {
   // Queue for TTS to speak text as it streams in from AI
   final List<String> _sentenceQueue = [];
   bool _isSpeaking = false;
+
+  final RemoteTtsService _remoteTts = RemoteTtsService.instance;
+
+  /// Bumped whenever speech is cancelled. Remote audio is fetched over the
+  /// network, so a sentence can still be in flight when the user interrupts;
+  /// without this the reply they cut off would play a moment later.
+  int _speechGeneration = 0;
+
+  /// Abandons anything queued or in flight. Callers that clear the queue must
+  /// go through here, otherwise an already-dispatched request still speaks.
+  void _cancelPendingSpeech() {
+    _speechGeneration++;
+    _sentenceQueue.clear();
+    unawaited(_remoteTts.stop());
+  }
   final StringBuffer _incomingTextBuffer = StringBuffer();
   final StringBuffer _fullAiResponseBuffer =
       StringBuffer(); // Accumulates full response for Flow Loop
@@ -194,7 +210,7 @@ class VoiceService with ChangeNotifier {
         "[VoiceService] Interrupting Flow. Transitioning to Listen Mode.");
     _isFlowInterrupted = true;
     _isSpeaking = false;
-    _sentenceQueue.clear();
+    _cancelPendingSpeech();
     _incomingTextBuffer.clear();
 
     // [FIX] Ensure TTS is completely stopped
@@ -212,8 +228,9 @@ class VoiceService with ChangeNotifier {
 
   void stopSpeaking({BuildContext? context}) async {
     await _flutterTts.stop();
+    await _remoteTts.stop();
     _isSpeaking = false;
-    _sentenceQueue.clear();
+    _cancelPendingSpeech();
     _incomingTextBuffer.clear();
 
     // [FIX] Hard Stop: Breaking the Flow Loop entirely on manual stop.
@@ -300,7 +317,7 @@ class VoiceService with ChangeNotifier {
     _voiceSystemPrompt = voiceSystemPrompt;
     _isSpeaking = false;
     _liveTranscript = "";
-    _sentenceQueue.clear();
+    _cancelPendingSpeech();
     _incomingTextBuffer.clear();
     _fullAiResponseBuffer.clear();
 
@@ -359,7 +376,7 @@ class VoiceService with ChangeNotifier {
     // User might resume session, but flow state is persistent until toggled off?
     // Assuming stopSession completely stops everything.
     isFlowActive = false;
-    _sentenceQueue.clear();
+    _cancelPendingSpeech();
     _incomingTextBuffer.clear();
     _fullAiResponseBuffer.clear();
     _isSpeaking = false;
@@ -588,6 +605,11 @@ class VoiceService with ChangeNotifier {
       return;
     }
 
+    // The next sentence's audio is fetched while the current one plays, so the
+    // gap between sentences is playback-to-playback rather than a network
+    // round trip each time.
+    Future<Uint8List?>? prefetched;
+
     // Safety Loop
     while (_sentenceQueue.isNotEmpty) {
       // Check if interrupted?
@@ -596,12 +618,34 @@ class VoiceService with ChangeNotifier {
 
       _isSpeaking = true;
       _updateState(VoiceState.speaking);
-      String next = _sentenceQueue.removeAt(0);
+      final int generation = _speechGeneration;
+      final String next = _sentenceQueue.removeAt(0);
 
       debugPrint("[VoiceService] Speaking: $next");
-      await _flutterTts.speak(next);
-      // await _flutterTts.speak() waits because we set awaitSpeakCompletion(true)
-      // So this line blocks until speech is done.
+
+      final Future<Uint8List?> pending =
+          prefetched ?? _remoteTts.synthesize(next);
+      prefetched = _sentenceQueue.isEmpty
+          ? null
+          : _remoteTts.synthesize(_sentenceQueue.first);
+
+      final Uint8List? audio = await pending;
+      if (generation != _speechGeneration) return;
+
+      // A null result means speech was unavailable — no balance, provider
+      // down, no session. Voice mode falls back to the on-device voice rather
+      // than going silent.
+      bool spoken = false;
+      if (audio != null) {
+        spoken = await _remoteTts.play(audio);
+      }
+      if (generation != _speechGeneration) return;
+      if (!spoken) {
+        await _flutterTts.speak(next);
+        // await _flutterTts.speak() waits because we set awaitSpeakCompletion(true)
+        // So this line blocks until speech is done.
+        if (generation != _speechGeneration) return;
+      }
 
       _isSpeaking = false;
     }
