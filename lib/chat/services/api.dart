@@ -300,7 +300,7 @@ class ApiService {
             "stream": true,
             if (source != null) "source": source,
             if (tools != null) "tools": tools,
-            "tool_choice": (tools != null) ? "auto" : null,
+            if (tools != null) "tool_choice": "auto",
             "enableReasoning": enablefeatureReasoning,
             "enableWebSearch": enableWebSearch,
             "isCharacterModel": isCharacterModel,
@@ -402,6 +402,13 @@ class ApiService {
                       break;
                     case 'FAL_SCHEMA_INVALID':
                       userMsg = localizations.falErrorSchemaInvalid;
+                      break;
+                    case 'FAL_OFFLINE':
+                      // The server disables the fal lane when the provider
+                      // balance runs low. falOfflineMessage explains that in
+                      // the user's language; without this case it fell
+                      // through to the generic server error.
+                      userMsg = localizations.falOfflineMessage;
                       break;
                     case 'LIMIT_IMAGE_INSUFFICIENT':
                       userMsg = localizations.errorReachedLimit;

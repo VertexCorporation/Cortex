@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 8.1.1+811
+version: 8.1.1+813
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
@@ -105,6 +105,7 @@ dependencies:
   universal_io: ^2.3.1
   audioplayers: ^6.6.0
   video_player: ^2.9.2
+  record: ^7.1.1
 
 dev_dependencies:
   flutter_test:
