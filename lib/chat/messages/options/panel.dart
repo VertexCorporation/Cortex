@@ -114,9 +114,10 @@ class OptionsPanelViewModel {
     final isDynamicContext = session.isDynamicChat;
     final isOfflineModel = modelSeriesData?.isServerSide == false;
 
-    // We check predits from the viewmodel directly
+    // Billing v2 has no premium lane, so this is a balance question. The
+    // getter keeps the old predit check for unmigrated accounts.
     final hasPreditsForPremium = session.isUserSubscribed ||
-        (context.read<CreditsManager>().preditsNotifier.value ?? 0) > 0;
+        context.read<CreditsManager>().canUsePremiumModel;
 
     final isCurrentModelPremium = currentModel.isPremium;
 

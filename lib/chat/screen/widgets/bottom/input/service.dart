@@ -5,6 +5,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/server/credits.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -330,18 +331,23 @@ class InputService {
       return false;
     }
 
-    // 2. Premium / Predits Limits
-    // Dynamic chat is gated by dredits only on the client. The server may still
-    // spend predits/credits after routing if it chooses a premium provider.
+    // 2. Credit gate
+    //
+    // Billing v2 retired the premium lane and the Dynamic Chat currency: every
+    // model bills its real cost against one balance, so both cases collapse
+    // into "can they afford to start a text request". canUsePremiumModel and
+    // canSendDynamicChat keep the pre-migration behaviour for accounts the
+    // lazy migration has not touched yet.
+    final creditsManager = context.read<CreditsManager>();
+
     if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
-      if ((availablePredits ?? 0) < 10) {
+      if (!creditsManager.canUsePremiumModel) {
         return false;
       }
     }
 
-    // 3. Dynamic Chat / Dredits Limit
     if (isDynamicChatMode) {
-      if ((availableDredits ?? 0) < 1) {
+      if (!creditsManager.canSendDynamicChat) {
         return false;
       }
     }
@@ -402,18 +408,23 @@ class InputService {
       return false;
     }
 
-    // 2. Premium / Predits Limits
-    // Dynamic chat must remain sendable as long as the user has dredits. Predits
-    // are only a routing/cost concern after the server chooses a premium path.
+    // 2. Credit gate
+    //
+    // Billing v2 retired the premium lane and the Dynamic Chat currency: every
+    // model bills its real cost against one balance, so both cases collapse
+    // into "can they afford to start a text request". canUsePremiumModel and
+    // canSendDynamicChat keep the pre-migration behaviour for accounts the
+    // lazy migration has not touched yet.
+    final creditsManager = context.read<CreditsManager>();
+
     if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
-      if ((availablePredits ?? 0) < 10) {
+      if (!creditsManager.canUsePremiumModel) {
         return false;
       }
     }
 
-    // 3. Dynamic Chat / Dredits Limit
     if (isDynamicChatMode) {
-      if ((availableDredits ?? 0) < 1) {
+      if (!creditsManager.canSendDynamicChat) {
         return false;
       }
     }
