@@ -54,9 +54,10 @@ Future<void> showModelSelectionDialog({
     return m.attachmentPaths.any((path) => _isImageFile(path));
   });
 
-  // Premium access: subscribed OR has predits balance > 0
+  // Premium access. Billing v2 has no premium lane — anything the user can
+  // afford is allowed — so this asks the balance, not a separate currency.
   final hasPremiumAccess = session.isUserSubscribed ||
-      (context.read<CreditsManager>().preditsNotifier.value ?? 0) > 0;
+      context.read<CreditsManager>().canUsePremiumModel;
   final Set<String> downloadedModelIds =
       (await UserModels.loadDownloadedModelPaths()).keys.toSet();
 
