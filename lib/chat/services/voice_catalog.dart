@@ -14,11 +14,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'tts_remote.dart';
 
 /// One selectable voice, as published in `server/voice.voices`.
+/// How a voice is grouped in the picker. Anything the catalog does not label
+/// falls into [unspecified] and is listed last rather than guessed at.
+enum VoiceGender { male, female, unspecified }
+
 class CortexVoice {
-  const CortexVoice({required this.id, required this.name, this.description});
+  const CortexVoice({
+    required this.id,
+    required this.name,
+    this.description,
+    this.gender = VoiceGender.unspecified,
+  });
 
   final String id;
   final String name;
+  final VoiceGender gender;
 
   /// Optional one-line character note ("warm, conversational"), shown under the
   /// name so the list is scannable without playing every sample.
@@ -32,10 +42,23 @@ class CortexVoice {
     return CortexVoice(
       id: id.trim(),
       name: name is String && name.trim().isNotEmpty ? name.trim() : id.trim(),
+      gender: _genderFrom(raw['gender']),
       description: raw['description'] is String && (raw['description'] as String).trim().isNotEmpty
           ? (raw['description'] as String).trim()
           : null,
     );
+  }
+
+  static VoiceGender _genderFrom(dynamic raw) {
+    if (raw is! String) return VoiceGender.unspecified;
+    switch (raw.trim().toLowerCase()) {
+      case 'male':
+        return VoiceGender.male;
+      case 'female':
+        return VoiceGender.female;
+      default:
+        return VoiceGender.unspecified;
+    }
   }
 }
 

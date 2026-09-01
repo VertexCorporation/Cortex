@@ -111,6 +111,17 @@ class VoiceSection extends StatelessWidget {
   }
 }
 
+/// One row in the dialog: either a group heading or a voice.
+class _Entry {
+  const _Entry.header(this.header) : voice = null;
+  const _Entry.voice(this.voice) : header = null;
+
+  final String? header;
+  final CortexVoice? voice;
+
+  bool get isHeader => header != null;
+}
+
 class _VoiceSelectionDialog extends StatefulWidget {
   const _VoiceSelectionDialog({
     required this.catalog,
@@ -168,11 +179,35 @@ class _VoiceSelectionDialogState extends State<_VoiceSelectionDialog> {
     }
   }
 
+  /// Groups the catalog by gender, keeping the catalog's own order inside each
+  /// group. A group with nothing in it contributes no heading, so a catalog
+  /// that labels nothing still reads as a plain list.
+  List<_Entry> _entriesFor(List<CortexVoice> voices) {
+    final entries = <_Entry>[];
+    final groups = <VoiceGender, String?>{
+      VoiceGender.female: widget.localizations.voiceFemale,
+      VoiceGender.male: widget.localizations.voiceMale,
+      VoiceGender.unspecified: null,
+    };
+
+    for (final entry in groups.entries) {
+      final inGroup = voices.where((v) => v.gender == entry.key).toList();
+      if (inGroup.isEmpty) continue;
+      final heading = entry.value;
+      // Only label the ungrouped remainder when there is something to
+      // distinguish it from.
+      if (heading != null) entries.add(_Entry.header(heading));
+      entries.addAll(inGroup.map(_Entry.voice));
+    }
+    return entries;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final voices = widget.catalog.voices;
+    final entries = _entriesFor(voices);
     final selectedId = widget.catalog.effectiveVoiceId;
 
     return Dialog(
@@ -204,9 +239,31 @@ class _VoiceSelectionDialogState extends State<_VoiceSelectionDialog> {
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: EdgeInsets.only(bottom: screenHeight * 0.012),
-                itemCount: voices.length,
+                itemCount: entries.length,
                 itemBuilder: (context, index) {
-                  final voice = voices[index];
+                  final entry = entries[index];
+
+                  if (entry.isHeader) {
+                    return Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        screenWidth * 0.05,
+                        screenHeight * 0.016,
+                        screenWidth * 0.05,
+                        screenHeight * 0.006,
+                      ),
+                      child: Text(
+                        entry.header!,
+                        style: TextStyle(
+                          color: AppColors.quinaryColor,
+                          fontSize: screenWidth * 0.032,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    );
+                  }
+
+                  final voice = entry.voice!;
                   final isSelected = voice.id == selectedId;
                   final isPreviewing = _previewingId == voice.id;
 

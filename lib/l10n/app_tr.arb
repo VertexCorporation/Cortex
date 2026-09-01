@@ -928,5 +928,7 @@
   "voiceDefaultOption": "Varsayılan",
   "voicePreview": "Örnek dinle",
   "voicePreviewText": "Merhaba, ben Cortex. Bugün sana nasıl yardımcı olabilirim?",
-  "voicePreviewFailed": "Örnek çalınamadı. Bağlantını veya bakiyeni kontrol et."
+  "voicePreviewFailed": "Örnek çalınamadı. Bağlantını veya bakiyeni kontrol et.",
+  "voiceMale": "Erkek sesleri",
+  "voiceFemale": "Kadın sesleri"
 }

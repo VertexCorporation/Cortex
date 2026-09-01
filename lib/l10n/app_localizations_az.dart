@@ -2145,4 +2145,10 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get voicePreviewFailed =>
       'Could not play the sample. Check your connection or balance.';
+
+  @override
+  String get voiceMale => 'Male voices';
+
+  @override
+  String get voiceFemale => 'Female voices';
 }

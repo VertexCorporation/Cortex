@@ -2139,4 +2139,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get voicePreviewFailed =>
       'Örnek çalınamadı. Bağlantını veya bakiyeni kontrol et.';
+
+  @override
+  String get voiceMale => 'Erkek sesleri';
+
+  @override
+  String get voiceFemale => 'Kadın sesleri';
 }

@@ -3920,6 +3920,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not play the sample. Check your connection or balance.'**
   String get voicePreviewFailed;
+
+  /// Voice picker group heading
+  ///
+  /// In en, this message translates to:
+  /// **'Male voices'**
+  String get voiceMale;
+
+  /// Voice picker group heading
+  ///
+  /// In en, this message translates to:
+  /// **'Female voices'**
+  String get voiceFemale;
 }
 
 class _AppLocalizationsDelegate

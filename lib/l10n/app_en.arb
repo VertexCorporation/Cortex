@@ -936,5 +936,9 @@
   "voicePreviewText": "Hello, I am Cortex. How can I help you today?",
   "@voicePreviewText": { "description": "Voice picker in settings" },
   "voicePreviewFailed": "Could not play the sample. Check your connection or balance.",
-  "@voicePreviewFailed": { "description": "Voice picker in settings" }
+  "@voicePreviewFailed": { "description": "Voice picker in settings" },
+  "voiceMale": "Male voices",
+  "@voiceMale": { "description": "Voice picker group heading" },
+  "voiceFemale": "Female voices",
+  "@voiceFemale": { "description": "Voice picker group heading" }
 }
