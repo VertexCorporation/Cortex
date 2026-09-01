@@ -3,8 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import 'stt_remote.dart';
+
 class SpeechService with ChangeNotifier {
   final SpeechToText _speech = SpeechToText();
+  final RemoteSttService _remote = RemoteSttService.instance;
+
+  /// True while Deepgram is driving. The on-device recogniser stays as the
+  /// fallback for anyone the remote path cannot serve — no balance, no
+  /// network, permission refused — so both engines have to be accounted for
+  /// everywhere below.
+  bool _usingRemote = false;
+
+  /// Deepgram reports each settled span once and then moves on, while the
+  /// text field wants the whole utterance. Finalised spans accumulate here
+  /// and the current interim span is appended for display.
+  String _finalizedText = "";
 
   bool _isAvailable = false;
 
@@ -18,7 +32,7 @@ class SpeechService with ChangeNotifier {
   // Getters
   bool get isListening => _isListening;
 
-  double get soundLevel => _soundLevel;
+  double get soundLevel => _usingRemote ? _remote.soundLevel.value : _soundLevel;
 
   bool get isAvailable => _isAvailable;
 
@@ -98,19 +112,38 @@ class SpeechService with ChangeNotifier {
 
     _localeId = locale;
 
+    // Try Deepgram first. It returns false without starting anything when it
+    // cannot run, so falling through costs nothing.
+    _finalizedText = "";
+    final startedRemote = await _remote.start(
+      onResult: (result) {
+        final spoken = result.isFinal
+            ? _appendFinal(result.text)
+            : _withInterim(result.text);
+        onResult(_capitalize(spoken));
+      },
+      onClosed: () {
+        _usingRemote = false;
+        _isListening = false;
+        notifyListeners();
+      },
+    );
+
+    if (startedRemote) {
+      _usingRemote = true;
+      _isAvailable = true;
+      _isDeviceSupported = true;
+      _isListening = true;
+      _remote.soundLevel.addListener(_onRemoteLevel);
+      notifyListeners();
+      return;
+    }
+
     await _speech.listen(
       localeId: _localeId,
       onResult: (result) {
         // Send partial or final results immediately to the text field
-        String text = result.recognizedWords;
-        // Strict Capitalization: First letter of FIRST word upper, rest lower.
-        if (text.isNotEmpty) {
-          text = text.trim();
-          if (text.isNotEmpty) {
-            text = text[0].toUpperCase() + text.substring(1).toLowerCase();
-          }
-        }
-        onResult(text);
+        onResult(_capitalize(result.recognizedWords));
       },
       onSoundLevelChange: (level) {
         if (!_isListening) return; // Guard against updates after stop
@@ -132,6 +165,33 @@ class SpeechService with ChangeNotifier {
     _isListening = false;
     _soundLevel = 0.0;
     notifyListeners();
+
+    if (_usingRemote) {
+      _usingRemote = false;
+      _remote.soundLevel.removeListener(_onRemoteLevel);
+      await _remote.stop();
+      return;
+    }
     await _speech.stop();
+  }
+
+  void _onRemoteLevel() => notifyListeners();
+
+  /// Adds a settled span to the utterance and returns the whole thing.
+  String _appendFinal(String span) {
+    _finalizedText = _finalizedText.isEmpty ? span : "$_finalizedText $span";
+    return _finalizedText;
+  }
+
+  /// The utterance so far plus the span Deepgram is still revising.
+  String _withInterim(String span) =>
+      _finalizedText.isEmpty ? span : "$_finalizedText $span";
+
+  /// Matches the on-device path: first letter upper, the rest lower, so the
+  /// text field reads the same whichever engine produced it.
+  String _capitalize(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return trimmed;
+    return trimmed[0].toUpperCase() + trimmed.substring(1).toLowerCase();
   }
 }
