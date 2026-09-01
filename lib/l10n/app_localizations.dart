@@ -3884,6 +3884,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Inanimate'**
   String get categoryInanimate;
+
+  /// Voice picker in settings
+  ///
+  /// In en, this message translates to:
+  /// **'AI Voice'**
+  String get voiceSelection;
+
+  /// Voice picker in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the voice Cortex speaks with in voice mode.'**
+  String get voiceSelectionDescription;
+
+  /// Voice picker in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get voiceDefaultOption;
+
+  /// Voice picker in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Play sample'**
+  String get voicePreview;
+
+  /// Voice picker in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, I am Cortex. How can I help you today?'**
+  String get voicePreviewText;
+
+  /// Voice picker in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Could not play the sample. Check your connection or balance.'**
+  String get voicePreviewFailed;
 }
 
 class _AppLocalizationsDelegate

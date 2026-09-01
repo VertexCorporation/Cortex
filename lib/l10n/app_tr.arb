@@ -922,5 +922,11 @@
   "renameConversation": "Sohbeti Yeniden Adlandır",
   "conversationName": "Sohbet Adı",
   "deleteConversationConfirm": "Bu sohbeti silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-  "archive": "Arşivle"
+  "archive": "Arşivle",
+  "voiceSelection": "Yapay Zeka Sesi",
+  "voiceSelectionDescription": "Cortex’in sesli sohbette kullanacağı sesi seçin.",
+  "voiceDefaultOption": "Varsayılan",
+  "voicePreview": "Örnek dinle",
+  "voicePreviewText": "Merhaba, ben Cortex. Bugün sana nasıl yardımcı olabilirim?",
+  "voicePreviewFailed": "Örnek çalınamadı. Bağlantını veya bakiyeni kontrol et."
 }

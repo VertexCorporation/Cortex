@@ -924,5 +924,17 @@
   "categoryPhoto": "Photo",
   "categoryMasculine": "Masculine",
   "categoryFeminine": "Feminine",
-  "categoryInanimate": "Inanimate"
+  "categoryInanimate": "Inanimate",
+  "voiceSelection": "AI Voice",
+  "@voiceSelection": { "description": "Voice picker in settings" },
+  "voiceSelectionDescription": "Choose the voice Cortex speaks with in voice mode.",
+  "@voiceSelectionDescription": { "description": "Voice picker in settings" },
+  "voiceDefaultOption": "Default",
+  "@voiceDefaultOption": { "description": "Voice picker in settings" },
+  "voicePreview": "Play sample",
+  "@voicePreview": { "description": "Voice picker in settings" },
+  "voicePreviewText": "Hello, I am Cortex. How can I help you today?",
+  "@voicePreviewText": { "description": "Voice picker in settings" },
+  "voicePreviewFailed": "Could not play the sample. Check your connection or balance.",
+  "@voicePreviewFailed": { "description": "Voice picker in settings" }
 }

@@ -2118,4 +2118,25 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get categoryInanimate => 'Cansız';
+
+  @override
+  String get voiceSelection => 'Yapay Zeka Sesi';
+
+  @override
+  String get voiceSelectionDescription =>
+      'Cortex’in sesli sohbette kullanacağı sesi seçin.';
+
+  @override
+  String get voiceDefaultOption => 'Varsayılan';
+
+  @override
+  String get voicePreview => 'Örnek dinle';
+
+  @override
+  String get voicePreviewText =>
+      'Merhaba, ben Cortex. Bugün sana nasıl yardımcı olabilirim?';
+
+  @override
+  String get voicePreviewFailed =>
+      'Örnek çalınamadı. Bağlantını veya bakiyeni kontrol et.';
 }

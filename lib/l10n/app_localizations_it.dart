@@ -2134,4 +2134,25 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get categoryInanimate => 'Inanimate';
+
+  @override
+  String get voiceSelection => 'AI Voice';
+
+  @override
+  String get voiceSelectionDescription =>
+      'Choose the voice Cortex speaks with in voice mode.';
+
+  @override
+  String get voiceDefaultOption => 'Default';
+
+  @override
+  String get voicePreview => 'Play sample';
+
+  @override
+  String get voicePreviewText =>
+      'Hello, I am Cortex. How can I help you today?';
+
+  @override
+  String get voicePreviewFailed =>
+      'Could not play the sample. Check your connection or balance.';
 }
