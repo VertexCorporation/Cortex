@@ -171,6 +171,11 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin play_install_referrer, com.chunkytofustudios.play_install_referrer.PlayInstallReferrerPlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new com.llfbandit.record.RecordPlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin record_android, com.llfbandit.record.RecordPlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new dev.fluttercommunity.plus.share.SharePlusPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin share_plus, dev.fluttercommunity.plus.share.SharePlusPlugin", e);
