@@ -105,6 +105,7 @@ dependencies:
   universal_io: ^2.3.1
   audioplayers: ^6.6.0
   video_player: ^2.9.2
+  record: ^7.1.1
 
 dev_dependencies:
   flutter_test:
