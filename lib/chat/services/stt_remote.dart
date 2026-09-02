@@ -20,6 +20,8 @@ import 'dart:math' as math;
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:record/record.dart';
 
 /// One transcript update. Deepgram sends a running best guess and then a
@@ -98,6 +100,40 @@ class RemoteSttService {
   /// and nothing extra on the happy path.
   String? _lastFailure;
 
+  /// Build number and hardware, attached to every report.
+  ///
+  /// Two testers on two builds produced logs that could not be told apart,
+  /// and the microphone question is a hardware question — which phone, which
+  /// Android — so guessing at it from the server was hopeless. Gathered once
+  /// and cached; failures are rare and this must never be the reason one goes
+  /// unreported.
+  Map<String, dynamic>? _context;
+
+  Future<Map<String, dynamic>> _deviceContext() async {
+    final cached = _context;
+    if (cached != null) return cached;
+
+    final gathered = <String, dynamic>{};
+    try {
+      gathered["build"] = (await PackageInfo.fromPlatform()).buildNumber;
+    } catch (_) {}
+    try {
+      final plugin = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final a = await plugin.androidInfo;
+        gathered["device"] = "${a.manufacturer} ${a.model}";
+        gathered["os"] = "Android ${a.version.release} (SDK ${a.version.sdkInt})";
+      } else if (Platform.isIOS) {
+        final i = await plugin.iosInfo;
+        gathered["device"] = i.utsname.machine;
+        gathered["os"] = "iOS ${i.systemVersion}";
+      }
+    } catch (_) {}
+
+    _context = gathered;
+    return gathered;
+  }
+
   void _fail(String code, [Object? detail]) {
     _lastFailure = detail == null ? code : "$code: $detail";
     debugPrint("[RemoteStt] $_lastFailure");
@@ -121,7 +157,11 @@ class RemoteSttService {
 
       await _dio.post<Map<String, dynamic>>(
         _tokenEndpoint,
-        data: <String, dynamic>{'lastFailure': failure, 'reportOnly': true},
+        data: <String, dynamic>{
+          'lastFailure': failure,
+          'reportOnly': true,
+          ...await _deviceContext(),
+        },
         options: Options(
           headers: {
             'Authorization': 'Bearer $idToken',
@@ -150,7 +190,10 @@ class RemoteSttService {
       final response = await _dio.post<Map<String, dynamic>>(
         _tokenEndpoint,
         data: <String, dynamic>{
-          if (previousFailure != null) 'lastFailure': previousFailure,
+          if (previousFailure != null) ...{
+            'lastFailure': previousFailure,
+            ...await _deviceContext(),
+          },
         },
         options: Options(
           headers: {
@@ -196,12 +239,18 @@ class RemoteSttService {
     final recorder = AudioRecorder();
     try {
       if (!await recorder.hasPermission()) {
+        // Reported like any other failure. This one returns before a token is
+        // ever needed, so without saying so explicitly a device that simply
+        // never got microphone permission is invisible from the server —
+        // indistinguishable from a tester who did not try.
         _fail("PERMISSION_DENIED");
+        unawaited(_report());
         await recorder.dispose();
         return false;
       }
     } catch (e) {
       _fail("PERMISSION_CHECK_FAILED", e);
+      unawaited(_report());
       await recorder.dispose();
       return false;
     }
