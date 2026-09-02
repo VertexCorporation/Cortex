@@ -340,15 +340,26 @@ class InputService {
     // lazy migration has not touched yet.
     final creditsManager = context.read<CreditsManager>();
 
-    if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
-      if (!creditsManager.canUsePremiumModel) {
-        return false;
-      }
+    // Past the debt floor nothing is sendable until the allowance renews, and
+    // that holds for every lane rather than the one the user happens to be in.
+    if (!creditsManager.canSendAnything) {
+      return false;
     }
 
-    if (isDynamicChatMode) {
-      if (!creditsManager.canSendDynamicChat) {
-        return false;
+    // The lane-specific currencies below exist only outside the daily engine.
+    // Under it a model the user may not choose is rewritten to Dynamic Chat
+    // rather than refused, so it is not a reason to disable sending.
+    if (!creditsManager.creditsV3Notifier.value) {
+      if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
+        if (!creditsManager.canUsePremiumModel) {
+          return false;
+        }
+      }
+
+      if (isDynamicChatMode) {
+        if (!creditsManager.canSendDynamicChat) {
+          return false;
+        }
       }
     }
 
@@ -417,15 +428,26 @@ class InputService {
     // lazy migration has not touched yet.
     final creditsManager = context.read<CreditsManager>();
 
-    if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
-      if (!creditsManager.canUsePremiumModel) {
-        return false;
-      }
+    // Past the debt floor nothing is sendable until the allowance renews, and
+    // that holds for every lane rather than the one the user happens to be in.
+    if (!creditsManager.canSendAnything) {
+      return false;
     }
 
-    if (isDynamicChatMode) {
-      if (!creditsManager.canSendDynamicChat) {
-        return false;
+    // The lane-specific currencies below exist only outside the daily engine.
+    // Under it a model the user may not choose is rewritten to Dynamic Chat
+    // rather than refused, so it is not a reason to disable sending.
+    if (!creditsManager.creditsV3Notifier.value) {
+      if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
+        if (!creditsManager.canUsePremiumModel) {
+          return false;
+        }
+      }
+
+      if (isDynamicChatMode) {
+        if (!creditsManager.canSendDynamicChat) {
+          return false;
+        }
       }
     }
 
