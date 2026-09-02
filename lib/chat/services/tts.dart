@@ -3,10 +3,18 @@
 // Text-to-Speech service for reading messages aloud.
 
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import 'tts_remote.dart';
+
 enum TtsState { idle, playing, paused }
+
+/// Which engine is speaking. The device recogniser and the remote voice have
+/// different notions of position and completion, so every transport control
+/// has to know which one it is talking to.
+enum _TtsEngine { device, remote }
 
 class TtsService with ChangeNotifier {
   static final TtsService _instance = TtsService._internal();
@@ -14,6 +22,36 @@ class TtsService with ChangeNotifier {
   TtsService._internal();
 
   final FlutterTts _flutterTts = FlutterTts();
+
+  // ── Remote voice ─────────────────────────────────────────────────────────
+  //
+  // Reading a message aloud used to be the one place the app still spoke in
+  // the device's robot voice, which reads as a bug once the user has picked a
+  // voice in settings. It now uses the same voice as voice mode, and keeps the
+  // device engine for when that is not possible — offline, out of credit, or
+  // synthesis simply failing.
+  //
+  // Playback is driven here rather than through RemoteTtsService.play, which
+  // returns only when the audio has finished. The player UI needs pause,
+  // resume and seek, so it needs the player itself.
+
+  /// The server takes 800 characters per request, so a message is spoken in
+  /// pieces. Sentence boundaries are preferred; the limit is what decides.
+  static const int _remoteChunkLimit = 700;
+
+  AudioPlayer? _remotePlayer;
+  StreamSubscription<void>? _remoteComplete;
+  StreamSubscription<Duration>? _remotePosition;
+  StreamSubscription<Duration>? _remoteDurationSub;
+  Duration? _remoteDurationCache;
+
+  _TtsEngine _engine = _TtsEngine.device;
+
+  /// The message split for the remote voice, with the character offset each
+  /// piece starts at, so progress can be reported against the whole text
+  /// rather than the piece being spoken.
+  List<String> _chunks = const [];
+  List<int> _chunkStarts = const [];
 
   TtsState _state = TtsState.idle;
   Timer? _ttsTimer;
@@ -202,12 +240,179 @@ class TtsService with ChangeNotifier {
     _currentText = textChunk; // This is the chunk currently being spoken
     _state = TtsState.playing;
     notifyListeners();
+
+    // The picked voice first. It falls back rather than failing, so a device
+    // that cannot reach it still reads the message aloud.
+    if (await _speakRemote(textChunk)) return;
+
+    _engine = _TtsEngine.device;
     await _flutterTts.speak(textChunk);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // REMOTE VOICE
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Splits text into pieces the server will accept, breaking at sentence
+  /// ends where it can and mid-text only when a single sentence is too long
+  /// to send.
+  List<String> _splitForRemote(String text) {
+    final pieces = <String>[];
+    final sentences = text.split(RegExp(r'(?<=[.!?…])\s+'));
+
+    var current = "";
+    void flush() {
+      final trimmed = current.trim();
+      if (trimmed.isNotEmpty) pieces.add(trimmed);
+      current = "";
+    }
+
+    for (final sentence in sentences) {
+      if (sentence.length > _remoteChunkLimit) {
+        flush();
+        for (var i = 0; i < sentence.length; i += _remoteChunkLimit) {
+          final end = (i + _remoteChunkLimit).clamp(0, sentence.length);
+          pieces.add(sentence.substring(i, end).trim());
+        }
+        continue;
+      }
+      if (current.length + sentence.length + 1 > _remoteChunkLimit) flush();
+      current = current.isEmpty ? sentence : "$current $sentence";
+    }
+    flush();
+
+    return pieces.where((p) => p.isNotEmpty).toList(growable: false);
+  }
+
+  /// Starts the remote voice. Returns false when it could not speak at all,
+  /// leaving nothing playing so the caller can use the device engine.
+  Future<bool> _speakRemote(String text) async {
+    await _stopRemote();
+
+    final pieces = _splitForRemote(text);
+    if (pieces.isEmpty) return false;
+
+    // Offsets are measured against the text actually spoken, so the progress
+    // bar tracks the whole message rather than restarting at each piece.
+    final starts = <int>[];
+    var offset = 0;
+    for (final piece in pieces) {
+      starts.add(offset);
+      offset += piece.length + 1;
+    }
+
+    _chunks = pieces;
+    _chunkStarts = starts;
+    _engine = _TtsEngine.remote;
+
+    if (await _playChunk(0)) return true;
+
+    // Nothing was produced; leave no trace for the device engine to trip over.
+    _engine = _TtsEngine.device;
+    _chunks = const [];
+    _chunkStarts = const [];
+    return false;
+  }
+
+  Future<bool> _playChunk(int index) async {
+    if (index < 0 || index >= _chunks.length) return false;
+
+    final bytes = await RemoteTtsService.instance.synthesize(_chunks[index]);
+    if (bytes == null) return false;
+
+    try {
+      final player = _remotePlayer ??= AudioPlayer();
+      await player.stop();
+
+      await _remoteComplete?.cancel();
+      await _remotePosition?.cancel();
+      await _remoteDurationSub?.cancel();
+
+      // Duration arrives after playback starts, so progress within a piece is
+      // reported only once it is known. Until then the bar sits at the piece's
+      // starting offset rather than jumping around.
+      _remoteDurationCache = null;
+      _remoteDurationSub = player.onDurationChanged.listen((d) {
+        _remoteDurationCache = d;
+      });
+
+      _remotePosition = player.onPositionChanged.listen((position) {
+        _reportRemoteProgress(index, position);
+      });
+
+      _remoteComplete = player.onPlayerComplete.listen((_) {
+        unawaited(_advanceRemote(index));
+      });
+
+      await player.play(BytesSource(bytes));
+      _state = TtsState.playing;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint("[TtsService] Remote playback failed: $e");
+      return false;
+    }
+  }
+
+  void _reportRemoteProgress(int index, Duration position) {
+    if (_engine != _TtsEngine.remote || _originalText.isEmpty) return;
+    if (index >= _chunkStarts.length) return;
+
+    final total = _remoteDurationCache;
+    final chunkLength = _chunks[index].length;
+
+    var within = 0.0;
+    if (total != null && total.inMilliseconds > 0) {
+      within = position.inMilliseconds / total.inMilliseconds;
+      if (within > 1.0) within = 1.0;
+    }
+
+    final spoken = _chunkStarts[index] + (chunkLength * within);
+    _progress = (spoken / _originalText.length).clamp(0.0, 1.0);
+    notifyListeners();
+  }
+
+  /// Moves to the next piece, or settles as finished.
+  Future<void> _advanceRemote(int finished) async {
+    if (_engine != _TtsEngine.remote) return;
+    if (_isInterrupted) return;
+
+    final next = finished + 1;
+    if (next < _chunks.length && await _playChunk(next)) return;
+
+    _state = TtsState.idle;
+    _progress = 1.0;
+    notifyListeners();
+
+    _ttsTimer = Timer(const Duration(milliseconds: 2000), () {
+      if (_state == TtsState.idle) {
+        _progress = 0.0;
+        _currentText = '';
+        notifyListeners();
+      }
+    });
+  }
+
+  Future<void> _stopRemote() async {
+    await _remoteComplete?.cancel();
+    await _remotePosition?.cancel();
+    await _remoteDurationSub?.cancel();
+    _remoteComplete = null;
+    _remotePosition = null;
+    _remoteDurationSub = null;
+    _remoteDurationCache = null;
+    try {
+      await _remotePlayer?.stop();
+    } catch (_) {}
   }
 
   Future<void> stop() async {
     _isInterrupted = false; // Allow completion handler to clean up
     _ttsTimer?.cancel();
+    await _stopRemote();
+    _engine = _TtsEngine.device;
+    _chunks = const [];
+    _chunkStarts = const [];
     await _flutterTts.stop();
     // Handler will be called, but we can double check:
     _state = TtsState.idle;
@@ -219,18 +424,41 @@ class TtsService with ChangeNotifier {
   }
 
   Future<void> pause() async {
-    if (_state == TtsState.playing) {
-      _isInterrupted = true; // Don't treat this as "finished"
-      await _flutterTts
-          .stop(); // Using stop to ensure we can restart from offset precisely
-      _state = TtsState.paused;
-      _isInterrupted = false;
-      notifyListeners();
+    if (_state != TtsState.playing) return;
+
+    _isInterrupted = true; // Don't treat this as "finished"
+    if (_engine == _TtsEngine.remote) {
+      // Real audio, so it can be suspended where it stands rather than
+      // restarted from a character offset.
+      try {
+        await _remotePlayer?.pause();
+      } catch (e) {
+        debugPrint("[TtsService] Remote pause failed: $e");
+      }
+    } else {
+      // Using stop so playback can restart from the offset precisely.
+      await _flutterTts.stop();
     }
+    _state = TtsState.paused;
+    _isInterrupted = false;
+    notifyListeners();
   }
 
   Future<void> resume() async {
-    if (_state == TtsState.paused && _originalText.isNotEmpty) {
+    if (_state != TtsState.paused) return;
+
+    if (_engine == _TtsEngine.remote) {
+      try {
+        await _remotePlayer?.resume();
+        _state = TtsState.playing;
+        notifyListeners();
+        return;
+      } catch (e) {
+        debugPrint("[TtsService] Remote resume failed: $e");
+      }
+    }
+
+    if (_originalText.isNotEmpty) {
       // Calculate text remaining based on last progress
       // Progress = (offset + current_chunk_pos) / total
       // We can approximate the resumption point based on _progress
@@ -247,6 +475,25 @@ class TtsService with ChangeNotifier {
     if (_originalText.isEmpty) return;
 
     _isInterrupted = true;
+
+    if (_engine == _TtsEngine.remote && _chunks.isNotEmpty) {
+      // Seeking lands on the piece containing that point and starts it from
+      // the beginning. Sub-piece accuracy would mean mapping characters onto
+      // milliseconds, which the audio gives no way to do honestly.
+      final target = (newProgress * _originalText.length).toInt();
+      var piece = 0;
+      for (var i = 0; i < _chunkStarts.length; i++) {
+        if (_chunkStarts[i] <= target) piece = i;
+      }
+      _isInterrupted = false;
+      _progress = newProgress;
+      notifyListeners();
+      if (await _playChunk(piece)) return;
+      // Falling through means the remote voice gave out mid-message; the
+      // device engine picks up from the requested point.
+      _engine = _TtsEngine.device;
+    }
+
     await _flutterTts.stop();
     _isInterrupted = false;
 
@@ -317,6 +564,9 @@ class TtsService with ChangeNotifier {
   @override
   void dispose() {
     _flutterTts.stop();
+    unawaited(_stopRemote());
+    _remotePlayer?.dispose();
+    _remotePlayer = null;
     super.dispose();
   }
 }
