@@ -38,20 +38,46 @@ class SpeechService with ChangeNotifier {
 
   bool get isDeviceSupported => _isDeviceSupported;
 
+  /// Initialises the on-device recogniser with both of its callbacks.
+  ///
+  /// `speech_to_text` keeps the handlers from the first successful
+  /// `initialize` and ignores the ones passed to later calls. The availability
+  /// check runs at startup and wins that race, so registering `onStatus` only
+  /// at listen time meant it was never registered at all: `_isListening`
+  /// stayed false for the whole device-recogniser session, which killed the
+  /// waveform (it is gated on that flag) and made voice mode drop straight
+  /// back to idle the moment it looked at the flag.
+  ///
+  /// Both callbacks therefore live here, and every caller goes through this.
+  Future<bool> _initializeDevice() async {
+    return _speech.initialize(
+      onStatus: (status) {
+        // Deepgram drives its own state; the device engine is not running.
+        if (_usingRemote) return;
+        _isListening = status == 'listening';
+        if (!_isListening) _soundLevel = 0.0;
+        notifyListeners();
+      },
+      onError: (e) {
+        if (_usingRemote) return;
+        _isListening = false;
+        _soundLevel = 0.0;
+        // Only the OS lacking an engine is permanent. Network hiccups and
+        // silence timeouts must not hide the feature.
+        if (e.errorMsg.contains('recognition service') ||
+            e.errorMsg.contains('SpeechRecognizer')) {
+          _isDeviceSupported = false;
+        }
+        debugPrint("Speech error: ${e.errorMsg}");
+        notifyListeners();
+      },
+    );
+  }
+
   /// Lightweight availability check.
   Future<void> checkAvailability() async {
     try {
-      bool available = await _speech.initialize(
-        onError: (e) {
-          // Only permanently disable buttons if the OS lacks the engine
-          if (e.errorMsg.contains('recognition service') ||
-              e.errorMsg.contains('SpeechRecognizer')) {
-            _isDeviceSupported = false;
-            notifyListeners();
-          }
-          debugPrint("Speech Availability Error: ${e.errorMsg}");
-        },
-      );
+      final available = await _initializeDevice();
       if (available) {
         _isAvailable = true;
         _isDeviceSupported = true;
@@ -69,51 +95,18 @@ class SpeechService with ChangeNotifier {
     required String locale,
     required Function(String text) onResult,
   }) async {
-    if (!_isDeviceSupported) return;
-
-    // Ensure initialized if not already
-    if (!_isAvailable) {
-      bool initSuccess = false;
-      try {
-        initSuccess = await _speech.initialize(
-          onStatus: (status) {
-            _isListening = status == 'listening';
-            if (!_isListening) {
-              _soundLevel = 0.0;
-            }
-            notifyListeners();
-          },
-          onError: (errorNotification) {
-            _isListening = false;
-            _soundLevel = 0.0;
-            // Note: We DO NOT set _isDeviceSupported=false here.
-            // Temporary errors (network, silence) should not hide the feature.
-            notifyListeners();
-          },
-        );
-      } on PlatformException catch (e) {
-        debugPrint("Speech recognition not available (PlatformException): $e");
-        _isDeviceSupported = false;
-        notifyListeners();
-        return;
-      } catch (e) {
-        debugPrint("Speech initialization failed in startListening: $e");
-        _isDeviceSupported = false;
-        notifyListeners();
-        return;
-      }
-
-      if (!initSuccess) {
-        // Initialization failed, but maybe temporary.
-        return;
-      }
-      _isAvailable = true;
-    }
-
     _localeId = locale;
 
-    // Try Deepgram first. It returns false without starting anything when it
-    // cannot run, so falling through costs nothing.
+    // Deepgram first, and before the on-device engine is touched at all.
+    //
+    // It needs nothing from the OS recogniser, so a phone that lacks one —
+    // old hardware, no Google apps, the service disabled — should still be
+    // able to dictate. The previous order asked the OS for permission to
+    // proceed and gave up on exactly the devices the remote path exists to
+    // serve.
+    //
+    // `start` returns false without having started anything when it cannot
+    // run, so falling through to the fallback costs nothing.
     _finalizedText = "";
     final startedRemote = await _remote.start(
       onResult: (result) {
@@ -137,6 +130,32 @@ class SpeechService with ChangeNotifier {
       _remote.soundLevel.addListener(_onRemoteLevel);
       notifyListeners();
       return;
+    }
+
+    // ── Fallback: the on-device recogniser ──
+    if (!_isDeviceSupported) return;
+
+    if (!_isAvailable) {
+      bool initSuccess = false;
+      try {
+        initSuccess = await _initializeDevice();
+      } on PlatformException catch (e) {
+        debugPrint("Speech recognition not available (PlatformException): $e");
+        _isDeviceSupported = false;
+        notifyListeners();
+        return;
+      } catch (e) {
+        debugPrint("Speech initialization failed in startListening: $e");
+        _isDeviceSupported = false;
+        notifyListeners();
+        return;
+      }
+
+      if (!initSuccess) {
+        // Initialization failed, but maybe temporary.
+        return;
+      }
+      _isAvailable = true;
     }
 
     await _speech.listen(

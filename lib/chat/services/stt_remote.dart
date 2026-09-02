@@ -68,6 +68,22 @@ class RemoteSttService {
   /// measured, otherwise the waveform in the UI would sit still.
   final ValueNotifier<double> soundLevel = ValueNotifier<double>(0.0);
 
+  /// Why the last attempt fell back, carried to the server on the next token
+  /// request.
+  ///
+  /// Everything in this file degrades to false rather than throwing, which is
+  /// right for the user and useless for diagnosis: a failure is indistinguishable
+  /// from the feature not existing, and the only trace is a `debugPrint` on a
+  /// device we do not have. Piggy-backing the reason onto a call the client
+  /// already makes puts it in the function logs instead, with no new endpoint
+  /// and nothing extra on the happy path.
+  String? _lastFailure;
+
+  void _fail(String code, [Object? detail]) {
+    _lastFailure = detail == null ? code : "$code: $detail";
+    debugPrint("[RemoteStt] $_lastFailure");
+  }
+
   /// Asks the server for a short-lived Deepgram token. Returns null when
   /// dictation is unavailable — no session, no balance, provider down.
   Future<String?> _fetchToken() async {
@@ -77,9 +93,14 @@ class RemoteSttService {
       final idToken = await user.getIdToken();
       if (idToken == null) return null;
 
+      final previousFailure = _lastFailure;
+      _lastFailure = null;
+
       final response = await _dio.post<Map<String, dynamic>>(
         _tokenEndpoint,
-        data: const <String, dynamic>{},
+        data: <String, dynamic>{
+          if (previousFailure != null) 'lastFailure': previousFailure,
+        },
         options: Options(
           headers: {
             'Authorization': 'Bearer $idToken',
@@ -115,18 +136,19 @@ class RemoteSttService {
     final recorder = AudioRecorder();
     try {
       if (!await recorder.hasPermission()) {
-        debugPrint("[RemoteStt] Microphone permission denied.");
+        _fail("PERMISSION_DENIED");
         await recorder.dispose();
         return false;
       }
     } catch (e) {
-      debugPrint("[RemoteStt] Permission check failed: $e");
+      _fail("PERMISSION_CHECK_FAILED", e);
       await recorder.dispose();
       return false;
     }
 
     final token = await _fetchToken();
     if (token == null) {
+      _fail("NO_TOKEN");
       await recorder.dispose();
       return false;
     }
@@ -137,7 +159,7 @@ class RemoteSttService {
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 10));
     } catch (e) {
-      debugPrint("[RemoteStt] Connect failed: $e");
+      _fail("CONNECT_FAILED", e);
       await recorder.dispose();
       _socket = null;
       return false;
@@ -152,50 +174,83 @@ class RemoteSttService {
         if (result != null) onResult(result);
       },
       onError: (Object e) {
-        debugPrint("[RemoteStt] Socket error: $e");
+        _fail("SOCKET_ERROR", e);
         unawaited(stop());
         onClosed?.call();
       },
       onDone: () {
-        if (!_closing) onClosed?.call();
+        // A close we did not ask for carries Deepgram's reason for it.
+        if (!_closing) {
+          final socket = _socket;
+          _fail(
+            "SOCKET_CLOSED",
+            "code=${socket?.closeCode} reason=${socket?.closeReason}",
+          );
+          onClosed?.call();
+        }
         unawaited(stop());
       },
       cancelOnError: true,
     );
 
-    try {
-      final stream = await recorder.startStream(
-        const RecordConfig(
-          encoder: AudioEncoder.pcm16bits,
-          sampleRate: _sampleRate,
-          numChannels: 1,
-          echoCancel: true,
-          noiseSuppress: true,
-        ),
-      );
-
-      _micSubscription = stream.listen(
-        (chunk) {
-          soundLevel.value = _levelOf(chunk);
-          final socket = _socket;
-          if (socket != null && socket.readyState == WebSocket.open) {
-            socket.add(chunk);
-          }
-        },
-        onError: (Object e) {
-          debugPrint("[RemoteStt] Microphone error: $e");
-          unawaited(stop());
-          onClosed?.call();
-        },
-        cancelOnError: true,
-      );
-    } catch (e) {
-      debugPrint("[RemoteStt] Could not start microphone: $e");
+    final stream = await _openMicrophone(recorder);
+    if (stream == null) {
       await stop();
       return false;
     }
 
+    _micSubscription = stream.listen(
+      (chunk) {
+        soundLevel.value = _levelOf(chunk);
+        final socket = _socket;
+        if (socket != null && socket.readyState == WebSocket.open) {
+          socket.add(chunk);
+        }
+      },
+      onError: (Object e) {
+        _fail("MIC_ERROR", e);
+        unawaited(stop());
+        onClosed?.call();
+      },
+      cancelOnError: true,
+    );
+
     return true;
+  }
+
+  /// Opens the microphone, dropping the audio effects if they are what the
+  /// device objects to.
+  ///
+  /// `echoCancel` and `noiseSuppress` map onto Android's AcousticEchoCanceler
+  /// and NoiseSuppressor, which are hardware features a lot of older phones
+  /// simply do not have. Asking for them there can fail the whole recording
+  /// rather than being ignored, so the second attempt gives them up: worse
+  /// audio for Deepgram to work with beats no audio at all.
+  Future<Stream<Uint8List>?> _openMicrophone(AudioRecorder recorder) async {
+    const base = RecordConfig(
+      encoder: AudioEncoder.pcm16bits,
+      sampleRate: _sampleRate,
+      numChannels: 1,
+      echoCancel: true,
+      noiseSuppress: true,
+    );
+
+    try {
+      return await recorder.startStream(base);
+    } catch (e) {
+      _fail("MIC_START_FAILED", e);
+    }
+
+    try {
+      return await recorder.startStream(const RecordConfig(
+        encoder: AudioEncoder.pcm16bits,
+        sampleRate: _sampleRate,
+        numChannels: 1,
+      ));
+    } catch (e) {
+      _fail("MIC_START_FAILED_PLAIN", e);
+      return null;
+    }
   }
 
   /// Closes the microphone and the socket, asking Deepgram to flush whatever
@@ -237,7 +292,21 @@ class RemoteSttService {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic>) return null;
-      if (decoded['type'] != 'Results') return null;
+
+      // Deepgram reports a rejected request as a message on the open socket
+      // rather than by refusing the upgrade — a bad model or an unsupported
+      // language arrives here, not at connect time. Dropping everything that
+      // is not a transcript would turn that into silence with no explanation.
+      final type = decoded['type'];
+      if (type == 'Error' || decoded['err_code'] != null) {
+        _fail(
+          "DEEPGRAM_ERROR",
+          decoded['err_msg'] ?? decoded['description'] ?? raw,
+        );
+        return null;
+      }
+
+      if (type != 'Results') return null;
 
       final alternatives =
           decoded['channel']?['alternatives'] as List<dynamic>?;
