@@ -73,6 +73,13 @@ class RemoteSttService {
   Completer<void>? _firstChunk;
   bool _closing = false;
 
+  // Enough of the session to tell the difference between a microphone that
+  // never produced anything, audio that Deepgram never answered, and a
+  // transcript that arrived. A session the user simply ends leaves no other
+  // trace, so "it did nothing" and "it worked" looked identical from here.
+  int _chunksSent = 0;
+  int _transcriptsSeen = 0;
+
   bool get isActive => _socket != null;
 
   /// Latest microphone loudness, 0..1, derived from the PCM the recorder hands
@@ -237,7 +244,10 @@ class RemoteSttService {
       (dynamic message) {
         if (message is! String) return;
         final result = _parseTranscript(message);
-        if (result != null) onResult(result);
+        if (result != null) {
+          _transcriptsSeen++;
+          onResult(result);
+        }
       },
       onError: (Object e) {
         _fail("SOCKET_ERROR", e);
@@ -307,6 +317,7 @@ class RemoteSttService {
       _micSubscription = stream.listen(
         (chunk) {
           if (!(_firstChunk?.isCompleted ?? true)) _firstChunk!.complete();
+          _chunksSent++;
           soundLevel.value = _levelOf(chunk);
 
           final socket = _socket;
@@ -362,6 +373,19 @@ class RemoteSttService {
   /// Closes the microphone and the socket, asking Deepgram to flush whatever
   /// it is still holding so the last words are not lost.
   Future<void> stop() async {
+    // A session that captured audio and got nothing back is the case with no
+    // other symptom: the socket behaved, the waveform moved, and the text
+    // field stayed empty. Record it before the counters are cleared.
+    if (_chunksSent > 0 && _transcriptsSeen == 0 && _socket != null) {
+      _fail("NO_TRANSCRIPT", "chunks=$_chunksSent");
+      // Sent now rather than waiting to ride along with the next token
+      // request: a user who gets nothing back tends not to try again, and
+      // that is exactly the session worth hearing about.
+      unawaited(_report());
+    }
+    _chunksSent = 0;
+    _transcriptsSeen = 0;
+
     _closing = true;
     soundLevel.value = 0.0;
     _pending.clear();
