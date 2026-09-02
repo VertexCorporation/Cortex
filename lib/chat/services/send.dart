@@ -12,6 +12,7 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/api.dart';
+import 'package:cortex/server/credits.dart';
 import 'package:cortex/chat/services/background.dart';
 import 'package:cortex/chat/services/context.dart';
 import 'package:cortex/chat/services/moderator.dart';
@@ -355,9 +356,11 @@ class SendService {
 
       final localState = context.read<ModelLocalStateProvider>();
       final langCode = Localizations.localeOf(context).languageCode;
+      // Read before the await below; the context must not be touched across it.
+      final creditsManager = context.read<CreditsManager>();
       final hasInternet = await InternetConnection().hasInternetAccess;
 
-      final originalUiModelId = overrideModelId ??
+      var originalUiModelId = overrideModelId ??
           (sessionProvider.isDynamicChat
               ? 'cortex/auto'
               : sessionProvider.modelId) ??
@@ -369,6 +372,19 @@ class SendService {
         apiModelIdForSend = 'cortex/auto';
       } else {
         apiModelIdForSend = sessionProvider.modelId;
+      }
+
+      // Under the daily credit engine, model choice belongs to paid tiers with
+      // credit left; everyone else is answered by Dynamic Chat. The gateway
+      // applies this regardless, so applying it here too keeps the message
+      // labelled with the model that actually answered it.
+      //
+      // The session's preferred model is left alone on purpose — when the
+      // allowance renews tomorrow the user gets it back without having to pick
+      // it again.
+      if (!creditsManager.canChooseModel) {
+        apiModelIdForSend = 'cortex/auto';
+        originalUiModelId = 'cortex/auto';
       }
 
       final intentResolvedModelId = _resolveAttachmentIntentModelId(
