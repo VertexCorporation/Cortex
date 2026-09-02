@@ -40,6 +40,11 @@ class RemoteTtsService {
   AudioPlayer? _player;
   bool _contextConfigured = false;
 
+  /// The voice the user picked, kept here so voice mode does not have to reach
+  /// for a provider on every sentence. VoiceCatalogProvider writes it; null
+  /// means the server picks.
+  String? activeVoiceId;
+
   /// The audio session voice mode needs. flutter_tts configures this itself,
   /// so playing through audioplayers instead means configuring it here too —
   /// otherwise iOS routes playback to the earpiece and the microphone drops
@@ -83,6 +88,10 @@ class RemoteTtsService {
     final trimmed = text.trim();
     if (trimmed.isEmpty || trimmed.length > maxChars) return null;
 
+    // An explicit id wins so the settings preview can audition a voice the
+    // user has not committed to yet.
+    final voice = voiceId ?? activeVoiceId;
+
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return null;
@@ -93,7 +102,7 @@ class RemoteTtsService {
         _endpoint,
         data: {
           'text': trimmed,
-          if (voiceId != null && voiceId.isNotEmpty) 'voiceId': voiceId,
+          if (voice != null && voice.isNotEmpty) 'voiceId': voice,
         },
         options: Options(
           responseType: ResponseType.bytes,

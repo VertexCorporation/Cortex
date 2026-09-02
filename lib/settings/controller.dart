@@ -18,6 +18,7 @@ import 'sections/header.dart';
 import 'sections/language.dart';
 import 'sections/settings.dart';
 import 'sections/theme.dart';
+import 'sections/voice.dart';
 import 'sections/personalization.dart';
 import 'sections/user.dart';
 import 'skeleton.dart';
@@ -144,6 +145,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       const AppLanguageSection(),
       SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
       const AppThemeSection(),
+      SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
+      const VoiceSection(),
       SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
       const PersonalizationSection(),
       SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),

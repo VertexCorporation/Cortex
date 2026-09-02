@@ -54,6 +54,7 @@ import 'chat/services/context.dart';
 import 'chat/services/database.dart';
 import 'chat/services/offline.dart';
 import 'chat/services/read.dart';
+import 'chat/services/voice_catalog.dart';
 import 'chat/services/regenerate.dart';
 import 'chat/services/response.dart';
 import 'chat/services/scroll.dart';
@@ -410,6 +411,12 @@ List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
     ),
     ChangeNotifierProvider<InternetProvider>(
       create: (_) => InternetProvider(),
+    ),
+
+    // Published voice list plus this device's choice. Loaded eagerly so the
+    // settings row and voice mode agree from the first frame.
+    ChangeNotifierProvider<VoiceCatalogProvider>(
+      create: (_) => VoiceCatalogProvider()..load(),
     ),
 
     // User data & credits.
