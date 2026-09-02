@@ -56,9 +56,21 @@ class RemoteSttService {
     receiveTimeout: const Duration(seconds: 15),
   ));
 
+  /// How long to wait for the first buffer before deciding a microphone is
+  /// not going to produce one. Android normally delivers within a couple of
+  /// hundred milliseconds, and nothing waits on the full window when it does.
+  static const Duration _audioProbe = Duration(milliseconds: 1500);
+
+  /// Speech captured while the socket is still being opened, so the opening
+  /// words are not lost. Bounded: a socket that never arrives must not grow
+  /// this without limit. 200 buffers of 16 kHz mono is a few seconds.
+  static const int _maxPendingChunks = 200;
+
   AudioRecorder? _recorder;
   WebSocket? _socket;
   StreamSubscription<Uint8List>? _micSubscription;
+  final List<Uint8List> _pending = [];
+  Completer<void>? _firstChunk;
   bool _closing = false;
 
   bool get isActive => _socket != null;
@@ -82,6 +94,38 @@ class RemoteSttService {
   void _fail(String code, [Object? detail]) {
     _lastFailure = detail == null ? code : "$code: $detail";
     debugPrint("[RemoteStt] $_lastFailure");
+  }
+
+  /// Sends the last failure on its own, buying nothing.
+  ///
+  /// Used when the session ends before a token is needed. The server
+  /// recognises `reportOnly` and logs without charging, so diagnosing a broken
+  /// microphone never costs the user credits.
+  Future<void> _report() async {
+    final failure = _lastFailure;
+    if (failure == null) return;
+    _lastFailure = null;
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final idToken = await user.getIdToken();
+      if (idToken == null) return;
+
+      await _dio.post<Map<String, dynamic>>(
+        _tokenEndpoint,
+        data: <String, dynamic>{'lastFailure': failure, 'reportOnly': true},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $idToken',
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          validateStatus: (_) => true,
+        ),
+      );
+    } catch (e) {
+      debugPrint("[RemoteStt] Could not report failure: $e");
+    }
   }
 
   /// Asks the server for a short-lived Deepgram token. Returns null when
@@ -126,12 +170,21 @@ class RemoteSttService {
   ///
   /// Returns false if the remote path could not be established, in which case
   /// nothing has been started and the caller should use the on-device engine.
+  ///
+  /// The microphone is opened and proven to be producing audio *before* a
+  /// token is asked for. That ordering matters twice over. A grant costs the
+  /// user credits, and a device whose microphone yields nothing was being
+  /// charged for a session that could never transcribe a word. It also fixes
+  /// the diagnosis: Deepgram closes an idle socket with a generic timeout, so
+  /// a silent microphone used to surface as a network-looking error several
+  /// steps away from the actual fault.
   Future<bool> start({
     required void Function(SttResult result) onResult,
     void Function()? onClosed,
   }) async {
     if (_socket != null) return true;
     _closing = false;
+    _pending.clear();
 
     final recorder = AudioRecorder();
     try {
@@ -146,13 +199,29 @@ class RemoteSttService {
       return false;
     }
 
-    final token = await _fetchToken();
-    if (token == null) {
-      _fail("NO_TOKEN");
-      await recorder.dispose();
+    _recorder = recorder;
+
+    // ── 1. A microphone that is actually recording ──
+    if (!await _openMicrophone(recorder, onClosed: onClosed)) {
+      // Nothing further will be requested, so this failure would never reach
+      // the server on its own — and a microphone that never yields audio is
+      // exactly the failure worth seeing. Reported explicitly, without buying
+      // anything.
+      unawaited(_report());
+      await stop();
       return false;
     }
 
+    // ── 2. Now that there is audio to send, buy a token ──
+    final token = await _fetchToken();
+    if (token == null) {
+      _fail("NO_TOKEN");
+      await stop();
+      return false;
+    }
+
+    // ── 3. The socket. Speech captured while it opens is buffered, so the
+    //       first word survives the round trip. ──
     try {
       _socket = await WebSocket.connect(
         _listenUrl,
@@ -160,12 +229,9 @@ class RemoteSttService {
       ).timeout(const Duration(seconds: 10));
     } catch (e) {
       _fail("CONNECT_FAILED", e);
-      await recorder.dispose();
-      _socket = null;
+      await stop();
       return false;
     }
-
-    _recorder = recorder;
 
     _socket!.listen(
       (dynamic message) {
@@ -193,64 +259,104 @@ class RemoteSttService {
       cancelOnError: true,
     );
 
-    final stream = await _openMicrophone(recorder);
-    if (stream == null) {
-      await stop();
-      return false;
-    }
-
-    _micSubscription = stream.listen(
-      (chunk) {
-        soundLevel.value = _levelOf(chunk);
-        final socket = _socket;
-        if (socket != null && socket.readyState == WebSocket.open) {
-          socket.add(chunk);
-        }
-      },
-      onError: (Object e) {
-        _fail("MIC_ERROR", e);
-        unawaited(stop());
-        onClosed?.call();
-      },
-      cancelOnError: true,
-    );
-
     return true;
   }
 
-  /// Opens the microphone, dropping the audio effects if they are what the
-  /// device objects to.
+  /// Starts recording and waits for the device to prove it by handing over a
+  /// buffer.
   ///
-  /// `echoCancel` and `noiseSuppress` map onto Android's AcousticEchoCanceler
-  /// and NoiseSuppressor, which are hardware features a lot of older phones
-  /// simply do not have. Asking for them there can fail the whole recording
-  /// rather than being ignored, so the second attempt gives them up: worse
-  /// audio for Deepgram to work with beats no audio at all.
-  Future<Stream<Uint8List>?> _openMicrophone(AudioRecorder recorder) async {
-    const base = RecordConfig(
+  /// `echoCancel` and `noiseSuppress` make record_android ask for the
+  /// VOICE_COMMUNICATION audio source instead of the plain microphone. On some
+  /// hardware that source starts without complaint and then stays silent
+  /// forever — `startStream` succeeds, `isRecording` reports true, and not one
+  /// buffer ever arrives. Waiting for real audio is the only way to catch it,
+  /// since nothing throws.
+  ///
+  /// The second attempt gives up the effects. Worse audio for Deepgram to work
+  /// with beats no audio at all.
+  Future<bool> _openMicrophone(
+    AudioRecorder recorder, {
+    void Function()? onClosed,
+  }) async {
+    const withEffects = RecordConfig(
       encoder: AudioEncoder.pcm16bits,
       sampleRate: _sampleRate,
       numChannels: 1,
       echoCancel: true,
       noiseSuppress: true,
     );
+    const plain = RecordConfig(
+      encoder: AudioEncoder.pcm16bits,
+      sampleRate: _sampleRate,
+      numChannels: 1,
+    );
 
-    try {
-      return await recorder.startStream(base);
-    } catch (e) {
-      _fail("MIC_START_FAILED", e);
+    for (final attempt in const [
+      (config: withEffects, label: "with_effects"),
+      (config: plain, label: "plain"),
+    ]) {
+      final Stream<Uint8List> stream;
+      try {
+        stream = await recorder.startStream(attempt.config);
+      } catch (e) {
+        _fail("MIC_START_FAILED_${attempt.label}", e);
+        continue;
+      }
+
+      _firstChunk = Completer<void>();
+      _micSubscription = stream.listen(
+        (chunk) {
+          if (!(_firstChunk?.isCompleted ?? true)) _firstChunk!.complete();
+          soundLevel.value = _levelOf(chunk);
+
+          final socket = _socket;
+          if (socket != null && socket.readyState == WebSocket.open) {
+            if (_pending.isNotEmpty) {
+              for (final held in _pending) {
+                socket.add(held);
+              }
+              _pending.clear();
+            }
+            socket.add(chunk);
+          } else if (_pending.length < _maxPendingChunks) {
+            _pending.add(chunk);
+          }
+        },
+        onError: (Object e) {
+          _fail("MIC_ERROR", e);
+          unawaited(stop());
+          onClosed?.call();
+        },
+        cancelOnError: true,
+      );
+
+      var gotAudio = true;
+      try {
+        await _firstChunk!.future.timeout(_audioProbe);
+      } on TimeoutException {
+        gotAudio = false;
+      }
+
+      if (gotAudio) return true;
+
+      var recording = false;
+      try {
+        recording = await recorder.isRecording();
+      } catch (_) {}
+      _fail(
+        "NO_AUDIO_${attempt.label}",
+        "isRecording=$recording after ${_audioProbe.inMilliseconds}ms",
+      );
+
+      await _micSubscription?.cancel();
+      _micSubscription = null;
+      _pending.clear();
+      try {
+        await recorder.stop();
+      } catch (_) {}
     }
 
-    try {
-      return await recorder.startStream(const RecordConfig(
-        encoder: AudioEncoder.pcm16bits,
-        sampleRate: _sampleRate,
-        numChannels: 1,
-      ));
-    } catch (e) {
-      _fail("MIC_START_FAILED_PLAIN", e);
-      return null;
-    }
+    return false;
   }
 
   /// Closes the microphone and the socket, asking Deepgram to flush whatever
@@ -258,6 +364,8 @@ class RemoteSttService {
   Future<void> stop() async {
     _closing = true;
     soundLevel.value = 0.0;
+    _pending.clear();
+    _firstChunk = null;
 
     await _micSubscription?.cancel();
     _micSubscription = null;
