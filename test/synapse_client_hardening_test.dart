@@ -11,6 +11,10 @@ void main() {
           'https://huggingface.co/org/model/resolve/main/model.gguf');
       expect(uri.scheme, 'https');
       expect(uri.host, 'huggingface.co');
+
+      final fcDomain = ModelSecurity.requireTrustedDownloadUri(
+          'https://fcdn.example.com/model.gguf');
+      expect(fcDomain.host, 'fcdn.example.com');
     });
 
     test('rejects clear-text and private hosts', () {
@@ -85,7 +89,11 @@ void main() {
 
   test('validates GGUF magic bytes', () async {
     final dir = await Directory.systemTemp.createTemp('cortex_gguf_test_');
-    addTearDown(() => dir.delete(recursive: true));
+    addTearDown(() async {
+      if (await dir.exists()) {
+        await dir.delete(recursive: true);
+      }
+    });
 
     final valid = File(p.join(dir.path, 'valid.gguf'));
     await valid.writeAsBytes([0x47, 0x47, 0x55, 0x46, 0, 0, 0, 0]);
