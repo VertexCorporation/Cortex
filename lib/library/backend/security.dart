@@ -143,22 +143,24 @@ class ModelSecurity {
 
   static bool _isBlockedHost(String rawHost) {
     final host = rawHost.toLowerCase().replaceAll(RegExp(r'^\[|\]$'), '');
+    final isIpv6Literal = host.contains(':');
+
     if (host == 'localhost' ||
         host.endsWith('.localhost') ||
         host.endsWith('.local') ||
         host == '::1' ||
-        host.startsWith('fc') ||
-        host.startsWith('fd') ||
-        host.startsWith('fe80:')) {
+        (isIpv6Literal &&
+            (host.startsWith('fc') ||
+                host.startsWith('fd') ||
+                host.startsWith('fe80:')))) {
       return true;
     }
 
     final parts = host.split('.');
     if (parts.length != 4) return false;
     final octets = parts.map(int.tryParse).toList();
-    if (octets.any((value) => value == null || value < 0 || value > 255)) {
-      return false;
-    }
+    if (octets.any((value) => value == null)) return false;
+    if (octets.any((value) => value! < 0 || value > 255)) return false;
 
     final a = octets[0]!;
     final b = octets[1]!;
