@@ -114,10 +114,16 @@ class OptionsPanelViewModel {
     final isDynamicContext = session.isDynamicChat;
     final isOfflineModel = modelSeriesData?.isServerSide == false;
 
+    final creditsManager = context.read<CreditsManager>();
+
     // Billing v2 has no premium lane, so this is a balance question. The
     // getter keeps the old predit check for unmigrated accounts.
-    final hasPreditsForPremium = session.isUserSubscribed ||
-        context.read<CreditsManager>().canUsePremiumModel;
+    final hasPreditsForPremium =
+        session.isUserSubscribed || creditsManager.canUsePremiumModel;
+
+    // Under the daily engine, model choice is a paid feature that also closes
+    // when a paid balance runs out.
+    final canChooseModel = creditsManager.canChooseModel;
 
     final isCurrentModelPremium = currentModel.isPremium;
 
@@ -147,6 +153,7 @@ class OptionsPanelViewModel {
       }
 
       if (option == MessageOption.changeModel) {
+        if (!isOfflineModel && !canChooseModel) return false;
         if (!isOfflineModel && totalCredits <= 0) return false;
         if (!isDynamicContext) {
           if (modelSeriesData != null) {
