@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/library/backend/security.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -102,5 +103,42 @@ void main() {
     final invalid = File(p.join(dir.path, 'invalid.gguf'));
     await invalid.writeAsBytes([0x50, 0x4b, 0x03, 0x04]);
     expect(await ModelSecurity.isValidGgufFile(invalid), isFalse);
+  });
+
+  test('detects picker images from bytes even without a file extension', () async {
+    final dir = await Directory.systemTemp.createTemp('cortex_image_test_');
+    addTearDown(() async {
+      if (await dir.exists()) {
+        await dir.delete(recursive: true);
+      }
+    });
+
+    // PNG signature followed by a small dummy payload. The app only needs MIME
+    // detection/base64 encoding here; it is not decoding pixels in this helper.
+    final extensionless = File(p.join(dir.path, 'picker_cache_item'));
+    await extensionless.writeAsBytes([
+      0x89,
+      0x50,
+      0x4E,
+      0x47,
+      0x0D,
+      0x0A,
+      0x1A,
+      0x0A,
+      0x00,
+      0x00,
+      0x00,
+      0x0D,
+      0x49,
+      0x48,
+      0x44,
+      0x52,
+    ]);
+
+    final block = await Utils.processAttachment(extensionless.path);
+    expect(block, isNotNull);
+    expect(block!['type'], 'image_url');
+    final imageUrl = block['image_url'] as Map<String, dynamic>;
+    expect(imageUrl['url'], startsWith('data:image/png;base64,'));
   });
 }
