@@ -164,19 +164,49 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   bool _checkModality(String modality) {
-    if (_selectedModel == null) return false;
-    if (_selectedModel!.modalities[modality] == true) return true;
+    final selected = _selectedModel;
+    if (selected == null) return false;
+    if (selected.modalities[modality] == true) return true;
 
-    final isCharacter = _selectedModel!.category == 'roleplay' ||
-        _selectedModel!.category == 'self';
+    // A selected catalog entry can represent an entire series. The send layer
+    // resolves that series to a concrete variant for each request, so the UI
+    // capability check must use the same aggregate view. Previously this only
+    // inspected the parent map, causing the attachment UI and actual routing
+    // logic to disagree about whether a Claude/Llama/etc. series supported
+    // images, audio or video.
+    final variants = selected.variants;
+    if (variants != null && variants.isNotEmpty) {
+      for (final rawVariant in variants.values) {
+        if (rawVariant is! Map) continue;
+        final variant = Map<String, dynamic>.from(rawVariant);
+        final modalities = variant['modalities'];
+        if (modalities is Map && modalities[modality] == true) {
+          return true;
+        }
+      }
+    }
+
+    final isCharacter = selected.category == 'roleplay' ||
+        selected.category == 'self';
     if (isCharacter &&
-        _selectedModel!.baseModelId != null &&
-        _selectedModel!.baseModelId!.isNotEmpty) {
+        selected.baseModelId != null &&
+        selected.baseModelId!.isNotEmpty) {
       try {
         final baseModel = _modelService.getPreciseModelData(
-            _selectedModel!.baseModelId!,
+            selected.baseModelId!,
             langCode: _currentLocale.languageCode);
-        return baseModel.modalities[modality] == true;
+        if (baseModel.modalities[modality] == true) return true;
+        final baseVariants = baseModel.variants;
+        if (baseVariants != null) {
+          for (final rawVariant in baseVariants.values) {
+            if (rawVariant is! Map) continue;
+            final variantModalities = rawVariant['modalities'];
+            if (variantModalities is Map &&
+                variantModalities[modality] == true) {
+              return true;
+            }
+          }
+        }
       } catch (_) {}
     }
     return false;
@@ -262,527 +292,247 @@ class ChatSessionProvider with ChangeNotifier {
 
   ChatSessionProvider({
     required ModelService modelService,
-    String initialModelId = 'cortex/auto',
-    String initialModelTitle = '', // [NEW] Cached title
-    Locale initialLocale = const Locale('en'),
-  }) : _modelService = modelService {
+    ModelLocalStateProvider? localStateProvider,
+  })  : _modelService = modelService,
+        _localStateProvider = localStateProvider {
+    _listenToAuth();
+  }
+
+  void _listenToAuth() {
     try {
       _authSub = FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           resetForLogout();
         }
       });
-    } catch (e) {/* Ignore in tests */}
-
-    // Optimistic Initialization
-    _currentLocale = initialLocale;
-
-    // We try to load the model immediately.
-    // NOTE: ModelService might not have full catalog yet, but basic logic might work
-    // or we can fall back gracefully without setting it to null (which implies dynamic).
-
-    // If we can't find it immediately, we store it to resolve later?
-    // Actually, initializeDefaultSession() was doing async prefs read.
-    // Now we have the ID.
-
-    // Listen to ModelService updates to resolve pending model when catalog loads
-    _modelService.addListener(_onModelServiceUpdate);
-
-    // IMMEDIATE CHECK: In case it's already loaded or loading finished before listener attach
-    debugPrint(
-        "[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: ${_modelService.isLoading}");
-    if (!_modelService.isLoading) {
-      _onModelServiceUpdate();
-    }
-
-    // CRITICAL FIX: Check if cache is empty FIRST.
-    // If we call getPreciseModelData while cache is empty, ModelService returns a generic "Unknown Model" entity
-    // instead of throwing. This bypasses our catch block where we would use the cached title.
-    // So we must manually check cache state.
-    final bool isCacheEmpty = _modelService.getCachedModelsSync().isEmpty;
-
-    if (isCacheEmpty) {
-      debugPrint(
-          "[ChatSessionProvider] Cache is empty. Using cached title: '$initialModelTitle' for ID: $initialModelId");
-      _initializeWithStub(
-          initialModelId, ModelDataUtils.formatModelName(initialModelTitle));
-    } else {
-      final langCode = initialLocale.languageCode;
-      if (_modelService.hasModelInCache(initialModelId)) {
-        try {
-          final entity = _modelService.getPreciseModelData(initialModelId,
-              langCode: langCode);
-          selectModel(entity, savePreference: false);
-        } catch (e) {
-          // Fallback to stub if exact lookup fails even with cache present
-          _initializeWithStub(initialModelId,
-              ModelDataUtils.formatModelName(initialModelTitle));
-        }
-      } else {
-        // The saved model was removed from catalog. Default to dynamic chat.
-        startDynamicConversation(savePreference: true);
-      }
-    }
-  }
-
-  void _initializeWithStub(String modelId, String title) {
-    if (modelId == 'cortex/auto' || modelId == 'dynamic') {
-      startDynamicConversation(savePreference: false);
-    } else {
-      debugPrint(
-          "[ChatSessionProvider] Initialization fallback. Storing pending ID: $modelId");
-
-      // [FIX] Ensure title is never empty for the stub
-      String effectiveTitle = title;
-      if (effectiveTitle.isEmpty) {
-        if (modelId == 'cortex/auto') {
-          effectiveTitle = 'Cortex';
-        } else {
-          effectiveTitle = ModelDataUtils.formatModelName(modelId);
-        }
-      }
-
-      // Store for later resolution when catalog loads
-      _pendingModelId = modelId;
-
-      // Create stub with valid title if cached, otherwise empty
-      final stubEntity = ModelEntity(
-        id: modelId,
-        displayTitle: effectiveTitle,
-        producer: 'Vertex',
-        displaySummary: '',
-        displayDescription: '',
-        type: 'online',
-        source: 'openrouter',
-        category: 'general',
-        tier: 'free',
-        modalities: {'text': true},
-        outputs: {'text': true},
-        isFullyLocalized: true,
-        toolUse: false,
-      );
-      selectModel(stubEntity, savePreference: false);
-    }
-  }
-
-  void _onModelServiceUpdate() {
-    // Debug log to trace service updates
-    // debugPrint("[ChatSessionProvider] _onModelServiceUpdate. isLoading: ${_modelService.isLoading}, pendingId: $_pendingModelId");
-
-    // If models are loaded and we have a pending ID, try to resolve it
-    if (!_modelService.isLoading && _pendingModelId != null) {
-      unawaited(refreshModelAfterCatalogLoad());
+    } catch (_) {
+      // Ignore during tests
     }
   }
 
   @override
   void dispose() {
-    _modelService.removeListener(_onModelServiceUpdate);
     _authSub?.cancel();
     super.dispose();
   }
 
-  /// Called when model catalog finishes loading to resolve pending model
-  Future<void> refreshModelAfterCatalogLoad() async {
-    if (_pendingModelId == null) return;
+  // ===========================================================================
+  // SECTION 4: STATE MUTATION & MODEL SELECTION
+  // ===========================================================================
 
-    final pendingId = _pendingModelId!;
-    debugPrint(
-        "[ChatSessionProvider] refreshModelAfterCatalogLoad: Attempting to resolve pending ID: $pendingId");
-
-    final langCode = _currentLocale.languageCode;
-    try {
-      // Check if service actually has data now
-      if (_modelService.getCachedModelsSync().isEmpty) {
-        debugPrint(
-            "[ChatSessionProvider] refreshModelAfterCatalogLoad: Service cache still empty. Aborting.");
-        return;
-      }
-
-      if (!_modelService.hasModelInCache(pendingId)) {
-        debugPrint(
-            "[ChatSessionProvider] Pending model '$pendingId' no longer exists. Falling back to dynamic.");
-        _pendingModelId = null;
-        startDynamicConversation(savePreference: true);
-        return;
-      }
-
-      final entity = await _resolveRestorableModelEntity(pendingId, langCode);
-
-      // Clear pending ID first so selectModel doesn't get confused or we don't retry unnecessarily
-      _pendingModelId = null;
-
-      if (!_canUseRestoredModel(entity)) {
-        debugPrint(
-            "[ChatSessionProvider] Pending model '$pendingId' is unavailable on this device. Falling back to dynamic.");
-        startDynamicConversation(savePreference: true);
-        return;
-      }
-
-      selectModel(entity, savePreference: false);
-      debugPrint(
-          "[ChatSessionProvider] Successfully resolved pending model: ${entity.displayTitle}");
-    } catch (e) {
-      debugPrint(
-          "[ChatSessionProvider] Failed to resolve pending model: $pendingId. Error: $e");
-      _pendingModelId = null;
-      startDynamicConversation(savePreference: true);
+  Future<void> initialize() async {
+    final prefs = await _sharedPrefs;
+    final savedModelId = prefs.getString(_prefDefaultModelKey);
+    if (savedModelId != null && savedModelId.isNotEmpty) {
+      _pendingModelId = savedModelId;
     }
   }
 
+  void updateDependencies({ModelLocalStateProvider? localStateProvider}) {
+    if (localStateProvider != null) {
+      _localStateProvider = localStateProvider;
+    }
+  }
+
+  /// Selects a model and persists the user's preferred model ID.
+  void selectModel(ModelEntity model) {
+    _selectedModel = model;
+    _pendingModelId = null;
+    _savePreferredModelId(model.id);
+    _updateLocalModelLoadedState();
+    notifyListeners();
+  }
+
+  /// Updates only the active variant ID while preserving the current series.
+  /// This is used by selectors where the series is already active but a concrete
+  /// backend variant is chosen.
+  void updateActiveModelVariant(String modelId) {
+    try {
+      final langCode = _currentLocale.languageCode;
+      final precise =
+          _modelService.getPreciseModelData(modelId, langCode: langCode);
+      _selectedModel = precise;
+    } catch (_) {
+      if (_selectedModel != null) {
+        _selectedModel = _selectedModel!.copyWith(id: modelId);
+      }
+    }
+    _pendingModelId = null;
+    _savePreferredModelId(modelId);
+    _updateLocalModelLoadedState();
+    notifyListeners();
+  }
+
+  void clearModelSelection() {
+    _selectedModel = null;
+    _pendingModelId = null;
+    _savePreferredModelId('cortex/auto');
+    _updateLocalModelLoadedState();
+    notifyListeners();
+  }
+
+  Future<void> _savePreferredModelId(String id) async {
+    try {
+      final prefs = await _sharedPrefs;
+      await prefs.setString(_prefDefaultModelKey, id);
+    } catch (_) {}
+  }
+
+  /// Re-resolves the currently selected model after the catalog is refreshed.
+  /// Important when Synapse metadata (modalities/variants/titles) changes.
+  void refreshSelectedModelFromCatalog() {
+    final currentId = _selectedModel?.id ?? _pendingModelId;
+    if (currentId == null || currentId.isEmpty || currentId == 'cortex/auto') {
+      return;
+    }
+    try {
+      _selectedModel = _modelService.getPreciseModelData(currentId,
+          langCode: _currentLocale.languageCode);
+      _pendingModelId = null;
+      _updateLocalModelLoadedState();
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> refreshModelAfterCatalogLoad() async {
+    final id = _pendingModelId ?? _selectedModel?.id;
+    if (id == null || id.isEmpty || id == 'cortex/auto') return;
+    try {
+      _selectedModel = _modelService.getPreciseModelData(id,
+          langCode: _currentLocale.languageCode);
+      _pendingModelId = null;
+      _updateLocalModelLoadedState();
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> setUserSubscribed(bool value) async {
+    if (_isUserSubscribed == value) return;
+    _isUserSubscribed = value;
+    notifyListeners();
+  }
+
+  Future<void> updateLocale(Locale locale) async {
+    if (_currentLocale == locale) return;
+    _currentLocale = locale;
+    // Re-resolve selected model so localized title/description stays correct.
+    refreshSelectedModelFromCatalog();
+    notifyListeners();
+  }
+
   // ===========================================================================
-  // SECTION 4: STATE MUTATION METHODS (ACTIONS)
+  // SECTION 5: LOCAL MODEL STATE
   // ===========================================================================
 
-  void setLocale(Locale locale) {
-    _currentLocale = locale;
+  void _updateLocalModelLoadedState() {
+    final selected = _selectedModel;
+    final local = _localStateProvider;
+    if (selected == null || selected.isServerSide) {
+      _isLocalModelLoaded = false;
+      return;
+    }
+
+    if (local == null ||
+        !local.isInitialized ||
+        !local.hasResolvedFilesDirectory) {
+      _isLocalModelLoaded = false;
+      return;
+    }
+
+    // For a series entry, consider it loaded if any local variant is on disk.
+    if (selected.variants != null && selected.variants!.isNotEmpty) {
+      _isLocalModelLoaded = selected.variants!.keys.any((variantId) {
+        final path = local.getFilePathById(variantId);
+        return local.isModelOnDisk(path);
+      });
+      return;
+    }
+
+    final path = local.getFilePathById(selected.id);
+    _isLocalModelLoaded = local.isModelOnDisk(path);
+  }
+
+  // ===========================================================================
+  // SECTION 6: CHAT SESSION HYDRATION / STORAGE
+  // ===========================================================================
+
+  Future<void> hydrateFromConversationModel(String? modelId) async {
+    if (modelId == null || modelId.isEmpty || modelId == 'cortex/auto') {
+      clearModelSelection();
+      return;
+    }
+    try {
+      final precise = _modelService.getPreciseModelData(modelId,
+          langCode: _currentLocale.languageCode);
+      _selectedModel = precise;
+      _pendingModelId = null;
+    } catch (_) {
+      _pendingModelId = modelId;
+    }
+    _updateLocalModelLoadedState();
+    notifyListeners();
+  }
+
+  void restoreSelectionWithoutPersistence(String? modelId) {
+    if (modelId == null || modelId.isEmpty || modelId == 'cortex/auto') {
+      _selectedModel = null;
+      _pendingModelId = null;
+    } else {
+      try {
+        _selectedModel = _modelService.getPreciseModelData(modelId,
+            langCode: _currentLocale.languageCode);
+        _pendingModelId = null;
+      } catch (_) {
+        _pendingModelId = modelId;
+      }
+    }
+    _updateLocalModelLoadedState();
+    notifyListeners();
+  }
+
+  // ===========================================================================
+  // SECTION 7: FLAGS / RESET
+  // ===========================================================================
+
+  void setStorageSufficient(bool value) {
+    if (_isStorageSufficient == value) return;
+    _isStorageSufficient = value;
+    notifyListeners();
   }
 
   void setFluxMode(bool value) {
+    if (_isFluxMode == value) return;
     _isFluxMode = value;
     notifyListeners();
   }
 
-  /// Selects a specific model entity for the session.
-  /// [savePreference]: If true, remembers this model as the default for future new chats.
-  void selectModel(ModelEntity entity, {bool savePreference = true}) {
-    final bool isSameModel = _selectedModel?.id == entity.id;
-    _isExitingChat = false;
-    _selectedModel = entity;
-
-    if (!entity.isServerSide && !isSameModel) {
-      _isLocalModelLoaded = false;
+  void setExitingChat(bool value) {
+    _isExitingChat = value;
+    if (value) {
+      _lastExitedModel = _selectedModel;
+    } else {
+      _lastExitedModel = null;
     }
-
-    final bool shouldSave = savePreference &&
-        entity.category != 'roleplay' &&
-        entity.category != 'self';
-
-    if (shouldSave) {
-      _savePreference(entity.id, entity.displayTitle);
-    }
-
     notifyListeners();
   }
 
-  /// Initializes the session based on the user's last selected preference.
-  /// This is called when the app starts or "New Chat" is clicked.
-  Future<void> initializeDefaultSession() async {
-    final prefs = await _sharedPrefs;
-    String savedId = prefs.getString(_prefDefaultModelKey) ?? 'cortex/auto';
-    final langCode = _currentLocale.languageCode;
-    try {
-      final bool isCacheEmpty = _modelService.getCachedModelsSync().isEmpty;
-
-      // If cache is empty, we must wait for catalog to load before making a final decision.
-      if (isCacheEmpty) {
-        String savedTitle = 'Cortex';
-        _initializeWithStub(savedId, savedTitle);
-        return;
-      }
-
-      // Check internet explicitly for offline fallback
-      final hasInternet = await InternetConnection().hasInternetAccess;
-      if (!hasInternet) {
-        // Find if we have any downloaded offline models
-        final allCachedModels = _modelService.getCachedModelsSync();
-        final offlineModels = allCachedModels.where((m) => m.type == 'offline');
-        final downloadedOfflineModels = offlineModels.where((m) {
-          final provider = _localStateProvider;
-          if (provider == null) return false;
-          final path = provider.getFilePathById(m.id);
-          return provider.isModelOnDisk(path);
-        }).toList();
-
-        if (downloadedOfflineModels.isNotEmpty) {
-          // If the user's saved model is NOT one of the downloaded offline models, override it
-          final isSavedModelDownloadedOffline =
-              downloadedOfflineModels.any((m) => m.id == savedId);
-          if (!isSavedModelDownloadedOffline) {
-            savedId = downloadedOfflineModels.first.id;
-          }
-        }
-      }
-
-      if (!_modelService.hasModelInCache(savedId)) {
-        startDynamicConversation(savePreference: true);
-        return;
-      }
-
-      final entity = await _resolveRestorableModelEntity(savedId, langCode);
-      if (!_canUseRestoredModel(entity)) {
-        startDynamicConversation(savePreference: true);
-        return;
-      }
-      selectModel(entity, savePreference: false);
-    } catch (e) {
-      startDynamicConversation(savePreference: true);
-    }
-  }
-
-  /// Sets up the session for Dynamic Chat (Implicitly cortex/auto).
-  /// This effectively just sets selectedModel to null.
-  void startDynamicConversation({bool savePreference = true}) {
-    _isExitingChat = false;
-    _selectedModel = null;
-    _isLocalModelLoaded = false;
-
-    if (savePreference) {
-      _savePreference('cortex/auto', '');
-    }
-
-    notifyListeners();
-  }
-
-  /// Updates the variant of the currently active model.
-  void updateActiveModelVariant(String newModelId,
-      {bool savePreference = true}) {
-    final langCode = _currentLocale.languageCode;
-    _selectedModel =
-        _modelService.getPreciseModelData(newModelId, langCode: langCode);
-
-    final bool shouldSave = savePreference &&
-        _selectedModel?.category != 'roleplay' &&
-        _selectedModel?.category != 'self';
-
-    if (shouldSave) {
-      _savePreference(newModelId, _selectedModel!.displayTitle);
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> _savePreference(String id, String title) async {
-    try {
-      final prefs = await _sharedPrefs;
-      await prefs.setString(_prefDefaultModelKey, id);
-      await prefs.setString('${_prefDefaultModelKey}_title', title);
-    } catch (e) {
-      debugPrint("Failed to save model preference: $e");
-    }
-  }
-
-  void configureForStandardChat({
-    required ModelEntity model,
-    required bool isPremium,
-  }) {
-    selectModel(model, savePreference: false);
-  }
-
-  /// A complete state wipe out for when the user logs out.
   void resetForLogout() {
-    _isExitingChat = false;
-    _lastExitedModel = null;
     _selectedModel = null;
+    _pendingModelId = null;
     _isUserSubscribed = false;
-    _chatLimitManager = null;
     _displayName = null;
     _email = null;
+    _isStorageSufficient = true;
+    _isFluxMode = false;
+    _isExitingChat = false;
+    _lastExitedModel = null;
     _isLocalModelLoaded = false;
-    _isFluxMode = false;
-    ChatStorageService.isFluxMode = false;
-    _pendingModelId = null;
     notifyListeners();
   }
 
-  /// Resets session flags (Flux etc) but DOES NOT close the chat view.
-  /// Used when starting a new conversation to clear temporary states.
-  void resetSessionState() {
-    _lastExitedModel = _selectedModel;
-    _isExitingChat = true;
-
-    // Reset flags (Do not reset _isLocalModelLoaded here, it is tied to the physical cpp model instance)
-    _isFluxMode = false;
-    ChatStorageService.isFluxMode = false;
-
+  void setProfile({String? displayName, String? email}) {
+    _displayName = displayName;
+    _email = email;
     notifyListeners();
-
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (_isExitingChat) {
-        _isExitingChat = false;
-        _lastExitedModel = null;
-        notifyListeners();
-      }
-    });
-  }
-
-  void setDependencies(ModelLocalStateProvider localStateProvider) {
-    final wasResolved = _hasResolvedLocalModelState;
-    _localStateProvider = localStateProvider;
-    
-    // If the file system has just finished resolving, we MUST notify listeners
-    // so that the ChatScreen can fetch the correct modelPath and start caching.
-    if (!wasResolved && _hasResolvedLocalModelState) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifyListeners();
-      });
-    }
-    
-    unawaited(_reconcileSelectedModelAvailability());
-  }
-
-  bool get _hasResolvedLocalModelState {
-    final localState = _localStateProvider;
-    return localState != null &&
-        localState.isInitialized &&
-        localState.hasResolvedFilesDirectory;
-  }
-
-  bool _isOfflineModelAvailableById(String id) {
-    final localState = _localStateProvider;
-    if (localState == null || !_hasResolvedLocalModelState) {
-      // Local file state is still booting. Defer the final decision so a
-      // valid saved offline selection does not briefly get overwritten.
-      return true;
-    }
-
-    if (localState.downloadCompleted[id] == true) {
-      return true;
-    }
-
-    final path = localState.getFilePathById(id);
-    return localState.isModelOnDisk(path);
-  }
-
-  void removeDownloadedModel(String id) {
-    _localStateProvider?.removeDownloadedModel(id);
-  }
-
-  bool _canUseRestoredModel(ModelEntity entity) {
-    if (entity.id == 'cortex/auto' || entity.id == 'dynamic') return true;
-    if (entity.isServerSide) return true;
-
-    final variants = entity.variants;
-    if (variants != null && variants.isNotEmpty) {
-      return variants.keys.any(_isOfflineModelAvailableById);
-    }
-
-    return _isOfflineModelAvailableById(entity.id);
-  }
-
-  Future<ModelEntity> _resolveRestorableModelEntity(
-    String savedId,
-    String langCode,
-  ) async {
-    final entity =
-        _modelService.getPreciseModelData(savedId, langCode: langCode);
-
-    final variants = entity.variants;
-    if (entity.isServerSide || variants == null || variants.isEmpty) {
-      return entity;
-    }
-
-    final candidateIds = <String>[];
-    final lastUsedId = await Variants.getLastSelectedVariant(entity.id);
-    if (lastUsedId.isNotEmpty && variants.containsKey(lastUsedId)) {
-      candidateIds.add(lastUsedId);
-    }
-    candidateIds.addAll(variants.keys.where((id) => id != lastUsedId));
-
-    for (final candidateId in candidateIds) {
-      if (_isOfflineModelAvailableById(candidateId)) {
-        return _modelService.getPreciseModelData(
-          candidateId,
-          langCode: langCode,
-        );
-      }
-    }
-
-    return entity;
-  }
-
-  Future<void> _reconcileSelectedModelAvailability() async {
-    final model = _selectedModel;
-    if (model == null || model.isServerSide || !_hasResolvedLocalModelState) {
-      return;
-    }
-
-    final langCode = _currentLocale.languageCode;
-    final resolved = await _resolveRestorableModelEntity(model.id, langCode);
-
-    if (!_canUseRestoredModel(resolved)) {
-      debugPrint(
-          "[ChatSessionProvider] Saved offline model '${model.id}' is no longer available. Falling back to Dynamic Chat.");
-      startDynamicConversation(savePreference: true);
-      return;
-    }
-
-    if (resolved.id != model.id) {
-      selectModel(resolved, savePreference: true);
-    }
-  }
-
-  void setLocalModelLoaded(bool isLoaded) {
-    if (_isLocalModelLoaded != isLoaded) {
-      _isLocalModelLoaded = isLoaded;
-      notifyListeners();
-    }
-  }
-
-  void updateUserData(Map<String, dynamic> data) {
-    final int subscriptionLevel = _activeSubscriptionLevelFrom(data);
-    _isUserSubscribed = subscriptionLevel > 0;
-
-    _displayName =
-        data['displayName'] as String? ?? data['username'] as String?;
-    _email = data['email'] as String?;
-
-    final dynamic expiresValue = data['subscriptionExpiresAt'];
-    Timestamp? subscriptionExpiresAt;
-    if (expiresValue is Timestamp) {
-      subscriptionExpiresAt = expiresValue;
-    } else if (expiresValue is String) {
-      final parsedDate = DateTime.tryParse(expiresValue);
-      if (parsedDate != null) {
-        subscriptionExpiresAt = Timestamp.fromDate(parsedDate);
-      }
-    }
-
-    _chatLimitManager = ChatLimitManager(
-      cortexSubscription: subscriptionLevel,
-      subscriptionExpiresAt: subscriptionExpiresAt,
-    );
-
-    notifyListeners();
-  }
-
-  int _parseSubscriptionLevel(dynamic value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
-  }
-
-  Timestamp? _parseSubscriptionTimestamp(dynamic value) {
-    if (value is Timestamp) return value;
-    if (value is DateTime) return Timestamp.fromDate(value);
-    if (value is String) {
-      final parsedDate = DateTime.tryParse(value);
-      if (parsedDate != null) {
-        return Timestamp.fromDate(parsedDate);
-      }
-    }
-    return null;
-  }
-
-  int _activeSubscriptionLevelFrom(Map<String, dynamic> data) {
-    final user = FirebaseAuth.instance.currentUser;
-    final isAnonymous =
-        (user?.isAnonymous ?? false) || data['accountType'] == 'anonymous';
-    if (isAnonymous) return 0;
-
-    final level = _parseSubscriptionLevel(data['hasCortexSubscription']);
-    if (level <= 0) return 0;
-
-    final expiry = _parseSubscriptionTimestamp(data['subscriptionExpiresAt']);
-    if (expiry == null) return level >= 4 && level <= 6 ? level : 0;
-    return expiry.toDate().isAfter(DateTime.now()) ? level : 0;
-  }
-
-  void setStorageSufficient(bool isSufficient) {
-    if (_isStorageSufficient != isSufficient) {
-      _isStorageSufficient = isSufficient;
-      notifyListeners();
-    }
   }
 }
