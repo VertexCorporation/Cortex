@@ -5,6 +5,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+/// The access bands of the daily credit engine, mirroring `ACCESS` in
+/// functions/src/credits.js. The strings are the server's, not ours, so a
+/// mismatch is a compile-time typo rather than a silent wrong gate.
+abstract final class CreditAccess {
+  static const String full = 'full';
+  static const String lowOnly = 'low_only';
+  static const String blocked = 'blocked';
+}
+
+/// Daily allowance per tier, mirroring `DAILY_GRANTS` in
+/// functions/src/credits.js. Needed here only to locate the debt floor, which
+/// is one grant below zero.
+const Map<String, int> _dailyGrants = {
+  'free': 100,
+  'plus': 500,
+  'pro': 1000,
+  'ultra': 10000,
+};
+
 /// Central, singleton-style service that keeps the **current user’s**
 /// credit balance in memory for UI display purposes and provides a real-time
 /// stream of the total credit value.
@@ -30,6 +49,23 @@ class CreditsManager {
   /// and every gate has to ask which one it is looking at.
   final ValueNotifier<bool> billingV2Notifier = ValueNotifier<bool>(false);
 
+  /// Whether the daily credit engine is the one billing this account. Set by
+  /// the server the first time it renews the allowance, so it turns on for a
+  /// user at the same moment the gateway starts charging them that way.
+  final ValueNotifier<bool> creditsV3Notifier = ValueNotifier<bool>(false);
+
+  /// What the balance permits, mirroring `accessFor` in
+  /// functions/src/credits.js:
+  ///
+  ///   full      everything the tier allows
+  ///   low_only  Dynamic Chat, cheapest mode, no model choice
+  ///   blocked   nothing until the allowance renews
+  ///
+  /// The server decides this again on every request; the client tracks it only
+  /// so the UI can stop offering what would be refused.
+  final ValueNotifier<String> accessNotifier =
+      ValueNotifier<String>(CreditAccess.full);
+
   /// What the user can actually spend: the allowance bucket plus owned
   /// credits. This is the number the server gates on, so the client gates on
   /// the same one instead of guessing from a display total.
@@ -40,11 +76,37 @@ class CreditsManager {
   /// a failure the user cannot act on.
   static const int minTextBalance = 50;
 
+  /// Whether the user may pick a specific model, as opposed to being answered
+  /// by Dynamic Chat.
+  ///
+  /// Two separate things close this door and the server treats them the same
+  /// way: model choice is a paid feature, and it is also the first thing to go
+  /// when a paid balance runs out. Deliberately *not* OR'd with the
+  /// subscription flag — a subscriber in the debt band has lost the privilege
+  /// just as a free user never had it, and offering a picker whose choice the
+  /// gateway would silently override is worse than not offering one.
+  ///
+  /// Outside the daily engine this stays true and the old premium filters keep
+  /// deciding what the picker shows.
+  bool get canChooseModel {
+    if (!creditsV3Notifier.value) return true;
+    return accessNotifier.value == CreditAccess.full && _tierIsPaid;
+  }
+
+  /// Whether anything at all can be sent. Only the floor closes this.
+  bool get canSendAnything {
+    if (!creditsV3Notifier.value) return true;
+    return accessNotifier.value != CreditAccess.blocked;
+  }
+
+  bool _tierIsPaid = false;
+
   /// Under billing v2 there is no premium lane — every model bills its real
   /// cost, so anything the user can afford is allowed and this is the only
   /// question worth asking. Before migration it falls back to the predit
   /// balance the old engine maintained.
   bool get canUsePremiumModel {
+    if (creditsV3Notifier.value) return canChooseModel;
     if (billingV2Notifier.value) {
       return (spendableNotifier.value ?? 0) >= minTextBalance;
     }
@@ -52,8 +114,11 @@ class CreditsManager {
   }
 
   /// Dynamic Chat had its own currency (dredits) under the old engine. v2
-  /// retires it: a dynamic turn is billed like any other text turn.
+  /// retires it: a dynamic turn is billed like any other text turn. The daily
+  /// engine goes further — Dynamic Chat is what the user is *left* with in the
+  /// debt band, so it stays open until the floor.
   bool get canSendDynamicChat {
+    if (creditsV3Notifier.value) return canSendAnything;
     if (billingV2Notifier.value) {
       return (spendableNotifier.value ?? 0) >= minTextBalance;
     }
@@ -85,6 +150,56 @@ class CreditsManager {
     return fallback;
   }
 
+  /// Mirrors `resolveTier` in functions/src/credits.js. Levels 4-6 are lifetime
+  /// grants and carry no expiry; 1-3 lapse back to free.
+  String _resolveTier(Map<String, dynamic> data) {
+    final level = _readInt(data['hasCortexSubscription'], 0);
+    if (level == 0) return 'free';
+
+    final lifetime = level >= 4 && level <= 6;
+    if (!lifetime) {
+      final raw = data['subscriptionExpiresAt'];
+      final expiry = raw is Timestamp ? raw.toDate() : null;
+      if (expiry == null || !expiry.isAfter(DateTime.now())) return 'free';
+    }
+
+    switch (level) {
+      case 1:
+      case 4:
+        return 'plus';
+      case 2:
+      case 5:
+        return 'pro';
+      case 3:
+      case 6:
+        return 'ultra';
+      default:
+        return 'free';
+    }
+  }
+
+  /// Mirrors `accessFor` in functions/src/credits.js. The floor is measured on
+  /// the allowance alone, so a purchased wallet widens the top band without
+  /// letting the user go further into debt.
+  String _accessFor(int allowance, int purchased, int grant) {
+    final spendable = allowance + (purchased < 0 ? 0 : purchased);
+    if (spendable > 0) return CreditAccess.full;
+    if (allowance > -grant) return CreditAccess.lowOnly;
+    return CreditAccess.blocked;
+  }
+
+  /// Puts the engine flags back to a neutral state.
+  ///
+  /// Neutral means *open*, not blocked: the server is the real gate, and
+  /// failing closed here would lock a user out of their own app over a
+  /// transient Firestore error.
+  void _resetEngineFlags() {
+    billingV2Notifier.value = false;
+    creditsV3Notifier.value = false;
+    accessNotifier.value = CreditAccess.full;
+    _tierIsPaid = false;
+  }
+
   bool _isStaleListener(int generation, String uid) {
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
     return generation != _listenerGeneration ||
@@ -106,7 +221,7 @@ class CreditsManager {
       preditsNotifier.value = 0;
       dreditsNotifier.value = 0;
       spendableNotifier.value = 0;
-      billingV2Notifier.value = false;
+      _resetEngineFlags();
       return;
     }
 
@@ -133,10 +248,34 @@ class CreditsManager {
       if (snapshot.exists) {
         final data = snapshot.data() ?? {};
         final billingV2 = data['billingV2'] == true;
+        final creditsV3 = data['creditsV3'] == true;
         final main = _readInt(data['credits'], 0);
         billingV2Notifier.value = billingV2;
+        creditsV3Notifier.value = creditsV3;
 
-        if (billingV2) {
+        if (creditsV3) {
+          // One balance: the daily allowance plus whatever was purchased.
+          // `credits` is the wallet and never renews, which is why the two are
+          // kept apart on the server and only added up for display here.
+          final allowance = _readFloor(data['dailyCredits'], 0);
+          final spendable = allowance + main;
+          final tier = _resolveTier(data);
+          final grant = _dailyGrants[tier] ?? _dailyGrants['free']!;
+
+          _tierIsPaid = tier != 'free';
+          accessNotifier.value = _accessFor(allowance, main, grant);
+
+          totalCreditsNotifier.value = spendable;
+          spendableNotifier.value = spendable;
+          // The legacy notifiers still drive a few overlays. Feeding them the
+          // one balance keeps those readouts honest rather than showing a
+          // currency that no longer moves.
+          preditsNotifier.value = spendable;
+          dreditsNotifier.value = spendable;
+
+          debugPrint(
+              "Balances updated (v3): Spendable=$spendable (allowance=$allowance, owned=$main), tier=$tier, access=${accessNotifier.value}");
+        } else if (billingV2) {
           // One currency. Spendable is the allowance bucket plus owned
           // credits — exactly what authorizeRequest checks server-side.
           // predits/dredits still arrive as legacy mirrors for older clients;
@@ -171,6 +310,7 @@ class CreditsManager {
         preditsNotifier.value = 0;
         dreditsNotifier.value = 0;
         spendableNotifier.value = 0;
+        _resetEngineFlags();
       }
     }, onError: (error) {
       if (_isStaleListener(generation, uid)) {
@@ -184,6 +324,7 @@ class CreditsManager {
       preditsNotifier.value = 0;
       dreditsNotifier.value = 0;
       spendableNotifier.value = 0;
+      _resetEngineFlags();
     });
   }
 
@@ -197,6 +338,6 @@ class CreditsManager {
     preditsNotifier.value = null;
     dreditsNotifier.value = null;
     spendableNotifier.value = null;
-    billingV2Notifier.value = false;
+    _resetEngineFlags();
   }
 }
