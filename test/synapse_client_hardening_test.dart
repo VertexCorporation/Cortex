@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cortex/chat/services/utils.dart';
+import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/security.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -86,6 +87,27 @@ void main() {
       expect(result.map((m) => m['id']).toList(),
           ['google--vision', 'meta--vision', 'unique']);
     });
+  });
+
+  test('aggregates image capability from a series vision variant', () {
+    final series = ModelEntity.fromMap({
+      'id': 'claude-series',
+      'title': 'Claude',
+      'producer': 'Anthropic',
+      'type': 'online',
+      'variants': {
+        'Text': {
+          'id': 'anthropic/claude-text',
+          'modalities': {'image': false}
+        },
+        'Vision': {
+          'id': 'anthropic/claude-vision',
+          'modalities': {'image': true}
+        },
+      },
+    }, 'en');
+
+    expect(series.modalities['image'], isTrue);
   });
 
   test('validates GGUF magic bytes', () async {
