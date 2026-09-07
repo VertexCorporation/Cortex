@@ -3,6 +3,25 @@ part of 'service.dart';
 extension FundsVerification on FundsBackend {
   Future<void> _verifyAndCompletePurchase(
       PurchaseDetails purchaseDetails) async {
+    // A store may replay the same purchase while verification is still pending.
+    final receipt = purchaseDetails.verificationData.serverVerificationData;
+    final key = '${purchaseDetails.productID}:'
+        '${purchaseDetails.purchaseID ?? receipt}';
+    try {
+      await _verificationGuard.run(key, () async {
+        if (_disposed || _auth.currentUser == null) return;
+        _notify();
+        await _processPurchase(purchaseDetails);
+      });
+    } catch (e, stack) {
+      await _crashlytics.recordError(e, stack,
+          reason: 'Purchase processing failed', fatal: false);
+    } finally {
+      if (!_disposed) _notify();
+    }
+  }
+
+  Future<void> _processPurchase(PurchaseDetails purchaseDetails) async {
     String? verificationData;
 
     if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -61,7 +80,17 @@ extension FundsVerification on FundsBackend {
         'transactionId': purchaseDetails.purchaseID,
       });
 
-      if (purchaseDetails.pendingCompletePurchase) {
+      // Do not consume Android credits until server verification has succeeded.
+      if (defaultTargetPlatform == TargetPlatform.android &&
+          !FundsBackend._subscriptionIds.contains(purchaseDetails.productID)) {
+        final android = _inAppPurchase
+            .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+        final result = await android.consumePurchase(purchaseDetails);
+        if (result.responseCode != BillingResponse.ok) {
+          throw StateError('Could not consume verified purchase: '
+              '${result.responseCode}');
+        }
+      } else if (purchaseDetails.pendingCompletePurchase) {
         await _inAppPurchase.completePurchase(purchaseDetails);
       }
 
@@ -100,25 +129,13 @@ extension FundsVerification on FundsBackend {
       log('Verification failed: ${e.message} (Code: ${e.code})',
           name: FundsBackend._logName);
 
-      if (e.code == 'invalid-argument' ||
-          e.code == 'not-found' ||
-          e.code == 'already-exists') {
-        log('Fatal error. Clearing from queue.', name: FundsBackend._logName);
-        if (purchaseDetails.pendingCompletePurchase) {
-          await _inAppPurchase.completePurchase(purchaseDetails);
-        }
-        _notificationService?.showNotification(
-          message: _localizations?.purchaseError ?? 'purchaseError',
-          type: NotificationType.error,
-          oneLine: false,
-        );
-      } else {
-        _notificationService?.showNotification(
-          message: _localizations?.verificationDelayed ?? 'verificationDelayed',
-          type: NotificationType.error,
-          oneLine: false,
-        );
-      }
+      // A generic error code does not prove that entitlement was delivered.
+      // Keep the transaction recoverable until the server confirms success.
+      _notificationService?.showNotification(
+        message: _localizations?.verificationDelayed ?? 'verificationDelayed',
+        type: NotificationType.error,
+        oneLine: false,
+      );
 
       await _crashlytics.recordError(e, stack,
           reason: 'Server returned HttpsError for ${purchaseDetails.productID}',
