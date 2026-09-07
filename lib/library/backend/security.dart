@@ -160,7 +160,12 @@ class ModelSecurity {
     if (parts.length != 4) return false;
     final octets = parts.map(int.tryParse).toList();
     if (octets.any((value) => value == null)) return false;
-    if (octets.any((value) => value! < 0 || value > 255)) return false;
+    if (octets.any((value) {
+      final octet = value!;
+      return octet < 0 || octet > 255;
+    })) {
+      return false;
+    }
 
     final a = octets[0]!;
     final b = octets[1]!;
