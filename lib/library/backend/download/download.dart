@@ -8,6 +8,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import '../security.dart';
 
 class DownloadManager extends ChangeNotifier {
   bool isDownloading = false;
@@ -141,6 +142,22 @@ class FileDownloadHelper extends ChangeNotifier {
           } else if (dstatus == DownloadTaskStatus.enqueued) {
             // Do nothing
           } else if (dstatus == DownloadTaskStatus.complete) {
+            final downloadedFile = File(taskInfo.filePath);
+            final isValid = await ModelSecurity.isValidGgufFile(downloadedFile);
+            if (!isValid) {
+              if (await downloadedFile.exists()) {
+                try {
+                  await downloadedFile.delete();
+                } catch (_) {}
+              }
+              taskInfo.onDownloadError(
+                  'Downloaded file is not a valid GGUF model.');
+              _tasks.remove(taskId);
+              debugPrint(
+                  "[FileDownloadHelper] Rejected invalid GGUF download for '${taskInfo.modelId}'.");
+              return;
+            }
+
             taskInfo.onDownloadCompleted(taskId);
             _tasks.remove(taskId);
             debugPrint(
@@ -209,6 +226,8 @@ class FileDownloadHelper extends ChangeNotifier {
     required bool showNotification,
   }) async {
     try {
+      final safeUrl = ModelSecurity.requireTrustedDownloadUri(url).toString();
+
       _status = 'Downloading';
       refresh();
 
@@ -236,7 +255,7 @@ class FileDownloadHelper extends ChangeNotifier {
       if (!useDioFallback) {
         try {
           taskId = await FlutterDownloader.enqueue(
-            url: url,
+            url: safeUrl,
             savedDir: savedDir,
             fileName: fileName,
             showNotification: showNotification,
@@ -263,7 +282,7 @@ class FileDownloadHelper extends ChangeNotifier {
           taskId: taskId,
           title: title,
           filePath: filePath,
-          url: url,
+          url: safeUrl,
           cancelToken: cancelToken,
           isDioFallback: true,
           onProgress: onProgress,
@@ -279,7 +298,7 @@ class FileDownloadHelper extends ChangeNotifier {
           taskId: taskId,
           title: title,
           filePath: filePath,
-          url: url,
+          url: safeUrl,
           onProgress: onProgress,
           onDownloadCompleted: onDownloadCompleted,
           onDownloadError: onDownloadError,
@@ -326,6 +345,11 @@ class FileDownloadHelper extends ChangeNotifier {
       );
 
       final tempFile = File(tempFilePath);
+      if (!await ModelSecurity.isValidGgufFile(tempFile)) {
+        if (await tempFile.exists()) await tempFile.delete();
+        throw StateError('Downloaded file is not a valid GGUF model.');
+      }
+
       if (await tempFile.exists()) {
         await tempFile.rename(taskInfo.filePath);
       }
