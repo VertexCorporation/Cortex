@@ -43,84 +43,34 @@ class ModelEntity {
       }
     }
 
-    // Strip lone leading/trailing formatting chars
     result = result.replaceAll(_loneLeadingQuotes, '');
     result = result.replaceAll(_loneTrailingQuotes, '');
     return result.trim();
   }
 
-  /// The unique identifier for the model (e.g., 'gpt-5', 'neuro').
   final String id;
-
-  /// The display-ready, localized title.
   final String displayTitle;
-
-  /// The series of the model.
   final String? series;
-
-  /// The name of the entity or company that produced the model.
   final String producer;
-
-  /// The type of the model (e.g., 'online', 'offline').
   final String type;
-
-  /// The source/provider of the model (e.g., 'openrouter', 'fal', 'huggingface').
   final String source;
-
-  /// The category of the model (e.g., 'roleplay', 'self', 'assistant').
   final String category;
-
-  /// The system prompt or persona definition for roleplay models.
   final String? role;
-
-  /// The display-ready, localized summary.
   final String displaySummary;
-
-  /// The display-ready, localized detailed description.
   final String displayDescription;
-
-  /// The ID of the base model this model is derived from.
   final String? baseModelId;
-
-  /// The raw path to the model's image asset (local file path, asset path, or URL).
   final String? imagePath;
-
-  /// The path to the GGUF file for offline models.
   final String? ggufPath;
-
-  /// The tier of the model (e.g., 'free', 'premium').
   final String tier;
-
-  /// The size of the model in megabytes (MB).
   final int? size;
-
-  /// The required RAM in megabytes (MB) to run the model.
   final int? ram;
-
-  /// A map defining the input modalities supported by the model (e.g., {'image': true}).
   final Map<String, dynamic> modalities;
-
-  /// A map defining the output capabilities of the model (e.g., {'text': true}).
   final Map<String, dynamic> outputs;
-
-  /// Whether the model supports tool use.
   final bool toolUse;
-
-  /// A map containing variant data for variant models.
   final Map<String, dynamic>? variants;
-
-  /// The URL for downloading the model.
   final String? url;
-
-  /// The context window or other technical context for the model (e.g., "8k", "128k").
   final String? context;
-
-  /// Indicates if all main text fields were successfully localized
-  /// for the current non-English language, or if an English fallback was used.
-  /// This is calculated and provided by the ModelRepository.
   final bool isFullyLocalized;
-
-  /// The chat format configuration for offline models.
   final ChatFormat? chatFormat;
 
   const ModelEntity({
@@ -183,6 +133,30 @@ class ModelEntity {
       return null;
     }
 
+    /// A top-level catalog entry can represent a series rather than one exact
+    /// backend model. Synapse keeps capabilities on individual variants, while
+    /// the UI asks the parent ModelEntity whether it can accept an image/audio
+    /// input. Aggregate true capabilities from every variant so those two views
+    /// cannot disagree. Explicit parent values are preserved.
+    Map<String, dynamic> aggregateModalities() {
+      final result = _safeStringKeyMap(map['modalities']);
+      final rawVariants = map['variants'];
+      if (rawVariants is! Map) return result;
+
+      for (final rawVariant in rawVariants.values) {
+        if (rawVariant is! Map) continue;
+        final variantModalities = _safeStringKeyMap(rawVariant['modalities']);
+        for (final entry in variantModalities.entries) {
+          if (entry.value == true) {
+            result[entry.key] = true;
+          } else {
+            result.putIfAbsent(entry.key, () => entry.value);
+          }
+        }
+      }
+      return result;
+    }
+
     final id = map['id']?.toString() ?? 'unknown';
     final seriesSource = getStringOrLocalized(map['series']);
     final rawTitleCandidate = getLocalizedFieldFromDetails('title') ??
@@ -227,7 +201,7 @@ class ModelEntity {
       tier: getStringOrLocalized(map['tier']) ?? 'free',
       size: int.tryParse(map['size']?.toString() ?? ''),
       ram: int.tryParse(map['ram']?.toString() ?? ''),
-      modalities: _safeStringKeyMap(map['modalities']),
+      modalities: aggregateModalities(),
       outputs: _safeStringKeyMap(map['outputs']),
       toolUse: map['toolUse'] == true,
       variants: map['variants'] is Map
@@ -270,7 +244,6 @@ class ModelEntity {
     return jsonDecode(jsonEncode(value));
   }
 
-  /// Creates a copy of this [ModelEntity] but with the given fields replaced.
   ModelEntity copyWith({
     String? id,
     String? displayTitle,
@@ -325,7 +298,6 @@ class ModelEntity {
     );
   }
 
-  /// Converts the [ModelEntity] back to a generic map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -354,15 +326,12 @@ class ModelEntity {
     };
   }
 
-  // --- Getters for convenience ---
-
   bool get isCustomModel =>
       source == 'user' || id.startsWith('self_') || id.startsWith('local_');
 
   bool get isServerSide => type != 'offline';
 
   bool get isPremium {
-    // Explicit list of premium models as requested by the user.
     final premiumKeywords = [
       'claude',
       'codex',
