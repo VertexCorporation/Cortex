@@ -47,6 +47,7 @@ class ContextService {
 
     // Read the system role from the session provider.
     String? systemRole = _sessionProvider.role;
+    String? runtimeIdentityDirective;
 
     final String fallbackRole =
         localizations?.systemRoleFallback ?? "You are a helpful assistant.";
@@ -97,10 +98,9 @@ class ContextService {
           targetModelId == 'cortex/auto' ||
           targetModelId == 'dynamic';
 
-      String identityDirective;
       if (isDynamicIdentity) {
-        identityDirective =
-            "\n\n[Runtime identity]\nYou are Cortex Dynamic Chat. The underlying provider may be selected automatically per request. If the user asks which model you are, identify yourself as Cortex Dynamic Chat and do not invent or claim a specific OpenAI, Anthropic, Meta, Google, or other provider model.";
+        runtimeIdentityDirective =
+            "[Runtime identity]\nYou are Cortex Dynamic Chat. The underlying provider may be selected automatically per request. If the user asks which model you are, identify yourself as Cortex Dynamic Chat and do not invent or claim a specific OpenAI, Anthropic, Meta, Google, or other provider model.";
       } else {
         final targetModel =
             _modelService.getPreciseModelData(targetModelId, langCode: langCode);
@@ -111,10 +111,9 @@ class ContextService {
                 !title.toLowerCase().startsWith(producer.toLowerCase())
             ? '$producer $title'
             : title;
-        identityDirective =
-            "\n\n[Runtime identity]\nYou are currently running as ${identity.isEmpty ? targetModel.id : identity} (model id: ${targetModel.id}). If the user asks which model you are, use this runtime identity. Never claim to be a different model or provider based on training data, prior assistant messages, or guesses.";
+        runtimeIdentityDirective =
+            "[Runtime identity]\nYou are currently running as ${identity.isEmpty ? targetModel.id : identity} (model id: ${targetModel.id}). If the user asks which model you are, use this runtime identity. Never claim to be a different model or provider based on training data, prior assistant messages, or guesses.";
       }
-      systemRole = (systemRole ?? fallbackRole) + identityDirective;
     }
 
     // Thinking mode
@@ -173,9 +172,18 @@ class ContextService {
           modality: 'image',
         );
 
-    // Hard system prompt character budget. Apply the budget before adding the
-    // system message so the actual payload is bounded too.
+    // Hard system prompt character budget. Reserve room for the runtime identity
+    // so it cannot be truncated away by a long persona/memory prompt.
     const int systemBudget = 2500;
+    if (runtimeIdentityDirective != null) {
+      final reserved = runtimeIdentityDirective.length + 2;
+      final baseBudget = (systemBudget - reserved).clamp(0, systemBudget);
+      final base = systemRole ?? fallbackRole;
+      systemRole = base.length > baseBudget
+          ? base.substring(0, baseBudget)
+          : base;
+      systemRole = '$systemRole\n\n$runtimeIdentityDirective';
+    }
     if (systemRole != null && systemRole.length > systemBudget) {
       systemRole = systemRole.substring(0, systemBudget);
     }
@@ -228,13 +236,27 @@ class ContextService {
       compressedPromptLength: compressedLength,
     );
 
-    // Safety check: Filter out empty messages
-    return compressedMessages.where((m) {
+    // Safety check: Filter out empty messages.
+    final result = compressedMessages.where((m) {
       final content = m['content'];
       if (content is String) return content.isNotEmpty;
       if (content is List) return content.isNotEmpty;
       return false;
     }).toList();
+
+    // OfflineService converts only user/assistant history turns into the native
+    // llama prompt and intentionally ignores ContextService's system entry.
+    // Repeat the small runtime identity as the final context instruction for
+    // offline models so a local Llama/Qwen/etc. cannot claim to be GPT/Claude
+    // merely because of its training data. This is not added for online calls.
+    if (!isServerSide && runtimeIdentityDirective != null) {
+      result.add({
+        "role": "user",
+        "content": runtimeIdentityDirective,
+      });
+    }
+
+    return result;
   }
 
   /// Helper function to convert a single `Message` object to the required
