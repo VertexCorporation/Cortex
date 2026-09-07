@@ -45,20 +45,17 @@ class ContextService {
   }) async {
     final List<Map<String, dynamic>> contextMessages = [];
 
-    // Read the system role from the session provider.
     String? systemRole = _sessionProvider.role;
     String? runtimeIdentityDirective;
 
     final String fallbackRole =
         localizations?.systemRoleFallback ?? "You are a helpful assistant.";
 
-    // Language instruction FIRST to prevent English-heavy blocks below from priming the model
     if (localizations != null) {
       systemRole = (systemRole ?? fallbackRole) +
           localizations.systemLanguageInstruction;
     }
 
-    // Inject current date and time for non-character models
     if (localizations != null && !isCharacterModel) {
       final now = DateTime.now();
       final formattedTime = DateFormat.yMMMd(langCode).add_Hm().format(now);
@@ -66,13 +63,11 @@ class ContextService {
           localizations.systemTimeInfo(formattedTime);
     }
 
-    // User memory - short, relevant facts only
     if (isServerSide && userMemory != null && userMemory.trim().isNotEmpty) {
       final memoryPrompt = "\n\n[User Memory]\n$userMemory";
       systemRole = (systemRole ?? fallbackRole) + memoryPrompt;
     }
 
-    // Custom instruction (Intelligence)
     if (customInstruction != null &&
         customInstruction.trim().isNotEmpty &&
         localizations != null) {
@@ -81,18 +76,15 @@ class ContextService {
       systemRole = (systemRole ?? fallbackRole) + instructionPrompt;
     }
 
-    // Brief tone/style instruction
     if (!isCharacterModel) {
       const toneDirective =
           "\n\nBe natural, conversational and direct. Avoid poetic or dramatic language unless asked.";
       systemRole = (systemRole ?? fallbackRole) + toneDirective;
     }
 
-    // Keep model identity deterministic. Model IDs stored on old assistant
-    // messages are UI metadata and must never be used as conversational text.
-    // Dynamic Chat intentionally hides the provider selected for an individual
-    // request, so it identifies itself as Cortex rather than hallucinating a
-    // provider/model name.
+    // Model IDs stored on assistant messages are presentation/storage metadata.
+    // Keep the model's runtime identity out of conversation history and define it
+    // once from the actual model selected for this request.
     if (!isCharacterModel) {
       final isDynamicIdentity = _sessionProvider.isDynamicChat ||
           targetModelId == 'cortex/auto' ||
@@ -116,15 +108,12 @@ class ContextService {
       }
     }
 
-    // Thinking mode
     if (enableThinkingMode && localizations != null) {
       final thinkingInstruction =
           "\n\n${localizations.thinkingModeInstruction}";
       systemRole = (systemRole ?? fallbackRole) + thinkingInstruction;
     }
 
-    // Read the message list from the conversation provider and filter for valid context.
-    // We specifically exclude messages that are not visible to the user (e.g., pre-input prompts).
     List<Message> history = _conversationProvider.messages
         .where((m) =>
             m.includeInContext && !m.isThinking && !m.isError && m.isVisible)
@@ -134,7 +123,6 @@ class ContextService {
 
     final bool isLowEnd = _isLowEndModel(targetModelId);
 
-    // Memory extraction: only after meaningful conversation (3+ user messages)
     if (isServerSide && !isCharacterModel && userMessageCount >= 3) {
       final extractionInstruction = localizations != null
           ? localizations.systemMemoryDirective
@@ -142,7 +130,6 @@ class ContextService {
       systemRole = (systemRole ?? fallbackRole) + extractionInstruction;
     }
 
-    // Retrieve related context from past conversations
     String? lastUserText;
     if (history.isNotEmpty) {
       final lastUserMsg =
@@ -172,12 +159,11 @@ class ContextService {
           modality: 'image',
         );
 
-    // Hard system prompt character budget. Reserve room for the runtime identity
-    // so it cannot be truncated away by a long persona/memory prompt.
     const int systemBudget = 2500;
     if (runtimeIdentityDirective != null) {
       final reserved = runtimeIdentityDirective.length + 2;
-      final baseBudget = (systemBudget - reserved).clamp(0, systemBudget);
+      final int baseBudget =
+          systemBudget > reserved ? systemBudget - reserved : 0;
       final base = systemRole ?? fallbackRole;
       systemRole = base.length > baseBudget
           ? base.substring(0, baseBudget)
@@ -188,13 +174,10 @@ class ContextService {
       systemRole = systemRole.substring(0, systemBudget);
     }
 
-    // Add the system prompt to the context, if it exists.
     if (systemRole != null && systemRole.isNotEmpty) {
       contextMessages.add({"role": "system", "content": systemRole});
     }
 
-    // If we're regenerating a response, exclude the last user message
-    // because it will be added again by the SendService.
     if (!includeLastUser && history.isNotEmpty) {
       final int lastUserMessageIndex =
           history.lastIndexWhere((m) => m.isUserMessage);
@@ -203,7 +186,6 @@ class ContextService {
       }
     }
 
-    // Loop through the filtered history and format each message into the API's required JSON structure.
     for (final message in history) {
       contextMessages.addAll(await _formatMessagesToJson(
         message,
@@ -236,7 +218,6 @@ class ContextService {
       compressedPromptLength: compressedLength,
     );
 
-    // Safety check: Filter out empty messages.
     final result = compressedMessages.where((m) {
       final content = m['content'];
       if (content is String) return content.isNotEmpty;
@@ -244,11 +225,10 @@ class ContextService {
       return false;
     }).toList();
 
-    // OfflineService converts only user/assistant history turns into the native
-    // llama prompt and intentionally ignores ContextService's system entry.
-    // Repeat the small runtime identity as the final context instruction for
-    // offline models so a local Llama/Qwen/etc. cannot claim to be GPT/Claude
-    // merely because of its training data. This is not added for online calls.
+    // OfflineService intentionally converts only user/assistant history turns
+    // into the native llama prompt. Carry the runtime identity as the final
+    // offline context instruction so local models cannot self-identify from
+    // their training data instead of the model Cortex actually loaded.
     if (!isServerSide && runtimeIdentityDirective != null) {
       result.add({
         "role": "user",
@@ -259,9 +239,6 @@ class ContextService {
     return result;
   }
 
-  /// Helper function to convert a single `Message` object to the required
-  /// multimodal JSON format. If the assistant generated an image, we split it
-  /// into a separate synthetic user message so the vision API accepts it.
   Future<List<Map<String, dynamic>>> _formatMessagesToJson(Message message,
       {required bool includeImage,
       required bool includeAllMedia,
@@ -270,9 +247,8 @@ class ContextService {
     List<Map<String, dynamic>> textParts = [];
     List<Map<String, dynamic>> mediaParts = [];
 
-    // 1. Text Content. `message.model` is UI/storage metadata, not dialogue.
-    // Prefixing it into assistant text causes cross-model identity contamination
-    // when the user switches from e.g. Cortex to Llama or Claude.
+    // `message.model` is UI/storage metadata, not dialogue. Prefixing it into
+    // assistant content contaminates the next model after a model switch.
     if (message.text.isNotEmpty) {
       final String processedText = message.isUserMessage
           ? LocalPiiRedactionFilter.redact(message.text)
@@ -280,7 +256,6 @@ class ContextService {
       textParts.add({"type": "text", "text": processedText});
     }
 
-    // 2. Attachment Content
     if (includeImage && message.hasAttachments) {
       for (final path in message.attachmentPaths) {
         if (_isImageFile(path) ||
