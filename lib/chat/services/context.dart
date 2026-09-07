@@ -82,9 +82,39 @@ class ContextService {
 
     // Brief tone/style instruction
     if (!isCharacterModel) {
-      final toneDirective =
+      const toneDirective =
           "\n\nBe natural, conversational and direct. Avoid poetic or dramatic language unless asked.";
       systemRole = (systemRole ?? fallbackRole) + toneDirective;
+    }
+
+    // Keep model identity deterministic. Model IDs stored on old assistant
+    // messages are UI metadata and must never be used as conversational text.
+    // Dynamic Chat intentionally hides the provider selected for an individual
+    // request, so it identifies itself as Cortex rather than hallucinating a
+    // provider/model name.
+    if (!isCharacterModel) {
+      final isDynamicIdentity = _sessionProvider.isDynamicChat ||
+          targetModelId == 'cortex/auto' ||
+          targetModelId == 'dynamic';
+
+      String identityDirective;
+      if (isDynamicIdentity) {
+        identityDirective =
+            "\n\n[Runtime identity]\nYou are Cortex Dynamic Chat. The underlying provider may be selected automatically per request. If the user asks which model you are, identify yourself as Cortex Dynamic Chat and do not invent or claim a specific OpenAI, Anthropic, Meta, Google, or other provider model.";
+      } else {
+        final targetModel =
+            _modelService.getPreciseModelData(targetModelId, langCode: langCode);
+        final title = targetModel.displayTitle.trim();
+        final producer = targetModel.producer.trim();
+        final identity = producer.isNotEmpty &&
+                producer.toLowerCase() != 'unknown' &&
+                !title.toLowerCase().startsWith(producer.toLowerCase())
+            ? '$producer $title'
+            : title;
+        identityDirective =
+            "\n\n[Runtime identity]\nYou are currently running as ${identity.isEmpty ? targetModel.id : identity} (model id: ${targetModel.id}). If the user asks which model you are, use this runtime identity. Never claim to be a different model or provider based on training data, prior assistant messages, or guesses.";
+      }
+      systemRole = (systemRole ?? fallbackRole) + identityDirective;
     }
 
     // Thinking mode
@@ -143,6 +173,13 @@ class ContextService {
           modality: 'image',
         );
 
+    // Hard system prompt character budget. Apply the budget before adding the
+    // system message so the actual payload is bounded too.
+    const int systemBudget = 2500;
+    if (systemRole != null && systemRole.length > systemBudget) {
+      systemRole = systemRole.substring(0, systemBudget);
+    }
+
     // Add the system prompt to the context, if it exists.
     if (systemRole != null && systemRole.isNotEmpty) {
       contextMessages.add({"role": "system", "content": systemRole});
@@ -175,12 +212,6 @@ class ContextService {
         if (c is String) len += c.length + 1;
       }
       return len;
-    }
-
-    // Hard system prompt character budget
-    const int systemBudget = 2500;
-    if (systemRole != null && systemRole.length > systemBudget) {
-      systemRole = systemRole.substring(0, systemBudget);
     }
 
     final int originalLength = totalContentLength(contextMessages);
@@ -217,13 +248,13 @@ class ContextService {
     List<Map<String, dynamic>> textParts = [];
     List<Map<String, dynamic>> mediaParts = [];
 
-    // 1. Text Content
+    // 1. Text Content. `message.model` is UI/storage metadata, not dialogue.
+    // Prefixing it into assistant text causes cross-model identity contamination
+    // when the user switches from e.g. Cortex to Llama or Claude.
     if (message.text.isNotEmpty) {
       final String processedText = message.isUserMessage
           ? LocalPiiRedactionFilter.redact(message.text)
-          : (message.model != null && message.model!.isNotEmpty
-              ? "[Model: ${message.model}] ${message.text}"
-              : message.text);
+          : message.text;
       textParts.add({"type": "text", "text": processedText});
     }
 
