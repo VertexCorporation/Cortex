@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:async';
+import 'web_sources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/chat/services/tools.dart';
 import 'package:cortex/chat/services/utils.dart';
@@ -509,8 +510,9 @@ class ApiService {
 
                   case 'citations':
                     onWebSearchActive?.call(false);
-                    if (data['citations'] is List && onCitations != null) {
-                      onCitations(data['citations'] as List<dynamic>);
+                    final sources = mergeWebSources(const [], data);
+                    if (sources.isNotEmpty) {
+                      onCitations?.call(sources);
                     }
                     break;
 
@@ -684,6 +686,7 @@ class ApiService {
       throw ApiException(localizations.errorNetwork);
     } finally {
       _cancelToken = null;
+      onWebSearchActive?.call(false);
     }
   }
 
@@ -698,6 +701,9 @@ class ApiService {
     String? source,
     List<String> attachmentPaths = const [],
     bool enablefeatureReasoning = false,
+    bool enableWebSearch = false,
+    Function(List<dynamic>)? onCitations,
+    Function(bool)? onWebSearchActive,
     Function(String)? onTextChunk,
     Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
@@ -727,9 +733,10 @@ class ApiService {
       isPremium: isPremium,
       source: source,
       enablefeatureReasoning: enablefeatureReasoning,
-      enableWebSearch: false,
+      enableWebSearch: enableWebSearch,
       isCharacterModel: true,
-      // Characters usually don't need web search, or pass it if needed
+      onCitations: onCitations,
+      onWebSearchActive: onWebSearchActive,
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
       onVideoReceived: onVideoReceived,

@@ -1121,6 +1121,8 @@ class SendService {
     bool shouldContinue = true;
     int loopCount = 0;
     const int maxLoops = 5; // Safety break
+    // Preserve the choice for this send, even if another chat changes the UI.
+    final webSearchRequested = _inputProvider.enableWebSearch;
 
     // State for managing featureReasoning block - OUTSIDE loop to persist across iterations
     // enablefeatureReasoning is already defined above when building context
@@ -1404,6 +1406,14 @@ class SendService {
         return;
       }
 
+      void onSearchSources(List<dynamic> citations) {
+        setWebSearchActive(false);
+        if (_isConversationActive(targetConvId)) {
+          _conversationProvider.updateLastBotMessageSources(
+              citations, messageIndex: aiMessageIndex);
+        }
+      }
+
       // Execute Request
       if (isCharacterModel) {
         // Characters typically don't use tools in this architecture yet
@@ -1421,6 +1431,9 @@ class SendService {
           source: characterBaseModel.source,
           isPremium: isPremium,
           enablefeatureReasoning: enablefeatureReasoning,
+          enableWebSearch: webSearchRequested,
+          onCitations: onSearchSources,
+          onWebSearchActive: setWebSearchActive,
           localizations: localizations,
           onTextChunk: onTextChunk,
           onfeatureReasoning: onfeatureReasoning,
@@ -1476,7 +1489,7 @@ class SendService {
         }
         // --------------------------------------------------
 
-        final enableWebSearch = !isMediaModel && _inputProvider.enableWebSearch;
+        final enableWebSearch = !isMediaModel && webSearchRequested;
         if (enableWebSearch) {
           setWebSearchActive(true);
         }
@@ -1504,12 +1517,7 @@ class SendService {
           onToolCall: (tools) {
             turnToolCalls = tools;
           },
-          onCitations: (citations) {
-            setWebSearchActive(false);
-            if (_isConversationActive(targetConvId)) {
-              _conversationProvider.updateLastBotMessageSources(citations);
-            }
-          },
+          onCitations: onSearchSources,
           onWebSearchActive: setWebSearchActive,
         );
       }

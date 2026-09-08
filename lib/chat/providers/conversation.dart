@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cortex/chat/messages/messages.dart';
 
 import '../../cache.dart';
+import '../services/web_sources.dart';
 
 /// A dedicated provider responsible for managing the state of an active conversation.
 ///
@@ -401,29 +402,13 @@ class ConversationProvider with ChangeNotifier {
     _scheduleStreamUpdate();
   }
 
-  void updateLastBotMessageSources(List<dynamic> sources) {
-    if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
-      final lastMessage = _messages.last;
-
-      // Merge with existing sources if they exist, or just use the new ones
-      List<dynamic> updatedSources = [];
-      if (lastMessage.webSearchSources != null) {
-        updatedSources.addAll(lastMessage.webSearchSources!);
-      }
-      for (var source in sources) {
-        // Prevent duplicates
-        bool exists = updatedSources.any((existing) {
-          if (existing is Map && source is Map) {
-            return existing['url'] == source['url'];
-          }
-          return existing == source;
-        });
-        if (!exists) {
-          updatedSources.add(source);
-        }
-      }
-
-      _messages[_messages.length - 1] = lastMessage.copyWith(
+  void updateLastBotMessageSources(List<dynamic> sources, {int? messageIndex}) {
+    final index = messageIndex ?? _messages.length - 1;
+    if (index >= 0 && index < _messages.length && !_messages[index].isUserMessage) {
+      final lastMessage = _messages[index];
+      final updatedSources = mergeWebSources(
+          lastMessage.webSearchSources ?? const [], sources);
+      _messages[index] = lastMessage.copyWith(
         webSearchSources: updatedSources.isNotEmpty ? updatedSources : null,
       );
       _scheduleStreamUpdate(); // Reuse throttle logic
