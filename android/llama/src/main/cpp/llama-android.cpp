@@ -1,4 +1,5 @@
 #include <atomic>
+#include <algorithm>
 #include <android/log.h>
 #include <jni.h>
 #include <iomanip>
@@ -39,6 +40,11 @@ jmethodID la_int_var_inc = nullptr;
 std::string cached_token_chars;
 
 static std::atomic<bool> g_stop_requested(false);
+
+// The app owns a single native model instance. Keep the exact token sequence
+// represented by its KV cache so a later prompt can reuse a verified prefix.
+static llama_context * g_cached_context = nullptr;
+static std::vector<llama_token> g_cached_sequence_tokens;
 
 static std::vector<uint8_t> g_image_bytes;
 static std::mutex g_image_mutex;
@@ -92,10 +98,12 @@ JNIEXPORT jlong JNICALL
 Java_android_llama_cpp_LLamaAndroid_load_1model(JNIEnv *env, jobject, jstring filename, jint n_gpu_layers) {
     llama_model_params model_params = llama_model_default_params();
 
-    // GPU OFFLOADING: Set the number of layers to offload to GPU
-    // 99 = offload all layers (Vulkan/OpenCL if available)
-    // 0 = CPU only
+    // This Android target is currently built without GGML_VULKAN, so Dart
+    // supplies zero. Keep the parameter wired for a future verified backend.
     model_params.n_gpu_layers = n_gpu_layers;
+    // llama.cpp supports mmap for GGUF files on Android. Make the intended
+    // default explicit so weights are not copied into an additional heap buffer.
+    model_params.use_mmap = llama_supports_mmap();
 
     auto path_to_model = env->GetStringUTFChars(filename, 0);
     LOGi("Loading model from %s with n_gpu_layers=%d", path_to_model, n_gpu_layers);
@@ -110,6 +118,14 @@ Java_android_llama_cpp_LLamaAndroid_load_1model(JNIEnv *env, jobject, jstring fi
     }
 
     return reinterpret_cast<jlong>(model);
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_android_llama_cpp_LLamaAndroid_model_1n_1ctx_1train(
+        JNIEnv *, jobject, jlong model_pointer) {
+    const auto model = reinterpret_cast<llama_model *>(model_pointer);
+    return model ? llama_model_n_ctx_train(model) : 0;
 }
 
 // This is the NEW JNI function to set the stop flag from Kotlin.
@@ -160,7 +176,15 @@ llama_model_free(reinterpret_cast<llama_model *>(model));
 
 extern "C"
 JNIEXPORT jlong JNICALL
-        Java_android_llama_cpp_LLamaAndroid_new_1context(JNIEnv *env, jobject, jlong jmodel, jint n_ctx, jint n_threads) {
+Java_android_llama_cpp_LLamaAndroid_new_1context(
+        JNIEnv *env,
+        jobject,
+        jlong jmodel,
+        jint n_ctx,
+        jint n_threads,
+        jint n_threads_batch,
+        jint n_batch,
+        jint n_ubatch) {
 auto model = reinterpret_cast<llama_model *>(jmodel);
 
 if (!model) {
@@ -170,15 +194,29 @@ return 0;
 }
 
 // Use provided thread count, or fallback to auto-detection
-int threads = n_threads > 0 ? n_threads : std::max(1, std::min(8, (int) sysconf(_SC_NPROCESSORS_ONLN) - 2));
-LOGi("Creating context with n_ctx=%d, n_threads=%d", n_ctx, threads);
+const int detected_cores = std::max(1L, sysconf(_SC_NPROCESSORS_ONLN));
+const int threads = n_threads > 0
+        ? n_threads
+        : std::max(1, std::min(8, detected_cores - 1));
+const int batch_threads = n_threads_batch > 0 ? n_threads_batch : threads;
+const int model_context = llama_model_n_ctx_train(model);
+const int context_size = model_context > 0
+        ? std::clamp(static_cast<int>(n_ctx), 128, model_context)
+        : std::max(128, static_cast<int>(n_ctx));
+const int batch_size = std::clamp(static_cast<int>(n_batch), 32, context_size);
+const int ubatch_size = std::clamp(static_cast<int>(n_ubatch), 32, batch_size);
+
+LOGi("Creating context ctx=%d threads=%d/%d batch=%d/%d",
+     context_size, threads, batch_threads, batch_size, ubatch_size);
 
 llama_context_params ctx_params = llama_context_default_params();
 
 // DYNAMIC CONTEXT SIZE from Dart!
-ctx_params.n_ctx           = n_ctx;
+ctx_params.n_ctx           = context_size;
+ctx_params.n_batch         = batch_size;
+ctx_params.n_ubatch        = ubatch_size;
 ctx_params.n_threads       = threads;
-ctx_params.n_threads_batch = threads;
+ctx_params.n_threads_batch = batch_threads;
 
 llama_context * context = llama_init_from_model(model, ctx_params);
 
@@ -193,9 +231,38 @@ return reinterpret_cast<jlong>(context);
 }
 
 extern "C"
+JNIEXPORT jint JNICALL
+Java_android_llama_cpp_LLamaAndroid_context_1n_1ctx(
+        JNIEnv *, jobject, jlong context_pointer) {
+    const auto context = reinterpret_cast<llama_context *>(context_pointer);
+    return context ? static_cast<jint>(llama_n_ctx(context)) : 0;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_android_llama_cpp_LLamaAndroid_context_1n_1batch(
+        JNIEnv *, jobject, jlong context_pointer) {
+    const auto context = reinterpret_cast<llama_context *>(context_pointer);
+    return context ? static_cast<jint>(llama_n_batch(context)) : 0;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_android_llama_cpp_LLamaAndroid_context_1n_1ubatch(
+        JNIEnv *, jobject, jlong context_pointer) {
+    const auto context = reinterpret_cast<llama_context *>(context_pointer);
+    return context ? static_cast<jint>(llama_n_ubatch(context)) : 0;
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_android_llama_cpp_LLamaAndroid_free_1context(JNIEnv *, jobject, jlong context) {
-llama_free(reinterpret_cast<llama_context *>(context));
+auto ctx = reinterpret_cast<llama_context *>(context);
+if (g_cached_context == ctx) {
+    g_cached_context = nullptr;
+    g_cached_sequence_tokens.clear();
+}
+llama_free(ctx);
 }
 
 extern "C"
@@ -426,7 +493,7 @@ Java_android_llama_cpp_LLamaAndroid_system_1info(JNIEnv *env, jobject) {
 }
 
 extern "C"
-JNIEXPORT jint JNICALL
+JNIEXPORT jlongArray JNICALL
         Java_android_llama_cpp_LLamaAndroid_completion_1init(
         JNIEnv *env,
         jobject,
@@ -437,54 +504,111 @@ jboolean format_chat,
         jint n_len
 ) {
 g_stop_requested = false;
-
 cached_token_chars.clear();
-
-const auto text = env->GetStringUTFChars(jtext, 0);
+(void) n_len;
 const auto context = reinterpret_cast<llama_context *>(context_pointer);
 const auto batch = reinterpret_cast<llama_batch *>(batch_pointer);
 
+auto make_result = [env](jlong n_cur, jlong prompt_tokens,
+                         jlong cache_hit_tokens, jlong prefill_us) {
+    const jlong values[] = {n_cur, prompt_tokens, cache_hit_tokens, prefill_us};
+    auto result = env->NewLongArray(4);
+    if (result != nullptr) env->SetLongArrayRegion(result, 0, 4, values);
+    return result;
+};
+
+if (context == nullptr || batch == nullptr || jtext == nullptr) {
+    LOGe("completion_init() called with null input");
+    return make_result(-1, 0, 0, 0);
+}
+
+const auto prefill_start = ggml_time_us();
+const auto text = env->GetStringUTFChars(jtext, nullptr);
+if (text == nullptr) return make_result(-1, 0, 0, 0);
+
 bool parse_special = (format_chat == JNI_TRUE);
 const auto tokens_list = common_tokenize(context, text, true, parse_special);
+env->ReleaseStringUTFChars(jtext, text);
 
 if (!g_image_bytes.empty()) {
 LOGi("completion_init: %zu image bytes available for multimodal processing.",
      static_cast<size_t>(g_image_bytes.size()));
 }
 
-auto n_ctx = llama_n_ctx(context);
-auto n_kv_req = tokens_list.size() + n_len;
-
-LOGi("n_len = %d, n_ctx = %d, n_kv_req = %zu",
-     n_len,
-     n_ctx,
-     (size_t) n_kv_req);
-
-if (n_kv_req > n_ctx) {
-LOGe("error: n_kv_req > n_ctx, the required KV cache size is not big enough");
+const auto n_ctx = llama_n_ctx(context);
+if (tokens_list.empty() || tokens_list.size() >= n_ctx) {
+    LOGe("Prompt token count %zu does not fit context %u",
+         tokens_list.size(), n_ctx);
+    return make_result(-1, tokens_list.size(), 0,
+                       ggml_time_us() - prefill_start);
 }
 
-for (auto id : tokens_list) {
-LOGi("token: `%s`-> %d ", common_token_to_piece(context, id).c_str(), id);
+auto memory = llama_get_memory(context);
+size_t common_prefix = 0;
+if (g_cached_context == context) {
+    const size_t compare_count = std::min(
+            tokens_list.size(), g_cached_sequence_tokens.size());
+    while (common_prefix < compare_count &&
+           tokens_list[common_prefix] == g_cached_sequence_tokens[common_prefix]) {
+        ++common_prefix;
+    }
+} else {
+    llama_memory_clear(memory, false);
+    g_cached_context = context;
+    g_cached_sequence_tokens.clear();
 }
 
-common_batch_clear(*batch);
-
-// evaluate the initial prompt
-for (auto i = 0; i < tokens_list.size(); i++) {
-common_batch_add(*batch, tokens_list[i], i, { 0 }, false);
+// A decode call is still required to produce fresh logits when the incoming
+// prompt is byte-for-byte identical to the cached sequence.
+if (common_prefix == tokens_list.size() && common_prefix > 0) {
+    --common_prefix;
 }
 
-// llama_decode will output logits only for the last token of the prompt
-batch->logits[batch->n_tokens - 1] = true;
-
-if (llama_decode(context, *batch) != 0) {
-LOGe("llama_decode() failed");
+if (common_prefix < g_cached_sequence_tokens.size()) {
+    const bool removed = llama_memory_seq_rm(
+            memory, 0, static_cast<llama_pos>(common_prefix), -1);
+    if (!removed) {
+        // Some recurrent architectures cannot drop a partial sequence. A full
+        // clear is always safe and preserves compatibility with those models.
+        llama_memory_clear(memory, false);
+        common_prefix = 0;
+    }
 }
 
-env->ReleaseStringUTFChars(jtext, text);
+const size_t logical_batch = std::max<size_t>(32, llama_n_batch(context));
+size_t offset = common_prefix;
+while (offset < tokens_list.size()) {
+    const size_t chunk_size = std::min(
+            logical_batch, tokens_list.size() - offset);
+    common_batch_clear(*batch);
 
-return batch->n_tokens;
+    for (size_t i = 0; i < chunk_size; ++i) {
+        common_batch_add(
+                *batch,
+                tokens_list[offset + i],
+                static_cast<llama_pos>(offset + i),
+                {0},
+                false);
+    }
+
+    if (offset + chunk_size == tokens_list.size()) {
+        batch->logits[batch->n_tokens - 1] = true;
+    }
+
+    if (llama_decode(context, *batch) != 0) {
+        LOGe("llama_decode() failed during prompt prefill at offset %zu", offset);
+        llama_memory_clear(memory, false);
+        g_cached_sequence_tokens.clear();
+        return make_result(-1, tokens_list.size(), common_prefix,
+                           ggml_time_us() - prefill_start);
+    }
+    offset += chunk_size;
+}
+
+g_cached_context = context;
+g_cached_sequence_tokens.assign(tokens_list.begin(), tokens_list.end());
+const auto prefill_us = ggml_time_us() - prefill_start;
+return make_result(tokens_list.size(), tokens_list.size(), common_prefix, prefill_us);
 }
 
 extern "C"
@@ -550,7 +674,6 @@ return nullptr;
 jstring new_token = nullptr;
 if (is_valid_utf8(cached_token_chars.c_str())) {
     new_token = env->NewStringUTF(cached_token_chars.c_str());
-    LOGi("cached: %s, new_token_chars: `%s`, id: %d", cached_token_chars.c_str(), new_token_chars.c_str(), new_token_id);
     cached_token_chars.clear();
 } else {
     new_token = env->NewStringUTF("");
@@ -572,6 +695,10 @@ if (llama_decode(context, *batch) != 0) {
     LOGe("llama_decode() returned null");
     if (new_token) env->DeleteLocalRef(new_token);
     return nullptr;
+}
+
+if (g_cached_context == context) {
+    g_cached_sequence_tokens.push_back(new_token_id);
 }
 
 return new_token;
@@ -596,5 +723,8 @@ return;
 
 auto ctx = reinterpret_cast<llama_context *>(context);
 llama_memory_clear(llama_get_memory(ctx), true);
+if (g_cached_context == ctx) {
+    g_cached_sequence_tokens.clear();
+}
 __android_log_print(ANDROID_LOG_INFO, "llama-android", "KV cache successfully cleared.");
 }

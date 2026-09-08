@@ -15,29 +15,25 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
 
     override fun onCleared() {
         super.onCleared()
-        unload()
+        viewModelScope.launch { unload() }
     }
 
-    fun unload() {
+    suspend fun unload() {
         Log.d(tag, "ViewModel received unload command.")
-        viewModelScope.launch {
-            try {
-                llamaAndroid.unload()
-                Log.d(tag, "Model removed from memory.")
-            } catch (exc: IllegalStateException) {
-                Log.e(tag, "unload() was unsuccessful", exc)
-            }
+        try {
+            llamaAndroid.unload()
+            Log.d(tag, "Model removed from memory.")
+        } catch (exc: IllegalStateException) {
+            Log.e(tag, "unload() was unsuccessful", exc)
         }
     }
 
-    fun clearKv() {
-        viewModelScope.launch {
-            try {
-                llamaAndroid.clearKv()
-                Log.d(tag, "KV cache cleared.")
-            } catch (e: Exception) {
-                Log.e(tag, "clearKv() failed", e)
-            }
+    suspend fun clearKv() {
+        try {
+            llamaAndroid.clearKv()
+            Log.d(tag, "KV cache cleared.")
+        } catch (e: Exception) {
+            Log.e(tag, "clearKv() failed", e)
         }
     }
 
@@ -66,7 +62,8 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         presencePenalty: Float = 0.0f,
         mirostatMode: Int = 0,
         mirostatTau: Float = 5.0f,
-        mirostatEta: Float = 0.1f
+        mirostatEta: Float = 0.1f,
+        debugPerf: Boolean = false
     ) {
         val text = currentMessage
         currentMessage = ""
@@ -88,7 +85,8 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
                     presencePenalty = presencePenalty,
                     mirostatMode = mirostatMode,
                     mirostatTau = mirostatTau,
-                    mirostatEta = mirostatEta
+                    mirostatEta = mirostatEta,
+                    debugPerf = debugPerf
                 )
                     .catch { exception ->
                         Log.e(tag, "send() failed via Flow", exception)
@@ -107,10 +105,27 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         }
     }
 
-    suspend fun load(pathToModel: String, nCtx: Int, nGpuLayers: Int, nThreads: Int) {
+    suspend fun load(
+        pathToModel: String,
+        nCtx: Int,
+        nGpuLayers: Int,
+        nThreads: Int,
+        nThreadsBatch: Int,
+        nBatch: Int,
+        nUbatch: Int,
+        debugPerf: Boolean
+    ): LLamaAndroid.LoadResult {
         try {
-            llamaAndroid.load(pathToModel, nCtx, nGpuLayers, nThreads)
-            Log.d(tag, "Loaded $pathToModel with nCtx=$nCtx")
+            return llamaAndroid.load(
+                pathToModel,
+                nCtx,
+                nGpuLayers,
+                nThreads,
+                nThreadsBatch,
+                nBatch,
+                nUbatch,
+                debugPerf
+            )
         } catch (exc: IllegalStateException) {
             Log.e(tag, "load() failed", exc)
             throw exc

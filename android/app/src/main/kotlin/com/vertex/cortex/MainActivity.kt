@@ -122,8 +122,12 @@ class MainActivity : FlutterFragmentActivity() {
                     "cacheModel"    -> {
                         val path = call.argument<String>("path")
                         val nCtx = call.argument<Int>("nCtx") ?: 2048
-                        val nGpu = call.argument<Int>("nGpu") ?: 99
+                        val nGpu = call.argument<Int>("nGpu") ?: 0
                         val nThreads = call.argument<Int>("nThreads") ?: 4
+                        val nThreadsBatch = call.argument<Int>("nThreadsBatch") ?: nThreads
+                        val nBatch = call.argument<Int>("nBatch") ?: 512
+                        val nUbatch = call.argument<Int>("nUbatch") ?: 128
+                        val debugPerf = call.argument<Boolean>("debugPerf") ?: false
 
                         if (path.isNullOrBlank()) {
                             result.error("INVALID_PATH", "Model path is null or empty", null)
@@ -136,6 +140,10 @@ class MainActivity : FlutterFragmentActivity() {
                             putExtra("nCtx", nCtx)
                             putExtra("nGpu", nGpu)
                             putExtra("nThreads", nThreads)
+                            putExtra("nThreadsBatch", nThreadsBatch)
+                            putExtra("nBatch", nBatch)
+                            putExtra("nUbatch", nUbatch)
+                            putExtra("debugPerf", debugPerf)
                         }
                         startServiceSafe(intent)
                         
@@ -149,6 +157,13 @@ class MainActivity : FlutterFragmentActivity() {
                         val temp = call.argument<Double>("temp")?.toFloat() ?: 0.7f
                         val topP = call.argument<Double>("topP")?.toFloat() ?: 0.95f
                         val topK = call.argument<Int>("topK") ?: 40
+                        val repeatPenalty = call.argument<Double>("repeatPenalty")?.toFloat() ?: 1.0f
+                        val frequencyPenalty = call.argument<Double>("frequencyPenalty")?.toFloat() ?: 0.0f
+                        val presencePenalty = call.argument<Double>("presencePenalty")?.toFloat() ?: 0.0f
+                        val mirostatMode = call.argument<Int>("mirostatMode") ?: 0
+                        val mirostatTau = call.argument<Double>("mirostatTau")?.toFloat() ?: 5.0f
+                        val mirostatEta = call.argument<Double>("mirostatEta")?.toFloat() ?: 0.1f
+                        val debugPerf = call.argument<Boolean>("debugPerf") ?: false
 
                         if (msg.isNullOrBlank()) {
                             result.error("INVALID_MSG", "Message is null or empty", null)
@@ -162,6 +177,13 @@ class MainActivity : FlutterFragmentActivity() {
                             putExtra("temp", temp)
                             putExtra("topP", topP)
                             putExtra("topK", topK)
+                            putExtra("repeatPenalty", repeatPenalty)
+                            putExtra("frequencyPenalty", frequencyPenalty)
+                            putExtra("presencePenalty", presencePenalty)
+                            putExtra("mirostatMode", mirostatMode)
+                            putExtra("mirostatTau", mirostatTau)
+                            putExtra("mirostatEta", mirostatEta)
+                            putExtra("debugPerf", debugPerf)
                         }
                         startServiceSafe(intent)
                         

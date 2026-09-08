@@ -6,9 +6,9 @@
 // on-device (offline) models via a platform channel.
 //
 // Optimizations:
-// - Dynamic Context Size (4096 tokens).
-// - GPU Offloading (Max layers).
-// - Tuned Sampler Settings (Temp 0.7 default).
+// - Adaptive context, CPU threads, and prefill batches.
+// - Native model and verified prompt-prefix/KV reuse.
+// - Platform-verified GPU offload with CPU fallback.
 //
 
 import 'dart:async';
@@ -27,6 +27,7 @@ import '../../library/backend/data/service.dart';
 import '../../library/backend/data/format.dart';
 import '../../library/backend/data/defaults.dart';
 import 'context.dart';
+import 'offline_tuning.dart';
 
 class SamplerPreset {
   final double temperature;
@@ -130,11 +131,14 @@ class OfflineService {
   static const MethodChannel _llamaChannel =
       MethodChannel('com.vertex.cortex/llama');
 
-  static const int _maxModelLoadRetries = 5;
-
   Completer<bool>? _modelLoadCompleter;
   Completer<bool>? _singleLoadAttemptCompleter;
   Timer? _retryTimer;
+  String? _loadedModelPath;
+  int _loadedContextSize = 0;
+  String? _pendingLoadPath;
+  OfflineRuntimeConfig? _pendingRuntimeConfig;
+  Stopwatch? _modelLoadStopwatch;
 
   OfflineService({
     required ResponseService responseService,
@@ -158,64 +162,91 @@ class OfflineService {
   // Public API
   // ===========================================================================
 
-  /// Queries AVAILABLE (free) RAM and returns an optimal context size.
-  /// Uses 80% of free RAM to leave headroom for the OS and other apps.
-  Future<int> _computeOptimalContextSize() async {
+  Future<OfflineRuntimeConfig> _computeRuntimeConfig({
+    String prompt = '',
+    String? modelContext,
+  }) async {
+    const memoryChannel = MethodChannel('com.vertex.cortex/memory');
+    var totalRamMb = 4096;
+    var usedRamMb = 2048;
+
     try {
-      const memoryChannel = MethodChannel('com.vertex.cortex/memory');
-
-      // Get total and used RAM
-      int totalRAM =
-          await memoryChannel.invokeMethod<int>('getDeviceMemory') ?? 4096;
-      int usedRAM =
-          await memoryChannel.invokeMethod<int>('getUsedMemory') ?? 2048;
-
-      // Calculate free RAM
-      int freeRAM = totalRAM - usedRAM;
-
-      // If freeRAM is negative or abnormally low, fall back to safe defaults
-      if (freeRAM <= 0) {
-        freeRAM = 1024;
-      }
-
-      // We should assume that the model itself takes huge RAM (e.g. 2-5 GB).
-      // So instead of just looking at current freeRAM, we use a conservative clamp based on total RAM or cap it around 4096 to prevent silent OOM crashes in native libraries.
-      int nCtx = 2048;
-      if (totalRAM >= 8192) {
-        nCtx = 8192; // 8GB+ devices can handle 8K
-      } else if (totalRAM >= 6144) {
-        nCtx = 4096; // 6GB devices
-      } else {
-        nCtx = 2048; // Standard safe fallback
-      }
-
-      debugPrint(
-          "[OfflineService] RAM Status: total=$totalRAM MB, used=$usedRAM MB, free=$freeRAM MB");
-      debugPrint(
-          "[OfflineService] Computed Context: $nCtx tokens for offline model.");
-
-      return nCtx;
+      final values = await Future.wait<int>([
+        memoryChannel
+            .invokeMethod<int>('getDeviceMemory')
+            .then((value) => value ?? 4096),
+        memoryChannel
+            .invokeMethod<int>('getUsedMemory')
+            .then((value) => value ?? 2048),
+      ]);
+      totalRamMb = values[0];
+      usedRamMb = values[1];
     } catch (e) {
-      debugPrint(
-          "[OfflineService] Failed to query RAM, using safe default: $e");
-      return 2048; // Safe fallback
+      if (kDebugMode) {
+        debugPrint('[OfflineService] RAM query failed; using safe defaults: $e');
+      }
     }
+
+    final freeRamMb =
+        (totalRamMb - usedRamMb).clamp(0, totalRamMb).toInt();
+    final logicalCores = Platform.numberOfProcessors;
+    final nCtx = OfflineInferenceTuning.selectContextSize(
+      prompt: prompt,
+      totalRamMb: totalRamMb,
+      freeRamMb: freeRamMb,
+      modelContext: modelContext,
+    );
+    final batch = OfflineInferenceTuning.selectBatchConfig(
+      totalRamMb: totalRamMb,
+      freeRamMb: freeRamMb,
+      contextSize: nCtx,
+    );
+
+    // The Android build does not enable GGML_VULKAN, so Android must remain
+    // CPU-only. The shipped iOS framework contains Metal and retains its
+    // existing CPU fallback on load failure.
+    final nGpuLayers = Platform.isIOS ? 99 : 0;
+
+    return OfflineRuntimeConfig(
+      nCtx: nCtx,
+      nThreads:
+          OfflineInferenceTuning.selectGenerationThreads(logicalCores),
+      nThreadsBatch: OfflineInferenceTuning.selectBatchThreads(logicalCores),
+      nBatch: batch.nBatch,
+      nUbatch: batch.nUbatch,
+      nGpuLayers: nGpuLayers,
+      totalRamMb: totalRamMb,
+      freeRamMb: freeRamMb,
+      logicalCoreCount: logicalCores,
+    );
   }
 
-  /// Computes optimal thread count based on total device RAM as a proxy for CPU power.
-  int _computeOptimalThreads(int totalRAM) {
-    if (totalRAM <= 4096) return 2;
-    if (totalRAM <= 8192) return 4;
-    return 6; // High-end devices
-  }
+  Future<bool> cacheModel(
+    String path, {
+    String prompt = '',
+    String? modelContext,
+  }) async {
+    final runtimeConfig = await _computeRuntimeConfig(
+      prompt: prompt,
+      modelContext: modelContext,
+    );
 
-  Future<bool> cacheModel(String path) async {
-    if (_sessionProvider.isLocalModelLoaded) {
+    if (_sessionProvider.isLocalModelLoaded &&
+        _loadedModelPath == path &&
+        _loadedContextSize >= runtimeConfig.nCtx) {
+      if (kDebugMode) {
+        debugPrint(
+            '[OfflineService][perf] model reuse path=$path ctx=$_loadedContextSize');
+      }
       return true;
     }
 
     if (_modelLoadCompleter != null) {
-      return _modelLoadCompleter!.future;
+      final pendingCanSatisfy = _pendingLoadPath == path &&
+          (_pendingRuntimeConfig?.nCtx ?? 0) >= runtimeConfig.nCtx;
+      final result = await _modelLoadCompleter!.future;
+      if (pendingCanSatisfy) return result;
+      return cacheModel(path, prompt: prompt, modelContext: modelContext);
     }
 
     if (path.isEmpty) {
@@ -231,68 +262,58 @@ class OfflineService {
     }
 
     _modelLoadCompleter = Completer<bool>();
-    unawaited(_loadModelWithRetries(path));
+    _pendingLoadPath = path;
+    _pendingRuntimeConfig = runtimeConfig;
+    _modelLoadStopwatch = Stopwatch()..start();
+    unawaited(_loadModelWithRetries(path, runtimeConfig));
     return _modelLoadCompleter!.future;
   }
 
-  Future<void> _loadModelWithRetries(String path) async {
+  Future<void> _loadModelWithRetries(
+    String path,
+    OfflineRuntimeConfig runtimeConfig,
+  ) async {
     bool loaded = false;
+    final maxAttempts = runtimeConfig.nGpuLayers > 0 ? 2 : 1;
 
-    // DYNAMIC CONTEXT SIZE based on device RAM
-    final int nCtx = await _computeOptimalContextSize();
-
-    // GPU Layers: On Android, forcing GPU can cause silent crashes if Vulkan/OpenCL is unsupported.
-    // We pass 99 for iOS since Metal usually handles it well, but let's be careful on Android.
-    int nGpu = 0;
-    if (Platform.isIOS) {
-      nGpu = 99;
+    if (kDebugMode) {
+      debugPrint(
+          '[OfflineService][perf] load path=$path ctx=${runtimeConfig.nCtx} '
+          'threads=${runtimeConfig.nThreads}/${runtimeConfig.nThreadsBatch} '
+          'gpu=${runtimeConfig.nGpuLayers} batch=${runtimeConfig.nBatch}/'
+          '${runtimeConfig.nUbatch} cores=${runtimeConfig.logicalCoreCount} '
+          'ram=${runtimeConfig.totalRamMb}MB free=${runtimeConfig.freeRamMb}MB');
     }
 
-    // DYNAMIC THREADS based on RAM (proxy for CPU power)
-    const memoryChannel = MethodChannel('com.vertex.cortex/memory');
-    int ramMB = 4096;
     try {
-      ramMB = await memoryChannel.invokeMethod<int>('getDeviceMemory') ?? 4096;
-    } catch (e) {
-      debugPrint("[OfflineService] Failed to getDeviceMemory for threads: $e");
-    }
-    final int nThreads = _computeOptimalThreads(ramMB);
-
-    debugPrint(
-        "[OfflineService] 🚀 Caching Model => ctx=$nCtx, gpu=$nGpu, threads=$nThreads (RAM: $ramMB MB)");
-
-    try {
-      for (var attempt = 1; attempt <= _maxModelLoadRetries; attempt++) {
-        // Fallback to CPU-only on retry if GPU fails (vital for Simulators/older devices)
-        int currentGpu = attempt == 1 ? nGpu : 0;
+      for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+        final currentGpu = attempt == 1 ? runtimeConfig.nGpuLayers : 0;
 
         loaded = await _runSingleModelLoadAttempt(
           path: path,
-          nCtx: nCtx,
+          nCtx: runtimeConfig.nCtx,
           nGpu: currentGpu,
-          nThreads: nThreads,
+          nThreads: runtimeConfig.nThreads,
+          nThreadsBatch: runtimeConfig.nThreadsBatch,
+          nBatch: runtimeConfig.nBatch,
+          nUbatch: runtimeConfig.nUbatch,
           attempt: attempt,
+          maxAttempts: maxAttempts,
         );
         if (loaded) break;
 
-        await _safeReleaseNativeModel();
-        _sessionProvider.setLocalModelLoaded(false);
-
-        if (attempt < _maxModelLoadRetries) {
+        if (attempt < maxAttempts) {
           _retryTimer?.cancel();
           await _retryDelay(const Duration(milliseconds: 350));
         }
       }
 
-      if (!loaded) {
-        await _autoRemoveSelectedOfflineModel();
-      }
     } catch (e) {
       debugPrint("[OfflineService] Model load retry loop failed: $e");
       loaded = false;
     }
 
-    if (!loaded) {
+    if (!loaded && !_sessionProvider.isLocalModelLoaded) {
       _sessionProvider.setLocalModelLoaded(false);
     }
 
@@ -300,6 +321,9 @@ class OfflineService {
       _modelLoadCompleter!.complete(loaded);
     }
     _modelLoadCompleter = null;
+    _pendingLoadPath = null;
+    _pendingRuntimeConfig = null;
+    _modelLoadStopwatch = null;
   }
 
   Future<bool> _runSingleModelLoadAttempt({
@@ -307,10 +331,15 @@ class OfflineService {
     required int nCtx,
     required int nGpu,
     required int nThreads,
+    required int nThreadsBatch,
+    required int nBatch,
+    required int nUbatch,
     required int attempt,
+    required int maxAttempts,
   }) async {
-    debugPrint(
-        "[OfflineService] Model load attempt $attempt/$_maxModelLoadRetries");
+    if (kDebugMode) {
+      debugPrint('[OfflineService] Model load attempt $attempt/$maxAttempts');
+    }
     _singleLoadAttemptCompleter = Completer<bool>();
 
     try {
@@ -319,11 +348,14 @@ class OfflineService {
         'nCtx': nCtx,
         'nGpu': nGpu,
         'nThreads': nThreads,
+        'nThreadsBatch': nThreadsBatch,
+        'nBatch': nBatch,
+        'nUbatch': nUbatch,
+        'debugPerf': kDebugMode,
       });
 
-      // Reduced timeout but also changed how fast we return
       return await _singleLoadAttemptCompleter!.future.timeout(
-        const Duration(seconds: 15),
+        const Duration(seconds: 90),
         onTimeout: () {
           debugPrint(
               "[OfflineService] Timeout while waiting for model load (attempt $attempt).");
@@ -336,15 +368,6 @@ class OfflineService {
       return false;
     } finally {
       _singleLoadAttemptCompleter = null;
-    }
-  }
-
-  Future<void> _safeReleaseNativeModel() async {
-    try {
-      await _llamaChannel.invokeMethod<void>('releaseModel');
-    } catch (e) {
-      debugPrint(
-          "[OfflineService] releaseModel after failed load also failed: $e");
     }
   }
 
@@ -375,6 +398,8 @@ class OfflineService {
     await stopGeneration();
     await _llamaChannel.invokeMethod('releaseModel');
     _sessionProvider.setLocalModelLoaded(false);
+    _loadedModelPath = null;
+    _loadedContextSize = 0;
     if (_modelLoadCompleter != null && !_modelLoadCompleter!.isCompleted) {
       _modelLoadCompleter!.complete(false);
     }
@@ -410,19 +435,6 @@ class OfflineService {
       return;
     }
 
-    final modelReady = await cacheModel(modelPath);
-    if (!modelReady) {
-      _responseService.finalizeResponse();
-      return;
-    }
-
-    // Setup Processor (Stops formatting tokens)
-    _currentProcessor = ChatFormatProcessor(
-      model.chatFormat,
-      onStopTokenDetected: stopGeneration,
-    );
-    _resetRepetitionGuardState();
-
     final bool enableThinkingMode =
         activeMode == ChatInputMode.featureReasoning;
     final langCode = _sessionProvider.getLocale().languageCode;
@@ -449,6 +461,23 @@ class OfflineService {
       return;
     }
 
+    final modelReady = await cacheModel(
+      modelPath,
+      prompt: finalPrompt,
+      modelContext: model.context,
+    );
+    if (!modelReady) {
+      _responseService.finalizeResponse();
+      return;
+    }
+
+    // Setup Processor (Stops formatting tokens)
+    _currentProcessor = ChatFormatProcessor(
+      model.chatFormat,
+      onStopTokenDetected: stopGeneration,
+    );
+    _resetRepetitionGuardState();
+
     // OPTIMIZATION: Computed Samplers with per-task presets
     final SamplerPreset sampler;
     switch (activeMode) {
@@ -460,15 +489,11 @@ class OfflineService {
       default:
         sampler = computeSampler(model);
     }
-    debugPrint(
-        "[OfflineService] Sending Message with Samplers: T=${sampler.temperature}, P=${sampler.topP}, K=${sampler.topK}");
-
-    // Note: We don't reset KV cache every turn necessarily if we want conversational memory,
-    // but the current architecture might clear it on the native side.
-    // If the native side clears KV on 'send', we should rely on that or manage it here.
-    // The updated Native logic clears KV before generating to handle the FULL prompt we send (history included).
-    // So we don't need to manually clear it here if native does it, but calling it ensures sync.
-    // await _resetKvCache(); // Native code handles this now in 'send' flow based on the full prompt.
+    if (kDebugMode) {
+      debugPrint(
+          '[OfflineService] sampler temp=${sampler.temperature} '
+          'topP=${sampler.topP} topK=${sampler.topK}');
+    }
 
     final specArgs = _speculativeConfig.enabled
         ? _speculativeConfig.toNativeArgs()
@@ -488,6 +513,7 @@ class OfflineService {
         'mirostatMode': sampler.mirostatMode,
         'mirostatTau': sampler.mirostatTau,
         'mirostatEta': sampler.mirostatEta,
+        'debugPerf': kDebugMode,
         ...specArgs,
       },
     );
@@ -549,11 +575,29 @@ class OfflineService {
         break;
 
       case 'onModelLoaded':
-        debugPrint("[OfflineService] Model Loaded Successfully.");
+        final details = call.arguments;
+        if (details is Map) {
+          _loadedModelPath = details['path']?.toString() ?? _pendingLoadPath;
+          _loadedContextSize = (details['nCtx'] as num?)?.toInt() ??
+              _pendingRuntimeConfig?.nCtx ??
+              0;
+        } else {
+          _loadedModelPath = _pendingLoadPath;
+          _loadedContextSize = _pendingRuntimeConfig?.nCtx ?? 0;
+        }
         _sessionProvider.setLocalModelLoaded(true);
+        final ready = details is! Map || details['capacitySatisfied'] != false;
+        if (kDebugMode) {
+          _modelLoadStopwatch?.stop();
+          debugPrint(
+              '[OfflineService][perf] model ready path=$_loadedModelPath '
+              'ctx=$_loadedContextSize elapsedMs='
+              '${_modelLoadStopwatch?.elapsedMilliseconds ?? -1} '
+              'reused=${details is Map ? details['reusedModel'] : null}');
+        }
         if (_singleLoadAttemptCompleter != null &&
             !_singleLoadAttemptCompleter!.isCompleted) {
-          _singleLoadAttemptCompleter!.complete(true);
+          _singleLoadAttemptCompleter!.complete(ready);
         }
         break;
 

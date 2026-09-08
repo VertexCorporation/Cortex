@@ -1,12 +1,17 @@
+import Dispatch
 import Flutter
 import Foundation
 
 class LlamaService: NSObject, FlutterPlugin {
     private var llamaContext: LlamaContext?
+    private var loadedModelPath: String?
     private var resultChannel: FlutterMethodChannel?
 
     static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "com.vertex.cortex/llama", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(
+            name: "com.vertex.cortex/llama",
+            binaryMessenger: registrar.messenger()
+        )
         let instance = LlamaService()
         instance.resultChannel = channel
         registrar.addMethodCallDelegate(instance, channel: channel)
@@ -14,122 +19,327 @@ class LlamaService: NSObject, FlutterPlugin {
 
     func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
-
         case "cacheModel":
-            guard let args = call.arguments as? [String: Any],
-            let path = args["path"] as? String else {
-                result(FlutterError(code: "INVALID_ARGS", message: "Path is required", details: nil))
-                return
-            }
-            
-            // Extract dynamic parameters from Dart
-            let nCtx = args["nCtx"] as? Int32 ?? 2048
-            let nGpu = args["nGpu"] as? Int32 ?? 99       // Default to 99 (Max GPU) if not provided
-            let nThreads = args["nThreads"] as? Int32 ?? 4
-
-            Task {
-                do {
-                    if let context = self.llamaContext {
-                        await context.stop()
-                        self.llamaContext = nil
-                    }
-
-                    // Pass dynamic parameters to context creation
-                    self.llamaContext = try LlamaContext.create_context(path: path, nCtx: nCtx, nGpu: nGpu, nThreads: nThreads)
-
-                    DispatchQueue.main.async {
-                        self.resultChannel?.invokeMethod("onModelLoaded", arguments: nil)
-                        result(nil)
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        self.resultChannel?.invokeMethod("onModelLoadFailed", arguments: error.localizedDescription)
-                        result(FlutterError(code: "LOAD_FAILED", message: "Failed to load model", details: nil))
-                    }
-                }
-            }
-
+            cacheModel(call, result: result)
         case "sendMessage":
-            guard let args = call.arguments as? [String: Any],
-            let message = args["message"] as? String else {
-                result(FlutterError(code: "INVALID_ARGS", message: "Message is required", details: nil))
-                return
-            }
-
-            let photoPath = args["photoPath"] as? String
-            var photoData: Data? = nil
-            
-            if let path = photoPath, !path.isEmpty {
-                let fileURL = URL(fileURLWithPath: path)
-                do {
-                    photoData = try Data(contentsOf: fileURL)
-                    print("[LlamaService] Photo loaded: \(path) (\(photoData!.count) bytes)")
-                } catch {
-                     print("[LlamaService] Error reading photo: \(error)")
-                }
-            }
-            
-            // Extract sampler parameters from Dart (use defaults if not provided)
-            let temp = args["temp"] as? Float ?? 0.7
-            let topP = args["topP"] as? Float ?? 0.9
-            let topK = args["topK"] as? Int32 ?? 40
-
-            guard let context = self.llamaContext else {
-                result(FlutterError(code: "NO_MODEL", message: "Model not loaded", details: nil))
-                return
-            }
-
-            result(nil)
-
-            Task {
-                await context.clear()
-                
-                // Update sampler with Dart-provided parameters
-                await context.updateSampler(temp: temp, topP: topP, topK: topK)
-
-                await context.completion_init(text: message, imageData: photoData)
-
-                while await !context.is_done {
-                    // completion_loop logic ...
-                    if let token = await context.completion_loop() {
-                        if !token.isEmpty {
-                            DispatchQueue.main.async {
-                                self.resultChannel?.invokeMethod("onMessageResponse", arguments: token)
-                            }
-                        }
-                    } else {
-                        break
-                    }
-                }
-
-                await context.clear()
-
-                DispatchQueue.main.async {
-                    self.resultChannel?.invokeMethod("onMessageComplete", arguments: nil)
-                }
-            }
-
+            sendMessage(call, result: result)
         case "stopGeneration":
             Task {
                 await self.llamaContext?.stop()
-                result(nil)
+                DispatchQueue.main.async { result(nil) }
             }
-
         case "releaseModel":
             Task {
                 await self.llamaContext?.stop()
                 self.llamaContext = nil
-                result(nil)
+                self.loadedModelPath = nil
+                DispatchQueue.main.async { result(nil) }
             }
-
         case "resetKv":
             Task {
                 await self.llamaContext?.clear()
-                result(nil)
+                DispatchQueue.main.async { result(nil) }
             }
-
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+
+    private func cacheModel(
+        _ call: FlutterMethodCall,
+        result: @escaping FlutterResult
+    ) {
+        guard let args = call.arguments as? [String: Any],
+              let path = args["path"] as? String,
+              !path.isEmpty else {
+            result(FlutterError(
+                code: "INVALID_ARGS",
+                message: "Path is required",
+                details: nil
+            ))
+            return
+        }
+
+        let nCtx = int32Argument(args, "nCtx", default: 2048)
+        let nGpu = int32Argument(args, "nGpu", default: 99)
+        let nThreads = int32Argument(args, "nThreads", default: 4)
+        let nThreadsBatch = int32Argument(
+            args,
+            "nThreadsBatch",
+            default: nThreads
+        )
+        let nBatch = int32Argument(args, "nBatch", default: 512)
+        let nUbatch = int32Argument(args, "nUbatch", default: 128)
+        let debugPerformance = boolArgument(args, "debugPerf", default: false)
+
+        // Match Android's asynchronous contract. Completion is delivered through
+        // onModelLoaded/onModelLoadFailed while disk/model work stays off Flutter's
+        // method call path.
+        result(nil)
+
+        Task(priority: .userInitiated) {
+            let loadStart = DispatchTime.now().uptimeNanoseconds
+            do {
+                let info: LlamaRuntimeInfo
+                let reusedModel: Bool
+                let capacitySatisfied: Bool
+
+                if let context = self.llamaContext,
+                   self.loadedModelPath == path {
+                    let capacity = await context.ensureCapacity(
+                        nCtx: nCtx,
+                        nThreads: nThreads,
+                        nThreadsBatch: nThreadsBatch,
+                        nBatch: nBatch,
+                        nUbatch: nUbatch,
+                        debugPerformance: debugPerformance
+                    )
+                    info = capacity.info
+                    reusedModel = true
+                    capacitySatisfied = capacity.capacitySatisfied
+                } else {
+                    if let previous = self.llamaContext {
+                        await previous.stop()
+                        self.llamaContext = nil
+                        self.loadedModelPath = nil
+                    }
+
+                    let context = try LlamaContext.createContext(
+                        path: path,
+                        nCtx: nCtx,
+                        nGpu: nGpu,
+                        nThreads: nThreads,
+                        nThreadsBatch: nThreadsBatch,
+                        nBatch: nBatch,
+                        nUbatch: nUbatch,
+                        debugPerformance: debugPerformance
+                    )
+                    self.llamaContext = context
+                    self.loadedModelPath = path
+                    info = await context.runtimeInfo()
+                    reusedModel = false
+                    capacitySatisfied = true
+                }
+
+                let loadMilliseconds = self.millisecondsSince(loadStart)
+                self.debugPerformanceLog(
+                    enabled: debugPerformance,
+                    "[LlamaService][perf] modelLoadMs=\(loadMilliseconds) ctx=\(info.nCtx) threads=\(info.nThreads)/\(info.nThreadsBatch) gpu=\(info.nGpuLayers) batch=\(info.nBatch)/\(info.nUbatch) reused=\(reusedModel)"
+                )
+                let details = self.modelDetails(
+                    path: path,
+                    info: info,
+                    reusedModel: reusedModel,
+                    capacitySatisfied: capacitySatisfied
+                )
+                DispatchQueue.main.async {
+                    self.resultChannel?.invokeMethod(
+                        "onModelLoaded",
+                        arguments: details
+                    )
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.resultChannel?.invokeMethod(
+                        "onModelLoadFailed",
+                        arguments: error.localizedDescription
+                    )
+                }
+            }
+        }
+    }
+
+    private func sendMessage(
+        _ call: FlutterMethodCall,
+        result: @escaping FlutterResult
+    ) {
+        guard let args = call.arguments as? [String: Any],
+              let message = args["message"] as? String else {
+            result(FlutterError(
+                code: "INVALID_ARGS",
+                message: "Message is required",
+                details: nil
+            ))
+            return
+        }
+        guard let context = llamaContext else {
+            result(FlutterError(
+                code: "NO_MODEL",
+                message: "Model not loaded",
+                details: nil
+            ))
+            return
+        }
+
+        let photoPath = args["photoPath"] as? String
+        let temp = floatArgument(args, "temp", default: 0.7)
+        let topP = floatArgument(args, "topP", default: 0.95)
+        let topK = int32Argument(args, "topK", default: 40)
+        let repeatPenalty = floatArgument(
+            args,
+            "repeatPenalty",
+            default: 1.0
+        )
+        let frequencyPenalty = floatArgument(
+            args,
+            "frequencyPenalty",
+            default: 0.0
+        )
+        let presencePenalty = floatArgument(
+            args,
+            "presencePenalty",
+            default: 0.0
+        )
+        let mirostatMode = int32Argument(args, "mirostatMode", default: 0)
+        let mirostatTau = floatArgument(args, "mirostatTau", default: 5.0)
+        let mirostatEta = floatArgument(args, "mirostatEta", default: 0.1)
+        let debugPerformance = boolArgument(args, "debugPerf", default: false)
+
+        result(nil)
+
+        Task(priority: .userInitiated) {
+            let requestStart = DispatchTime.now().uptimeNanoseconds
+            let photoData: Data?
+            if let photoPath = photoPath, !photoPath.isEmpty {
+                photoData = try? Data(contentsOf: URL(fileURLWithPath: photoPath))
+            } else {
+                photoData = nil
+            }
+
+            await context.updateSampler(
+                temp: temp,
+                topP: topP,
+                topK: topK,
+                repeatPenalty: repeatPenalty,
+                frequencyPenalty: frequencyPenalty,
+                presencePenalty: presencePenalty,
+                mirostatMode: mirostatMode,
+                mirostatTau: mirostatTau,
+                mirostatEta: mirostatEta
+            )
+
+            do {
+                let promptStats = try await context.completion_init(
+                    text: message,
+                    imageData: photoData
+                )
+                let prefillDone = DispatchTime.now().uptimeNanoseconds
+                var firstTokenTime: UInt64?
+                var generatedTokens = 0
+
+                while !(await context.is_done) {
+                    guard let token = await context.completion_loop() else {
+                        break
+                    }
+                    generatedTokens += 1
+                    if firstTokenTime == nil {
+                        firstTokenTime = DispatchTime.now().uptimeNanoseconds
+                    }
+                    if !token.isEmpty {
+                        DispatchQueue.main.async {
+                            self.resultChannel?.invokeMethod(
+                                "onMessageResponse",
+                                arguments: token
+                            )
+                        }
+                    }
+                }
+
+                let end = DispatchTime.now().uptimeNanoseconds
+                let timeToFirstToken = firstTokenTime.map {
+                    Double($0 - requestStart) / 1_000_000.0
+                } ?? -1.0
+                let generationSeconds = max(
+                    Double(end - prefillDone) / 1_000_000_000.0,
+                    0.000_001
+                )
+                let tokensPerSecond = Double(generatedTokens) / generationSeconds
+                let cacheStatus = promptStats.cacheHitTokens > 0 ? "hit" : "miss"
+                let info = await context.runtimeInfo()
+                self.debugPerformanceLog(
+                    enabled: debugPerformance,
+                    "[LlamaService][perf] ctx=\(info.nCtx) threads=\(info.nThreads)/\(info.nThreadsBatch) gpu=\(info.nGpuLayers) batch=\(info.nBatch)/\(info.nUbatch) promptTokens=\(promptStats.promptTokens) prefillMs=\(promptStats.prefillMilliseconds) ttftMs=\(timeToFirstToken) generationTps=\(tokensPerSecond) cache=\(cacheStatus) cacheTokens=\(promptStats.cacheHitTokens)"
+                )
+            } catch {
+                self.debugPerformanceLog(
+                    enabled: debugPerformance,
+                    "[LlamaService] Generation failed: \(error.localizedDescription)"
+                )
+            }
+
+            DispatchQueue.main.async {
+                self.resultChannel?.invokeMethod(
+                    "onMessageComplete",
+                    arguments: nil
+                )
+            }
+        }
+    }
+
+    private func int32Argument(
+        _ args: [String: Any],
+        _ key: String,
+        default defaultValue: Int32
+    ) -> Int32 {
+        if let number = args[key] as? NSNumber {
+            return number.int32Value
+        }
+        if let value = args[key] as? Int {
+            return Int32(clamping: value)
+        }
+        return defaultValue
+    }
+
+    private func floatArgument(
+        _ args: [String: Any],
+        _ key: String,
+        default defaultValue: Float
+    ) -> Float {
+        (args[key] as? NSNumber)?.floatValue ?? defaultValue
+    }
+
+    private func boolArgument(
+        _ args: [String: Any],
+        _ key: String,
+        default defaultValue: Bool
+    ) -> Bool {
+        if let value = args[key] as? Bool {
+            return value
+        }
+        return (args[key] as? NSNumber)?.boolValue ?? defaultValue
+    }
+
+    private func modelDetails(
+        path: String,
+        info: LlamaRuntimeInfo,
+        reusedModel: Bool,
+        capacitySatisfied: Bool
+    ) -> [String: Any] {
+        [
+            "path": path,
+            "nCtx": Int(info.nCtx),
+            "nThreads": Int(info.nThreads),
+            "nThreadsBatch": Int(info.nThreadsBatch),
+            "nBatch": Int(info.nBatch),
+            "nUbatch": Int(info.nUbatch),
+            "nGpu": Int(info.nGpuLayers),
+            "reusedModel": reusedModel,
+            "capacitySatisfied": capacitySatisfied,
+        ]
+    }
+
+    private func millisecondsSince(_ start: UInt64) -> Double {
+        Double(DispatchTime.now().uptimeNanoseconds - start) / 1_000_000.0
+    }
+
+    private func debugPerformanceLog(
+        enabled: Bool,
+        _ message: @autoclosure () -> String
+    ) {
+        #if DEBUG
+        if enabled {
+            print(message())
+        }
+        #endif
     }
 }

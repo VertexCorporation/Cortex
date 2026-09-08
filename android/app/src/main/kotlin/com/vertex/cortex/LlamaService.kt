@@ -49,10 +49,23 @@ class LlamaService : Service() {
         }
 
         @JvmStatic
-        fun sendModelLoadedToFlutter(path: String) {
+        fun sendModelLoadedToFlutter(load: android.llama.cpp.LLamaAndroid.LoadResult) {
             if (isChannelInitialized) {
                 mainHandler.post {
-                    resultChannel.invokeMethod("onModelLoaded", "Model loaded: $path")
+                    resultChannel.invokeMethod(
+                        "onModelLoaded",
+                        mapOf(
+                            "path" to load.path,
+                            "nCtx" to load.nCtx,
+                            "nThreads" to load.nThreads,
+                            "nThreadsBatch" to load.nThreadsBatch,
+                            "nBatch" to load.nBatch,
+                            "nUbatch" to load.nUbatch,
+                            "nGpu" to load.nGpuLayers,
+                            "reusedModel" to load.reusedModel,
+                            "capacitySatisfied" to load.capacitySatisfied
+                        )
+                    )
                 }
             }
         }
@@ -91,8 +104,23 @@ class LlamaService : Service() {
                     val nCtx = it.getIntExtra("nCtx", 2048)
                     val nGpu = it.getIntExtra("nGpu", 0)
                     val nThreads = it.getIntExtra("nThreads", 4)
+                    val nThreadsBatch = it.getIntExtra("nThreadsBatch", nThreads)
+                    val nBatch = it.getIntExtra("nBatch", 512)
+                    val nUbatch = it.getIntExtra("nUbatch", 128)
+                    val debugPerf = it.getBooleanExtra("debugPerf", false)
                     
-                    path?.let { p -> cacheModel(p, nCtx, nGpu, nThreads) }
+                    path?.let { p ->
+                        cacheModel(
+                            p,
+                            nCtx,
+                            nGpu,
+                            nThreads,
+                            nThreadsBatch,
+                            nBatch,
+                            nUbatch,
+                            debugPerf
+                        )
+                    }
                 }
                 "sendMessage" -> {
                     val message = it.getStringExtra("message") ?: ""
@@ -107,8 +135,22 @@ class LlamaService : Service() {
                     val mirostatMode = it.getIntExtra("mirostatMode", 0)
                     val mirostatTau = it.getFloatExtra("mirostatTau", 5.0f)
                     val mirostatEta = it.getFloatExtra("mirostatEta", 0.1f)
+                    val debugPerf = it.getBooleanExtra("debugPerf", false)
 
-                    sendMessage(message, photoPath, temp, topP, topK, repeatPenalty, frequencyPenalty, presencePenalty, mirostatMode, mirostatTau, mirostatEta)
+                    sendMessage(
+                        message,
+                        photoPath,
+                        temp,
+                        topP,
+                        topK,
+                        repeatPenalty,
+                        frequencyPenalty,
+                        presencePenalty,
+                        mirostatMode,
+                        mirostatTau,
+                        mirostatEta,
+                        debugPerf
+                    )
                 }
                 "stopGeneration" -> stopGeneration()
                 "releaseModel" -> releaseModel()
@@ -119,13 +161,42 @@ class LlamaService : Service() {
         return START_STICKY
     }
 
-    private fun cacheModel(path: String, nCtx: Int, nGpu: Int, nThreads: Int) {
+    private fun cacheModel(
+        path: String,
+        nCtx: Int,
+        nGpu: Int,
+        nThreads: Int,
+        nThreadsBatch: Int,
+        nBatch: Int,
+        nUbatch: Int,
+        debugPerf: Boolean
+    ) {
         serviceScope.launch {
+            val startNs = System.nanoTime()
             try {
-                withContext(Dispatchers.IO) {
-                    viewModel.load(path, nCtx, nGpu, nThreads)
+                val load = withContext(Dispatchers.IO) {
+                    viewModel.load(
+                        path,
+                        nCtx,
+                        nGpu,
+                        nThreads,
+                        nThreadsBatch,
+                        nBatch,
+                        nUbatch,
+                        debugPerf
+                    )
                 }
-                sendModelLoadedToFlutter(path)
+                if (debugPerf) {
+                    val elapsedMs = (System.nanoTime() - startNs) / 1_000_000.0
+                    Log.d(
+                        "LlamaService",
+                        "[perf] modelLoadMs=$elapsedMs ctx=${load.nCtx} " +
+                            "threads=${load.nThreads}/${load.nThreadsBatch} " +
+                            "gpu=${load.nGpuLayers} batch=${load.nBatch}/${load.nUbatch} " +
+                            "reused=${load.reusedModel}"
+                    )
+                }
+                sendModelLoadedToFlutter(load)
             } catch (e: Exception) {
                 Log.e("LlamaService", "Model load failed", e)
                 sendModelLoadFailedToFlutter(e.message ?: "Unknown error")
@@ -164,7 +235,8 @@ class LlamaService : Service() {
         presencePenalty: Float = 0.0f,
         mirostatMode: Int = 0,
         mirostatTau: Float = 5.0f,
-        mirostatEta: Float = 0.1f
+        mirostatEta: Float = 0.1f,
+        debugPerf: Boolean = false
     ) {
         val safeMessage = message ?: ""
         serviceScope.launch {
@@ -189,7 +261,19 @@ class LlamaService : Service() {
                 }
             }
             // Trigger the generation
-            viewModel.send(photoBase64, temp, topP, topK, repeatPenalty, frequencyPenalty, presencePenalty, mirostatMode, mirostatTau, mirostatEta)
+            viewModel.send(
+                photoBase64,
+                temp,
+                topP,
+                topK,
+                repeatPenalty,
+                frequencyPenalty,
+                presencePenalty,
+                mirostatMode,
+                mirostatTau,
+                mirostatEta,
+                debugPerf
+            )
         }
     }
 
