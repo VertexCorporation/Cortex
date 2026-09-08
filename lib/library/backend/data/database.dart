@@ -8,6 +8,7 @@ import 'crypto.dart';
 
 class DatabaseHelper {
   static Database? _database;
+  static Future<Database>? _openingDatabase;
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   DatabaseHelper._privateConstructor();
@@ -17,8 +18,14 @@ class DatabaseHelper {
     if (kIsWeb) return null;
 
     if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
+    // Share the whole initialization, including getDatabasesPath/onCreate.
+    // Clear failures as well so a later call can retry.
+    return _openingDatabase ??= _initDatabase().then((db) {
+      _database = db;
+      return db;
+    }).whenComplete(() {
+      _openingDatabase = null;
+    });
   }
 
   Future<Database> _initDatabase() async {

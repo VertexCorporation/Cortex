@@ -17,17 +17,21 @@ class Message {
 
   /// Returns the text completely stripped of any memory tags or their streaming fragments
   /// so that UI elements (like typing animations or raw text selection screens) never show them.
-  String get displayableText {
-    return text
+  // Message text is immutable. Compute once per Message instance, including
+  // streaming copies, instead of re-running both scans on every widget read.
+  static final _partialMemoryTag = RegExp(
+      r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
+      caseSensitive: false);
+  static final _memoryTag = RegExp(
+      r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*', caseSensitive: false);
+  late final String _displayableText = text
         .replaceAll(
-            RegExp(r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
-                caseSensitive: false),
+            _partialMemoryTag,
             '')
         .replaceAll(
-            RegExp(r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*',
-                caseSensitive: false),
+            _memoryTag,
             '');
-  }
+  String get displayableText => _displayableText;
 
   /// The boolean variable for controlling the message type
   final bool isUserMessage;
