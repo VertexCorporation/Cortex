@@ -2,11 +2,9 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// ignore: depend_on_referenced_packages
-import 'package:path/path.dart' as p;
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -23,11 +21,7 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/notifications/extrovert.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    hide Message;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../library/backend/data/entity.dart';
@@ -41,17 +35,10 @@ import 'package:cortex/chat/services/memory_store.dart';
 import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/rag/chat.dart';
 import 'tools.dart';
-
-enum _MediaIntent {
-  none,
-  understand,
-  editImage,
-  editVideo,
-  editAudio,
-  generateImage,
-  generateVideo,
-  generateAudio,
-}
+import 'send/media.dart';
+import 'send/circuit.dart';
+import 'send/saver.dart';
+import 'send/notify.dart';
 
 /// Service responsible for sending messages. It orchestrates interactions between providers and other services.
 class SendService {
@@ -67,15 +54,12 @@ class SendService {
   final UserMemoryProvider _userMemoryProvider;
   final BackgroundTaskService _backgroundTaskService;
   final RagChatService _ragChat;
+  late final MediaRouter _mediaRouter;
+  final CircuitBreaker _circuitBreaker = CircuitBreaker();
 
   /// Track which conversations are currently sending.
   /// Replaces the old single boolean `_isSending`.
   final Set<String> _activeSendConversations = {};
-
-  /// Session-level circuit breaker for models that repeatedly fail.
-  /// Once a model fails and fallback succeeds, it's added here so
-  /// subsequent sends skip directly to the fallback.
-  static final Set<String> _failedModelCircuitBreaker = {};
 
   // PERF: Stateless moderator — create once, reuse on every offline send.
   final OfflineModeratorService _offlineModerator = OfflineModeratorService();
@@ -105,7 +89,9 @@ class SendService {
         _voiceService = voiceService,
         _userMemoryProvider = userMemoryProvider,
         _backgroundTaskService = backgroundTaskService,
-        _ragChat = ragChat;
+        _ragChat = ragChat {
+    _mediaRouter = MediaRouter(_modelService);
+  }
 
   /// Returns true if the given conversation is the one currently being viewed.
   bool _isConversationActive(String convId) {
@@ -299,6 +285,7 @@ class SendService {
     // -----------------------------------------------------------------------
 
     final String text = messageText.trim();
+    final String displayText = text;
     List<String> currentAttachmentPaths = [];
 
     if (isRegenerate) {
@@ -336,6 +323,17 @@ class SendService {
       final bool enableThinkingMode =
           activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
+
+      // Generation feature modes (Create Image/Video/Audio) do NOT modify
+      // the text on the client. Only a generation key is sent to the server,
+      // which routes directly to the matching model group and prepends the
+      // canonical prefix itself (see Fulcrum's gateway/router).
+      final String? generationTarget = switch (activeMode) {
+        ChatInputMode.imageGeneration => 'image',
+        ChatInputMode.videoGeneration => 'video',
+        ChatInputMode.audioGeneration => 'audio',
+        _ => null,
+      };
 
       // Apply voice system prompt to API text only (not shown to user)
       if (voiceSystemPrompt != null && voiceSystemPrompt.isNotEmpty) {
@@ -387,7 +385,7 @@ class SendService {
         originalUiModelId = 'cortex/auto';
       }
 
-      final intentResolvedModelId = _resolveAttachmentIntentModelId(
+      final intentResolvedModelId = _mediaRouter.resolveAttachmentIntentModelId(
         currentModelId: apiModelIdForSend ?? 'cortex/auto',
         text: text,
         attachments: currentAttachmentPaths,
@@ -405,8 +403,8 @@ class SendService {
 
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
-          final bool hasVisualContent =
-              currentAttachmentPaths.any((path) => _isImageFile(path));
+          final bool hasVisualContent = currentAttachmentPaths
+              .any((path) => _mediaRouter.isImageFile(path));
 
           List<dynamic> getPreferredCandidates(List<dynamic> sourceList) {
             final filtered = sourceList.where((v) {
@@ -501,7 +499,7 @@ class SendService {
 
       // Circuit breaker: skip models that have repeatedly failed this session
       if (apiModelIdForSend != 'cortex/auto' &&
-          _failedModelCircuitBreaker.contains(apiModelIdForSend)) {
+          _circuitBreaker.isFailed(apiModelIdForSend)) {
         debugPrint(
             "SendService: Circuit breaker triggered for '$apiModelIdForSend'. Skipping to cortex/auto.");
         apiModelIdForSend = 'cortex/auto';
@@ -527,7 +525,7 @@ class SendService {
 
       // Optimistic UI Message
       final userMessage = Message(
-        text: text,
+        text: displayText,
         isUserMessage: true,
         attachmentPaths: currentAttachmentPaths,
         isAttachmentUploading: currentAttachmentPaths.isNotEmpty,
@@ -547,9 +545,11 @@ class SendService {
           final newConvId = _uuid.v4();
           targetConvId = newConvId;
           final defaultTitle =
-              (text.isEmpty && currentAttachmentPaths.isNotEmpty)
+              (displayText.isEmpty && currentAttachmentPaths.isNotEmpty)
                   ? "📁"
-                  : (text.length > 32 ? text.substring(0, 32) : text);
+                  : (displayText.length > 32
+                      ? displayText.substring(0, 32)
+                      : displayText);
 
           final modelForStorage = originalUiModelId;
 
@@ -558,7 +558,7 @@ class SendService {
                 newConvId, modelForStorage, userMessage,
                 title: isHidden ? localizations.flowMode : null);
           } else {
-            _conversationProvider.startNewConversationSession(
+            await _conversationProvider.startNewConversationSession(
               newConvId,
               defaultTitle,
               modelForStorage,
@@ -743,6 +743,7 @@ class SendService {
               langCode: langCode,
               enableThinkingMode: enableThinkingMode,
               targetConvId: convId,
+              generationTarget: generationTarget,
             );
             success = true;
           } catch (e) {
@@ -774,12 +775,12 @@ class SendService {
                 langCode: langCode,
               );
               final hasImageAttachment =
-                  currentAttachmentPaths.any(_isImageFile);
+                  currentAttachmentPaths.any(_mediaRouter.isImageFile);
               final canRetryImageToImage = hasImageAttachment &&
-                  _isFalMediaModel(failedModel, 'image') &&
+                  _mediaRouter.isFalMediaModel(failedModel, 'image') &&
                   failedModel.modalities['image'] != true;
               final imageToImageFallback = canRetryImageToImage
-                  ? _findFalMediaModel(
+                  ? _mediaRouter.findFalMediaModel(
                       langCode: langCode,
                       isUserSubscribed: sessionProvider.isUserSubscribed,
                       outputType: 'image',
@@ -839,7 +840,7 @@ class SendService {
         // remember the failure so we skip the failing model next time.
         if (preFallbackModelId != (apiModelIdForSend ?? 'cortex/auto') &&
             preFallbackModelId != 'cortex/auto') {
-          _failedModelCircuitBreaker.add(preFallbackModelId);
+          _circuitBreaker.recordFailure(preFallbackModelId);
           debugPrint(
               "SendService: Added '$preFallbackModelId' to circuit breaker.");
         }
@@ -1049,6 +1050,7 @@ class SendService {
     required String langCode,
     required bool enableThinkingMode,
     required String targetConvId,
+    String? generationTarget,
   }) async {
     final ModelEntity modelData =
         _modelService.getPreciseModelData(modelId, langCode: langCode);
@@ -1083,7 +1085,7 @@ class SendService {
       attachmentPaths: attachments,
     );
     final bool ragActive = ragContext != null && ragContext.isNotEmpty;
-    
+
     String combinedText = "";
     if (ragActive) {
       final safeContext = LocalPiiRedactionFilter.redact(ragContext);
@@ -1095,7 +1097,7 @@ class SendService {
     if (initialText.isNotEmpty) {
       combinedText += initialText;
     }
-    
+
     if (combinedText.isNotEmpty) {
       userContent.add({"type": "text", "text": combinedText.trim()});
     }
@@ -1141,6 +1143,34 @@ class SendService {
       _conversationProvider.updateMessageAtIndex(
         aiMessageIndex,
         message.copyWith(isWebSearchActive: active),
+      );
+    }
+
+    // Tool execution is a separate, transient UI channel. Keep it on the
+    // message so the tile can show a localized, expandable trace while the
+    // response loop is waiting for a tool result. It never enters the model
+    // context or the persisted assistant text.
+    final toolSteps = <String>[];
+    void setToolActivity(String toolName, {bool completed = false}) {
+      if (!_isConversationActive(targetConvId)) return;
+      final messages = _conversationProvider.messages;
+      if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+
+      if (completed && toolName.isNotEmpty && !toolSteps.contains(toolName)) {
+        toolSteps.add(toolName);
+      }
+      final message = messages[aiMessageIndex];
+      final active = completed ? '' : toolName;
+      if (message.toolActivity == active &&
+          listEquals(message.toolSteps, toolSteps)) {
+        return;
+      }
+      _conversationProvider.updateMessageAtIndex(
+        aiMessageIndex,
+        message.copyWith(
+          toolActivity: active,
+          toolSteps: List<String>.unmodifiable(toolSteps),
+        ),
       );
     }
 
@@ -1492,6 +1522,7 @@ class SendService {
           enablefeatureReasoning: enablefeatureReasoning,
           enableWebSearch: enableWebSearch,
           enableRag: ragActive,
+          generationTarget: generationTarget,
           useTools: !isMediaModel && !_voiceService.isFlowActive,
           // Disable tools in Flow Mode
           onTextChunk: onTextChunk,
@@ -1511,6 +1542,18 @@ class SendService {
             }
           },
           onWebSearchActive: setWebSearchActive,
+          onServerFallback: () {
+            if (!_isConversationActive(targetConvId)) return;
+            final messages = _conversationProvider.messages;
+            if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+            final message = messages[aiMessageIndex];
+            if (!message.isServerFallback) {
+              _conversationProvider.updateMessageAtIndex(
+                aiMessageIndex,
+                message.copyWith(isServerFallback: true),
+              );
+            }
+          },
         );
       }
 
@@ -1533,9 +1576,16 @@ class SendService {
 
         // 2. Execute Tools & Add Results
         for (var call in turnToolCalls) {
-          final String callId = call['id'];
-          final String name = call['function']['name'];
-          final String argsStr = call['function']['arguments'];
+          final String callId = (call['id'] ?? '').toString();
+          final function = call['function'];
+          final String name = function is Map
+              ? (function['name'] ?? 'tool').toString()
+              : 'tool';
+          final String argsStr = function is Map
+              ? (function['arguments'] ?? '{}').toString()
+              : '{}';
+
+          setToolActivity(name);
 
           String result;
           final tool = ToolRegistry.getTool(name);
@@ -1581,6 +1631,8 @@ class SendService {
           } else {
             result = "Tool not found.";
           }
+
+          setToolActivity(name, completed: true);
 
           // Add Tool Result to History
           contextMessages.add({
@@ -1767,469 +1819,13 @@ class SendService {
     required String dataPrefix,
     required List<String> allowedExtensions,
     required String fallbackExtension,
-  }) async {
-    final ext = _inferMediaExtension(
-      url: url,
-      allowedExtensions: allowedExtensions,
-      fallbackExtension: fallbackExtension,
-    );
-    final dir = await getApplicationDocumentsDirectory();
-    final localPath = '${dir.path}/${_uuid.v4()}.$ext';
-
-    if (url.startsWith(dataPrefix)) {
-      try {
-        final commaIndex = url.indexOf(',');
-        if (commaIndex <= 0 || commaIndex >= url.length - 1) return url;
-        final encoded = url.substring(commaIndex + 1);
-        final bytes = base64Decode(encoded);
-        await File(localPath).writeAsBytes(bytes);
-        return localPath;
-      } catch (e) {
-        debugPrint("Media data URI decode failed. Falling back to raw URL: $e");
-        return url;
-      }
-    }
-
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      try {
-        final request = await HttpClient().getUrl(Uri.parse(url));
-        final response = await request.close();
-        if (response.statusCode < 200 || response.statusCode >= 300) {
-          throw HttpException(
-            'Unexpected HTTP status: ${response.statusCode}',
-            uri: Uri.parse(url),
-          );
-        }
-        final bytes = await consolidateHttpClientResponseBytes(response);
-        await File(localPath).writeAsBytes(bytes);
-        return localPath;
-      } catch (e) {
-        debugPrint("Media download failed. Falling back to remote URL: $e");
-        return url;
-      }
-    }
-
-    return url;
-  }
-
-  String _inferMediaExtension({
-    required String url,
-    required List<String> allowedExtensions,
-    required String fallbackExtension,
-  }) {
-    final mimeMatch =
-        RegExp(r'^data:([^;]+);base64,', caseSensitive: false).firstMatch(url);
-    if (mimeMatch != null) {
-      final mime = (mimeMatch.group(1) ?? '').toLowerCase();
-      final slashIndex = mime.indexOf('/');
-      if (slashIndex != -1 && slashIndex < mime.length - 1) {
-        final mimeExt = mime.substring(slashIndex + 1);
-        if (allowedExtensions.contains(mimeExt)) {
-          return mimeExt;
-        }
-      }
-    }
-
-    final ext =
-        p.extension(url.split('?').first).toLowerCase().replaceAll('.', '');
-    if (allowedExtensions.contains(ext)) {
-      return ext;
-    }
-
-    return fallbackExtension;
-  }
-
-  bool _isImageFile(String path) {
-    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
-  }
-
-  bool _isVideoFile(String path) {
-    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['mp4', 'mov', 'm4v', 'webm', 'mkv', 'avi'].contains(ext);
-  }
-
-  bool _isAudioFile(String path) {
-    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac', 'opus'].contains(ext);
-  }
-
-  String _normalizeIntentText(String text) {
-    return text
-        .toLowerCase()
-        .replaceAll('ı', 'i')
-        .replaceAll('ğ', 'g')
-        .replaceAll('ü', 'u')
-        .replaceAll('ş', 's')
-        .replaceAll('ö', 'o')
-        .replaceAll('ç', 'c');
-  }
-
-  bool _containsAny(String value, Iterable<String> needles) {
-    for (final needle in needles) {
-      final regExp = RegExp(r'' + RegExp.escape(needle.trim()) + r'',
-          caseSensitive: false);
-      if (regExp.hasMatch(' $value ')) return true;
-    }
-    return false;
-  }
-
-  bool _isNegativeIntent(String value) {
-    final negatives = [
-      'istemiyorum',
-      'yapma',
-      'cizme',
-      'atma',
-      'gonderme',
-      'hayir',
-      'yok',
-      'degil',
-      'yaz',
-      'resim atma',
-      'gorsel atma'
-    ];
-    for (final neg in negatives) {
-      if (value.contains(neg)) return true;
-    }
-    return false;
-  }
-
-  _MediaIntent _inferMediaIntentFromText({
-    required String text,
-    required bool hasImage,
-    required bool hasVideo,
-    required bool hasAudio,
-  }) {
-    final normalized = _normalizeIntentText(text);
-    if (normalized.trim().isEmpty) return _MediaIntent.none;
-    if (_isNegativeIntent(normalized)) return _MediaIntent.none;
-
-    const editTerms = [
-      'edit',
-      'modify',
-      'change',
-      'replace',
-      'remove',
-      'erase',
-      'add ',
-      'upscale',
-      'enhance',
-      'restore',
-      'colorize',
-      'background',
-      'better',
-      'beautify',
-      'prettier',
-      'style',
-      'stylize',
-      'turn into',
-      'make it',
-      'duzenle',
-      'degistir',
-      'sil',
-      'kaldir',
-      'ekle',
-      'iyilestir',
-      'netlestir',
-      'renklendir',
-      'arka plan',
-      'fon',
-      'restor',
-      'stille',
-      'stilize',
-      'tarz',
-      'tarzi',
-      'guzel',
-      'daha iyi',
-      'daha kaliteli',
-      'kaliteli yap',
-      'canlandir',
-      'kirp',
-      'dondur',
-      'buyut',
-      'kucult',
-    ];
-    const imageTerms = [
-      'image',
-      'picture',
-      'photo',
-      'gorsel',
-      'resim',
-      'fotograf',
-      'foto',
-    ];
-    const videoTerms = [
-      'video',
-      'clip',
-      'animation',
-      'animate',
-      'motion',
-      'animasyon',
-      'hareket',
-      'hareketlendir',
-      'canlandir',
-    ];
-    const audioTerms = ['audio', 'voice', 'sound', 'music', 'ses', 'muzik'];
-    const generateTerms = [
-      'generate',
-      'create',
-      'draw',
-      'make',
-      'produce',
-      'olustur',
-      'uret',
-      'ciz',
-      'yap',
-    ];
-    const understandTerms = [
-      'what',
-      'describe',
-      'explain',
-      'analyze',
-      'read',
-      'transcribe',
-      'summarize',
-      'ne',
-      'nedir',
-      'acikla',
-      'anlat',
-      'analiz',
-      'oku',
-      'cevir',
-      'ozetle',
-      'yaziyor',
-      'kim',
-      'nerede',
-    ];
-
-    final edits = _containsAny(normalized, editTerms);
-    final generates = _containsAny(normalized, generateTerms);
-    final mentionsImage = _containsAny(normalized, imageTerms);
-    final mentionsVideo = _containsAny(normalized, videoTerms);
-    final mentionsAudio = _containsAny(normalized, audioTerms);
-
-    if (hasImage && !hasVideo && mentionsVideo && (edits || generates)) {
-      return _MediaIntent.generateVideo;
-    }
-    if (hasImage &&
-        (edits ||
-            (generates &&
-                (mentionsImage || !mentionsVideo && !mentionsAudio)))) {
-      return _MediaIntent.editImage;
-    }
-    if (hasVideo && (edits || (generates && mentionsVideo))) {
-      return _MediaIntent.editVideo;
-    }
-    if (hasAudio && (edits || (generates && mentionsAudio))) {
-      return _MediaIntent.editAudio;
-    }
-    if (generates && mentionsVideo) return _MediaIntent.generateVideo;
-    if (generates && mentionsAudio) return _MediaIntent.generateAudio;
-    if (generates) return _MediaIntent.generateImage;
-    if (_containsAny(normalized, understandTerms)) {
-      return _MediaIntent.understand;
-    }
-
-    return _MediaIntent.understand;
-  }
-
-  Iterable<ModelEntity> _iterPreciseModels(String langCode) sync* {
-    final seen = <String>{};
-    for (final model in _modelService.getCachedModelsSync()) {
-      if (seen.add(model.id)) {
-        yield _modelService.getPreciseModelData(model.id, langCode: langCode);
-      }
-      final variants = model.variants;
-      if (variants == null) continue;
-      for (final entry in variants.entries) {
-        final variantId = entry.key;
-        if (seen.add(variantId)) {
-          yield _modelService.getPreciseModelData(variantId,
-              langCode: langCode);
-        }
-      }
-    }
-  }
-
-  ModelEntity? _pickModel(
-    String langCode,
-    bool isUserSubscribed,
-    bool Function(ModelEntity model) predicate,
-  ) {
-    final candidates = _iterPreciseModels(langCode).where((model) {
-      if (!model.isServerSide) return false;
-      if (!isUserSubscribed && model.isPremium) return false;
-      final id = model.id.toLowerCase();
-      if (id.contains('guard')) return false;
-      return predicate(model);
-    }).toList();
-
-    if (candidates.isEmpty) return null;
-    candidates.sort((a, b) {
-      int score(ModelEntity model) {
-        var value = 0;
-        if (!model.isPremium) value += 100;
-        if (model.source.toLowerCase() == 'openrouter') value += 20;
-        if (model.source.toLowerCase() == 'fal') value += 20;
-        if (model.tier.toLowerCase() == 'free') value += 10;
-        return value;
-      }
-
-      return score(b).compareTo(score(a));
-    });
-    return candidates.first;
-  }
-
-  ModelEntity? _findFalMediaModel({
-    required String langCode,
-    required bool isUserSubscribed,
-    required String outputType,
-    String? requiredInputType,
-    Set<String> excludeIds = const {},
-  }) {
-    return _pickModel(
-      langCode,
-      isUserSubscribed,
-      (model) {
-        if (excludeIds.contains(model.id)) return false;
-        if (model.source.toLowerCase() != 'fal') return false;
-        if (model.outputs[outputType] != true && model.category != outputType) {
-          return false;
-        }
-        if (requiredInputType != null &&
-            model.modalities[requiredInputType] != true) {
-          return false;
-        }
-        return true;
-      },
-    );
-  }
-
-  ModelEntity? _findAttachmentUnderstandingModel({
-    required String langCode,
-    required bool isUserSubscribed,
-    required bool hasImage,
-    required bool hasVideo,
-    required bool hasAudio,
-  }) {
-    return _pickModel(
-      langCode,
-      isUserSubscribed,
-      (model) {
-        final category = model.category.toLowerCase();
-        if (category == 'image' || category == 'video' || category == 'audio') {
-          return false;
-        }
-        if (model.source.toLowerCase() == 'fal') return false;
-        if (hasImage && model.modalities['image'] != true) return false;
-        if (hasVideo && model.modalities['video'] != true) return false;
-        if (hasAudio && model.modalities['audio'] != true) return false;
-        return model.outputs['text'] == true || model.outputs.isEmpty;
-      },
-    );
-  }
-
-  String? _resolveAttachmentIntentModelId({
-    required String currentModelId,
-    required String text,
-    required List<String> attachments,
-    required String langCode,
-    required bool isUserSubscribed,
-  }) {
-    if (text.trim().isEmpty) return null;
-    if (currentModelId != 'cortex/auto' && currentModelId != 'dynamic') {
-      return null;
-    }
-
-    final hasImage = attachments.any(_isImageFile);
-    final hasVideo = attachments.any(_isVideoFile);
-    final hasAudio = attachments.any(_isAudioFile);
-
-    // We do NOT block empty attachments anymore, because text-only can ask for generation.
-
-    final intent = _inferMediaIntentFromText(
-      text: text,
-      hasImage: hasImage,
-      hasVideo: hasVideo,
-      hasAudio: hasAudio,
-    );
-
-    ModelEntity? routed;
-    switch (intent) {
-      case _MediaIntent.editImage:
-        routed = _findFalMediaModel(
-          langCode: langCode,
-          isUserSubscribed: isUserSubscribed,
-          outputType: 'image',
-          requiredInputType: 'image',
-        );
-        break;
-      case _MediaIntent.editVideo:
-        routed = _findFalMediaModel(
-          langCode: langCode,
-          isUserSubscribed: isUserSubscribed,
-          outputType: 'video',
-          requiredInputType: hasVideo ? 'video' : null,
-        );
-        break;
-      case _MediaIntent.editAudio:
-        routed = _findFalMediaModel(
-          langCode: langCode,
-          isUserSubscribed: isUserSubscribed,
-          outputType: 'audio',
-          requiredInputType: hasAudio ? 'audio' : null,
-        );
-        break;
-      case _MediaIntent.generateImage:
-        routed = _findFalMediaModel(
-          langCode: langCode,
-          isUserSubscribed: isUserSubscribed,
-          outputType: 'image',
-          requiredInputType: hasImage ? 'image' : null,
-        );
-        break;
-      case _MediaIntent.generateVideo:
-        routed = _findFalMediaModel(
-          langCode: langCode,
-          isUserSubscribed: isUserSubscribed,
-          outputType: 'video',
-          requiredInputType: hasVideo
-              ? 'video'
-              : hasImage
-                  ? 'image'
-                  : null,
-        );
-        break;
-      case _MediaIntent.generateAudio:
-        routed = _findFalMediaModel(
-          langCode: langCode,
-          isUserSubscribed: isUserSubscribed,
-          outputType: 'audio',
-          requiredInputType: hasAudio ? 'audio' : null,
-        );
-        break;
-      case _MediaIntent.understand:
-      case _MediaIntent.none:
-        routed = _findAttachmentUnderstandingModel(
-          langCode: langCode,
-          isUserSubscribed: isUserSubscribed,
-          hasImage: hasImage,
-          hasVideo: hasVideo,
-          hasAudio: hasAudio,
-        );
-        break;
-    }
-
-    if (routed == null) return null;
-    debugPrint(
-        "[SendService] Attachment intent '$intent' routed dynamic chat to '${routed.id}'.");
-    return routed.id;
-  }
-
-  bool _isFalMediaModel(ModelEntity model, String outputType) {
-    return model.source.toLowerCase() == 'fal' &&
-        (model.outputs[outputType] == true || model.category == outputType);
-  }
+  }) =>
+      MediaSaver.persistGeneratedMedia(
+        url: url,
+        dataPrefix: dataPrefix,
+        allowedExtensions: allowedExtensions,
+        fallbackExtension: fallbackExtension,
+      );
 
   String _localizedFalFallbackMessage(
     ApiException error,
@@ -2267,6 +1863,7 @@ class SendService {
     const userFacingCodes = <String>{
       'NO_USER',
       'CONTENT_FLAGGED',
+      'MODERATION_UNAVAILABLE',
       'PREMIUM_TRIAL_EXHAUSTED',
       'PREDIT_EXHAUSTED',
       'DREDIT_EXHAUSTED',
@@ -2480,57 +2077,15 @@ class SendService {
   }
 
   /// Gets the conversation title for the notification.
-  Future<String> _getChatTitleForNotification(String convId) async {
-    try {
-      final db = await ChatStorageService.getConversationTitle(convId);
-      return db ?? 'Chat';
-    } catch (_) {
-      return 'Chat';
-    }
-  }
+  Future<String> _getChatTitleForNotification(String convId) =>
+      BackgroundNotifier.getChatTitle(convId);
 
   /// Sends a local push notification when a background chat finishes.
   void _sendBackgroundCompletionNotification(
-      String convId, String chatTitle, AppLocalizations localizations) {
-    try {
-      final plugin = FlutterLocalNotificationsPlugin();
-
-      final title = chatTitle;
-      final body = localizations.backgroundChatNotificationTitle;
-
-      const androidDetails = AndroidNotificationDetails(
-        'background_chat',
-        'Background Chats',
-        channelDescription:
-            'Notifications when background chats finish generating.',
-        importance: Importance.high,
-        priority: Priority.high,
+          String convId, String chatTitle, AppLocalizations localizations) =>
+      BackgroundNotifier.sendCompletionNotification(
+        convId: convId,
+        chatTitle: chatTitle,
+        localizations: localizations,
       );
-
-      const platformDetails = NotificationDetails(
-        android: androidDetails,
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      );
-
-      plugin.show(
-        DateTime.now().millisecondsSinceEpoch.toSigned(31),
-        title,
-        body,
-        platformDetails,
-        payload: jsonEncode({
-          'type': 'background_chat',
-          'screen': 'chat',
-          'conversation_id': convId,
-        }),
-      );
-
-      debugPrint('[SendService] Background notification sent for: $chatTitle');
-    } catch (e) {
-      debugPrint('[SendService] Failed to send background notification: $e');
-    }
-  }
 }

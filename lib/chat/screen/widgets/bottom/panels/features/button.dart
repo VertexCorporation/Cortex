@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/widgets/bottom/features/button.dart
 
 import 'package:flutter/material.dart';
@@ -46,7 +47,6 @@ class FeaturesSheetButton extends StatelessWidget {
 
     final double iconContainerSize =
         isTablet ? screenWidth * 0.08 : screenWidth * 0.09; // reduced
-    final double innerIconSize = iconContainerSize * 0.5;
     final double titleSize =
         isTablet ? screenWidth * 0.026 : screenWidth * 0.035; // reduced
     final double descSize =
@@ -129,8 +129,8 @@ class FeaturesSheetButton extends StatelessWidget {
                         child: iconPath != null
                             ? SvgPicture.asset(
                                 iconPath!,
-                                width: innerIconSize,
-                                height: innerIconSize,
+                                width: CortexDesign.icon,
+                                height: CortexDesign.icon,
                                 colorFilter: ColorFilter.mode(
                                   targetFg,
                                   BlendMode.srcIn,
@@ -138,7 +138,7 @@ class FeaturesSheetButton extends StatelessWidget {
                               )
                             : Icon(
                                 iconData,
-                                size: innerIconSize,
+                                size: CortexDesign.icon,
                                 color: targetFg,
                               ),
                       ),
@@ -190,7 +190,7 @@ class FeaturesSheetButton extends StatelessWidget {
                         child: Icon(
                           Icons.chevron_right_rounded,
                           color: AppColors.tertiaryColor.withValues(alpha: 0.5),
-                          size: 18.0,
+                          size: CortexDesign.icon,
                         ),
                       ),
                   ],

@@ -16,7 +16,7 @@ class _LogoutDialog extends StatelessWidget {
         child: Container(
           width: screenWidth * 0.8,
           decoration: BoxDecoration(
-              color: AppColors.secondaryColor,
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(10)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/arts/screen.dart
 
 import 'dart:io';
@@ -109,9 +110,9 @@ class _ArtsScreenState extends State<ArtsScreen>
     double screenHeight,
   ) {
     final double screenWidth = MediaQuery.sizeOf(context).width;
-    final double iconSize = screenWidth * 0.22;
-    final double titleFontSize = screenWidth * 0.065;
-    final double descFontSize = screenWidth * 0.042;
+    final double iconSize = CortexDesign.iconSize(screenWidth, tier: 3);
+    final double titleFontSize = 26;
+    final double descFontSize = 16;
     final double titleSpacing = screenWidth * 0.04;
     final double descSpacing = screenWidth * 0.02;
 
@@ -178,8 +179,8 @@ class _ArtsScreenState extends State<ArtsScreen>
     double topSafeArea,
   ) {
     final double screenWidth = MediaQuery.sizeOf(context).width;
-    final double padding = screenWidth * 0.04;
-    final double spacing = 3.0;
+    final double padding = CortexDesign.gutter(screenWidth);
+    final double spacing = 12.0;
 
     return CustomScrollView(
       slivers: [
@@ -193,7 +194,8 @@ class _ArtsScreenState extends State<ArtsScreen>
           padding: EdgeInsets.symmetric(horizontal: padding),
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
+              crossAxisCount:
+                  CortexDesign.columns(screenWidth, target: 180, minimum: 3),
               crossAxisSpacing: spacing,
               mainAxisSpacing: spacing,
               childAspectRatio: 1.0,
@@ -360,7 +362,7 @@ class _ArtTile extends StatelessWidget {
                 child: Icon(
                   Icons.play_circle_filled_rounded,
                   color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-                  size: 36,
+                  size: CortexDesign.icon,
                 ),
               ),
             ],
@@ -398,8 +400,8 @@ class _ArtTile extends StatelessWidget {
               Center(
                 child: SvgPicture.asset(
                   'assets/icons/voice.svg',
-                  width: 32,
-                  height: 32,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter: ColorFilter.mode(
                     AppColors.primaryColor.inverted.withValues(alpha: 0.7),
                     BlendMode.srcIn,
@@ -417,7 +419,7 @@ class _ArtTile extends StatelessWidget {
       child: Icon(
         icon,
         color: AppColors.tertiaryColor.withValues(alpha: 0.5),
-        size: 28,
+        size: CortexDesign.icon,
       ),
     );
   }

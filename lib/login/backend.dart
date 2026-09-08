@@ -119,7 +119,8 @@ class LoginBackendService {
   Future<void> _ensureGoogleSignInInitialized() async {
     if (_googleSignInInitialized) return;
     _googleSignInInitialized = true;
-    final nonceRaw = List<int>.generate(32, (_) => Random.secure().nextInt(256));
+    final nonceRaw =
+        List<int>.generate(32, (_) => Random.secure().nextInt(256));
     final nonce = base64Url.encode(nonceRaw);
     await _googleSignIn.initialize(
       serverClientId:
@@ -427,11 +428,8 @@ class LoginBackendService {
         return GoogleSignInCancelled();
       }
 
-      dev.log(
-          '[Auth.Google] Unexpected error during Google Sign-In',
-          name: 'LoginBackend',
-          error: e,
-          stackTrace: st);
+      dev.log('[Auth.Google] Unexpected error during Google Sign-In',
+          name: 'LoginBackend', error: e, stackTrace: st);
       notificationService.showNotification(
           message: l10n.authError, type: NotificationType.error);
       return GoogleSignInFailure();

@@ -67,3 +67,5 @@ android_signing_keys.zip
 
 # Tools
 .cursor/ios/llama.xcframework/
+# Widget Preview related
+.widget_preview/

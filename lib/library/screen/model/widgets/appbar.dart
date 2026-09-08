@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/library/screen/model/widgets/appbar.dart
 
 import 'dart:async';
@@ -300,7 +301,6 @@ class DetailAppBarState extends State<DetailAppBar>
     // Tablet: Large Fonts (24/20).
     // Phone: Compact Fonts (20/14)
     final double titleFontSize = isTablet ? 24.0 : screenWidth * 0.05;
-    final double iconSize = isTablet ? 20.0 : screenWidth * 0.04;
     final double iconPadding = 8.0;
 
     final titleText = Text(
@@ -331,8 +331,8 @@ class DetailAppBarState extends State<DetailAppBar>
               angle: -1.57075, // Keeps original rotation logic
               child: SvgPicture.asset(
                 'assets/icons/arrov.svg',
-                width: iconSize,
-                height: iconSize,
+                width: CortexDesign.icon,
+                height: CortexDesign.icon,
                 colorFilter: ColorFilter.mode(
                     AppColors.primaryColor.inverted, BlendMode.srcIn),
               ),

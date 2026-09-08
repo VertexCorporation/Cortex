@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/widgets/bottom/selection/cards/variant.dart
 
 import 'package:flutter/material.dart';
@@ -78,8 +79,8 @@ class ModelVariantCard extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 4),
                   child: SvgPicture.asset(
                     'assets/icons/sparkle.svg',
-                    width: 12,
-                    height: 12,
+                    width: CortexDesign.icon,
+                    height: CortexDesign.icon,
                     colorFilter: ColorFilter.mode(textColor, BlendMode.srcIn),
                   ),
                 ),

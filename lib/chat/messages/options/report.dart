@@ -211,7 +211,6 @@ class _ReportDialogState extends State<ReportDialog>
       debugPrint(
           "[ReportDialog] Called onReportSuccess callback to update parent UI.");
     }
-
   }
 
   @override

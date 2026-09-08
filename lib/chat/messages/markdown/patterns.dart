@@ -1,29 +1,39 @@
 class RegexPatterns {
-  static final thinking =
-      RegExp(r'(<think>[\s\S]*?(?:</think>|$))', multiLine: false);
+  static final thinking = RegExp(r'(<think\b[^>]*>[\s\S]*?(?:</think\s*>|$))',
+      caseSensitive: false);
+  // Markdown requires one repeated marker, rather than any mixture of `*`,
+  // `_` and `-` (for example `*-*` is not a horizontal rule).
   static final horizontalRule =
-      RegExp(r'^[ \t]*(?:[-*_][ \t]*){3,}\s*$', multiLine: true);
-  static final codeBlock =
-      RegExp(r'^```([^\r\n]*)\r?\n([\s\S]*?)\r?\n^```$', multiLine: true);
+      RegExp(r'^[ \t]*([*_-])(?:[ \t]*\1){2,}[ \t]*$', multiLine: true);
+  static final codeBlock = RegExp(
+      r'^[ \t]*(```+)([^\r\n]*)\r?\n([\s\S]*?)\r?\n^[ \t]*\1[ \t]*$',
+      multiLine: true);
   static final blockquote = RegExp(r'^(?:\s*>\s?.+(?:\n|$))+', multiLine: true);
   static final table = RegExp(
-      r'(^\s*\|.+\|\s*\n\s*\|(?:\s*:?-+:?\s*\|)+\s*\n(?:\s*\|.*\|\s*\n?)+)',
+      r'(^[ \t]*\|[^\r\n]+\|[ \t]*\r?\n[ \t]*\|(?:[ \t]*:?-+:?[ \t]*\|)+[ \t]*(?:\r?\n|$)(?:[ \t]*\|[^\r\n]*\|[ \t]*(?:\r?\n|$))*)',
       multiLine: true);
   static final heading = RegExp(r'^#{1,6}\s+.+$', multiLine: true);
   static final bulletList = RegExp(r'^\s*[*\-+]\s+(.+)$', multiLine: true);
 
-  static final inlineCode = RegExp(r'`[^`\r\n]+?`');
-  static final link = RegExp(r'\(?\s*\[([^\]]+)\]\(([^)]+)\)\s*\)?');
-  static final bareUrl = RegExp(r'(?<![\])])\b(https?://[^\s<]+)');
+  static final inlineCode = RegExp(r'(?<!`)`([^`\r\n]+)`(?!`)');
+  // One balanced parenthesised segment is accepted inside a URL. This covers
+  // common links such as `/Function_(mathematics)` without swallowing prose.
+  static final link =
+      RegExp(r'(?<!\\)\[([^\]\r\n]+)\]\(((?:\\.|[^()\r\n]|\([^()\r\n]*\))*)\)');
+  static final bareUrl = RegExp(
+      r'(?<![\]\w])(https?://(?:[^\s<>()\[\]{}]*[A-Za-z0-9_~%#=/]|[^\s<>()\[\]{}]*\([^\s<>()\[\]{}]*\)))');
   static final citation = RegExp(r'\[\s*(\d+)\s*\]|【\s*(.*?)\s*】');
-  static final boldItalic =
-      RegExp(r'(\*\*\*.+?\*\*\*|___.+?___)', dotAll: true);
-  static final bold = RegExp(r'(\*\*.+?\*\*|__.+?__)', dotAll: true);
-  static final strikethrough = RegExp(r'~~.+?~~', dotAll: true);
-  static final italic =
-      RegExp(r'(?<![*$])\*(?!\*).+?(?<!\*)\*(?![*$])', dotAll: true);
-  static final thinkStart = RegExp(r'<think>\s*');
-  static final thinkEnd = RegExp(r'\s*</think>');
+  static final boldItalic = RegExp(
+      r'(\*\*\*(?!\s).+?(?<!\s)\*\*\*|___(?!\s).+?(?<!\s)___)',
+      dotAll: true);
+  static final bold =
+      RegExp(r'(\*\*(?!\s).+?(?<!\s)\*\*|__(?!\s).+?(?<!\s)__)', dotAll: true);
+  static final strikethrough = RegExp(r'~~(?!\s).+?(?<!\s)~~', dotAll: true);
+  static final italic = RegExp(
+      r'(?<![\w*_$])\*(?![\s*]).+?(?<![\s*])\*(?![\w*$])|(?<![\w_])_(?![\s_]).+?(?<![\s_])_(?![\w_])',
+      dotAll: true);
+  static final thinkStart = RegExp(r'<think\b[^>]*>\s*', caseSensitive: false);
+  static final thinkEnd = RegExp(r'\s*</think\s*>', caseSensitive: false);
 
   static final blockPatterns = {
     'thinking': thinking,
@@ -35,12 +45,6 @@ class RegexPatterns {
     'bulletList': bulletList,
   };
 
-  static final combinedInlinePattern = RegExp(
-      inlinePatterns.entries
-          .map((e) => '(?<${e.key}>${e.value.pattern})')
-          .join('|'),
-      dotAll: true);
-
   static final inlinePatterns = {
     'inlineCode': inlineCode,
     'link': link,
@@ -51,4 +55,10 @@ class RegexPatterns {
     'strikethrough': strikethrough,
     'italic': italic,
   };
+
+  static final combinedInlinePattern = RegExp(
+      inlinePatterns.entries
+          .map((entry) => '(?<${entry.key}>${entry.value.pattern})')
+          .join('|'),
+      dotAll: true);
 }

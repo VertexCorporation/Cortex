@@ -48,6 +48,7 @@ class CreditsManager {
   /// engine. Migration is lazy and per-user, so both systems are live at once
   /// and every gate has to ask which one it is looking at.
   final ValueNotifier<bool> billingV2Notifier = ValueNotifier<bool>(false);
+  int _subscriptionLevel = 0;
 
   /// Whether the daily credit engine is the one billing this account. Set by
   /// the server the first time it renews the allowance, so it turns on for a
@@ -110,7 +111,7 @@ class CreditsManager {
     if (billingV2Notifier.value) {
       return (spendableNotifier.value ?? 0) >= minTextBalance;
     }
-    return (preditsNotifier.value ?? 0) > 0;
+    return (totalCreditsNotifier.value ?? 0) > 0;
   }
 
   /// Dynamic Chat had its own currency (dredits) under the old engine. v2
@@ -122,7 +123,9 @@ class CreditsManager {
     if (billingV2Notifier.value) {
       return (spendableNotifier.value ?? 0) >= minTextBalance;
     }
-    return (dreditsNotifier.value ?? 0) >= 1;
+    const allowances = <int, int>{0: 100, 1: 500, 2: 1000, 3: 10000};
+    final allowance = allowances[_subscriptionLevel] ?? allowances[0]!;
+    return (totalCreditsNotifier.value ?? 0) > -allowance;
   }
 
   // --- Internal State ---
@@ -250,6 +253,7 @@ class CreditsManager {
         final billingV2 = data['billingV2'] == true;
         final creditsV3 = data['creditsV3'] == true;
         final main = _readInt(data['credits'], 0);
+        _subscriptionLevel = _readInt(data['hasCortexSubscription'], 0);
         billingV2Notifier.value = billingV2;
         creditsV3Notifier.value = creditsV3;
 
@@ -291,12 +295,11 @@ class CreditsManager {
           debugPrint(
               "Balances updated (v2): Spendable=$spendable (allowance=$allowance, owned=$main)");
         } else {
-          final bonus = _readInt(data['bonusCredits'], 0);
           final predits = _readInt(data['predits'], 100);
           final dredits = _readInt(data['dredits'], 100);
 
-          totalCreditsNotifier.value = main + bonus;
-          spendableNotifier.value = main + bonus;
+          totalCreditsNotifier.value = main;
+          spendableNotifier.value = main;
           preditsNotifier.value = predits;
           dreditsNotifier.value = dredits;
 

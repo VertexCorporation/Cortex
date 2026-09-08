@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/appbar/appbar.dart
 
 import 'dart:async';
@@ -97,7 +98,6 @@ class AppbarState extends State<Appbar> {
     final bool isTablet = size.shortestSide > 600;
     final bool isDesktop = size.width >= 800; // [NEW] Desktop breakpoint
     final double buttonSize = isTablet ? 48.0 : 42.0;
-    final double iconSize = isTablet ? 26.0 : 22.0;
 
     // State Checks
     final bool isChatActive = conversation.messages.isNotEmpty;
@@ -177,8 +177,8 @@ class AppbarState extends State<Appbar> {
             ? SvgPicture.asset(
                 'assets/icons/new.svg',
                 key: const ValueKey('new_chat_icon'),
-                width: iconSize,
-                height: iconSize,
+                width: CortexDesign.icon,
+                height: CortexDesign.icon,
                 colorFilter: ColorFilter.mode(
                   AppColors.primaryColor.inverted,
                   BlendMode.srcIn,
@@ -189,8 +189,8 @@ class AppbarState extends State<Appbar> {
                     ? 'assets/icons/on/ghost.svg'
                     : 'assets/icons/off/ghost.svg',
                 key: ValueKey('ghost_${session.isFluxMode}'),
-                width: iconSize,
-                height: iconSize,
+                width: CortexDesign.icon,
+                height: CortexDesign.icon,
                 colorFilter: ColorFilter.mode(
                   AppColors.primaryColor.inverted,
                   BlendMode.srcIn,
@@ -219,5 +219,3 @@ class AppbarState extends State<Appbar> {
     );
   }
 }
-
-

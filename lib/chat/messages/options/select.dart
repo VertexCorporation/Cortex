@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/messages/options/select.dart
 
 import 'package:cortex/app.dart';
@@ -69,7 +70,6 @@ class SelectTextScreenState extends State<SelectTextScreen> {
 
     // Define dynamic dimensions
     final double bodyFontSize = 16.0 * scale;
-    final double iconSize = 24.0 * scale;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       16.0 * scale,
       8.0 * scale,
@@ -106,7 +106,7 @@ class SelectTextScreenState extends State<SelectTextScreen> {
                     : Icons.visibility,
                 key: ValueKey(_hideSpecialFormatting),
                 color: fg,
-                size: iconSize,
+                size: CortexDesign.icon,
               ),
             ),
           ),
@@ -117,8 +117,8 @@ class SelectTextScreenState extends State<SelectTextScreen> {
             child: SvgPicture.asset(
               'assets/icons/copy.svg',
               colorFilter: ColorFilter.mode(fg, BlendMode.srcIn),
-              width: iconSize,
-              height: iconSize,
+              width: CortexDesign.iconSmall,
+              height: CortexDesign.iconSmall,
             ),
           ),
         ],

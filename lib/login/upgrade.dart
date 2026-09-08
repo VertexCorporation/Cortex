@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/login/upgrade.dart
 
 import 'package:cortex/app.dart';
@@ -128,7 +129,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
                   HapticFeedback.lightImpact();
                   _controller.signInWithApple(context);
                 },
-                icon: Icon(Icons.apple, size: 24 * fontScale),
+                icon: Icon(Icons.apple, size: CortexDesign.icon),
                 label: Text(
                   l10n.continueWithApple,
                   style: TextStyle(
@@ -156,8 +157,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
                       'assets/icons/google.svg',
                       colorFilter: ColorFilter.mode(
                           AppColors.primaryColor.inverted, BlendMode.srcIn),
-                      width: 16 * fontScale,
-                      height: 16 * fontScale,
+                      width: CortexDesign.icon,
+                      height: CortexDesign.icon,
                     ),
                     SizedBox(width: 12 * fontScale),
                     Text(
@@ -375,7 +376,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
                       size: 40.0,
                       onTap: () => Navigator.of(context).pop(),
                       child: Icon(Icons.close_rounded,
-                          color: AppColors.primaryColor.inverted, size: 20.0),
+                          color: AppColors.primaryColor.inverted,
+                          size: CortexDesign.icon),
                     ),
                   ),
                 ),

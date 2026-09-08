@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/voice.dart
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../../chat/services/tts_remote.dart';
 import '../../chat/services/voice_catalog.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme.dart';
+import '../widgets/grouped_button.dart';
 
 /// Lets the user choose which voice Cortex speaks with in voice mode.
 ///
@@ -53,44 +55,33 @@ class VoiceSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: screenHeight * 0.02),
-        Material(
-          color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(10.0),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              _showVoiceSelectionDialog(context);
-            },
-            borderRadius: BorderRadius.circular(10.0),
-            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                vertical: screenHeight * 0.02,
-                horizontal: screenWidth * 0.04,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      currentName,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: screenWidth * 0.041,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
+        SettingsGroupedRow(
+          position: SettingsRowPosition.standalone,
+          scale: (screenWidth / 375).clamp(0.85, 1.25),
+          onTap: () {
+            HapticFeedback.lightImpact();
+            _showVoiceSelectionDialog(context);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  currentName,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
                     color: AppColors.primaryColor.inverted,
-                    size: screenWidth * 0.04,
+                    fontSize: screenWidth * 0.041,
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
+                ),
               ),
-            ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.primaryColor.inverted,
+                size: CortexDesign.iconSize(screenWidth, tier: 1),
+              ),
+            ],
           ),
         ),
       ],
@@ -211,7 +202,7 @@ class _VoiceSelectionDialogState extends State<_VoiceSelectionDialog> {
     final selectedId = widget.catalog.effectiveVoiceId;
 
     return Dialog(
-      backgroundColor: AppColors.secondaryColor,
+      backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: screenHeight * 0.7),
@@ -325,14 +316,14 @@ class _VoiceSelectionDialogState extends State<_VoiceSelectionDialog> {
                                 : Icon(
                                     Icons.play_circle_outline,
                                     color: AppColors.primaryColor.inverted,
-                                    size: screenWidth * 0.055,
+                                    size: CortexDesign.icon,
                                   ),
                           ),
                           if (isSelected)
                             Icon(
                               Icons.check,
                               color: AppColors.primaryColor.inverted,
-                              size: screenWidth * 0.05,
+                              size: CortexDesign.icon,
                             ),
                         ],
                       ),

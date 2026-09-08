@@ -29,8 +29,7 @@ class ApiException implements Exception {
 }
 
 class ApiService {
-  final String _proxyBaseUrl =
-      "https://proxyopenrouterrequest-o5h7dmtija-ew.a.run.app";
+  final String _proxyBaseUrl = "https://sendmessage-o5h7dmtija-ew.a.run.app";
   final String _titleBaseUrl =
       "https://generatefasttitle-o5h7dmtija-ew.a.run.app";
 
@@ -60,13 +59,18 @@ class ApiService {
   Future<String> _getResponse({
     required List<Map<String, dynamic>> messages,
     required String model,
-    required bool isPremium,
+    bool isPremium = false,
     String? source,
     List<Map<String, dynamic>>? tools,
     bool enablefeatureReasoning = false,
     bool enableWebSearch = false,
     bool enableRag = false,
     bool isCharacterModel = false,
+    // Generation key (image/video/audio) for the Create Image/Video/Audio
+    // features. The client never prepends any prompt text; the server uses
+    // this key to skip intent analysis, route directly to the matching
+    // model group and prepend the canonical prefix itself.
+    String? generationTarget,
     Function(String textChunk)? onTextChunk,
     Function(String featureReasoning)? onfeatureReasoning,
     FutureOr<void> Function(String imageUrl)? onImageReceived,
@@ -76,6 +80,7 @@ class ApiService {
     Function(List<dynamic> toolCalls)? onToolCall,
     Function(List<dynamic> citations)? onCitations,
     Function(bool active)? onWebSearchActive,
+    Function(String title)? onTitleReceived,
     Function()? onServerFallback,
     required AppLocalizations localizations,
   }) async {
@@ -246,6 +251,7 @@ class ApiService {
           'INSUFFICIENT_BALANCE',
           'CREDITS_EXHAUSTED',
           'CREDIT_EXHAUSTED',
+          'DYNAMIC_CREDITS_EXHAUSTED',
           'QUOTA_EXCEEDED',
           'PAYMENT_REQUIRED',
         };
@@ -296,7 +302,6 @@ class ApiService {
           data: jsonEncode({
             "model": targetModel,
             "messages": messages,
-            "isPremiumModel": isPremium,
             "stream": true,
             if (source != null) "source": source,
             if (tools != null) "tools": tools,
@@ -304,6 +309,7 @@ class ApiService {
             "enableReasoning": enablefeatureReasoning,
             "enableWebSearch": enableWebSearch,
             "isCharacterModel": isCharacterModel,
+            if (generationTarget != null) "generationTarget": generationTarget,
             "systemPromptLimitFallback":
                 localizations.systemPromptLimitFallback,
           }),
@@ -377,6 +383,7 @@ class ApiService {
                       userMsg = localizations.premiumTrialExhaustedMessage;
                       break;
                     case 'DREDIT_EXHAUSTED':
+                    case 'DYNAMIC_CREDITS_EXHAUSTED':
                       userMsg = localizations.errorReachedLimit;
                       break;
                     case 'INSUFFICIENT_USER_CREDITS':
@@ -427,6 +434,7 @@ class ApiService {
                       userMsg = localizations.falErrorGenericStatus(statusCode);
                       break;
                     case 'AI_SERVICE_ERROR':
+                    case 'MODERATION_UNAVAILABLE':
                       // Always use localized error — never show raw backend messages
                       userMsg = localizations.errorServer;
                       break;
@@ -505,6 +513,13 @@ class ApiService {
 
                   case 'server_fallback':
                     trackCallback(onServerFallback?.call());
+                    break;
+
+                  case 'title':
+                    final title = data['title'] as String?;
+                    if (title != null && title.isNotEmpty) {
+                      onTitleReceived?.call(title);
+                    }
                     break;
 
                   case 'citations':
@@ -621,7 +636,7 @@ class ApiService {
           cancelOnError: true,
         );
 
-        return completer.future;
+        return await completer.future;
       } on DioException {
         rethrow;
       }
@@ -693,7 +708,7 @@ class ApiService {
     required String userInput,
     required List<Map<String, dynamic>> context,
     required String characterId,
-    required bool isPremium,
+    bool isPremium = false,
     required String baseModelId,
     String? source,
     List<String> attachmentPaths = const [],
@@ -704,6 +719,7 @@ class ApiService {
     Function(String)? onVideoReceived,
     Function(String)? onAudioReceived,
     Function(String)? onMediaGenerating,
+    Function(String)? onTitleReceived,
     required AppLocalizations localizations,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
@@ -729,13 +745,13 @@ class ApiService {
       enablefeatureReasoning: enablefeatureReasoning,
       enableWebSearch: false,
       isCharacterModel: true,
-      // Characters usually don't need web search, or pass it if needed
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
       onVideoReceived: onVideoReceived,
       onImageReceived: onImageReceived,
       onAudioReceived: onAudioReceived,
       onMediaGenerating: onMediaGenerating,
+      onTitleReceived: onTitleReceived,
     );
   }
 
@@ -914,7 +930,7 @@ class ApiService {
 
   Future<String> getOnlineModelResponse({
     required String modelId,
-    required bool isPremium,
+    bool isPremium = false,
     required String userInput,
     required List<Map<String, dynamic>> context,
     String? source,
@@ -930,11 +946,13 @@ class ApiService {
     Function(List<dynamic>)? onToolCall,
     Function(List<dynamic>)? onCitations,
     Function(bool)? onWebSearchActive,
+    Function(String)? onTitleReceived,
     Function()? onServerFallback,
     required AppLocalizations localizations,
     required String langCode,
     bool useTools = true,
     bool enableWebSearch = false,
+    String? generationTarget,
     bool isRetry = false,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
@@ -975,6 +993,7 @@ class ApiService {
       enablefeatureReasoning: enablefeatureReasoning,
       enableWebSearch: enableWebSearch,
       enableRag: enableRag,
+      generationTarget: generationTarget,
       tools: toolsJson.isNotEmpty ? toolsJson : null,
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
@@ -985,6 +1004,7 @@ class ApiService {
       onToolCall: onToolCall,
       onCitations: onCitations,
       onWebSearchActive: onWebSearchActive,
+      onTitleReceived: onTitleReceived,
       onServerFallback: onServerFallback,
     );
   }

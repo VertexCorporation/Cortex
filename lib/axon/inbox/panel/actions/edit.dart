@@ -113,18 +113,20 @@ Future<String?> showEditTitleDialog({
                                       ),
                                       isDense: true,
                                       counterText: "",
-                                      contentPadding: const EdgeInsets.symmetric(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
                                         vertical: 12,
                                         horizontal: 12,
                                       ),
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: AppColors.quinaryColor),
+                                        borderSide: BorderSide(
+                                            color: AppColors.quinaryColor),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                          color: AppColors.primaryColor.inverted,
+                                          color:
+                                              AppColors.primaryColor.inverted,
                                           width: 1.0,
                                         ),
                                         borderRadius: BorderRadius.circular(10),
@@ -192,9 +194,11 @@ Future<String?> showEditTitleDialog({
                                             ? () => submitTitle(ctx,
                                                 trigger: 'save_button')
                                             : null,
-                                        splashColor: AppColors.primaryColor.inverted
+                                        splashColor: AppColors
+                                            .primaryColor.inverted
                                             .withValues(alpha: 0.1),
-                                        highlightColor: AppColors.primaryColor.inverted
+                                        highlightColor: AppColors
+                                            .primaryColor.inverted
                                             .withValues(alpha: 0.1),
                                         child: Container(
                                           alignment: Alignment.center,
@@ -208,7 +212,8 @@ Future<String?> showEditTitleDialog({
                                               localizations.save,
                                               style: TextStyle(
                                                 fontSize: screenWidth * 0.04,
-                                                color: AppColors.primaryColor.inverted,
+                                                color: AppColors
+                                                    .primaryColor.inverted,
                                               ),
                                             ),
                                           ),

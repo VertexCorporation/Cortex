@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/selected/widgets/input/panels/briefing.dart
 
 import 'dart:async';
@@ -562,7 +563,6 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
     }
 
     final double fontSize = isTablet ? screenWidth * 0.022 : 14.0;
-    final double iconSize = isTablet ? screenWidth * 0.035 : 24.0;
     final double paddingHorizontal = isTablet ? screenWidth * 0.03 : 20.0;
     final double paddingVertical = isTablet ? screenWidth * 0.02 : 12.0;
     final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
@@ -615,8 +615,8 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
                   : AppColors.primaryColor.inverted,
               BlendMode.srcIn,
             ),
-            width: iconSize,
-            height: iconSize,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
           ),
           SizedBox(width: isTablet ? screenWidth * 0.02 : 12.0),
           Expanded(

@@ -362,38 +362,6 @@ class ModelEntity {
   bool get isServerSide => type != 'offline';
 
   bool get isPremium {
-    // Explicit list of premium models as requested by the user.
-    final premiumKeywords = [
-      'claude',
-      'codex',
-      'elevenlabs',
-      'flux',
-      'gemini',
-      'grok',
-      'kimi',
-      'kling video',
-      'ling',
-      'nano banana',
-      'see dance',
-      'seedans',
-      'seedream',
-      'sonar',
-      'sora',
-      'stable',
-      'veo',
-      'z image'
-    ];
-
-    final titleLower = displayTitle.toLowerCase();
-    final idLower = id.toLowerCase();
-
-    for (final keyword in premiumKeywords) {
-      final pattern = RegExp('\\b${RegExp.escape(keyword)}\\b');
-      if (pattern.hasMatch(titleLower) || pattern.hasMatch(idLower)) {
-        return true;
-      }
-    }
-
     return false;
   }
 

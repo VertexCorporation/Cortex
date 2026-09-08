@@ -1,15 +1,14 @@
 part of '../ai.dart';
 
 class _AiBodyContent extends StatelessWidget {
-  static final _thinkTag = 'think';
   static final _leadingColons = RegExp(r'^[\s:]+');
+  static final _thinkStart = RegExp(r'<think\b[^>]*>', caseSensitive: false);
+  static final _thinkEnd = RegExp(r'</think\s*>', caseSensitive: false);
 
   final Message message;
   final Widget? embeddedMedia;
   final bool mediaAboveText;
-  final String stableText;
-  final String animatingText;
-  final AnimationController textAnimCtl;
+  final RevealTimeline reveal;
   final double scale;
   final Map<String, List<InlineSpan>> parseCache;
 
@@ -17,85 +16,87 @@ class _AiBodyContent extends StatelessWidget {
     required this.message,
     this.embeddedMedia,
     required this.mediaAboveText,
-    required this.stableText,
-    required this.animatingText,
-    required this.textAnimCtl,
+    required this.reveal,
     required this.scale,
     required this.parseCache,
   });
 
   @override
   Widget build(BuildContext context) {
-    String fullText = stableText + animatingText;
+    String fullText = reveal.visibleText;
     String thinkContent = '';
 
-    String mainStable = stableText;
-    String mainAnimating = animatingText;
+    String mainText = fullText;
 
-    final thinkStart = fullText.indexOf('<$_thinkTag>');
-    if (thinkStart != -1) {
-      final contentStart = thinkStart + '<$_thinkTag>'.length;
-      final thinkEnd = fullText.indexOf('</$_thinkTag>', contentStart);
+    final thinkStartMatch = _thinkStart.firstMatch(fullText);
+    if (thinkStartMatch != null) {
+      final contentStart = thinkStartMatch.end;
+      final thinkEndMatch =
+          _thinkEnd.firstMatch(fullText.substring(contentStart));
+      final thinkEnd =
+          thinkEndMatch == null ? -1 : contentStart + thinkEndMatch.start;
       final contentEnd = thinkEnd != -1 ? thinkEnd : fullText.length;
 
       thinkContent = fullText.substring(contentStart, contentEnd).trim();
 
-      final blockEnd =
-      thinkEnd != -1 ? thinkEnd + '</$_thinkTag>'.length : fullText.length;
-
-      final beforeThink = fullText.substring(0, thinkStart);
-      final afterThink = fullText.substring(blockEnd);
-      final remaining = beforeThink + afterThink;
-
-      if (remaining.length <= stableText.length) {
-        mainStable = remaining;
-        mainAnimating = '';
-      } else {
-        mainStable = remaining.substring(0, stableText.length);
-        mainAnimating = remaining.substring(stableText.length);
-      }
-
-      mainStable = mainStable.replaceFirst(_leadingColons, '');
-      if (mainStable.isEmpty) {
-        mainAnimating = mainAnimating.replaceFirst(_leadingColons, '');
-      }
+      mainText =
+          _withoutThinkingBlocks(fullText).replaceFirst(_leadingColons, '');
     }
 
-    final bool hasMainText = mainStable.isNotEmpty || mainAnimating.isNotEmpty;
+    final bool hasMainText = mainText.isNotEmpty;
     final bool hasThink = thinkContent.isNotEmpty;
     final bool hasMedia = embeddedMedia != null;
+    final bool hasToolActivity =
+        message.toolActivity.isNotEmpty || message.toolSteps.isNotEmpty;
 
-    if (!hasMainText && !hasMedia && !hasThink) {
+    if (!hasMainText && !hasMedia && !hasThink && !hasToolActivity) {
       return const SizedBox.shrink();
     }
 
     final thinkBlock = hasThink
         ? Padding(
-      padding: EdgeInsets.only(
-          top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
-      child:
-      ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
-    )
+            padding: EdgeInsets.only(
+                top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
+            child:
+                ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
+          )
         : const SizedBox.shrink();
 
     final mediaBlock = hasMedia
         ? Padding(
-      padding: EdgeInsets.only(
-          top: 8 * scale, left: 2.0 * scale, right: 2.0 * scale),
-      child: AnimatedSize(
-        duration: const Duration(milliseconds: 320),
-        curve: Curves.easeOutCubic,
-        alignment: Alignment.centerLeft,
-        child: embeddedMedia!,
-      ),
-    )
+            padding: EdgeInsets.only(
+                top: 8 * scale, left: 2.0 * scale, right: 2.0 * scale),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 320),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.centerLeft,
+              child: embeddedMedia!,
+            ),
+          )
+        : const SizedBox.shrink();
+
+    final toolBlock = hasToolActivity
+        ? Padding(
+            padding: EdgeInsets.only(
+                top: 4 * scale, left: 2.0 * scale, bottom: 2 * scale),
+            child: ToolActivityWidget(
+              activeTool: message.toolActivity,
+              steps: message.toolSteps,
+            ),
+          )
         : const SizedBox.shrink();
 
     final textBlock = hasMainText
-        ? Padding(
-      padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale),
-      child: _buildContent(context, scale, mainStable, mainAnimating),
-    )
+        ? SizedBox(
+            // Keep the paragraph's horizontal constraint stable while its
+            // reveal grows. Without this, short prefixes repeatedly change
+            // their intrinsic width and the message tile appears to wobble.
+            width: double.infinity,
+            child: Padding(
+              padding: EdgeInsets.only(top: 3 * scale, left: 2.0 * scale),
+              child: _buildContent(context, scale, mainText),
+            ),
+          )
         : const SizedBox.shrink();
 
     return Column(
@@ -103,6 +104,7 @@ class _AiBodyContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (hasThink) thinkBlock,
+        if (hasToolActivity) toolBlock,
         if (hasMedia && mediaAboveText) mediaBlock,
         if (hasMainText) textBlock,
         if (hasMedia && !mediaAboveText) mediaBlock,
@@ -110,210 +112,62 @@ class _AiBodyContent extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, double s, String stableText,
-      String animatingText) {
+  String _withoutThinkingBlocks(String text) {
+    final result = StringBuffer();
+    var cursor = 0;
+    while (cursor < text.length) {
+      final start = _thinkStart.firstMatch(text.substring(cursor));
+      if (start == null) {
+        result.write(text.substring(cursor));
+        break;
+      }
+
+      final startOffset = cursor + start.start;
+      result.write(text.substring(cursor, startOffset));
+      final contentStart = cursor + start.end;
+      final end = _thinkEnd.firstMatch(text.substring(contentStart));
+      if (end == null) break;
+      cursor = contentStart + end.end;
+    }
+    return result.toString();
+  }
+
+  Widget _buildContent(BuildContext context, double s, String text) {
     final baseStyle = TextStyle(
         fontSize: 17 * s, height: 1.38, color: AppColors.primaryColor.inverted);
-
-    if (stableText.isEmpty && animatingText.isEmpty) {
-      if (message.isWebSearchActive && message.isThinking) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 4 * s),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 16 * s,
-                height: 16 * s,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.0 * s,
-                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-                ),
-              ),
-              SizedBox(width: 9 * s),
-              Text(
-                "Aranıyor...",
-                style: TextStyle(
-                  fontSize: 15 * s,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-      return const SizedBox.shrink();
-    }
-
-    if (!textAnimCtl.isAnimating && animatingText.isEmpty) {
-      return RepaintBoundary(
-        child: SelectionArea(
-          child: Text.rich(
-            TextSpan(
-              children: _getParsedSpans(context, stableText, s),
-              style: baseStyle,
-            ),
-          ),
-        ),
-      );
-    }
-
-    final markdownText = _rebalanceMarkdownBoundary(stableText, animatingText);
-
+    // Parsing runs only when the visible source changes. Fade-only ticks are
+    // listened to by the glyph painter and never rebuild this tree.
+    final spans = _getParsedSpans(context, text, s);
     return RepaintBoundary(
       child: SelectionArea(
-        child: AnimatedBuilder(
-          animation: textAnimCtl,
-          builder: (context, child) {
-            final animValue = textAnimCtl.value;
-            final opacity = animValue.clamp(0.0, 1.0);
-
-            return Text.rich(
-              TextSpan(
-                style: baseStyle,
-                children: [
-                  ..._getParsedSpans(context, markdownText.stable, s),
-                  if (markdownText.animating.isNotEmpty)
-                    ..._getAnimatingSpans(
-                        context, markdownText.animating, s, opacity),
-                ],
-              ),
-            );
-          },
+        child: RevealText(
+          timeline: reveal,
+          text: TextSpan(style: baseStyle, children: spans),
         ),
       ),
     );
   }
 
-  List<InlineSpan> _getAnimatingSpans(BuildContext context, String text,
-      double s, double opacity) {
-    if (text.isEmpty) return [];
-    final spans = _getParsedSpans(context, text, s);
-    return spans
-        .map((span) => _applyOpacity(span, opacity))
-        .toList(growable: false);
-  }
-
-  List<InlineSpan> _getParsedSpans(BuildContext context, String text,
-      double s) {
+  List<InlineSpan> _getParsedSpans(
+      BuildContext context, String text, double s) {
     if (text.isEmpty) return [];
     final colorKey = AppColors.primaryColor.inverted.toARGB32();
-    final citationKey = message.webSearchSources?.length ?? 0;
-    final cacheKey = '$text:${message.isThinking}:$citationKey:$s:$colorKey';
+    final citationKey = message.webSearchSources.toString();
+    final cacheKey = '$text:${reveal.visualComplete}:$citationKey:$s:$colorKey';
     if (parseCache.containsKey(cacheKey)) return parseCache[cacheKey]!;
 
     final spans = parseText(context, text,
         fontSize: 17 * s,
-        isFinished: !message.isThinking,
+        isFinished: reveal.visualComplete,
         citations: message.webSearchSources);
 
     parseCache[cacheKey] = spans;
-    if (parseCache.length > 500) {
+    if (parseCache.length > 8) {
       final key = parseCache.keys.first;
       parseCache.remove(key);
     }
     return spans;
   }
-
-  InlineSpan _applyOpacity(InlineSpan span, double opacity) {
-    if (span is TextSpan) {
-      final baseColor = span.style?.color ?? AppColors.primaryColor.inverted;
-      return TextSpan(
-        text: span.text,
-        children: span.children
-            ?.map((child) => _applyOpacity(child, opacity))
-            .toList(growable: false),
-        style: span.style?.copyWith(
-          color: baseColor.withValues(alpha: opacity),
-          foreground: null,
-        ) ??
-            TextStyle(color: baseColor.withValues(alpha: opacity)),
-      );
-    } else if (span is WidgetSpan) {
-      return WidgetSpan(
-          alignment: span.alignment,
-          baseline: span.baseline,
-          child: Opacity(opacity: opacity, child: span.child));
-    }
-    return span;
-  }
-
-  _MarkdownTextParts _rebalanceMarkdownBoundary(String stable,
-      String animating,) {
-    if (stable.isEmpty || animating.isEmpty) {
-      return _MarkdownTextParts(stable: stable, animating: animating);
-    }
-
-    final delimiterStart = _lastUnclosedDelimiterStart(stable);
-    if (delimiterStart == null) {
-      return _MarkdownTextParts(stable: stable, animating: animating);
-    }
-
-    final lineStart = stable.lastIndexOf('\n', delimiterStart);
-    final splitIndex = lineStart < 0 ? 0 : lineStart + 1;
-
-    return _MarkdownTextParts(
-      stable: stable.substring(0, splitIndex),
-      animating: stable.substring(splitIndex) + animating,
-    );
-  }
-
-  int? _lastUnclosedDelimiterStart(String text) {
-    int? latest;
-    for (final delimiter in const ['**', '__', '`']) {
-      if (_unescapedDelimiterCount(text, delimiter).isOdd) {
-        final index = _lastUnescapedDelimiterIndex(text, delimiter);
-        if (index != null && (latest == null || index > latest)) {
-          latest = index;
-        }
-      }
-    }
-    return latest;
-  }
-
-  int _unescapedDelimiterCount(String text, String delimiter) {
-    var count = 0;
-    var index = 0;
-    while (index < text.length) {
-      final next = text.indexOf(delimiter, index);
-      if (next < 0) break;
-      if (!_isEscaped(text, next)) count++;
-      index = next + delimiter.length;
-    }
-    return count;
-  }
-
-  int? _lastUnescapedDelimiterIndex(String text, String delimiter) {
-    var index = text.length;
-    while (index > 0) {
-      final next = text.lastIndexOf(delimiter, index - 1);
-      if (next < 0) return null;
-      if (!_isEscaped(text, next)) return next;
-      index = next;
-    }
-    return null;
-  }
-
-  bool _isEscaped(String text, int index) {
-    var slashCount = 0;
-    var cursor = index - 1;
-    while (cursor >= 0 && text.codeUnitAt(cursor) == 0x5c) {
-      slashCount++;
-      cursor--;
-    }
-    return slashCount.isOdd;
-  }
-}
-
-class _MarkdownTextParts {
-  final String stable;
-  final String animating;
-
-  const _MarkdownTextParts({
-    required this.stable,
-    required this.animating,
-  });
 }
 
 class ThoughtProcessWidget extends StatefulWidget {
@@ -370,9 +224,7 @@ class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
   }
 
   void _toggleExpand() {
-    if (widget.thinkContent
-        .trim()
-        .isEmpty) {
+    if (widget.thinkContent.trim().isEmpty) {
       return;
     }
     setState(() {
@@ -436,7 +288,7 @@ class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
                       turns: _arrowTurns,
                       child: Icon(
                         Icons.keyboard_arrow_down,
-                        size: 18 * widget.scale,
+                        size: CortexDesign.icon,
                         color: AppColors.primaryColor.inverted
                             .withValues(alpha: 0.5),
                       ),
@@ -451,7 +303,7 @@ class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
               parent: _contentController,
               curve: Curves.easeInOut,
             ),
-            axisAlignment: -1.0,
+            alignment: Alignment.topCenter,
             child: FadeTransition(
               opacity: _contentFade,
               child: SlideTransition(

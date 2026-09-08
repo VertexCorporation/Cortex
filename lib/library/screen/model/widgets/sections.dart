@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/library/screen/model/widgets/sections.dart
 
 import 'dart:io';
@@ -143,8 +144,8 @@ class DescriptionSection extends StatelessWidget {
                       duration: const Duration(milliseconds: 200),
                       child: SvgPicture.asset(
                         'assets/icons/arrov.svg',
-                        width: screenWidth * 0.06,
-                        height: screenWidth * 0.06,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                         colorFilter: ColorFilter.mode(
                             AppColors.quinaryColor, BlendMode.srcIn),
                       ),
@@ -388,8 +389,9 @@ class _BaseModelSelectionSectionState extends State<BaseModelSelectionSection> {
                       Padding(
                         padding: EdgeInsets.only(right: screenWidth * 0.02),
                         child: SvgPicture.asset(
+                          height: CortexDesign.icon,
                           'assets/icons/sparkle.svg',
-                          width: screenWidth * 0.05,
+                          width: CortexDesign.icon,
                           colorFilter: ColorFilter.mode(
                             AppColors.primaryColor.inverted
                                 .withValues(alpha: 0.8),
@@ -403,7 +405,7 @@ class _BaseModelSelectionSectionState extends State<BaseModelSelectionSection> {
                       child: Icon(
                         Icons.keyboard_arrow_down,
                         color: AppColors.primaryColor.inverted,
-                        size: screenWidth * 0.06,
+                        size: CortexDesign.icon,
                       ),
                     ),
                   ],
@@ -436,13 +438,13 @@ class _BaseModelSelectionSectionState extends State<BaseModelSelectionSection> {
                                   fontSize: screenWidth * 0.038),
                               prefixIcon: Icon(Icons.search_rounded,
                                   color: AppColors.tertiaryColor,
-                                  size: screenWidth * 0.05),
+                                  size: CortexDesign.icon),
                               suffixIcon: _searchQuery.isNotEmpty
                                   ? GestureDetector(
                                       onTap: () => _searchController.clear(),
                                       child: Icon(Icons.close_rounded,
                                           color: AppColors.tertiaryColor,
-                                          size: screenWidth * 0.045),
+                                          size: CortexDesign.icon),
                                     )
                                   : null,
                               filled: true,
@@ -511,6 +513,8 @@ class _BaseModelSelectionSectionState extends State<BaseModelSelectionSection> {
           imageWidget = Padding(
             padding: const EdgeInsets.all(2.0),
             child: SvgPicture.asset(
+              height: CortexDesign.icon,
+              width: CortexDesign.icon,
               imagePath,
               fit: BoxFit.contain,
               colorFilter: ColorFilter.mode(
@@ -574,8 +578,9 @@ class _BaseModelSelectionSectionState extends State<BaseModelSelectionSection> {
                       Padding(
                         padding: EdgeInsets.only(left: screenWidth * 0.02),
                         child: SvgPicture.asset(
+                          height: CortexDesign.icon,
                           'assets/icons/sparkle.svg',
-                          width: screenWidth * 0.05,
+                          width: CortexDesign.icon,
                           colorFilter: ColorFilter.mode(
                               AppColors.primaryColor.inverted
                                   .withValues(alpha: 0.8),
@@ -722,7 +727,6 @@ class FeaturesSection extends StatelessWidget {
     if (validFeatures.isEmpty) return const SizedBox.shrink();
 
     final double iconBoxSize = screenWidth * 0.1;
-    final double iconSize = screenWidth * 0.055;
     final double iconRadius = screenWidth * 0.025;
 
     return SectionContainer(
@@ -756,7 +760,8 @@ class FeaturesSection extends StatelessWidget {
                         color: iconColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(iconRadius),
                       ),
-                      child: Icon(iconData, color: iconColor, size: iconSize),
+                      child: Icon(iconData,
+                          color: iconColor, size: CortexDesign.icon),
                     ),
                     SizedBox(width: screenWidth * 0.035),
                     // Title + description

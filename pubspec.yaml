@@ -65,7 +65,7 @@ dependencies:
   path: ^1.9.1
 
   # --- RAG / DOCUMENT CHAT ---
-  pdfrx: ^1.0.0
+  pdfrx: ^2.6.1
   excel: ^4.0.6
   archive: ^3.6.1
   xml: ^6.5.0
@@ -116,6 +116,9 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   mockito: ^5.6.3
   sqflite_common_ffi: ^2.3.3
+
+dependency_overrides:
+  archive: ^3.6.1
 
 flutter_launcher_icons:
   android: true

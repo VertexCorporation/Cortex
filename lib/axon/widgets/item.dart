@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/axon/item.dart
 
 import 'package:cortex/theme.dart';
@@ -38,19 +39,19 @@ class AxonItem extends StatelessWidget {
 
     // Optimization: Use withValues for cleaner opacity handling
     final Color targetBackgroundColor = isActive
-        ? AppColors.primaryColor.inverted.withValues(alpha: 0.05)
+        ? AppColors.primaryColor.withValues(alpha: 0.10)
         : Colors.transparent;
 
     final FontWeight fontWeight = isActive ? FontWeight.w600 : FontWeight.w500;
 
     // Dimensions
     // Dimensions — aligned with footer horizontal padding
-    final double itemPaddingV = screenHeight * 0.011;
-    final double itemPaddingH = referenceWidth * 0.04;
-    final double baseIconSize = referenceWidth * 0.055;
+    final double itemPaddingV = 9.5;
+    final double itemPaddingH = 16;
+    final double baseIconSize = 24;
     final double iconSize = reduceIconSize ? baseIconSize * 0.78 : baseIconSize;
-    final double fontSize = referenceWidth * 0.04;
-    final double borderRadius = referenceWidth * 0.03;
+    final double fontSize = 15;
+    final double borderRadius = CortexDesign.radius;
 
     // --- ANIMATED CONTAINER WRAPPER ---
     return Padding(
@@ -87,11 +88,11 @@ class AxonItem extends StatelessWidget {
                   SizedBox(
                     width: iconSize * 1.2,
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
                       child: SvgPicture.asset(
                         iconPath,
-                        width: iconSize,
-                        height: iconSize,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                         // Optimization: BlendMode.srcIn is faster than masking
                         colorFilter:
                             ColorFilter.mode(iconColor, BlendMode.srcIn),

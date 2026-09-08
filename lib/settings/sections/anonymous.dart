@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/anonymous.dart
 
 import 'package:cortex/navigation.dart';
@@ -29,17 +30,10 @@ class AnonymousUpgradePanel extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(screenWidth * 0.05),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primaryColor.withValues(alpha: 0.15),
-                AppColors.secondaryColor,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppColors.primaryColor.inverted.withValues(alpha: 0.3),
+              color: AppColors.border,
               width: 1.5,
             ),
           ),
@@ -51,7 +45,7 @@ class AnonymousUpgradePanel extends StatelessWidget {
                 children: [
                   Icon(Icons.verified,
                       color: AppColors.primaryColor.inverted,
-                      size: screenWidth * 0.07),
+                      size: CortexDesign.icon),
                   SizedBox(width: screenWidth * 0.02),
                   Text(
                     l10n.upgradeAccountTitle,
@@ -86,8 +80,9 @@ class AnonymousUpgradePanel extends StatelessWidget {
                     _openUpgradeScreen(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor.inverted,
-                    foregroundColor: AppColors.primaryColor,
+                    backgroundColor: AppColors.background,
+                    foregroundColor: AppColors.primaryColor.inverted,
+                    side: BorderSide(color: AppColors.border),
                     padding:
                         EdgeInsets.symmetric(vertical: screenWidth * 0.035),
                     shape: RoundedRectangleBorder(

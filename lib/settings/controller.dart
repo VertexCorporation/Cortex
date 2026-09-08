@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/controller.dart
 
 import 'dart:async';
@@ -279,17 +280,17 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
 
     final timeStr = _formatRemainingTime(_remainingSeconds);
 
-    final double headerSize = isTablet ? 24.0 : screenWidth * 0.045;
-    final double bodySize = isTablet ? 16.0 : screenWidth * 0.035;
+    final double headerSize = 20;
+    final double bodySize = 14;
     final double buttonHeight = isTablet ? 60.0 : screenHeight * 0.06;
-    final double padding = isTablet ? 24.0 : screenWidth * 0.04;
+    final double padding = CortexDesign.gutter(screenWidth);
 
     return Column(
       children: [
         Container(
           padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(
-            color: AppColors.secondaryColor,
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(12.0),
             border: Border.all(color: AppColors.septenaryColor, width: 2),
           ),

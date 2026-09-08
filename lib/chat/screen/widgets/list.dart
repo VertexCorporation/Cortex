@@ -12,6 +12,7 @@ import 'package:cortex/chat/services/stop.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/screen/widgets/tiles.dart';
 import 'package:cortex/chat/messages/options/report.dart';
+import 'package:cortex/chat/messages/tiles/ai.dart';
 import 'package:cortex/fog.dart';
 import 'package:cortex/chat/services/scroll.dart';
 
@@ -32,6 +33,7 @@ class ChatMessageList extends StatefulWidget {
 }
 
 class _ChatMessageListState extends State<ChatMessageList> {
+  bool _revealScrollScheduled = false;
   @override
   void initState() {
     super.initState();
@@ -56,6 +58,26 @@ class _ChatMessageListState extends State<ChatMessageList> {
     } else {
       controller.jumpTo(controller.position.maxScrollExtent);
     }
+  }
+
+  void _keepRevealedTextVisible() {
+    if (_revealScrollScheduled || !mounted) return;
+    final controller = widget.scrollController;
+    if (!controller.hasClients || controller.positions.length != 1) return;
+    final position = controller.position;
+    // Respect an intentional upward scroll. The normal chat-follow behavior
+    // only applies while the user is already close to the live bottom.
+    if (position.maxScrollExtent - position.pixels > 120) return;
+
+    _revealScrollScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _revealScrollScheduled = false;
+      if (!mounted || !controller.hasClients) return;
+      final current = controller.position;
+      if (current.maxScrollExtent - current.pixels <= 160) {
+        current.jumpTo(current.maxScrollExtent);
+      }
+    });
   }
 
   @override
@@ -88,10 +110,16 @@ class _ChatMessageListState extends State<ChatMessageList> {
     // This is the cleanest way to ensure "open new chat -> scroll to bottom".
     // We assume conversationProvider.conversationID changes.
 
-    return NotificationListener<ScrollMetricsNotification>(
+    return NotificationListener<Notification>(
       onNotification: (notification) {
+        if (notification is AiMessageRevealNotification) {
+          _keepRevealedTextVisible();
+          return false;
+        }
         // Trigger scroll visibility update when scroll metrics (like maxScrollExtent) change
-        context.read<ScrollService>().updateButtonVisibility();
+        if (notification is ScrollMetricsNotification) {
+          context.read<ScrollService>().updateButtonVisibility();
+        }
         return false; // let the notification bubble up
       },
       child: ScrollFog(

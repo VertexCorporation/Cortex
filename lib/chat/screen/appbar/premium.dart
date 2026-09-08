@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/premium.dart
 
 import 'dart:async';
@@ -71,7 +72,6 @@ class _PremiumButtonState extends State<PremiumButton>
     final double scale = (screenWidth / 375.0).clamp(0.85, 1.2);
 
     final double buttonHeight = 36.0 * scale;
-    final double iconSize = 14.0 * scale;
     final double fontSize = 13.0 * scale;
     final double paddingH = 14.0 * scale;
     final double gap = 6.0 * scale;
@@ -118,8 +118,8 @@ class _PremiumButtonState extends State<PremiumButton>
                           contentColor,
                           BlendMode.srcIn,
                         ),
-                        width: iconSize,
-                        height: iconSize,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                       ),
                       SizedBox(width: gap),
                       Flexible(

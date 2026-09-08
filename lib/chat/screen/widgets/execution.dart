@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,7 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
                 children: [
                   Icon(
                     Icons.terminal_rounded,
-                    size: 18,
+                    size: CortexDesign.icon,
                     color: hasError
                         ? AppColors.septenaryColor
                         : AppColors.tertiaryColor,
@@ -71,7 +72,7 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
                     _isExpanded
                         ? Icons.keyboard_arrow_up_rounded
                         : Icons.keyboard_arrow_down_rounded,
-                    size: 20,
+                    size: CortexDesign.icon,
                     color: AppColors.tertiaryColor,
                   ),
                 ],

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/screens/models/screen/new/widgets/header.dart
 
 import 'dart:io';
@@ -277,7 +278,8 @@ class _AvatarPicker extends StatelessWidget {
               backgroundImage: image != null ? FileImage(image!) : null,
               child: image == null
                   ? Icon(Icons.broken_image,
-                      size: size / 2.5, color: AppColors.primaryColor.inverted)
+                      size: CortexDesign.icon,
+                      color: AppColors.primaryColor.inverted)
                   : null,
             ),
             Positioned(
@@ -299,8 +301,9 @@ class _AvatarPicker extends StatelessWidget {
                     duration: const Duration(milliseconds: 300),
                     turns: image == null ? 0.0 : 0.125,
                     child: SvgPicture.asset(
+                      height: CortexDesign.icon,
                       'assets/icons/plus.svg',
-                      width: size * 0.18,
+                      width: CortexDesign.icon,
                       colorFilter: ColorFilter.mode(
                         image == null
                             ? AppColors.primaryColor.inverted

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/appbar/claim_offer.dart
 
 import 'dart:async';
@@ -76,7 +77,6 @@ class _ClaimOfferButtonState extends State<ClaimOfferButton>
     final double scale = (screenWidth / 375.0).clamp(0.85, 1.2);
 
     final double buttonHeight = 36.0 * scale;
-    final double iconSize = 16.0 * scale;
     final double fontSize = 13.0 * scale;
     final double paddingH = 14.0 * scale;
     final double gap = 6.0 * scale;
@@ -97,21 +97,21 @@ class _ClaimOfferButtonState extends State<ClaimOfferButton>
       buttonIconWidget = Icon(
         Icons.card_giftcard_rounded,
         color: contentColor,
-        size: iconSize,
+        size: CortexDesign.icon,
       );
     } else if (hasFreeTrial) {
       buttonText = localizations.freeOffer;
       buttonIconWidget = Icon(
         Icons.card_giftcard_rounded,
         color: contentColor,
-        size: iconSize,
+        size: CortexDesign.icon,
       );
     } else {
       buttonText = 'Cortex Premium';
       buttonIconWidget = SvgPicture.asset(
         'assets/icons/sparkle.svg',
-        width: iconSize,
-        height: iconSize,
+        width: CortexDesign.icon,
+        height: CortexDesign.icon,
         colorFilter: ColorFilter.mode(
           contentColor,
           BlendMode.srcIn,

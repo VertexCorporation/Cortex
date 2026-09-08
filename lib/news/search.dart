@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/news/search.dart
 
 import 'package:flutter/material.dart';
@@ -34,7 +35,6 @@ class NewsSearchBar extends StatelessWidget {
             : const EdgeInsets.symmetric(horizontal: 12, vertical: 6);
 
     // Dimensions
-    final double iconSize = isDesktop ? 22.0 : (isTablet ? 36.0 : w * .06);
     final double borderRadius = isDesktop ? 16.0 : (isTablet ? 24.0 : 16.0);
     final double maxBarWidth =
         isDesktop ? 500 : (isTablet ? 700 : double.infinity);
@@ -70,7 +70,7 @@ class NewsSearchBar extends StatelessWidget {
             ),
             prefixIcon: Icon(
               Icons.search,
-              size: iconSize,
+              size: CortexDesign.icon,
               color: contentColor,
             ),
             filled: true,

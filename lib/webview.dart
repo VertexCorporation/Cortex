@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/webview.dart
 
 import 'dart:math'
@@ -174,10 +175,11 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                     icon: Transform.rotate(
                       angle: -math.pi / 2,
                       child: SvgPicture.asset(
+                        height: CortexDesign.icon,
                         'assets/icons/arrow.svg',
                         colorFilter: ColorFilter.mode(
                             AppColors.primaryColor.inverted, BlendMode.srcIn),
-                        width: 22,
+                        width: CortexDesign.icon,
                       ),
                     ),
                     onPressed: _canGoBack
@@ -204,7 +206,7 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                   icon: Icon(Icons.close,
                       color: AppColors.primaryColor.inverted
                           .withValues(alpha: 0.7),
-                      size: 26),
+                      size: CortexDesign.icon),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -288,7 +290,7 @@ class _ErrorDisplay extends StatelessWidget {
           ScaleTransition(
             scale: animation,
             child: Icon(Icons.error_rounded,
-                color: AppColors.septenaryColor, size: 70),
+                color: AppColors.septenaryColor, size: CortexDesign.icon),
           ),
           const SizedBox(height: 24),
           Text(

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
@@ -77,8 +78,8 @@ void openLink(BuildContext context, String urlString) async {
               children: [
                 SvgPicture.asset(
                   'assets/icons/world.svg',
-                  width: 24,
-                  height: 24,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter: ColorFilter.mode(
                       AppColors.primaryColor.inverted, BlendMode.srcIn),
                 ),

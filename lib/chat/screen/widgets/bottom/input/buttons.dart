@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -92,17 +93,12 @@ class ActionButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context
-        .watch<InternetProvider>()
-        .isConnected;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
     final speechService = context.watch<SpeechService>();
     final inputProvider = context.watch<InputProvider>();
 
-    final screenWidth = MediaQuery
-        .sizeOf(context)
-        .width;
-    final bool isTablet = screenWidth >= 600;
-    final double buttonSize = isTablet ? 40.0 : 36.0;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final double buttonSize = screenWidth * 0.096;
 
     bool isDeviceSupported = speechService.isDeviceSupported;
 
@@ -170,42 +166,42 @@ class ActionButtonWidget extends StatelessWidget {
           },
           child: showMic
               ? Padding(
-            key: const ValueKey('mic_visible'),
-            padding: const EdgeInsetsDirectional.only(end: 8.0),
-            child: _ToolCircleButton(
-              size: buttonSize,
-              onTap: () async {
-                final localeCode = context
-                    .read<ChatSessionProvider>()
-                    .getLocale()
-                    .languageCode;
-                final currentText = controller.text;
+                  key: const ValueKey('mic_visible'),
+                  padding: const EdgeInsetsDirectional.only(end: 8.0),
+                  child: _ToolCircleButton(
+                    size: buttonSize,
+                    onTap: () async {
+                      final localeCode = context
+                          .read<ChatSessionProvider>()
+                          .getLocale()
+                          .languageCode;
+                      final currentText = controller.text;
 
-                inputProvider.setVoiceRecording(true);
+                      inputProvider.setVoiceRecording(true);
 
-                await speechService.startListening(
-                  locale: localeCode,
-                  onResult: (String text) {
-                    String spacer = (currentText.isNotEmpty &&
-                        !currentText.endsWith(' '))
-                        ? ' '
-                        : '';
-                    if (currentText.isEmpty) spacer = '';
-                    controller.text = "$currentText$spacer$text";
-                    controller.selection = TextSelection.fromPosition(
-                        TextPosition(offset: controller.text.length));
-                  },
-                );
-              },
-              child: SvgPicture.asset(
-                'assets/icons/microphone.svg',
-                width: buttonSize * 0.55,
-                height: buttonSize * 0.55,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-              ),
-            ),
-          )
+                      await speechService.startListening(
+                        locale: localeCode,
+                        onResult: (String text) {
+                          String spacer = (currentText.isNotEmpty &&
+                                  !currentText.endsWith(' '))
+                              ? ' '
+                              : '';
+                          if (currentText.isEmpty) spacer = '';
+                          controller.text = "$currentText$spacer$text";
+                          controller.selection = TextSelection.fromPosition(
+                              TextPosition(offset: controller.text.length));
+                        },
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/microphone.svg',
+                      width: CortexDesign.icon,
+                      height: CortexDesign.icon,
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted, BlendMode.srcIn),
+                    ),
+                  ),
+                )
               : const SizedBox.shrink(key: ValueKey('mic_hidden')),
         ),
 
@@ -235,17 +231,17 @@ class ActionButtonWidget extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.inverted,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(size / 2),
           border: Border.all(color: AppColors.border, width: 1.0),
         ),
         child: Center(
           child: SvgPicture.asset(
             'assets/icons/stop.svg',
-            width: size * 0.4,
-            height: size * 0.4,
-            colorFilter:
-            ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
+            colorFilter: ColorFilter.mode(
+                AppColors.primaryColor.inverted, BlendMode.srcIn),
           ),
         ),
       ),
@@ -253,36 +249,30 @@ class ActionButtonWidget extends StatelessWidget {
   }
 
   Widget _buildSendButton(double size, bool enabled, bool isConnected) {
-    Color backgroundColor;
-    Color iconColor;
-
-    if (enabled) {
-      backgroundColor = AppColors.primaryColor.inverted;
-      iconColor = AppColors.primaryColor;
-    } else {
-      backgroundColor = isConnected
-          ? AppColors.primaryColor.inverted.withValues(alpha: 0.1)
-          : AppColors.primaryColor.inverted.withValues(alpha: 0.06);
-      iconColor = AppColors.tertiaryColor;
-    }
+    final backgroundColor = AppColors.primaryColor.inverted;
+    final iconColor =
+        AppColors.primaryColor.withValues(alpha: enabled ? 1 : 0.45);
 
     return GestureDetector(
       onTap: enabled
           ? () {
-        HapticFeedback.lightImpact();
-        onSend();
-      }
+              HapticFeedback.lightImpact();
+              onSend();
+            }
           : null,
       child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
           color: backgroundColor,
+          border: Border.all(color: AppColors.primaryColor.inverted),
           shape: BoxShape.circle,
         ),
         child: Padding(
           padding: EdgeInsets.all(size * 0.22),
           child: SvgPicture.asset(
+            height: CortexDesign.icon,
+            width: CortexDesign.icon,
             'assets/icons/arrow.svg',
             colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
           ),
@@ -291,99 +281,95 @@ class ActionButtonWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildVoiceChatButton(BuildContext context, double size,
-      bool isEnabled) {
+  Widget _buildVoiceChatButton(
+      BuildContext context, double size, bool isEnabled) {
     return GestureDetector(
       onTap: !isEnabled
           ? () {
-        HapticFeedback.heavyImpact();
-      }
-          : () async {
-        HapticFeedback.lightImpact();
-
-        final voiceService = context.read<VoiceService>();
-
-        // [FIX] Ensure we always start in Standard Voice Mode, not Flow Mode
-        voiceService.setFlowMode(false);
-
-        final session = context.read<ChatSessionProvider>();
-        final inputProvider = context.read<InputProvider>();
-        final sendService = context.read<SendService>();
-        final localizations = AppLocalizations.of(context)!;
-        final localeCode = session
-            .getLocale()
-            .languageCode;
-        final conversationProvider = context
-            .read<ConversationProvider>(); // Restore variable
-
-        // [NEW] LOGIC: If chat is not empty, start a new conversation automatically
-        if (conversationProvider.messages.isNotEmpty) {
-          mainScreenKey.currentState
-              ?.startNewConversation(closeSidebar: false);
-          // Wait a brief moment for state to reset?
-          // startNewConversation is async-ish but returns void.
-          // It resets providers. We should yield to event loop.
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-
-        // [INTERRUPTION] Stop any active text generation
-        if (conversationProvider.isWaitingForResponse) {
-          conversationProvider.stopGenerating();
-        }
-
-        // [INTERRUPTION] Stop any active TTS speaking (and ensure clean slate)
-        await voiceService.stopSession(resetState: true);
-
-        if (!context.mounted) return;
-
-        // Activate UI mode (triggers Overlay)
-        inputProvider.setVoiceModeActive(true);
-
-        // Set Localized Agent Names
-        voiceService.setAgentNames([
-          localizations.agentRed,
-          localizations.agentBlue,
-          localizations.agentPurple
-        ]);
-
-        // Start Voice Session
-        await voiceService.startSession(
-          context: context,
-          locale: localeCode,
-          voiceSystemPrompt: localizations.voiceSystemPrompt,
-          flowPromptBuilder: (agentName, previousResponse) =>
-              localizations.flowModeContextParams(
-                  agentName, previousResponse),
-          onFinalSentence: (String text) {
-            if (!context.mounted) return;
-            if (text
-                .trim()
-                .isNotEmpty) {
-              sendService.sendMessage(
-                context: context,
-                localizations: localizations,
-                messageText: text,
-                isHidden: voiceService.shouldNextMessageBeHidden,
-                overrideModelId: 'cortex/auto',
-              );
+              HapticFeedback.heavyImpact();
             }
-          },
-        );
-      },
+          : () async {
+              HapticFeedback.lightImpact();
+
+              final voiceService = context.read<VoiceService>();
+
+              // [FIX] Ensure we always start in Standard Voice Mode, not Flow Mode
+              voiceService.setFlowMode(false);
+
+              final session = context.read<ChatSessionProvider>();
+              final inputProvider = context.read<InputProvider>();
+              final sendService = context.read<SendService>();
+              final localizations = AppLocalizations.of(context)!;
+              final localeCode = session.getLocale().languageCode;
+              final conversationProvider =
+                  context.read<ConversationProvider>(); // Restore variable
+
+              // [NEW] LOGIC: If chat is not empty, start a new conversation automatically
+              if (conversationProvider.messages.isNotEmpty) {
+                mainScreenKey.currentState
+                    ?.startNewConversation(closeSidebar: false);
+                // Wait a brief moment for state to reset?
+                // startNewConversation is async-ish but returns void.
+                // It resets providers. We should yield to event loop.
+                await Future.delayed(const Duration(milliseconds: 100));
+              }
+
+              // [INTERRUPTION] Stop any active text generation
+              if (conversationProvider.isWaitingForResponse) {
+                conversationProvider.stopGenerating();
+              }
+
+              // [INTERRUPTION] Stop any active TTS speaking (and ensure clean slate)
+              await voiceService.stopSession(resetState: true);
+
+              if (!context.mounted) return;
+
+              // Activate UI mode (triggers Overlay)
+              inputProvider.setVoiceModeActive(true);
+
+              // Set Localized Agent Names
+              voiceService.setAgentNames([
+                localizations.agentRed,
+                localizations.agentBlue,
+                localizations.agentPurple
+              ]);
+
+              // Start Voice Session
+              await voiceService.startSession(
+                context: context,
+                locale: localeCode,
+                voiceSystemPrompt: localizations.voiceSystemPrompt,
+                flowPromptBuilder: (agentName, previousResponse) =>
+                    localizations.flowModeContextParams(
+                        agentName, previousResponse),
+                onFinalSentence: (String text) {
+                  if (!context.mounted) return;
+                  if (text.trim().isNotEmpty) {
+                    sendService.sendMessage(
+                      context: context,
+                      localizations: localizations,
+                      messageText: text,
+                      isHidden: voiceService.shouldNextMessageBeHidden,
+                      overrideModelId: 'cortex/auto',
+                    );
+                  }
+                },
+              );
+            },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.inverted
-              .withValues(alpha: isEnabled ? 1.0 : 0.3),
+          color: AppColors.primaryColor.inverted,
+          border: Border.all(color: AppColors.primaryColor.inverted),
           shape: BoxShape.circle,
         ),
         child: Center(
           child: SvgPicture.asset(
             'assets/icons/voice.svg',
-            width: size * 0.55,
-            height: size * 0.55,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.withValues(alpha: isEnabled ? 1.0 : 0.3),
                 BlendMode.srcIn),
@@ -421,52 +407,56 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
   @override
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     final sessionProvider = context.watch<ChatSessionProvider>();
     final currentModel = sessionProvider.selectedModel;
 
-    final bool isFeatureActive = inputProvider.featureMode != ChatInputMode.none ||
-        inputProvider.enableWebSearch ||
-        inputProvider.ragEnabled ||
-        currentModel?.type == 'offline' ||
-        currentModel?.outputs['image'] == true ||
-        currentModel?.outputs['audio'] == true ||
-        currentModel?.outputs['video'] == true ||
-        currentModel?.category == 'image' ||
-        currentModel?.category == 'audio' ||
-        currentModel?.category == 'video';
+    final bool isFeatureActive =
+        inputProvider.featureMode != ChatInputMode.none ||
+            inputProvider.enableWebSearch ||
+            inputProvider.ragEnabled ||
+            currentModel?.type == 'offline' ||
+            currentModel?.outputs['image'] == true ||
+            currentModel?.outputs['audio'] == true ||
+            currentModel?.outputs['video'] == true ||
+            currentModel?.category == 'image' ||
+            currentModel?.category == 'audio' ||
+            currentModel?.category == 'video';
 
-    final Color backgroundColor = isFeatureActive 
-        ? AppColors.primaryColor.inverted 
-        : AppColors.secondaryColor;
-    final Color iconColor = isFeatureActive 
-        ? AppColors.background 
+    final Color backgroundColor = isFeatureActive
+        ? AppColors.primaryColor.inverted
+        : AppColors.background;
+    final Color iconColor = isFeatureActive
+        ? AppColors.primaryColor
         : AppColors.primaryColor.inverted;
 
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
     final bool buttonDisabled =
         widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
-    final double size = 36.0; // Reduced size to match the pill and Mic better
+    final double size = screenWidth * 0.096;
 
     return GestureDetector(
       onTap: buttonDisabled || widget.isPhotoLoading
           ? () {
-        HapticFeedback.heavyImpact();
-      }
+              HapticFeedback.heavyImpact();
+            }
           : () async {
-        HapticFeedback.lightImpact();
-        if (mounted) setState(() => _isOpened = true);
-        await showFeaturesSheet(
-            context: context, controller: widget.controller);
-        if (mounted) setState(() => _isOpened = false);
-      },
+              HapticFeedback.lightImpact();
+              if (mounted) setState(() => _isOpened = true);
+              await showFeaturesSheet(
+                  context: context, controller: widget.controller);
+              if (mounted) setState(() => _isOpened = false);
+            },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: backgroundColor.withValues(alpha: buttonDisabled ? 0.3 : (isFeatureActive ? 1.0 : 0.5)),
+          color: backgroundColor,
+          border: Border.all(
+              color: AppColors.border, width: isFeatureActive ? 2 : 1),
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -481,10 +471,10 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
               builder: (context, color, child) {
                 return SvgPicture.asset(
                   'assets/icons/add.svg',
-                  width: 26.0,
-                  height: 26.0,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter:
-                  ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
+                      ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
                 );
               },
             ),
@@ -527,123 +517,120 @@ class ModelSelectButton extends StatelessWidget {
       alignment: Alignment.centerLeft,
       children: [
         Material(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(borderRadius),
-            child: Ink(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(borderRadius),
-                border: Border.all(color: AppColors.border, width: 1.0),
-              ),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(borderRadius),
-                onTap: () {
-                  HapticFeedback.lightImpact();
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(borderRadius),
+              onTap: () {
+                HapticFeedback.lightImpact();
 
-                  // Eagerly read from context before opening the sheet (and before it closes)
-                  final modelService = context.read<ModelService>();
-                  final selectionService = context.read<SelectionService>();
-                  final inputProvider = context.read<InputProvider>();
-                  final langCode = Localizations
-                      .localeOf(context)
-                      .languageCode;
+                // Eagerly read from context before opening the sheet (and before it closes)
+                final modelService = context.read<ModelService>();
+                final selectionService = context.read<SelectionService>();
+                final inputProvider = context.read<InputProvider>();
+                final langCode = Localizations.localeOf(context).languageCode;
 
-                  showModelSelectionSheet(
-                    context: context,
-                    localizations: localizations,
-                    currentModelId: sessionProvider.modelId ?? '',
-                    initialModels: sessionProvider.allModels,
-                    onModelSelected: (String id) {
-                      // 2. Fetch Model Data
-                      final model = modelService.getPreciseModelData(id,
-                          langCode: langCode);
+                showModelSelectionSheet(
+                  context: context,
+                  localizations: localizations,
+                  currentModelId: sessionProvider.modelId ?? '',
+                  initialModels: sessionProvider.allModels,
+                  onModelSelected: (String id) {
+                    // 2. Fetch Model Data
+                    final model = modelService.getPreciseModelData(id,
+                        langCode: langCode);
 
-                      // 3. Select the Model
-                      selectionService.switchActiveModel(model);
+                    // 3. Select the Model
+                    selectionService.switchActiveModel(model);
 
-                      // Keep input features coherent with selected model capability.
-                      if (model.type == 'offline') {
-                        inputProvider.clearWebSearch();
-                        inputProvider.setFeatureMode(ChatInputMode.offline);
-                      } else if (model.outputs['image'] == true ||
-                          model.outputs['audio'] == true) {
-                        inputProvider.clearFeatureMode();
-                        inputProvider.clearWebSearch();
-                      } else if (inputProvider.featureMode ==
-                          ChatInputMode.offline) {
-                        inputProvider.clearFeatureMode();
-                      }
-                    },
-                  ).then((didSelect) {
-                    if (didSelect != true) return;
-                    Future.delayed(const Duration(milliseconds: 120), () {
-                      onSelectionComplete?.call();
-                    });
+                    // Keep input features coherent with selected model capability.
+                    if (model.type == 'offline') {
+                      inputProvider.clearWebSearch();
+                      inputProvider.setFeatureMode(ChatInputMode.offline);
+                    } else if (model.outputs['image'] == true ||
+                        model.outputs['audio'] == true) {
+                      inputProvider.clearFeatureMode();
+                      inputProvider.clearWebSearch();
+                    } else if (inputProvider.featureMode ==
+                        ChatInputMode.offline) {
+                      inputProvider.clearFeatureMode();
+                    }
+                  },
+                ).then((didSelect) {
+                  if (didSelect != true) return;
+                  Future.delayed(const Duration(milliseconds: 120), () {
+                    onSelectionComplete?.call();
                   });
-                },
-                child: Container(
-                  constraints: BoxConstraints(maxWidth: screenWidth * 0.55),
-                  padding: EdgeInsets.symmetric(
-                      horizontal: isTablet ? 16.0 : 14.0, vertical: 8.0),
-                  child: AnimatedSize(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                    alignment: Alignment.centerLeft,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 250),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return FadeTransition(
-                                  opacity: animation,
-                                  child: child);
-                            },
-                            child: Text(
-                              displayText,
-                              key: ValueKey<String>(displayText),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: AppColors.primaryColor.inverted,
-                                  fontSize: fontSize,
-                                  fontWeight: FontWeight.w500),
-                            ),
+                });
+              },
+              child: Container(
+                constraints: BoxConstraints(maxWidth: screenWidth * 0.55),
+                padding: EdgeInsets.symmetric(
+                    horizontal: isTablet ? 16.0 : 14.0, vertical: 8.0),
+                child: AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return FadeTransition(
+                                opacity: animation, child: child);
+                          },
+                          child: Text(
+                            displayText,
+                            key: ValueKey<String>(displayText),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: AppColors.primaryColor.inverted,
+                                fontSize: fontSize,
+                                fontWeight: FontWeight.w500),
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        Transform.rotate(
-                            angle: -1.5708,
-                            child: Icon(Icons.keyboard_arrow_down_rounded,
-                                color: AppColors.primaryColor.inverted,
-                                size: fontSize * 1.2)),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 4),
+                      Transform.rotate(
+                          angle: -1.5708,
+                          child: Icon(Icons.keyboard_arrow_down_rounded,
+                              color: AppColors.primaryColor.inverted,
+                              size: CortexDesign.icon)),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-          if (isDynamic)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.senaryColor.withValues(alpha: 0.1),
-                        Colors.transparent
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
+        ),
+        if (isDynamic)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.senaryColor.withValues(alpha: 0.1),
+                      Colors.transparent
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
                   ),
                 ),
               ),
             ),
-        ],
-      );
+          ),
+      ],
+    );
   }
 }

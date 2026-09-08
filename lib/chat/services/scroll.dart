@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/services/scroll.dart
 
 import 'package:cortex/theme.dart';
@@ -262,8 +263,8 @@ class ScrollService {
                       ),
                       child: SvgPicture.asset(
                         'assets/icons/arrov.svg',
-                        width: screenWidth * 0.045,
-                        height: screenWidth * 0.045,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                         colorFilter:
                             ColorFilter.mode(iconColor, BlendMode.srcIn),
                       ),

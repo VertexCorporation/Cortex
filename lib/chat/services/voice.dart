@@ -65,6 +65,7 @@ class VoiceService with ChangeNotifier {
     _sentenceQueue.clear();
     unawaited(_remoteTts.stop());
   }
+
   final StringBuffer _incomingTextBuffer = StringBuffer();
   final StringBuffer _fullAiResponseBuffer =
       StringBuffer(); // Accumulates full response for Flow Loop
@@ -517,10 +518,13 @@ class VoiceService with ChangeNotifier {
   /// Helper to clean raw streaming response for UI and TTS
   String _cleanResponseText(String text) {
     String cleaned = text;
-    cleaned = cleaned.replaceAll(RegExp(r'<function[\s\S]*?</function>[\s:]*'), '');
+    cleaned =
+        cleaned.replaceAll(RegExp(r'<function[\s\S]*?</function>[\s:]*'), '');
     cleaned = cleaned.replaceAll(RegExp(r'<function[\s\S]*?>[\s:]*'), '');
-    cleaned = cleaned.replaceAll(RegExp(r'<tool_call>[\s\S]*?</tool_call>[\s:]*'), '');
-    cleaned = cleaned.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
+    cleaned = cleaned.replaceAll(
+        RegExp(r'<tool_call>[\s\S]*?</tool_call>[\s:]*'), '');
+    cleaned =
+        cleaned.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
     cleaned = cleaned.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
     return cleaned;
   }

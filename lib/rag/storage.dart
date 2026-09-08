@@ -94,7 +94,8 @@ class RagStorageService {
 
   Future<void> deleteChunksForDocument(String documentId) async {
     final db = await DbHelper().db;
-    await db.delete(_chunkTable, where: 'documentId = ?', whereArgs: [documentId]);
+    await db
+        .delete(_chunkTable, where: 'documentId = ?', whereArgs: [documentId]);
   }
 
   /// Loads chunks for [documentIds] and groups them by document.

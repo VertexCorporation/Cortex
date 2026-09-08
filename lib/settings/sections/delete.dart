@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/delete.dart
 
 import 'dart:async';
@@ -13,6 +14,7 @@ import '../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
 import '../../shake.dart';
 import '../../theme.dart';
+import '../widgets/grouped_button.dart';
 import '../providers/general.dart';
 import '../providers/actions.dart';
 
@@ -93,7 +95,7 @@ class _DeleteAllConversationsDialogState
           child: Container(
             width: screenWidth * 0.8,
             decoration: BoxDecoration(
-                color: AppColors.secondaryColor,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(10)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -284,7 +286,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
           child: Container(
             width: screenWidth * 0.8,
             decoration: BoxDecoration(
-                color: AppColors.secondaryColor,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(10)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -464,84 +466,62 @@ class DeleteSection extends StatelessWidget {
     ).whenComplete(restoreNavBar);
   }
 
-  Widget _buildDeleteAllConversationsButton(BuildContext context) {
+  Widget _buildDeleteAllConversationsButton(
+      BuildContext context, SettingsRowPosition position) {
     final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    return Material(
-      color: AppColors.septenaryColor.withValues(alpha: 0.4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: AppColors.septenaryColor, width: 1.5),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          _showDialog(context, child: const _DeleteAllConversationsDialog());
-        },
-        borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.septenaryColor,
-        child: Container(
-          padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                appLocalizations.deleteAllConversationsButton,
-                style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.w500),
-              ),
-              Icon(Icons.arrow_forward_ios,
-                  color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.04),
-            ],
+    return SettingsGroupedRow(
+      position: position,
+      scale: (screenWidth / 375).clamp(0.85, 1.25),
+      backgroundColor: AppColors.septenaryColor.withValues(alpha: 0.4),
+      borderColor: AppColors.septenaryColor,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        _showDialog(context, child: const _DeleteAllConversationsDialog());
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            appLocalizations.deleteAllConversationsButton,
+            style: TextStyle(
+                color: AppColors.primaryColor.inverted,
+                fontSize: screenWidth * 0.04,
+                fontWeight: FontWeight.w500),
           ),
-        ),
+          Icon(Icons.arrow_forward_ios,
+              color: AppColors.primaryColor.inverted, size: CortexDesign.icon),
+        ],
       ),
     );
   }
 
-  Widget _buildDeleteAccountButton(BuildContext context) {
+  Widget _buildDeleteAccountButton(
+      BuildContext context, SettingsRowPosition position) {
     final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    return Material(
-      color: AppColors.septenaryColor.withValues(alpha: 0.4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: AppColors.septenaryColor, width: 1.5),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          _showDialog(context, child: const _DeleteAccountDialog());
-        },
-        borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.septenaryColor,
-        child: Container(
-          padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                appLocalizations.deleteAccount,
-                style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.w500),
-              ),
-              Icon(Icons.arrow_forward_ios,
-                  color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.04),
-            ],
+    return SettingsGroupedRow(
+      position: position,
+      scale: (screenWidth / 375).clamp(0.85, 1.25),
+      backgroundColor: AppColors.septenaryColor.withValues(alpha: 0.4),
+      borderColor: AppColors.septenaryColor,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        _showDialog(context, child: const _DeleteAccountDialog());
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            appLocalizations.deleteAccount,
+            style: TextStyle(
+                color: AppColors.primaryColor.inverted,
+                fontSize: screenWidth * 0.04,
+                fontWeight: FontWeight.w500),
           ),
-        ),
+          Icon(Icons.arrow_forward_ios,
+              color: AppColors.primaryColor.inverted, size: CortexDesign.icon),
+        ],
       ),
     );
   }
@@ -565,8 +545,8 @@ class DeleteSection extends StatelessWidget {
             'assets/icons/warning.svg',
             colorFilter:
                 ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
-            width: screenWidth * 0.05,
-            height: screenWidth * 0.05,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
           ),
           SizedBox(width: screenWidth * 0.025),
           Expanded(
@@ -614,11 +594,20 @@ class DeleteSection extends StatelessWidget {
         if (isFromActiveChat)
           _buildDisabledInfoText(context)
         else
-          _buildDeleteAllConversationsButton(context),
-        if (hasInternet && !isAnonymous) ...[
-          SizedBox(height: screenHeight * 0.015),
-          _buildDeleteAccountButton(context),
-        ],
+          SettingsGroupedColumn(
+            scale: (screenWidth / 375).clamp(0.85, 1.25),
+            borderColor: AppColors.septenaryColor,
+            children: [
+              _buildDeleteAllConversationsButton(
+                context,
+                hasInternet && !isAnonymous
+                    ? SettingsRowPosition.first
+                    : SettingsRowPosition.standalone,
+              ),
+              if (hasInternet && !isAnonymous)
+                _buildDeleteAccountButton(context, SettingsRowPosition.last),
+            ],
+          ),
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/default/view.dart
 
 import 'dart:async';
@@ -14,6 +15,7 @@ import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/select.dart';
+import 'package:cortex/chat/services/generation.dart';
 import 'package:cortex/main.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/navigation.dart';
@@ -128,7 +130,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     super.didChangeDependencies();
 
     // TickerMode Visibility Handling
-    final bool isAnimationEnabled = TickerMode.of(context);
+    final bool isAnimationEnabled = TickerMode.valuesOf(context).enabled;
     if (_isVisible != isAnimationEnabled) {
       _isVisible = isAnimationEnabled;
       if (!isAnimationEnabled) {
@@ -249,15 +251,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
     final horizontalPadding = screenWidth * 0.02;
 
-    final catalog = context.read<ModelCatalogProvider>();
-
-    final hasImage = catalog.allModels
-        .any((m) => m.outputs['image'] == true || m.category == 'image');
-    final hasVideo = catalog.allModels
-        .any((m) => m.outputs['video'] == true || m.category == 'video');
-    final hasAudio = catalog.allModels
-        .any((m) => m.outputs['audio'] == true || m.category == 'audio');
-
+    // Dynamic generation is routed by the server, independently of the
+    // downloadable model catalog (which may still be loading or empty).
     final userProvider = context.read<UserProvider>();
     final int subLevel = userProvider.activeSubscriptionLevel;
     // Lifetime or Ultra
@@ -287,7 +282,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   title: l10n.featureCreateImageTitle,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: !hasImage,
+                  isDisabled: false,
                   onTap: () => _handleGeneration(context, 'image'),
                 ),
               ),
@@ -305,7 +300,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   title: l10n.featureCreateVideoTitle,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: !hasVideo,
+                  isDisabled: false,
                   isAnimatedRainbowBorder: !isUltra,
                   onTap: () => _handleGeneration(context, 'video'),
                 ),
@@ -328,7 +323,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   title: l10n.featureCreateAudioTitle,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: !hasAudio,
+                  isDisabled: false,
                   onTap: () => _handleGeneration(context, 'audio'),
                 ),
               ),
@@ -387,8 +382,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       children: [
         SvgPicture.asset(
           iconPath,
-          width: iconSize,
-          height: iconSize,
+          width: CortexDesign.icon,
+          height: CortexDesign.icon,
           colorFilter: ColorFilter.mode(
             AppColors.primaryColor.inverted,
             BlendMode.srcIn,
@@ -413,8 +408,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   SizedBox(width: buttonSpacing * 0.2),
                   SvgPicture.asset(
                     'assets/icons/sparkle.svg',
-                    width: fontSize * 0.9,
-                    height: fontSize * 0.9,
+                    width: CortexDesign.icon,
+                    height: CortexDesign.icon,
                     colorFilter: ColorFilter.mode(
                       AppColors.primaryColor.inverted,
                       BlendMode.srcIn,
@@ -503,34 +498,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       }
     }
 
-    final catalog = context.read<ModelCatalogProvider>();
-    final session = context.read<ChatSessionProvider>();
-    final inputProvider = context.read<InputProvider>();
-    final selectionService = context.read<SelectionService>();
-
-    final candidates = catalog.allModels
-        .where((m) => m.outputs[targetType] == true || m.category == targetType)
-        .toList();
-
-    if (candidates.isEmpty) return;
-
-    final currentModel = session.selectedModel;
-    final bool currentSupportsTarget = currentModel != null &&
-        (currentModel.outputs[targetType] == true ||
-            currentModel.category == targetType);
-
-    inputProvider.clearFeatureMode();
-    inputProvider.clearWebSearch();
-
-    final targetModel = candidates.firstWhere(
-      (m) => !m.isPremium,
-      orElse: () => candidates.first,
-    );
-
-    // Select only if current model does not already support this generation type.
-    if (!currentSupportsTarget) {
-      selectionService.switchActiveModel(targetModel, context: context);
-    }
+    // Activates the matching input feature (like a Features sheet selection)
+    // instead of sending directly. The server receives only a generation
+    // key on send; no prefix is determined here.
+    setGenerationFeatureMode(context, targetType: targetType);
   }
 
   void _showOfflinePrompt(BuildContext context) {
@@ -1074,34 +1045,16 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // Colors
     final Color contentColor = AppColors.primaryColor.inverted;
 
-    final double logoSize = isDesktop
-        ? 96.0
-        : (isTablet ? screenWidth * 0.15 : screenWidth * 0.125);
-
-    final double verticalSpacing = screenHeight * 0.022;
-
-    final double titleSize =
-        isDesktop ? 36.0 : (isTablet ? screenWidth * 0.04 : screenWidth * 0.06);
-    final double bodyFontSize = isDesktop
-        ? 16.0
-        : (isTablet ? screenWidth * 0.025 : screenWidth * 0.04);
-
-    final double buttonHeight = isDesktop
-        ? 34.0
-        : (isTablet ? screenHeight * 0.035 : screenHeight * 0.036);
-    final double buttonSpacing =
-        isDesktop ? 10.0 : (isTablet ? screenWidth * 0.02 : screenWidth * 0.02);
-    final double rowSpacing = isDesktop
-        ? 8.0
-        : (isTablet ? screenHeight * 0.008 : screenHeight * 0.006);
-    final double iconSize = isDesktop
-        ? 16.0
-        : (isTablet ? screenWidth * 0.035 : screenWidth * 0.035);
-    final double fontSize = isDesktop
-        ? 12.0
-        : (isTablet ? screenWidth * 0.02 : screenWidth * 0.022);
-    final double borderRadius =
-        isDesktop ? 16.0 : (isTablet ? screenWidth * 0.06 : screenWidth * 0.07);
+    final double logoSize = isDesktop ? 80 : 56;
+    final double verticalSpacing = (screenHeight * .022).clamp(12.0, 24.0);
+    final double titleSize = isDesktop ? 32 : 26;
+    final double bodyFontSize = 16;
+    final double buttonHeight = 44;
+    final double buttonSpacing = 8;
+    final double rowSpacing = 8;
+    final double iconSize = 16;
+    final double fontSize = 12;
+    final double borderRadius = 16;
 
     final double buttonsAreaHeight =
         buttonHeight * 2 + rowSpacing + (buttonHeight * 0.15) + 16.0;
@@ -1200,8 +1153,12 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                               scale: _breathingScaleAnimation,
                                               child: SvgPicture.asset(
                                                 'assets/icons/on/ghost.svg',
-                                                width: logoSize,
-                                                height: logoSize,
+                                                width: CortexDesign.iconSize(
+                                                    screenWidth,
+                                                    tier: 3),
+                                                height: CortexDesign.iconSize(
+                                                    screenWidth,
+                                                    tier: 3),
                                                 fit: BoxFit.contain,
                                                 colorFilter: ColorFilter.mode(
                                                     contentColor,
@@ -1244,8 +1201,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                       MainAxisSize.min,
                                                   children: [
                                                     ShaderMask(
-                                                      shaderCallback: (bounds) =>
-                                                          LinearGradient(
+                                                      shaderCallback:
+                                                          (bounds) =>
+                                                              LinearGradient(
                                                         colors: [
                                                           contentColor
                                                               .withValues(
@@ -1255,8 +1213,11 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                               .withValues(
                                                                   alpha: 0.55),
                                                         ],
-                                                        stops:
-                                                            const [0.0, 0.5, 1.0],
+                                                        stops: const [
+                                                          0.0,
+                                                          0.5,
+                                                          1.0
+                                                        ],
                                                       ).createShader(bounds),
                                                       blendMode:
                                                           BlendMode.srcIn,
@@ -1299,7 +1260,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
                                             // Description <-> Buttons (Timed, smooth crossfade, same position)
                                             Container(
-                                              constraints: BoxConstraints(minHeight: buttonsAreaHeight),
+                                              constraints: BoxConstraints(
+                                                  minHeight: buttonsAreaHeight),
                                               child: AnimatedBuilder(
                                                 animation: _swapController,
                                                 builder: (context, _) {

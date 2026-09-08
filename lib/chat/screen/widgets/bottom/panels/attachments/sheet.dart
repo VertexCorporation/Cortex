@@ -54,7 +54,7 @@ void showAttachmentSheet({
           bottom: MediaQuery.paddingOf(context).bottom + 20,
         ),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: AppColors.background.withValues(alpha: 0.86),
           borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
         ),
         child: Column(

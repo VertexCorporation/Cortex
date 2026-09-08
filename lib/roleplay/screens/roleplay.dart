@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/roleplay/screens/roleplay_chat_screen.dart
 //
 // The immersive roleplay chat screen — full RP experience.
@@ -116,7 +117,8 @@ class _RoleplayChatScreenState extends State<RoleplayChatScreen>
                 border: Border.all(color: AppColors.border),
               ),
               child: Icon(Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.primaryColor.inverted, size: 16),
+                  color: AppColors.primaryColor.inverted,
+                  size: CortexDesign.icon),
             ),
           ),
           const SizedBox(width: 12),
@@ -186,7 +188,8 @@ class _RoleplayChatScreenState extends State<RoleplayChatScreen>
                 border: Border.all(color: AppColors.border),
               ),
               child: Icon(Icons.more_vert_rounded,
-                  color: AppColors.primaryColor.inverted, size: 20),
+                  color: AppColors.primaryColor.inverted,
+                  size: CortexDesign.icon),
             ),
           ),
         ],
@@ -328,7 +331,8 @@ class _RoleplayChatScreenState extends State<RoleplayChatScreen>
                             ),
                           ),
                           Icon(Icons.send_rounded,
-                              color: AppColors.senaryColor, size: 16),
+                              color: AppColors.senaryColor,
+                              size: CortexDesign.icon),
                         ],
                       ),
                     ),
@@ -511,7 +515,7 @@ class _RoleplayChatScreenState extends State<RoleplayChatScreen>
                           Icons.send_rounded,
                           color:
                               canSend ? Colors.white : AppColors.tertiaryColor,
-                          size: 20,
+                          size: CortexDesign.icon,
                         ),
                 ),
               );
@@ -788,7 +792,7 @@ class _OptionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = color ?? AppColors.primaryColor.inverted;
     return ListTile(
-      leading: Icon(icon, color: c),
+      leading: Icon(size: CortexDesign.icon, icon, color: c),
       title:
           Text(label, style: TextStyle(color: c, fontWeight: FontWeight.w600)),
       onTap: onTap,

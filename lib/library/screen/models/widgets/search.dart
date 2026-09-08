@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // search.dart
 
 import 'dart:async';
@@ -75,7 +76,6 @@ class ModelsSearchController {
         ? const EdgeInsets.only(top: 40, bottom: 8, left: 2, right: 2)
         : EdgeInsets.symmetric(horizontal: w * .05, vertical: w * .025);
 
-    final double iconSize = isTablet ? 36.0 : w * .06;
     final double borderRadius = isTablet ? 24.0 : w * .05;
     final double maxBarWidth = isTablet ? 700 : double.infinity;
     final double? fontSize = isTablet ? 22.0 : null;
@@ -101,7 +101,8 @@ class ModelsSearchController {
               fontSize: fontSize,
             ),
             prefixIcon: Icon(Icons.search,
-                size: iconSize, color: AppColors.primaryColor.inverted),
+                size: CortexDesign.icon,
+                color: AppColors.primaryColor.inverted),
             filled: true,
             fillColor: AppColors.quaternaryColor,
             border: OutlineInputBorder(

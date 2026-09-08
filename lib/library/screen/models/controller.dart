@@ -262,7 +262,8 @@ class LibraryScreenState extends State<LibraryScreen>
       );
     }
 
-    return Selector2<ModelCatalogProvider, ModelLocalStateProvider, _CatalogState>(
+    return Selector2<ModelCatalogProvider, ModelLocalStateProvider,
+        _CatalogState>(
       selector: (_, catalog, local) => _CatalogState(
         isLoading: catalog.isLoading,
         hasError: catalog.loadError,
@@ -305,7 +306,8 @@ class LibraryScreenState extends State<LibraryScreen>
                 systemInfo: state.systemInfo,
                 downloadedStates: state.downloadedStates,
                 downloadManagers: state.downloadManagers,
-                getCompatibilityStatus: _localStateProvider!.getCompatibilityStatus,
+                getCompatibilityStatus:
+                    _localStateProvider!.getCompatibilityStatus,
                 searchController: _searchCtrl!,
                 showLocalizationWarning: _showLocalizationWarning,
                 onDismissWarningPanel: _dismissWarningPanel,
@@ -315,9 +317,11 @@ class LibraryScreenState extends State<LibraryScreen>
                   await _catalogProvider!.removeModel(context, modelToRemove);
                   FocusManager.instance.primaryFocus?.unfocus();
                 },
-                onChatPressed: (id, _, {String? modelPath, isCustomModel = false}) =>
+                onChatPressed: (id, _,
+                        {String? modelPath, isCustomModel = false}) =>
                     _handleChatPress(id),
-                onDownloadPressed: ({required id, required url, required title}) =>
+                onDownloadPressed: (
+                        {required id, required url, required title}) =>
                     _localStateProvider!.requestPermissionAndStartDownload(
                         context: context, id: id, url: url),
                 onCancelDownload: _localStateProvider!.cancelDownload,

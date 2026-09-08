@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/widgets/options/item.dart
 
 import 'package:cortex/app.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_svg/svg.dart';
 /// Defines the layout metrics for an option item, calculated as factors of
 /// the screen width for a responsive UI.
 class _UIFactors {
-  static const double iconSizeFactor = 0.055;
   static const double defaultFontSizeFactor = 0.035;
   static const double iconTextSpacingFactor = 0.025;
   static const double optionMinHeightFactor = 0.06;
@@ -35,9 +35,6 @@ class OptionPanelItem extends StatelessWidget {
   /// The callback function to execute when the item is tapped.
   final VoidCallback onTap;
 
-  /// An optional override for the icon's size.
-  final double? iconSizeOverride;
-
   /// An optional horizontal and vertical offset for fine-tuning the icon's position.
   final Offset iconOffset;
 
@@ -55,7 +52,6 @@ class OptionPanelItem extends StatelessWidget {
     required this.label,
     required this.iconAsset,
     required this.onTap,
-    this.iconSizeOverride,
     this.iconOffset = Offset.zero,
     this.padding,
     this.isDisabled = false,
@@ -68,8 +64,6 @@ class OptionPanelItem extends StatelessWidget {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
     // Define layout values based on screen size for responsiveness.
-    final double iconSize =
-        iconSizeOverride ?? screenWidth * _UIFactors.iconSizeFactor;
     final double defaultHorizontalPadding = screenWidth * 0.04;
     final double defaultVerticalPadding = screenWidth * 0.02;
     final double iconTextSpacing =
@@ -112,8 +106,8 @@ class OptionPanelItem extends StatelessWidget {
                       AppColors.primaryColor.inverted,
                       BlendMode.srcIn,
                     ),
-                    width: iconSize,
-                    height: iconSize,
+                    width: CortexDesign.iconSmall,
+                    height: CortexDesign.iconSmall,
                   ),
                   SizedBox(width: iconTextSpacing),
                   Expanded(

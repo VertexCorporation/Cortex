@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:flutter/material.dart';
 import '../../../../theme.dart';
 
@@ -60,7 +61,7 @@ class _PremiumBadgeState extends State<PremiumBadge>
             child: Icon(
               Icons.workspace_premium_rounded,
               color: AppColors.premium,
-              size: widget.size * 0.6,
+              size: CortexDesign.icon,
             ),
           ),
         );

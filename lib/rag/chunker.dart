@@ -22,9 +22,7 @@ class DocumentChunker {
   /// Splits [text] into a list of chunks. Chunks are trimmed and empty
   /// chunks are dropped. Returns `[]` when [text] is empty.
   List<String> chunk(String text) {
-    if (text
-        .trim()
-        .isEmpty) {
+    if (text.trim().isEmpty) {
       return const [];
     }
 
@@ -62,9 +60,7 @@ class DocumentChunker {
           chunkSize,
           overlapChars,
         );
-        if (slice.text
-            .trim()
-            .isNotEmpty) {
+        if (slice.text.trim().isNotEmpty) {
           result.add(slice.text.trim());
         }
         current.clear();
@@ -102,7 +98,7 @@ class DocumentChunker {
     } else {
       // Otherwise try a sentence boundary.
       final sentenceMatches =
-      RegExp(r'[.!?؟۔]\s').allMatches(window).map((m) => m.start).toList();
+          RegExp(r'[.!?؟۔]\s').allMatches(window).map((m) => m.start).toList();
       if (sentenceMatches.isNotEmpty) {
         final lastSentence = sentenceMatches.last;
         if (lastSentence >= size ~/ 2) {

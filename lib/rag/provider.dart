@@ -32,9 +32,8 @@ class RagProvider extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  int get indexedCount => _documents
-      .where((d) => d.status == RagDocumentStatus.indexed)
-      .length;
+  int get indexedCount =>
+      _documents.where((d) => d.status == RagDocumentStatus.indexed).length;
 
   bool isIndexing(String path) => _indexingPaths.contains(path);
 

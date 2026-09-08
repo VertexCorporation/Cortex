@@ -217,8 +217,8 @@ class InboxViewModel extends ChangeNotifier {
     if (a.isStarred && b.isStarred) {
       final dateA = a.starredDate ?? DateTime(0);
       final dateB = b.starredDate ?? DateTime(0);
-      // Compare dateA to dateB for ascending (oldest first)
-      final comparison = dateA.compareTo(dateB);
+      // Newest starred first (descending by starred date)
+      final comparison = dateB.compareTo(dateA);
       if (comparison != 0) return comparison;
     }
 
@@ -280,6 +280,8 @@ class InboxViewModel extends ChangeNotifier {
         // Force refresh the list view just in case the tile rebuilds based on it
         notifyListeners();
         _updateConversationCache();
+      } else {
+        await loadConversations(langCode: _currentLangCode, isReload: true);
       }
     });
 
@@ -362,8 +364,21 @@ class InboxViewModel extends ChangeNotifier {
 
         freshIds.add(convID);
 
-        // If manager already exists, update it in place instead of recreating
+        // If manager already exists, update its last-message snapshot in place
+        // so the sort order stays accurate after a reload triggered by a new message.
         if (_conversationManagers.containsKey(convID)) {
+          final existing = _conversationManagers[convID]!;
+          final String? lastMsgTextExisting = row['lastMessageText'] as String?;
+          final String? lastMsgPhotoExisting =
+              row['lastMessagePhoto'] as String?;
+          final int? realLastMsgTsExisting = row['realLastMessageTs'] as int?;
+          if (realLastMsgTsExisting != null) {
+            existing.updateLastMessage(
+              lastMsgTextExisting ?? '',
+              lastMsgPhotoExisting ?? '',
+              DateTime.fromMillisecondsSinceEpoch(realLastMsgTsExisting),
+            );
+          }
           continue;
         }
 

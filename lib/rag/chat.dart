@@ -13,13 +13,60 @@ import 'package:flutter/foundation.dart';
 
 /// File extensions that participate in RAG indexing.
 const Set<String> kRagDocumentExtensions = {
-  'txt', 'md', 'rtf', 'json', 'xml', 'csv', 'tsv',
-  'html', 'htm', 'css', 'js', 'ts', 'jsx', 'tsx', 'py', 'dart',
-  'java', 'c', 'cpp', 'h', 'hpp', 'swift', 'kt', 'go', 'rs', 'rb',
-  'php', 'sh', 'bash', 'ps1', 'sql', 'r', 'scala', 'lua', 'pl', 'pm',
-  'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'env', 'log',
-  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
-  'odt', 'ods', 'odp',
+  'txt',
+  'md',
+  'rtf',
+  'json',
+  'xml',
+  'csv',
+  'tsv',
+  'html',
+  'htm',
+  'css',
+  'js',
+  'ts',
+  'jsx',
+  'tsx',
+  'py',
+  'dart',
+  'java',
+  'c',
+  'cpp',
+  'h',
+  'hpp',
+  'swift',
+  'kt',
+  'go',
+  'rs',
+  'rb',
+  'php',
+  'sh',
+  'bash',
+  'ps1',
+  'sql',
+  'r',
+  'scala',
+  'lua',
+  'pl',
+  'pm',
+  'yaml',
+  'yml',
+  'toml',
+  'ini',
+  'cfg',
+  'conf',
+  'env',
+  'log',
+  'pdf',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'ppt',
+  'pptx',
+  'odt',
+  'ods',
+  'odp',
 };
 
 class RagChatService {
@@ -33,8 +80,7 @@ class RagChatService {
     required RagIngestionService ingestion,
     required RagStorageService storage,
     RagContextInjector? injector,
-  })
-      : _retrievalEngine = retrievalEngine,
+  })  : _retrievalEngine = retrievalEngine,
         _ingestion = ingestion,
         _storage = storage,
         _injector = injector ?? const RagContextInjector();
@@ -82,10 +128,10 @@ class RagChatService {
 
     List<RagRetrievalResult> results = query.isNotEmpty
         ? await _retrievalEngine.query(
-      query: query,
-      documentIds: documentIds.toList(),
-      topK: topK,
-    )
+            query: query,
+            documentIds: documentIds.toList(),
+            topK: topK,
+          )
         : const [];
 
     // Fallback: the query matched nothing but documents are attached — feed
@@ -104,9 +150,7 @@ class RagChatService {
   Future<RagDocument?> _ensureIndexed(String path) async {
     try {
       final existing = await _storage.getAllDocuments();
-      final prior = existing
-          .where((d) => d.filePath == path)
-          .firstOrNull;
+      final prior = existing.where((d) => d.filePath == path).firstOrNull;
       if (prior != null && prior.status == RagDocumentStatus.indexed) {
         return prior;
       }
@@ -117,10 +161,12 @@ class RagChatService {
     }
   }
 
-  Future<List<RagRetrievalResult>> _firstChunks(Set<String> documentIds,
-      int topK,) async {
+  Future<List<RagRetrievalResult>> _firstChunks(
+    Set<String> documentIds,
+    int topK,
+  ) async {
     final chunksByDoc =
-    await _storage.getChunksByDocument(documentIds.toList());
+        await _storage.getChunksByDocument(documentIds.toList());
     final results = <RagRetrievalResult>[];
     for (final entry in chunksByDoc.entries) {
       final doc = await _storage.getDocument(entry.key);

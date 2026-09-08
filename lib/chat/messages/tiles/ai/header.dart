@@ -7,6 +7,7 @@ class _AiHeader extends StatelessWidget {
   final Animation<double> thinkPulseAnim;
   final Animation<double> thinkRotateAnim;
   final Animation<double> headerEntryAnim;
+  final Animation<double> modelDetailsAnim;
   final String textToDisplay;
   final bool isCortexDynamic;
 
@@ -19,6 +20,7 @@ class _AiHeader extends StatelessWidget {
     required this.thinkPulseAnim,
     required this.thinkRotateAnim,
     required this.headerEntryAnim,
+    required this.modelDetailsAnim,
     required this.textToDisplay,
     required this.isCortexDynamic,
   });
@@ -118,60 +120,64 @@ class _AiHeader extends StatelessWidget {
       }
     }
 
-    return _HeaderData(textToDisplay: textToDisplay, isCortexDynamic: isCortexDynamic);
+    return _HeaderData(
+        textToDisplay: textToDisplay, isCortexDynamic: isCortexDynamic);
   }
 
   @override
   Widget build(BuildContext context) {
     final isSearching = message.isWebSearchActive && message.isThinking;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        ScaleTransition(
-          scale: thinkPulseAnim,
-          child: RotationTransition(
-            turns: thinkRotateAnim,
-            child: RepaintBoundary(
-              child: SvgPicture.asset(
-                'assets/cortex.svg',
-                width: 16 * scale,
-                height: 16 * scale,
-                colorFilter: ColorFilter.mode(
-                  AppColors.primaryColor.inverted,
-                  BlendMode.srcIn,
+    // Reserve the header's vertical footprint before the first token arrives.
+    // This keeps the whole message column from shifting when the model label
+    // fades in or the search label changes.
+    return SizedBox(
+      height: 30 * scale,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ScaleTransition(
+            scale: thinkPulseAnim,
+            child: RotationTransition(
+              turns: thinkRotateAnim,
+              child: RepaintBoundary(
+                child: SvgPicture.asset(
+                  'assets/cortex.svg',
+                  width: 16 * scale,
+                  height: 16 * scale,
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 260),
-          switchInCurve: Curves.easeOutCubic,
-          switchOutCurve: Curves.easeInCubic,
-          transitionBuilder: (child, animation) {
-            final offset = Tween<Offset>(
-              begin: const Offset(-0.35, 0),
-              end: Offset.zero,
-            ).animate(animation);
-            return ClipRect(
-              child: FadeTransition(
-                opacity: animation,
-                child: SlideTransition(position: offset, child: child),
-              ),
-            );
-          },
-          child: isSearching
-              ? _SearchingLabel(key: const ValueKey('searching'), scale: scale)
-              : const SizedBox.shrink(key: ValueKey('not_searching')),
-        ),
-        SizeTransition(
-          sizeFactor: headerEntryAnim,
-          axis: Axis.horizontal,
-          axisAlignment: -1.0,
-          child: FadeTransition(
-            opacity: headerEntryAnim,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 260),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) {
+              final offset = Tween<Offset>(
+                begin: const Offset(-0.35, 0),
+                end: Offset.zero,
+              ).animate(animation);
+              return ClipRect(
+                child: FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(position: offset, child: child),
+                ),
+              );
+            },
+            child: isSearching
+                ? _SearchingLabel(
+                    key: const ValueKey('searching'), scale: scale)
+                : const SizedBox.shrink(key: ValueKey('not_searching')),
+          ),
+          // Opacity keeps the header width stable while its metadata appears.
+          FadeTransition(
+            opacity: modelDetailsAnim,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -190,7 +196,8 @@ class _AiHeader extends StatelessWidget {
                   Text(
                     ModelDataUtils.formatModelName(textToDisplay),
                     style: TextStyle(
-                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.7),
                         fontSize: 12 * scale,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5),
@@ -199,8 +206,8 @@ class _AiHeader extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -208,8 +215,11 @@ class _AiHeader extends StatelessWidget {
     final containerSize = 30 * s;
     final iconSize = 24 * s;
     final fallbackWidget = SvgPicture.asset('assets/icons/self.svg',
-        width: iconSize, height: iconSize, fit: BoxFit.contain,
-        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
+        width: CortexDesign.icon,
+        height: CortexDesign.icon,
+        fit: BoxFit.contain,
+        colorFilter:
+            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
     Widget imageWidget;
     if (avatarPath.isEmpty || avatarPath.endsWith('self.svg')) {
       imageWidget = fallbackWidget;
@@ -218,21 +228,33 @@ class _AiHeader extends StatelessWidget {
       final isAsset = avatarPath.startsWith('assets/');
       if (isSvg) {
         imageWidget = isAsset
-            ? SvgPicture.asset(avatarPath, width: iconSize, height: iconSize,
-                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(avatarPath), width: iconSize, height: iconSize,
-                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget);
+            ? SvgPicture.asset(avatarPath,
+                width: CortexDesign.icon,
+                height: CortexDesign.icon,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => fallbackWidget)
+            : SvgPicture.file(File(avatarPath),
+                width: iconSize,
+                height: iconSize,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => fallbackWidget);
       } else {
         ImageProvider imageProvider = isAsset
             ? AssetImage(avatarPath) as ImageProvider
             : FileImage(File(avatarPath));
         final int cacheSize = (containerSize * 3).toInt().clamp(50, 200);
-        imageProvider = ResizeImage(imageProvider, width: cacheSize, height: cacheSize);
+        imageProvider =
+            ResizeImage(imageProvider, width: cacheSize, height: cacheSize);
         imageWidget = Image(
-            image: imageProvider, width: containerSize, height: containerSize,
-            fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallbackWidget);
+            image: imageProvider,
+            width: containerSize,
+            height: containerSize,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => fallbackWidget);
       }
     }
     return Container(
@@ -240,12 +262,16 @@ class _AiHeader extends StatelessWidget {
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-              color: AppColors.primaryColor.inverted.withValues(alpha: 0.2), width: 1.0)),
+              color: AppColors.primaryColor.inverted.withValues(alpha: 0.2),
+              width: 1.0)),
       child: Container(
-          width: containerSize, height: containerSize,
+          width: containerSize,
+          height: containerSize,
           clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(color: AppColors.secondaryColor, shape: BoxShape.circle),
-          alignment: Alignment.center, child: imageWidget),
+          decoration: BoxDecoration(
+              color: AppColors.secondaryColor, shape: BoxShape.circle),
+          alignment: Alignment.center,
+          child: imageWidget),
     );
   }
 }
@@ -264,9 +290,11 @@ class _SearchingLabel extends StatelessWidget {
         highlightColor: AppColors.primaryColor.inverted.withValues(alpha: 0.90),
         period: const Duration(milliseconds: 1250),
         child: Text(text,
-          style: TextStyle(
-            color: AppColors.primaryColor.inverted.withValues(alpha: 0.55),
-            fontSize: 14 * scale, fontWeight: FontWeight.w700, letterSpacing: 0)),
+            style: TextStyle(
+                color: AppColors.primaryColor.inverted.withValues(alpha: 0.55),
+                fontSize: 14 * scale,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0)),
       ),
     );
   }
@@ -275,5 +303,6 @@ class _SearchingLabel extends StatelessWidget {
 class _HeaderData {
   final String textToDisplay;
   final bool isCortexDynamic;
-  const _HeaderData({required this.textToDisplay, required this.isCortexDynamic});
+  const _HeaderData(
+      {required this.textToDisplay, required this.isCortexDynamic});
 }

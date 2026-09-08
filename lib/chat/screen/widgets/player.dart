@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/widgets/player.dart
 //
 // Floating TTS player that appears below the AppBar when reading a message.
@@ -146,7 +147,6 @@ class _TtsPlayerBar extends StatelessWidget {
     final double height = screenHeight * 0.055;
     final double horizontalMargin = isTablet ? 24.0 : 16.0;
     final double borderRadius = isTablet ? 16.0 : 12.0;
-    final double iconSize = isTablet ? 24.0 : 20.0;
     final double buttonPadding = isTablet ? 12.0 : 10.0;
 
     final ttsService = context.watch<TtsService>();
@@ -239,8 +239,8 @@ class _TtsPlayerBar extends StatelessWidget {
                                     ? 'assets/icons/stop.svg'
                                     : 'assets/icons/play.svg',
                                 key: ValueKey(isPlaying),
-                                width: iconSize * 0.75,
-                                height: iconSize * 0.75,
+                                width: CortexDesign.icon,
+                                height: CortexDesign.icon,
                                 colorFilter: ColorFilter.mode(
                                   AppColors.primaryColor.inverted,
                                   BlendMode.srcIn,

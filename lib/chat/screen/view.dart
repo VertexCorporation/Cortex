@@ -273,6 +273,14 @@ class ChatViewState extends State<ChatView>
     });
   }
 
+  /// Cancels delayed focus retries when the main navigator switches away from
+  /// chat. The chat screen stays mounted inside FadeIndexedStack, so relying
+  /// on dispose() is insufficient and can make an offstage input request focus
+  /// while another screen is laying out.
+  void cancelPendingKeyboardFocus() {
+    _keyboardFocusGeneration++;
+  }
+
   @override
   Widget build(BuildContext context) {
     // We isolate rebuilds by using context.select instead of context.watch
@@ -300,11 +308,14 @@ class ChatViewState extends State<ChatView>
 
     final mainStack = Stack(
       children: [
-        Positioned.fill(child: _buildMainContent(isLoadingMessages, isMessagesEmpty, isVoiceModeActive)),
+        Positioned.fill(
+            child: _buildMainContent(
+                isLoadingMessages, isMessagesEmpty, isVoiceModeActive)),
         if (!isVoiceModeActive) _buildBottomFog(screenHeight),
         _buildBottomPanel(isVoiceModeActive, bottomSafe),
         _buildBriefingOverlay(bottomSafe, isVoiceModeActive),
-        _buildScrollDownButton(isVoiceModeActive, bottomSafe, screenWidth, screenHeight),
+        _buildScrollDownButton(
+            isVoiceModeActive, bottomSafe, screenWidth, screenHeight),
         const Positioned(top: 0, left: 0, right: 0, child: TtsPlayerOverlay()),
         if (isVoiceModeActive) const VoiceSessionOverlay(),
       ],
@@ -349,7 +360,8 @@ class ChatViewState extends State<ChatView>
               return const MessageListSkeleton(key: ValueKey('skeleton'));
             }
             if (isEmpty) {
-              return ChatEmptyState(key: const ValueKey('empty'), bottomPadding: bottomPadding);
+              return ChatEmptyState(
+                  key: const ValueKey('empty'), bottomPadding: bottomPadding);
             }
             return ChatMessageList(
               key: const ValueKey('list'),
@@ -365,13 +377,16 @@ class ChatViewState extends State<ChatView>
 
   Widget _buildBottomFog(double screenHeight) {
     return Positioned(
-      left: 0, right: 0, bottom: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       child: IgnorePointer(
         child: Container(
           height: screenHeight * 0.05,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.bottomCenter, end: Alignment.topCenter,
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
               colors: [
                 AppColors.background,
                 AppColors.background.withValues(alpha: 0.8),
@@ -393,18 +408,23 @@ class ChatViewState extends State<ChatView>
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
         child: SafeArea(
-          top: false, bottom: true,
+          top: false,
+          bottom: true,
           child: NotificationListener<SizeChangedLayoutNotification>(
             onNotification: (_) {
-              WidgetsBinding.instance.addPostFrameCallback((_) => _updateBottomPanelHeight());
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _updateBottomPanelHeight());
               return true;
             },
             child: SizeChangedLayoutNotifier(
               child: SizedBox(
-                key: _bottomPanelKey, width: double.infinity,
+                key: _bottomPanelKey,
+                width: double.infinity,
                 child: ChatInputPanel(
-                  editService: editService, scrollService: _scrollService,
-                  editPanelController: editPanelController, slideAnimation: slideAnimation,
+                  editService: editService,
+                  scrollService: _scrollService,
+                  editPanelController: editPanelController,
+                  slideAnimation: slideAnimation,
                 ),
               ),
             ),
@@ -416,8 +436,10 @@ class ChatViewState extends State<ChatView>
 
   Widget _buildBriefingOverlay(double bottomSafe, bool isVoiceMode) {
     return Positioned(
-      left: 16, right: 16,
-      bottom: bottomPanelHeightNotifier.value + bottomSafe + _briefingBottomOffset,
+      left: 16,
+      right: 16,
+      bottom:
+          bottomPanelHeightNotifier.value + bottomSafe + _briefingBottomOffset,
       child: AnimatedSlide(
         offset: isVoiceMode ? const Offset(0, 1.5) : Offset.zero,
         duration: const Duration(milliseconds: 300),
@@ -433,17 +455,22 @@ class ChatViewState extends State<ChatView>
     );
   }
 
-  Widget _buildScrollDownButton(bool isVoiceMode, double bottomSafe, double screenWidth, double screenHeight) {
+  Widget _buildScrollDownButton(bool isVoiceMode, double bottomSafe,
+      double screenWidth, double screenHeight) {
     return AnimatedBuilder(
       animation: _combinedLayoutNotifier,
       builder: (context, _) {
         final combined = bottomPanelHeightNotifier.value +
-            briefingVisibleHeightNotifier.value + _briefingBottomOffset + bottomSafe;
+            briefingVisibleHeightNotifier.value +
+            _briefingBottomOffset +
+            bottomSafe;
         return _scrollService.buildScrollDownButton(
-          screenWidth: screenWidth, screenHeight: screenHeight,
+          screenWidth: screenWidth,
+          screenHeight: screenHeight,
           bottomPanelHeight: combined,
           showScrollDownButton: showScrollDownButtonNotifier.value,
-          isKeyboardOpen: false, keyboardHeight: 0.0,
+          isKeyboardOpen: false,
+          keyboardHeight: 0.0,
           slideOffset: isVoiceMode ? const Offset(0, 2) : Offset.zero,
         );
       },
@@ -476,7 +503,9 @@ class _BriefingOverlayWrapper extends StatelessWidget {
     final langCode = Localizations.localeOf(context).languageCode;
 
     final isOffline = !Utils.isServerSideModel(
-      session.modelId, langCode: langCode, modelService: modelService,
+      session.modelId,
+      langCode: langCode,
+      modelService: modelService,
     );
 
     final isDownloaded = context

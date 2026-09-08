@@ -19,6 +19,9 @@ enum ChatInputMode {
   quiz,
   offline,
   featureReasoning,
+  imageGeneration,
+  videoGeneration,
+  audioGeneration,
 }
 
 enum AttachmentType {

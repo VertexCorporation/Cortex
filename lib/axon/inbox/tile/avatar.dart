@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/inbox/widgets/tiles/avatar.dart
 
 import 'dart:io';
@@ -62,8 +63,8 @@ class TileAvatar extends StatelessWidget {
     if (isAsset) {
       return SvgPicture.asset(
         imagePath,
-        width: iconSize,
-        height: iconSize,
+        width: CortexDesign.icon,
+        height: CortexDesign.icon,
         fit: BoxFit.contain,
         colorFilter: colorFilter,
       );
@@ -113,7 +114,7 @@ class TileAvatar extends StatelessWidget {
     return Icon(
       Icons.image_not_supported_rounded,
       color: AppColors.tertiaryColor,
-      size: size * 0.6,
+      size: CortexDesign.icon,
     );
   }
 }

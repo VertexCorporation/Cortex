@@ -5,7 +5,8 @@ import 'package:cortex/theme.dart';
 import 'patterns.dart';
 import 'utils.dart';
 
-final _linkPattern = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
+final _linkPattern =
+    RegExp(r'(?<!\\)\[([^\]\r\n]+)\]\(((?:\\.|[^()\r\n]|\([^()\r\n]*\))*)\)');
 final _citationBracketClean = RegExp(r'[\[\]【】\s]');
 
 List<InlineSpan> processInlineElements(
@@ -149,6 +150,7 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
         );
       case 'bareUrl':
         final url = matchText.trim();
+        urlMap?.putIfAbsent(url, () => urlMap.length + 1);
         return WidgetSpan(
             child: GestureDetector(
                 onTap: () => openLink(context, url),

@@ -101,7 +101,6 @@ class RegenerateService {
       debugPrint("$logPrefix: Delegating to SendService.");
       final newAiIndex = _conversationProvider.messages.length - 1;
 
-      // Final Call
       await _sendService.sendMessage(
         context: context,
         localizations: localizations,

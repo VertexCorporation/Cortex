@@ -14,6 +14,7 @@ class ConversationManager extends ChangeNotifier {
   bool isStarred;
   DateTime? starredDate;
   bool isDeleted = false;
+  bool shouldAnimateTitle = false;
   late ModelEntity _model;
   final ModelService _modelService;
 
@@ -222,6 +223,7 @@ class ConversationManager extends ChangeNotifier {
       debugPrint(
           "[AxonRename.Manager] id=$conversationID old='$conversationTitle' new='$trimmedTitle'");
       conversationTitle = trimmedTitle;
+      shouldAnimateTitle = true;
       notifyListeners();
     }
   }

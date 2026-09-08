@@ -205,14 +205,6 @@ class ModelService with ChangeNotifier {
       final resolvedPath = getModelImagePath(tempEntity);
       finalEntities.add(tempEntity.copyWith(imagePath: resolvedPath));
 
-      // Inject cortexRoleplayData
-      if (i == 0) {
-        final roleplayEntity =
-            ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
-        final roleplayPath = getModelImagePath(roleplayEntity);
-        finalEntities.add(roleplayEntity.copyWith(imagePath: roleplayPath));
-      }
-
       // Yield to the event loop frequently to completely eliminate UI stutter
       // during heavy synchronous filesystem checks.
       if (i % 5 == 0) {
@@ -273,14 +265,6 @@ class ModelService with ChangeNotifier {
       final tempEntity = ModelEntity.fromMap(rawMap, langCode);
       final resolvedPath = getModelImagePath(tempEntity);
       finalEntities.add(tempEntity.copyWith(imagePath: resolvedPath));
-
-      // Inject cortexRoleplayData
-      if (i == 0) {
-        final roleplayEntity =
-            ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
-        final roleplayPath = getModelImagePath(roleplayEntity);
-        finalEntities.add(roleplayEntity.copyWith(imagePath: roleplayPath));
-      }
     }
 
     const int minOfflineSizeMb = 300;

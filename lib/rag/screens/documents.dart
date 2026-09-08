@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/rag/screens/document_library_screen.dart
 //
 // Full-screen document library for RAG ("Document Chat"):
@@ -228,8 +229,8 @@ class _DocumentLibraryScreenViewState
             tooltip: l10n.ragAddDocuments,
             icon: SvgPicture.asset(
               'assets/icons/add.svg',
-              width: 22,
-              height: 22,
+              width: CortexDesign.icon,
+              height: CortexDesign.icon,
               colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.inverted,
                 BlendMode.srcIn,
@@ -253,8 +254,8 @@ class _DocumentLibraryScreenViewState
                     ? _EmptyState(
                         icon: SvgPicture.asset(
                           'assets/icons/attachment.svg',
-                          width: 64,
-                          height: 64,
+                          width: 56,
+                          height: 56,
                           colorFilter: ColorFilter.mode(
                             AppColors.primaryColor.inverted
                                 .withValues(alpha: 0.2),
@@ -267,7 +268,13 @@ class _DocumentLibraryScreenViewState
                         onAction: _addDocuments,
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                        padding: EdgeInsets.fromLTRB(
+                            CortexDesign.readingInset(
+                                MediaQuery.sizeOf(context).width),
+                            8,
+                            CortexDesign.readingInset(
+                                MediaQuery.sizeOf(context).width),
+                            24),
                         itemCount: documents.length,
                         itemBuilder: (context, index) {
                           final doc = documents[index];
@@ -383,7 +390,7 @@ class _DocumentTile extends StatelessWidget {
                     color: color.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: color, size: 22),
+                  child: Icon(icon, color: color, size: CortexDesign.icon),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -430,8 +437,8 @@ class _DocumentTile extends StatelessWidget {
                     tooltip: l10n.ragStatusFailed,
                     icon: SvgPicture.asset(
                       'assets/icons/regenerate.svg',
-                      width: 20,
-                      height: 20,
+                      width: CortexDesign.icon,
+                      height: CortexDesign.icon,
                       colorFilter:
                           ColorFilter.mode(Colors.redAccent, BlendMode.srcIn),
                     ),
@@ -439,8 +446,8 @@ class _DocumentTile extends StatelessWidget {
                 else if (isSelected)
                   SvgPicture.asset(
                     'assets/icons/checkmark.svg',
-                    width: 22,
-                    height: 22,
+                    width: CortexDesign.icon,
+                    height: CortexDesign.icon,
                     colorFilter: ColorFilter.mode(
                       AppColors.primaryColor,
                       BlendMode.srcIn,
@@ -463,8 +470,8 @@ class _DocumentTile extends StatelessWidget {
                   tooltip: l10n.delete,
                   icon: SvgPicture.asset(
                     'assets/icons/delete.svg',
-                    width: 20,
-                    height: 20,
+                    width: CortexDesign.icon,
+                    height: CortexDesign.icon,
                     colorFilter: ColorFilter.mode(
                       inverted.withValues(alpha: 0.45),
                       BlendMode.srcIn,

@@ -20,23 +20,67 @@ typedef ServerDocParser = Future<String?> Function(String filePath);
 class DocTextExtractor {
   /// Text-based extensions that are read directly.
   static const List<String> textExtensions = [
-    'txt', 'md', 'rtf',
-    'json', 'xml', 'csv', 'tsv',
-    'html', 'htm', 'css',
-    'js', 'ts', 'jsx', 'tsx', 'py', 'dart', 'java', 'c', 'cpp', 'h', 'hpp',
-    'swift', 'kt', 'go', 'rs', 'rb', 'php', 'sh', 'bash', 'ps1',
-    'sql', 'r', 'scala', 'lua', 'pl', 'pm',
-    'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'env', 'log',
+    'txt',
+    'md',
+    'rtf',
+    'json',
+    'xml',
+    'csv',
+    'tsv',
+    'html',
+    'htm',
+    'css',
+    'js',
+    'ts',
+    'jsx',
+    'tsx',
+    'py',
+    'dart',
+    'java',
+    'c',
+    'cpp',
+    'h',
+    'hpp',
+    'swift',
+    'kt',
+    'go',
+    'rs',
+    'rb',
+    'php',
+    'sh',
+    'bash',
+    'ps1',
+    'sql',
+    'r',
+    'scala',
+    'lua',
+    'pl',
+    'pm',
+    'yaml',
+    'yml',
+    'toml',
+    'ini',
+    'cfg',
+    'conf',
+    'env',
+    'log',
   ];
 
   /// On-device binary formats.
   static const List<String> onDeviceBinaryExtensions = [
-    'pdf', 'docx', 'xlsx', 'pptx',
+    'pdf',
+    'docx',
+    'xlsx',
+    'pptx',
   ];
 
   /// Formats that require the server-side fallback.
   static const List<String> serverFallbackExtensions = [
-    'doc', 'xls', 'odt', 'ods', 'odp',
+    'doc',
+    'xls',
+    'odt',
+    'ods',
+    'odp',
   ];
 
   /// Returns true if this extension can be handled on-device.
@@ -53,10 +97,7 @@ class DocTextExtractor {
       final file = File(path);
       if (!await file.exists()) return null;
 
-      final extension = path
-          .split('.')
-          .last
-          .toLowerCase();
+      final extension = path.split('.').last.toLowerCase();
 
       // 1. Text files.
       if (textExtensions.contains(extension)) {
@@ -103,8 +144,9 @@ class DocTextExtractor {
       for (final page in document.pages) {
         try {
           final text = await page.loadText();
-          if (text.fullText.isNotEmpty) {
-            sb.write(text.fullText);
+          final fullText = text?.fullText;
+          if (fullText != null && fullText.isNotEmpty) {
+            sb.write(fullText);
             sb.write('\n\n');
           }
         } catch (e) {
@@ -175,7 +217,8 @@ class DocTextExtractor {
     }
   }
 
-  Future<String?> _extractOoxmlText(List<int> bytes, {
+  Future<String?> _extractOoxmlText(
+    List<int> bytes, {
     required String targetEntry,
     required String paragraphTag,
     required String textTag,
@@ -195,7 +238,8 @@ class DocTextExtractor {
     }
   }
 
-  String _parseOoxmlText(String xmlString, {
+  String _parseOoxmlText(
+    String xmlString, {
     required String paragraphTag,
     required String textTag,
   }) {
@@ -215,9 +259,7 @@ class DocTextExtractor {
             .map((e) => e.innerText)
             .toList();
         final line = texts.join();
-        if (line
-            .trim()
-            .isNotEmpty) {
+        if (line.trim().isNotEmpty) {
           sb.writeln(line.trim());
         }
       }

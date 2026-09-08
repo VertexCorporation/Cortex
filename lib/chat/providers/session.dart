@@ -222,20 +222,6 @@ class ChatSessionProvider with ChangeNotifier {
       return allPremium;
     }
 
-    // Explicitly treat Fal models as premium on the client side
-    if (model.source == 'fal') return true;
-    if (model.isPremium) return true;
-
-    if (model.baseModelId != null) {
-      try {
-        final baseModel = _modelService.getPreciseModelData(model.baseModelId!,
-            langCode: _currentLocale.languageCode);
-        if (baseModel.source == 'fal') return true;
-        return baseModel.isPremium;
-      } catch (_) {
-        return false;
-      }
-    }
     return false;
   }
 
@@ -609,7 +595,7 @@ class ChatSessionProvider with ChangeNotifier {
   void setDependencies(ModelLocalStateProvider localStateProvider) {
     final wasResolved = _hasResolvedLocalModelState;
     _localStateProvider = localStateProvider;
-    
+
     // If the file system has just finished resolving, we MUST notify listeners
     // so that the ChatScreen can fetch the correct modelPath and start caching.
     if (!wasResolved && _hasResolvedLocalModelState) {
@@ -617,7 +603,7 @@ class ChatSessionProvider with ChangeNotifier {
         notifyListeners();
       });
     }
-    
+
     unawaited(_reconcileSelectedModelAvailability());
   }
 

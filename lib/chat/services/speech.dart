@@ -32,7 +32,8 @@ class SpeechService with ChangeNotifier {
   // Getters
   bool get isListening => _isListening;
 
-  double get soundLevel => _usingRemote ? _remote.soundLevel.value : _soundLevel;
+  double get soundLevel =>
+      _usingRemote ? _remote.soundLevel.value : _soundLevel;
 
   bool get isAvailable => _isAvailable;
 

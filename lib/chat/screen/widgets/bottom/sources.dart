@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import "package:cortex/app.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -41,8 +42,8 @@ class WebSearchSourcesWidget extends StatelessWidget {
               children: [
                 SvgPicture.asset(
                   'assets/icons/world.svg',
-                  width: 14 * scale,
-                  height: 14 * scale,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter: ColorFilter.mode(
                     AppColors.primaryColor.inverted,
                     BlendMode.srcIn,
@@ -50,7 +51,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                 ),
                 SizedBox(width: 6 * scale),
                 Text(
-                  AppLocalizations.of(context)!.webSearchSources,
+                  AppLocalizations.of(context)?.webSearchSources ?? 'Sources',
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 12 * scale,
@@ -220,8 +221,8 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                                         stackTrace) =>
                                                     SvgPicture.asset(
                                                   'assets/icons/world.svg',
-                                                  width: 20 * scale,
-                                                  height: 20 * scale,
+                                                  width: CortexDesign.icon,
+                                                  height: CortexDesign.icon,
                                                   colorFilter: ColorFilter.mode(
                                                       AppColors.primaryColor
                                                           .inverted,
@@ -230,8 +231,8 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                               )
                                             : SvgPicture.asset(
                                                 'assets/icons/world.svg',
-                                                width: 20 * scale,
-                                                height: 20 * scale,
+                                                width: CortexDesign.icon,
+                                                height: CortexDesign.icon,
                                                 colorFilter: ColorFilter.mode(
                                                     AppColors
                                                         .primaryColor.inverted,
@@ -275,7 +276,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                       ),
                                       Icon(
                                         Icons.arrow_forward_ios,
-                                        size: 14 * scale,
+                                        size: CortexDesign.icon,
                                         color: AppColors.primaryColor.inverted
                                             .withValues(alpha: 0.5),
                                       ),

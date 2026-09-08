@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/roleplay/screens/discover_screen.dart
 //
 // Character AI "Keşfet" (Discover) screen — full-featured discover + my bots.
@@ -105,7 +106,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   Widget _buildHeader() {
     final screenWidth = MediaQuery.sizeOf(context).width;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+      padding:
+          EdgeInsets.symmetric(horizontal: CortexDesign.gutter(screenWidth)),
       child: Padding(
         padding: const EdgeInsets.only(top: 16),
         child: Row(
@@ -118,7 +120,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                   style: TextStyle(
                     fontFamily: 'Inter',
                     color: AppColors.primaryColor.inverted,
-                    fontSize: screenWidth * 0.065,
+                    fontSize: 28,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -161,7 +163,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.smart_toy_rounded,
-                      size: 18, color: AppColors.primaryColor.inverted),
+                      size: CortexDesign.icon,
+                      color: AppColors.primaryColor.inverted),
                   const SizedBox(width: 6),
                   Text(
                     'Botlarım',
@@ -204,8 +207,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final screenWidth = MediaQuery.sizeOf(context).width;
     return Padding(
       padding: EdgeInsets.only(
-        left: screenWidth * 0.04,
-        right: screenWidth * 0.04,
+        left: CortexDesign.gutter(screenWidth),
+        right: CortexDesign.gutter(screenWidth),
         top: 14,
       ),
       child: Container(
@@ -235,7 +238,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             hintText: 'Karakter ara...',
             hintStyle: TextStyle(color: AppColors.tertiaryColor, fontSize: 14),
             prefixIcon: Icon(Icons.search_rounded,
-                color: AppColors.tertiaryColor, size: 20),
+                color: AppColors.tertiaryColor, size: CortexDesign.icon),
             suffixIcon: _searchController.text.isNotEmpty
                 ? GestureDetector(
                     onTap: () {
@@ -244,7 +247,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       setState(() {});
                     },
                     child: Icon(Icons.close_rounded,
-                        color: AppColors.tertiaryColor, size: 18),
+                        color: AppColors.tertiaryColor,
+                        size: CortexDesign.icon),
                   )
                 : null,
             border: InputBorder.none,
@@ -263,7 +267,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       child: SizedBox(
         height: 36,
         child: ListView.separated(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+          padding: EdgeInsets.symmetric(
+              horizontal: CortexDesign.gutter(screenWidth)),
           scrollDirection: Axis.horizontal,
           itemCount: _categories.length,
           separatorBuilder: (_, __) => const SizedBox(width: 8),
@@ -323,15 +328,15 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
         return GridView.builder(
           padding: EdgeInsets.fromLTRB(
-            screenWidth * 0.04,
+            CortexDesign.gutter(screenWidth),
             16,
-            screenWidth * 0.04,
+            CortexDesign.gutter(screenWidth),
             100,
           ),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: CortexDesign.columns(screenWidth),
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
             childAspectRatio: 0.75,
           ),
           itemCount: chars.length,
@@ -350,15 +355,15 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final screenWidth = MediaQuery.sizeOf(context).width;
     return GridView.builder(
       padding: EdgeInsets.fromLTRB(
-        screenWidth * 0.04,
+        CortexDesign.gutter(screenWidth),
         16,
-        screenWidth * 0.04,
+        CortexDesign.gutter(screenWidth),
         100,
       ),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: CortexDesign.columns(screenWidth),
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
         childAspectRatio: 0.75,
       ),
       itemCount: 6,
@@ -372,7 +377,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.search_rounded,
-              size: 48, color: AppColors.tertiaryColor.withValues(alpha: 0.4)),
+              size: CortexDesign.icon,
+              color: AppColors.tertiaryColor.withValues(alpha: 0.4)),
           const SizedBox(height: 12),
           Text(
             'Karakter bulunamadı',
@@ -421,7 +427,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       backgroundColor: AppColors.senaryColor,
       foregroundColor: Colors.white,
       elevation: 4,
-      icon: const Icon(Icons.add_rounded),
+      icon: const Icon(size: CortexDesign.icon, Icons.add_rounded),
       label: const Text(
         'Bot Oluştur',
         style: TextStyle(
@@ -558,7 +564,7 @@ class _CharacterCard extends StatelessWidget {
                       children: [
                         Icon(Icons.chat_bubble_outline_rounded,
                             color: Colors.white.withValues(alpha: 0.7),
-                            size: 10),
+                            size: CortexDesign.icon),
                         const SizedBox(width: 2),
                         Text(
                           _formatCount(character.chatCount),
@@ -713,7 +719,7 @@ class _MyBotsSheet extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.smart_toy_rounded,
-                            size: 48,
+                            size: CortexDesign.icon,
                             color:
                                 AppColors.tertiaryColor.withValues(alpha: 0.4)),
                         const SizedBox(height: 12),
@@ -861,7 +867,7 @@ class _UserBotTile extends StatelessWidget {
                       .deleteCharacter(character.id);
                 },
                 child: Icon(Icons.delete_outline_rounded,
-                    color: AppColors.tertiaryColor, size: 20),
+                    color: AppColors.tertiaryColor, size: CortexDesign.icon),
               ),
             ],
           ),

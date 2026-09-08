@@ -47,8 +47,8 @@ void main() {
     for (var tier in tiers) {
     test('Tier detection for $tier', () {
       final model = ModelEntity.fromMap({'id': tier == 'premium' ? 'claude' : 'm', 'title': tier == 'premium' ? 'Claude' : 'M', 'tier': tier}, 'en');
-      final isPremiumTier = tier == 'premium';
-      expect(model.isPremium, isPremiumTier);
+      // Premium gating moved off the client: no tier is premium anymore.
+      expect(model.isPremium, false);
     });
   }
 

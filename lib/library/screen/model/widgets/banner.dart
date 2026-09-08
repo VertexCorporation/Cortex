@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/library/screen/model/widgets/banner.dart
 
 import 'package:cortex/app.dart';
@@ -113,7 +114,6 @@ class _WarningOverlaysState extends State<WarningOverlays>
     final double borderRadius = screenWidth * 0.025;
     final double internalPaddingVertical = screenWidth * 0.03;
     final double internalPaddingHorizontal = screenWidth * 0.04;
-    final double iconSize = screenWidth * 0.07;
     final double titleFontSize = screenWidth * 0.038;
     final double descriptionFontSize = screenWidth * 0.033;
 
@@ -160,10 +160,11 @@ class _WarningOverlaysState extends State<WarningOverlays>
             child: Row(
               children: [
                 SvgPicture.asset(
+                  height: CortexDesign.icon,
                   'assets/icons/sparkle.svg',
                   colorFilter: ColorFilter.mode(
                       AppColors.primaryColor.inverted, BlendMode.srcIn),
-                  width: iconSize,
+                  width: CortexDesign.icon,
                 ),
                 SizedBox(width: internalPaddingHorizontal),
                 Expanded(
@@ -204,7 +205,6 @@ class _WarningOverlaysState extends State<WarningOverlays>
     final double borderRadius = screenWidth * 0.025;
     final double internalPaddingVertical = screenWidth * 0.03;
     final double internalPaddingHorizontal = screenWidth * 0.04;
-    final double iconSize = screenWidth * 0.06;
     final double textFontSize = screenWidth * 0.035;
 
     return Container(
@@ -227,10 +227,11 @@ class _WarningOverlaysState extends State<WarningOverlays>
           child: Row(
             children: [
               SvgPicture.asset(
+                height: CortexDesign.icon,
                 'assets/icons/warning.svg',
                 colorFilter: ColorFilter.mode(
                     AppColors.primaryColor.inverted, BlendMode.srcIn),
-                width: iconSize,
+                width: CortexDesign.icon,
               ),
               SizedBox(width: internalPaddingHorizontal),
               Expanded(

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/widgets/bottom/selection/cards/main.dart
 
 import 'dart:io';
@@ -46,7 +47,6 @@ class ModelCard extends StatelessWidget {
     final double titleFontSize = isTablet ? 16.0 : screenWidth * 0.038;
     final double subTitleFontSize = isTablet ? 12.0 : screenWidth * 0.026;
     final double arrowBoxWidth = isTablet ? 50.0 : screenWidth * 0.11;
-    final double arrowIconSize = isTablet ? 24.0 : screenWidth * 0.06;
 
     final Color cardBackgroundColor =
         isSelected ? AppColors.primaryColor.inverted : AppColors.background;
@@ -124,6 +124,8 @@ class ModelCard extends StatelessWidget {
                                 ? (imagePath.endsWith('.svg')
                                     ? (imagePath.startsWith('assets')
                                         ? SvgPicture.asset(
+                                            height: CortexDesign.icon,
+                                            width: CortexDesign.icon,
                                             imagePath,
                                             fit: BoxFit.contain,
                                             colorFilter: ColorFilter.mode(
@@ -141,7 +143,7 @@ class ModelCard extends StatelessWidget {
                                                 ),
                                               )
                                             : Icon(Icons.broken_image,
-                                                size: iconBoxSize * 0.6,
+                                                size: CortexDesign.icon,
                                                 color: iconContentColor)))
                                     : (imagePath.startsWith('assets')
                                         ? Image.asset(
@@ -156,10 +158,10 @@ class ModelCard extends StatelessWidget {
                                                 cacheWidth: 120,
                                               )
                                             : Icon(Icons.broken_image,
-                                                size: iconBoxSize * 0.6,
+                                                size: CortexDesign.icon,
                                                 color: iconContentColor))))
                                 : Icon(Icons.token,
-                                    size: iconBoxSize * 0.6,
+                                    size: CortexDesign.icon,
                                     color: iconContentColor),
                           ),
 
@@ -229,7 +231,7 @@ class ModelCard extends StatelessWidget {
                             child: Icon(
                               Icons.chevron_right_rounded,
                               color: arrowColor,
-                              size: arrowIconSize,
+                              size: CortexDesign.icon,
                             ),
                           ),
                         ),

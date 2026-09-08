@@ -28,7 +28,7 @@ class LoginBubbleButton extends StatelessWidget {
 
     final Color backgroundColor = AppColors.primaryColor.inverted;
     final Color contentColor = AppColors.primaryColor;
-    final Color borderColor = contentColor.withValues(alpha: 0.1);
+    final Color borderColor = AppColors.primaryColor.inverted;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),

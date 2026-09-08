@@ -1,14 +1,17 @@
+import 'dart:convert';
 import 'package:cortex/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/chat/screen/widgets/thinking.dart';
 import 'package:cortex/chat/messages/codeblocks.dart';
+import 'package:cortex/chat/screen/widgets/tools.dart';
 import 'inline.dart';
+import 'patterns.dart';
 import 'utils.dart';
 
 final _thinkingClean = RegExp(
-  r'(^<think>\s*)|(\s*</think>$)|</?think>|'
+  r'(^<think\b[^>]*>\s*)|(\s*</think\s*>$)|</?think\b[^>]*>|'
   r'\*?Thinking\.\.\.\*?',
   caseSensitive: false,
 );
@@ -16,8 +19,12 @@ final _excessNewlines = RegExp(r'\n{3,}');
 final _singleNewline = RegExp(r'(?<!\n)\n(?!\n)');
 final _excessSpaces = RegExp(r' {2,}');
 final _blockquotePrefix = RegExp(r'^\s*>\s?');
-final _codeBlockPattern =
-    RegExp(r'^(```+)([^\r\n]*)\r?\n([\s\S]*?)\r?\n^\1$', multiLine: true);
+final _codeBlockPattern = RegExp(
+    r'^[ \t]*(```+)([^\r\n]*)\r?\n([\s\S]*?)\r?\n^[ \t]*\1[ \t]*$',
+    multiLine: true);
+final _widgetMarker = RegExp(
+    r'<<<WIDGET:([A-Za-z0-9_-]+)>>>([\s\S]*?)<<<END>>>',
+    caseSensitive: false);
 
 InlineSpan processBlockMatch(BuildContext context, MatchRange match,
     Map<String, RegExp> inlinePatterns, double fs,
@@ -27,9 +34,26 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
   try {
     final matchText = match.text;
     switch (match.type) {
+      case 'toolWidget':
+        final widgetMatch = _widgetMarker.firstMatch(matchText);
+        if (widgetMatch == null) {
+          return const WidgetSpan(child: SizedBox.shrink());
+        }
+        final type = widgetMatch.group(1) ?? '';
+        try {
+          final decoded = jsonDecode(widgetMatch.group(2) ?? '{}');
+          final data = decoded is Map
+              ? Map<String, dynamic>.from(decoded)
+              : <String, dynamic>{};
+          return WidgetSpan(
+            child: ToolWidgetFactory.build(type, data),
+          );
+        } catch (_) {
+          return const WidgetSpan(child: SizedBox.shrink());
+        }
       case 'thinking':
         String content = matchText;
-        final bool hasCloseTag = matchText.contains('</think>');
+        final bool hasCloseTag = RegexPatterns.thinkEnd.hasMatch(matchText);
         final bool isThinkingFinished = hasCloseTag || isFinished;
 
         content = content.replaceAll(_thinkingClean, '');
@@ -155,7 +179,7 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
               text: TextSpan(
                 children: processInlineElements(
                     context, text, inlinePatterns, fs,
-                    citations: citations),
+                    urlMap: urlMap, citations: citations),
                 style: TextStyle(
                     fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
                     color: AppColors.primaryColor.inverted),
@@ -200,31 +224,43 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
                     final availableWidth = constraints.maxWidth;
                     if (colCount > 6) {
                       const minColWidth = 120.0;
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: availableWidth,
-                            maxWidth: (minColWidth * colCount)
-                                .clamp(availableWidth, double.infinity),
-                          ),
-                          child: Table(
-                            border: TableBorder.all(color: AppColors.border),
-                            defaultColumnWidth: const FlexColumnWidth(),
-                            defaultVerticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            children: tableRows,
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: availableWidth,
+                              maxWidth: (minColWidth * colCount)
+                                  .clamp(availableWidth, double.infinity),
+                            ),
+                            child: Table(
+                              border: TableBorder.all(
+                                color: AppColors.border,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              defaultColumnWidth: const FlexColumnWidth(),
+                              defaultVerticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              children: tableRows,
+                            ),
                           ),
                         ),
                       );
                     }
 
-                    return Table(
-                      border: TableBorder.all(color: AppColors.border),
-                      defaultColumnWidth: const FlexColumnWidth(),
-                      defaultVerticalAlignment:
-                          TableCellVerticalAlignment.middle,
-                      children: tableRows,
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Table(
+                        border: TableBorder.all(
+                          color: AppColors.border,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        defaultColumnWidth: const FlexColumnWidth(),
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
+                        children: tableRows,
+                      ),
                     );
                   },
                 )));

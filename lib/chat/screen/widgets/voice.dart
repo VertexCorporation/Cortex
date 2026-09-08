@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -80,216 +81,219 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
       body: SlideTransition(
         position: _slideAnimation,
         child: Stack(
-        children: [
-          // 0. Top Live Speech Text (Smooth text only, no box/icon)
-          if (voiceService.liveTranscript.isNotEmpty)
-            Positioned(
-              top: MediaQuery.paddingOf(context).top + 72,
-              left: 32,
-              right: 32,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.2),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
+          children: [
+            // 0. Top Live Speech Text (Smooth text only, no box/icon)
+            if (voiceService.liveTranscript.isNotEmpty)
+              Positioned(
+                top: MediaQuery.paddingOf(context).top + 72,
+                left: 32,
+                right: 32,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.2),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Text(
+                    voiceService.liveTranscript,
+                    key: ValueKey<String>(voiceService.liveTranscript),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.9),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.2,
+                      height: 1.4,
                     ),
-                  );
-                },
-                child: Text(
-                  voiceService.liveTranscript,
-                  key: ValueKey<String>(voiceService.liveTranscript),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: -0.2,
-                    height: 1.4,
                   ),
+                ),
+              ),
+
+            // 1. Central Visualizer (The Core Experience)
+            // Animated from small to full size on entrance
+            Center(
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // MORPHING VISUALIZER
+                    // Wave (AI) <-> Dot (User)
+                    SizedBox(
+                      height: 150, // Increased height for larger visual
+                      width: double.infinity,
+                      child: _MorphingVisualizer(
+                        isUserSpeaking: isUserSpeaking,
+                        isAiSpeaking: isAiSpeaking,
+                        level: level,
+                        isFluxMode: sessionProvider.isFluxMode,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
 
-          // 1. Central Visualizer (The Core Experience)
-          // Animated from small to full size on entrance
-          Center(
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // MORPHING VISUALIZER
-                  // Wave (AI) <-> Dot (User)
-                  SizedBox(
-                    height: 150, // Increased height for larger visual
-                    width: double.infinity,
-                    child: _MorphingVisualizer(
-                      isUserSpeaking: isUserSpeaking,
-                      isAiSpeaking: isAiSpeaking,
-                      level: level,
-                      isFluxMode: sessionProvider.isFluxMode,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+            // 2. Bottom Controls (3 Buttons)
+            Positioned(
+              bottom: MediaQuery.paddingOf(context).bottom +
+                  16, // Reduced padding to move 1x height
+              left: 24,
+              right: 24,
+              child: FadeTransition(
+                opacity: _entranceController,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // LEFT BUTTON: Flow Mode Toggle
+                        // Logic:
+                        // If Flow OFF: Show Flow Icon. Tap -> Enable Flow.
+                        // If Flow ON: Show Voice Icon. Tap -> Disable Flow (Start New Chat if needed).
+                        Builder(builder: (context) {
+                          final isFlow = voiceService.isFlowMode;
+                          return _buildCircleButton(
+                            iconPath: isFlow
+                                ? 'assets/icons/voice.svg'
+                                : 'assets/icons/flow.svg',
+                            onTap: () {
+                              HapticFeedback.selectionClick();
 
-          // 2. Bottom Controls (3 Buttons)
-          Positioned(
-            bottom: MediaQuery.paddingOf(context).bottom +
-                16, // Reduced padding to move 1x height
-            left: 24,
-            right: 24,
-            child: FadeTransition(
-              opacity: _entranceController,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // LEFT BUTTON: Flow Mode Toggle
-                      // Logic:
-                      // If Flow OFF: Show Flow Icon. Tap -> Enable Flow.
-                      // If Flow ON: Show Voice Icon. Tap -> Disable Flow (Start New Chat if needed).
-                      Builder(builder: (context) {
-                        final isFlow = voiceService.isFlowMode;
-                        return _buildCircleButton(
-                          iconPath: isFlow
-                              ? 'assets/icons/voice.svg'
-                              : 'assets/icons/flow.svg',
-                          onTap: () {
-                            HapticFeedback.selectionClick();
+                              if (!isFlow) {
+                                // Enable Flow
 
-                            if (!isFlow) {
-                              // Enable Flow
+                                // [NEW] If chat is not empty, start fresh before entering Flow Mode
+                                final conversationProvider =
+                                    context.read<ConversationProvider>();
+                                if (conversationProvider.messages.isNotEmpty) {
+                                  conversationProvider.clearConversation();
+                                  // Ensure we are in a fresh state
+                                  context
+                                      .read<ChatSessionProvider>()
+                                      .startDynamicConversation();
+                                }
 
-                              // [NEW] If chat is not empty, start fresh before entering Flow Mode
-                              final conversationProvider =
-                                  context.read<ConversationProvider>();
-                              if (conversationProvider.messages.isNotEmpty) {
-                                conversationProvider.clearConversation();
-                                // Ensure we are in a fresh state
-                                context
-                                    .read<ChatSessionProvider>()
-                                    .startDynamicConversation();
-                              }
-
-                              // Service sets visual to Line (Processing) + Stops Listening
-                              voiceService.toggleFlowMode();
-                            } else {
-                              // Disable Flow -> Return to Voice
-                              // First toggle mode (sets visual to listening/idle)
-                              voiceService.toggleFlowMode();
-
-                              // [NEW] Stop any ongoing generation/speech immediately
-                              // This ensures we don't have lingering TTS or generation when switching modes
-                              final conversationProvider =
-                                  context.read<ConversationProvider>();
-                              conversationProvider.stopGenerating();
-                              voiceService.stopSpeaking(context: context);
-                              final sessionProvider =
-                                  context.read<ChatSessionProvider>();
-
-                              // If current chat has content, start fresh
-                              if (conversationProvider.messages.isNotEmpty) {
-                                // Clear conversation to start fresh "background" chat
-                                conversationProvider.clearConversation();
-                                // Reset session state (standard dynamic)
-                                sessionProvider.startDynamicConversation();
-
-                                // Re-start listening in new context
-                                voiceService.startListening(context: context);
+                                // Service sets visual to Line (Processing) + Stops Listening
+                                voiceService.toggleFlowMode();
                               } else {
-                                // Empty chat, just start listening
-                                voiceService.startListening(context: context);
+                                // Disable Flow -> Return to Voice
+                                // First toggle mode (sets visual to listening/idle)
+                                voiceService.toggleFlowMode();
+
+                                // [NEW] Stop any ongoing generation/speech immediately
+                                // This ensures we don't have lingering TTS or generation when switching modes
+                                final conversationProvider =
+                                    context.read<ConversationProvider>();
+                                conversationProvider.stopGenerating();
+                                voiceService.stopSpeaking(context: context);
+                                final sessionProvider =
+                                    context.read<ChatSessionProvider>();
+
+                                // If current chat has content, start fresh
+                                if (conversationProvider.messages.isNotEmpty) {
+                                  // Clear conversation to start fresh "background" chat
+                                  conversationProvider.clearConversation();
+                                  // Reset session state (standard dynamic)
+                                  sessionProvider.startDynamicConversation();
+
+                                  // Re-start listening in new context
+                                  voiceService.startListening(context: context);
+                                } else {
+                                  // Empty chat, just start listening
+                                  voiceService.startListening(context: context);
+                                }
                               }
+                            },
+                            isSecondary:
+                                true, // Always "Secondary" style (White/Outline) per user request
+                          );
+                        }),
+
+                        // CENTER BUTTON: Mic / Stop / Flow Start
+                        _buildCenterButton(
+                          isUserSpeaking: isUserSpeaking,
+                          isAiSpeaking: isAiSpeaking,
+                          isFlowMode: voiceService.isFlowMode,
+                          isFlowActive: voiceService.isFlowActive,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+
+                            if (voiceService.isFlowMode) {
+                              if (!voiceService.isFlowActive) {
+                                // Start Flow Mode
+                                voiceService.startFlowWithPrompt(
+                                    AppLocalizations.of(context)!
+                                        .flowModeQuestion);
+                              } else {
+                                // Interrupt Flow (Stop speaking)
+                                voiceService.stopSpeaking(context: context);
+                              }
+                              return;
+                            }
+
+                            if (isUserSpeaking) {
+                              voiceService.manualSubmit(context);
+                            } else if (isAiSpeaking) {
+                              voiceService.stopSpeaking(context: context);
+                            } else {
+                              debugPrint(
+                                  "Restarting voice session from idle...");
+                              voiceService.startListening(context: context);
                             }
                           },
-                          isSecondary:
-                              true, // Always "Secondary" style (White/Outline) per user request
-                        );
-                      }),
+                        ),
 
-                      // CENTER BUTTON: Mic / Stop / Flow Start
-                      _buildCenterButton(
-                        isUserSpeaking: isUserSpeaking,
-                        isAiSpeaking: isAiSpeaking,
-                        isFlowMode: voiceService.isFlowMode,
-                        isFlowActive: voiceService.isFlowActive,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-
-                          if (voiceService.isFlowMode) {
-                            if (!voiceService.isFlowActive) {
-                              // Start Flow Mode
-                              voiceService.startFlowWithPrompt(
-                                  AppLocalizations.of(context)!
-                                      .flowModeQuestion);
-                            } else {
-                              // Interrupt Flow (Stop speaking)
-                              voiceService.stopSpeaking(context: context);
-                            }
-                            return;
-                          }
-
-                          if (isUserSpeaking) {
-                            voiceService.manualSubmit(context);
-                          } else if (isAiSpeaking) {
-                            voiceService.stopSpeaking(context: context);
-                          } else {
-                            debugPrint("Restarting voice session from idle...");
-                            voiceService.startListening(context: context);
-                          }
-                        },
-                      ),
-
-                      // RIGHT BUTTON: Exit (Arrow)
-                      _buildCircleButton(
-                        iconPath:
-                            'assets/icons/arrov.svg', // Assuming arrov.svg is correct as used before
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          voiceService.stopSession();
-                          inputProvider.setVoiceModeActive(false);
-                        },
-                        isSecondary: true,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      voiceService.isFlowMode
-                          ? AppLocalizations.of(context)!.flowModeDescription
-                          : AppLocalizations.of(context)!.voiceModeInformation,
-                      key: ValueKey<bool>(voiceService.isFlowMode),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.tertiaryColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        // RIGHT BUTTON: Exit (Arrow)
+                        _buildCircleButton(
+                          iconPath:
+                              'assets/icons/arrov.svg', // Assuming arrov.svg is correct as used before
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            voiceService.stopSession();
+                            inputProvider.setVoiceModeActive(false);
+                          },
+                          isSecondary: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: Text(
+                        voiceService.isFlowMode
+                            ? AppLocalizations.of(context)!.flowModeDescription
+                            : AppLocalizations.of(context)!
+                                .voiceModeInformation,
+                        key: ValueKey<bool>(voiceService.isFlowMode),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.tertiaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          )
-        ],
-      ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -321,6 +325,8 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                     child: ScaleTransition(scale: animation, child: child));
               },
               child: SvgPicture.asset(
+                height: CortexDesign.icon,
+                width: CortexDesign.icon,
                 iconPath,
                 key: ValueKey<String>(iconPath),
                 colorFilter: ColorFilter.mode(
@@ -373,18 +379,19 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                 ? Padding(
                     key: const ValueKey('start_flow_icon'),
                     padding: const EdgeInsets.all(80 * 0.22),
-                    child: RotatedBox(
-                      quarterTurns: 2,
-                      child: SvgPicture.asset(
-                        'assets/icons/arrow.svg',
-                        colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor, BlendMode.srcIn),
-                      ),
+                    child: SvgPicture.asset(
+                      height: CortexDesign.icon,
+                      width: CortexDesign.icon,
+                      'assets/icons/arrow.svg',
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor, BlendMode.srcIn),
                     ),
                   )
                 : Padding(
                     padding: const EdgeInsets.all(22),
                     child: SvgPicture.asset(
+                      height: CortexDesign.icon,
+                      width: CortexDesign.icon,
                       showStop
                           ? 'assets/icons/stop.svg'
                           : 'assets/icons/microphone.svg',

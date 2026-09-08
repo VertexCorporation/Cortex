@@ -68,7 +68,6 @@ class _AiErrorWidgetState extends State<_AiErrorWidget>
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final dynamicFontSize = screenWidth * 0.04;
-    final iconSize = screenWidth * 0.06;
 
     return GestureDetector(
       onTap: () => setState(() {
@@ -96,25 +95,31 @@ class _AiErrorWidgetState extends State<_AiErrorWidget>
             decoration: BoxDecoration(
                 color: AppColors.septenaryColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                border: Border.all(color: AppColors.septenaryColor, width: 0.5)),
+                border:
+                    Border.all(color: AppColors.septenaryColor, width: 0.5)),
             padding: EdgeInsets.all(screenWidth * 0.03),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.error_rounded, color: AppColors.septenaryColor, size: iconSize),
+                    Icon(Icons.error_rounded,
+                        color: AppColors.septenaryColor,
+                        size: CortexDesign.icon),
                     SizedBox(width: screenWidth * 0.02),
                     Expanded(
                       child: Text(AppLocalizations.of(context)!.requestFailed,
-                        style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize)),
+                          style: TextStyle(
+                              color: AppColors.septenaryColor,
+                              fontSize: dynamicFontSize)),
                     ),
                     AnimatedRotation(
                       turns: _isExpandedError ? 0.50 : 0.0,
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeOutQuad,
                       child: Icon(Icons.keyboard_arrow_down_rounded,
-                          color: AppColors.septenaryColor, size: iconSize),
+                          color: AppColors.septenaryColor,
+                          size: CortexDesign.icon),
                     ),
                   ],
                 ),
@@ -131,13 +136,15 @@ class _AiErrorWidgetState extends State<_AiErrorWidget>
                             child: SlideTransition(
                               position: _errorSlideAnim,
                               child: Padding(
-                                padding: EdgeInsets.only(top: screenWidth * 0.02),
+                                padding:
+                                    EdgeInsets.only(top: screenWidth * 0.02),
                                 child: SelectionArea(
                                   child: Text.rich(
                                     TextSpan(
                                       children: _buildBoldSpans(
                                         widget.message.displayableText,
-                                        TextStyle(color: AppColors.septenaryColor,
+                                        TextStyle(
+                                            color: AppColors.septenaryColor,
                                             fontSize: dynamicFontSize * 0.9),
                                       ),
                                     ),

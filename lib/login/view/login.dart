@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/login/view/login.dart
 
 import 'package:cortex/app.dart';
@@ -139,7 +140,7 @@ class _LoginFormState extends State<LoginForm> {
                     fontSize: 14 * widget.fontScale),
                 prefixIcon: Icon(Icons.email,
                     color: Theme.of(context).iconTheme.color,
-                    size: 24 * widget.fontScale),
+                    size: CortexDesign.icon),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10 * widget.fontScale),
                     borderSide: BorderSide.none),
@@ -184,7 +185,7 @@ class _LoginFormState extends State<LoginForm> {
                     fontSize: 14 * widget.fontScale),
                 prefixIcon: Icon(Icons.lock,
                     color: Theme.of(context).iconTheme.color,
-                    size: 24 * widget.fontScale),
+                    size: CortexDesign.icon),
                 suffixIcon: IconButton(
                   icon: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
@@ -196,7 +197,7 @@ class _LoginFormState extends State<LoginForm> {
                           : Icons.visibility_off,
                       key: ValueKey(_isPasswordVisible ? 'icon1' : 'icon2'),
                       color: Theme.of(context).iconTheme.color,
-                      size: 24 * widget.fontScale,
+                      size: CortexDesign.icon,
                     ),
                   ),
                   onPressed: () =>

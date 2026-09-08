@@ -1,9 +1,9 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 
 class AttachmentSheetButton extends StatelessWidget {
   final String iconPath;
@@ -28,7 +28,6 @@ class AttachmentSheetButton extends StatelessWidget {
     final double itemWidth = (screenWidth * 0.85) / 3;
     final double itemHeight = height ?? itemWidth;
 
-    final double iconSize = itemWidth * 0.30; // Slightly compact icon
     final double borderRadius = screenWidth * 0.04; // Responsive radius
     final double fontSize = screenWidth * 0.030; // Adjusted font size
     final double gapHeight = 6.0; // Fixed gap between icon and text
@@ -60,8 +59,8 @@ class AttachmentSheetButton extends StatelessWidget {
               // Icon
               SvgPicture.asset(
                 iconPath,
-                width: iconSize,
-                height: iconSize,
+                width: CortexDesign.icon,
+                height: CortexDesign.icon,
                 colorFilter: ColorFilter.mode(
                   AppColors.primaryColor.inverted,
                   BlendMode.srcIn,
@@ -92,4 +91,3 @@ class AttachmentSheetButton extends StatelessWidget {
     );
   }
 }
-

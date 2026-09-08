@@ -116,7 +116,7 @@ class _MyPlanButtonState extends State<_MyPlanButton>
                       Icon(
                         Icons.arrow_forward_ios,
                         color: AppColors.primaryColor.inverted,
-                        size: screenWidth * 0.04,
+                        size: CortexDesign.icon,
                       ),
                     ],
                   ),

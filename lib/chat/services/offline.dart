@@ -674,21 +674,36 @@ class OfflineService {
 
   String _languageName(String langCode) {
     switch (langCode) {
-      case 'tr': return 'Turkish';
-      case 'de': return 'German';
-      case 'fr': return 'French';
-      case 'es': return 'Spanish';
-      case 'it': return 'Italian';
-      case 'pt': return 'Portuguese';
-      case 'nl': return 'Dutch';
-      case 'pl': return 'Polish';
-      case 'ru': return 'Russian';
-      case 'ja': return 'Japanese';
-      case 'ko': return 'Korean';
-      case 'zh': return 'Chinese';
-      case 'ar': return 'Arabic';
-      case 'hi': return 'Hindi';
-      default: return 'English';
+      case 'tr':
+        return 'Turkish';
+      case 'de':
+        return 'German';
+      case 'fr':
+        return 'French';
+      case 'es':
+        return 'Spanish';
+      case 'it':
+        return 'Italian';
+      case 'pt':
+        return 'Portuguese';
+      case 'nl':
+        return 'Dutch';
+      case 'pl':
+        return 'Polish';
+      case 'ru':
+        return 'Russian';
+      case 'ja':
+        return 'Japanese';
+      case 'ko':
+        return 'Korean';
+      case 'zh':
+        return 'Chinese';
+      case 'ar':
+        return 'Arabic';
+      case 'hi':
+        return 'Hindi';
+      default:
+        return 'English';
     }
   }
 

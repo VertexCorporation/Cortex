@@ -1,7 +1,11 @@
+import 'package:cortex/design.dart';
+import 'package:cortex/theme.dart';
+import '../../app.dart';
 // ================ lib/chat/messages/codeblocks.dart (FULLY REFACTORED AND FIXED) ================
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:highlight/highlight.dart' as highlight;
@@ -154,14 +158,18 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
             : AppLocalizations.of(context)!.text;
 
     final languageForHighlighter = _resolvedLanguage ?? 'plaintext';
+    final highlightTheme = Map<String, TextStyle>.of(oneDarkProTheme)
+      ..['root'] = TextStyle(
+        backgroundColor: AppColors.background,
+        color: const Color(0xffabb2bf),
+      );
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+        border: Border.all(color: AppColors.border, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
@@ -178,10 +186,9 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFF2D2D2D),
+                color: AppColors.secondaryColor,
                 border: Border(
-                  bottom:
-                      BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                  bottom: BorderSide(color: AppColors.border, width: 1),
                 ),
               ),
               child: Row(
@@ -214,7 +221,7 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                   Text(
                     languageNameForDisplay,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Inter',
@@ -227,40 +234,53 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 200),
                         child: _copying
                             ? const Icon(Icons.check_rounded,
-                                size: 16,
+                                size: CortexDesign.icon,
                                 color: Color(0xFF27C93F),
                                 key: ValueKey('check'))
-                            : Icon(Icons.copy_rounded,
-                                size: 16,
-                                color: Colors.white.withValues(alpha: 0.7),
-                                key: const ValueKey('copy')),
+                            : SvgPicture.asset(
+                                'assets/icons/copy.svg',
+                                width: CortexDesign.icon,
+                                height: CortexDesign.icon,
+                                colorFilter: ColorFilter.mode(
+                                  AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                                  BlendMode.srcIn,
+                                ),
+                                key: const ValueKey('copy'),
+                              ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.zero,
-              child: HighlightView(
-                widget.code,
-                language: languageForHighlighter,
-                theme: oneDarkProTheme,
-                padding: const EdgeInsets.all(16),
-                textStyle: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 14,
-                  height: 1.5,
-                ),
-              ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.zero,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: HighlightView(
+                      widget.code,
+                      language: languageForHighlighter,
+                      theme: highlightTheme,
+                      padding: const EdgeInsets.all(16),
+                      textStyle: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),

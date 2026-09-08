@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/login/screen.dart
 
 import 'package:cortex/app.dart';
@@ -296,7 +297,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     HapticFeedback.lightImpact();
                     _controller.signInWithApple(context);
                   },
-                  icon: Icon(Icons.apple, size: 24 * fontScale),
+                  icon: Icon(Icons.apple, size: CortexDesign.icon),
                   label: Text(
                     l10n.continueWithApple,
                     style: TextStyle(
@@ -324,8 +325,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                         'assets/icons/google.svg',
                         colorFilter: ColorFilter.mode(
                             AppColors.primaryColor.inverted, BlendMode.srcIn),
-                        width: 16 * fontScale,
-                        height: 16 * fontScale,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                       ),
                       SizedBox(width: 12 * fontScale),
                       Text(

@@ -43,7 +43,8 @@ class CortexVoice {
       id: id.trim(),
       name: name is String && name.trim().isNotEmpty ? name.trim() : id.trim(),
       gender: _genderFrom(raw['gender']),
-      description: raw['description'] is String && (raw['description'] as String).trim().isNotEmpty
+      description: raw['description'] is String &&
+              (raw['description'] as String).trim().isNotEmpty
           ? (raw['description'] as String).trim()
           : null,
     );
@@ -145,7 +146,8 @@ class VoiceCatalogProvider extends ChangeNotifier {
     if (_selectedVoiceId != null &&
         _voices.isNotEmpty &&
         !_voices.any((v) => v.id == _selectedVoiceId)) {
-      debugPrint("[VoiceCatalog] Stored voice is no longer published; clearing.");
+      debugPrint(
+          "[VoiceCatalog] Stored voice is no longer published; clearing.");
       _selectedVoiceId = null;
       unawaitedClear();
     }

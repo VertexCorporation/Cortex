@@ -62,7 +62,8 @@ class SpeculativeDecodingConfig {
         lowRankDimension: lowRankDimension ?? this.lowRankDimension,
         calibrationTemperature:
             calibrationTemperature ?? this.calibrationTemperature,
-        loadAwareVerification: loadAwareVerification ?? this.loadAwareVerification,
+        loadAwareVerification:
+            loadAwareVerification ?? this.loadAwareVerification,
       );
 }
 
@@ -98,7 +99,8 @@ class SpeculativeDecodingMath {
     double verifyTimeMs,
     double expectedBlockLen,
   ) {
-    final latency = latencyImprovementFactor(draftTimeMs, verifyTimeMs, expectedBlockLen);
+    final latency =
+        latencyImprovementFactor(draftTimeMs, verifyTimeMs, expectedBlockLen);
     if (latency <= 0) return 1.0;
     return standardTokenTimeMs / latency;
   }
@@ -134,7 +136,8 @@ class SpeculativeDecodingMath {
   }
 
   /// Rejection resampling distribution: p_kalan(x) = max(0, p(x)-q(x)) / Z
-  static double residualProbability(double pX, double qX, double normalization) {
+  static double residualProbability(
+      double pX, double qX, double normalization) {
     if (normalization <= 0) return 0;
     return math.max(0.0, pX - qX) / normalization;
   }

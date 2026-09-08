@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/header.dart
 
 import 'dart:math';
@@ -143,20 +144,19 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
         vertical: screenHeight * 0.006,
       ),
       decoration: BoxDecoration(
-        color: AppColors.secondaryColor.withValues(alpha: 0.8),
+        color: AppColors.background.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon,
-              color: AppColors.primaryColor.inverted,
-              size: screenWidth * 0.045),
+              color: AppColors.primaryColor.inverted, size: CortexDesign.icon),
           SizedBox(width: screenWidth * 0.015),
           Text(label,
               style: TextStyle(
                   color: AppColors.primaryColor.inverted,
-                  fontSize: screenWidth * 0.032,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500)),
         ],
       ),
@@ -194,7 +194,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
     final isAlphaUser = userData?['alphaUser'] as bool? ?? false;
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final double avatarSize = screenWidth * 0.25;
+    final double avatarSize = 88;
 
     Widget avatar = Container(
       width: avatarSize,
@@ -202,7 +202,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
       padding: const EdgeInsets.all(3.0),
       child: CircleAvatar(
         radius: avatarSize / 2.2,
-        backgroundColor: AppColors.secondaryColor,
+        backgroundColor: AppColors.background,
         child: Text(
           isAnonymous
               ? (displayName.isNotEmpty
@@ -251,7 +251,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                     child: Text(displayName,
                         style: TextStyle(
                             color: AppColors.primaryColor.inverted,
-                            fontSize: screenWidth * 0.06,
+                            fontSize: 24,
                             fontWeight: FontWeight.w600),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis),
@@ -262,7 +262,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                     child: Text(email,
                         style: TextStyle(
                             color: AppColors.quinaryColor,
-                            fontSize: screenWidth * 0.035,
+                            fontSize: 14,
                             // Slightly smaller for guest warning
                             fontWeight: FontWeight.w400),
                         maxLines: 2, // Allow 2 lines for the guest warning
