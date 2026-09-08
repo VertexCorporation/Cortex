@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/theme.dart
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../../darkener.dart';
 import '../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
 import '../../theme.dart';
+import '../widgets/grouped_button.dart';
 import '../providers/general.dart';
 
 /// A widget that manages the app theme selection section in the settings screen.
@@ -146,7 +148,7 @@ class AppThemeSection extends StatelessWidget {
               // Cap width for tablets so it doesn't look too stretched
               width: (screenWidth * 0.8).clamp(0, 500 * scale),
               decoration: BoxDecoration(
-                  color: AppColors.secondaryColor,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(16 * scale)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16 * scale),
@@ -160,8 +162,8 @@ class AppThemeSection extends StatelessWidget {
                         SizedBox(height: 20 * scale),
                         SvgPicture.asset(
                           'assets/icons/theme.svg',
-                          width: 30 * scale,
-                          height: 30 * scale,
+                          width: CortexDesign.icon,
+                          height: CortexDesign.icon,
                           colorFilter: ColorFilter.mode(
                               AppColors.primaryColor.inverted, BlendMode.srcIn),
                         ),
@@ -340,7 +342,7 @@ class AppThemeSection extends StatelessWidget {
                                             child: Icon(Icons.check_circle,
                                                 color:
                                                     themeColors.secondaryColor,
-                                                size: 20 * scale),
+                                                size: CortexDesign.icon),
                                           ),
                                         ),
                                       if (!isEnabled)
@@ -354,8 +356,8 @@ class AppThemeSection extends StatelessWidget {
                                           child: Center(
                                             child: SvgPicture.asset(
                                               'assets/icons/lock.svg',
-                                              width: 24 * scale,
-                                              height: 24 * scale,
+                                              width: CortexDesign.icon,
+                                              height: CortexDesign.icon,
                                               colorFilter:
                                                   const ColorFilter.mode(
                                                       Colors.white,
@@ -448,35 +450,27 @@ class AppThemeSection extends StatelessWidget {
           style: TextStyle(color: AppColors.quinaryColor, fontSize: 14 * scale),
         ),
         SizedBox(height: 16 * scale),
-        Material(
-          color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(10.0 * scale),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              _showThemeSelectionDialog(context);
-            },
-            borderRadius: BorderRadius.circular(10.0 * scale),
-            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                  vertical: 16 * scale, horizontal: 16 * scale),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    currentThemeName,
-                    style: TextStyle(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: 16 * scale,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  Icon(Icons.arrow_forward_ios,
-                      color: AppColors.primaryColor.inverted, size: 16 * scale),
-                ],
+        SettingsGroupedRow(
+          position: SettingsRowPosition.standalone,
+          scale: scale,
+          onTap: () {
+            HapticFeedback.lightImpact();
+            _showThemeSelectionDialog(context);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                currentThemeName,
+                style: TextStyle(
+                    color: AppColors.primaryColor.inverted,
+                    fontSize: 16 * scale,
+                    fontWeight: FontWeight.w500),
               ),
-            ),
+              Icon(Icons.arrow_forward_ios,
+                  color: AppColors.primaryColor.inverted,
+                  size: CortexDesign.iconSize(screenWidth, tier: 1)),
+            ],
           ),
         ),
       ],

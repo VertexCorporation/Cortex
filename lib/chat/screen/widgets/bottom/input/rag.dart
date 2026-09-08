@@ -43,8 +43,8 @@ class _RagStatusChip extends StatelessWidget {
               children: [
                 SvgPicture.asset(
                   'assets/icons/attachment.svg',
-                  width: 15,
-                  height: 15,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter: ColorFilter.mode(inverted, BlendMode.srcIn),
                 ),
                 const SizedBox(width: 6),
@@ -76,7 +76,7 @@ class _RagStatusChip extends StatelessWidget {
                   onTap: () => context.read<InputProvider>().clearRag(),
                   child: Icon(
                     Icons.close_rounded,
-                    size: 15,
+                    size: CortexDesign.icon,
                     color: inverted.withValues(alpha: 0.6),
                   ),
                 ),

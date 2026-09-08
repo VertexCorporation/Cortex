@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/widgets/options/change.dart
 
 import 'package:cortex/app.dart';
@@ -21,7 +22,6 @@ import '../../../server/credits.dart';
 // --- UI Metrics (Constants) ---
 class _UIFactors {
   static const double borderRadiusFactor = 0.03;
-  static const double iconSizeFactor = 0.08;
   static const double titleFontSizeFactor = 0.04;
   static const double itemFontSizeFactor = 0.035;
   static const double maxContentHeightFactor = 0.3;
@@ -375,136 +375,134 @@ class _ModelSelectionDialogContentState
               screenWidth * _UIFactors.borderRadiusFactor),
         ),
         child: ClipRRect(
-            borderRadius: BorderRadius.circular(
-                screenWidth * _UIFactors.borderRadiusFactor),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                    height: screenHeight * _UIFactors.verticalSpacingFactor),
-                SvgPicture.asset(
-                  'assets/icons/variant.svg',
-                  width: screenWidth * _UIFactors.iconSizeFactor,
-                  height: screenWidth * _UIFactors.iconSizeFactor,
-                  colorFilter: ColorFilter.mode(
-                      AppColors.primaryColor.inverted, BlendMode.srcIn),
+          borderRadius: BorderRadius.circular(
+              screenWidth * _UIFactors.borderRadiusFactor),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: screenHeight * _UIFactors.verticalSpacingFactor),
+              SvgPicture.asset(
+                'assets/icons/variant.svg',
+                width: CortexDesign.iconSmall,
+                height: CortexDesign.iconSmall,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+              ),
+              SizedBox(
+                  height: screenHeight * _UIFactors.smallVerticalSpacingFactor),
+              Text(
+                widget.title,
+                style: TextStyle(
+                  fontSize: screenWidth * _UIFactors.titleFontSizeFactor,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor.inverted,
                 ),
-                SizedBox(
-                    height:
-                        screenHeight * _UIFactors.smallVerticalSpacingFactor),
-                Text(
-                  widget.title,
-                  style: TextStyle(
-                    fontSize: screenWidth * _UIFactors.titleFontSizeFactor,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryColor.inverted,
-                  ),
-                ),
-                Divider(
-                    thickness: 0.5,
-                    color: AppColors.border.withValues(alpha: 0.5)),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxHeight:
-                          screenHeight * _UIFactors.maxContentHeightFactor),
-                  child: RadioGroup<String>(
-                    groupValue: _selectedCode,
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _selectedCode = value);
-                        widget.onSelectionChanged(value);
-                      }
-                    },
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      itemCount: widget.items.length,
-                      itemBuilder: (_, index) {
-                        final item = widget.items[index];
-                        if (item['isHeader'] == true) {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              left: screenWidth *
-                                  _UIFactors.horizontalPaddingFactor *
-                                  1.5,
-                              top: screenHeight *
-                                  _UIFactors.itemVerticalSpacingFactor *
-                                  (index == 0 ? 0.5 : 1.5),
-                              bottom: screenHeight *
-                                  _UIFactors.itemVerticalSpacingFactor *
-                                  0.5,
-                            ),
-                            child: Text(
-                              item['name'] as String,
-                              style: TextStyle(
-                                color: AppColors.tertiaryColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenWidth *
-                                    _UIFactors.itemFontSizeFactor *
-                                    0.9,
-                              ),
-                            ),
-                          );
-                        }
-
-                        final String itemCode = item['code'] as String;
-                        return ListTile(
-                          title: Text(
+              ),
+              Divider(
+                  thickness: 0.5,
+                  color: AppColors.border.withValues(alpha: 0.5)),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxHeight:
+                        screenHeight * _UIFactors.maxContentHeightFactor),
+                child: RadioGroup<String>(
+                  groupValue: _selectedCode,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _selectedCode = value);
+                      widget.onSelectionChanged(value);
+                    }
+                  },
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    itemCount: widget.items.length,
+                    itemBuilder: (_, index) {
+                      final item = widget.items[index];
+                      if (item['isHeader'] == true) {
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            left: screenWidth *
+                                _UIFactors.horizontalPaddingFactor *
+                                1.5,
+                            top: screenHeight *
+                                _UIFactors.itemVerticalSpacingFactor *
+                                (index == 0 ? 0.5 : 1.5),
+                            bottom: screenHeight *
+                                _UIFactors.itemVerticalSpacingFactor *
+                                0.5,
+                          ),
+                          child: Text(
                             item['name'] as String,
-                            maxLines: 2,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize:
-                                  screenWidth * _UIFactors.itemFontSizeFactor,
-                              color: AppColors.primaryColor.inverted,
+                              color: AppColors.tertiaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: screenWidth *
+                                  _UIFactors.itemFontSizeFactor *
+                                  0.9,
                             ),
                           ),
-                          leading: Radio<String>(
-                            value: itemCode,
-                            activeColor: AppColors.primaryColor.inverted,
-                          ),
-                          onTap: () {
-                            if (_selectedCode != itemCode) {
-                              setState(() => _selectedCode = itemCode);
-                              widget.onSelectionChanged(itemCode);
-                            }
-                          },
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: screenWidth *
-                                  _UIFactors.horizontalPaddingFactor),
                         );
-                      },
+                      }
+
+                      final String itemCode = item['code'] as String;
+                      return ListTile(
+                        title: Text(
+                          item['name'] as String,
+                          maxLines: 2,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize:
+                                screenWidth * _UIFactors.itemFontSizeFactor,
+                            color: AppColors.primaryColor.inverted,
+                          ),
+                        ),
+                        leading: Radio<String>(
+                          value: itemCode,
+                          activeColor: AppColors.primaryColor.inverted,
+                        ),
+                        onTap: () {
+                          if (_selectedCode != itemCode) {
+                            setState(() => _selectedCode = itemCode);
+                            widget.onSelectionChanged(itemCode);
+                          }
+                        },
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: screenWidth *
+                                _UIFactors.horizontalPaddingFactor),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(
+                      vertical: screenHeight *
+                          _UIFactors.buttonVerticalPaddingFactor),
+                  decoration: BoxDecoration(
+                    border: Border(
+                        top: BorderSide(
+                            color: AppColors.border.withValues(alpha: 0.5),
+                            width: 0.5)),
+                  ),
+                  child: Text(
+                    l10n.changeModel,
+                    style: TextStyle(
+                      fontSize: screenWidth * _UIFactors.itemFontSizeFactor,
+                      color: AppColors.senaryColor,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-                InkWell(
-                  onTap: () => Navigator.of(context).pop(true),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(
-                        vertical: screenHeight *
-                            _UIFactors.buttonVerticalPaddingFactor),
-                    decoration: BoxDecoration(
-                      border: Border(
-                          top: BorderSide(
-                              color: AppColors.border.withValues(alpha: 0.5),
-                              width: 0.5)),
-                    ),
-                    child: Text(
-                      l10n.changeModel,
-                      style: TextStyle(
-                        fontSize: screenWidth * _UIFactors.itemFontSizeFactor,
-                        color: AppColors.senaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/widgets/bottom/selection/sheet.dart
 
 import 'package:cortex/chat/screen/widgets/bottom/panels/selection/skeleton.dart';
@@ -898,8 +899,8 @@ class _VariantsPanel extends StatelessWidget {
             children: [
               SvgPicture.asset(
                 'assets/icons/route.svg',
-                width: iconSize * 0.8,
-                height: iconSize * 0.8,
+                width: CortexDesign.icon,
+                height: CortexDesign.icon,
                 colorFilter:
                     ColorFilter.mode(AppColors.tertiaryColor, BlendMode.srcIn),
               ),

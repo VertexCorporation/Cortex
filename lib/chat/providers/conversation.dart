@@ -213,14 +213,14 @@ class ConversationProvider with ChangeNotifier {
   /// Starts a new conversation session with the first user message.
   /// This atomic operation sets the conversation ID, title, and adds the
   /// initial user message and a "thinking" bubble.
-  void startNewConversationSession(
+  Future<void> startNewConversationSession(
     String id,
     String title,
     String modelIdForStorage,
     Message userMessage, {
     String? modelTitleForStorage,
     String? modelImagePathForStorage,
-  }) {
+  }) async {
     _conversationID = id;
     _conversationTitle = title;
 
@@ -237,14 +237,21 @@ class ConversationProvider with ChangeNotifier {
     _isLoadingMessages = false;
     _streamBuffer = StringBuffer();
 
-    // Persist the new conversation structure asynchronously.
-    ChatStorageService.saveConversation(id, title, [],
+    // Persist the new conversation structure — await sequentially so the
+    // inbox stream never fires before the DB row actually exists.
+    notifyListeners();
+    await (() async {
+      try {
+        await ChatStorageService.saveConversation(id, title, [],
             modelId: modelIdForStorage,
             modelTitle: modelTitleForStorage,
-            modelImagePath: modelImagePathForStorage)
-        .then((_) {
-      ChatStorageService.upsertMessage(id, 0, userMessage);
-    });
+            modelImagePath: modelImagePathForStorage);
+        await ChatStorageService.upsertMessage(id, 0, userMessage);
+      } catch (e) {
+        debugPrint(
+            '[ConversationProvider] Failed to persist new conversation: $e');
+      }
+    })();
     CacheService.invalidateConversationCache();
 
     notifyListeners();
@@ -376,6 +383,9 @@ class ConversationProvider with ChangeNotifier {
   /// Appends a chunk of text to the last AI message in the list (for streaming responses).
   /// Uses throttling to prevent excessive UI rebuilds during fast streaming.
   void appendToLastBotMessage(String chunk) {
+    final hadVisibleText = _messages.isNotEmpty &&
+        !_messages.last.isUserMessage &&
+        _messages.last.displayableText.isNotEmpty;
     if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
       final lastMessage = _messages.last;
 
@@ -389,16 +399,21 @@ class ConversationProvider with ChangeNotifier {
       _streamBuffer ??= StringBuffer(lastMessage.text);
       _streamBuffer!.write(textToAppend);
 
-      _messages[_messages.length - 1] = lastMessage.copyWithText(_streamBuffer!.toString());
+      _messages[_messages.length - 1] =
+          lastMessage.copyWithText(_streamBuffer!.toString());
     } else {
       String initialText = chunk;
       if (initialText.startsWith('\n')) {
         initialText = initialText.trimLeft();
       }
-      _messages.add(Message(text: initialText, isUserMessage: false, isThinking: true));
+      _messages.add(
+          Message(text: initialText, isUserMessage: false, isThinking: true));
     }
 
     _scheduleStreamUpdate();
+    if (!hadVisibleText && _messages.last.displayableText.isNotEmpty) {
+      flushStreamUpdates();
+    }
   }
 
   void updateLastBotMessageSources(List<dynamic> sources) {
@@ -514,15 +529,19 @@ class ConversationProvider with ChangeNotifier {
           isThinking: false,
           includeInContext: true,
           pendingMediaType: MediaGenerationType.none,
+          toolActivity: '',
         );
       } else if (cleanedText != msg.text) {
         _messages[index] = msg.copyWith(
           text: cleanedText,
           pendingMediaType: MediaGenerationType.none,
+          toolActivity: '',
         );
       } else if (msg.pendingMediaType != MediaGenerationType.none) {
-        _messages[index] =
-            msg.copyWith(pendingMediaType: MediaGenerationType.none);
+        _messages[index] = msg.copyWith(
+          pendingMediaType: MediaGenerationType.none,
+          toolActivity: '',
+        );
       }
       if (_conversationID != null) {
         if (_isEphemeral) {
@@ -597,6 +616,7 @@ class ConversationProvider with ChangeNotifier {
       isThinking: false,
       isError: true,
       includeInContext: false,
+      toolActivity: '',
     );
 
     if (isContentFlagError && index > 0) {

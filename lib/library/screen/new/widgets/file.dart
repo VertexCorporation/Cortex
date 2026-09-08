@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/screens/models/screen/new/widgets/file.dart
 
 import 'dart:io';
@@ -92,7 +93,7 @@ class GgufFilePicker extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.check_circle_rounded,
-            color: AppColors.senaryColor, size: isTablet ? 80.0 : w * 0.1),
+            color: AppColors.senaryColor, size: CortexDesign.icon),
         SizedBox(height: h * 0.01),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -117,8 +118,9 @@ class GgufFilePicker extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SvgPicture.asset(
+          height: CortexDesign.icon,
           'assets/icons/upload.svg',
-          width: isTablet ? 80.0 : w * 0.1,
+          width: CortexDesign.icon,
           colorFilter: ColorFilter.mode(
               AppColors.primaryColor.inverted.withValues(alpha: 0.8),
               BlendMode.srcIn),

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'dart:async';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
@@ -238,8 +239,8 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                         turns: _arrowTurns,
                         child: SvgPicture.asset(
                           'assets/icons/arrov.svg',
-                          width: 16,
-                          height: 16,
+                          width: CortexDesign.icon,
+                          height: CortexDesign.icon,
                           colorFilter: ColorFilter.mode(
                             AppColors.tertiaryColor,
                             BlendMode.srcIn,
@@ -258,7 +259,7 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
               parent: _contentController,
               curve: Curves.easeInOut,
             ),
-            axisAlignment: -1.0,
+            alignment: Alignment.topCenter,
             child: FadeTransition(
               opacity: _contentFade,
               child: SlideTransition(
@@ -292,6 +293,201 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A compact tool trace shown inside an AI message while the server-side
+/// tool loop is running. It deliberately shares the same arrow and
+/// expand/collapse language as the reasoning block, while keeping tool
+/// details out of the assistant's markdown text.
+class ToolActivityWidget extends StatefulWidget {
+  final String activeTool;
+  final List<String> steps;
+
+  const ToolActivityWidget({
+    super.key,
+    this.activeTool = '',
+    this.steps = const [],
+  });
+
+  @override
+  State<ToolActivityWidget> createState() => _ToolActivityWidgetState();
+}
+
+class _ToolActivityWidgetState extends State<ToolActivityWidget>
+    with TickerProviderStateMixin {
+  bool _expanded = false;
+  late final AnimationController _arrowController;
+  late final Animation<double> _arrowTurns;
+
+  @override
+  void initState() {
+    super.initState();
+    _arrowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+    _arrowTurns = Tween<double>(begin: 0, end: 0.5).animate(
+      CurvedAnimation(parent: _arrowController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _arrowController.dispose();
+    super.dispose();
+  }
+
+  String _label(BuildContext context, String name, {bool active = false}) {
+    final isTurkish = Localizations.localeOf(context).languageCode == 'tr';
+    final labels = <String, List<String>>{
+      'run_python_code': ['Kod çalıştırılıyor', 'Kod çalıştırıldı'],
+      'get_weather': ['Hava durumu aranıyor', 'Hava durumu getirildi'],
+      'get_stock_price': ['Piyasa verisi aranıyor', 'Piyasa verisi getirildi'],
+      'read_document': ['Belge okunuyor', 'Belge okundu'],
+      'render_chart': ['Grafik hazırlanıyor', 'Grafik hazırlandı'],
+      'calculate': ['Hesaplanıyor', 'Hesaplandı'],
+      'need_web_search': ['Web aranıyor', 'Web araması tamamlandı'],
+      'web_search': ['Web aranıyor', 'Web araması tamamlandı'],
+    };
+    final pair = labels[name] ??
+        (isTurkish
+            ? ['Araç çalıştırılıyor', 'Araç tamamlandı']
+            : ['Using a tool', 'Tool completed']);
+    if (isTurkish) return active ? pair[0] : pair[1];
+
+    final english = <String, List<String>>{
+      'run_python_code': ['Running code', 'Code executed'],
+      'get_weather': ['Checking weather', 'Weather checked'],
+      'get_stock_price': ['Checking market data', 'Market data checked'],
+      'read_document': ['Reading document', 'Document read'],
+      'render_chart': ['Preparing chart', 'Chart prepared'],
+      'calculate': ['Calculating', 'Calculated'],
+      'need_web_search': ['Searching the web', 'Web search complete'],
+      'web_search': ['Searching the web', 'Web search complete'],
+    };
+    final englishPair = english[name] ?? ['Using a tool', 'Tool completed'];
+    return active ? englishPair[0] : englishPair[1];
+  }
+
+  void _toggle() {
+    if (widget.steps.isEmpty && widget.activeTool.isEmpty) return;
+    setState(() => _expanded = !_expanded);
+    if (_expanded) {
+      _arrowController.forward();
+    } else {
+      _arrowController.reverse();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasActivity = widget.activeTool.isNotEmpty || widget.steps.isNotEmpty;
+    if (!hasActivity) return const SizedBox.shrink();
+
+    final visibleSteps = <String>[...widget.steps];
+    if (widget.activeTool.isNotEmpty &&
+        (visibleSteps.isEmpty || visibleSteps.last != widget.activeTool)) {
+      visibleSteps.add(widget.activeTool);
+    }
+    final isActive = widget.activeTool.isNotEmpty;
+    final title = isActive
+        ? _label(context, widget.activeTool, active: true)
+        : (Localizations.localeOf(context).languageCode == 'tr'
+            ? 'Araç adımları'
+            : 'Tool steps');
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _toggle,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isActive)
+                      Shimmer.fromColors(
+                        baseColor: AppColors.tertiaryColor,
+                        highlightColor:
+                            AppColors.primaryColor.withValues(alpha: 0.55),
+                        period: const Duration(milliseconds: 1500),
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            color: AppColors.tertiaryColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )
+                    else
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: AppColors.tertiaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    const SizedBox(width: 8),
+                    RotationTransition(
+                      turns: _arrowTurns,
+                      child: SvgPicture.asset(
+                        'assets/icons/arrov.svg',
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
+                        colorFilter: ColorFilter.mode(
+                          AppColors.tertiaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizeTransition(
+                  sizeFactor: CurvedAnimation(
+                    parent: _arrowController,
+                    curve: Curves.easeInOut,
+                  ),
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 4, top: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: visibleSteps
+                          .asMap()
+                          .entries
+                          .map(
+                            (entry) => Padding(
+                              padding: const EdgeInsets.only(bottom: 3),
+                              child: Text(
+                                '${entry.key + 1}. ${_label(context, entry.value, active: entry.value == widget.activeTool)}',
+                                style: TextStyle(
+                                  color: AppColors.primaryColor.inverted
+                                      .withValues(alpha: 0.62),
+                                  fontSize: 12,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

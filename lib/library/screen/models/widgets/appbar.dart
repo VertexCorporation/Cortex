@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/library/screen/models/widgets/appbar.dart
 
 import 'package:flutter/material.dart';
@@ -25,8 +26,6 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
     final bool isTablet = screenWidth >= 600;
     final bool isDesktop = screenWidth >= 800;
 
-    // Icon size matches the rest of the app
-    final double iconSize = isTablet ? 18.0 : 15.0;
     final double buttonSize = isTablet ? 48.0 : 42.0;
 
     return CortexAppBar(
@@ -45,8 +44,8 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
         onTap: onOpenCreateScreen,
         child: SvgPicture.asset(
           'assets/icons/add.svg',
-          width: iconSize,
-          height: iconSize,
+          width: CortexDesign.icon,
+          height: CortexDesign.icon,
           colorFilter: ColorFilter.mode(
             AppColors.primaryColor.inverted,
             BlendMode.srcIn,

@@ -286,13 +286,12 @@ class BottomActionButtons extends StatelessWidget {
               }
             : null,
         style: ElevatedButton.styleFrom(
-          // Changed button color to primaryColor.inverted.
-          backgroundColor: AppColors.primaryColor.inverted,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.background,
+          foregroundColor: AppColors.primaryColor.inverted,
+          side: BorderSide(color: AppColors.border),
           // Updated disabled color to match the new background color.
-          disabledBackgroundColor:
-              AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-          disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
+          disabledBackgroundColor: AppColors.background,
+          disabledForegroundColor: AppColors.tertiaryColor,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(screenWidth * 0.03)),
         ),
@@ -300,8 +299,7 @@ class BottomActionButtons extends StatelessWidget {
           buttonText,
           style: TextStyle(
               fontSize: screenWidth * 0.04,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryColor),
+              fontWeight: FontWeight.bold),
         ),
       ),
     );

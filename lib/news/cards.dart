@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/news/cards.dart
 
 import 'package:cortex/news/view.dart';
@@ -119,7 +120,6 @@ class _NewsArticleCardState extends State<NewsArticleCard>
         final double basePadding = referenceWidth * 0.04;
         final double mediumSpacing = referenceWidth * 0.03;
         final double smallSpacing = referenceWidth * 0.01;
-        final double iconSize = referenceWidth * 0.06;
 
         final title = widget.article.titleFor(context);
         final summary = widget.article.summaryFor(context);
@@ -200,7 +200,7 @@ class _NewsArticleCardState extends State<NewsArticleCard>
                               if (hasLink)
                                 IconButton(
                                   icon: Icon(Icons.touch_app,
-                                      size: iconSize,
+                                      size: CortexDesign.icon,
                                       color: AppColors.primaryColor.inverted
                                           .withValues(alpha: 0.8)),
                                   onPressed: _launchLink,

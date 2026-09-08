@@ -85,7 +85,7 @@ class OptionsPanelViewModel {
         MessageOption.speak,
       ];
       if (!message.isError) {
-        options.addAll([MessageOption.regenerate, MessageOption.changeModel]);
+        options.add(MessageOption.regenerate);
         if (!message.isReported) {
           options.add(MessageOption.report);
         }
@@ -443,7 +443,7 @@ class _AnimatedMessageOptionsPanelState
                     width: panelWidth,
                     decoration: BoxDecoration(
                       color: widget.message.isUserMessage
-                          ? AppColors.secondaryColor
+                          ? AppColors.quaternaryColor
                           : AppColors.background,
                       borderRadius: BorderRadius.circular(borderRadius),
                       border: Border.all(

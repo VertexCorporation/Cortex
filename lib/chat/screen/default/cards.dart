@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/default/cards.dart
 
 import 'package:flutter/material.dart';
@@ -76,8 +77,8 @@ class DefaultCard extends StatelessWidget {
                 angle: -1.5708, // 90 degrees (Pi / 2)
                 child: SvgPicture.asset(
                   'assets/icons/arrov.svg',
-                  width: screenWidth * 0.05,
-                  height: screenWidth * 0.04,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter: ColorFilter.mode(
                     contentColor.withValues(alpha: 0.6),
                     BlendMode.srcIn,

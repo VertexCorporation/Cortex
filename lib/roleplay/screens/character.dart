@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/roleplay/screens/create_character_screen.dart
 //
 // Full-featured bot / character creation screen.
@@ -65,8 +66,6 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
     [Color(0xFFE91E63), Color(0xFF880E4F)],
     [Color(0xFF009688), Color(0xFF004D40)],
   ];
-
-
 
   @override
   void initState() {
@@ -154,7 +153,8 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Icon(Icons.close_rounded,
-                      color: AppColors.primaryColor.inverted, size: 18),
+                      color: AppColors.primaryColor.inverted,
+                      size: CortexDesign.icon),
                 ),
               ),
               const SizedBox(width: 14),
@@ -223,9 +223,8 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                       Container(
                         height: 4,
                         decoration: BoxDecoration(
-                          color: isCompleted || isActive
-                              ? null
-                              : AppColors.border,
+                          color:
+                              isCompleted || isActive ? null : AppColors.border,
                           gradient: isCompleted || isActive
                               ? LinearGradient(colors: _gradientColors)
                               : null,
@@ -332,7 +331,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                       ),
                       child: isSelected
                           ? const Icon(Icons.check_rounded,
-                              color: Colors.white, size: 18)
+                              color: Colors.white, size: CortexDesign.icon)
                           : null,
                     ),
                   );
@@ -458,7 +457,8 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                       GestureDetector(
                         onTap: () => setState(() => _traits.remove(t)),
                         child: Icon(Icons.close_rounded,
-                            size: 14, color: AppColors.tertiaryColor),
+                            size: CortexDesign.icon,
+                            color: AppColors.tertiaryColor),
                       ),
                     ],
                   ),
@@ -483,7 +483,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.add_rounded,
-                        color: AppColors.senaryColor, size: 18),
+                        color: AppColors.senaryColor, size: CortexDesign.icon),
                     const SizedBox(width: 6),
                     Text(
                       'Özellik Ekle',
@@ -544,7 +544,9 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => setState(() => _openers.removeAt(index)),
-                      child: Icon(Icons.close_rounded,
+                      child: Icon(
+                          size: CortexDesign.icon,
+                          Icons.close_rounded,
                           color: AppColors.tertiaryColor),
                     ),
                   ],
@@ -555,7 +557,10 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
           if (_openers.length < 3)
             TextButton.icon(
               onPressed: () => setState(() => _openers.add('')),
-              icon: Icon(Icons.add_rounded, color: AppColors.senaryColor),
+              icon: Icon(
+                  size: CortexDesign.icon,
+                  Icons.add_rounded,
+                  color: AppColors.senaryColor),
               label:
                   Text('Ekle', style: TextStyle(color: AppColors.senaryColor)),
             ),
@@ -601,7 +606,8 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                         color: AppColors.senaryColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(7),
                       ),
-                      child: const Center(child: Text('💡', style: TextStyle(fontSize: 14))),
+                      child: const Center(
+                          child: Text('💡', style: TextStyle(fontSize: 14))),
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -978,7 +984,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.arrow_back_rounded,
-                                size: 16,
+                                size: CortexDesign.icon,
                                 color: AppColors.primaryColor.inverted),
                             const SizedBox(width: 4),
                             Text(
@@ -1027,7 +1033,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                             ),
                             const SizedBox(width: 4),
                             const Icon(Icons.arrow_forward_rounded,
-                                color: Colors.white, size: 16),
+                                color: Colors.white, size: CortexDesign.icon),
                           ],
                         ),
                       ),
@@ -1377,7 +1383,7 @@ class _SummaryRow extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.circle_rounded,
-              size: 5, color: AppColors.tertiaryColor),
+              size: CortexDesign.icon, color: AppColors.tertiaryColor),
           const SizedBox(width: 8),
           Text(label,
               style: TextStyle(color: AppColors.tertiaryColor, fontSize: 13)),

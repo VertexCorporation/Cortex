@@ -56,7 +56,8 @@ extension FundsVerification on FundsBackend {
       await callable.call<dynamic>({
         'receiptData': verificationData,
         'productId': purchaseDetails.productID,
-        'platform': defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
+        'platform':
+            defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
         'packageName': FundsBackend.appPackageName,
         'transactionId': purchaseDetails.purchaseID,
       });

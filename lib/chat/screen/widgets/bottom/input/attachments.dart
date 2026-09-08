@@ -140,7 +140,7 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
                       ),
                       child: const Icon(
                         Icons.close_rounded,
-                        size: 16,
+                        size: CortexDesign.icon,
                         color: Colors.black,
                       ),
                     ),
@@ -211,8 +211,10 @@ class _AttachmentItem extends StatelessWidget {
             width: size * 2.0,
             height: size,
             fit: BoxFit.cover,
-            errorBuilder: (ctx, err, stack) =>
-                Icon(Icons.broken_image, color: AppColors.tertiaryColor),
+            errorBuilder: (ctx, err, stack) => Icon(
+                size: CortexDesign.icon,
+                Icons.broken_image,
+                color: AppColors.tertiaryColor),
           ),
         ),
       );
@@ -230,7 +232,7 @@ class _AttachmentItem extends StatelessWidget {
           children: [
             Icon(
               _getFileIcon(attachment.extension),
-              size: size * 0.4,
+              size: CortexDesign.icon,
               color: AppColors.primaryColor.inverted,
             ),
             const SizedBox(height: 4),

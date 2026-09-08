@@ -5,12 +5,16 @@ class _InlineOptionsRow extends StatefulWidget {
   final VoidCallback? onReport;
   final void Function({String? newModelId})? onRegenerate;
   final double scale;
+  final bool revealComplete;
+  final bool isExiting;
 
   const _InlineOptionsRow({
     required this.message,
     this.onReport,
     this.onRegenerate,
     required this.scale,
+    required this.revealComplete,
+    this.isExiting = false,
   });
 
   @override
@@ -28,7 +32,7 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
     _animCtl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 400));
     // If the message is already done, start animation immediately
-    if (!widget.message.isThinking && !widget.message.isError) {
+    if (widget.revealComplete && !widget.message.isError) {
       _animCtl.forward();
     }
   }
@@ -36,11 +40,11 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
   @override
   void didUpdateWidget(covariant _InlineOptionsRow old) {
     super.didUpdateWidget(old);
-    if (old.message.isThinking &&
-        !widget.message.isThinking &&
+    if (!old.revealComplete &&
+        widget.revealComplete &&
         !widget.message.isError) {
       _animCtl.forward(from: 0.0);
-    } else if (!old.message.isThinking && widget.message.isThinking) {
+    } else if (old.revealComplete && !widget.revealComplete) {
       _animCtl.reverse();
     }
   }
@@ -195,8 +199,8 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
                 padding: EdgeInsets.all(6.0 * s),
                 child: SvgPicture.asset(
                   iconAsset,
-                  width: 14 * s,
-                  height: 14 * s,
+                  width: CortexDesign.iconSmall,
+                  height: CortexDesign.iconSmall,
                   colorFilter: ColorFilter.mode(
                     AppColors.primaryColor.inverted,
                     BlendMode.srcIn,
@@ -212,7 +216,7 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.message.isThinking || widget.message.isError) {
+    if (!widget.revealComplete || widget.message.isError) {
       return const SizedBox.shrink();
     }
 
@@ -229,10 +233,16 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
       totalCredits: totalCredits,
     );
 
-    _visibleOptions = viewModel.getVisibleOptions(context);
+    // Keep the pre-regeneration button set while the outgoing row is fading.
+    // The provider is already waiting for the new response at this point,
+    // which would otherwise hide or reorder the old controls mid-animation.
+    if (!widget.isExiting || _visibleOptions.isEmpty) {
+      _visibleOptions = viewModel.getVisibleOptions(context);
+    }
 
     // Remove options that are not supported inline
     _visibleOptions.remove(MessageOption.stop);
+    _visibleOptions.remove(MessageOption.changeModel);
 
     if (_visibleOptions.isEmpty) return const SizedBox.shrink();
 

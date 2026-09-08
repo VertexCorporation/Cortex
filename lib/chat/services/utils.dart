@@ -124,9 +124,17 @@ class Utils {
               r'\.(jpg|jpeg|png|webp|gif|bmp|heic|mp4|webm|mov|mkv|m4v|mp3|wav|m4a|aac|ogg|flac|opus)(\?|$)',
             ).hasMatch(lowerPath);
         if (looksLikeMediaUrl) {
+          final mediaType = lowerPath.startsWith('data:video/') ||
+                  RegExp(r'\.(mp4|webm|mov|mkv|m4v)(\?|$)').hasMatch(lowerPath)
+              ? 'video_url'
+              : lowerPath.startsWith('data:audio/') ||
+                      RegExp(r'\.(mp3|wav|m4a|aac|ogg|flac|opus)(\?|$)')
+                          .hasMatch(lowerPath)
+                  ? 'audio_url'
+                  : 'image_url';
           return {
-            "type": "image_url",
-            "image_url": {"url": path}
+            "type": mediaType,
+            mediaType: {"url": path}
           };
         }
       }
@@ -146,9 +154,14 @@ class Utils {
         if (base64Url != null) {
           // OpenRouter/OpenAI structure uses "image_url" conventionally
           // Fal.ai and custom Vertex routing will pull the URL from this object
+          final mediaType = mimeType.startsWith('video/')
+              ? 'video_url'
+              : mimeType.startsWith('audio/')
+                  ? 'audio_url'
+                  : 'image_url';
           return {
-            "type": "image_url",
-            "image_url": {"url": base64Url}
+            "type": mediaType,
+            mediaType: {"url": base64Url}
           };
         }
       }

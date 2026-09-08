@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -111,20 +112,22 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               Material(
                 color: Colors.transparent,
                 child: ListTile(
-                leading: Icon(Icons.share_rounded,
-                    color: AppColors.primaryColor.inverted),
-                title: Text(l10n.download,
-                    style: TextStyle(
-                        color: AppColors.primaryColor.inverted,
-                        fontWeight: FontWeight.bold)),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  SharePlus.instance
-                      .share(ShareParams(files: [XFile(widget.audioPath)]));
-                },
+                  leading: Icon(
+                      size: CortexDesign.icon,
+                      Icons.share_rounded,
+                      color: AppColors.primaryColor.inverted),
+                  title: Text(l10n.download,
+                      style: TextStyle(
+                          color: AppColors.primaryColor.inverted,
+                          fontWeight: FontWeight.bold)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    SharePlus.instance
+                        .share(ShareParams(files: [XFile(widget.audioPath)]));
+                  },
                 ),
-                ), // Material
-              ],
+              ), // Material
+            ],
           ),
         ));
       },
@@ -170,8 +173,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                   ),
                   child: SvgPicture.asset(
                     'assets/icons/voice.svg',
-                    width: isTablet ? 18 : 14,
-                    height: isTablet ? 18 : 14,
+                    width: CortexDesign.icon,
+                    height: CortexDesign.icon,
                     colorFilter: ColorFilter.mode(
                         AppColors.primaryColor.inverted, BlendMode.srcIn),
                   ),
@@ -210,7 +213,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     ),
                     child: Icon(
                       Icons.more_horiz_rounded,
-                      size: isTablet ? 22 : 18,
+                      size: CortexDesign.icon,
                       color: AppColors.primaryColor.inverted
                           .withValues(alpha: 0.6),
                     ),
@@ -243,7 +246,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                             ? Icons.pause_rounded
                             : Icons.play_arrow_rounded,
                         color: AppColors.primaryColor,
-                        size: isTablet ? 28 : 22.0,
+                        size: CortexDesign.icon,
                       ),
                     ),
                   ),

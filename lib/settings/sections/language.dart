@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/language.dart
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../../language.dart';
 import '../../library/providers/catalog.dart';
 import '../../theme.dart';
+import '../widgets/grouped_button.dart';
 
 /// A widget that manages the app language selection in the settings screen.
 ///
@@ -141,7 +143,7 @@ class AppLanguageSection extends StatelessWidget {
             child: Container(
               width: screenWidth * 0.7,
               decoration: BoxDecoration(
-                color: AppColors.secondaryColor,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: ClipRRect(
@@ -156,8 +158,8 @@ class AppLanguageSection extends StatelessWidget {
                         SizedBox(height: screenHeight * 0.02),
                         SvgPicture.asset(
                           'assets/icons/world.svg',
-                          width: screenWidth * 0.07,
-                          height: screenWidth * 0.07,
+                          width: CortexDesign.icon,
+                          height: CortexDesign.icon,
                           colorFilter: ColorFilter.mode(
                               AppColors.primaryColor.inverted, BlendMode.srcIn),
                         ),
@@ -207,42 +209,45 @@ class AppLanguageSection extends StatelessWidget {
                                 child: Material(
                                   color: Colors.transparent,
                                   child: ListTile(
-                                  title: Text(
-                                    lang['name']!,
-                                    style: TextStyle(
-                                      fontSize: screenWidth * 0.038,
-                                      color: AppColors.primaryColor.inverted,
+                                    title: Text(
+                                      lang['name']!,
+                                      style: TextStyle(
+                                        fontSize: screenWidth * 0.038,
+                                        color: AppColors.primaryColor.inverted,
+                                      ),
                                     ),
-                                  ),
-                                  leading: AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 200),
-                                    transitionBuilder: (child, animation) =>
-                                        FadeTransition(
-                                            opacity: animation, child: child),
-                                    child: Icon(
-                                      isSelected
-                                          ? Icons.radio_button_checked
-                                          : Icons.radio_button_unchecked,
-                                      key: ValueKey<bool>(isSelected),
-                                      // Important for AnimatedSwitcher
-                                      color: AppColors.primaryColor.inverted,
+                                    leading: AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      transitionBuilder: (child, animation) =>
+                                          FadeTransition(
+                                              opacity: animation, child: child),
+                                      child: Icon(
+                                        size: CortexDesign.icon,
+                                        isSelected
+                                            ? Icons.radio_button_checked
+                                            : Icons.radio_button_unchecked,
+                                        key: ValueKey<bool>(isSelected),
+                                        // Important for AnimatedSwitcher
+                                        color: AppColors.primaryColor.inverted,
+                                      ),
                                     ),
+                                    onTap: () {
+                                      if (!isSelected) {
+                                        HapticFeedback.lightImpact();
+                                        setStateDialog(() =>
+                                            tempSelectedLanguageCode =
+                                                langCode);
+                                      }
+                                    },
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.02),
                                   ),
-                                  onTap: () {
-                                    if (!isSelected) {
-                                      HapticFeedback.lightImpact();
-                                      setStateDialog(() =>
-                                          tempSelectedLanguageCode = langCode);
-                                    }
-                                  },
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.02),
-                                  ),
-                                  ), // Material
-                                );
+                                ), // Material
+                              );
                             },
                           ),
                         ),
@@ -345,40 +350,30 @@ class AppLanguageSection extends StatelessWidget {
         ),
         SizedBox(height: screenHeight * 0.02),
         // The main button to open the selection dialog.
-        Material(
-          color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(10.0),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              _showLanguageSelectionDialog(context);
-            },
-            borderRadius: BorderRadius.circular(10.0),
-            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                  vertical: screenHeight * 0.02,
-                  horizontal: screenWidth * 0.04),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    currentLanguageName,
-                    style: TextStyle(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: screenWidth * 0.041,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: AppColors.primaryColor.inverted,
-                    size: screenWidth * 0.04,
-                  ),
-                ],
+        SettingsGroupedRow(
+          position: SettingsRowPosition.standalone,
+          scale: (screenWidth / 375).clamp(0.85, 1.25),
+          onTap: () {
+            HapticFeedback.lightImpact();
+            _showLanguageSelectionDialog(context);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                currentLanguageName,
+                style: TextStyle(
+                  color: AppColors.primaryColor.inverted,
+                  fontSize: screenWidth * 0.041,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.primaryColor.inverted,
+                size: CortexDesign.iconSize(screenWidth, tier: 1),
+              ),
+            ],
           ),
         ),
       ],

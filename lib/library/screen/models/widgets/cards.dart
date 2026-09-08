@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // cards.dart
 
 import 'dart:async';
@@ -185,7 +186,7 @@ class _ModelTileState extends State<ModelTile> {
 
   Widget _buildButton(BuildContext context, double w, AppLocalizations loc) {
     const double radiusFactor = .08;
-    final double h = w * .09;
+    final double h = CortexDesign.control;
     final double btnW = w * .25;
     final BorderRadius br = BorderRadius.circular(w * radiusFactor);
     final manager = widget.manager;
@@ -199,7 +200,7 @@ class _ModelTileState extends State<ModelTile> {
         borderRadius: w * radiusFactor,
         borderColor: AppColors.primaryColor.inverted,
         text: loc.cancel,
-        fontSize: w * .035,
+        fontSize: 14,
       );
     }
 
@@ -340,7 +341,10 @@ class _ModelTileState extends State<ModelTile> {
       imageContent = fallbackImage;
     } else {
       if (variant == '.svg') {
-        imageContent = SvgPicture.asset(resolvedImagePath,
+        imageContent = SvgPicture.asset(
+            height: CortexDesign.icon,
+            width: CortexDesign.icon,
+            resolvedImagePath,
             fit: BoxFit.contain,
             colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.inverted, BlendMode.srcIn),
@@ -391,7 +395,10 @@ class _ModelTileState extends State<ModelTile> {
       color: AppColors.secondaryColor,
       child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SvgPicture.asset('assets/icons/self.svg',
+          child: SvgPicture.asset(
+              height: CortexDesign.icon,
+              width: CortexDesign.icon,
+              'assets/icons/self.svg',
               colorFilter: ColorFilter.mode(
                   AppColors.primaryColor.inverted, BlendMode.srcIn))));
 
@@ -421,7 +428,7 @@ class _ModelTileState extends State<ModelTile> {
                     text: _resolveDisplayTitle(widget.model),
                     style: TextStyle(
                         color: AppColors.primaryColor.inverted,
-                        fontSize: w * .04,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: w * .005),
@@ -438,7 +445,7 @@ class _ModelTileState extends State<ModelTile> {
                     style: TextStyle(
                         color: AppColors.primaryColor.inverted
                             .withValues(alpha: .5),
-                        fontSize: w * .029),
+                        fontSize: 12),
                   ),
                 ],
               ),
@@ -492,6 +499,6 @@ class _ModelTileState extends State<ModelTile> {
       transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
       child: child);
 
-  TextStyle _boldWhite(BuildContext ctx, double w) => TextStyle(
-      color: Colors.white, fontSize: w * .035, fontWeight: FontWeight.bold);
+  TextStyle _boldWhite(BuildContext ctx, double w) =>
+      TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
 }

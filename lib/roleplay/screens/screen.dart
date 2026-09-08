@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/roleplay/screens/character_profile_screen.dart
 //
 // Detailed character profile before starting a chat.
@@ -54,7 +55,7 @@ class _CharacterProfileScreenState extends State<CharacterProfileScreen> {
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.white, size: 18),
+              color: Colors.white, size: CortexDesign.icon),
         ),
       ),
       flexibleSpace: FlexibleSpaceBar(
@@ -361,7 +362,7 @@ class _CharacterProfileScreenState extends State<CharacterProfileScreen> {
     return Row(
       children: [
         Icon(Icons.person_outline_rounded,
-            color: AppColors.tertiaryColor, size: 16),
+            color: AppColors.tertiaryColor, size: CortexDesign.icon),
         const SizedBox(width: 6),
         Text(
           'Oluşturan: ${char.creatorName}',
@@ -452,7 +453,7 @@ class _StatChip extends StatelessWidget {
         child: Column(
           children: [
             if (icon != null)
-              Icon(icon, color: AppColors.senaryColor, size: 20)
+              Icon(icon, color: AppColors.senaryColor, size: CortexDesign.icon)
             else
               Text(emoji!, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 4),

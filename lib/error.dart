@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // errorview.dart
 
 import 'package:cortex/app.dart';
@@ -37,10 +38,11 @@ class ErrorView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SvgPicture.asset(
+              height: CortexDesign.icon,
               'assets/icons/warning.svg',
               colorFilter:
                   ColorFilter.mode(AppColors.septenaryColor, BlendMode.srcIn),
-              width: screenWidth * 0.2,
+              width: CortexDesign.icon,
             ),
             SizedBox(height: screenWidth * 0.06),
             Text(

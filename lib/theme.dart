@@ -35,7 +35,13 @@ class ThemeProvider extends ChangeNotifier {
         statusBarColor: Colors.transparent,
         systemNavigationBarIconBrightness:
             themeColors.navigationBarIconBrightness,
-        statusBarIconBrightness: themeColors.statusBarIconBrightness,
+        statusBarIconBrightness:
+            ThemeData.estimateBrightnessForColor(themeColors.background) ==
+                    Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+        statusBarBrightness:
+            ThemeData.estimateBrightnessForColor(themeColors.background),
       ),
     );
   }
@@ -88,15 +94,15 @@ class AppColors {
   static final Map<String, ThemeColors> _themeDefinitions = {
     'light': ThemeColors(
       primaryColor: Colors.white,
-      secondaryColor: const Color(0xFFF3F3F3),
+      secondaryColor: const Color(0xFFF4F4F4),
       tertiaryColor: const Color(0xFF535353),
-      quaternaryColor: const Color(0xFFEBEBEB),
+      quaternaryColor: const Color(0xFFEAEAEA),
       quinaryColor: const Color(0xA8000000),
       senaryColor: const Color(0xFF0D62FE),
       septenaryColor: const Color(0xFFFF322B),
       // Soft Red (was 0xFFFA2626)
       background: const Color(0xFFFFFFFF),
-      border: const Color(0xFFBFBFBF),
+      border: const Color(0xFFDADADA),
       premium: const Color(0xFF9900FF),
       navigationBarColor: Colors.white,
       statusBarColor: Colors.transparent,
@@ -109,11 +115,11 @@ class AppColors {
       tertiaryColor: const Color(0xFF8F8F8F),
       quaternaryColor: const Color(0xFF141414),
       quinaryColor: Colors.white70,
-      senaryColor: const Color(0xFF0D31FE),
+      senaryColor: const Color(0xFF7C9CFF),
       septenaryColor: const Color(0xFF6E1E1E),
       // Soft Red (was 0xFFD32F2F)
       background: const Color(0xFF090909),
-      border: const Color(0xFF303030),
+      border: const Color(0xFF2C2C2C),
       premium: const Color(0xFFBB86FC),
       navigationBarColor: const Color(0xFF090909),
       statusBarColor: const Color(0xFF090909),
@@ -150,7 +156,7 @@ class AppColors {
       navigationBarColor: const Color(0xFF16392a),
       statusBarColor: Colors.transparent,
       navigationBarIconBrightness: Brightness.light,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ),
     'behindTheSlaughter': ThemeColors(
       primaryColor: Colors.black,

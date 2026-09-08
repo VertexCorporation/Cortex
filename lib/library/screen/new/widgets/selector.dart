@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/screens/models/screen/new/widgets/selector.dart
 
 import 'dart:io';
@@ -93,7 +94,6 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
     final double descSize = isTablet ? 18.0 : screenWidth * 0.035;
     final double textSize = isTablet ? 20.0 : screenWidth * 0.04;
     final double borderRadius = isTablet ? 16.0 : screenWidth * 0.03;
-    final double iconSize = isTablet ? 28.0 : screenWidth * 0.05;
     final double paddingV = isTablet ? 20.0 : screenWidth * 0.035;
     final double paddingH = isTablet ? 24.0 : screenWidth * 0.04;
 
@@ -170,8 +170,9 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                     padding: EdgeInsets.only(
                         right: isTablet ? 12.0 : screenWidth * 0.02),
                     child: SvgPicture.asset(
+                      height: CortexDesign.icon,
                       'assets/icons/sparkle.svg',
-                      width: iconSize,
+                      width: CortexDesign.icon,
                       colorFilter: ColorFilter.mode(
                           AppColors.primaryColor.inverted
                               .withValues(alpha: 0.5),
@@ -181,7 +182,7 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                 Icon(Icons.lock_outline,
                     color:
                         AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-                    size: isTablet ? 24 : screenWidth * 0.05),
+                    size: CortexDesign.icon),
               ],
             ),
           ),
@@ -232,6 +233,8 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
         imageWidget = Padding(
           padding: const EdgeInsets.all(2.0),
           child: SvgPicture.asset(
+            height: CortexDesign.icon,
+            width: CortexDesign.icon,
             imagePath,
             fit: BoxFit.contain,
             colorFilter: ColorFilter.mode(
@@ -297,8 +300,9 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                   Padding(
                     padding: EdgeInsets.only(left: screenWidth * 0.02),
                     child: SvgPicture.asset(
+                      height: CortexDesign.icon,
                       'assets/icons/sparkle.svg',
-                      width: screenWidth * 0.05,
+                      width: CortexDesign.icon,
                       colorFilter: ColorFilter.mode(
                         AppColors.primaryColor.inverted.withValues(alpha: 0.8),
                         BlendMode.srcIn,
@@ -343,7 +347,7 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                     prefixIcon: Icon(
                       Icons.search_rounded,
                       color: AppColors.tertiaryColor,
-                      size: screenWidth * 0.05,
+                      size: CortexDesign.icon,
                     ),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? GestureDetector(
@@ -351,7 +355,7 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                             child: Icon(
                               Icons.close_rounded,
                               color: AppColors.tertiaryColor,
-                              size: screenWidth * 0.045,
+                              size: CortexDesign.icon,
                             ),
                           )
                         : null,

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/news/view.dart
 
 import 'package:cortex/app.dart';
@@ -93,7 +94,7 @@ class _NewsScreenState extends State<NewsScreen>
     final double blobHeight = screenHeight * 0.83;
 
     // Spacing Constants
-    final double horizontalPadding = screenWidth * 0.041;
+    final double horizontalPadding = CortexDesign.gutter(screenWidth);
     final double searchGap = screenHeight * 0.02;
 
     final double topSafeArea = MediaQuery.paddingOf(context).top;
@@ -439,8 +440,6 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final iconSize = screenWidth * 0.08;
     return Material(
       color: AppColors.border.withValues(alpha: 0.5),
       child: InkWell(
@@ -448,8 +447,8 @@ class _ErrorState extends StatelessWidget {
         child: Center(
           child: SvgPicture.asset(
             'assets/icons/warning.svg',
-            width: iconSize,
-            height: iconSize,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.inverted.withValues(alpha: 0.6),
                 BlendMode.srcIn),

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/axon/content.dart
 
 import 'package:flutter/material.dart';
@@ -76,7 +77,7 @@ class AxonContent extends StatelessWidget {
   Widget _buildBody(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final screenHeight = MediaQuery.sizeOf(context).height;
-    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenWidth = referenceWidth;
 
     final inboxViewModel = context.watch<InboxViewModel>();
 
@@ -95,7 +96,7 @@ class AxonContent extends StatelessWidget {
     final hasFreeTrial =
         context.select<FundsBackend, bool>((f) => f.hasFreeTrial);
 
-    final double horizontalPadding = referenceWidth * 0.05;
+    final double horizontalPadding = CortexDesign.gutter(referenceWidth);
     final double fontSizeBody = referenceWidth * 0.04;
 
     return Stack(
@@ -214,7 +215,7 @@ class AxonContent extends StatelessWidget {
                             icon: Icon(
                               Icons.close_rounded,
                               color: AppColors.primaryColor.inverted,
-                              size: referenceWidth * 0.055,
+                              size: CortexDesign.icon,
                             ),
                             onPressed: () {
                               HapticFeedback.lightImpact();
@@ -242,7 +243,7 @@ class AxonContent extends StatelessWidget {
                                   ? Icons.deselect_rounded
                                   : Icons.select_all_rounded,
                               color: AppColors.primaryColor.inverted,
-                              size: referenceWidth * 0.055,
+                              size: CortexDesign.icon,
                             ),
                             onPressed: () {
                               HapticFeedback.lightImpact();
@@ -262,7 +263,7 @@ class AxonContent extends StatelessWidget {
                                   ? AppColors.primaryColor.inverted
                                       .withValues(alpha: 0.3)
                                   : Colors.redAccent,
-                              size: referenceWidth * 0.055,
+                              size: CortexDesign.icon,
                             ),
                             onPressed: inboxViewModel.selectedIDs.isEmpty
                                 ? null
@@ -385,9 +386,9 @@ class AxonContent extends StatelessWidget {
             right: horizontalPadding,
             bottom: screenHeight * 0.03,
             child: Material(
-              color: AppColors.primaryColor.inverted,
-              shape: const StadiumBorder(),
-              elevation: 8.0,
+              color: AppColors.background,
+              shape: StadiumBorder(side: BorderSide(color: AppColors.border)),
+              elevation: 0,
               shadowColor: Colors.black54,
               clipBehavior: Clip.antiAlias,
               child: InkWell(
@@ -408,10 +409,10 @@ class AxonContent extends StatelessWidget {
                     children: [
                       SvgPicture.asset(
                         'assets/icons/new.svg',
-                        width: referenceWidth * 0.055,
-                        height: referenceWidth * 0.055,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                         colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor,
+                          AppColors.primaryColor.inverted,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -419,7 +420,7 @@ class AxonContent extends StatelessWidget {
                       Text(
                         localizations.newChat,
                         style: TextStyle(
-                          color: AppColors.primaryColor,
+                          color: AppColors.primaryColor.inverted,
                           fontSize: referenceWidth * 0.04,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inter',
@@ -439,8 +440,9 @@ class AxonContent extends StatelessWidget {
             bottom: screenHeight * 0.03,
             child: Material(
               color: AppColors.primaryColor.inverted,
-              shape: const StadiumBorder(),
-              elevation: 8.0,
+              shape: StadiumBorder(
+                  side: BorderSide(color: AppColors.primaryColor.inverted)),
+              elevation: 0,
               shadowColor: Colors.black54,
               clipBehavior: Clip.antiAlias,
               child: InkWell(
@@ -465,7 +467,7 @@ class AxonContent extends StatelessWidget {
                       Icon(
                         Icons.person_rounded,
                         color: AppColors.primaryColor,
-                        size: referenceWidth * 0.055,
+                        size: CortexDesign.icon,
                       ),
                       SizedBox(width: referenceWidth * 0.02),
                       Text(
@@ -495,13 +497,9 @@ class AxonContent extends StatelessWidget {
             child: Builder(
               builder: (context) {
                 // Glassmorphism: same formula as the appbar ClaimOfferButton
-                final Color baseColor =
-                    AppColors.premium.withValues(alpha: 0.25);
-                final Color glassBackground =
-                    Color.alphaBlend(baseColor, AppColors.background);
-                final Color borderColor =
-                    AppColors.premium.withValues(alpha: 0.4);
-                final Color contentColor = AppColors.premium;
+                final Color glassBackground = AppColors.background;
+                final Color borderColor = AppColors.border;
+                final Color contentColor = AppColors.primaryColor.inverted;
 
                 return Material(
                   color: glassBackground,
@@ -535,7 +533,7 @@ class AxonContent extends StatelessWidget {
                           Icon(
                             Icons.card_giftcard_rounded,
                             color: contentColor,
-                            size: referenceWidth * 0.055,
+                            size: CortexDesign.icon,
                           ),
                           SizedBox(width: referenceWidth * 0.02),
                           Text(

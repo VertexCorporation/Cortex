@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/login/controller.dart';
@@ -174,7 +175,7 @@ class _GuestLimitSheetContentState extends State<_GuestLimitSheetContent>
                             HapticFeedback.lightImpact();
                             _controller.signInWithApple(context);
                           },
-                          icon: Icon(Icons.apple, size: 24 * fontScale),
+                          icon: Icon(Icons.apple, size: CortexDesign.icon),
                           label: Text(
                             widget.localizations.continueWithApple,
                             style: TextStyle(
@@ -204,8 +205,8 @@ class _GuestLimitSheetContentState extends State<_GuestLimitSheetContent>
                                 colorFilter: ColorFilter.mode(
                                     AppColors.primaryColor.inverted,
                                     BlendMode.srcIn),
-                                width: 16 * fontScale,
-                                height: 16 * fontScale,
+                                width: CortexDesign.icon,
+                                height: CortexDesign.icon,
                               ),
                               SizedBox(width: 12 * fontScale),
                               Text(

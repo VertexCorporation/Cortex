@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // funds.dart
 
 import 'dart:async';
@@ -583,8 +584,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset(
+                      height: CortexDesign.icon,
                       'assets/icons/warning.svg',
-                      width: screenSize.width * 0.25,
+                      width: CortexDesign.icon,
                       colorFilter: ColorFilter.mode(
                           AppColors.septenaryColor, BlendMode.srcIn),
                     ),
@@ -880,7 +882,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
     final scale = (screenWidth / 375.0).clamp(0.85, 1.2);
     final badgeHeight = 36.0 * scale;
-    final iconSize = 14.0 * scale;
     final fontSize = 13.0 * scale;
     final paddingH = 14.0 * scale;
     final gap = 6.0 * scale;
@@ -905,7 +906,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       transitionBuilder: (child, animation) {
         return SizeTransition(
           sizeFactor: animation,
-          axisAlignment: 0.0,
+          alignment: Alignment.center,
           child: FadeTransition(
             opacity: animation,
             child: child,
@@ -932,8 +933,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       'assets/icons/sparkle.svg',
                       colorFilter:
                           ColorFilter.mode(contentColor, BlendMode.srcIn),
-                      width: iconSize,
-                      height: iconSize,
+                      width: CortexDesign.icon,
+                      height: CortexDesign.icon,
                     ),
                     SizedBox(width: gap),
                     Flexible(

@@ -36,7 +36,7 @@ class AxonMenu extends StatelessWidget {
 
     // --- Layout Constants ---
     final double horizontalPadding = referenceWidth * 0.05;
-    final double verticalSpacing = screenHeight * 0.005;
+    final double verticalSpacing = screenHeight * 0.002;
 
     // Match footer padding for consistent horizontal alignment
     return Padding(

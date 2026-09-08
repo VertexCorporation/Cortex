@@ -1,6 +1,7 @@
 // lib/screens/models/screen/new/widgets/button.dart
 
 import 'package:flutter/material.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../../l10n/app_localizations.dart';
@@ -70,13 +71,15 @@ class CreationSaveButton extends StatelessWidget {
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith<Color>(
                   (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.disabled)) {
-                      return AppColors.senaryColor.withValues(alpha: 0.5);
-                    }
-                    return AppColors.senaryColor;
+                    return AppColors.background;
                   },
                 ),
-                foregroundColor: WidgetStateProperty.all(Colors.white),
+                foregroundColor:
+                    WidgetStateProperty.resolveWith((states) =>
+                        AppColors.primaryColor.inverted.withValues(
+                            alpha: states.contains(WidgetState.disabled) ? 0.45 : 1)),
+                side: WidgetStateProperty.all(
+                    BorderSide(color: AppColors.border)),
                 padding: WidgetStateProperty.all(EdgeInsets.symmetric(
                     vertical: isTablet ? 20 : screenHeight * 0.018)),
                 shape: WidgetStateProperty.all(
@@ -86,12 +89,12 @@ class CreationSaveButton extends StatelessWidget {
                 ),
               ),
               child: isSaving
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Colors.white,
+                        color: AppColors.primaryColor.inverted,
                       ),
                     )
                   : Text(

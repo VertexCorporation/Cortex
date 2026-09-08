@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/notifications/introvert.dart
 
 import 'dart:async';
@@ -332,7 +333,6 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
   Widget build(BuildContext context) {
     // --- STYLING CONSTANTS (From Code 2) ---
     const double borderRadius = 12.0;
-    const double iconSize = 20.0;
     const double gapSize = 10.0;
 
     return SlideTransition(
@@ -372,7 +372,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
                     Icon(
                       widget.icon,
                       color: widget.textColor,
-                      size: iconSize,
+                      size: CortexDesign.icon,
                     ),
                     const SizedBox(width: gapSize),
                   ],

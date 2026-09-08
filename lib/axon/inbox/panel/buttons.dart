@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/inbox/widgets/tiles/actions/buttons.dart
 
 import 'package:flutter/material.dart';
@@ -92,8 +93,8 @@ class ActionPanelButton extends StatelessWidget {
                   iconAsset!,
                   colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
                   // The icon itself can be slightly smaller than its container for better visual spacing.
-                  width: iconContainerSize * 0.9,
-                  height: iconContainerSize * 0.9,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                 ),
               ),
             )
@@ -120,7 +121,8 @@ class ActionPanelButton extends StatelessWidget {
                       style: TextStyle(
                         color: textColor,
                         fontSize: fontSize,
-                        fontWeight: FontWeight.w500, // Medium weight for clarity
+                        fontWeight:
+                            FontWeight.w500, // Medium weight for clarity
                       ),
                     ),
                   ),

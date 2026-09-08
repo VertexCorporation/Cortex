@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/meet.dart
 
 import 'dart:async';
@@ -17,7 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NoGoBackScrollPhysics extends BouncingScrollPhysics {
   final TextDirection textDirection;
 
-  const NoGoBackScrollPhysics({super.parent, this.textDirection = TextDirection.ltr});
+  const NoGoBackScrollPhysics(
+      {super.parent, this.textDirection = TextDirection.ltr});
 
   @override
   NoGoBackScrollPhysics applyTo(ScrollPhysics? ancestor) {
@@ -31,7 +33,8 @@ class NoGoBackScrollPhysics extends BouncingScrollPhysics {
   double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
     // In LTR, a positive offset means swiping back (right-to-left in PageView).
     // In RTL, the direction is reversed: negative offset means swiping back.
-    final isBackSwipe = textDirection == TextDirection.ltr ? offset > 0 : offset < 0;
+    final isBackSwipe =
+        textDirection == TextDirection.ltr ? offset > 0 : offset < 0;
     if (isBackSwipe) {
       return 0.0;
     }
@@ -178,7 +181,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             PageView.builder(
               controller: _pageController,
               physics: _isPageReady
-                  ? NoGoBackScrollPhysics(textDirection: Directionality.of(context))
+                  ? NoGoBackScrollPhysics(
+                      textDirection: Directionality.of(context))
                   : const NeverScrollableScrollPhysics(),
               onPageChanged: (int page) {
                 setState(() {
@@ -218,7 +222,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     onTap: () => Navigator.of(context).pop(),
                     child: Icon(
                       Icons.close_rounded,
-                      size: 20.0,
+                      size: CortexDesign.icon,
                       color: AppColors.primaryColor.inverted,
                     ),
                   ),
@@ -502,8 +506,8 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
                       angle: -math.pi / 2,
                       child: SvgPicture.asset(
                         'assets/icons/arrov.svg',
-                        width: iconSize,
-                        height: iconSize,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                         colorFilter: ColorFilter.mode(
                           AppColors.senaryColor,
                           BlendMode.srcIn,

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/axon/inbox/widgets/tiles/view.dart
 
 import 'dart:async';
@@ -163,21 +164,32 @@ class _AxonConversationTileState extends State<AxonConversationTile>
       },
       buttons: [
         ActionPanelButton(
-          customIcon: Icon(manager.isStarred ? Icons.star_rounded : Icons.star_outline_rounded,
-                           color: manager.isStarred ? Colors.amber : AppColors.primaryColor.inverted,
-                           size: 22),
-          iconColor: manager.isStarred ? Colors.amber : AppColors.primaryColor.inverted,
-          text: manager.isStarred ? l10n.unstarConversation : l10n.starConversation,
+          customIcon: Icon(
+              manager.isStarred
+                  ? Icons.star_rounded
+                  : Icons.star_outline_rounded,
+              color: manager.isStarred
+                  ? Colors.amber
+                  : AppColors.primaryColor.inverted,
+              size: CortexDesign.icon),
+          iconColor: manager.isStarred
+              ? Colors.amber
+              : AppColors.primaryColor.inverted,
+          text: manager.isStarred
+              ? l10n.unstarConversation
+              : l10n.starConversation,
           textColor: AppColors.primaryColor.inverted,
           onPressed: () async {
             _panelController?.close();
-            final success = await inboxViewModel.togglePinStatus(manager.conversationID);
+            final success =
+                await inboxViewModel.togglePinStatus(manager.conversationID);
             if (!success && mounted) {
               final ctx = mainScreenKey.currentContext;
               if (ctx != null && ctx.mounted) {
-                final notifCtx = Provider.of<IntrovertNotificationService>(ctx, listen: false);
+                final notifCtx = Provider.of<IntrovertNotificationService>(ctx,
+                    listen: false);
                 notifCtx.showNotification(
-                   message: l10n.pinLimitReached,
+                  message: l10n.pinLimitReached,
                   type: NotificationType.error,
                 );
               }
@@ -233,31 +245,66 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog.adaptive(
-        title: Text(l10n.renameConversation),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: l10n.conversationName,
-            border: const OutlineInputBorder(),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.secondaryColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: AppColors.border),
+        ),
+        title: Text(
+          l10n.renameConversation,
+          style: TextStyle(color: AppColors.primaryColor.inverted),
+        ),
+        content: Material(
+          color: Colors.transparent,
+          child: TextField(
+            controller: controller,
+            autofocus: true,
+            style: TextStyle(color: AppColors.primaryColor.inverted),
+            decoration: InputDecoration(
+              hintText: l10n.conversationName,
+              hintStyle: TextStyle(
+                color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.primaryColor.inverted),
+              ),
+            ),
+            onSubmitted: (value) {
+              if (value.trim().isNotEmpty) {
+                context.read<InboxViewModel>().editConversation(
+                      manager.conversationID,
+                      value.trim(),
+                    );
+                Navigator.of(ctx).pop();
+              }
+            },
           ),
-          onSubmitted: (value) {
-            if (value.trim().isNotEmpty) {
-              context.read<InboxViewModel>().editConversation(
-                    manager.conversationID,
-                    value.trim(),
-                  );
-              Navigator.of(ctx).pop();
-            }
-          },
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(
+                color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+              ),
+            ),
           ),
           FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primaryColor.inverted,
+              foregroundColor: AppColors.primaryColor,
+            ),
             onPressed: () {
               final value = controller.text.trim();
               if (value.isNotEmpty) {
@@ -275,13 +322,12 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     // Wrap the entire tile content in animations for deletion
     return SizeTransition(
       sizeFactor: _sizeAnimation,
-      axisAlignment: -1.0,
+      alignment: Alignment.topCenter,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: _buildTileContent(),
@@ -416,7 +462,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                           ? const Icon(
                               Icons.check,
                               color: Colors.white,
-                              size: 13.0,
+                              size: CortexDesign.icon,
                             )
                           : null,
                     ),
@@ -447,23 +493,75 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                       },
                       transitionBuilder:
                           (Widget child, Animation<double> animation) {
-                        return FadeTransition(opacity: animation, child: child);
+                        return AnimatedBuilder(
+                          animation: animation,
+                          child: child,
+                          builder: (context, child) => ShaderMask(
+                            blendMode: BlendMode.dstIn,
+                            shaderCallback: (bounds) {
+                              final edge = animation.value * 1.2;
+                              return LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: const [Colors.white, Colors.transparent],
+                                stops: [
+                                  (edge - 0.2).clamp(0.0, 1.0),
+                                  edge.clamp(0.0, 1.0),
+                                ],
+                              ).createShader(bounds);
+                            },
+                            child: child,
+                          ),
+                        );
                       },
-                      child: OverflowText(
-                        key: ValueKey<String>(widget.manager.conversationTitle),
-                        text: widget.manager.conversationTitle,
-                        maxLines: 1,
-                        fadeLength: 8,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          color: isActive
-                              ? textColor
-                              : textColor.withValues(alpha: 0.85),
-                          fontSize: fontSize,
-                          fontWeight:
-                              isActive ? FontWeight.w600 : FontWeight.w500,
-                        ),
-                      ),
+                      child: widget.manager.shouldAnimateTitle
+                          ? TweenAnimationBuilder<double>(
+                              key: ValueKey<String>(widget.manager.conversationTitle),
+                              tween: Tween(begin: 0, end: 1),
+                              duration: const Duration(milliseconds: 350),
+                              onEnd: () {
+                                widget.manager.shouldAnimateTitle = false;
+                              },
+                              builder: (context, value, child) => ShaderMask(
+                                blendMode: BlendMode.dstIn,
+                                shaderCallback: (bounds) => LinearGradient(
+                                  colors: const [Colors.white, Colors.transparent],
+                                  stops: [
+                                    (value * 1.2 - 0.2).clamp(0.0, 1.0),
+                                    (value * 1.2).clamp(0.0, 1.0),
+                                  ],
+                                ).createShader(bounds),
+                                child: child,
+                              ),
+                              child: OverflowText(
+                                text: widget.manager.conversationTitle,
+                                maxLines: 1,
+                                fadeLength: 8,
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: isActive
+                                      ? textColor
+                                      : textColor.withValues(alpha: 0.85),
+                                  fontSize: fontSize,
+                                  fontWeight:
+                                      isActive ? FontWeight.w600 : FontWeight.w500,
+                                ),
+                              ),
+                            )
+                          : OverflowText(
+                              text: widget.manager.conversationTitle,
+                              maxLines: 1,
+                              fadeLength: 8,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: isActive
+                                    ? textColor
+                                    : textColor.withValues(alpha: 0.85),
+                                fontSize: fontSize,
+                                fontWeight:
+                                    isActive ? FontWeight.w600 : FontWeight.w500,
+                              ),
+                            ),
                     ),
                   ),
 
@@ -505,7 +603,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                         ? Icon(
                             Icons.star_rounded,
                             key: const ValueKey('star'),
-                            size: starIconSize,
+                            size: CortexDesign.icon,
                             color: Colors.amber,
                           )
                         : SizedBox.shrink(key: const ValueKey('empty')),

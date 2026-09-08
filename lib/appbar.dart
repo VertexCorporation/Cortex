@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/appbar.dart
 
 import 'dart:math' as math;
@@ -52,11 +53,10 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.sizeOf(context).width;
-    final bool isTablet = screenWidth >= 600;
 
-    final double buttonSize = isTablet ? 46.0 : 40.0;
-    final double iconSize = isTablet ? 24.0 : 20.0;
-    final double horizontalPadding = screenWidth * 0.04;
+    final double buttonSize = CortexDesign.control;
+    final double iconSize = 22;
+    final double horizontalPadding = CortexDesign.gutter(screenWidth);
     final double gapSize = 10.0;
 
     // --- LEADING LOGIC ---
@@ -250,7 +250,7 @@ class DualActionPill extends StatelessWidget {
     this.secondaryIcon,
     required this.onMainTap,
     this.onSecondaryTap,
-    this.size = 42.0,
+    this.size = CortexDesign.control,
   });
 
   @override
@@ -258,11 +258,11 @@ class DualActionPill extends StatelessWidget {
     context.watch<ThemeProvider>();
     final invertedColor = AppColors.primaryColor.inverted;
     final Color backgroundColor = AppColors.background;
-    final Color borderColor = invertedColor.withValues(alpha: 0.12);
+    final Color borderColor = AppColors.border;
     final Color splashColor = invertedColor.withValues(alpha: 0.1);
 
     // Using 16.0 to match AppBarButton's radius
-    const double radius = 16.0;
+    const double radius = CortexDesign.radius;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 350),
@@ -386,8 +386,8 @@ class _BackButton extends StatelessWidget {
         angle: rotationAngle,
         child: SvgPicture.asset(
           'assets/icons/arrov.svg',
-          width: iconSize,
-          height: iconSize,
+          width: CortexDesign.icon,
+          height: CortexDesign.icon,
           colorFilter: ColorFilter.mode(
             AppColors.primaryColor.inverted,
             BlendMode.srcIn,
@@ -476,8 +476,8 @@ class _AxonToggleButtonState extends State<_AxonToggleButton> {
               ? 'assets/icons/on/axon.svg'
               : 'assets/icons/off/axon.svg',
           key: ValueKey<bool>(_isActivated),
-          width: widget.iconSize,
-          height: widget.iconSize,
+          width: CortexDesign.icon,
+          height: CortexDesign.icon,
           colorFilter: ColorFilter.mode(
             AppColors.primaryColor.inverted,
             BlendMode.srcIn,
@@ -574,7 +574,7 @@ class AppBarButton extends StatelessWidget {
     super.key,
     required this.child,
     required this.onTap,
-    this.size = 42.0,
+    this.size = CortexDesign.control,
     this.isTitle = false,
     this.enableHaptic = true,
   });
@@ -584,10 +584,10 @@ class AppBarButton extends StatelessWidget {
     context.watch<ThemeProvider>();
     final invertedColor = AppColors.primaryColor.inverted;
     final Color backgroundColor = AppColors.background;
-    final Color borderColor = invertedColor.withValues(alpha: 0.12);
+    final Color borderColor = AppColors.border;
     final Color splashColor = invertedColor.withValues(alpha: 0.1);
 
-    const double radius = 16.0;
+    const double radius = CortexDesign.radius;
 
     return Container(
       width: isTitle ? null : size,

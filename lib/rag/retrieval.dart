@@ -13,8 +13,7 @@ import 'package:flutter/foundation.dart';
 /// Tokenizes text for retrieval scoring.
 class RagTokenizer {
   /// Splits on anything that is not a letter or digit (Unicode aware).
-  static final RegExp _splitPattern =
-      RegExp(r'[^\p{L}\p{N}]+', unicode: true);
+  static final RegExp _splitPattern = RegExp(r'[^\p{L}\p{N}]+', unicode: true);
 
   /// Combining diacritical marks (to fold decomposed accents).
   static final RegExp _combiningMarks = RegExp(r'\p{M}', unicode: true);
@@ -92,9 +91,8 @@ class Bm25RetrievalEngine implements RetrievalEngine {
     if (normalizedQuery.isEmpty) return const [];
 
     final allDocs = await _storage.getAllDocuments();
-    final indexedDocs = allDocs
-        .where((d) => d.status == RagDocumentStatus.indexed)
-        .toList();
+    final indexedDocs =
+        allDocs.where((d) => d.status == RagDocumentStatus.indexed).toList();
     if (indexedDocs.isEmpty) return const [];
 
     final Set<String> allowedIds;
@@ -105,11 +103,13 @@ class Bm25RetrievalEngine implements RetrievalEngine {
     }
 
     final docsById = <String, RagDocument>{
-      for (final d in indexedDocs) if (allowedIds.contains(d.id)) d.id: d,
+      for (final d in indexedDocs)
+        if (allowedIds.contains(d.id)) d.id: d,
     };
     if (docsById.isEmpty) return const [];
 
-    final chunksByDoc = await _storage.getChunksByDocument(docsById.keys.toList());
+    final chunksByDoc =
+        await _storage.getChunksByDocument(docsById.keys.toList());
 
     // Flatten chunks with their documents.
     final entries = <(RagDocument, RagChunk)>[];
@@ -156,8 +156,7 @@ class Bm25RetrievalEngine implements RetrievalEngine {
       }
     }
 
-    final avgLen =
-        lengths.isEmpty ? 1 : lengths.reduce((a, b) => a + b) / n;
+    final avgLen = lengths.isEmpty ? 1 : lengths.reduce((a, b) => a + b) / n;
 
     final results = <RagRetrievalResult>[];
     for (var i = 0; i < n; i++) {
@@ -176,8 +175,7 @@ class Bm25RetrievalEngine implements RetrievalEngine {
           1 + (n - docFreq + 0.5) / (docFreq + 0.5),
         );
 
-        final denominator =
-            termFreq + _k1 * (1 - _b + _b * (dl / avgLen));
+        final denominator = termFreq + _k1 * (1 - _b + _b * (dl / avgLen));
         score += idf * ((termFreq * (_k1 + 1)) / denominator);
       }
 

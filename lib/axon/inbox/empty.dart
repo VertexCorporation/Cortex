@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/axon/inbox/widgets/empty.dart
 
 import 'package:flutter/material.dart';
@@ -54,13 +55,13 @@ class EmptyStateView extends StatelessWidget {
               isForStarred
                   ? Icon(
                       Icons.star_rounded,
-                      size: 48,
+                      size: CortexDesign.icon,
                       color: AppColors.tertiaryColor.withValues(alpha: 0.4),
                     )
                   : SvgPicture.asset(
                       'assets/icons/inbox.svg',
-                      width: 48,
-                      height: 48,
+                      width: CortexDesign.icon,
+                      height: CortexDesign.icon,
                       colorFilter: ColorFilter.mode(
                         AppColors.tertiaryColor.withValues(alpha: 0.4),
                         BlendMode.srcIn,

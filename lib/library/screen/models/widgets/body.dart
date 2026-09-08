@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/library/screen/models/widgets/body.dart
 
 import 'package:cortex/app.dart';
@@ -162,8 +163,8 @@ class ModelsBody extends StatelessWidget {
                   'assets/icons/warning.svg',
                   colorFilter: ColorFilter.mode(
                       AppColors.primaryColor.inverted, BlendMode.srcIn),
-                  width: isTablet ? 28 : 24,
-                  height: isTablet ? 28 : 24,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -264,8 +265,10 @@ class ModelsBody extends StatelessWidget {
             model.category != 'self' &&
             model.category != 'roleplay')
         .toList();
-    final role =
-        allModels.where((model) => model.category == 'roleplay').toList();
+    final role = allModels
+        .where((model) =>
+            model.category == 'roleplay' && !model.id.startsWith('cortex'))
+        .toList();
     final serverSide = allModels
         .where((model) =>
             model.isServerSide &&
@@ -279,7 +282,7 @@ class ModelsBody extends StatelessWidget {
 
     return Center(
       child: Container(
-        constraints: BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
+        constraints: BoxConstraints(maxWidth: CortexDesign.readingWidth),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

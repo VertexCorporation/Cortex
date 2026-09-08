@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // tools.dart
 
 import 'package:cortex/app.dart';
@@ -666,7 +667,7 @@ class _WorkInProgressWidgetState extends State<WorkInProgressWidget>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.hourglass_full_rounded,
-                    size: 16, color: AppColors.tertiaryColor),
+                    size: CortexDesign.icon, color: AppColors.tertiaryColor),
                 const SizedBox(width: 8),
                 Text(
                   text,

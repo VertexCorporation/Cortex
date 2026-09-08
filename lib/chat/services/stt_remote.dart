@@ -34,12 +34,24 @@ class SttResult {
   final bool isFinal;
 }
 
+class _SpeechLease {
+  const _SpeechLease({required this.token, required this.sessionId, required this.provider});
+
+  final String token;
+  final String? sessionId;
+  final String provider;
+}
+
 class RemoteSttService {
   RemoteSttService._();
   static final RemoteSttService instance = RemoteSttService._();
 
   static const String _tokenEndpoint =
       "https://getspeechtoken-o5h7dmtija-ew.a.run.app";
+  static const String _assemblyTokenEndpoint =
+      "https://getassemblytoken-o5h7dmtija-ew.a.run.app";
+  static const String _settleUsageEndpoint =
+      "https://settlespeechusage-o5h7dmtija-ew.a.run.app";
 
   // Raw PCM at 16 kHz mono: what Deepgram expects for linear16, and small
   // enough to stream comfortably on mobile data.
@@ -47,8 +59,7 @@ class RemoteSttService {
 
   /// `language=multi` selects nova-3 multilingual. Turkish is not covered by
   /// the cheaper monolingual model, so this is not an optional upgrade.
-  static const String _listenUrl =
-      "wss://api.deepgram.com/v1/listen"
+  static const String _listenUrl = "wss://api.deepgram.com/v1/listen"
       "?model=nova-3&language=multi&encoding=linear16"
       "&sample_rate=$_sampleRate&channels=1"
       "&interim_results=true&smart_format=true";
@@ -74,6 +85,12 @@ class RemoteSttService {
   final List<Uint8List> _pending = [];
   Completer<void>? _firstChunk;
   bool _closing = false;
+  String? _provider;
+  String? _sessionId;
+  double? _providerDurationSeconds;
+  double? _providerSessionDurationSeconds;
+  String? _providerRequestId;
+  DateTime? _sessionStartedAt;
 
   // Enough of the session to tell the difference between a microphone that
   // never produced anything, audio that Deepgram never answered, and a
@@ -177,7 +194,7 @@ class RemoteSttService {
 
   /// Asks the server for a short-lived Deepgram token. Returns null when
   /// dictation is unavailable — no session, no balance, provider down.
-  Future<String?> _fetchToken() async {
+  Future<_SpeechLease?> _fetchToken() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return null;
@@ -209,11 +226,98 @@ class RemoteSttService {
         return null;
       }
       final token = response.data?['token'];
-      return token is String && token.isNotEmpty ? token : null;
+      if (token is! String || token.isEmpty) return null;
+      final sessionId = response.data?['sessionId'];
+      return _SpeechLease(
+        token: token,
+        sessionId: sessionId is String ? sessionId : null,
+        provider: response.data?['provider'] == 'assemblyai' ? 'assemblyai' : 'deepgram',
+      );
     } catch (e) {
       debugPrint("[RemoteStt] Token request failed: $e");
       return null;
     }
+  }
+
+  Future<_SpeechLease?> _fetchAssemblyToken() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return null;
+      final idToken = await user.getIdToken();
+      if (idToken == null) return null;
+
+      final response = await _dio.post<Map<String, dynamic>>(
+        _assemblyTokenEndpoint,
+        data: const <String, dynamic>{},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $idToken',
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          validateStatus: (_) => true,
+        ),
+      );
+      final token = response.data?['token'];
+      if (response.statusCode != 200 || token is! String || token.isEmpty) return null;
+      final sessionId = response.data?['sessionId'];
+      return _SpeechLease(
+        token: token,
+        sessionId: sessionId is String ? sessionId : null,
+        provider: 'assemblyai',
+      );
+    } catch (e) {
+      debugPrint("[RemoteStt] AssemblyAI token request failed: $e");
+      return null;
+    }
+  }
+
+  Future<bool> _startAssemblyAi({
+    required AudioRecorder recorder,
+    required String token,
+    String? sessionId,
+    required void Function(SttResult result) onResult,
+    void Function()? onClosed,
+  }) async {
+    try {
+      _socket = await WebSocket.connect(
+        "wss://streaming.assemblyai.com/v3/ws?sample_rate=$_sampleRate"
+            "&speech_model=universal-streaming-multilingual",
+        headers: {'Authorization': token},
+      ).timeout(const Duration(seconds: 10));
+    } catch (e) {
+      debugPrint("[RemoteStt] AssemblyAI connect failed: $e");
+      _socket = null;
+      return false;
+    }
+
+    _recorder = recorder;
+    _provider = 'assemblyai';
+    _sessionId = sessionId;
+    _sessionStartedAt = DateTime.now();
+    _socket!.listen(
+      (dynamic message) {
+        if (message is! String) return;
+        _captureAssemblyUsage(message);
+        final result = _parseAssemblyTranscript(message);
+        if (result != null) onResult(result);
+      },
+      onError: (Object e) {
+        debugPrint("[RemoteStt] AssemblyAI socket error: $e");
+        unawaited(stop());
+        onClosed?.call();
+      },
+      onDone: () {
+        if (!_closing) onClosed?.call();
+        unawaited(stop());
+      },
+      cancelOnError: true,
+    );
+
+    // The microphone is already streaming from _openMicrophone: its
+    // subscription reads _socket on every chunk, so the live audio (and
+    // anything buffered in _pending while the socket was opening) flows to
+    // AssemblyAI from here on without restarting the recorder.
+    return true;
   }
 
   /// Opens the microphone and starts transcribing.
@@ -269,8 +373,21 @@ class RemoteSttService {
     }
 
     // ── 2. Now that there is audio to send, buy a token ──
-    final token = await _fetchToken();
-    if (token == null) {
+    final lease = await _fetchToken();
+    if (lease == null) {
+      // Deepgram is out of tokens; AssemblyAI takes over the same live
+      // microphone before the session is torn down.
+      final assemblyLease = await _fetchAssemblyToken();
+      if (assemblyLease != null) {
+        final startedAssembly = await _startAssemblyAi(
+          recorder: recorder,
+          token: assemblyLease.token,
+          sessionId: assemblyLease.sessionId,
+          onResult: onResult,
+          onClosed: onClosed,
+        );
+        if (startedAssembly) return true;
+      }
       _fail("NO_TOKEN");
       await stop();
       return false;
@@ -281,17 +398,36 @@ class RemoteSttService {
     try {
       _socket = await WebSocket.connect(
         _listenUrl,
-        headers: {'Authorization': 'Bearer $token'},
+        headers: {'Authorization': 'Bearer ${lease.token}'},
       ).timeout(const Duration(seconds: 10));
     } catch (e) {
       _fail("CONNECT_FAILED", e);
+      _socket = null;
+      // Deepgram's door did not open; AssemblyAI takes over the same live
+      // microphone before the session is torn down.
+      final assemblyLease = await _fetchAssemblyToken();
+      if (assemblyLease != null) {
+        final startedAssembly = await _startAssemblyAi(
+          recorder: recorder,
+          token: assemblyLease.token,
+          sessionId: assemblyLease.sessionId,
+          onResult: onResult,
+          onClosed: onClosed,
+        );
+        if (startedAssembly) return true;
+      }
       await stop();
       return false;
     }
 
+    _provider = 'deepgram';
+    _sessionId = lease.sessionId;
+    _sessionStartedAt = DateTime.now();
+
     _socket!.listen(
       (dynamic message) {
         if (message is! String) return;
+        _captureDeepgramUsage(message);
         final result = _parseTranscript(message);
         if (result != null) {
           _transcriptsSeen++;
@@ -454,16 +590,69 @@ class RemoteSttService {
     _recorder = null;
 
     final socket = _socket;
+    final provider = _provider;
+    final sessionId = _sessionId;
+    final startedAt = _sessionStartedAt;
     _socket = null;
     if (socket != null) {
       try {
         if (socket.readyState == WebSocket.open) {
-          socket.add(jsonEncode({'type': 'CloseStream'}));
+          socket.add(jsonEncode({
+            'type': provider == 'assemblyai' ? 'Terminate' : 'CloseStream',
+          }));
+          // Let the provider deliver its final usage metadata before closing.
+          await Future<void>.delayed(const Duration(milliseconds: 400));
         }
         await socket.close();
       } catch (e) {
         debugPrint("[RemoteStt] Socket close failed: $e");
       }
+    }
+    await _settleUsage(
+      provider: provider,
+      sessionId: sessionId,
+      fallbackDurationSeconds: startedAt == null
+          ? 0
+          : DateTime.now().difference(startedAt).inMilliseconds / 1000.0,
+    );
+    _provider = null;
+    _sessionId = null;
+    _providerDurationSeconds = null;
+    _providerSessionDurationSeconds = null;
+    _providerRequestId = null;
+    _sessionStartedAt = null;
+  }
+
+  Future<void> _settleUsage({
+    required String? provider,
+    required String? sessionId,
+    required double fallbackDurationSeconds,
+  }) async {
+    if (provider == null || sessionId == null) return;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      final idToken = await user?.getIdToken();
+      if (idToken == null) return;
+      await _dio.post<void>(
+        _settleUsageEndpoint,
+        data: <String, dynamic>{
+          'provider': provider,
+          'sessionId': sessionId,
+          if (_providerRequestId != null) 'requestId': _providerRequestId,
+          'durationSeconds': _providerDurationSeconds ?? fallbackDurationSeconds,
+          if (_providerSessionDurationSeconds != null)
+            'sessionDurationSeconds': _providerSessionDurationSeconds,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $idToken',
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          validateStatus: (_) => true,
+        ),
+      );
+    } catch (e) {
+      debugPrint('[RemoteStt] Usage settlement failed: $e');
     }
   }
 
@@ -502,6 +691,54 @@ class RemoteSttService {
       );
     } catch (e) {
       debugPrint("[RemoteStt] Could not parse message: $e");
+      return null;
+    }
+  }
+
+  void _captureDeepgramUsage(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic> && decoded['type'] == 'Metadata') {
+        final requestId = decoded['request_id'];
+        if (requestId is String && requestId.isNotEmpty) {
+          _providerRequestId = requestId;
+        }
+        final duration = num.tryParse('${decoded['duration'] ?? ''}');
+        if (duration != null && duration >= 0) {
+          _providerDurationSeconds = duration.toDouble();
+        }
+      }
+    } catch (_) {}
+  }
+
+  void _captureAssemblyUsage(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic> && decoded['type'] == 'Termination') {
+        final audio = num.tryParse('${decoded['audio_duration_seconds'] ?? ''}');
+        final session = num.tryParse('${decoded['session_duration_seconds'] ?? ''}');
+        if (audio != null && audio >= 0) _providerDurationSeconds = audio.toDouble();
+        if (session != null && session >= 0) _providerSessionDurationSeconds = session.toDouble();
+      }
+    } catch (_) {}
+  }
+
+  SttResult? _parseAssemblyTranscript(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic> || decoded['type'] != 'Turn') {
+        return null;
+      }
+
+      final transcript = decoded['transcript'];
+      if (transcript is! String || transcript.trim().isEmpty) return null;
+
+      return SttResult(
+        transcript.trim(),
+        isFinal: decoded['end_of_turn'] == true,
+      );
+    } catch (e) {
+      debugPrint("[RemoteStt] Could not parse AssemblyAI message: $e");
       return null;
     }
   }

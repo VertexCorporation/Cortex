@@ -211,10 +211,8 @@ class RagIngestionService {
       return text.length > 8 ? text : null;
     }
     if (data is List) {
-      final parts = data
-          .whereType<String>()
-          .where((s) => s.trim().isNotEmpty)
-          .toList();
+      final parts =
+          data.whereType<String>().where((s) => s.trim().isNotEmpty).toList();
       return parts.isEmpty ? null : parts.join('\n');
     }
     return null;

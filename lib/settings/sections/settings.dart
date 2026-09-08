@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/settings.dart
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import '../../shake.dart';
 import '../../theme.dart';
 import '../../webview.dart';
 import '../providers/general.dart';
+import '../widgets/grouped_button.dart';
 import '../providers/actions.dart';
 import 'package:cortex/invite.dart';
 import 'package:cortex/meet.dart';
@@ -90,7 +92,7 @@ class _SettingsSectionState extends State<SettingsSection>
                 child: Container(
                   width: screenWidth * 0.8,
                   decoration: BoxDecoration(
-                      color: AppColors.secondaryColor,
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(10)),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
@@ -321,47 +323,33 @@ class _SettingsSectionState extends State<SettingsSection>
   Widget _buildSettingsButton(BuildContext context,
       {required String text,
       required Widget icon,
-      required VoidCallback onPressed}) {
+      required VoidCallback onPressed,
+      required SettingsRowPosition position}) {
     final screenWidth = MediaQuery.of(context).size.width;
-    return Material(
-      color: AppColors.secondaryColor,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onPressed();
-        },
-        splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.04, vertical: screenWidth * 0.045),
-          child: Row(
-            children: [
-              icon,
-              SizedBox(width: screenWidth * 0.04),
-              Expanded(
-                  child: Text(text,
-                      style: TextStyle(
-                          color: AppColors.primaryColor.inverted,
-                          fontSize: screenWidth * 0.04,
-                          fontWeight: FontWeight.w500))),
-              Icon(Icons.arrow_forward_ios,
-                  color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.04),
-            ],
-          ),
-        ),
+    final scale = (screenWidth / 375).clamp(0.85, 1.25);
+    return SettingsGroupedRow(
+      position: position,
+      scale: scale,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onPressed();
+      },
+      child: Row(
+        children: [
+          icon,
+          SizedBox(width: screenWidth * 0.04),
+          Expanded(
+              child: Text(text,
+                  style: TextStyle(
+                      color: AppColors.primaryColor.inverted,
+                      fontSize: screenWidth * 0.04,
+                      fontWeight: FontWeight.w500))),
+          Icon(Icons.arrow_forward_ios,
+              color: AppColors.primaryColor.inverted,
+              size: CortexDesign.iconSize(screenWidth, tier: 1)),
+        ],
       ),
     );
-  }
-
-  /// Builds a divider line used between settings buttons.
-  Widget _buildDivider(double screenWidth) {
-    return Divider(
-        color: AppColors.quinaryColor.withValues(alpha: 0.5),
-        thickness: 0.5,
-        height: 0.5,
-        indent: screenWidth * 0.04,
-        endIndent: screenWidth * 0.04);
   }
 
   @override
@@ -470,56 +458,63 @@ class _SettingsSectionState extends State<SettingsSection>
               color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
         ),
         SizedBox(height: screenHeight * 0.02),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12.0),
-          child: Column(
-            children: List.generate(settingsButtons.length, (index) {
-              final item = settingsButtons[index];
-              final key = item['key'] as String;
+        SettingsGroupedColumn(
+          scale: (screenWidth / 375).clamp(0.85, 1.25),
+          children: List.generate(settingsButtons.length, (index) {
+            final item = settingsButtons[index];
+            final key = item['key'] as String;
+            final position = index == 0
+                ? SettingsRowPosition.first
+                : index == settingsButtons.length - 1
+                    ? SettingsRowPosition.last
+                    : SettingsRowPosition.middle;
 
-              if (key == 'shareApp') {
-                return Column(children: [
-                  _PremiumButton(
+            if (key == 'shareApp') {
+              return SettingsGroupedRow(
+                position: position,
+                scale: (screenWidth / 375).clamp(0.85, 1.25),
+                verticalPadding: 0,
+                horizontalPadding: 0,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: _PremiumButton(
                     text: getLocalizedText(key),
                     iconPath: item['icon'],
+                    horizontalPadding:
+                        16 * (screenWidth / 375).clamp(0.85, 1.25),
                     hasBorder: false,
                     borderRadius: 0,
                     onPressed: item['action'],
                   ),
-                  if (index < settingsButtons.length - 1)
-                    _buildDivider(screenWidth),
-                ]);
-              }
-
-              final iconData = item['icon'];
-              Widget iconWidget;
-              if (iconData is IconData) {
-                iconWidget = Icon(iconData,
-                    color: AppColors.primaryColor.inverted,
-                    size: screenWidth * 0.05);
-              } else if (iconData is String && iconData.endsWith('.svg')) {
-                iconWidget = SvgPicture.asset(iconData,
-                    width: screenWidth * 0.05,
-                    colorFilter: ColorFilter.mode(
-                        AppColors.primaryColor.inverted, BlendMode.srcIn));
-              } else {
-                iconWidget = const SizedBox.shrink();
-              }
-
-              return Column(
-                children: [
-                  _buildSettingsButton(
-                    context,
-                    text: getLocalizedText(item['key']),
-                    icon: iconWidget,
-                    onPressed: item['action'],
-                  ),
-                  if (index < settingsButtons.length - 1)
-                    _buildDivider(screenWidth),
-                ],
+                ),
               );
-            }),
-          ),
+            }
+
+            final iconData = item['icon'];
+            Widget iconWidget;
+            if (iconData is IconData) {
+              iconWidget = Icon(iconData,
+                  color: AppColors.primaryColor.inverted,
+                  size: CortexDesign.iconSize(screenWidth, tier: 2));
+            } else if (iconData is String && iconData.endsWith('.svg')) {
+              iconWidget = SvgPicture.asset(
+                  height: CortexDesign.iconSize(screenWidth, tier: 2),
+                  iconData,
+                  width: CortexDesign.iconSize(screenWidth, tier: 2),
+                  colorFilter: ColorFilter.mode(
+                      AppColors.primaryColor.inverted, BlendMode.srcIn));
+            } else {
+              iconWidget = const SizedBox.shrink();
+            }
+
+            return _buildSettingsButton(
+              context,
+              text: getLocalizedText(item['key']),
+              icon: iconWidget,
+              onPressed: item['action'],
+              position: position,
+            );
+          }),
         ),
       ],
     );
@@ -531,6 +526,7 @@ class _PremiumButton extends StatefulWidget {
   final String iconPath;
   final bool hasBorder;
   final double borderRadius;
+  final double? horizontalPadding;
   final VoidCallback onPressed;
 
   const _PremiumButton({
@@ -539,6 +535,7 @@ class _PremiumButton extends StatefulWidget {
     this.iconPath = 'assets/icons/sparkle.svg',
     this.hasBorder = true,
     this.borderRadius = 10.0,
+    this.horizontalPadding,
   });
 
   @override
@@ -610,8 +607,8 @@ class _PremiumButtonState extends State<_PremiumButton>
             // 1. BASE CONTAINER
             Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.04,
-                  vertical: screenWidth * 0.045),
+                  horizontal: widget.horizontalPadding ?? screenWidth * 0.04,
+                  vertical: screenWidth * 0.03),
               decoration: BoxDecoration(
                 // Unified background color
                 color: AppColors.premium.withValues(alpha: 0.15),
@@ -630,8 +627,9 @@ class _PremiumButtonState extends State<_PremiumButton>
                   Row(
                     children: [
                       SvgPicture.asset(
+                        height: CortexDesign.icon,
                         widget.iconPath,
-                        width: screenWidth * 0.05,
+                        width: CortexDesign.icon,
                         colorFilter: ColorFilter.mode(
                             AppColors.premium, BlendMode.srcIn),
                       ),
@@ -649,7 +647,7 @@ class _PremiumButtonState extends State<_PremiumButton>
                   Icon(
                     Icons.arrow_forward_ios,
                     color: AppColors.premium,
-                    size: screenWidth * 0.04,
+                    size: CortexDesign.icon,
                   ),
                 ],
               ),

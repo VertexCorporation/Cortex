@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/chat/screen/selected/tiles.dart
 
 import 'dart:convert';
@@ -48,7 +49,6 @@ class Tiles {
     // Dimensions
     final double padding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
     final double fontSize = isTablet ? screenWidth * 0.022 : 15.0;
-    final double iconSize = isTablet ? screenWidth * 0.03 : 20.0;
     final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
 
     return AnimatedCrossFade(
@@ -74,7 +74,8 @@ class Tiles {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.info_rounded,
-                  color: AppColors.primaryColor.inverted, size: iconSize),
+                  color: AppColors.primaryColor.inverted,
+                  size: CortexDesign.icon),
               SizedBox(width: screenWidth * 0.02),
               Expanded(
                 child: Text(
@@ -156,6 +157,7 @@ class Tiles {
   static Widget buildAIMessageTile({
     required BuildContext context,
     required Message message,
+    required int index,
     required String modelId,
     required VoidCallback onReport,
     required void Function({String? newModelId}) onRegenerate,
@@ -279,7 +281,7 @@ class Tiles {
     );
 
     return Column(
-      key: ValueKey('ai_message_${message.id}'),
+      key: ValueKey('ai_message_${message.id ?? 'slot_$index'}'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showContent) aiMessageContentWidget,
@@ -409,7 +411,9 @@ class Tiles {
                               cacheWidth: decodeCacheSize,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.broken_image,
+                                  const Icon(
+                                      size: CortexDesign.icon,
+                                      Icons.broken_image,
                                       color: Colors.grey),
                             )
                           : isNetworkImage
@@ -420,7 +424,9 @@ class Tiles {
                                   cacheWidth: decodeCacheSize,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(Icons.broken_image,
+                                      const Icon(
+                                          size: CortexDesign.icon,
+                                          Icons.broken_image,
                                           color: Colors.grey),
                                 )
                               : Image.file(
@@ -430,7 +436,9 @@ class Tiles {
                                   cacheWidth: decodeCacheSize,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(Icons.broken_image,
+                                      const Icon(
+                                          size: CortexDesign.icon,
+                                          Icons.broken_image,
                                           color: Colors.grey),
                                 ),
                       if (paths.length == 1 && !isUser)
@@ -496,7 +504,7 @@ class Tiles {
                               child: const Icon(
                                 Icons.ios_share_rounded,
                                 color: Colors.white,
-                                size: 18,
+                                size: CortexDesign.icon,
                               ),
                             ),
                           ),
@@ -526,7 +534,7 @@ class Tiles {
                 Icon(
                   _getFileIcon(path),
                   color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.08,
+                  size: CortexDesign.icon,
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -618,6 +626,7 @@ class Tiles {
   }) {
     if (message.isUserMessage) {
       return RepaintBoundary(
+        key: key ?? ValueKey('message_slot_$index'),
         // PERFORMANCE: Repaint Boundary
         child: buildUserMessageTile(
           context: context,
@@ -634,10 +643,12 @@ class Tiles {
       );
     } else {
       return RepaintBoundary(
+        key: key ?? ValueKey('message_slot_$index'),
         // PERFORMANCE: Repaint Boundary
         child: buildAIMessageTile(
           context: context,
           message: message,
+          index: index,
           modelId: modelId,
           onReport: onReport,
           onRegenerate: onRegenerate,
@@ -687,51 +698,52 @@ class Tiles {
       child: Container(
         constraints: BoxConstraints(maxWidth: messageMaxWidth),
         child: ListView.separated(
-      controller: scrollController,
-      padding: EdgeInsets.only(
-          top: totalTopPadding, bottom: bottomPadding + (screenHeight * 0.01)),
-      // ignore: deprecated_member_use
-      cacheExtent:
-          2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
-      addAutomaticKeepAlives:
-          true, // FIX: Restored to true to prevent scroll jumps on viewport resize for variable-height messages
-      addRepaintBoundaries:
-          true, // PERFORMANCE: Independent Repaint boundaries per tile
-      itemCount: visibleIndices.length,
-      separatorBuilder: (context, index) => separatorWidget,
-      itemBuilder: (context, index) {
-        final int realIndex = visibleIndices[index];
-        Message message = messages[realIndex];
+          controller: scrollController,
+          padding: EdgeInsets.only(
+              top: totalTopPadding,
+              bottom: bottomPadding + (screenHeight * 0.01)),
+          // ignore: deprecated_member_use
+          cacheExtent:
+              2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
+          addAutomaticKeepAlives:
+              true, // FIX: Restored to true to prevent scroll jumps on viewport resize for variable-height messages
+          addRepaintBoundaries:
+              true, // PERFORMANCE: Independent Repaint boundaries per tile
+          itemCount: visibleIndices.length,
+          separatorBuilder: (context, index) => separatorWidget,
+          itemBuilder: (context, index) {
+            final int realIndex = visibleIndices[index];
+            Message message = messages[realIndex];
 
-        final bool isMessageUnderEdit = isEditingMode &&
-            editingMessageIndex != null &&
-            realIndex > editingMessageIndex;
-        if (isMessageUnderEdit) {
-          message = message.copyWith(opacity: 0.0);
-        }
+            final bool isMessageUnderEdit = isEditingMode &&
+                editingMessageIndex != null &&
+                realIndex > editingMessageIndex;
+            if (isMessageUnderEdit) {
+              message = message.copyWith(opacity: 0.0);
+            }
 
-        return buildMessageTile(
-          context: context,
-          message: message,
-          index: realIndex,
-          key: ValueKey(message.id),
-          isEditingMode: isEditingMode,
-          editingMessageIndex: editingMessageIndex,
-          onEdit: () => onEdit(realIndex),
-          onFadeOutComplete: isMessageUnderEdit
-              ? null
-              : () => onFadeOutComplete?.call(realIndex),
-          screenWidth: screenWidth,
-          screenHeight: screenHeight,
-          modelId: modelId,
-          onReport: () => onReport(realIndex),
-          onRegenerate: ({String? newModelId}) {
-            onRegenerate(realIndex, newModelId: newModelId);
+            return buildMessageTile(
+              context: context,
+              message: message,
+              index: realIndex,
+              key: ValueKey(message.id ?? 'message_slot_$realIndex'),
+              isEditingMode: isEditingMode,
+              editingMessageIndex: editingMessageIndex,
+              onEdit: () => onEdit(realIndex),
+              onFadeOutComplete: isMessageUnderEdit
+                  ? null
+                  : () => onFadeOutComplete?.call(realIndex),
+              screenWidth: screenWidth,
+              screenHeight: screenHeight,
+              modelId: modelId,
+              onReport: () => onReport(realIndex),
+              onRegenerate: ({String? newModelId}) {
+                onRegenerate(realIndex, newModelId: newModelId);
+              },
+              onStop: onStop,
+              modelService: modelService,
+            );
           },
-          onStop: onStop,
-          modelService: modelService,
-        );
-      },
         ),
       ),
     );
@@ -806,8 +818,6 @@ class _VideoAttachmentCardState extends State<_VideoAttachmentCard> {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(widget.borderRadius);
-    final iconSize =
-        widget.isTablet ? widget.screenWidth * 0.08 : widget.screenWidth * 0.12;
 
     return Material(
       color: Colors.transparent,
@@ -851,7 +861,7 @@ class _VideoAttachmentCardState extends State<_VideoAttachmentCard> {
               Center(
                 child: Icon(
                   Icons.play_circle_fill_rounded,
-                  size: iconSize,
+                  size: CortexDesign.icon,
                   color: Colors.white.withValues(alpha: 0.86),
                 ),
               ),
@@ -882,9 +892,7 @@ class _VideoAttachmentCardState extends State<_VideoAttachmentCard> {
         child: Icon(
           Icons.videocam_rounded,
           color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-          size: widget.isTablet
-              ? widget.screenWidth * 0.06
-              : widget.screenWidth * 0.08,
+          size: CortexDesign.icon,
         ),
       );
     }

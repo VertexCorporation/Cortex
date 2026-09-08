@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // subscriptions.dart (FINAL, REFINED & CLEANED - NO LOGOS)
 // This version integrates the central ScrollFog widget internally and removes
 // heavy PNG assets for a cleaner, faster UI.
@@ -104,7 +105,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
+    final screenWidth = screenSize.width.clamp(0.0, 500.0);
     final screenHeight = screenSize.height;
 
     final double horizontalPadding = screenWidth * 0.06;
@@ -323,7 +324,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     required String activeSubscriptionOption,
   }) {
     final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
+    final screenWidth = screenSize.width.clamp(0.0, 500.0);
     final screenHeight = screenSize.height;
 
     final bool isVirtualSubscription = widget.activeSubscriptionLevel >= 4 &&
@@ -370,7 +371,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(CortexDesign.cardRadius),
         border: Border.all(
           color:
               isSelected ? AppColors.primaryColor.inverted : AppColors.border,
@@ -454,8 +455,8 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                           AppColors.primaryColor.inverted,
                           BlendMode.srcIn,
                         ),
-                        width: screenWidth * 0.09,
-                        height: screenWidth * 0.09,
+                        width: CortexDesign.icon,
+                        height: CortexDesign.icon,
                       ),
                     )
                   : SizedBox(
@@ -507,7 +508,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
             content,
             Positioned.fill(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(CortexDesign.cardRadius),
                 child: AnimatedBuilder(
                   animation: _shineAnimation,
                   builder: (context, child) => Transform.translate(
@@ -543,7 +544,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
 
   Widget _buildBenefitsList(
       BuildContext context, AppLocalizations localizations, String planType) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.of(context).size.width.clamp(0.0, 500.0);
     final double horizontalPadding = screenWidth * 0.06;
 
     // Benefits that should be highlighted when special offer is active
@@ -605,7 +606,6 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       children: benefits.asMap().entries.map((entry) {
         final int index = entry.key;
         final String benefit = entry.value;
-        final double iconSize = screenWidth * 0.057;
 
         // Check if this benefit should be highlighted
         final bool isHighlighted = widget.isSpecialOfferActive &&
@@ -621,8 +621,8 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SvgPicture.asset('assets/icons/checkmark.svg',
-                  width: iconSize,
-                  height: iconSize,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter: ColorFilter.mode(benefitColor, BlendMode.srcIn)),
               SizedBox(width: screenWidth * 0.03),
               Expanded(

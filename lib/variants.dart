@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // variants.dart
 
 import 'dart:async';
@@ -82,7 +83,9 @@ class Variants {
 
   void animateVariantChange(String newFullModelId) {
     if (displayedVariantLabel == newFullModelId) return;
-    if (variantFadeOutController == null || variantFadeInController == null) return;
+    if (variantFadeOutController == null || variantFadeInController == null) {
+      return;
+    }
 
     variantFadeOutController!.forward(from: 0.0).then((_) {
       displayedVariantLabel = newFullModelId;
@@ -260,8 +263,8 @@ class Variants {
         child: SvgPicture.asset(
           'assets/icons/arrov.svg',
           colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-          width: 20,
-          height: 20,
+          width: CortexDesign.icon,
+          height: CortexDesign.icon,
         ),
       ),
     );
@@ -428,8 +431,8 @@ class Variants {
           scale: isSelected ? 1.2 : 1.0,
           child: SvgPicture.asset(
             'assets/icons/variant.svg',
-            width: iconSize,
-            height: iconSize,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
               AppColors.primaryColor.inverted,
               BlendMode.srcIn,
@@ -450,8 +453,8 @@ class Variants {
           SizedBox(width: horizontalPadding * 0.25),
           SvgPicture.asset(
             'assets/icons/sparkle.svg',
-            width: iconSize * 0.8,
-            height: iconSize * 0.8,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
               AppColors.primaryColor.inverted.withValues(alpha: 0.8),
               BlendMode.srcIn,

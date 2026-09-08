@@ -15,11 +15,13 @@ final _brTag = RegExp(r'<\s*br\s*/?\s*>|<\s*/\s*br\s*>', caseSensitive: false);
 final _memoryOpen = RegExp(r'\s*<memory[)>]?[\s\S]*?(?:</memory[)>]?|$)\s*',
     caseSensitive: false);
 final _sourceHeader = RegExp(
-    r'(?:\n|^)#{1,6}\s*(?:Sources|References|Citations):?\s*$',
+    r'(?:\n|^)#{1,6}[ \t]*(?:Sources|References|Citations|Kaynaklar|Referanslar):?[ \t]*$',
     caseSensitive: false,
     multiLine: true);
-final _closedThink = RegExp(r'<think>([\s\S]*?)</think>', multiLine: true);
-final _unclosedThink = RegExp(r'<think>([\s\S]*)$', multiLine: true);
+final _closedThink =
+    RegExp(r'<think\b[^>]*>([\s\S]*?)</think\s*>', caseSensitive: false);
+final _unclosedThink =
+    RegExp(r'<think\b[^>]*>([\s\S]*)$', caseSensitive: false);
 final _cleanThinkTags = RegExp(r'</?think>', caseSensitive: false);
 final _leadingColon = RegExp(r'^[\s:]+');
 final _trailingNewlines = RegExp(r'^\n+|\n+$');
@@ -38,26 +40,30 @@ final _functionTag = RegExp(
     r'\s*<function(?:-call)?[)>]?[\s\S]*?(?:</function(?:-call)?[)>]?|$)\s*',
     caseSensitive: false);
 
-final _widgetBlock = RegExp(
-    r'<<<WIDGET:[\s\S]*?<<<END>>>',
+final _widgetBlock = RegExp(r'<<<WIDGET:([A-Za-z0-9_-]+)>>>[\s\S]*?<<<END>>>',
     caseSensitive: false);
 
-final _usingToolLine = RegExp(
-    r'\n?\*Using [^*]+\.\.\.[^*]*\*\s*[✅❌✓✗]?\s*\n?');
+final _usingToolLine = RegExp(r'\n?\*Using [^*]+\.\.\.[^*]*\*\s*[✅❌✓✗]?\s*\n?');
 
 List<InlineSpan> parseText(BuildContext context, String text,
     {double? fontSize, bool isFinished = false, List<dynamic>? citations}) {
   try {
+    // A widget marker is appended atomically, but the character reveal can
+    // briefly expose its prefix. Hide an unfinished marker so the protocol
+    // text never flashes in the chat bubble.
+    final lastWidgetStart = text.lastIndexOf('<<<WIDGET:');
+    if (lastWidgetStart >= 0 &&
+        !_widgetBlock.hasMatch(text.substring(lastWidgetStart))) {
+      text = text.substring(0, lastWidgetStart);
+    }
     text = text.replaceAll(_usingToolLine, '');
     text = text.replaceAll(_checkEmoji, '');
     text = text.replaceAll(_newlineGtNewline, '\n');
     text = text.replaceAllMapped(_brTag, (_) => '\n');
-    text = text.replaceAll(_widgetBlock, '');
     text = text.replaceAll(_memoryOpen, '');
 
     text = mergeFragmentedThinkingBlocks(text);
     text = text.replaceAllMapped(_functionTag, (_) => '');
-    text = text.replaceAll(_tableSeparator, '');
     text = _stripTrailingHorizontalRule(text);
 
     List<Source> sources = [];
@@ -75,9 +81,9 @@ List<InlineSpan> parseText(BuildContext context, String text,
         line = line.trim();
         if (line.isEmpty) continue;
 
-        final linkMatch =
-            RegExp(r'(?:^\d+\.?\s*|^-\s*)?\[([^\]]+)\]\(([^)]+)\)')
-                .firstMatch(line);
+        final linkMatch = RegExp(
+                r'(?:^\d+\.?\s*|^-\s*)?\[([^\]\r\n]+)\]\(((?:\\.|[^()\r\n]|\([^()\r\n]*\))*)\)')
+            .firstMatch(line);
         if (linkMatch != null) {
           sources.add(Source(
               index: indexCounter++,
@@ -125,6 +131,18 @@ List<InlineSpan> parseText(BuildContext context, String text,
             text: match.group(0)!,
             type: entry.key));
       }
+    }
+
+    // Tool results are inserted as atomic markers by SendService. Treat them
+    // as block spans so weather, chart and code widgets survive markdown
+    // parsing instead of being silently stripped from the response.
+    for (final match in _widgetBlock.allMatches(text)) {
+      blockMatches.add(MatchRange(
+        start: match.start,
+        end: match.end,
+        text: match.group(0)!,
+        type: 'toolWidget',
+      ));
     }
 
     blockMatches.sort((a, b) => a.start - b.start);
@@ -187,11 +205,20 @@ List<InlineSpan> parseText(BuildContext context, String text,
           urlMap: urlMap, citations: activeCitations));
     }
 
-    if (isFinished && activeCitations != null && activeCitations.isNotEmpty) {
+    final displayedSources = <dynamic>[...?activeCitations];
+    for (final url in urlMap.keys) {
+      final uri = Uri.tryParse(url);
+      if (uri == null || !['http', 'https'].contains(uri.scheme) || uri.host.isEmpty) continue;
+      if (!displayedSources.any((source) =>
+          source == url || source is Map && source['url'] == url)) {
+        displayedSources.add(url);
+      }
+    }
+    if (isFinished && displayedSources.isNotEmpty) {
       spans.add(WidgetSpan(
         child: Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: WebSearchSourcesWidget(scale: 1.0, sources: activeCitations),
+          child: WebSearchSourcesWidget(scale: 1.0, sources: displayedSources),
         ),
       ));
     }

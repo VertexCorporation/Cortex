@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/axon/widgets/header.dart
 
 import 'dart:math' as math;
@@ -165,7 +166,7 @@ class AxonHeader extends StatelessWidget {
                                         child: Center(
                                           child: Icon(
                                             Icons.search_rounded,
-                                            size: referenceWidth * 0.06,
+                                            size: CortexDesign.icon,
                                             color:
                                                 AppColors.primaryColor.inverted,
                                           ),
@@ -269,8 +270,8 @@ class AxonHeader extends StatelessWidget {
                                     angle: isRtl ? -math.pi / 2 : math.pi / 2,
                                     child: SvgPicture.asset(
                                       'assets/icons/arrov.svg',
-                                      width: referenceWidth * 0.045,
-                                      height: referenceWidth * 0.045,
+                                      width: CortexDesign.icon,
+                                      height: CortexDesign.icon,
                                       colorFilter: ColorFilter.mode(
                                         AppColors.primaryColor.inverted,
                                         BlendMode.srcIn,
@@ -312,7 +313,7 @@ class AxonHeader extends StatelessWidget {
                                   EdgeInsets.only(right: bubbleHeight * 0.25),
                               child: Icon(
                                 Icons.search_rounded,
-                                size: referenceWidth * 0.055,
+                                size: CortexDesign.icon,
                                 color: AppColors.tertiaryColor,
                               ),
                             ),

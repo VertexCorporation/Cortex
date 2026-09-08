@@ -3,8 +3,7 @@
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/select.dart';
-import 'package:cortex/chat/services/send.dart';
-import 'package:cortex/library/backend/data/entity.dart';
+import 'package:cortex/chat/services/generation.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
@@ -21,6 +20,7 @@ import '../../../../../providers/input.dart';
 import '../selection/sheet.dart';
 import 'button.dart';
 import '../../../../../../fog.dart';
+import 'package:cortex/sheet.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:shimmer/shimmer.dart';
@@ -43,9 +43,11 @@ Future<void> showFeaturesSheet({
       maxWidth: MediaQuery.sizeOf(context).width,
     ),
     builder: (BuildContext modalContext) {
-      return _FeaturesSheetContent(
-        controller: controller,
-        parentContext: context,
+      return ScaledBottomSheet(
+        child: _FeaturesSheetContent(
+          controller: controller,
+          parentContext: context,
+        ),
       );
     },
   );
@@ -83,29 +85,11 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
     final l10n = AppLocalizations.of(context)!;
     final inputService = InputService();
     final userProvider = context.watch<UserProvider>();
-    final catalog = context.watch<ModelCatalogProvider>();
     final sessionProvider = context.watch<ChatSessionProvider>();
     final inputProvider = context.watch<InputProvider>();
     final currentMode = inputProvider.featureMode;
     final currentModel = sessionProvider.selectedModel;
     final bool isOfflineModelSelected = currentModel?.type == 'offline';
-    final bool isCurrentImageModel = currentModel?.outputs['image'] == true ||
-        currentModel?.category == 'image';
-    final bool isCurrentAudioModel = currentModel?.outputs['audio'] == true ||
-        currentModel?.category == 'audio';
-    final bool isCurrentVideoModel = currentModel?.outputs['video'] == true ||
-        currentModel?.category == 'video';
-
-    final imageGenModels = catalog.allModels
-        .where((m) => m.outputs['image'] == true || m.category == 'image')
-        .toList();
-    final audioGenModels = catalog.allModels
-        .where((m) => m.outputs['audio'] == true || m.category == 'audio')
-        .toList();
-    final videoGenModels = catalog.allModels
-        .where((m) => m.outputs['video'] == true || m.category == 'video')
-        .toList();
-
     return Container(
       constraints: BoxConstraints(
         maxHeight: screenHeight * 0.55,
@@ -124,7 +108,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
               width: MediaQuery.sizeOf(context).width * 0.12,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.secondaryColor,
+                color: AppColors.background.withValues(alpha: 0.86),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -355,20 +339,15 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/make.svg',
                       title: l10n.featureCreateImageTitle,
                       description: l10n.featureCreateImageDescription,
-                      isDisabled: imageGenModels.isEmpty,
-                      isSelected: isCurrentImageModel,
+                      isSelected:
+                          currentMode == ChatInputMode.imageGeneration,
+                      isDisabled: false,
                       onTap: () {
                         Navigator.pop(context);
-                        if (isCurrentImageModel) {
-                          _selectDynamicModel(context);
-                        } else {
-                          _handleGenerationFeatureAction(
-                            context,
-                            imageGenModels,
-                            widget.controller,
-                            targetType: 'image',
-                          );
-                        }
+                        setGenerationFeatureMode(
+                          widget.parentContext,
+                          targetType: 'image',
+                        );
                       },
                     ),
 
@@ -377,20 +356,15 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/voice.svg',
                       title: l10n.featureCreateAudioTitle,
                       description: l10n.featureCreateAudioDescription,
-                      isDisabled: audioGenModels.isEmpty,
-                      isSelected: isCurrentAudioModel,
+                      isSelected:
+                          currentMode == ChatInputMode.audioGeneration,
+                      isDisabled: false,
                       onTap: () {
                         Navigator.pop(context);
-                        if (isCurrentAudioModel) {
-                          _selectDynamicModel(context);
-                        } else {
-                          _handleGenerationFeatureAction(
-                            context,
-                            audioGenModels,
-                            widget.controller,
-                            targetType: 'audio',
-                          );
-                        }
+                        setGenerationFeatureMode(
+                          widget.parentContext,
+                          targetType: 'audio',
+                        );
                       },
                     ),
 
@@ -399,20 +373,15 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/transition.svg',
                       title: l10n.featureCreateVideoTitle,
                       description: l10n.featureCreateVideoDescription,
-                      isDisabled: videoGenModels.isEmpty,
-                      isSelected: isCurrentVideoModel,
+                      isSelected:
+                          currentMode == ChatInputMode.videoGeneration,
+                      isDisabled: false,
                       onTap: () {
                         Navigator.pop(context);
-                        if (isCurrentVideoModel) {
-                          _selectDynamicModel(context);
-                        } else {
-                          _handleGenerationFeatureAction(
-                            context,
-                            videoGenModels,
-                            widget.controller,
-                            targetType: 'video',
-                          );
-                        }
+                        setGenerationFeatureMode(
+                          widget.parentContext,
+                          targetType: 'video',
+                        );
                       },
                     ),
 
@@ -445,38 +414,38 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     // 7. EXPLORE
                     if (userProvider.isSubscriptionActive)
                       FeaturesSheetButton(
-                      iconData: Icons.visibility,
-                      title: l10n.explore,
-                      description: l10n.featureExploreDescription,
-                      onTap: () {
-                        Navigator.pop(context);
-                        showModelSelectionSheet(
-                          context: widget.parentContext,
-                          localizations: l10n,
-                          currentModelId: widget.parentContext
-                                  .read<ChatSessionProvider>()
-                                  .modelId ??
-                              '',
-                          initialModels: widget.parentContext
-                              .read<ChatSessionProvider>()
-                              .allModels,
-                          onModelSelected: (String id) {
-                            final modelService =
-                                widget.parentContext.read<ModelService>();
-                            final selectionService =
-                                widget.parentContext.read<SelectionService>();
-                            final langCode =
-                                Localizations.localeOf(widget.parentContext)
-                                    .languageCode;
-                            final model = modelService.getPreciseModelData(
-                              id,
-                              langCode: langCode,
-                            );
-                            selectionService.switchActiveModel(model);
-                          },
-                        );
-                      },
-                    ),
+                        iconData: Icons.visibility,
+                        title: l10n.explore,
+                        description: l10n.featureExploreDescription,
+                        onTap: () {
+                          Navigator.pop(context);
+                          showModelSelectionSheet(
+                            context: widget.parentContext,
+                            localizations: l10n,
+                            currentModelId: widget.parentContext
+                                    .read<ChatSessionProvider>()
+                                    .modelId ??
+                                '',
+                            initialModels: widget.parentContext
+                                .read<ChatSessionProvider>()
+                                .allModels,
+                            onModelSelected: (String id) {
+                              final modelService =
+                                  widget.parentContext.read<ModelService>();
+                              final selectionService =
+                                  widget.parentContext.read<SelectionService>();
+                              final langCode =
+                                  Localizations.localeOf(widget.parentContext)
+                                      .languageCode;
+                              final model = modelService.getPreciseModelData(
+                                id,
+                                langCode: langCode,
+                              );
+                              selectionService.switchActiveModel(model);
+                            },
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),
@@ -516,48 +485,6 @@ void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
     selectionService.switchActiveModel(firstModel, context: context);
   } else {
     mainScreenKey.currentState?.switchToLibrary(pulse: true);
-  }
-}
-
-/// Logic for "Create Image/Audio": selects a suitable generation model and keeps
-/// feature states coherent (single feature rule).
-void _handleGenerationFeatureAction(BuildContext context,
-    List<ModelEntity> candidates, TextEditingController controller,
-    {required String targetType}) {
-  if (candidates.isEmpty) return;
-
-  final inputProvider = context.read<InputProvider>();
-  final selectionService = context.read<SelectionService>();
-  final session = context.read<ChatSessionProvider>();
-
-  // Image/Audio/Video focus bypasses text features.
-  inputProvider.clearFeatureMode();
-  inputProvider.clearWebSearch();
-
-  final currentModel = session.selectedModel;
-  final bool currentSupportsTarget = currentModel != null &&
-      (currentModel.outputs[targetType] == true ||
-          currentModel.category == targetType);
-
-  // Priority: Non-Premium (Free) first, otherwise Premium.
-  final ModelEntity targetModel = candidates.firstWhere(
-    (m) => !m.isPremium,
-    orElse: () => candidates.first,
-  );
-
-  // Select only if current model does not already support this generation type.
-  if (!currentSupportsTarget) {
-    selectionService.switchActiveModel(targetModel, context: context);
-  }
-
-  // If text exists, send it immediately.
-  final String currentText = controller.text.trim();
-  if (currentText.isNotEmpty) {
-    context.read<SendService>().sendMessage(
-          context: context,
-          localizations: AppLocalizations.of(context)!,
-          messageText: currentText,
-        );
   }
 }
 

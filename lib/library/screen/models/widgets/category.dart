@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 // lib/library/screen/models/widgets/category.dart
 
@@ -426,12 +427,19 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                   _isMenuOpen = true;
                 });
                 final loc = AppLocalizations.of(context)!;
-                final List<ActionPanelButton> buttons = widget.subCategories!.map((cat) {
+                final List<ActionPanelButton> buttons =
+                    widget.subCategories!.map((cat) {
                   final isSelected = _selectedCategory == cat;
                   return ActionPanelButton(
-                    customIcon: isSelected 
-                      ? SvgPicture.asset('assets/icons/checkmark.svg', width: 18, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn))
-                      : const SizedBox(width: 18),
+                    customIcon: isSelected
+                        ? SvgPicture.asset(
+                            height: CortexDesign.icon,
+                            'assets/icons/checkmark.svg',
+                            width: CortexDesign.icon,
+                            colorFilter: ColorFilter.mode(
+                                AppColors.primaryColor.inverted,
+                                BlendMode.srcIn))
+                        : const SizedBox(width: 18),
                     iconColor: AppColors.primaryColor.inverted,
                     text: _getLocalizedCategory(cat, loc),
                     textColor: AppColors.primaryColor.inverted,
@@ -475,7 +483,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                       _isMenuOpen
                           ? Icons.keyboard_arrow_up_rounded
                           : Icons.keyboard_arrow_down_rounded,
-                      size: 20,
+                      size: CortexDesign.icon,
                       color: AppColors.primaryColor.inverted
                           .withValues(alpha: 0.7),
                     ),

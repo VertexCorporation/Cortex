@@ -18,6 +18,8 @@ import 'package:intl/intl.dart';
 /// Service responsible for building the list of messages in the format
 /// required by the backend API. It reads the current state from the relevant providers.
 class ContextService {
+  static final RegExp _toolWidgetMarker =
+      RegExp(r'<<<WIDGET:[\s\S]*?<<<END>>>', caseSensitive: false);
   final ChatSessionProvider _sessionProvider;
   final ConversationProvider _conversationProvider;
   final ModelService _modelService;
@@ -224,7 +226,12 @@ class ContextService {
           : (message.model != null && message.model!.isNotEmpty
               ? "[Model: ${message.model}] ${message.text}"
               : message.text);
-      textParts.add({"type": "text", "text": processedText});
+      final contextText = message.isUserMessage
+          ? processedText
+          : processedText.replaceAll(_toolWidgetMarker, '').trim();
+      if (contextText.isNotEmpty) {
+        textParts.add({"type": "text", "text": contextText});
+      }
     }
 
     // 2. Attachment Content

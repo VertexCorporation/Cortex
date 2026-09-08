@@ -229,7 +229,8 @@ class FileDownloadHelper extends ChangeNotifier {
         final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
         if (!iosInfo.isPhysicalDevice) {
           useDioFallback = true;
-          debugPrint('[FileDownloadHelper] Forcing Dio fallback on iOS Simulator');
+          debugPrint(
+              '[FileDownloadHelper] Forcing Dio fallback on iOS Simulator');
         }
       }
 

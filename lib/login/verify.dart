@@ -117,8 +117,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
     // This timer periodically checks if the user's email has been verified.
     // This is where the network call happens and where the error must be handled.
-    _emailCheckTimer =
-        Timer.periodic(const Duration(seconds: 3), (timer) {
+    _emailCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       // THE FIX IS IMPLEMENTED HERE:
       // We wrap the entire network-dependent logic in a try-catch block
       // to gracefully handle potential network failures without crashing the app.
@@ -166,15 +165,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 name: 'EmailVerification',
                 error: e);
           }
-      } catch (e) {
-        // This is a general catch-all for any other unexpected errors,
-        // ensuring the application remains stable under all circumstances.
-        dev.log(
-            '[EmailVerification] A generic error occurred during verification check.',
-            name: 'EmailVerification',
-            error: e);
-      }
-    });
+        } catch (e) {
+          // This is a general catch-all for any other unexpected errors,
+          // ensuring the application remains stable under all circumstances.
+          dev.log(
+              '[EmailVerification] A generic error occurred during verification check.',
+              name: 'EmailVerification',
+              error: e);
+        }
+      });
     });
   }
 

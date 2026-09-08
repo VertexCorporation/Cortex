@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:cortex/app.dart';
@@ -184,7 +185,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
     final wasShowing = oldWidget.isModelSelected || oldWidget.isDynamicChatMode;
     final isShowing = widget.isModelSelected || widget.isDynamicChatMode;
-    
+
     if (wasShowing && !isShowing) {
       // Clear focus when the input field is hidden to prevent semantics crashes
       if (widget.textFieldFocusNode.hasFocus) {
@@ -299,7 +300,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final viewportWidth = MediaQuery.of(context).size.width;
+    final screenWidth = viewportWidth.clamp(0.0, CortexDesign.readingWidth);
     final bool isTablet = screenWidth >= 600;
 
     final inputProvider = context.watch<InputProvider>();
@@ -309,181 +311,182 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
     final bool shouldShow = widget.isModelSelected || widget.isDynamicChatMode;
 
-    final double radius = isTablet ? screenWidth * 0.025 : 32.0;
+    final double radius = CortexDesign.cardRadius;
 
     return Offstage(
       offstage: !shouldShow,
       child: Padding(
-      padding: EdgeInsets.fromLTRB(
-        screenWidth * 0.02,
-        0,
-        screenWidth * 0.02,
-        12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
-      ),
-      child: Container(
-        key: _inputFieldKey,
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(radius),
-          border: Border.all(
-            color: AppColors.border.withValues(alpha: 0.5),
-            width: 0.5,
-          ),
+        padding: EdgeInsets.fromLTRB(
+          CortexDesign.readingInset(viewportWidth),
+          0,
+          CortexDesign.readingInset(viewportWidth),
+          12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-              vertical: 8.0), // Extra padding to make it bigger
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _AttachmentPreviewSection(
-                  screenWidth: screenWidth, isTablet: isTablet),
+        child: Container(
+          key: _inputFieldKey,
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(radius),
+            border: Border.all(
+              color: AppColors.border,
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical: 8.0), // Extra padding to make it bigger
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _AttachmentPreviewSection(
+                    screenWidth: screenWidth, isTablet: isTablet),
 
-              _RagStatusChip(screenWidth: screenWidth),
+                _RagStatusChip(screenWidth: screenWidth),
 
-              // Main Animated Area
-              AnimatedBuilder(
-                animation: _modeController,
-                builder: (context, child) {
-                  final bool isForward =
-                      _modeController.status == AnimationStatus.forward ||
-                          _modeController.status == AnimationStatus.completed;
-                  final double inputCutoff = isForward ? 0.5 : 0.9;
+                // Main Animated Area
+                AnimatedBuilder(
+                  animation: _modeController,
+                  builder: (context, child) {
+                    final bool isForward =
+                        _modeController.status == AnimationStatus.forward ||
+                            _modeController.status == AnimationStatus.completed;
+                    final double inputCutoff = isForward ? 0.5 : 0.9;
 
-                  final bool showInputLayout =
-                      _modeController.value < inputCutoff;
-                  final bool showWaveLayout = _modeController.value > 0.1;
+                    final bool showInputLayout =
+                        _modeController.value < inputCutoff;
+                    final bool showWaveLayout = _modeController.value > 0.1;
 
-                  return AnimatedSize(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                    alignment: Alignment.bottomCenter,
-                    child: Stack(
+                    return AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutCubic,
                       alignment: Alignment.bottomCenter,
-                      children: [
-                        // 1. INPUT CONTENT
-                        Visibility(
-                          visible: showInputLayout,
-                          maintainState: true,
-                          child: IgnorePointer(
-                            ignoring: _inputOpacityAnim.value < 0.1,
-                            child: FadeTransition(
-                              opacity: _inputOpacityAnim,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsetsDirectional.only(
-                                              start: isTablet
-                                                  ? screenWidth * 0.02
-                                                  : 12.0,
-                                            ),
-                                            child: AddPhotoButton(
-                                              isLimitExceeded:
-                                                  widget.isLimitExceeded,
-                                              isPhotoLoading:
-                                                  widget.isPhotoLoading,
-                                              localizations:
-                                                  widget.localizations,
-                                              controller: widget.controller,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: isTablet
-                                                      ? screenWidth * 0.02
-                                                      : 8.0),
-                                              child: _TextFieldSection(
-                                                key:
-                                                    const ValueKey('textfield'),
-                                                controller: widget.controller,
-                                                focusNode:
-                                                    widget.textFieldFocusNode,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          // 1. INPUT CONTENT
+                          Visibility(
+                            visible: showInputLayout,
+                            maintainState: true,
+                            child: IgnorePointer(
+                              ignoring: _inputOpacityAnim.value < 0.1,
+                              child: FadeTransition(
+                                opacity: _inputOpacityAnim,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  EdgeInsetsDirectional.only(
+                                                start: isTablet
+                                                    ? screenWidth * 0.02
+                                                    : 12.0,
+                                              ),
+                                              child: AddPhotoButton(
+                                                isLimitExceeded:
+                                                    widget.isLimitExceeded,
+                                                isPhotoLoading:
+                                                    widget.isPhotoLoading,
                                                 localizations:
                                                     widget.localizations,
-                                                screenWidth: screenWidth,
-                                                isTablet: isTablet,
-                                                showHintText: true,
-                                                onEnterPressed: () {
-                                                  if (isSendButtonEnabled) {
-                                                    widget.onSend();
-                                                  }
-                                                },
+                                                controller: widget.controller,
                                               ),
                                             ),
-                                          ),
-                                          Visibility(
-                                            visible: false,
-                                            maintainSize: true,
-                                            maintainAnimation: true,
-                                            maintainState: true,
-                                            child: _SendButtonSection(
-                                              screenWidth: screenWidth,
-                                              isTablet: isTablet,
-                                              widget: widget,
-                                              isEnabled: isSendButtonEnabled,
-                                              isActionPermitted:
-                                                  isActionPermitted,
-                                              controller: widget.controller,
+                                            Expanded(
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: isTablet
+                                                        ? screenWidth * 0.02
+                                                        : 8.0),
+                                                child: _TextFieldSection(
+                                                  key: const ValueKey(
+                                                      'textfield'),
+                                                  controller: widget.controller,
+                                                  focusNode:
+                                                      widget.textFieldFocusNode,
+                                                  localizations:
+                                                      widget.localizations,
+                                                  screenWidth: screenWidth,
+                                                  isTablet: isTablet,
+                                                  showHintText: true,
+                                                  onEnterPressed: () {
+                                                    if (isSendButtonEnabled) {
+                                                      widget.onSend();
+                                                    }
+                                                  },
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                            Visibility(
+                                              visible: false,
+                                              maintainSize: true,
+                                              maintainAnimation: true,
+                                              maintainState: true,
+                                              child: _SendButtonSection(
+                                                screenWidth: screenWidth,
+                                                isTablet: isTablet,
+                                                widget: widget,
+                                                isEnabled: isSendButtonEnabled,
+                                                isActionPermitted:
+                                                    isActionPermitted,
+                                                controller: widget.controller,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
 
-                        // 2. WAVEFORM CONTENT
-                        Visibility(
-                          visible: showWaveLayout,
-                          maintainState: true,
-                          child: IgnorePointer(
-                            ignoring: _waveOpacityAnim.value < 0.1,
-                            child: FadeTransition(
-                              opacity: _waveOpacityAnim,
-                              child: const _WaveformSection(
-                                  key: ValueKey('waveform')),
+                          // 2. WAVEFORM CONTENT
+                          Visibility(
+                            visible: showWaveLayout,
+                            maintainState: true,
+                            child: IgnorePointer(
+                              ignoring: _waveOpacityAnim.value < 0.1,
+                              child: FadeTransition(
+                                opacity: _waveOpacityAnim,
+                                child: const _WaveformSection(
+                                    key: ValueKey('waveform')),
+                              ),
                             ),
                           ),
-                        ),
 
-                        // 3. MAIN ACTION BUTTON (PERSISTENT)
-                        Positioned(
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          child: Center(
-                            child: _SendButtonSection(
-                              screenWidth: screenWidth,
-                              isTablet: isTablet,
-                              widget: widget,
-                              isEnabled: isSendButtonEnabled,
-                              isActionPermitted: isActionPermitted,
-                              controller: widget.controller,
+                          // 3. MAIN ACTION BUTTON (PERSISTENT)
+                          Positioned(
+                            top: 0,
+                            bottom: 0,
+                            right: 0,
+                            child: Center(
+                              child: _SendButtonSection(
+                                screenWidth: screenWidth,
+                                isTablet: isTablet,
+                                widget: widget,
+                                isEnabled: isSendButtonEnabled,
+                                isActionPermitted: isActionPermitted,
+                                controller: widget.controller,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

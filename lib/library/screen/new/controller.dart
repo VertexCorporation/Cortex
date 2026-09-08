@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/library/screen/new/controller.dart
 
 import 'package:cortex/app.dart';
@@ -61,7 +62,6 @@ class _ModelCreationHostState extends State<ModelCreationHost>
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
-    final double transitionIconSize = isTablet ? 24.0 : 20.0;
     final double titleFontSize = isTablet ? 20.0 : 18.0;
 
     final titleStyle = TextStyle(
@@ -154,8 +154,8 @@ class _ModelCreationHostState extends State<ModelCreationHost>
                         opacity: provider.isSaving ? 0.5 : 1.0,
                         child: SvgPicture.asset(
                           'assets/icons/transition.svg',
-                          width: transitionIconSize,
-                          height: transitionIconSize,
+                          width: CortexDesign.icon,
+                          height: CortexDesign.icon,
                           colorFilter: ColorFilter.mode(
                             AppColors.primaryColor.inverted,
                             BlendMode.srcIn,

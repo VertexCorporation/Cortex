@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/axon/widgets/list.dart
 
 import 'package:flutter/material.dart';
@@ -332,8 +333,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
         children: [
           SvgPicture.asset(
             'assets/icons/warning.svg',
-            width: widget.referenceWidth * 0.12,
-            height: widget.referenceWidth * 0.12,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
               AppColors.tertiaryColor.withValues(alpha: 0.4),
               BlendMode.srcIn,

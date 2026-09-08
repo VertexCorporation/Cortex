@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/screen.dart
 
 import 'dart:async';
@@ -32,6 +33,8 @@ import 'roleplay/screens/discover.dart';
 import 'notifications/introvert.dart';
 
 import 'rag/screens/documents.dart';
+import 'stack.dart';
+import 'boundary.dart';
 
 enum MainScreenView {
   chat,
@@ -41,49 +44,6 @@ enum MainScreenView {
   arts,
   roleplay,
   documents,
-}
-
-class FadeIndexedStack extends StatelessWidget {
-  final int index;
-  final List<Widget> children;
-  final Duration duration;
-
-  const FadeIndexedStack({
-    super.key,
-    required this.index,
-    required this.children,
-    this.duration = const Duration(milliseconds: 100),
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final idx = index;
-    final list = children;
-    return Stack(
-      fit: StackFit.expand,
-      children: List<Widget>.generate(list.length, (int i) {
-        final isActive = idx == i;
-        return IgnorePointer(
-          ignoring: !isActive,
-          child: AnimatedOpacity(
-            opacity: isActive ? 1.0 : 0.0,
-            duration: duration,
-            child: TickerMode(
-              enabled: isActive,
-              child: isActive
-                  ? list[i]
-                  : MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        viewInsets: EdgeInsets.zero,
-                      ),
-                      child: list[i],
-                    ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
 }
 
 class MainScreen extends StatefulWidget {
@@ -126,13 +86,16 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   Widget? _cachedAxonWidget;
   bool _cachedAxonIsOpen = false;
   int _cachedAxonActiveTab = -1;
+  double? _cachedAxonWidth;
 
   Widget _getAxonWidget(bool isOpen, int activeTab, double standardAxonWidth) {
     if (_cachedAxonWidget != null &&
         _cachedAxonIsOpen == isOpen &&
-        _cachedAxonActiveTab == activeTab) {
+        _cachedAxonActiveTab == activeTab &&
+        _cachedAxonWidth == standardAxonWidth) {
       return _cachedAxonWidget!;
     }
+    _cachedAxonWidth = standardAxonWidth;
     _cachedAxonIsOpen = isOpen;
     _cachedAxonActiveTab = activeTab;
     return _cachedAxonWidget = Axon(
@@ -276,7 +239,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
   }
 
-
   void _openDocumentLibrary() {
     closeAxon();
     _updateCurrentView(MainScreenView.documents);
@@ -359,8 +321,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
 
     final double screenW = MediaQuery.of(context).size.width;
-    // Full-width sidebar: standardAxonW is now the full screen width.
-    final double standardAxonW = screenW;
+    // Keep drag distance consistent with the responsive drawer geometry.
+    final double standardAxonW = CortexDesign.drawerWidth(screenW);
     // searchGapW is 0 in full-width mode; guard against division by zero.
     final double searchGapW = (screenW * 0.15).clamp(1.0, double.infinity);
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
@@ -513,6 +475,11 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   void _updateCurrentView(MainScreenView view) {
     if (_currentView == view) return;
+    if (view != MainScreenView.chat) {
+      // Chat is kept alive by FadeIndexedStack. Cancel any delayed focus
+      // retries before the destination screen starts its layout pass.
+      chatScreenKey.currentState?.cancelPendingKeyboardFocus();
+    }
     setState(() => _currentView = view);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -779,7 +746,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       children: [
         // Index 0: Chat
         RepaintBoundary(
-          child: ChatController(key: chatScreenKey),
+          child: ErrorBoundary(
+            child: ChatController(key: chatScreenKey),
+          ),
         ),
         // Index 1: Library
         RepaintBoundary(
@@ -821,9 +790,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final mediaQuery = MediaQuery.sizeOf(context);
     final screenWidth = mediaQuery.width;
     final screenHeight = mediaQuery.height;
-    // Full-width sidebar: Axon occupies the entire screen width.
-    // Users close it via left-swipe gesture, tapping "New Chat", or selecting a conversation.
-    final double standardAxonWidth = screenWidth;
+    // Phones use the full width; tablets retain context beside a compact drawer.
+    final double standardAxonWidth = CortexDesign.drawerWidth(screenWidth);
 
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final double directionMultiplier = isRtl ? -1.0 : 1.0;

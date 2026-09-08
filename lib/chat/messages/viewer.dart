@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // viewer.dart
 
 import 'dart:io';
@@ -223,7 +224,7 @@ class PhotoViewerState extends State<PhotoViewer>
                           child: Icon(
                             Icons.close,
                             color: AppColors.primaryColor.inverted,
-                            size: screenSize.width * 0.055,
+                            size: CortexDesign.icon,
                           ),
                         ),
 
@@ -237,8 +238,8 @@ class PhotoViewerState extends State<PhotoViewer>
                             size: screenSize.width * 0.11,
                             child: SvgPicture.asset(
                               'assets/icons/edit.svg',
-                              width: screenSize.width * 0.05,
-                              height: screenSize.width * 0.05,
+                              width: CortexDesign.icon,
+                              height: CortexDesign.icon,
                               colorFilter: ColorFilter.mode(
                                 AppColors.primaryColor.inverted,
                                 BlendMode.srcIn,
@@ -287,8 +288,8 @@ class PhotoViewerState extends State<PhotoViewer>
                               children: [
                                 SvgPicture.asset(
                                   'assets/icons/world.svg',
-                                  width: screenSize.width * 0.05,
-                                  height: screenSize.width * 0.05,
+                                  width: CortexDesign.icon,
+                                  height: CortexDesign.icon,
                                   colorFilter: const ColorFilter.mode(
                                       Colors.white, BlendMode.srcIn),
                                 ),
@@ -363,8 +364,8 @@ class PhotoViewerState extends State<PhotoViewer>
                               children: [
                                 SvgPicture.asset(
                                   'assets/icons/download.svg',
-                                  width: screenSize.width * 0.05,
-                                  height: screenSize.width * 0.05,
+                                  width: CortexDesign.icon,
+                                  height: CortexDesign.icon,
                                   colorFilter: const ColorFilter.mode(
                                       Colors.white, BlendMode.srcIn),
                                 ),
@@ -721,7 +722,7 @@ class _VideoViewerState extends State<VideoViewer>
                                                 icon: const Icon(
                                                     Icons.replay_10_rounded,
                                                     color: Colors.white,
-                                                    size: 34),
+                                                    size: CortexDesign.icon),
                                               ),
                                               const SizedBox(width: 8),
                                               IconButton(
@@ -741,7 +742,7 @@ class _VideoViewerState extends State<VideoViewer>
                                                       : Icons
                                                           .play_circle_fill_rounded,
                                                   color: Colors.white,
-                                                  size: 56,
+                                                  size: CortexDesign.icon,
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
@@ -752,7 +753,7 @@ class _VideoViewerState extends State<VideoViewer>
                                                 icon: const Icon(
                                                     Icons.forward_10_rounded,
                                                     color: Colors.white,
-                                                    size: 34),
+                                                    size: CortexDesign.icon),
                                               ),
                                             ],
                                           ),
@@ -839,7 +840,7 @@ class _VideoViewerState extends State<VideoViewer>
                           child: Icon(
                             Icons.close,
                             color: AppColors.primaryColor.inverted,
-                            size: screenSize.width * 0.055,
+                            size: CortexDesign.icon,
                           ),
                         ),
                         if (showEditButton)
@@ -851,8 +852,8 @@ class _VideoViewerState extends State<VideoViewer>
                             size: screenSize.width * 0.11,
                             child: SvgPicture.asset(
                               'assets/icons/edit.svg',
-                              width: screenSize.width * 0.05,
-                              height: screenSize.width * 0.05,
+                              width: CortexDesign.icon,
+                              height: CortexDesign.icon,
                               colorFilter: ColorFilter.mode(
                                 AppColors.primaryColor.inverted,
                                 BlendMode.srcIn,
@@ -883,7 +884,9 @@ class _VideoViewerState extends State<VideoViewer>
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.share_rounded,
+                              const Icon(
+                                  size: CortexDesign.icon,
+                                  Icons.share_rounded,
                                   color: Colors.white),
                               const SizedBox(height: 4),
                               Text(
@@ -900,7 +903,9 @@ class _VideoViewerState extends State<VideoViewer>
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.download_rounded,
+                              const Icon(
+                                  size: CortexDesign.icon,
+                                  Icons.download_rounded,
                                   color: Colors.white),
                               const SizedBox(height: 4),
                               Text(
@@ -1069,7 +1074,7 @@ class _AudioViewerState extends State<AudioViewer> {
                           child: Icon(
                             Icons.close,
                             color: AppColors.primaryColor.inverted,
-                            size: screenSize.width * 0.055,
+                            size: CortexDesign.icon,
                           ),
                         ),
                         if (showEditButton)
@@ -1081,8 +1086,8 @@ class _AudioViewerState extends State<AudioViewer> {
                             size: screenSize.width * 0.11,
                             child: SvgPicture.asset(
                               'assets/icons/edit.svg',
-                              width: screenSize.width * 0.05,
-                              height: screenSize.width * 0.05,
+                              width: CortexDesign.icon,
+                              height: CortexDesign.icon,
                               colorFilter: ColorFilter.mode(
                                 AppColors.primaryColor.inverted,
                                 BlendMode.srcIn,
@@ -1114,15 +1119,15 @@ class _AudioViewerState extends State<AudioViewer> {
                           child: _isPlaying
                               ? SvgPicture.asset(
                                   'assets/icons/stop.svg',
-                                  width: screenSize.width * 0.16,
-                                  height: screenSize.width * 0.16,
+                                  width: CortexDesign.icon,
+                                  height: CortexDesign.icon,
                                   colorFilter: const ColorFilter.mode(
                                       Colors.white, BlendMode.srcIn),
                                 )
                               : Icon(
                                   Icons.play_circle_fill_rounded,
                                   color: Colors.white,
-                                  size: screenSize.width * 0.18,
+                                  size: CortexDesign.icon,
                                 ),
                         ),
                       ],
@@ -1144,7 +1149,9 @@ class _AudioViewerState extends State<AudioViewer> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.share_rounded,
+                              const Icon(
+                                  size: CortexDesign.icon,
+                                  Icons.share_rounded,
                                   color: Colors.white),
                               const SizedBox(height: 4),
                               Text(
@@ -1161,7 +1168,9 @@ class _AudioViewerState extends State<AudioViewer> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.download_rounded,
+                              const Icon(
+                                  size: CortexDesign.icon,
+                                  Icons.download_rounded,
                                   color: Colors.white),
                               const SizedBox(height: 4),
                               Text(

@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/settings/sections/personalization.dart
 
 import 'package:flutter/material.dart';
@@ -66,9 +67,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .sizeOf(context)
-        .width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final double scale = screenWidth / 400.0;
     final memoryProvider = context.watch<UserMemoryProvider>();
 
@@ -105,24 +104,25 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
             'assets/icons/context.svg',
             colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.inverted, BlendMode.srcIn),
-            width: 24 * scale,
-            height: 24 * scale,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                ],
+                children: [],
               ),
               TextField(
                 controller: _memoryController,
                 focusNode: _memoryFocusNode,
                 maxLength: 2048,
                 buildCounter: (BuildContext context,
-                    {int? currentLength, int? maxLength, bool? isFocused}) =>
-                null,
+                        {int? currentLength,
+                        int? maxLength,
+                        bool? isFocused}) =>
+                    null,
                 maxLines: 10,
                 minLines: 7,
                 style: TextStyle(
@@ -134,15 +134,16 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                   hintStyle: TextStyle(
                       color: AppColors.quinaryColor, fontSize: 14 * scale),
                   filled: true,
-                  fillColor: AppColors.background,
+                  fillColor: AppColors.border,
                   contentPadding: EdgeInsets.all(12 * scale),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide.none,
+                    borderSide:
+                        BorderSide(color: AppColors.border, width: scale),
                     borderRadius: BorderRadius.circular(8 * scale),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: AppColors.primaryColor.inverted, width: 0.5),
+                    borderSide:
+                        BorderSide(color: AppColors.border, width: scale),
                     borderRadius: BorderRadius.circular(8 * scale),
                   ),
                 ),
@@ -177,16 +178,16 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
             'assets/icons/test.svg',
             colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.inverted, BlendMode.srcIn),
-            width: 24 * scale,
-            height: 24 * scale,
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
           ),
           child: TextField(
             controller: _instructionController,
             focusNode: _instructionFocusNode,
             maxLength: 2048,
             buildCounter: (BuildContext context,
-                {int? currentLength, int? maxLength, bool? isFocused}) =>
-            null,
+                    {int? currentLength, int? maxLength, bool? isFocused}) =>
+                null,
             maxLines: 10,
             minLines: 7,
             style: TextStyle(
@@ -198,15 +199,16 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
               hintStyle: TextStyle(
                   color: AppColors.quinaryColor, fontSize: 14 * scale),
               filled: true,
-              fillColor: AppColors.background,
+              fillColor: AppColors.border,
               contentPadding: EdgeInsets.all(12 * scale),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide.none,
+                borderSide:
+                    BorderSide(color: AppColors.border, width: scale),
                 borderRadius: BorderRadius.circular(8 * scale),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color: AppColors.primaryColor.inverted, width: 0.5),
+                borderSide:
+                    BorderSide(color: AppColors.border, width: scale),
                 borderRadius: BorderRadius.circular(8 * scale),
               ),
             ),
@@ -221,7 +223,8 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     );
   }
 
-  Widget _buildPanel(BuildContext context, {
+  Widget _buildPanel(
+    BuildContext context, {
     required double scale,
     required String title,
     required String subtitle,
@@ -232,8 +235,9 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
       width: double.infinity,
       padding: EdgeInsets.all(14 * scale),
       decoration: BoxDecoration(
-        color: AppColors.secondaryColor,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(10 * scale),
+        border: Border.all(color: AppColors.border, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,4 +278,3 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     );
   }
 }
-

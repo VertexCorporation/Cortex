@@ -25,7 +25,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "az": [
@@ -54,7 +62,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "cs": [
@@ -83,7 +99,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "de": [
@@ -112,7 +136,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "es": [
@@ -141,7 +173,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "fr": [
@@ -170,7 +210,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "hi": [
@@ -199,7 +247,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "hu": [
@@ -228,7 +284,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "id": [
@@ -257,7 +321,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "it": [
@@ -286,7 +358,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "ja": [
@@ -315,7 +395,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "ko": [
@@ -344,7 +432,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "nl": [
@@ -373,7 +469,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "no": [
@@ -402,7 +506,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "pt": [
@@ -431,7 +543,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "ru": [
@@ -460,7 +580,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "sv": [
@@ -489,7 +617,15 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ],
 
   "tr": [
@@ -523,6 +659,14 @@
     "ragDeleteConfirm",
     "ragFileTooBig",
     "ragUnsupportedType",
-    "ragAddedToChat"
+    "ragAddedToChat",
+    "voiceSelection",
+    "voiceSelectionDescription",
+    "voiceDefaultOption",
+    "voicePreview",
+    "voicePreviewText",
+    "voicePreviewFailed",
+    "voiceMale",
+    "voiceFemale"
   ]
 }

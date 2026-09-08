@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import 'package:cortex/funds/backend.dart';
 import 'package:cortex/funds/funds.dart';
 import 'package:cortex/navigation.dart';
@@ -51,12 +52,14 @@ class UserSection extends StatelessWidget {
     return Opacity(
       opacity: enabled ? 1.0 : 0.5,
       child: Material(
-        color: AppColors.secondaryColor,
-        borderRadius: BorderRadius.circular(10.0),
+        color: AppColors.background,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(CortexDesign.radius),
+            side: BorderSide(color: AppColors.border)),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: enabled ? onPressed : null,
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(CortexDesign.radius),
           splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -67,11 +70,11 @@ class UserSection extends StatelessWidget {
                 Text(text,
                     style: TextStyle(
                         color: AppColors.primaryColor.inverted,
-                        fontSize: screenWidth * 0.041,
+                        fontSize: 15,
                         fontWeight: FontWeight.w500)),
                 Icon(Icons.arrow_forward_ios,
                     color: AppColors.primaryColor.inverted,
-                    size: screenWidth * 0.04),
+                    size: CortexDesign.icon),
               ],
             ),
           ),

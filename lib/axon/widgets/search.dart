@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 import "package:cortex/app.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -56,8 +57,8 @@ class SearchHitTile extends StatelessWidget {
               children: [
                 SvgPicture.asset(
                   'assets/icons/search.svg',
-                  width: 16,
-                  height: 16,
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
                   colorFilter: ColorFilter.mode(
                       AppColors.secondaryColor, BlendMode.srcIn),
                 ),

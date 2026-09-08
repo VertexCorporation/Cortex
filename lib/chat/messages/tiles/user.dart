@@ -108,7 +108,7 @@ class UserMessageTileState extends State<UserMessageTile>
                 color: Colors.transparent,
                 child: Ink(
                   decoration: BoxDecoration(
-                    color: AppColors.secondaryColor,
+                    color: AppColors.quaternaryColor,
                     borderRadius: BorderRadius.circular(24 * scale),
                   ),
                   child: InkWell(

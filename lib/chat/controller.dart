@@ -136,6 +136,10 @@ class ChatControllerState extends State<ChatController>
     );
   }
 
+  void cancelPendingKeyboardFocus() {
+    chatViewKey.currentState?.cancelPendingKeyboardFocus();
+  }
+
   Future<void> _performInitialAsyncSetup(String langCode) async {
     if (widget.conversationID != null) {
       context.read<ConversationProvider>().setLoadingMessages(true);

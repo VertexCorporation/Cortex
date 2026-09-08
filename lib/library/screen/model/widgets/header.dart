@@ -1,3 +1,4 @@
+import 'package:cortex/design.dart';
 // lib/library/screen/model/widgets/header.dart
 
 import 'dart:io';
@@ -129,6 +130,8 @@ class ModelHeader extends StatelessWidget {
     final fallbackImage = Padding(
       padding: const EdgeInsets.all(12.0),
       child: SvgPicture.asset(
+        height: CortexDesign.icon,
+        width: CortexDesign.icon,
         'assets/icons/self.svg',
         fit: BoxFit.contain,
         colorFilter: svgColorFilter,
@@ -139,8 +142,12 @@ class ModelHeader extends StatelessWidget {
       if (imagePath.startsWith('assets/')) {
         return Padding(
           padding: const EdgeInsets.all(12.0),
-          child: SvgPicture.asset(imagePath,
-              fit: BoxFit.contain, colorFilter: svgColorFilter),
+          child: SvgPicture.asset(
+              height: CortexDesign.icon,
+              width: CortexDesign.icon,
+              imagePath,
+              fit: BoxFit.contain,
+              colorFilter: svgColorFilter),
         );
       }
       final file = File(imagePath);
@@ -191,8 +198,8 @@ class _InfoRow extends StatelessWidget {
       children: [
         SvgPicture.asset(
           iconPath,
-          width: screenWidth * 0.05,
-          height: screenWidth * 0.05,
+          width: CortexDesign.icon,
+          height: CortexDesign.icon,
           colorFilter:
               ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
         ),

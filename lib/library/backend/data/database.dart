@@ -232,9 +232,11 @@ class DatabaseHelper {
         if (decryptedJson != null) {
           // Success! This model belongs to the current user.
           try {
-            decodedModels.add(json.decode(decryptedJson) as Map<String, dynamic>);
+            decodedModels
+                .add(json.decode(decryptedJson) as Map<String, dynamic>);
           } catch (_) {
-            debugPrint("[DatabaseHelper] Failed to decode decrypted JSON for '$modelId'.");
+            debugPrint(
+                "[DatabaseHelper] Failed to decode decrypted JSON for '$modelId'.");
           }
         } else {
           // Decryption failed. This model belongs to another user. Skip it.
@@ -246,7 +248,8 @@ class DatabaseHelper {
         try {
           decodedModels.add(json.decode(rawJsonString) as Map<String, dynamic>);
         } catch (_) {
-          debugPrint("[DatabaseHelper] Failed to decode raw JSON for '$modelId'.");
+          debugPrint(
+              "[DatabaseHelper] Failed to decode raw JSON for '$modelId'.");
         }
       }
     }
