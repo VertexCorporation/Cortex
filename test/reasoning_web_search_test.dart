@@ -32,12 +32,11 @@ void main() {
     expect(input.enableWebSearch, isTrue);
   });
 
-  test('offline mode still clears unsupported search and logout clears both', () {
+  test('offline mode preserves optional search and logout clears both', () {
     input.toggleWebSearch();
     input.setFeatureMode(ChatInputMode.offline);
-    expect(input.enableWebSearch, isFalse);
+    expect(input.enableWebSearch, isTrue);
     input.setFeatureMode(ChatInputMode.featureReasoning);
-    input.toggleWebSearch();
     input.resetForLogout();
     expect(input.featureMode, ChatInputMode.none);
     expect(input.enableWebSearch, isFalse);

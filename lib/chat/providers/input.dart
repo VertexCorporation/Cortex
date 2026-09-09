@@ -140,7 +140,9 @@ class InputProvider with ChangeNotifier {
 
   void setFeatureMode(ChatInputMode mode) {
     _featureMode = mode;
-    if (mode != ChatInputMode.none && mode != ChatInputMode.featureReasoning) {
+    if (mode != ChatInputMode.none &&
+        mode != ChatInputMode.featureReasoning &&
+        mode != ChatInputMode.offline) {
       _enableWebSearch = false;
     }
     notifyListeners();
@@ -176,7 +178,8 @@ class InputProvider with ChangeNotifier {
     _enableWebSearch = !_enableWebSearch;
     if (_enableWebSearch &&
         _featureMode != ChatInputMode.none &&
-        _featureMode != ChatInputMode.featureReasoning) {
+        _featureMode != ChatInputMode.featureReasoning &&
+        _featureMode != ChatInputMode.offline) {
       _featureMode = ChatInputMode.none;
     }
     notifyListeners();

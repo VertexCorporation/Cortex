@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -41,6 +42,7 @@ import 'package:cortex/chat/services/memory_store.dart';
 import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/rag/chat.dart';
 import 'tools.dart';
+import 'local_web_context.dart';
 
 enum _MediaIntent {
   none,
@@ -81,6 +83,69 @@ class SendService {
   final OfflineModeratorService _offlineModerator = OfflineModeratorService();
 
   Timer? _retryTimer;
+
+  Future<String> _augmentLocalWithWeb({
+    required String query,
+    required String prompt,
+    required String conversationId,
+    required int messageIndex,
+    required AppLocalizations localizations,
+    required String langCode,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final model = _findOpenRouterCharacterBase(langCode);
+    if (user == null || model == null || query.trim().isEmpty) return prompt;
+    final client = ApiService();
+    var cancelled = false;
+    bool ownsConversation() => !cancelled &&
+        FirebaseAuth.instance.currentUser?.uid == user.uid &&
+        _isConversationActive(conversationId) &&
+        !_conversationProvider.wasResponseStopped &&
+        _conversationProvider.isWaitingForResponse;
+    void checkOwnership() {
+      if (!ownsConversation()) {
+        cancelled = true;
+        client.closeLocalWebRequest();
+      }
+    }
+    void setSearching(bool active) {
+      if (!_isConversationActive(conversationId)) return;
+      final messages = _conversationProvider.messages;
+      if (messageIndex < 0 || messageIndex >= messages.length) return;
+      _conversationProvider.updateMessageAtIndex(messageIndex,
+          messages[messageIndex].copyWith(isWebSearchActive: active));
+    }
+    _conversationProvider.addListener(checkOwnership);
+    final auth = FirebaseAuth.instance.authStateChanges().listen((_) => checkOwnership());
+    try {
+      final connected = await InternetConnection().hasInternetAccess.timeout(
+          const Duration(seconds: 2), onTimeout: () => false);
+      if (!connected || !ownsConversation()) return prompt;
+      setSearching(true);
+      final citations = <dynamic>[];
+      final summary = await client.getLocalWebSummary(
+        query: query.length <= 2000 ? query : query.substring(0, 2000),
+        modelId: model.id,
+        localizations: localizations,
+        onCitations: citations.addAll,
+      ).timeout(const Duration(seconds: 20));
+      if (!ownsConversation()) return prompt;
+      final web = LocalWebContext(summary, citations);
+      if (!web.isUsable) return prompt;
+      _conversationProvider.updateLastBotMessageSources(
+          web.sources, messageIndex: messageIndex);
+      return web.augment(prompt);
+    } catch (_) {
+      // Search is optional. Network, auth, quota, timeout and provider failures
+      // must not prevent the downloaded model from answering.
+      return prompt;
+    } finally {
+      _conversationProvider.removeListener(checkOwnership);
+      await auth.cancel();
+      client.closeLocalWebRequest();
+      setSearching(false);
+    }
+  }
 
   SendService({
     required ConversationProvider conversationProvider,
@@ -333,6 +398,7 @@ class SendService {
       // 2. FEATURE MODES (Study, Quiz, etc.)
       // -----------------------------------------------------------------------
       final activeMode = _inputProvider.featureMode;
+      final localWebEnabled = _inputProvider.enableWebSearch;
       final bool enableThinkingMode =
           activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
@@ -680,6 +746,20 @@ class SendService {
       if (!isServerSide) {
         // Offline Flow
         if (_offlineModerator.isPromptAcceptable(textForApi)) {
+          if (localWebEnabled && targetConvId != null &&
+              targetAiMessageIndex != null) {
+            textForApi = await _augmentLocalWithWeb(
+              query: text,
+              prompt: textForApi,
+              conversationId: targetConvId,
+              messageIndex: targetAiMessageIndex,
+              localizations: localizations,
+              langCode: langCode,
+            );
+            if (!_isConversationActive(targetConvId) ||
+                _conversationProvider.wasResponseStopped ||
+                !_conversationProvider.isWaitingForResponse) return;
+          }
           await _offlineService.sendMessage(
             textForApi,
             currentAttachmentPaths.firstOrNull,

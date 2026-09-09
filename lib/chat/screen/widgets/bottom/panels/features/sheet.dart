@@ -326,7 +326,11 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/world.svg',
                       title: l10n.featureWebSearchTitle,
-                      description: l10n.featureWebSearchDescription,
+                      description: isOfflineModelSelected
+                          ? (Localizations.localeOf(context).languageCode == 'tr'
+                              ? 'Arama sorusu çevrimiçi gönderilir; yanıt cihazda üretilir. Arama kredi kullanabilir. İnternetsiz normal çalışır.'
+                              : 'The search query goes online; the answer runs on device. Search may use credits. Works normally offline.')
+                          : l10n.featureWebSearchDescription,
                       isSelected: inputProvider.enableWebSearch,
                       onTap: () {
                         _prepareForTextFeature(context);
@@ -507,8 +511,7 @@ void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
   }).toList();
 
   if (downloadedModels.isNotEmpty) {
-    // Offline focus must be singular.
-    inputProvider.clearWebSearch();
+    // Web search is optional augmentation; the answer still runs locally.
     inputProvider.setFeatureMode(ChatInputMode.offline);
 
     // Auto-select an available offline model.
@@ -577,13 +580,12 @@ void _handleFeatureSelection(BuildContext context, ChatInputMode mode) {
 }
 
 /// Ensures text-only features run on a compatible text model.
-/// If current model is offline or generation-focused, switch back to dynamic chat.
+/// Keep local text models selected; only media models need a text fallback.
 void _prepareForTextFeature(BuildContext context) {
   final inputProvider = context.read<InputProvider>();
   final sessionProvider = context.read<ChatSessionProvider>();
   final currentModel = sessionProvider.selectedModel;
 
-  final bool isOfflineModel = currentModel?.type == 'offline';
   final bool isGenerationFocused = currentModel?.outputs['image'] == true ||
       currentModel?.outputs['audio'] == true ||
       currentModel?.outputs['video'] == true ||
@@ -597,7 +599,7 @@ void _prepareForTextFeature(BuildContext context) {
     inputProvider.clearFeatureMode();
   }
 
-  if (isOfflineModel || isGenerationFocused) {
+  if (isGenerationFocused) {
     _selectDynamicModel(context);
   }
 }
