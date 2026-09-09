@@ -13,11 +13,21 @@ List<Map<String, String>> mergeWebSources(
         uri.host.isEmpty || uri.userInfo.isNotEmpty) return;
     final url = uri.toString();
     final title = source is Map ? source['title'] : null;
-    result.putIfAbsent(url, () => {
+    final previous = result[url];
+    final displayTitle = title is String && title.trim().isNotEmpty
+        ? title.trim() : uri.host;
+    // Streaming gateways can send the URL before its title. Enrich that
+    // placeholder without reordering cards or replacing an established title.
+    if (previous != null) {
+      if (previous['title'] == uri.host && displayTitle != uri.host) {
+        result[url] = {'url': url, 'title': displayTitle};
+      }
+      return;
+    }
+    result[url] = {
       'url': url,
-      'title': title is String && title.trim().isNotEmpty
-          ? title.trim() : uri.host,
-    });
+      'title': displayTitle,
+    };
   }
   for (final source in existing) {
     add(source);
