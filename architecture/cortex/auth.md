@@ -31,7 +31,7 @@ Registration posts a username suggestion to the `usernameSuggestions` Firestore 
 
 ## Settings-side and user state
 
-`AuthService` (settings/services/auth.dart) and `ProfileService` (settings/services/profile.dart) own account actions and profile edits, with their own exception types. `UserProvider` (server/user.dart) exposes the user record to the app.
+`AuthService` (settings/services/auth.dart) and `ProfileService` (settings/services/profile.dart) own account actions and profile edits, with their own exception types. `UserProvider` (server/user.dart) exposes the user record to the app and owns the single `users/{uid}` snapshot listener — `FundsBackend` and `CreditsManager` attach to it via `ChangeNotifier` instead of opening their own snapshots. The nested `subscription` entitlement is resolved through `SubscriptionEntitlement` (see `payments.md`).
 
 ## Server contract
 

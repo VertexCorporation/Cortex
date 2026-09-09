@@ -26,3 +26,11 @@ Serves cache hits first, falls back to KV, filters blacklisted models, adds ETag
 `syncer.js` · `core/sync.js` · `core/serve.js` · `config.js` (+ `config/client-assets.js`) · `types.js` · `processing/` (`catalog-policy`, `cloudflare`, `dedup`, `deepgram`, `elevenlabs`, `fal-models`, `fal`, `groq`, `huggingface-chat`, `huggingface-discovery`, `huggingface`, `manual`, `merge`, `offline`, `online`, `parser`) · `kv/` (`data`, `lock`) · `utils/` (`api`, `helpers`). Tests: `tests/` (catalog-policy, fal-models, huggingface).
 
 Client counterpart: `../cortex/library.md` (`ModelRepository` consumes `/models.json`).
+
+## Curated family policy and offline presentation
+
+`config/client-assets.js` explicitly names approved online series (`FAMILY_NAMES`); producer assets are logos, not authorization. `catalog-policy.js` validates OpenRouter (including free fallback), Groq, Fal, Cloudflare, Deepgram, ElevenLabs and approved manual online records, then canonicalizes family names. Unknown series are excluded. Checks run before deduplication, after merge, and when serving old KV documents; the serving policy header bypasses obsolete edge responses while retaining the normal cache purge key.
+
+`offline.js` groups by base family, keeping version, size and quantization in variant labels. The recovered May 17 source documents the Next family contract; the current file-level IDs, shard exclusions, URL/size refresh and outage handling remain in place. HF discovery accepts known offline families. Next 1B/4B and different quants stay distinct variants under Next. Cortex splits online/offline variants before using family cards and filters size/RAM per variant rather than dropping a family based on its first entry.
+
+Offline publication selects one download per full model name (generation and parameter size remain part of that name). Manual choices take precedence; otherwise Q4_K_M is preferred with deterministic fallbacks and ID tie-breaking. Quantization/recipe duplicates are removed after enrichment and when serving retained KV data. Selected download IDs, URLs and sizes remain unchanged; identity titles are repaired without replacing translated descriptions.
