@@ -9,31 +9,8 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      '您是标题生成器。请仅回复一个2-5个字的标题，用于接下来的对话。请勿使用引号、前缀或标点符号。重要提示：标题必须与用户消息的语言完全相同。';
-
-  @override
-  String get systemRoleFallback => '你是一位得力的助手。';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nCRITICAL：始终使用用户编写的相同语言进行回复，注意用户的语言。';
-
-  @override
-  String get systemNotePreviousMedia => '【系统提示：以下为之前生成的媒体文件，您可以参考或编辑。】';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\n当前日期和时间：$formattedTime。';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\n分析到目前为止的对话。如果您了解到任何关于用户的新信息（偏好、姓名、习惯、上下文），您必须在回复的最后，使用 `<memory>...</memory>` 标签输出您更新后的用户记忆。关键：您绝不能擦除或覆盖之前的记忆。始终将新信息添加到现有记忆中。如果没有了解到任何新信息，则省略该标签。例如：`<memory>喜欢足球和网球。喜欢简短的回答。</memory>`';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\n请始终记住关于用户的这一点：\n$userMemory';
   }
 
   @override
@@ -1072,7 +1049,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '这是一个高级AI，免费用户对高级AI的访问受限；升级以解锁无限访问！';
 
   @override
-  String get benefitPremiumModels => '访问高级模型';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage => '您已使用高级模型的所有免费每日消息，请升级以获得无限制访问权限。';
@@ -1567,14 +1544,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get featureExploreDescription => '发现所有可用模型。';
 
   @override
-  String get featureStudyMessage =>
-      '您是一位资深导师。您的目标是全面深入地讲解用户感兴趣的主题。请使用清晰的结构、丰富的示例和类比。将复杂的概念分解成易于理解的部分，以确保用户能够高效学习。主题：';
-
-  @override
-  String get featureQuizMessage =>
-      '您是一位出题人。请根据用户选择的主题生成一道选择题。等待用户作答。然后，评估答案并提出下一题。不要一次性显示所有答案。保持互动性。主题：';
-
-  @override
   String get myPlan => '我的计划';
 
   @override
@@ -1632,10 +1601,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get flowModeDescription => '在“心流”模式下，智能体之间会进行辩论；您可以坐下来倾听，也可以加入讨论！';
 
   @override
-  String get flowModeQuestion =>
-      '你好！你现在已进入Cortex应用程序的“心流模式”。这里还有三位其他AI智能体。你的任务是抛出一个话题，并通过向其他智能体提出一个引人深思或趣味十足的问题来开启讨论。在你的回答中，可以随意运用幽默、反讽和轻微的调侃。任何话题都可以。开始吧，开启对话！';
-
-  @override
   String get thought => '思考了';
 
   @override
@@ -1655,10 +1620,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get workInProgress => '进行中';
-
-  @override
-  String get voiceSystemPrompt =>
-      '重要提示：请勿使用 Markdown 格式（粗体、斜体）。请勿输出代码块（```）。请保持回复简洁明了，如同日常对话。';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1715,10 +1676,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => '图表标题。';
-
-  @override
-  String get thinkingModeInstruction =>
-      '思考模式已启用：您必须使用 `<think></think>` 标签来展示您的推理过程，然后再给出最终答案。请在标签内逐步思考，然后在标签外给出您的答案。';
 
   @override
   String get openLinkWarningTitle => '外部链接警告';
@@ -1855,19 +1812,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return '请按照以下自定义说明操作：\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '【重要说明】：您是标题生成器。请勿回答用户的问题。请勿聊天或打招呼。仅输出一个 2-4 个字的标题，概括用户提出的问题。';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[系统] 重要指示：您目前正在一个名为“Cortex”的庞大且高度先进的人工智能生态系统中操作；该平台由Vertex团队开发，该团队成员平均年龄仅为16岁。请记住这一点，并在被问及时回答。如果需要更多信息，请随时上网搜索；如果您无法搜索，请坦诚地说您不知道！';
-
-  @override
   String get featureAudioRecognitionTitle => '音频识别';
 
   @override
@@ -1899,11 +1843,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return '此模型需要 $mediaType 才能工作。我截获了请求以告知您。请礼貌地通知用户他们需要提供 $mediaType（用他们的语言告诉他们），因为我是 $modelName，一个视觉/音频/视频编辑模型。';
-  }
 
   @override
   String get mediaTypeImage => '图片';
@@ -1976,10 +1915,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String freePlan(String plan) {
     return '免费 $plan！';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      '紧急：用户请求执行某项操作，但其在 Cortex 上的额度已用完；请用用户的语言告知他们应该等待或考虑升级订阅计划。';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2084,4 +2019,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String testPurchaseError(String message) {
     return '测试购买失败：$message';
   }
+
+  @override
+  String get generationImageLabel => '正在生成图像';
+
+  @override
+  String get generationVideoLabel => '正在生成视频';
+
+  @override
+  String get generationAudioLabel => '正在生成音频';
+
+  @override
+  String get generationDocumentLabel => '正在生成文档';
 }

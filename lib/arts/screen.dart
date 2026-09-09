@@ -290,12 +290,14 @@ class _ArtTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8.0),
-      child: Container(
-        color: AppColors.senaryColor.withValues(alpha: 0.3),
-        child: _buildContent(context),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: AppColors.border),
       ),
+      clipBehavior: Clip.antiAlias,
+      child: _buildContent(context),
     );
   }
 
@@ -397,7 +399,7 @@ class _ArtTile extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Container(
-                color: AppColors.senaryColor.withValues(alpha: 0.5),
+                color: AppColors.background,
               ),
               Center(
                 child: SvgPicture.asset(

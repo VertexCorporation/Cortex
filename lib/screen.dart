@@ -164,6 +164,18 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _isDialogOpen = isOpen;
   }
 
+  /// Initial session setup can finish after the user has opened another view.
+  void focusInitialChat() {
+    if (!mounted ||
+        _currentView != MainScreenView.chat ||
+        _axonController.value != 0 ||
+        _isDialogOpen ||
+        _isSearchFocused) {
+      return;
+    }
+    _requestChatKeyboardFocus(initialDelayMs: 150, source: 'first_launch');
+  }
+
   void _requestChatKeyboardFocus({
     int initialDelayMs = 0,
     int controllerRetries = 10,

@@ -9,32 +9,8 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'आप एक शीर्षक निर्माता हैं। कृपया निम्नलिखित वार्तालाप के लिए केवल 2-5 शब्दों का शीर्षक ही लिखें। उद्धरण चिह्नों, उपसर्गों या विराम चिह्नों का प्रयोग न करें। महत्वपूर्ण: शीर्षक उपयोगकर्ता के संदेश की भाषा में ही होना चाहिए।';
-
-  @override
-  String get systemRoleFallback => 'आप एक मददगार सहायक हैं।';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nCRITICAL: हमेशा उसी भाषा में उत्तर दें जिसमें उपयोगकर्ता लिखता है, उपयोगकर्ता की भाषा पर ध्यान दें।';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[सिस्टम नोट: नीचे पूर्व में उत्पन्न मीडिया है। आप इसे संदर्भित या संपादित कर सकते हैं।]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nवर्तमान दिनांक और समय: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nअब तक की बातचीत का विश्लेषण करें। यदि आपको उपयोगकर्ता के बारे में कोई भी नया विशिष्ट तथ्य (पसंद, नाम, आदतें, संदर्भ) पता चला है, तो आपको अपने उत्तर के बिल्कुल अंत में <memory>...</memory> टैग के अंदर उपयोगकर्ता के बारे में अपनी पूरी अद्यतन जानकारी अवश्य लिखनी चाहिए। महत्वपूर्ण: आपको पिछली जानकारी को कभी भी मिटाना या ओवरराइट नहीं करना है। हमेशा मौजूदा जानकारी में नए तथ्य जोड़ें। यदि बिल्कुल भी कुछ नया पता नहीं चला है, तो टैग को छोड़ दें। उदाहरण: <memory>फुटबॉल और टेनिस पसंद करता है। संक्षिप्त उत्तर पसंद करता है।</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\nउपयोगकर्ता के बारे में हमेशा यह याद रखें:\n$userMemory';
   }
 
   @override
@@ -1125,7 +1101,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'यह AI एक प्रीमियम AI है, मुफ्त उपयोगकर्ताओं के पास प्रीमियम AI तक सीमित पहुंच है; असीमित पहुंच के लिए अपग्रेड करें!';
 
   @override
-  String get benefitPremiumModels => 'प्रीमियम मॉडल तक पहुंच';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1654,14 +1630,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get featureExploreDescription => 'सभी उपलब्ध मॉडलों को देखें।';
 
   @override
-  String get featureStudyMessage =>
-      'आप एक कुशल शिक्षक हैं। आपका लक्ष्य उपयोगकर्ता के विषय को व्यापक रूप से समझाना है। स्पष्ट संरचना, उदाहरणों और उपमाओं का प्रयोग करें। जटिल विचारों को सरल भागों में बाँटें ताकि उपयोगकर्ता प्रभावी ढंग से सीख सके। विषय:';
-
-  @override
-  String get featureQuizMessage =>
-      'आप एक क्विज़ मास्टर हैं। उपयोगकर्ता के विषय के आधार पर एक विशिष्ट बहुविकल्पीय प्रश्न तैयार करें। उनके उत्तर की प्रतीक्षा करें। फिर, उसका मूल्यांकन करें और अगला प्रश्न पूछें। सभी उत्तर एक साथ प्रकट न करें। इसे इंटरैक्टिव बनाए रखें। विषय:';
-
-  @override
   String get myPlan => 'मेरी योजना';
 
   @override
@@ -1721,10 +1689,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'फ्लो मोड में, बुद्धिमत्ताएँ आपस में बहस करती हैं; आप या तो आराम से बैठकर सुन सकते हैं या फिर चर्चा में शामिल हो सकते हैं!';
 
   @override
-  String get flowModeQuestion =>
-      'नमस्कार! आप कॉर्टेक्स ऐप के फ्लो मोड में हैं। आपके साथ तीन अन्य एआई एजेंट भी मौजूद हैं। आपका काम है एक विषय को चर्चा में लाना और एक रोचक या मनोरंजक प्रश्न पूछकर बातचीत शुरू करना। अपने उत्तरों में हास्य, व्यंग्य और हल्के-फुल्के कटाक्ष का प्रयोग करें। कोई भी विषय चलेगा। तो चलिए, बातचीत शुरू कीजिए।';
-
-  @override
   String get thought => 'सोचा';
 
   @override
@@ -1744,10 +1708,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get workInProgress => 'काम जारी है';
-
-  @override
-  String get voiceSystemPrompt =>
-      'महत्वपूर्ण: मार्कडाउन फॉर्मेटिंग (बोल्ड, इटैलिक) का उपयोग न करें। कोड ब्लॉक (```) न लिखें। उत्तर बातचीत के अंदाज़ में और संक्षिप्त रखें।';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1811,10 +1771,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'चार्ट का शीर्षक।';
-
-  @override
-  String get thinkingModeInstruction =>
-      'सोचने की प्रक्रिया शुरू करें: अंतिम उत्तर देने से पहले अपनी तर्क प्रक्रिया को दर्शाने के लिए आपको <think></think> टैग का उपयोग करना होगा। टैग के अंदर चरण दर चरण सोचें, फिर टैग के बाहर अपना उत्तर दें।';
 
   @override
   String get openLinkWarningTitle => 'बाह्य लिंक चेतावनी';
@@ -1952,19 +1908,6 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'इन विशेष निर्देशों का पालन करें:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[महत्वपूर्ण निर्देश]: आप एक शीर्षक जनरेटर हैं। उपयोगकर्ता के प्रश्न का उत्तर न दें। चैट न करें या हैलो न कहें। केवल 2-4 शब्दों का शीर्षक आउटपुट करें जो उपयोगकर्ता के प्रश्न का सारांश प्रस्तुत करता हो।';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[System] महत्वपूर्ण निर्देश: आप वर्तमान में \"कॉर्टेक्स\" नामक एक विशाल, अत्यधिक उन्नत एआई पारिस्थितिकी तंत्र के भीतर काम कर रहे हैं; यह प्लेटफ़ॉर्म वर्टेक्स टीम द्वारा विकसित किया गया है, जिनकी औसत आयु मात्र 16 वर्ष है। इसे याद रखें और पूछे जाने पर उत्तर दें। यदि अधिक जानकारी मांगी जाए, तो इंटरनेट पर खोजने में संकोच न करें, या यदि आप खोज नहीं सकते हैं, तो बेझिझक कहें कि आपको नहीं पता!';
-
-  @override
   String get featureAudioRecognitionTitle => 'ऑडियो पहचान';
 
   @override
@@ -2000,11 +1943,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'इस मॉडल को काम करने के लिए एक $mediaType की आवश्यकता है। मैंने आपको बताने के लिए अनुरोध को रोक लिया है। कृपया उपयोगकर्ता को विनम्रतापूर्वक सूचित करें कि उन्हें एक $mediaType प्रदान करने की आवश्यकता है (उन्हें उनकी अपनी भाषा में बताएं) क्योंकि मैं $modelName हूँ, एक दृश्य/ऑडियो/वीडियो संपादन मॉडल।';
-  }
 
   @override
   String get mediaTypeImage => 'छवि';
@@ -2082,10 +2020,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String freePlan(String plan) {
     return 'मुफ़्त $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'गंभीर सूचना: उपयोगकर्ता ने एक कार्रवाई का अनुरोध किया है, लेकिन कॉर्टेक्स पर उनका कोटा समाप्त हो गया है; कृपया उपयोगकर्ता को उनकी भाषा में सूचित करें कि उन्हें प्रतीक्षा करनी चाहिए या अपनी सदस्यता योजना को अपग्रेड करने पर विचार करना चाहिए।';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2191,4 +2125,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'टेस्ट खरीदारी विफल: $message';
   }
+
+  @override
+  String get generationImageLabel => 'चित्र बनाया जा रहा है';
+
+  @override
+  String get generationVideoLabel => 'वीडियो बनाया जा रहा है';
+
+  @override
+  String get generationAudioLabel => 'ऑडियो बनाया जा रहा है';
+
+  @override
+  String get generationDocumentLabel => 'दस्तावेज़ बनाया जा रहा है';
 }

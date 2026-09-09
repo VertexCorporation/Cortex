@@ -53,7 +53,7 @@
   "benefit7": "Дополнительные ограничения на использование",
   "benefit8": "Добавить модели",
   "benefit9": "Новые темы",
-  "benefitPremiumModels": "Доступ к премиум-моделям",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "Чат",
   "branch": "Ветвь",
   "chatLengthLimitExceeded": "В этом чате превышен лимит символов. Пожалуйста, начните новый чат или приобретите подписку.",
-  "chatTitleCriticalInstruction": "[ВАЖНАЯ ИНСТРУКЦИЯ]: Вы ГЕНЕРАТОР ТИТУЛОВ. НЕ отвечайте на вопрос пользователя. НЕ общайтесь и не здоровайтесь. Выводите ТОЛЬКО заголовок из 2–4 слов, описывающий то, о чем спрашивает пользователь. Заголовок ДОЛЖЕН быть на том же языке, что и сообщение пользователя.",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "Вы генератор титулов. Отвечайте ТОЛЬКО, называя заголовок из 2–5 слов для следующего разговора. Не используйте кавычки, префиксы и знаки препинания. ВАЖНО: заголовок ДОЛЖЕН быть на ТОЧНО ТОМ же языке, что и сообщение пользователя.",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "Недавние",
   "checkYourInternet": "Пожалуйста, проверьте подключение к Интернету и повторите попытку.",
   "chinese": "китайский",
@@ -136,10 +128,6 @@
   "conversationDeleted": "Разговор удален!",
   "copy": "Копировать",
   "copyrights": "Атрибуция",
-  "cortexSystemPersona": "[Система] ВАЖНАЯ ИНСТРУКЦИЯ: В настоящее время вы работаете внутри огромной, высокоразвитой экосистемы искусственного интеллекта под названием \"Кортекс\"; эта платформа разработана командой Vertex, которой в среднем всего 16 лет. Помните об этом и отвечайте, если спросят. Если требуется дополнительная информация, не стесняйтесь искать в Интернете, а если вы не можете выполнить поиск, смело скажите, что вы не знаете!",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "Не удалось открыть ссылку",
   "create": "Создать",
   "createAI": "Создать",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "Сканирование фотографий",
   "featurePluralDescription": "Эта модель может автоматически интегрировать дополнительные варианты, тем самым расширяя свои функциональные возможности для поддержки разнообразного спектра операций с повышенной производительностью.",
   "featurePluralTitle": "Множественное число",
-  "featureQuizMessage": "Вы мастер викторин. Создайте конкретный вопрос с несколькими вариантами ответов на основе темы пользователя. Подождите их ответа. Затем оцените это и задайте следующий вопрос. Не раскрывайте все ответы сразу. Держите его интерактивным. Тема:",
   "featureQuizzesDescription": "Проверьте свои знания.",
   "featureQuizzesTitle": "Викторины",
   "featureReasoning": "Глубокое мышление",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "Ролевые модели позволяют создавать различные чаты и сценарии.",
   "featureRoleplayTitle": "Ролевая игра",
   "featureStudyDescription": "Получите пояснения и резюме.",
-  "featureStudyMessage": "Вы опытный репетитор. Ваша цель — подробно объяснить тему пользователя. Используйте четкую структуру, примеры и аналогии. Разбивайте сложные идеи на удобоваримые части, чтобы пользователь мог учиться эффективно. Тема:",
   "featureStudyTitle": "Учиться и учиться",
   "featureToolUseDescription": "Эта модель может использовать внешние инструменты и API.",
   "featureToolUseTitle": "Использование инструмента",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "В режиме потока разумы спорят между собой; вы можете либо сидеть сложа руки и слушать, либо присоединиться к обсуждению!",
-  "flowModeQuestion": "Привет! Теперь вы находитесь в режиме потока в приложении Cortex. С вами здесь еще три агента ИИ. Ваша задача — внести тему в комнату и начать дискуссию, задав другим провокационный или развлекательный вопрос. В своих ответах смело используйте юмор, иронию и легкую треш. Любая тема – честная игра. Давай, начни разговор.",
   "fluxChatDescription": "Чаты Flux — это временные чаты, которые не сохраняются на вашем устройстве.",
   "fluxChatTitle": "Flux Chat",
   "forgotPassword": "Забыли пароль?",
@@ -391,15 +376,6 @@
   "insufficientRAM": "Низкая память",
   "insufficientStorage": "Мало места для хранения",
   "intelligenceDescription": "ИИ общаются с вами вот так.",
-  "intelligenceSystemPrompt": "Следуйте этим пользовательским инструкциям:\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "Интеллект",
   "invalidCredentials": "Неправильный адрес электронной почты или пароль.",
   "invalidEmail": "Пожалуйста, введите действительный адрес электронной почты.",
@@ -733,35 +709,6 @@
   "supportCreator": "Поддержите автора",
   "swipeToContinue": "Проведите пальцем, чтобы продолжить",
   "systemInfo": "Системная информация",
-  "systemLanguageInstruction": "ВАЖНО: Всегда отвечайте на том же языке, на котором пишет пользователь, обращайте внимание на язык пользователя.",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "[ДИРЕКТИВА СИСТЕМНОЙ ПАМЯТИ]\nПроанализируйте разговор на данный момент. Если вы узнали ЛЮБЫЕ новые отдельные факты о пользователе (предпочтения, имя, привычки, контекст), вы ДОЛЖНЫ вывести ВСЮ обновленную память о пользователе внутри тегов <memory>...</memory> В САМОМ КОНЦЕ вашего ответа. ВАЖНО: НИКОГДА не следует стирать или перезаписывать предыдущую память. ВСЕГДА добавляйте новые факты к имеющейся памяти. Если не было обнаружено абсолютно ничего нового, опустите тег. Пример: <memory>Любит футбол и теннис. Предпочитает короткие ответы.</memory>",
-  "systemMemoryReminder": "Всегда помните следующее о пользователе:\n{userMemory}",
-  "systemNotePreviousMedia": "[Системное примечание: ниже приведены ранее созданные медиафайлы. Вы можете ссылаться на него или редактировать его.]",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "КРИТИЧЕСКОЕ: пользователь запросил действие, но его резерв на Cortex исчерпан; пожалуйста, сообщите пользователю на его языке, что ему следует подождать или рассмотреть возможность обновления своего плана подписки.",
-  "systemPromptMissingMedia": "Для работы этой модели требуется {mediaType}. Я перехватил запрос сообщить вам. Пожалуйста, вежливо сообщите пользователю, что ему необходимо предоставить {mediaType} (скажите им на его родном языке), потому что я {modelName}, модель редактирования визуальных/аудио/видео.",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "Вы полезный помощник.",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "Текущая дата и время: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "Вы можете переключаться между светлой и темной темами по своему усмотрению. Выбранная тема будет применяться во всем интерфейсе Cortex.",
   "themeLocked": "Эта тема требует более высокого уровня подписки. Пожалуйста, обновите, чтобы разблокировать.",
   "thinking": "Мышление",
-  "thinkingModeInstruction": "РЕЖИМ МЫШЛЕНИЯ ВКЛЮЧЕН: вы ДОЛЖНЫ использовать теги <think></think>, чтобы продемонстрировать процесс рассуждения, прежде чем дать окончательный ответ. Подумайте шаг за шагом внутри тегов, а затем дайте ответ вне тегов.",
   "thought": "Мысль",
   "tooManyRequests": "Слишком много запросов",
   "toolCalculateDescription": "Оцените математическое выражение.",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Для создания видео вам понадобится подписка Ultra, обновите ее сейчас и почувствуйте поток!",
   "voiceModeInformation": "Cortex обеспечивает безопасность ваших данных, полностью работая на устройстве, даже в режиме голосового чата; наслаждайтесь непрерывным общением!",
-  "voiceSystemPrompt": "ВАЖНО: Не используйте форматирование уценки (жирный, курсив). НЕ выводите блоки кода (```). Ответы должны быть разговорными и краткими.",
   "weakPassword": "Пароль слишком слабый.",
   "webSearchSources": "Источники",
   "offlineUse": "Использование без Интернета",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "Тестовая покупка",
   "testPurchaseBadge": "ТЕСТ",
   "testPurchaseNotice": "Симулированная оплата для тестирования — реальное списание не производится. Это даёт доступ к {plan} на {duration}.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Завершить тестовую покупку",
   "testDurationMinutes": "{minutes} мин.",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Тестовый режим: покупки симулируются и предоставляют кратковременные тестовые права — реальное списание исключено.",
   "testSubscriptionManage": "Отменить тестовую подписку",
   "testPurchaseSuccess": "Тестовая подписка активирована.",
   "testPurchaseRevoked": "Тестовая подписка отменена.",
   "testPurchaseError": "Не удалось выполнить тестовую покупку: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Создание изображения",
+  "generationVideoLabel": "Создание видео",
+  "generationAudioLabel": "Создание аудио",
+  "generationDocumentLabel": "Создание документа"
 }

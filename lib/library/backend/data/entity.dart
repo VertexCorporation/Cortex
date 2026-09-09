@@ -213,8 +213,9 @@ class ModelEntity {
       type: getStringOrLocalized(map['type']) ?? 'online',
       source: getStringOrLocalized(map['source']) ?? 'openrouter',
       category: getStringOrLocalized(map['category']) ?? 'online',
-      role: getLocalizedFieldFromDetails('role') ??
-          getStringOrLocalized(map['role']),
+      role: map['role'] is String
+          ? map['role'] as String?
+          : getStringOrLocalized(map['role']),
       displaySummary: _stripWrappedQuotes(
           getLocalizedFieldFromDetails('summary') ??
               getStringOrLocalized(map['summary']) ??

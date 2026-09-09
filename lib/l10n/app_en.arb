@@ -1,20 +1,4 @@
 {
-  "chatTitlePrompt": "You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation. CRITICAL: The title MUST be in the EXACT SAME language as the user's message.",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
-  "systemRoleFallback": "You are a helpful assistant.",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
-  "systemLanguageInstruction": "\n\nCRITICAL: Always respond in the same language the user writes in, pay attention to the user's language.",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemNotePreviousMedia": "[System Note: Below is the media generated previously. You may reference or edit it.]",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
   "systemTimeInfo": "\n\nCurrent date and time: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -25,8 +9,6 @@
       }
     }
   },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
-  "systemMemoryReminder": "\n\nAlways remember this about the user:\n{userMemory}",
   "@@locale": "en",
   "cancel": "Cancel",
   "remove": "Remove",
@@ -441,7 +423,7 @@
   "@premiumModelNoticeDescription": {
     "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
   },
-  "benefitPremiumModels": "Access to premium models",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -659,11 +641,9 @@
   "featureQuizzesTitle": "Quizzes",
   "featureQuizzesDescription": "Test your knowledge.",
   "featureExploreDescription": "Discover all available models.",
-  "featureStudyMessage": "You are an expert tutor. Your goal is to explain the user's topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:",
-  "featureQuizMessage": "You are a quiz master. Generate a specific multiple-choice question based on the user's topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:",
   "myPlan": "My Plan",
-  "welcomeOfferBadge": "Welcome Offer â€¢ {time}",
-  "exclusiveOfferBadge": "Exclusive Offer â€¢ {time}",
+  "welcomeOfferBadge": "Welcome Offer • {time}",
+  "exclusiveOfferBadge": "Exclusive Offer • {time}",
   "@welcomeOfferBadge": {
     "placeholders": {
       "time": {
@@ -686,7 +666,6 @@
   "continueInOfflineMode": "Continue in Offline Mode",
   "voiceModeInformation": "Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!",
   "flowModeDescription": "In Flow mode, intelligences debate among themselves; you can either sit back and listen or jump in and join the discussion!",
-  "flowModeQuestion": "Hello! You are now in Flow Mode on the Cortex app. There are three other AI agents here with you. Your task is to throw a topic into the room and kick off a discussion by asking the others a provocative or entertaining question. In your responses, feel free to use humor, irony, and light trash talk. Any topic is fair game. Go ahead, start the conversation.",
   "thought": "Thought",
   "agentRed": "Red",
   "agentBlue": "Blue",
@@ -694,7 +673,6 @@
   "flowMode": "Flow Mode",
   "premium": "Premium",
   "workInProgress": "Work In Progress",
-  "voiceSystemPrompt": "IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.",
   "flowModeContextParams": "Cortex Flow Mode ({agentName}). Previous: {previousResponse}",
   "@flowModeContextParams": {
     "description": "Context string for Flow Mode with agent name and previous response placeholders.",
@@ -725,7 +703,6 @@
   "toolChartDataParam": "Numeric data values for the chart.",
   "toolChartLabelParam": "Dataset label for the chart legend.",
   "toolChartTitleParam": "Title of the chart.",
-  "thinkingModeInstruction": "THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags.",
   "openLinkWarningTitle": "External Link Warning",
   "openLinkCancel": "Cancel",
   "openLinkConfirm": "Open Link",
@@ -790,23 +767,6 @@
       }
     }
   },
-  "intelligenceSystemPrompt": "Follow these custom instructions:\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
-  "chatTitleCriticalInstruction": "[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user's question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about. The title MUST be in the same language as the user's message.",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "cortexSystemPersona": "\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\"; this platform is developed by the Vertex team, who are on average just 16 years old. Remember this and answer if asked. If more information is requested, do not hesitate to search the internet, or if you cannot search, feel free to say you don't know!",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "featureAudioRecognitionTitle": "Audio Recognition",
   "featureAudioRecognitionDescription": "This model can understand and process audio inputs.",
   "featureVideoRecognitionTitle": "Video Recognition",
@@ -818,20 +778,6 @@
   "videoModels": "Video Models",
   "imageModels": "Image Models",
   "audioModels": "Audio Models",
-  "systemPromptMissingMedia": "This model requires a {mediaType} to work. I have intercepted the request to let you know. Please inform the user gracefully that they need to provide a {mediaType} (tell them in their own language) because I am {modelName}, a visual/audio/video editing model.",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
   "mediaTypeImage": "image",
   "mediaTypeVideo": "video",
   "mediaTypeAudio": "audio",
@@ -914,7 +860,6 @@
       }
     }
   },
-  "systemPromptLimitFallback": "CRITICAL: The user requested an action, but their allowance on Cortex has depleted; kindly inform the user in their language that they should wait or consider upgrading their subscription plan.",
   "dynamicPreditsUpgradeMessage": "Cortex can give even better answers; upgrade now and get the best answer for every question!",
   "pinLimitReached": "You can pin up to 3 chats.",
   "categoryAll": "All",
@@ -926,35 +871,79 @@
   "categoryFeminine": "Feminine",
   "categoryInanimate": "Inanimate",
   "voiceSelection": "AI Voice",
-  "@voiceSelection": { "description": "Voice picker in settings" },
+  "@voiceSelection": {
+    "description": "Voice picker in settings"
+  },
   "voiceSelectionDescription": "Choose the voice Cortex speaks with in voice mode.",
-  "@voiceSelectionDescription": { "description": "Voice picker in settings" },
+  "@voiceSelectionDescription": {
+    "description": "Voice picker in settings"
+  },
   "voiceDefaultOption": "Default",
-  "@voiceDefaultOption": { "description": "Voice picker in settings" },
+  "@voiceDefaultOption": {
+    "description": "Voice picker in settings"
+  },
   "voicePreview": "Play sample",
-  "@voicePreview": { "description": "Voice picker in settings" },
+  "@voicePreview": {
+    "description": "Voice picker in settings"
+  },
   "voicePreviewText": "Hello, I am Cortex. How can I help you today?",
-  "@voicePreviewText": { "description": "Voice picker in settings" },
+  "@voicePreviewText": {
+    "description": "Voice picker in settings"
+  },
   "voicePreviewFailed": "Could not play the sample. Check your connection or balance.",
-  "@voicePreviewFailed": { "description": "Voice picker in settings" },
+  "@voicePreviewFailed": {
+    "description": "Voice picker in settings"
+  },
   "voiceMale": "Male voices",
-  "@voiceMale": { "description": "Voice picker group heading" },
+  "@voiceMale": {
+    "description": "Voice picker group heading"
+  },
   "voiceFemale": "Female voices",
-  "@voiceFemale": { "description": "Voice picker group heading" },
+  "@voiceFemale": {
+    "description": "Voice picker group heading"
+  },
   "premiumChatGateTitle": "Unlock more",
   "premiumChatGateDescription": "Upgrade to Cortex Premium to access this powerful AI model and more.",
   "premiumChatGateCta": "Join Premium",
   "testPurchaseTitle": "Test Purchase",
   "testPurchaseBadge": "TEST",
   "testPurchaseNotice": "Simulated checkout for testing — no real charge is made. This grants {plan} access for {duration}.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Complete Test Purchase",
   "testDurationMinutes": "{minutes} minutes",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Test mode: purchases are simulated and grant short-lived test entitlements — real billing is never involved.",
   "testSubscriptionManage": "Cancel Test Subscription",
   "testPurchaseSuccess": "Test subscription is now active.",
   "testPurchaseRevoked": "Test subscription cancelled.",
   "testPurchaseError": "Test purchase failed: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Generating image",
+  "generationVideoLabel": "Generating video",
+  "generationAudioLabel": "Generating audio",
+  "generationDocumentLabel": "Generating document"
 }

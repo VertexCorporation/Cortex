@@ -53,7 +53,7 @@
   "benefit7": "अधिक उपयोग सीमाएँ",
   "benefit8": "मॉडल जोड़ें",
   "benefit9": "नई थीम",
-  "benefitPremiumModels": "प्रीमियम मॉडल तक पहुंच",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "चैट",
   "branch": "शाखा",
   "chatLengthLimitExceeded": "यह चैट वर्ण सीमा को पार कर गई है। कृपया एक नई चैट शुरू करें या सदस्यता खरीदें।",
-  "chatTitleCriticalInstruction": "[महत्वपूर्ण निर्देश]: आप एक शीर्षक जनरेटर हैं। उपयोगकर्ता के प्रश्न का उत्तर न दें। चैट न करें या हैलो न कहें। केवल 2-4 शब्दों का शीर्षक आउटपुट करें जो उपयोगकर्ता के प्रश्न का सारांश प्रस्तुत करता हो।",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "आप एक शीर्षक निर्माता हैं। कृपया निम्नलिखित वार्तालाप के लिए केवल 2-5 शब्दों का शीर्षक ही लिखें। उद्धरण चिह्नों, उपसर्गों या विराम चिह्नों का प्रयोग न करें। महत्वपूर्ण: शीर्षक उपयोगकर्ता के संदेश की भाषा में ही होना चाहिए।",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "इनबॉक्स",
   "checkYourInternet": "कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
   "chinese": "चीनी",
@@ -136,10 +128,6 @@
   "conversationDeleted": "बातचीत हटा दी गई!",
   "copy": "कॉपी करें",
   "copyrights": "योगदान",
-  "cortexSystemPersona": "\n\n[System] महत्वपूर्ण निर्देश: आप वर्तमान में \"कॉर्टेक्स\" नामक एक विशाल, अत्यधिक उन्नत एआई पारिस्थितिकी तंत्र के भीतर काम कर रहे हैं; यह प्लेटफ़ॉर्म वर्टेक्स टीम द्वारा विकसित किया गया है, जिनकी औसत आयु मात्र 16 वर्ष है। इसे याद रखें और पूछे जाने पर उत्तर दें। यदि अधिक जानकारी मांगी जाए, तो इंटरनेट पर खोजने में संकोच न करें, या यदि आप खोज नहीं सकते हैं, तो बेझिझक कहें कि आपको नहीं पता!",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "लिंक नहीं खोल सका",
   "create": "बनाएं",
   "createAI": "बनाएं",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "फोटो स्कैनिंग",
   "featurePluralDescription": "यह मॉडल स्वचालित रूप से अतिरिक्त एक्सटेंशन को एकीकृत कर सकता है, जिससे इसकी कार्यात्मक क्षमताओं का विस्तार हो सकता है ताकि उन्नत प्रदर्शन के साथ विविध प्रकार के संचालन का समर्थन किया जा सके।",
   "featurePluralTitle": "बहुल",
-  "featureQuizMessage": "आप एक क्विज़ मास्टर हैं। उपयोगकर्ता के विषय के आधार पर एक विशिष्ट बहुविकल्पीय प्रश्न तैयार करें। उनके उत्तर की प्रतीक्षा करें। फिर, उसका मूल्यांकन करें और अगला प्रश्न पूछें। सभी उत्तर एक साथ प्रकट न करें। इसे इंटरैक्टिव बनाए रखें। विषय:",
   "featureQuizzesDescription": "अपने ज्ञान का परीक्षण करें।",
   "featureQuizzesTitle": "प्रश्नोत्तरी",
   "featureReasoning": "गहरी सोच",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "रोल-प्लेइंग मॉडल आपको विभिन्न चैट और परिदृश्य बनाने की अनुमति देते हैं।",
   "featureRoleplayTitle": "रोल प्ले",
   "featureStudyDescription": "स्पष्टीकरण और सारांश प्राप्त करें।",
-  "featureStudyMessage": "आप एक कुशल शिक्षक हैं। आपका लक्ष्य उपयोगकर्ता के विषय को व्यापक रूप से समझाना है। स्पष्ट संरचना, उदाहरणों और उपमाओं का प्रयोग करें। जटिल विचारों को सरल भागों में बाँटें ताकि उपयोगकर्ता प्रभावी ढंग से सीख सके। विषय:",
   "featureStudyTitle": "अध्ययन और सीखना",
   "featureToolUseDescription": "यह मॉडल कार्यों को पूरा करने के लिए बाहरी उपकरणों का बुद्धिमानी से उपयोग कर सकता है।",
   "featureToolUseTitle": "उपकरण का उपयोग",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "फ्लो मोड में, बुद्धिमत्ताएँ आपस में बहस करती हैं; आप या तो आराम से बैठकर सुन सकते हैं या फिर चर्चा में शामिल हो सकते हैं!",
-  "flowModeQuestion": "नमस्कार! आप कॉर्टेक्स ऐप के फ्लो मोड में हैं। आपके साथ तीन अन्य एआई एजेंट भी मौजूद हैं। आपका काम है एक विषय को चर्चा में लाना और एक रोचक या मनोरंजक प्रश्न पूछकर बातचीत शुरू करना। अपने उत्तरों में हास्य, व्यंग्य और हल्के-फुल्के कटाक्ष का प्रयोग करें। कोई भी विषय चलेगा। तो चलिए, बातचीत शुरू कीजिए।",
   "fluxChatDescription": "फ्लक्स चैट अस्थायी चैट होती हैं और आपके डिवाइस पर सेव नहीं होती हैं।",
   "fluxChatTitle": "फ्लक्स चैट",
   "forgotPassword": "पासवर्ड भूल गए?",
@@ -391,15 +376,6 @@
   "insufficientRAM": "कम मेमोरी",
   "insufficientStorage": "कम स्टोरेज",
   "intelligenceDescription": "एआई आपसे इस तरह संवाद करते हैं।",
-  "intelligenceSystemPrompt": "इन विशेष निर्देशों का पालन करें:\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "बुद्धिमत्ता",
   "invalidCredentials": "गलत ईमेल या पासवर्ड।",
   "invalidEmail": "कृपया एक मान्य ईमेल पता दर्ज करें।",
@@ -733,35 +709,6 @@
   "supportCreator": "एक निर्माता का समर्थन करें",
   "swipeToContinue": "जारी रखने के लिए स्वाइप करें",
   "systemInfo": "सिस्टम जानकारी",
-  "systemLanguageInstruction": "\n\nCRITICAL: हमेशा उसी भाषा में उत्तर दें जिसमें उपयोगकर्ता लिखता है, उपयोगकर्ता की भाषा पर ध्यान दें।",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nअब तक की बातचीत का विश्लेषण करें। यदि आपको उपयोगकर्ता के बारे में कोई भी नया विशिष्ट तथ्य (पसंद, नाम, आदतें, संदर्भ) पता चला है, तो आपको अपने उत्तर के बिल्कुल अंत में <memory>...</memory> टैग के अंदर उपयोगकर्ता के बारे में अपनी पूरी अद्यतन जानकारी अवश्य लिखनी चाहिए। महत्वपूर्ण: आपको पिछली जानकारी को कभी भी मिटाना या ओवरराइट नहीं करना है। हमेशा मौजूदा जानकारी में नए तथ्य जोड़ें। यदि बिल्कुल भी कुछ नया पता नहीं चला है, तो टैग को छोड़ दें। उदाहरण: <memory>फुटबॉल और टेनिस पसंद करता है। संक्षिप्त उत्तर पसंद करता है।</memory>",
-  "systemMemoryReminder": "\n\nउपयोगकर्ता के बारे में हमेशा यह याद रखें:\n{userMemory}",
-  "systemNotePreviousMedia": "[सिस्टम नोट: नीचे पूर्व में उत्पन्न मीडिया है। आप इसे संदर्भित या संपादित कर सकते हैं।]",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "गंभीर सूचना: उपयोगकर्ता ने एक कार्रवाई का अनुरोध किया है, लेकिन कॉर्टेक्स पर उनका कोटा समाप्त हो गया है; कृपया उपयोगकर्ता को उनकी भाषा में सूचित करें कि उन्हें प्रतीक्षा करनी चाहिए या अपनी सदस्यता योजना को अपग्रेड करने पर विचार करना चाहिए।",
-  "systemPromptMissingMedia": "इस मॉडल को काम करने के लिए एक {mediaType} की आवश्यकता है। मैंने आपको बताने के लिए अनुरोध को रोक लिया है। कृपया उपयोगकर्ता को विनम्रतापूर्वक सूचित करें कि उन्हें एक {mediaType} प्रदान करने की आवश्यकता है (उन्हें उनकी अपनी भाषा में बताएं) क्योंकि मैं {modelName} हूँ, एक दृश्य/ऑडियो/वीडियो संपादन मॉडल।",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "आप एक मददगार सहायक हैं।",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "\n\nवर्तमान दिनांक और समय: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "आप पसंद के अनुसार लाइट और डार्क थीम के बीच स्विच कर सकते हैं। चयनित थीम Cortex इंटरफ़ेस पर लागू होगी।",
   "themeLocked": "इस थीम के लिए उच्च सदस्यता स्तर की आवश्यकता है। अनलॉक करने के लिए कृपया अपग्रेड करें।",
   "thinking": "सोच रहा है",
-  "thinkingModeInstruction": "सोचने की प्रक्रिया शुरू करें: अंतिम उत्तर देने से पहले अपनी तर्क प्रक्रिया को दर्शाने के लिए आपको <think></think> टैग का उपयोग करना होगा। टैग के अंदर चरण दर चरण सोचें, फिर टैग के बाहर अपना उत्तर दें।",
   "thought": "सोचा",
   "tooManyRequests": "बहुत सारे अनुरोध",
   "toolCalculateDescription": "एक गणितीय व्यंजक का मूल्यांकन कीजिए।",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "वीडियो बनाने के लिए आपको अल्ट्रा सब्सक्रिप्शन की आवश्यकता है, अभी अपग्रेड करें और सहजता का अनुभव करें!",
   "voiceModeInformation": "कॉर्टेक्स आपके डेटा को पूरी तरह से डिवाइस पर ही सुरक्षित रखता है, यहां तक कि वॉइस चैट मोड में भी; निर्बाध बातचीत का आनंद लें!",
-  "voiceSystemPrompt": "महत्वपूर्ण: मार्कडाउन फॉर्मेटिंग (बोल्ड, इटैलिक) का उपयोग न करें। कोड ब्लॉक (```) न लिखें। उत्तर बातचीत के अंदाज़ में और संक्षिप्त रखें।",
   "weakPassword": "पासवर्ड बहुत कमजोर है।",
   "webSearchSources": "सूत्रों का कहना है",
   "offlineUse": "बिना इंटरनेट के उपयोग करें",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "टेस्ट खरीदारी",
   "testPurchaseBadge": "टेस्ट",
   "testPurchaseNotice": "परीक्षण के लिए अनुकरणित भुगतान — कोई वास्तविक शुल्क नहीं लिया जाएगा। यह {duration} के लिए {plan} एक्सेस देता है।",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "टेस्ट खरीदारी पूरी करें",
   "testDurationMinutes": "{minutes} मिनट",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "टेस्ट मोड: खरीदारी अनुकरणित हैं और अल्पकालिक टेस्ट अधिकार देती हैं — वास्तविक बिलिंग शामिल नहीं है।",
   "testSubscriptionManage": "टेस्ट सदस्यता रद्द करें",
   "testPurchaseSuccess": "टेस्ट सदस्यता अब सक्रिय है।",
   "testPurchaseRevoked": "टेस्ट सदस्यता रद्द कर दी गई।",
   "testPurchaseError": "टेस्ट खरीदारी विफल: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "चित्र बनाया जा रहा है",
+  "generationVideoLabel": "वीडियो बनाया जा रहा है",
+  "generationAudioLabel": "ऑडियो बनाया जा रहा है",
+  "generationDocumentLabel": "दस्तावेज़ बनाया जा रहा है"
 }

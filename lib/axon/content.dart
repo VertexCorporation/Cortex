@@ -387,7 +387,8 @@ class AxonContent extends StatelessWidget {
             bottom: screenHeight * 0.03,
             child: Material(
               color: AppColors.primaryColor.inverted,
-              shape: StadiumBorder(side: BorderSide(color: AppColors.primaryColor.inverted)),
+              shape: StadiumBorder(
+                  side: BorderSide(color: AppColors.primaryColor.inverted)),
               elevation: 0,
               shadowColor: Colors.black54,
               clipBehavior: Clip.antiAlias,

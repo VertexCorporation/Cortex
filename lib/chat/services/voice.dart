@@ -32,10 +32,7 @@ class VoiceService with ChangeNotifier {
   Timer? _silenceTimer;
   Timer? _voiceTimer;
   Function(String)? _onFinalSentence; // Callback to send text to AI
-  String? _voiceSystemPrompt;
 
-  String Function(String agentName, String previousResponse)?
-      _flowPromptBuilder;
   bool isFlowMode = false; // "Setup" mode (Flow selected but not started)
   bool isFlowActive = false; // "Active" mode (Flow loop running)
   int currentFlowAgentIndex = 0; // 0, 1, 2 for the 3 agents
@@ -261,14 +258,6 @@ class VoiceService with ChangeNotifier {
     return val;
   }
 
-  /// Get the current voice system prompt for API calls
-  String? get voiceSystemPrompt => _voiceSystemPrompt;
-
-  /// Set a complete voice system prompt (replaces any existing)
-  void setVoiceSystemPrompt(String? prompt) {
-    _voiceSystemPrompt = prompt;
-  }
-
   void _updateVoiceParams(int index) async {
     // 0: Normal
     // 1: Deeper/Slower
@@ -301,9 +290,6 @@ class VoiceService with ChangeNotifier {
     required String locale,
     required Function(String) onFinalSentence,
     String? systemPrompt,
-    required String voiceSystemPrompt,
-    required String Function(String agentName, String previousResponse)
-        flowPromptBuilder,
   }) async {
     // -------------------------------------------------------------------------
     // 1. LIMIT & CREDIT CHECK (Before starting)
@@ -312,10 +298,6 @@ class VoiceService with ChangeNotifier {
 
     _currentLocale = locale;
     _onFinalSentence = onFinalSentence;
-
-    // Store localized builders
-    _flowPromptBuilder = flowPromptBuilder;
-    _voiceSystemPrompt = voiceSystemPrompt;
     _isSpeaking = false;
     _liveTranscript = "";
     _cancelPendingSpeech();
@@ -701,10 +683,8 @@ class VoiceService with ChangeNotifier {
           final agentName = _getAgentName(currentFlowAgentIndex);
 
           // Context prefix for the loop
-          // [NEW] Use localized builder
-          final String prompt = _flowPromptBuilder != null
-              ? _flowPromptBuilder!(agentName, previousResponse)
-              : "Cortex Flow Mode ($agentName). Previous: $previousResponse";
+          final String prompt =
+              "Cortex Flow Mode ($agentName). Previous: $previousResponse";
 
           _updateState(VoiceState.processing);
 

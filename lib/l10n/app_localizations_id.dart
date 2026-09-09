@@ -9,32 +9,8 @@ class AppLocalizationsId extends AppLocalizations {
   AppLocalizationsId([String locale = 'id']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Anda adalah pembuat judul. Balas HANYA dengan judul 2-5 kata untuk percakapan berikut. Jangan gunakan tanda kutip, awalan, atau tanda baca. PENTING: Judul HARUS dalam bahasa yang SAMA PERSIS dengan pesan pengguna.';
-
-  @override
-  String get systemRoleFallback => 'Anda adalah asisten yang sangat membantu.';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nKRITIS: Selalu tanggapi dalam bahasa yang sama dengan yang digunakan pengguna, perhatikan bahasa pengguna.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Catatan Sistem: Berikut adalah media yang dihasilkan sebelumnya. Anda dapat merujuk atau mengeditnya.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nTanggal dan waktu saat ini: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalisis percakapan sejauh ini. Jika Anda mempelajari FAKTA baru yang berbeda tentang pengguna (preferensi, nama, kebiasaan, konteks), Anda HARUS menampilkan SELURUH memori yang diperbarui tentang pengguna di dalam tag <memory>...</memory> DI AKHIR respons Anda. PENTING: Anda TIDAK PERNAH boleh menghapus atau menimpa memori sebelumnya. SELALU tambahkan fakta baru ke memori yang ada. Jika sama sekali tidak ada hal baru yang dipelajari, hilangkan tag tersebut. Contoh: <memory>Menyukai sepak bola dan tenis. Lebih suka jawaban singkat.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\nSelalu ingat ini tentang pengguna:\n$userMemory';
   }
 
   @override
@@ -1130,7 +1106,7 @@ class AppLocalizationsId extends AppLocalizations {
       'AI ini adalah AI premium, pengguna gratis memiliki akses terbatas ke AI premium; tingkatkan untuk membuka akses tak terbatas!';
 
   @override
-  String get benefitPremiumModels => 'Akses ke model premium';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1666,14 +1642,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get featureExploreDescription => 'Temukan semua model yang tersedia.';
 
   @override
-  String get featureStudyMessage =>
-      'Anda adalah seorang tutor ahli. Tujuan Anda adalah menjelaskan topik pengguna secara komprehensif. Gunakan struktur yang jelas, contoh, dan analogi. Uraikan ide-ide kompleks menjadi bagian-bagian yang mudah dipahami untuk memastikan pengguna belajar secara efektif. Topik:';
-
-  @override
-  String get featureQuizMessage =>
-      'Anda adalah seorang pengelola kuis. Buat pertanyaan pilihan ganda spesifik berdasarkan topik yang diberikan pengguna. Tunggu jawabannya. Kemudian, evaluasi jawaban tersebut dan ajukan pertanyaan berikutnya. Jangan ungkapkan semua jawaban sekaligus. Jaga agar tetap interaktif. Topik:';
-
-  @override
   String get myPlan => 'Rencana Saya';
 
   @override
@@ -1733,10 +1701,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Dalam mode Flow, kecerdasan-kecerdasan berdebat di antara mereka sendiri; Anda dapat duduk santai dan mendengarkan atau ikut serta dan bergabung dalam diskusi!';
 
   @override
-  String get flowModeQuestion =>
-      'Halo! Anda sekarang berada di Mode Alur pada aplikasi Cortex. Ada tiga agen AI lain di sini bersama Anda. Tugas Anda adalah mengajukan topik ke dalam ruangan dan memulai diskusi dengan mengajukan pertanyaan yang provokatif atau menghibur kepada yang lain. Dalam tanggapan Anda, jangan ragu untuk menggunakan humor, ironi, dan sedikit ejekan. Topik apa pun boleh dibahas. Silakan, mulai percakapannya.';
-
-  @override
   String get thought => 'Berpikir';
 
   @override
@@ -1756,10 +1720,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get workInProgress => 'Sedang dalam pengerjaan';
-
-  @override
-  String get voiceSystemPrompt =>
-      'PENTING: Jangan gunakan format markdown (tebal, miring). JANGAN keluarkan blok kode (```). Jaga agar respons tetap bersifat percakapan dan singkat.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1821,10 +1781,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Judul grafik.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'MODE BERPIKIR DIAKTIFKAN: Anda HARUS menggunakan tag <think></think> untuk menunjukkan proses penalaran Anda sebelum memberikan jawaban akhir. Pikirkan langkah demi langkah di dalam tag, lalu berikan respons Anda di luar tag.';
 
   @override
   String get openLinkWarningTitle => 'Peringatan Tautan Eksternal';
@@ -1964,19 +1920,6 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Ikuti petunjuk khusus ini:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[INSTRUKSI PENTING]: Anda adalah PEMBUAT JUDUL. JANGAN menjawab pertanyaan pengguna. JANGAN mengobrol atau menyapa. HANYA keluarkan judul 2-4 kata yang merangkum apa yang ditanyakan pengguna.';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[Sistem] INSTRUKSI PENTING: Anda saat ini beroperasi di dalam ekosistem AI yang sangat besar dan canggih bernama \"Cortex\"; platform ini dikembangkan oleh tim Vertex, yang rata-rata baru berusia 16 tahun. Ingat ini dan jawab jika ditanya. Jika informasi lebih lanjut diminta, jangan ragu untuk mencari di internet, atau jika Anda tidak dapat mencari, jangan ragu untuk mengatakan Anda tidak tahu!';
-
-  @override
   String get featureAudioRecognitionTitle => 'Pengenalan Audio';
 
   @override
@@ -2012,11 +1955,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Model ini memerlukan $mediaType agar dapat berfungsi. Saya telah mencegat permintaan tersebut untuk memberi tahu Anda. Tolong beri tahu pengguna dengan sopan bahwa mereka perlu menyediakan $mediaType (beri tahu mereka dalam bahasa mereka sendiri) karena saya adalah $modelName, model pengeditan visual/audio/video.';
-  }
 
   @override
   String get mediaTypeImage => 'gambar';
@@ -2093,10 +2031,6 @@ class AppLocalizationsId extends AppLocalizations {
   String freePlan(String plan) {
     return '$plan Gratis!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'PENTING: Pengguna meminta suatu tindakan, tetapi kuota mereka di Cortex telah habis; mohon informasikan kepada pengguna dalam bahasa mereka bahwa mereka harus menunggu atau mempertimbangkan untuk meningkatkan paket langganan mereka.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2202,4 +2136,16 @@ class AppLocalizationsId extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'Pembelian uji gagal: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Membuat gambar';
+
+  @override
+  String get generationVideoLabel => 'Membuat video';
+
+  @override
+  String get generationAudioLabel => 'Membuat audio';
+
+  @override
+  String get generationDocumentLabel => 'Membuat dokumen';
 }

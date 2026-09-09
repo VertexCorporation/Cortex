@@ -9,32 +9,8 @@ class AppLocalizationsNo extends AppLocalizations {
   AppLocalizationsNo([String locale = 'no']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Du er en tittelgenerator. Svar KUN med en tittel på 2-5 ord for følgende samtale. Ikke bruk anførselstegn, prefikser eller tegnsetting. KRITISK: Tittelen MÅ være på NØYAKTIG SAMME språk som brukerens melding.';
-
-  @override
-  String get systemRoleFallback => 'Du er en hjelpsom assistent.';
-
-  @override
-  String get systemLanguageInstruction =>
-      'KRITISK: Svar alltid på samme språk som brukeren skriver på, vær oppmerksom på brukerens språk.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Systemmerknad: Nedenfor er media generert tidligere. Du kan referere til eller redigere det.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return 'Gjeldende dato og klokkeslett: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '[SYSTEMMINNEDIREKTIV]\nAnalyser samtalen så langt. Hvis du har lært NOEN nye distinkte fakta om brukeren (preferanser, navn, vaner, kontekst), MÅ du skrive ut HELE ditt oppdaterte minne om brukeren i <memory>...</memory>-taggene HELT HELT på slutten av svaret ditt. KRITISK: Du må ALDRI slette eller overskrive tidligere minne. Legg ALLTID til nye fakta til det eksisterende minnet. Hvis absolutt ingenting nytt ble lært, utelat taggen. Eksempel: <memory>Elsker fotball og tennis. Foretrekker korte svar.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return 'Husk alltid dette om brukeren:\n$userMemory';
   }
 
   @override
@@ -1125,7 +1101,7 @@ class AppLocalizationsNo extends AppLocalizations {
       'Denne AI er en premium AI, gratis brukere har begrenset tilgang til premium AIer; oppgrader for å låse opp ubegrenset tilgang!';
 
   @override
-  String get benefitPremiumModels => 'Tilgang til premiummodeller';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1653,24 +1629,16 @@ class AppLocalizationsNo extends AppLocalizations {
   String get featureExploreDescription => 'Oppdag alle tilgjengelige modeller.';
 
   @override
-  String get featureStudyMessage =>
-      'Du er en ekspertveileder. Målet ditt er å forklare brukerens emne uttømmende. Bruk tydelig struktur, eksempler og analogier. Del komplekse ideer i fordøyelige deler for å sikre at brukeren lærer effektivt. Emne:';
-
-  @override
-  String get featureQuizMessage =>
-      'Du er en quizmester. Generer et spesifikt flervalgsspørsmål basert på brukerens emne. Vent på deres svar. Deretter vurderer du det og still det neste spørsmålet. Ikke avslør alle svarene på en gang. Hold det interaktivt. Emne:';
-
-  @override
   String get myPlan => 'Min plan';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Velkomsttilbud â€¢ $time';
+    return 'Velkomsttilbud • $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Eksklusivt tilbud â€¢ $time';
+    return 'Eksklusivt tilbud • $time';
   }
 
   @override
@@ -1720,10 +1688,6 @@ class AppLocalizationsNo extends AppLocalizations {
       'I Flow-modus debatterer intelligenser seg imellom; du kan enten lene deg tilbake og lytte eller hoppe inn og bli med i diskusjonen!';
 
   @override
-  String get flowModeQuestion =>
-      'Hallo! Du er nå i flytmodus på Cortex-appen. Det er tre andre AI-agenter her med deg. Din oppgave er å kaste et emne inn i rommet og starte en diskusjon ved å stille de andre et provoserende eller underholdende spørsmål. I svarene dine kan du gjerne bruke humor, ironi og lett søppelprat. Ethvert emne er rettferdig spill. Kom i gang, start samtalen.';
-
-  @override
   String get thought => 'Tenkte';
 
   @override
@@ -1743,10 +1707,6 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get workInProgress => 'Arbeid pågår';
-
-  @override
-  String get voiceSystemPrompt =>
-      'VIKTIG: Ikke bruk markdown-formatering (fet, kursiv). IKKE skriv ut kodeblokker (```). Hold svarene konverserende og korte.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1807,10 +1767,6 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Tittel på diagrammet.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'TENKEMODUS AKTIVERT: Du MÅ bruke <think></think>-tagger for å vise resonneringsprosessen din før du gir ditt endelige svar. Tenk steg for steg innenfor kodene, og gi deretter svaret ditt utenfor kodene.';
 
   @override
   String get openLinkWarningTitle => 'Advarsel om ekstern kobling';
@@ -1950,19 +1906,6 @@ class AppLocalizationsNo extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Følg disse egendefinerte instruksjonene:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[KRITISK INSTRUKSJON]: Du er en TITTELGENERATOR. IKKE svar på brukerens spørsmål. IKKE chat eller si hei. Skriv KUN ut en tittel på 2-4 ord som oppsummerer hva brukeren spør om. Tittelen MÅ være på samme språk som brukerens melding.';
-
-  @override
-  String get cortexSystemPersona =>
-      '[System] KRITISK INSTRUKSJON: Du opererer for tiden inne i et massivt, svært avansert AI-økosystem kalt \"Cortex\"; denne plattformen er utviklet av Vertex-teamet, som i gjennomsnitt bare er 16 år gamle. Husk dette og svar hvis du blir spurt. Hvis du ønsker mer informasjon, ikke nøl med å søke på internett, eller hvis du ikke kan søke, si gjerne at du ikke vet!';
-
-  @override
   String get featureAudioRecognitionTitle => 'Lydgjenkjenning';
 
   @override
@@ -1998,11 +1941,6 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get audioModels => 'Lydmodeller';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Denne modellen krever en $mediaType for å fungere. Jeg har avlyttet forespørselen om å gi deg beskjed. Vennligst informer brukeren om at de må oppgi en $mediaType (fortell dem på deres eget språk) fordi jeg er $modelName, en visuell-/lyd-/videoredigeringsmodell.';
-  }
 
   @override
   String get mediaTypeImage => 'bilde';
@@ -2079,10 +2017,6 @@ class AppLocalizationsNo extends AppLocalizations {
   String freePlan(String plan) {
     return 'Gratis $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'KRITISK: Brukeren ba om en handling, men deres kvote på Cortex er oppbrukt; vennligst informer brukeren på deres språk om at de bør vente eller vurdere å oppgradere abonnementet.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2188,4 +2122,16 @@ class AppLocalizationsNo extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'Testkjøp mislyktes: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Genererer bilde';
+
+  @override
+  String get generationVideoLabel => 'Genererer video';
+
+  @override
+  String get generationAudioLabel => 'Genererer lyd';
+
+  @override
+  String get generationDocumentLabel => 'Genererer dokument';
 }

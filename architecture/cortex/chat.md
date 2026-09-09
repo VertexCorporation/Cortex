@@ -54,3 +54,5 @@ Recording entry and exit share the composer’s 600 ms controller. `RecordingLay
 - Preserve conversation-ID checks during streaming.
 - Verify both `tiles.temp.dart` and `tiles_temp.dart` before removing either.
 - The complete file list for every chat subdirectory is in `file-map.md`.
+
+Generation placeholders share one bordered background card with a centered localized icon/label and distributed pulsing dots; image, video, audio and document statuses use the same presentation. Reduced-motion mode freezes the dots. Document placeholders respond to the `generating_document` stream event. Status labels use bundled Inter Regular.

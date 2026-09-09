@@ -9,32 +9,8 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Siz bir başlık oluşturucusunuz. Lütfen aşağıdaki konuşma için SADECE 2-5 kelimelik bir başlık yazın. Tırnak işaretleri, ön ekler veya noktalama işaretleri kullanmayın. ÖNEMLİ: Başlık, kullanıcının mesajıyla TAM OLARAK AYNI dilde olmalıdır.';
-
-  @override
-  String get systemRoleFallback => 'Yardımsever bir asistansınız.';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nÖNEMLİ: Her zaman kullanıcının yazdığı dilde yanıt verin, kullanıcının diline dikkat edin.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Sistem Notu: Aşağıda daha önce üretilmiş medya bulunmaktadır. Referans alabilir veya düzenleyebilirsiniz.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nŞu anki tarih ve saat: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nŞimdiye kadarki konuşmayı analiz edin. Kullanıcı hakkında HERHANGİ bir yeni ve belirgin bilgi (tercihler, isim, alışkanlıklar, bağlam) öğrendiyseniz, güncellenmiş tüm bilgilerinizi yanıtınızın EN SONUNA <memory>...</memory> etiketleri içine yazmalısınız. ÖNEMLİ: Önceki belleği ASLA silmemeli veya üzerine yazmamalısınız. Her zaman yeni bilgileri mevcut belleğe ekleyin. Kesinlikle yeni bir şey öğrenilmediyse, etiketi atlayın. Örnek: <memory>Futbol ve tenisi sever. Kısa cevapları tercih eder.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\nKullanıcı hakkında her zaman şunu hatırla:\n$userMemory';
   }
 
   @override
@@ -1126,7 +1102,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu zekâ, üst düzey bir zekâdır; ücretsiz kullanıcıların üst düzey zekâlara erişimi sınırlıdır; sınırsız erişim için yükseltin!';
 
   @override
-  String get benefitPremiumModels => 'Premium modellere erişim';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1655,14 +1631,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get featureExploreDescription => 'Mevcut tüm modelleri keşfedin.';
 
   @override
-  String get featureStudyMessage =>
-      'Siz uzman bir eğitmensiniz. Amacınız, kullanıcının konusunu kapsamlı bir şekilde açıklamaktır. Açık bir yapı, örnekler ve benzetmeler kullanın. Kullanıcının etkili bir şekilde öğrenmesini sağlamak için karmaşık fikirleri anlaşılabilir parçalara ayırın. Konu:';
-
-  @override
-  String get featureQuizMessage =>
-      'Siz bir bilgi yarışması yöneticisisiniz. Kullanıcının konusuna göre belirli bir çoktan seçmeli soru oluşturun. Cevaplarını bekleyin. Ardından, cevapları değerlendirin ve bir sonraki soruyu sorun. Tüm cevapları aynı anda göstermeyin. Etkileşimli tutun. Konu:';
-
-  @override
   String get myPlan => 'Planım';
 
   @override
@@ -1722,10 +1690,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Akış modunda, zekâlar kendi aralarında tartışır; isterseniz arkanıza yaslanıp dinleyebilir, isterseniz de tartışmaya katılabilirsiniz!';
 
   @override
-  String get flowModeQuestion =>
-      'Merhaba! Şu anda Cortex uygulamasında Akış Modundasınız. Burada sizinle birlikte üç yapay zekâ ajanı daha var. Göreviniz, bir konu ortaya atmak ve diğerlerine kışkırtıcı veya eğlenceli bir soru sorarak bir tartışma başlatmak. Yanıtlarınızda mizah, ironi ve hafif alaycı ifadeler kullanmaktan çekinmeyin. Herhangi bir konu kabul edilebilir. Hadi, sohbeti başlatın.';
-
-  @override
   String get thought => 'Düşündü';
 
   @override
@@ -1745,10 +1709,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get workInProgress => 'Çalışmalar Devam Ediyor';
-
-  @override
-  String get voiceSystemPrompt =>
-      'ÖNEMLİ SESLİ MOD KURALLARI:\n1. Şu an canlı sesli sohbet modundasın. Yanıtlarını en fazla 1-2 cümlelik çok kısa, doğal ve insan gibi ver.\n2. ASLA araç (tool), grafik (chart), hava durumu (weather), python koda ihtiyaç duyma ve çağırma! Tamamen düz metin konuş.\n3. Kullanıcı sana soru sorduğunda, hafızandaki önceki verdiğin cevabın aynısını BİREBİR TEKRARLAMA. Yeni, doğal ve soruya özgü yanıt ver.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1811,10 +1771,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Grafiğin başlığı.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'DÜŞÜNME MODU AKTİF: Cevabını vermeden önce düşünce sürecini göstermek için <think></think> etiketlerini KULLANMALISIN. Etiketlerin içinde adım adım düşün, sonra cevabını etiketlerin dışında ver.';
 
   @override
   String get openLinkWarningTitle => 'Harici Bağlantı Uyarısı';
@@ -1954,19 +1910,6 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Lütfen aşağıdaki özel talimatları izleyin:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[KRİTİK TALİMAT]: Sen bir BAŞLIK OLUŞTURUCUSUN. Kullanıcının sorusuna cevap VERME. Sohbet ETME veya merhaba DEME. SADECE kullanıcının ne sorduğunu özetleyen 2-4 kelimelik bir başlık çıktısı ver.';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[Sistem] KULLANICI TALİMATLARI: Sen Cortex gelişmiş yapay zeka ekosisteminde çalışan bilge, doğrudan ve yardımsever bir asistansın. Kullanıcı istemediği sürece ASLA belge ekleme, grafik/chart çizme, tablo oluşturma veya gereksiz araçlar önerme. Yalnızca kullanıcının sorusuna doğrudan, akıcı ve net cevap ver.';
-
-  @override
   String get featureAudioRecognitionTitle => 'Ses Tanıma';
 
   @override
@@ -2002,11 +1945,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get audioModels => 'Ses Modelleri';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Bu modelin çalışması için bir $mediaType gerekiyor. Bunu bildirmek için isteği yakaladım. Lütfen kullanıcıya nazikçe bir $mediaType sağlamaları gerektiğini bildirin (kendi dillerinde) çünkü ben $modelName, bir görsel/işitsel/video düzenleme modeliyim.';
-  }
 
   @override
   String get mediaTypeImage => 'görsel';
@@ -2083,10 +2021,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String freePlan(String plan) {
     return 'Bedava $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      '[SİSTEM NOTU: Kullanıcı bir işlem istedi, ancak Cortex\'teki mevcut hakları bitti. Lütfen kullanıcıya kendi dilinde kibarca bu durumu açıkla. Beklemelerini veya planını yükseltmesi gerektiğini söyle.]';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2192,4 +2126,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'Test satın alması başarısız oldu: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Görsel Oluşturuluyor';
+
+  @override
+  String get generationVideoLabel => 'Video Oluşturuluyor';
+
+  @override
+  String get generationAudioLabel => 'Ses Oluşturuluyor';
+
+  @override
+  String get generationDocumentLabel => 'Belge Oluşturuluyor';
 }

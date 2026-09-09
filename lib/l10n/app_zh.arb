@@ -53,7 +53,7 @@
   "benefit7": "更多使用限制",
   "benefit8": "添加模型",
   "benefit9": "新主题",
-  "benefitPremiumModels": "访问高级模型",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "聊天",
   "branch": "分支",
   "chatLengthLimitExceeded": "此聊天已超出字符限制。请开始新的聊天或购买订阅。",
-  "chatTitleCriticalInstruction": "【重要说明】：您是标题生成器。请勿回答用户的问题。请勿聊天或打招呼。仅输出一个 2-4 个字的标题，概括用户提出的问题。",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "您是标题生成器。请仅回复一个2-5个字的标题，用于接下来的对话。请勿使用引号、前缀或标点符号。重要提示：标题必须与用户消息的语言完全相同。",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "收件箱",
   "checkYourInternet": "请检查您的网络连接并重试。",
   "chinese": "中文",
@@ -136,10 +128,6 @@
   "conversationDeleted": "对话已删除！",
   "copy": "复制",
   "copyrights": "版权归属",
-  "cortexSystemPersona": "\n\n[系统] 重要指示：您目前正在一个名为“Cortex”的庞大且高度先进的人工智能生态系统中操作；该平台由Vertex团队开发，该团队成员平均年龄仅为16岁。请记住这一点，并在被问及时回答。如果需要更多信息，请随时上网搜索；如果您无法搜索，请坦诚地说您不知道！",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "无法打开链接",
   "create": "创建",
   "createAI": "创建",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "照片扫描",
   "featurePluralDescription": "该模型可以自动集成其他扩展，从而扩展其功能，以支持具有增强性能的各种操作。",
   "featurePluralTitle": "多元",
-  "featureQuizMessage": "您是一位出题人。请根据用户选择的主题生成一道选择题。等待用户作答。然后，评估答案并提出下一题。不要一次性显示所有答案。保持互动性。主题：",
   "featureQuizzesDescription": "测试一下你的知识。",
   "featureQuizzesTitle": "测验",
   "featureReasoning": "深度思考",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "角色扮演模型允许您创建各种聊天和场景。",
   "featureRoleplayTitle": "角色扮演",
   "featureStudyDescription": "获取解释和摘要。",
-  "featureStudyMessage": "您是一位资深导师。您的目标是全面深入地讲解用户感兴趣的主题。请使用清晰的结构、丰富的示例和类比。将复杂的概念分解成易于理解的部分，以确保用户能够高效学习。主题：",
   "featureStudyTitle": "学习",
   "featureToolUseDescription": "该模型能够智能地利用外部工具完成任务。",
   "featureToolUseTitle": "工具使用",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "在“心流”模式下，智能体之间会进行辩论；您可以坐下来倾听，也可以加入讨论！",
-  "flowModeQuestion": "你好！你现在已进入Cortex应用程序的“心流模式”。这里还有三位其他AI智能体。你的任务是抛出一个话题，并通过向其他智能体提出一个引人深思或趣味十足的问题来开启讨论。在你的回答中，可以随意运用幽默、反讽和轻微的调侃。任何话题都可以。开始吧，开启对话！",
   "fluxChatDescription": "Flux聊天记录是临时聊天记录，不会保存在您的设备上。",
   "fluxChatTitle": "Flux 聊天",
   "forgotPassword": "忘记密码？",
@@ -391,15 +376,6 @@
   "insufficientRAM": "内存不足",
   "insufficientStorage": "存储空间不足",
   "intelligenceDescription": "人工智能就是这样与你交流的。",
-  "intelligenceSystemPrompt": "请按照以下自定义说明操作：\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "智力",
   "invalidCredentials": "电子邮件或密码不正确。",
   "invalidEmail": "请输入有效的邮箱地址。",
@@ -733,35 +709,6 @@
   "supportCreator": "支持创作者",
   "swipeToContinue": "滑动继续",
   "systemInfo": "系统信息",
-  "systemLanguageInstruction": "\n\nCRITICAL：始终使用用户编写的相同语言进行回复，注意用户的语言。",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\n分析到目前为止的对话。如果您了解到任何关于用户的新信息（偏好、姓名、习惯、上下文），您必须在回复的最后，使用 `<memory>...</memory>` 标签输出您更新后的用户记忆。关键：您绝不能擦除或覆盖之前的记忆。始终将新信息添加到现有记忆中。如果没有了解到任何新信息，则省略该标签。例如：`<memory>喜欢足球和网球。喜欢简短的回答。</memory>`",
-  "systemMemoryReminder": "\n\n请始终记住关于用户的这一点：\n{userMemory}",
-  "systemNotePreviousMedia": "【系统提示：以下为之前生成的媒体文件，您可以参考或编辑。】",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "紧急：用户请求执行某项操作，但其在 Cortex 上的额度已用完；请用用户的语言告知他们应该等待或考虑升级订阅计划。",
-  "systemPromptMissingMedia": "此模型需要 {mediaType} 才能工作。我截获了请求以告知您。请礼貌地通知用户他们需要提供 {mediaType}（用他们的语言告诉他们），因为我是 {modelName}，一个视觉/音频/视频编辑模型。",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "你是一位得力的助手。",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "\n\n当前日期和时间：{formattedTime}。",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "您可以根据偏好在浅色和深色主题之间切换。所选主题将应用于整个 Cortex 界面。",
   "themeLocked": "此主题需要更高级别的订阅。请升级以解锁。",
   "thinking": "思考中",
-  "thinkingModeInstruction": "思考模式已启用：您必须使用 `<think></think>` 标签来展示您的推理过程，然后再给出最终答案。请在标签内逐步思考，然后在标签外给出您的答案。",
   "thought": "思考了",
   "tooManyRequests": "请求过于频繁",
   "toolCalculateDescription": "计算数学表达式的值。",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "您需要 Ultra 会员资格才能生成视频，立即升级，体验流畅体验！",
   "voiceModeInformation": "Cortex 完全在设备端运行，即使在语音聊天模式下也能确保您的数据安全；享受流畅的对话体验！",
-  "voiceSystemPrompt": "重要提示：请勿使用 Markdown 格式（粗体、斜体）。请勿输出代码块（```）。请保持回复简洁明了，如同日常对话。",
   "weakPassword": "密码太弱。",
   "webSearchSources": "来源",
   "offlineUse": "无网络使用",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "测试购买",
   "testPurchaseBadge": "测试",
   "testPurchaseNotice": "用于测试的模拟付款——不会产生任何真实扣费。此操作将授予 {plan} 访问权限，有效期为 {duration}。",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "完成测试购买",
   "testDurationMinutes": "{minutes} 分钟",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "测试模式：购买为模拟操作，授予短期测试权限——绝不涉及真实计费。",
   "testSubscriptionManage": "取消测试订阅",
   "testPurchaseSuccess": "测试订阅现已激活。",
   "testPurchaseRevoked": "测试订阅已取消。",
   "testPurchaseError": "测试购买失败：{message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "正在生成图像",
+  "generationVideoLabel": "正在生成视频",
+  "generationAudioLabel": "正在生成音频",
+  "generationDocumentLabel": "正在生成文档"
 }

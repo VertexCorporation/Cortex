@@ -132,18 +132,18 @@ class _PremiumButtonState extends State<PremiumButton>
                       SizedBox(width: gap),
                       Flexible(
                         child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          widget.label,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: -0.5,
-                            color: contentColor,
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            widget.label,
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.5,
+                              color: contentColor,
+                            ),
+                            maxLines: 1,
+                            softWrap: false,
                           ),
-                          maxLines: 1,
-                          softWrap: false,
-                        ),
                         ),
                       ),
                     ],

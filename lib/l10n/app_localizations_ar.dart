@@ -9,32 +9,8 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'أنت مسؤول عن إنشاء العناوين. يُرجى الرد بعنوان من كلمتين إلى خمس كلمات فقط للمحادثة التالية. لا تستخدم علامات الاقتباس أو البادئات أو علامات الترقيم. هام: يجب أن يكون العنوان بنفس لغة رسالة المستخدم تمامًا.';
-
-  @override
-  String get systemRoleFallback => 'أنت مساعد مفيد.';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nCRITICAL: يجب دائمًا الرد بنفس اللغة التي يكتب بها المستخدم، انتبه إلى لغة المستخدم.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[ملاحظة النظام: أدناه هي الوسائط التي تم إنشاؤها مسبقًا. يمكنك الإشارة إليها أو تعديلها.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nالتاريخ والوقت الحالي: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nحلل المحادثة حتى الآن. إذا تعلمت أي حقائق جديدة ومميزة عن المستخدم (تفضيلات، اسم، عادات، سياق)، فيجب عليك إخراج ذاكرتك المحدثة بالكامل عن المستخدم داخل علامات <memory>...</memory> في نهاية ردك. هام: لا تقم أبدًا بمسح أو استبدال الذاكرة السابقة. أضف دائمًا الحقائق الجديدة إلى الذاكرة الموجودة. إذا لم يتم تعلم أي شيء جديد على الإطلاق، فاحذف العلامة. مثال: <memory>يحب كرة القدم والتنس. يفضل الإجابات القصيرة.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\nتذكر دائمًا هذا عن المستخدم:\n$userMemory';
   }
 
   @override
@@ -1117,7 +1093,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا الذكاء الاصطناعي هو ذكاء اصطناعي مميز، المستخدمون المجانيون لديهم وصول محدود إلى الذكاء الاصطناعي المميز؛ قم بالترقية لفتح وصول غير محدود!';
 
   @override
-  String get benefitPremiumModels => 'الوصول إلى النماذج المتميزة';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1644,14 +1620,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get featureExploreDescription => 'اكتشف جميع النماذج المتاحة.';
 
   @override
-  String get featureStudyMessage =>
-      'أنت مُدرّس خبير. هدفك هو شرح موضوع المستخدم شرحًا وافيًا. استخدم بنية واضحة، وأمثلة، وتشبيهات. قسّم الأفكار المعقدة إلى أجزاء يسهل فهمها لضمان تعلّم المستخدم بفعالية. الموضوع:';
-
-  @override
-  String get featureQuizMessage =>
-      'أنت مُصمم أسئلة. أنشئ سؤالًا مُحددًا من نوع الاختيار من متعدد بناءً على موضوع المستخدم. انتظر إجابته. ثم قيّمها واطرح السؤال التالي. لا تكشف جميع الإجابات دفعة واحدة. اجعل الاختبار تفاعليًا. الموضوع:';
-
-  @override
   String get myPlan => 'خطتي';
 
   @override
@@ -1711,10 +1679,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'في وضع التدفق، تتناقش الذكاءات فيما بينها؛ يمكنك إما الجلوس والاستماع أو المشاركة في النقاش!';
 
   @override
-  String get flowModeQuestion =>
-      'مرحباً! أنت الآن في وضع التدفق على تطبيق كورتكس. يوجد معك ثلاثة عملاء ذكاء اصطناعي آخرين. مهمتك هي طرح موضوع في الغرفة وبدء نقاش من خلال طرح سؤال مثير أو مسلٍّ على الآخرين. في ردودك، لا تتردد في استخدام الفكاهة والسخرية والتعليقات الطريفة. أي موضوع مناسب. هيا، ابدأ المحادثة.';
-
-  @override
   String get thought => 'فكر';
 
   @override
@@ -1734,10 +1698,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get workInProgress => 'العمل قيد التنفيذ';
-
-  @override
-  String get voiceSystemPrompt =>
-      'هام: تجنب استخدام تنسيق Markdown (الخط العريض والمائل). لا تُدرج كتلًا برمجية (```). اجعل الردود موجزة وبسيطة.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1800,10 +1760,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'عنوان الرسم البياني.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'وضع التفكير مُفعّل: يجب عليك استخدام وسوم <think></think> لعرض خطوات تفكيرك قبل تقديم إجابتك النهائية. فكّر خطوة بخطوة داخل الوسوم، ثم قدّم إجابتك خارجها.';
 
   @override
   String get openLinkWarningTitle => 'تحذير بشأن الروابط الخارجية';
@@ -1942,19 +1898,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'اتبع هذه التعليمات المخصصة:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[تعليمات حاسمة]: أنت مُولِّد عناوين. لا تُجب على سؤال المستخدم. لا تُراسله أو تُلقي عليه التحية. فقط اعرض عنوانًا من كلمتين إلى أربع كلمات يُلخِّص ما يسأل عنه المستخدم.';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[النظام] تعليمات هامة: أنت تعمل حاليًا داخل نظام ذكاء اصطناعي ضخم ومتطور للغاية يُسمى \"كورتكس\"؛ هذه المنصة من تطوير فريق فيرتكس، الذين يبلغ متوسط أعمارهم 16 عامًا فقط. تذكر هذا وأجب إذا طُلب منك ذلك. إذا طُلب منك المزيد من المعلومات، فلا تتردد في البحث على الإنترنت، أو إذا لم تتمكن من البحث، فلا تتردد في قول \"لا أعرف\"!';
-
-  @override
   String get featureAudioRecognitionTitle => 'التعرف على الصوت';
 
   @override
@@ -1990,11 +1933,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'يحتاج هذا النموذج إلى $mediaType ليعمل. لقد اعترضت الطلب لإعلامك بذلك. يرجى إبلاغ المستخدم بلطف أنه بحاجة إلى توفير $mediaType (أخبرهم بلغتهم الخاصة) لأنني $modelName، نموذج تحرير مرئي/صوتي/فيديو.';
-  }
 
   @override
   String get mediaTypeImage => 'صورة';
@@ -2071,10 +2009,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String freePlan(String plan) {
     return '$plan مجاني!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'هام: طلب المستخدم إجراءً ما، ولكن رصيده على منصة كورتكس قد نفد؛ يرجى إبلاغ المستخدم بلغته أنه يجب عليه الانتظار أو التفكير في ترقية خطة اشتراكه.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2180,4 +2114,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'فشل الشراء التجريبي: $message';
   }
+
+  @override
+  String get generationImageLabel => 'جارٍ إنشاء الصورة';
+
+  @override
+  String get generationVideoLabel => 'جارٍ إنشاء الفيديو';
+
+  @override
+  String get generationAudioLabel => 'جارٍ إنشاء الصوت';
+
+  @override
+  String get generationDocumentLabel => 'جارٍ إنشاء المستند';
 }

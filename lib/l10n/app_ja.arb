@@ -53,7 +53,7 @@
   "benefit7": "使用制限の拡大",
   "benefit8": "モデルを追加",
   "benefit9": "新しいテーマ",
-  "benefitPremiumModels": "プレミアムモデルへのアクセス",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "チャット",
   "branch": "分岐",
   "chatLengthLimitExceeded": "このチャットは文字数制限を超えました。新しいチャットを開始するか、サブスクリプションを購入してください。",
-  "chatTitleCriticalInstruction": "【重要指示】：あなたはタイトル生成ツールです。ユーザーの質問に答えたり、チャットや挨拶をしたりしないでください。ユーザーの質問内容を要約した2～4語のタイトルのみを出力してください。",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "あなたはタイトル生成者です。以下の会話に対して、2～5語のタイトルのみを返信してください。引用符、接頭辞、句読点は使用しないでください。重要：タイトルは、ユーザーのメッセージと完全に同じ言語でなければなりません。",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "受信トレイ",
   "checkYourInternet": "インターネット接続を確認して、もう一度お試しください。",
   "chinese": "中国語",
@@ -136,10 +128,6 @@
   "conversationDeleted": "会話が削除されました!",
   "copy": "コピー",
   "copyrights": "帰属",
-  "cortexSystemPersona": "\n\n[システム] 重要な指示：あなたは現在、「Cortex」と呼ばれる大規模で高度なAIエコシステム内で作業しています。このプラットフォームは、平均年齢わずか16歳のVertexチームによって開発されています。このことを覚えておき、質問されたら答えてください。さらに情報が必要な場合は、ためらわずにインターネットで検索してください。検索できない場合は、知らないと答えても構いません。",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "リンクを開けませんでした",
   "create": "作成",
   "createAI": "作成",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "写真スキャン",
   "featurePluralDescription": "このモデルは追加の拡張機能を自動的に統合し、それによって機能的能力を拡張して、多様な操作を強化されたパフォーマンスでサポートします。",
   "featurePluralTitle": "複数",
-  "featureQuizMessage": "あなたはクイズマスターです。ユーザーのトピックに基づいて、具体的な多肢選択式の質問を作成します。回答を待ちます。その後、回答を評価し、次の質問をします。一度にすべての回答を公開しないでください。インタラクティブな形式にしてください。トピック：",
   "featureQuizzesDescription": "あなたの知識をテストしてください。",
   "featureQuizzesTitle": "クイズ",
   "featureReasoning": "深い思考",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "ロールプレイングモデルを使用すると、さまざまなチャットやシナリオを作成できます。",
   "featureRoleplayTitle": "ロールプレイ",
   "featureStudyDescription": "説明と要約を入手します。",
-  "featureStudyMessage": "あなたは熟練した講師です。目標は、ユーザーのトピックを包括的に説明することです。明確な構成、例、類推を用いて説明しましょう。複雑な概念を分かりやすい部分に分割し、ユーザーが効果的に学習できるようにします。トピック：",
   "featureStudyTitle": "勉強と学習",
   "featureToolUseDescription": "このモデルは、外部ツールを賢く活用してタスクを完了することができます。",
   "featureToolUseTitle": "ツールの使用",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "流れモードでは、インテリジェンスが互いに議論します。座って聞くことも、飛び込んで議論に参加することもできます。",
-  "flowModeQuestion": "こんにちは！Cortexアプリの流れモードに入っています。他に3人のAIエージェントがいます。あなたの課題は、話題を部屋に投げかけ、他の参加者に刺激的または面白い質問をして議論を始めることです。返答では、ユーモア、皮肉、軽いトラッシュトークなど、自由に使ってください。どんな話題でも構いません。さあ、会話を始めましょう！",
   "fluxChatDescription": "Flux チャットは一時的なチャットであり、デバイスに保存されません。",
   "fluxChatTitle": "フラックスチャット",
   "forgotPassword": "パスワードをお忘れですか？",
@@ -391,15 +376,6 @@
   "insufficientRAM": "メモリ不足",
   "insufficientStorage": "ストレージ不足",
   "intelligenceDescription": "AIはこのようにあなたとコミュニケーションをとります。",
-  "intelligenceSystemPrompt": "以下のカスタム手順に従ってください。\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "知能",
   "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
   "invalidEmail": "有効なメールアドレスを入力してください。",
@@ -733,35 +709,6 @@
   "supportCreator": "クリエイターをサポートする",
   "swipeToContinue": "スワイプして続行",
   "systemInfo": "システム情報",
-  "systemLanguageInstruction": "\n\nCRITICAL: 常にユーザーが入力した言語と同じ言語で応答し、ユーザーの言語に注意してください。",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nこれまでの会話を分析します。ユーザーに関する新しい明確な事実（好み、名前、習慣、状況など）が判明した場合は、応答の最後に、ユーザーに関する更新されたメモリ全体を<memory>...</memory>タグ内に出力する必要があります。重要：以前のメモリを消去または上書きしてはなりません。常に新しい事実を既存のメモリに追加してください。新しい情報が全く判明しなかった場合は、タグを省略してください。例：<memory>サッカーとテニスが好き。短い回答を好む。</memory>",
-  "systemMemoryReminder": "\n\nユーザーについて常に以下を覚えておいてください：\n{userMemory}",
-  "systemNotePreviousMedia": "【システム注記：以下は以前に生成されたメディアです。参照または編集してください。】",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "重要：ユーザーが操作を要求しましたが、Cortexの利用限度額が上限に達しています。ユーザーには、待つか、サブスクリプションプランのアップグレードを検討するよう、ユーザーの言語で通知してください。",
-  "systemPromptMissingMedia": "このモデルが機能するには{mediaType}が必要です。お知らせするためにリクエストを傍受しました。私は{modelName}という視覚/音声/ビデオ編集モデルであるため、{mediaType}を提供する必要があることをユーザーに丁寧にお知らせください（彼らの言語で）。",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "あなたは頼りになるアシスタントです。",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "\n\n現在の日時: {formattedTime}。",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "好みに応じてライトテーマとダークテーマを切り替えることができます。選択したテーマはCortexインターフェース全体に適用されます。",
   "themeLocked": "このテーマにはより高いサブスクリプションレベルが必要です。ロックを解除するにはアップグレードしてください。",
   "thinking": "考え中",
-  "thinkingModeInstruction": "思考モード有効：最終的な回答を出す前に、必ず<think></think>タグを使って推論のプロセスを示してください。タグ内で段階的に考え、タグの外で回答を記入してください。",
   "thought": "考えた",
   "tooManyRequests": "リクエストが多すぎます",
   "toolCalculateDescription": "数式を評価します。",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "動画を作成するにはUltraプランへのアップグレードが必要です。今すぐアップグレードして、スムーズな操作感を体験してください！",
   "voiceModeInformation": "Cortex は、音声チャット モードでもデバイス上で完全に実行することでデータを安全に保ち、シームレスな会話をお楽しみいただけます。",
-  "voiceSystemPrompt": "重要：マークダウン形式（太字、斜体）は使用しないでください。コードブロック（```）は出力しないでください。回答は会話形式で簡潔にしてください。",
   "weakPassword": "パスワードが弱すぎます。",
   "webSearchSources": "情報源",
   "offlineUse": "インターネットなしで使用",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "テスト購入",
   "testPurchaseBadge": "テスト",
   "testPurchaseNotice": "テスト用のシミュレートされた決済です。実際の請求は発生しません。{plan} へのアクセスが {duration} 付与されます。",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "テスト購入を完了",
   "testDurationMinutes": "{minutes}分",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "テストモード：購入はシミュレートされ、短期間のテスト特権が付与されます。実際の請求は発生しません。",
   "testSubscriptionManage": "テストサブスクリプションを解約",
   "testPurchaseSuccess": "テストサブスクリプションが有効になりました。",
   "testPurchaseRevoked": "テストサブスクリプションを解約しました。",
   "testPurchaseError": "テスト購入に失敗しました：{message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "画像を生成中",
+  "generationVideoLabel": "動画を生成中",
+  "generationAudioLabel": "音声を生成中",
+  "generationDocumentLabel": "ドキュメントを生成中"
 }

@@ -53,7 +53,7 @@
   "benefit7": "Höheres Nutzungslimit",
   "benefit8": "Modelle hinzufügen",
   "benefit9": "Neue Themes",
-  "benefitPremiumModels": "Zugang zu Premium-Modellen",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "Chat",
   "branch": "Zweig",
   "chatLengthLimitExceeded": "Dieser Chat hat das Zeichenlimit überschritten. Bitte starte einen neuen Chat oder kaufe ein Abonnement.",
-  "chatTitleCriticalInstruction": "[KRITISCHE ANWEISUNG]: Sie sind ein Titelgenerator. Beantworten Sie NICHT die Frage des Nutzers. Führen Sie KEINEN Chat und begrüßen Sie ihn nicht. Geben Sie AUSSCHLIESSLICH einen Titel mit 2–4 Wörtern aus, der die Frage des Nutzers zusammenfasst.",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "Sie generieren Titel. Antworten Sie AUSSCHLIESSLICH mit einem Titel von 2–5 Wörtern für die folgende Konversation. Verwenden Sie keine Anführungszeichen, Präfixe oder Satzzeichen. WICHTIG: Der Titel MUSS in GENAU DERSELBEN Sprache wie die Nachricht des Nutzers verfasst sein.",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "Posteingang",
   "checkYourInternet": "Bitte überprüfe deine Internetverbindung und versuche es erneut.",
   "chinese": "Chinesisch",
@@ -136,10 +128,6 @@
   "conversationDeleted": "Konversation gelöscht!",
   "copy": "Kopieren",
   "copyrights": "Namensnennungen",
-  "cortexSystemPersona": "\n\n[System] WICHTIGER HINWEIS: Sie befinden sich in einem riesigen, hochmodernen KI-Ökosystem namens „Cortex“. Diese Plattform wurde vom Vertex-Team entwickelt, dessen Mitglieder im Durchschnitt erst 16 Jahre alt sind. Merken Sie sich das und antworten Sie, falls Sie danach gefragt werden. Sollten weitere Informationen benötigt werden, zögern Sie nicht, im Internet zu recherchieren. Falls Sie nicht recherchieren können, geben Sie einfach an, dass Sie es nicht wissen!",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "Der Link konnte nicht geöffnet werden",
   "create": "Erstellen",
   "createAI": "Erstellen",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "Foto-Scanning",
   "featurePluralDescription": "Dieses Modell kann automatisch zusätzliche Erweiterungen integrieren und so seine funktionalen Fähigkeiten erweitern, um eine Vielzahl von Operationen mit verbesserter Leistung zu unterstützen.",
   "featurePluralTitle": "Plural",
-  "featureQuizMessage": "Sie sind der Quizmaster. Erstellen Sie eine passende Multiple-Choice-Frage zum Thema des Nutzers. Warten Sie auf seine Antwort. Werten Sie diese anschließend aus und stellen Sie die nächste Frage. Zeigen Sie nicht alle Antworten auf einmal an. Gestalten Sie das Quiz interaktiv. Thema:",
   "featureQuizzesDescription": "Testen Sie Ihr Wissen.",
   "featureQuizzesTitle": "Quizze",
   "featureReasoning": "Tiefgründiges Denken",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "Rollenspielmodelle ermöglichen es dir, verschiedene Chats und Szenarien zu erstellen.",
   "featureRoleplayTitle": "Rollenspiel",
   "featureStudyDescription": "Erhalten Sie Erklärungen und Zusammenfassungen.",
-  "featureStudyMessage": "Sie sind ein erfahrener Tutor. Ihr Ziel ist es, dem Nutzer das Thema umfassend zu erklären. Verwenden Sie eine klare Struktur, Beispiele und Analogien. Zerlegen Sie komplexe Ideen in verständliche Teile, um sicherzustellen, dass der Nutzer effektiv lernt. Thema:",
   "featureStudyTitle": "Studieren und Lernen",
   "featureToolUseDescription": "Dieses Modell kann externe Tools intelligent nutzen, um Aufgaben zu erledigen.",
   "featureToolUseTitle": "Werkzeugverwendung",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "Im Flussmodus debattieren die verschiedenen Intelligenzen untereinander; Sie können sich entweder zurücklehnen und zuhören oder sich aktiv an der Diskussion beteiligen!",
-  "flowModeQuestion": "Hallo! Du befindest dich jetzt im Flussmodus der Cortex-App. Drei weitere KI-Agenten sind ebenfalls anwesend. Deine Aufgabe ist es, ein Thema in den Raum zu werfen und eine Diskussion anzustoßen, indem du den anderen eine provokante oder unterhaltsame Frage stellst. In deinen Antworten kannst du gerne Humor, Ironie und ein bisschen neckischen Spott verwenden. Jedes Thema ist erlaubt. Leg los und starte das Gespräch!",
   "fluxChatDescription": "Flux-Chats sind temporäre Chats und werden nicht auf Ihrem Gerät gespeichert.",
   "fluxChatTitle": "Flux Chat",
   "forgotPassword": "Passwort vergessen?",
@@ -391,15 +376,6 @@
   "insufficientRAM": "Wenig Arbeitsspeicher",
   "insufficientStorage": "Wenig Speicherplatz",
   "intelligenceDescription": "So kommunizieren KIs mit Ihnen.",
-  "intelligenceSystemPrompt": "Befolgen Sie diese benutzerdefinierten Anweisungen:\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "Intelligenz",
   "invalidCredentials": "Falsche E-Mail oder falsches Passwort.",
   "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
@@ -733,35 +709,6 @@
   "supportCreator": "Unterstütze einen Kreativen",
   "swipeToContinue": "Zum Fortfahren wischen",
   "systemInfo": "Systeminformationen",
-  "systemLanguageInstruction": "\n\nCRITICAL: Antworten Sie immer in der Sprache, in der der Benutzer schreibt, und achten Sie auf die Sprache des Benutzers.",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalysieren Sie den bisherigen Gesprächsverlauf. Wenn Sie neue, eindeutige Informationen über den Benutzer erhalten haben (Präferenzen, Name, Gewohnheiten, Kontext), müssen Sie diese aktualisierten Informationen innerhalb der Tags `<memory>...</memory>` ganz am Ende Ihrer Antwort ausgeben. WICHTIG: Sie dürfen niemals vorherige Informationen löschen oder überschreiben. Fügen Sie neue Informationen immer den bestehenden Informationen hinzu. Wenn Sie absolut nichts Neues erfahren haben, lassen Sie den Tag weg. Beispiel: `<memory>Liebt Fußball und Tennis. Bevorzugt kurze Antworten.</memory>`",
-  "systemMemoryReminder": "\n\nDenken Sie immer an Folgendes über den Benutzer:\n{userMemory}",
-  "systemNotePreviousMedia": "[Systemhinweis: Unten sehen Sie die zuvor generierten Medien. Sie können diese referenzieren oder bearbeiten.]",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "KRITISCH: Der Benutzer hat eine Aktion angefordert, aber sein Datenvolumen bei Cortex ist aufgebraucht. Bitte informieren Sie den Benutzer in seiner Sprache, dass er warten oder ein Upgrade seines Abonnements in Betracht ziehen sollte.",
-  "systemPromptMissingMedia": "Dieses Modell benötigt ein(e) {mediaType}, um zu funktionieren. Ich habe die Anfrage abgefangen, um Sie darüber zu informieren. Bitte informieren Sie den Benutzer freundlich, dass er ein(e) {mediaType} bereitstellen muss (sagen Sie es ihm in seiner eigenen Sprache), da ich {modelName} bin, ein visuelles/Audio-/Video-Bearbeitungsmodell.",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "Sie sind ein hilfreicher Assistent.",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "\n\nAktuelles Datum und Uhrzeit: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "Du kannst je nach Vorliebe zwischen hellen und dunklen Themen wechseln. Das ausgewählte Thema wird auf die gesamte Cortex-Oberfläche angewendet.",
   "themeLocked": "Dieses Thema erfordert eine höhere Abonnementstufe. Bitte upgrade, um es freizuschalten.",
   "thinking": "Denke nach",
-  "thinkingModeInstruction": "DENKMODUS AKTIVIERT: Sie MÜSSEN <think></think>-Tags verwenden, um Ihren Gedankengang darzustellen, bevor Sie Ihre endgültige Antwort geben. Denken Sie innerhalb der Tags Schritt für Schritt und geben Sie Ihre Antwort anschließend außerhalb der Tags an.",
   "thought": "Nachgedacht",
   "tooManyRequests": "Zu viele Anfragen",
   "toolCalculateDescription": "Werte einen mathematischen Ausdruck aus.",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Sie benötigen ein Ultra-Abonnement, um Videos zu erstellen. Jetzt upgraden und den Flow erleben!",
   "voiceModeInformation": "Cortex schützt Ihre Daten, indem es vollständig auf dem Gerät ausgeführt wird, sogar im Sprachchat-Modus; genießen Sie reibungslose Gespräche!",
-  "voiceSystemPrompt": "WICHTIG: Bitte keine Markdown-Formatierung (fett, kursiv) verwenden. Codeblöcke (```) nicht ausgeben. Antworten sollten kurz und in einem lockeren, natürlichen Stil verfasst sein.",
   "weakPassword": "Das Passwort ist zu schwach.",
   "webSearchSources": "Quellen",
   "offlineUse": "Ohne Internet nutzen",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "Testkauf",
   "testPurchaseBadge": "TEST",
   "testPurchaseNotice": "Simulierte Zahlung zu Testzwecken — es wird keine echte Abbuchung vorgenommen. Du erhältst {plan} für {duration}.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Testkauf abschließen",
   "testDurationMinutes": "{minutes} Minuten",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Testmodus: Käufe sind simuliert und gewähren kurzzeitige Test-Berechtigungen — echte Abbuchungen erfolgen nie.",
   "testSubscriptionManage": "Testabo kündigen",
   "testPurchaseSuccess": "Das Testabo ist jetzt aktiv.",
   "testPurchaseRevoked": "Das Testabo wurde gekündigt.",
   "testPurchaseError": "Testkauf fehlgeschlagen: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Bild wird erstellt",
+  "generationVideoLabel": "Video wird erstellt",
+  "generationAudioLabel": "Audio wird erstellt",
+  "generationDocumentLabel": "Dokument wird erstellt"
 }

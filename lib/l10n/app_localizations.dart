@@ -134,47 +134,11 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
-  /// Prompt for AI to generate a chat title
-  ///
-  /// In en, this message translates to:
-  /// **'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation. CRITICAL: The title MUST be in the EXACT SAME language as the user\'s message.'**
-  String get chatTitlePrompt;
-
-  /// Fallback system role when no specific role is defined.
-  ///
-  /// In en, this message translates to:
-  /// **'You are a helpful assistant.'**
-  String get systemRoleFallback;
-
-  /// Instruction appended to the system prompt to force the model to respect the user's language.
-  ///
-  /// In en, this message translates to:
-  /// **'\n\nCRITICAL: Always respond in the same language the user writes in, pay attention to the user\'s language.'**
-  String get systemLanguageInstruction;
-
-  /// System note prepended to a synthetic user message containing AI-generated media.
-  ///
-  /// In en, this message translates to:
-  /// **'[System Note: Below is the media generated previously. You may reference or edit it.]'**
-  String get systemNotePreviousMedia;
-
   /// Localized time context injected into all model system prompts.
   ///
   /// In en, this message translates to:
   /// **'\n\nCurrent date and time: {formattedTime}.'**
   String systemTimeInfo(String formattedTime);
-
-  /// No description provided for @systemMemoryDirective.
-  ///
-  /// In en, this message translates to:
-  /// **'\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>'**
-  String get systemMemoryDirective;
-
-  /// No description provided for @systemMemoryReminder.
-  ///
-  /// In en, this message translates to:
-  /// **'\n\nAlways remember this about the user:\n{userMemory}'**
-  String systemMemoryReminder(Object userMemory);
 
   /// No description provided for @cancel.
   ///
@@ -2171,7 +2135,7 @@ abstract class AppLocalizations {
   /// A feature highlighting that the user gets access to higher-quality, premium models with this subscription.
   ///
   /// In en, this message translates to:
-  /// **'Access to premium models'**
+  /// **'Specific AI Selection'**
   String get benefitPremiumModels;
 
   /// No description provided for @premiumTrialExhaustedMessage.
@@ -3081,18 +3045,6 @@ abstract class AppLocalizations {
   /// **'Discover all available models.'**
   String get featureExploreDescription;
 
-  /// No description provided for @featureStudyMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:'**
-  String get featureStudyMessage;
-
-  /// No description provided for @featureQuizMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:'**
-  String get featureQuizMessage;
-
   /// No description provided for @myPlan.
   ///
   /// In en, this message translates to:
@@ -3102,13 +3054,13 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeOfferBadge.
   ///
   /// In en, this message translates to:
-  /// **'Welcome Offer â€¢ {time}'**
+  /// **'Welcome Offer • {time}'**
   String welcomeOfferBadge(String time);
 
   /// No description provided for @exclusiveOfferBadge.
   ///
   /// In en, this message translates to:
-  /// **'Exclusive Offer â€¢ {time}'**
+  /// **'Exclusive Offer • {time}'**
   String exclusiveOfferBadge(Object time);
 
   /// No description provided for @attachmentSheetTitle.
@@ -3195,12 +3147,6 @@ abstract class AppLocalizations {
   /// **'In Flow mode, intelligences debate among themselves; you can either sit back and listen or jump in and join the discussion!'**
   String get flowModeDescription;
 
-  /// No description provided for @flowModeQuestion.
-  ///
-  /// In en, this message translates to:
-  /// **'Hello! You are now in Flow Mode on the Cortex app. There are three other AI agents here with you. Your task is to throw a topic into the room and kick off a discussion by asking the others a provocative or entertaining question. In your responses, feel free to use humor, irony, and light trash talk. Any topic is fair game. Go ahead, start the conversation.'**
-  String get flowModeQuestion;
-
   /// No description provided for @thought.
   ///
   /// In en, this message translates to:
@@ -3242,12 +3188,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Work In Progress'**
   String get workInProgress;
-
-  /// No description provided for @voiceSystemPrompt.
-  ///
-  /// In en, this message translates to:
-  /// **'IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.'**
-  String get voiceSystemPrompt;
 
   /// Context string for Flow Mode with agent name and previous response placeholders.
   ///
@@ -3350,12 +3290,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Title of the chart.'**
   String get toolChartTitleParam;
-
-  /// No description provided for @thinkingModeInstruction.
-  ///
-  /// In en, this message translates to:
-  /// **'THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags.'**
-  String get thinkingModeInstruction;
 
   /// No description provided for @openLinkWarningTitle.
   ///
@@ -3609,24 +3543,6 @@ abstract class AppLocalizations {
   /// **'You are about to open the following external link:\\n\\n{url}\\n\\nAre you sure you want to proceed?'**
   String openLinkWarningMessage(String url);
 
-  /// No description provided for @intelligenceSystemPrompt.
-  ///
-  /// In en, this message translates to:
-  /// **'Follow these custom instructions:\\n\\n{instruction}'**
-  String intelligenceSystemPrompt(String instruction);
-
-  /// Critical system instruction appended to force the AI to only output a title
-  ///
-  /// In en, this message translates to:
-  /// **'[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user\'s question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about. The title MUST be in the same language as the user\'s message.'**
-  String get chatTitleCriticalInstruction;
-
-  /// System persona string added to online models
-  ///
-  /// In en, this message translates to:
-  /// **'\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\"; this platform is developed by the Vertex team, who are on average just 16 years old. Remember this and answer if asked. If more information is requested, do not hesitate to search the internet, or if you cannot search, feel free to say you don\'t know!'**
-  String get cortexSystemPersona;
-
   /// No description provided for @featureAudioRecognitionTitle.
   ///
   /// In en, this message translates to:
@@ -3692,12 +3608,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Audio Models'**
   String get audioModels;
-
-  /// System prompt sent to fallback model when user forgets to upload media.
-  ///
-  /// In en, this message translates to:
-  /// **'This model requires a {mediaType} to work. I have intercepted the request to let you know. Please inform the user gracefully that they need to provide a {mediaType} (tell them in their own language) because I am {modelName}, a visual/audio/video editing model.'**
-  String systemPromptMissingMedia(String mediaType, String modelName);
 
   /// Media type: mediaTypeImage
   ///
@@ -3818,12 +3728,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free {plan}!'**
   String freePlan(String plan);
-
-  /// No description provided for @systemPromptLimitFallback.
-  ///
-  /// In en, this message translates to:
-  /// **'CRITICAL: The user requested an action, but their allowance on Cortex has depleted; kindly inform the user in their language that they should wait or consider upgrading their subscription plan.'**
-  String get systemPromptLimitFallback;
 
   /// No description provided for @dynamicPreditsUpgradeMessage.
   ///
@@ -4010,6 +3914,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Test purchase failed: {message}'**
   String testPurchaseError(String message);
+
+  /// No description provided for @generationImageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating image'**
+  String get generationImageLabel;
+
+  /// No description provided for @generationVideoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating video'**
+  String get generationVideoLabel;
+
+  /// No description provided for @generationAudioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating audio'**
+  String get generationAudioLabel;
+
+  /// No description provided for @generationDocumentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating document'**
+  String get generationDocumentLabel;
 }
 
 class _AppLocalizationsDelegate

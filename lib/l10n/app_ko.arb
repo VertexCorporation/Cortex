@@ -53,7 +53,7 @@
   "benefit7": "추가 사용 제한",
   "benefit8": "모델 추가",
   "benefit9": "새로운 테마",
-  "benefitPremiumModels": "프리미엄 모델에 대한 액세스",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "채팅",
   "branch": "분기",
   "chatLengthLimitExceeded": "이 채팅이 글자 수 제한을 초과했습니다. 새 채팅을 시작하거나 구독을 구매해주세요.",
-  "chatTitleCriticalInstruction": "[중요 지시사항]: 당신은 제목 생성기입니다. 사용자의 질문에 답하거나, 채팅을 하거나, 인사하지 마세요. 사용자가 묻는 내용을 요약하는 2~4단어 분량의 제목만 출력하세요.",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "제목 생성기입니다. 다음 대화에 2~5단어로 된 제목만 입력하세요. 따옴표, 접두사, 구두점은 사용하지 마세요. 중요: 제목은 사용자의 메시지와 정확히 동일한 언어로 작성해야 합니다.",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "받은 편지함",
   "checkYourInternet": "인터넷 연결을 확인하고 다시 시도해주세요.",
   "chinese": "중국어",
@@ -136,10 +128,6 @@
   "conversationDeleted": "대화 내용이 삭제되었습니다!",
   "copy": "복사",
   "copyrights": "저작권 정보",
-  "cortexSystemPersona": "\n\n[시스템] 중요 지침: 현재 귀하는 \"Cortex\"라는 거대하고 고도로 발전된 AI 생태계 내에서 작업하고 있습니다. 이 플랫폼은 평균 연령이 16세에 불과한 Vertex 팀에서 개발했습니다. 이 점을 기억하고 질문을 받으면 답변하십시오. 추가 정보가 요청되면 주저하지 말고 인터넷을 검색하십시오. 검색할 수 없는 경우 모른다고 답해도 괜찮습니다!",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "링크를 열 수 없습니다.",
   "create": "생성",
   "createAI": "생성",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "사진 스캔",
   "featurePluralDescription": "이 모델은 추가적인 확장을 자동으로 통합하여, 향상된 성능으로 다양한 작업을 지원하도록 기능적 역량을 확장할 수 있습니다.",
   "featurePluralTitle": "복합적인",
-  "featureQuizMessage": "당신은 퀴즈 진행자입니다. 사용자가 선택한 주제에 따라 특정한 객관식 문제를 생성하세요. 사용자의 답변을 기다린 후, 답변을 평가하고 다음 문제를 제시하세요. 모든 정답을 한 번에 공개하지 마세요. 상호작용적인 방식으로 진행하세요. 주제:",
   "featureQuizzesDescription": "지식을 테스트해 보세요.",
   "featureQuizzesTitle": "퀴즈",
   "featureReasoning": "심층적 사고",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "역할 놀이 모델을 통해 다양한 채팅과 시나리오를 만들 수 있습니다.",
   "featureRoleplayTitle": "역할 놀이",
   "featureStudyDescription": "설명과 요약을 확인하세요.",
-  "featureStudyMessage": "당신은 전문 강사입니다. 당신의 목표는 사용자가 원하는 주제를 완벽하게 설명하는 것입니다. 명확한 구성, 예시 및 비유를 활용하세요. 복잡한 개념을 이해하기 쉬운 부분으로 나누어 사용자가 효과적으로 학습할 수 있도록 하세요. 주제:",
   "featureStudyTitle": "공부하고 배우세요",
   "featureToolUseDescription": "이 모델은 외부 도구를 지능적으로 활용하여 작업을 완료할 수 있습니다.",
   "featureToolUseTitle": "도구 사용",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "몰입 모드에서는 지능들이 서로 토론을 벌입니다. 당신은 가만히 앉아서 듣기만 하거나, 직접 토론에 참여할 수도 있습니다!",
-  "flowModeQuestion": "안녕하세요! 지금 Cortex 앱의 플로우 모드에 접속하셨습니다. 다른 세 명의 AI 에이전트가 함께하고 있습니다. 여러분의 임무는 주제를 하나 제시하고, 다른 에이전트들에게 도발적이거나 재미있는 질문을 던져 토론을 시작하는 것입니다. 답변할 때는 유머, 아이러니, 가벼운 농담도 자유롭게 사용하세요. 어떤 주제든 상관없습니다. 자, 이제 대화를 시작해 보세요!",
   "fluxChatDescription": "Flux 채팅은 임시 채팅이며 기기에 저장되지 않습니다.",
   "fluxChatTitle": "플럭스 채팅",
   "forgotPassword": "비밀번호를 잊으셨나요?",
@@ -391,15 +376,6 @@
   "insufficientRAM": "메모리 부족",
   "insufficientStorage": "저장 공간 부족",
   "intelligenceDescription": "인공지능은 이런 식으로 당신과 소통합니다.",
-  "intelligenceSystemPrompt": "다음 사용자 지정 지침을 따르세요:\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "지능",
   "invalidCredentials": "잘못된 이메일 또는 비밀번호입니다.",
   "invalidEmail": "유효한 이메일 주소를 입력해주세요.",
@@ -733,35 +709,6 @@
   "supportCreator": "크리에이터 지원하기",
   "swipeToContinue": "계속하려면 스와이프하세요",
   "systemInfo": "시스템 정보",
-  "systemLanguageInstruction": "\n\n중요: 항상 사용자가 작성한 언어와 동일한 언어로 응답하고, 사용자의 언어에 주의를 기울이십시오.",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\n지금까지의 대화를 분석합니다. 사용자에 대한 새로운 사실(선호도, 이름, 습관, 상황)을 알게 된 경우, 응답의 맨 마지막에 <memory>...</memory> 태그 안에 업데이트된 사용자 정보를 모두 출력해야 합니다. 중요: 이전 메모리를 절대 지우거나 덮어쓰면 안 됩니다. 항상 새로운 사실을 기존 메모리에 추가해야 합니다. 새로운 정보를 전혀 알지 못하는 경우에는 태그를 생략합니다. 예: <memory>축구와 테니스를 좋아합니다. 짧은 답변을 선호합니다.</memory>",
-  "systemMemoryReminder": "\n\n사용자에 대해 항상 다음을 기억하세요:\n{userMemory}",
-  "systemNotePreviousMedia": "[시스템 참고: 아래는 이전에 생성된 미디어입니다. 참고하거나 편집할 수 있습니다.]",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "중요: 사용자가 작업을 요청했지만 Cortex 사용량이 소진되었습니다. 해당 사용자에게 모국어로 기다리거나 구독 플랜 업그레이드를 고려하도록 안내해 주세요.",
-  "systemPromptMissingMedia": "이 모델이 작동하려면 {mediaType}이(가) 필요합니다. 이를 알려드리기 위해 요청을 가로챘습니다. 저는 시각/오디오/비디오 편집 모델인 {modelName}이므로 {mediaType}을(를) 제공해야 한다고 사용자에게 정중하게 (그들의 언어로) 알려주십시오.",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "당신은 도움을 주는 조력자입니다.",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "\n\n현재 날짜 및 시간: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "선호에 따라 라이트 테마와 다크 테마 간에 전환할 수 있습니다. 선택한 테마는 Cortex 인터페이스 전체에 적용됩니다.",
   "themeLocked": "이 테마는 더 높은 구독 등급이 필요합니다. 잠금 해제하려면 업그레이드해주세요.",
   "thinking": "생각 중",
-  "thinkingModeInstruction": "사고 모드 활성화: 최종 답변을 작성하기 전에 <think></think> 태그를 사용하여 사고 과정을 반드시 보여주세요. 태그 안에서 단계별로 생각한 후, 태그 바깥에 답변을 작성하세요.",
   "thought": "생각했다",
   "tooManyRequests": "요청이 너무 많습니다.",
   "toolCalculateDescription": "수학적 표현식을 평가하십시오.",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "동영상 제작을 위해서는 Ultra 구독이 필요합니다. 지금 업그레이드하고 원활한 콘텐츠 제작을 경험해 보세요!",
   "voiceModeInformation": "Cortex는 음성 채팅 모드에서도 기기 내에서 완벽하게 실행되어 데이터를 안전하게 보호합니다. 끊김 없는 대화를 즐겨보세요!",
-  "voiceSystemPrompt": "중요: 마크다운 서식(굵게, 기울임체)을 사용하지 마세요. 코드 블록(```)을 출력하지 마세요. 답변은 대화체로 간결하게 작성하세요.",
   "weakPassword": "비밀번호가 너무 약합니다.",
   "webSearchSources": "출처",
   "offlineUse": "인터넷 없이 사용",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "테스트 구매",
   "testPurchaseBadge": "테스트",
   "testPurchaseNotice": "테스트용 시뮬레이션 결제입니다 — 실제 결제가 청구되지 않습니다. {duration} 동안 {plan} 액세스 권한이 부여됩니다.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "테스트 구매 완료",
   "testDurationMinutes": "{minutes}분",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "테스트 모드: 구매는 시뮬레이션되며 단기 테스트 권한을 부여합니다 — 실제 결제는 절대 발생하지 않습니다.",
   "testSubscriptionManage": "테스트 구독 취소",
   "testPurchaseSuccess": "테스트 구독이 활성화되었습니다.",
   "testPurchaseRevoked": "테스트 구독이 취소되었습니다.",
   "testPurchaseError": "테스트 구매 실패: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "이미지 생성 중",
+  "generationVideoLabel": "동영상 생성 중",
+  "generationAudioLabel": "오디오 생성 중",
+  "generationDocumentLabel": "문서 생성 중"
 }

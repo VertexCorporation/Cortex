@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -59,7 +60,7 @@ class _ArtVideoPreviewState extends State<ArtVideoPreview> {
   Widget build(BuildContext context) {
     final controller = _controller;
     if (!_ready || controller == null) {
-      return const ColoredBox(color: Colors.black26);
+      return ColoredBox(color: AppColors.background);
     }
     return ClipRect(
       child: FittedBox(

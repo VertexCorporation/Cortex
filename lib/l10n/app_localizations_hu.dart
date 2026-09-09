@@ -9,32 +9,8 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Ön egy címgenerátor. A következő beszélgetésre CSAK 2-5 szavas címmel válaszoljon. Ne használjon idézőjeleket, előtagokat vagy írásjeleket. KRITIKUS: A címnek PONTOSAN UGYANAZON KELL lennie, mint a felhasználó üzenetének.';
-
-  @override
-  String get systemRoleFallback => 'Segítőkész asszisztens vagy.';
-
-  @override
-  String get systemLanguageInstruction =>
-      'KRITIKUS: Mindig ugyanazon a nyelven válaszoljon, amelyen a felhasználó ír, ügyeljen a felhasználó nyelvére.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Rendszer megjegyzés: Alul látható a korábban létrehozott adathordozó. Hivatkozhat rá vagy szerkesztheti.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return 'Jelenlegi dátum és idő: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '[RENDSZERMEMÓRIAI IRÁNYELV]\nElemezze az eddigi beszélgetést. Ha BÁRMILYEN új, különálló tényt megtudott a felhasználóról (preferenciák, név, szokások, kontextus), akkor a válasza VÉGÉN ki KELL adnia a TELJES frissített memóriáját a felhasználóról a <memory>...</memory> címkéken belül. KRITIKUS: SOHA nem szabad törölni vagy felülírni az előző memóriát. MINDIG fűzz hozzá új tényeket a meglévő memóriához. Ha semmi újat nem tanult, hagyja ki a címkét. Példa: <memory>Szereti a focit és a teniszt. A rövid válaszokat részesíti előnyben.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return 'Mindig emlékezzen erre a felhasználóról:\n$userMemory';
   }
 
   @override
@@ -1129,7 +1105,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez a mesterséges intelligencia egy prémium AI, az ingyenes felhasználók korlátozott hozzáféréssel rendelkeznek a prémium AI-khoz; frissítse a korlátlan hozzáférés feloldásához!';
 
   @override
-  String get benefitPremiumModels => 'Hozzáférés a prémium modellekhez';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1664,24 +1640,16 @@ class AppLocalizationsHu extends AppLocalizations {
       'Fedezze fel az összes elérhető modellt.';
 
   @override
-  String get featureStudyMessage =>
-      'Ön egy szakértő oktató. A cél az, hogy átfogóan elmagyarázza a felhasználó témáját. Használjon világos szerkezetet, példákat és analógiákat. Az összetett ötleteket emészthető részekre bontja, hogy a felhasználó hatékonyan tanulhasson. Téma:';
-
-  @override
-  String get featureQuizMessage =>
-      'Te egy kvízmester vagy. Hozzon létre egy konkrét feleletválasztós kérdést a felhasználó témája alapján. Várd meg a válaszukat. Ezután értékelje, és tegye fel a következő kérdést. Ne fedd fel az összes választ egyszerre. Legyen interaktív. Téma:';
-
-  @override
   String get myPlan => 'Saját tervem';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Üdvözlő ajánlat â€¢ $time';
+    return 'Üdvözlő ajánlat • $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Exkluzív ajánlat â€¢ $time';
+    return 'Exkluzív ajánlat • $time';
   }
 
   @override
@@ -1731,10 +1699,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Flow módban az intelligenciák vitatkoznak egymással; vagy hátradőlhet és hallgathat, vagy beugorhat és bekapcsolódhat a vitába!';
 
   @override
-  String get flowModeQuestion =>
-      'Helló! Most Flow módban van a Cortex alkalmazásban. Három másik AI ügynök van itt veled. Az Ön feladata, hogy bedobjon egy témát a terembe, és elindítsa a vitát úgy, hogy feltesz a többieknek egy provokatív vagy szórakoztató kérdést. Válaszaidban nyugodtan használj humort, iróniát és könnyed szemetes beszédet. Minden téma tisztességes játék. Gyerünk, kezdje el a beszélgetést.';
-
-  @override
   String get thought => 'Gondolat';
 
   @override
@@ -1754,10 +1718,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get workInProgress => 'Folyamatban lévő munka';
-
-  @override
-  String get voiceSystemPrompt =>
-      'FONTOS: Ne használjon markdown formázást (félkövér, dőlt). NE adjon ki kódblokkokat (```). Legyen a válaszok beszélgetősek és rövidek.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1822,10 +1782,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'A diagram címe.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'GONDOLKODÁSI MÓD ENGEDÉLYEZVE: A végső válasz megadása előtt <think></think> címkéket KELL használnia az érvelési folyamat bemutatására. Gondoljon lépésről lépésre a címkéken belül, majd adja meg a választ a címkéken kívül.';
 
   @override
   String get openLinkWarningTitle => 'Figyelmeztetés külső hivatkozásra';
@@ -1963,19 +1919,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Kövesse ezeket az egyéni utasításokat:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[KRITIKAI UTASÍTÁS]: Ön CÍMGENERÁTOR. NE válaszoljon a felhasználó kérdésére. NE csevegjen vagy köszönjön. CSAK 2-4 szavas címet adjon ki, amely összefoglalja a felhasználó kérdését. A címnek ugyanazon a nyelven KELL lennie, mint a felhasználó üzenetének.';
-
-  @override
-  String get cortexSystemPersona =>
-      '[Rendszer] KRITIKUS UTASÍTÁS: Ön jelenleg egy hatalmas, rendkívül fejlett mesterséges intelligencia-ökoszisztémában, a \"Cortex\"-ben működik; ezt a platformot a Vertex csapata fejlesztette ki, akik átlagosan mindössze 16 évesek. Emlékezz erre, és válaszolj, ha kérdeznek. Ha további információra van szüksége, ne habozzon keresni az interneten, vagy ha nem tud keresni, nyugodtan mondja, hogy nem tudja!';
-
-  @override
   String get featureAudioRecognitionTitle => 'Hangfelismerés';
 
   @override
@@ -2011,11 +1954,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio modellek';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Ennek a modellnek a működéséhez $mediaType szükséges. Elfogtam a kérést, hogy tájékoztassam Önt. Kérjük, figyelmesen tájékoztassa a felhasználót, hogy meg kell adnia egy $mediaType-t (mondja el nekik a saját nyelvén), mert én $modelName vagyok, egy vizuális/audió/videó szerkesztő modell.';
-  }
 
   @override
   String get mediaTypeImage => 'kép';
@@ -2093,10 +2031,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String freePlan(String plan) {
     return 'Ingyenes $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'KRITIKUS: A felhasználó műveletet kért, de a Cortexre vonatkozó kerete kimerült; kérjük, tájékoztassa a felhasználót a saját nyelvén, hogy várjon, vagy fontolja meg az előfizetési csomag frissítését.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2202,4 +2136,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'A tesztvásárlás sikertelen: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Kép készítése';
+
+  @override
+  String get generationVideoLabel => 'Videó készítése';
+
+  @override
+  String get generationAudioLabel => 'Hang készítése';
+
+  @override
+  String get generationDocumentLabel => 'Dokumentum készítése';
 }

@@ -1,12 +1,6 @@
 {
   "@@locale": "cs",
-  "chatTitlePrompt": "Jste generátor titulků. Odpovězte POUZE 2-5 slovním názvem pro následující konverzaci. Nepoužívejte uvozovky, předpony ani interpunkci. KRITICKÉ: Název MUSÍ být ve PŘESNĚ STEJNÉM jazyce jako zpráva uživatele.",
-  "systemRoleFallback": "Jste užitečný pomocník.",
-  "systemLanguageInstruction": "KRITICKÉ: Vždy odpovídejte ve stejném jazyce, ve kterém uživatel píše, věnujte pozornost jazyku uživatele.",
-  "systemNotePreviousMedia": "[Poznámka k systému: Níže jsou média vygenerovaná dříve. Můžete na něj odkazovat nebo jej upravovat.]",
   "systemTimeInfo": "Aktuální datum a čas: {formattedTime}.",
-  "systemMemoryDirective": "[SMĚRNICE O SYSTÉMOVÉ PAMĚTI]\nAnalyzujte dosavadní rozhovor. Pokud jste se dozvěděli JAKÉKOLI nová odlišná fakta o uživateli (preference, jméno, zvyky, kontext), MUSÍTE vypsat CELOU aktualizovanou paměť o uživateli uvnitř tagů <memory>...</memory> NA ÚPLNÉM KONCI vaší odpovědi. KRITICKÉ: NIKDY nesmíte vymazat nebo přepsat předchozí paměť. VŽDY přidejte nová fakta do stávající paměti. Pokud jste se nenaučili absolutně nic nového, značku vynechejte. Příklad: <memory>Miluje fotbal a tenis. Preferuje krátké odpovědi.</memory>",
-  "systemMemoryReminder": "Vždy si pamatujte toto o uživateli:\n{userMemory}",
   "cancel": "Zrušit",
   "remove": "Odebrat",
   "download": "Stáhnout",
@@ -331,7 +325,7 @@
   "featureVideoGenerationDescription": "Tento model dokáže vytvořit originální video na základě vašich textových popisů.",
   "premiumModelNoticeTitle": "Prémiový model",
   "premiumModelNoticeDescription": "Tato AI je prémiová AI, bezplatní uživatelé mají omezený přístup k prémiovým AI; upgradujte a odemkněte neomezený přístup!",
-  "benefitPremiumModels": "Přístup k prémiovým modelům",
+  "benefitPremiumModels": "Specific AI Selection",
   "premiumTrialExhaustedMessage": "Využili jste všechny své bezplatné denní zprávy pro prémiové modely. Upgradujte nyní a **pokračujte tam, kde jste skončili!**",
   "useOffline": "Použít offline",
   "explore": "Prozkoumat",
@@ -483,8 +477,6 @@
   "featureQuizzesTitle": "Kvízy",
   "featureQuizzesDescription": "Otestujte si své znalosti.",
   "featureExploreDescription": "Objevte všechny dostupné modely.",
-  "featureStudyMessage": "Jste odborný lektor. Vaším cílem je vysvětlit uživateli téma komplexně. Používejte jasnou strukturu, příklady a analogie. Rozdělte složité myšlenky na stravitelné části, abyste zajistili, že se uživatel bude efektivně učit. Téma:",
-  "featureQuizMessage": "Jste mistrem kvízu. Vygenerujte konkrétní otázku s možností výběru na základě tématu uživatele. Počkejte na jejich odpověď. Poté to vyhodnoťte a položte další otázku. Neodhalujte všechny odpovědi najednou. Udržujte to interaktivní. Téma:",
   "myPlan": "Můj plán",
   "welcomeOfferBadge": "Uvítací nabídka – {time}",
   "exclusiveOfferBadge": "Exkluzivní nabídka – {time}",
@@ -502,7 +494,6 @@
   "continueInOfflineMode": "Pokračujte v režimu offline",
   "voiceModeInformation": "Cortex udržuje vaše data v bezpečí tím, že běží plně na zařízení, a to i v režimu hlasového chatu; užijte si bezproblémové konverzace!",
   "flowModeDescription": "V režimu Flow mezi sebou inteligence debatují; můžete buď sedět a poslouchat, nebo skočit a zapojit se do diskuze!",
-  "flowModeQuestion": "Ahoj! Nyní jste v režimu Flow v aplikaci Cortex. Jsou tu s vámi další tři agenti AI. Vaším úkolem je vhodit do místnosti téma a zahájit diskuzi tím, že ostatním položíte provokativní nebo zábavnou otázku. Ve svých odpovědích klidně používejte humor, ironii a lehké nesmyslné řeči. Jakékoli téma je férová hra. Pokračujte, začněte konverzaci.",
   "thought": "Myšlenka",
   "agentRed": "Červená",
   "agentBlue": "Modrá",
@@ -510,7 +501,6 @@
   "flowMode": "Režim průtoku",
   "premium": "Premium",
   "workInProgress": "Probíhající práce",
-  "voiceSystemPrompt": "DŮLEŽITÉ: Nepoužívejte formátování markdown (tučné, kurzíva). NEVYSTUPUJTE bloky kódu (```). Udržujte odpovědi konverzační a stručné.",
   "flowModeContextParams": "Režim Cortex Flow ({agentName}). Předchozí: {previousResponse}",
   "toolReadDocumentDescription": "Čtěte a extrahujte textový obsah z nahraných dokumentů. Podporuje formáty PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) a OpenDocument. Toto použijte, když uživatel připojil soubor dokumentu.",
   "toolReadDocumentIndexParam": "Index přílohy dokumentu ke čtení (založený na 0). Obvykle 0 pro první dokument.",
@@ -528,7 +518,6 @@
   "toolChartDataParam": "Číselné hodnoty dat pro graf.",
   "toolChartLabelParam": "Štítek datové sady pro legendu grafu.",
   "toolChartTitleParam": "Název grafu.",
-  "thinkingModeInstruction": "REŽIM MYŠLENÍ ZAPNUT: Před poskytnutím konečné odpovědi MUSÍTE použít značky <think></think> k zobrazení procesu uvažování. Přemýšlejte krok za krokem uvnitř značek a poté poskytněte svou odpověď mimo značky.",
   "openLinkWarningTitle": "Upozornění na externí odkaz",
   "openLinkCancel": "Zrušit",
   "openLinkConfirm": "Otevřít odkaz",
@@ -553,9 +542,6 @@
   "intelligenceDescription": "AI s vámi takto komunikují.",
   "customInstructionHint": "Zde zadejte své vlastní pokyny",
   "openLinkWarningMessage": "Chystáte se otevřít následující externí odkaz:\\n\\n{url}\\n\\nOpravdu chcete pokračovat?",
-  "intelligenceSystemPrompt": "Postupujte podle těchto vlastních pokynů:\\n\\n{instruction}",
-  "chatTitleCriticalInstruction": "[KRITICKÝ POKYN]: Jste GENERÁTOR TITULŮ. NEODPOVÍDEJTE na otázku uživatele. NEchatujte ani nezdravte. Vydejte POUZE 2-4 slovní název shrnující, na co se uživatel ptá. Název MUSÍ být ve stejném jazyce jako uživatelova zpráva.",
-  "cortexSystemPersona": "[Systém] KRITICKÝ POKYN: V současné době působíte v masivním, vysoce pokročilém ekosystému umělé inteligence s názvem „Cortex“; tato platforma je vyvinuta týmem Vertex, kterým je v průměru pouhých 16 let. Pamatujte si to a na dotaz odpovězte. Pokud požadujete více informací, neváhejte prohledat internet, nebo pokud hledat nemůžete, klidně řekněte, že nevíte!",
   "featureAudioRecognitionTitle": "Rozpoznávání zvuku",
   "featureAudioRecognitionDescription": "Tento model dokáže porozumět a zpracovat audio vstupy.",
   "featureVideoRecognitionTitle": "Rozpoznávání videa",
@@ -567,7 +553,6 @@
   "videoModels": "Videomodelky",
   "imageModels": "Obrazové modely",
   "audioModels": "Audio modely",
-  "systemPromptMissingMedia": "Tento model ke svému fungování vyžaduje {mediaType}. Zachytil jsem žádost, abych vás informoval. Informujte prosím uživatele slušně, že musí poskytnout {mediaType} (řekněte jim to v jejich vlastním jazyce), protože jsem {modelName} a modeluji vizuální/audio/video úpravy.",
   "mediaTypeImage": "obrázek",
   "mediaTypeVideo": "video",
   "mediaTypeAudio": "audio",
@@ -588,7 +573,6 @@
   "trialMonthlyDescription": "První {days} dny zdarma, poté {price}/měsíc",
   "trialAnnualDescription": "První {days} dny zdarma, poté {price}/rok",
   "freePlan": "Zdarma {plan}!",
-  "systemPromptLimitFallback": "KRITICKÉ: Uživatel požádal o akci, ale jeho povolenka na Cortex se vyčerpala; laskavě informujte uživatele v jejich jazyce, že by měl počkat nebo zvážit upgrade svého plánu předplatného.",
   "dynamicPreditsUpgradeMessage": "Cortex může dát ještě lepší odpovědi; upgradujte nyní a získejte nejlepší odpověď na každou otázku!",
   "pinLimitReached": "Můžete připnout až 3 chaty.",
   "categoryAll": "Vše",
@@ -605,14 +589,42 @@
   "testPurchaseTitle": "Testovací nákup",
   "testPurchaseBadge": "TEST",
   "testPurchaseNotice": "Simulovaná platba pro testování — žádná skutečná platba nebude provedena. Získáte tak přístup k {plan} na dobu {duration}.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Dokončit testovací nákup",
   "testDurationMinutes": "{minutes} minut",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Testovací režim: nákupy jsou simulované a poskytují krátkodobé testovací nároky — skutečná platba se nikdy neprovádí.",
   "testSubscriptionManage": "Zrušit testovací předplatné",
   "testPurchaseSuccess": "Testovací předplatné je nyní aktivní.",
   "testPurchaseRevoked": "Testovací předplatné bylo zrušeno.",
   "testPurchaseError": "Testovací nákup se nezdařil: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Generování obrázku",
+  "generationVideoLabel": "Generování videa",
+  "generationAudioLabel": "Generování zvuku",
+  "generationDocumentLabel": "Generování dokumentu"
 }

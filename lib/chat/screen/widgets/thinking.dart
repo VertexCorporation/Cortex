@@ -214,7 +214,8 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                                     labelText,
                                     style: TextStyle(
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w400,
                                       color: AppColors.tertiaryColor,
                                     ),
                                   ),
@@ -223,7 +224,8 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                                   labelText,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
                                     color: AppColors.tertiaryColor,
                                   ),
                                 ),
@@ -437,7 +439,7 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
                           color: AppColors.tertiaryColor,
                           fontSize: 14,
                           fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     const SizedBox(width: 8),

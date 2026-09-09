@@ -35,3 +35,12 @@
 The Flutter `CreditsManager` (see `../cortex/payments.md`) mirrors the server's credit engines: access bands `full`/`low_only`/`blocked` and daily grants free 100 / plus 500 / pro 1000 / ultra 10000, with two engines live at once (single-currency `billingV2` and daily-allowance `creditsV3`; spendable = allowance + owned credits).
 
 Caution: the client documents these mirrors as `functions/src/credits.js` (`ACCESS`, `DAILY_GRANTS`) and `functions/src/billing.js` (`MIN_TEXT_BALANCE`), but those files are not present in the current local Fulcrum checkout — the equivalent logic lives in `helpers.js` and `scheduled.js` here. Verify constants against the deployed revision before changing either side.
+
+## Credit diagnostics and idempotency
+
+All credit mutations that trace to a single chat generation carry `GenID: <generationId>` in the structured log:
+
+- `deductDynamicCredits` / `deductUserCredits` — charged at gateway entry or after OpenRouter cost reconciliation.
+- `refundUserCredits` — returned on upstream failure, provider fallback, or cost overcharge.
+
+Idempotency is enforced by the `creditsDeducted` flag in the per-generation stream state. Refund calls check `creditsDeducted && totalCost > 0` before mutating Firestore, so multiple failure handlers (stream error + final fallback) cannot refund the same generation twice.

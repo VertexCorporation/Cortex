@@ -276,7 +276,6 @@ class SendService {
     int? regenerateAiIndex,
     String? overrideModelId,
     bool isHidden = false,
-    String? voiceSystemPrompt,
   }) async {
     final sessionProvider = context.read<ChatSessionProvider>();
 
@@ -315,6 +314,44 @@ class SendService {
     String? targetModelIdForSend;
     bool targetIsServerSide = false;
 
+    // Server-side title sync
+    String? newConvIdForTitle;
+    String? defaultTitleForServer;
+    bool serverTitleReceived = false;
+    Future<void> handleServerTitle(String title) async {
+      if (serverTitleReceived || title.isEmpty || newConvIdForTitle == null) {
+        return;
+      }
+      serverTitleReceived = true;
+
+      final rawTitle =
+          title.length > 40 ? title.substring(0, 40) : title;
+
+      final cleanTitle = rawTitle
+          .split(' ')
+          .map((word) => word.isEmpty
+              ? word
+              : '${word[0].toUpperCase()}${word.substring(1)}')
+          .join(' ');
+
+      final didRename = await ChatStorageService.renameConversation(
+        newConvIdForTitle,
+        cleanTitle,
+        source: 'titlegen_sse',
+        expectedCurrentTitle: defaultTitleForServer,
+      );
+
+      if (!didRename) {
+        debugPrint(
+            "[TitleGen] Skipped applying server-side title for $newConvIdForTitle because the title changed before completion.");
+        return;
+      }
+
+      if (_conversationProvider.conversationID == newConvIdForTitle) {
+        _conversationProvider.updateConversationTitle(cleanTitle);
+      }
+    }
+
     try {
       // -----------------------------------------------------------------------
       // 2. FEATURE MODES (Study, Quiz, etc.)
@@ -334,17 +371,6 @@ class SendService {
         ChatInputMode.audioGeneration => 'audio',
         _ => null,
       };
-
-      // Apply voice system prompt to API text only (not shown to user)
-      if (voiceSystemPrompt != null && voiceSystemPrompt.isNotEmpty) {
-        textForApi = "$voiceSystemPrompt\n\n$textForApi";
-      }
-
-      if (activeMode == ChatInputMode.study) {
-        textForApi = "${localizations.featureStudyMessage}\n\n$text";
-      } else if (activeMode == ChatInputMode.quiz) {
-        textForApi = "${localizations.featureQuizMessage}\n\n$text";
-      }
 
       // -----------------------------------------------------------------------
       // 3. MODEL RESOLUTION
@@ -475,16 +501,7 @@ class SendService {
 
         if ((demandsImage || demandsVideo || demandsAudio) &&
             currentAttachmentPaths.isEmpty) {
-          String mType = demandsImage
-              ? localizations.mediaTypeImage
-              : (demandsVideo
-                  ? localizations.mediaTypeVideo
-                  : localizations.mediaTypeAudio);
-
-          voiceSystemPrompt = localizations.systemPromptMissingMedia(
-              mType, entity.displayTitle);
-
-          // Route the prompt gracefully back to a text LLM so it can answer properly
+          // Route the request gracefully back to a text LLM so it can answer properly
           apiModelIdForSend = "cortex/auto";
         }
       }
@@ -553,6 +570,10 @@ class SendService {
 
           final modelForStorage = originalUiModelId;
 
+          // Capture for late server-side title events
+          newConvIdForTitle = newConvId;
+          defaultTitleForServer = defaultTitle;
+
           if (isHidden) {
             _conversationProvider.startEphemeralSession(
                 newConvId, modelForStorage, userMessage,
@@ -571,9 +592,15 @@ class SendService {
             if (isServerSide && text.isNotEmpty) {
               debugPrint("🚀 Triggering TitleGen for new chat...");
               _apiService
-                  .generateChatTitle(text, localizations.chatTitlePrompt,
-                      localizations.chatTitleCriticalInstruction)
+                  .generateChatTitle(
+                      text,
+                      'You are a chat title generator. Generate a very short, concise, and relevant title (max 6 words) for the following user message. Respond ONLY with the title text. No quotes, no punctuation, no explanation.',
+                      'CRITICAL: Output must be ONLY the title. No markdown, no quotes, no emojis, no extra text. Just the plain title.')
                   .then((aiTitle) async {
+                if (serverTitleReceived) {
+                  debugPrint("[TitleGen] Server-side title already received, skipping client-side title.");
+                  return;
+                }
                 if (aiTitle != null && aiTitle.trim().isNotEmpty) {
                   final rawTitle =
                       aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
@@ -744,6 +771,8 @@ class SendService {
               enableThinkingMode: enableThinkingMode,
               targetConvId: convId,
               generationTarget: generationTarget,
+              onTitleReceived: handleServerTitle,
+              activeMode: activeMode,
             );
             success = true;
           } catch (e) {
@@ -1051,6 +1080,8 @@ class SendService {
     required bool enableThinkingMode,
     required String targetConvId,
     String? generationTarget,
+    Function(String)? onTitleReceived,
+    required ChatInputMode activeMode,
   }) async {
     final ModelEntity modelData =
         _modelService.getPreciseModelData(modelId, langCode: langCode);
@@ -1067,11 +1098,7 @@ class SendService {
       includeLastUser: false,
       targetModelId: modelId,
       langCode: langCode,
-      enableThinkingMode: enablefeatureReasoning,
-      localizations: localizations,
       isCharacterModel: isCharacterModel,
-      customInstruction: _userMemoryProvider.customInstruction,
-      userMemory: _userMemoryProvider.memory,
     );
 
     // 2. Add Current User Message to Context (Manual Construction)
@@ -1459,6 +1486,7 @@ class SendService {
           onVideoReceived: onVideoReceived,
           onAudioReceived: onAudioReceived,
           onMediaGenerating: onMediaGenerating,
+          onTitleReceived: onTitleReceived,
         );
         // Characters exit loop immediately
         shouldContinue = false;
@@ -1520,6 +1548,15 @@ class SendService {
           source: modelData.source,
           localizations: localizations,
           langCode: langCode,
+          customInstruction: _userMemoryProvider.customInstruction,
+          userMemory: _userMemoryProvider.memory,
+          characterRole: modelData.role,
+          voiceMode: _inputProvider.isVoiceModeActive,
+          featureMode: activeMode == ChatInputMode.study
+              ? 'study'
+              : activeMode == ChatInputMode.quiz
+                  ? 'quiz'
+                  : null,
           enablefeatureReasoning: enablefeatureReasoning,
           enableWebSearch: enableWebSearch,
           enableRag: ragActive,
@@ -1532,6 +1569,7 @@ class SendService {
           onVideoReceived: onVideoReceived,
           onAudioReceived: onAudioReceived,
           onMediaGenerating: onMediaGenerating,
+          onTitleReceived: onTitleReceived,
           // Capture Tools
           onToolCall: (tools) {
             turnToolCalls = tools;

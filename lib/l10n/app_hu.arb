@@ -1,12 +1,6 @@
 {
   "@@locale": "hu",
-  "chatTitlePrompt": "Ön egy címgenerátor. A következő beszélgetésre CSAK 2-5 szavas címmel válaszoljon. Ne használjon idézőjeleket, előtagokat vagy írásjeleket. KRITIKUS: A címnek PONTOSAN UGYANAZON KELL lennie, mint a felhasználó üzenetének.",
-  "systemRoleFallback": "Segítőkész asszisztens vagy.",
-  "systemLanguageInstruction": "KRITIKUS: Mindig ugyanazon a nyelven válaszoljon, amelyen a felhasználó ír, ügyeljen a felhasználó nyelvére.",
-  "systemNotePreviousMedia": "[Rendszer megjegyzés: Alul látható a korábban létrehozott adathordozó. Hivatkozhat rá vagy szerkesztheti.]",
   "systemTimeInfo": "Jelenlegi dátum és idő: {formattedTime}.",
-  "systemMemoryDirective": "[RENDSZERMEMÓRIAI IRÁNYELV]\nElemezze az eddigi beszélgetést. Ha BÁRMILYEN új, különálló tényt megtudott a felhasználóról (preferenciák, név, szokások, kontextus), akkor a válasza VÉGÉN ki KELL adnia a TELJES frissített memóriáját a felhasználóról a <memory>...</memory> címkéken belül. KRITIKUS: SOHA nem szabad törölni vagy felülírni az előző memóriát. MINDIG fűzz hozzá új tényeket a meglévő memóriához. Ha semmi újat nem tanult, hagyja ki a címkét. Példa: <memory>Szereti a focit és a teniszt. A rövid válaszokat részesíti előnyben.</memory>",
-  "systemMemoryReminder": "Mindig emlékezzen erre a felhasználóról:\n{userMemory}",
   "cancel": "Mégse",
   "remove": "Eltávolítás",
   "download": "Letöltés",
@@ -331,7 +325,7 @@
   "featureVideoGenerationDescription": "Ez a modell eredeti videót tud létrehozni a szöveges leírások alapján.",
   "premiumModelNoticeTitle": "Prémium modell",
   "premiumModelNoticeDescription": "Ez a mesterséges intelligencia egy prémium AI, az ingyenes felhasználók korlátozott hozzáféréssel rendelkeznek a prémium AI-khoz; frissítse a korlátlan hozzáférés feloldásához!",
-  "benefitPremiumModels": "Hozzáférés a prémium modellekhez",
+  "benefitPremiumModels": "Specific AI Selection",
   "premiumTrialExhaustedMessage": "Felhasználta az összes ingyenes napi üzenetét a prémium modellekhez. Frissítsen most, és **folytassa ott, ahol abbahagyta!**",
   "useOffline": "Offline használat",
   "explore": "Felfedezés",
@@ -483,11 +477,9 @@
   "featureQuizzesTitle": "Kvízek",
   "featureQuizzesDescription": "Tesztelje tudását.",
   "featureExploreDescription": "Fedezze fel az összes elérhető modellt.",
-  "featureStudyMessage": "Ön egy szakértő oktató. A cél az, hogy átfogóan elmagyarázza a felhasználó témáját. Használjon világos szerkezetet, példákat és analógiákat. Az összetett ötleteket emészthető részekre bontja, hogy a felhasználó hatékonyan tanulhasson. Téma:",
-  "featureQuizMessage": "Te egy kvízmester vagy. Hozzon létre egy konkrét feleletválasztós kérdést a felhasználó témája alapján. Várd meg a válaszukat. Ezután értékelje, és tegye fel a következő kérdést. Ne fedd fel az összes választ egyszerre. Legyen interaktív. Téma:",
   "myPlan": "Saját tervem",
-  "welcomeOfferBadge": "Üdvözlő ajánlat â€¢ {time}",
-  "exclusiveOfferBadge": "Exkluzív ajánlat â€¢ {time}",
+  "welcomeOfferBadge": "Üdvözlő ajánlat • {time}",
+  "exclusiveOfferBadge": "Exkluzív ajánlat • {time}",
   "attachmentSheetTitle": "Mellékletek",
   "actionCamera": "Fényképezőgép",
   "actionGallery": "Galéria",
@@ -502,7 +494,6 @@
   "continueInOfflineMode": "Folytatás offline módban",
   "voiceModeInformation": "A Cortex biztonságban tartja adatait azáltal, hogy teljesen az eszközön fut, még hangcsevegési módban is; élvezze a zökkenőmentes beszélgetéseket!",
   "flowModeDescription": "Flow módban az intelligenciák vitatkoznak egymással; vagy hátradőlhet és hallgathat, vagy beugorhat és bekapcsolódhat a vitába!",
-  "flowModeQuestion": "Helló! Most Flow módban van a Cortex alkalmazásban. Három másik AI ügynök van itt veled. Az Ön feladata, hogy bedobjon egy témát a terembe, és elindítsa a vitát úgy, hogy feltesz a többieknek egy provokatív vagy szórakoztató kérdést. Válaszaidban nyugodtan használj humort, iróniát és könnyed szemetes beszédet. Minden téma tisztességes játék. Gyerünk, kezdje el a beszélgetést.",
   "thought": "Gondolat",
   "agentRed": "Piros",
   "agentBlue": "Kék",
@@ -510,7 +501,6 @@
   "flowMode": "Flow Mode",
   "premium": "Prémium",
   "workInProgress": "Folyamatban lévő munka",
-  "voiceSystemPrompt": "FONTOS: Ne használjon markdown formázást (félkövér, dőlt). NE adjon ki kódblokkokat (```). Legyen a válaszok beszélgetősek és rövidek.",
   "flowModeContextParams": "Cortex Flow Mode ({agentName}). Előző: {previousResponse}",
   "toolReadDocumentDescription": "Szöveges tartalom olvasása és kinyerése feltöltött dokumentumokból. Támogatja a PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) és OpenDocument formátumokat. Ezt akkor használja, ha a felhasználó csatolt egy dokumentumfájlt.",
   "toolReadDocumentIndexParam": "Az olvasandó dokumentummelléklet indexe (0 alapú). Általában 0 az első dokumentumnál.",
@@ -528,7 +518,6 @@
   "toolChartDataParam": "Numerikus adatértékek a diagramhoz.",
   "toolChartLabelParam": "Adatkészlet címke a diagram jelmagyarázatához.",
   "toolChartTitleParam": "A diagram címe.",
-  "thinkingModeInstruction": "GONDOLKODÁSI MÓD ENGEDÉLYEZVE: A végső válasz megadása előtt <think></think> címkéket KELL használnia az érvelési folyamat bemutatására. Gondoljon lépésről lépésre a címkéken belül, majd adja meg a választ a címkéken kívül.",
   "openLinkWarningTitle": "Figyelmeztetés külső hivatkozásra",
   "openLinkCancel": "Mégse",
   "openLinkConfirm": "Link megnyitása",
@@ -553,9 +542,6 @@
   "intelligenceDescription": "Az MI így kommunikál veled.",
   "customInstructionHint": "Ide írja be egyéni utasításait",
   "openLinkWarningMessage": "A következő külső hivatkozás megnyitására készül:\\n\\n{url}\\n\\nBiztosan folytatja?",
-  "intelligenceSystemPrompt": "Kövesse ezeket az egyéni utasításokat:\\n\\n{instruction}",
-  "chatTitleCriticalInstruction": "[KRITIKAI UTASÍTÁS]: Ön CÍMGENERÁTOR. NE válaszoljon a felhasználó kérdésére. NE csevegjen vagy köszönjön. CSAK 2-4 szavas címet adjon ki, amely összefoglalja a felhasználó kérdését. A címnek ugyanazon a nyelven KELL lennie, mint a felhasználó üzenetének.",
-  "cortexSystemPersona": "[Rendszer] KRITIKUS UTASÍTÁS: Ön jelenleg egy hatalmas, rendkívül fejlett mesterséges intelligencia-ökoszisztémában, a \"Cortex\"-ben működik; ezt a platformot a Vertex csapata fejlesztette ki, akik átlagosan mindössze 16 évesek. Emlékezz erre, és válaszolj, ha kérdeznek. Ha további információra van szüksége, ne habozzon keresni az interneten, vagy ha nem tud keresni, nyugodtan mondja, hogy nem tudja!",
   "featureAudioRecognitionTitle": "Hangfelismerés",
   "featureAudioRecognitionDescription": "Ez a modell képes megérteni és feldolgozni a hangbemeneteket.",
   "featureVideoRecognitionTitle": "Videofelismerés",
@@ -567,7 +553,6 @@
   "videoModels": "Videó modellek",
   "imageModels": "Képmodellek",
   "audioModels": "Audio modellek",
-  "systemPromptMissingMedia": "Ennek a modellnek a működéséhez {mediaType} szükséges. Elfogtam a kérést, hogy tájékoztassam Önt. Kérjük, figyelmesen tájékoztassa a felhasználót, hogy meg kell adnia egy {mediaType}-t (mondja el nekik a saját nyelvén), mert én {modelName} vagyok, egy vizuális/audió/videó szerkesztő modell.",
   "mediaTypeImage": "kép",
   "mediaTypeVideo": "videó",
   "mediaTypeAudio": "hang",
@@ -588,7 +573,6 @@
   "trialMonthlyDescription": "Először {days} nap ingyenes, majd {price}/hó",
   "trialAnnualDescription": "Először {days} nap ingyenes, majd {price}/év",
   "freePlan": "Ingyenes {plan}!",
-  "systemPromptLimitFallback": "KRITIKUS: A felhasználó műveletet kért, de a Cortexre vonatkozó kerete kimerült; kérjük, tájékoztassa a felhasználót a saját nyelvén, hogy várjon, vagy fontolja meg az előfizetési csomag frissítését.",
   "dynamicPreditsUpgradeMessage": "A Cortex még jobb válaszokat tud adni; frissítsen most, és minden kérdésre a legjobb választ kapja!",
   "pinLimitReached": "Legfeljebb 3 csevegést rögzíthet.",
   "categoryAll": "Mind",
@@ -605,14 +589,42 @@
   "testPurchaseTitle": "Tesztvásárlás",
   "testPurchaseBadge": "TESZT",
   "testPurchaseNotice": "Tesztelési célból szimulált fizetés — valódi terhelés nem történik. Ez {plan} hozzáférést ad {duration} időtartamra.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Tesztvásárlás befejezése",
   "testDurationMinutes": "{minutes} perc",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Tesztmód: a vásárlások szimuláltak és rövid idejű tesztjogosultságokat adnak — valódi számlázás soha nem történik.",
   "testSubscriptionManage": "Teszt-előfizetés lemondása",
   "testPurchaseSuccess": "A teszt-előfizetés mostantól aktív.",
   "testPurchaseRevoked": "A teszt-előfizetés lemondva.",
   "testPurchaseError": "A tesztvásárlás sikertelen: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Kép készítése",
+  "generationVideoLabel": "Videó készítése",
+  "generationAudioLabel": "Hang készítése",
+  "generationDocumentLabel": "Dokumentum készítése"
 }

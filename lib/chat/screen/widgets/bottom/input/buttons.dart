@@ -38,30 +38,138 @@ class _ToolCircleButton extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: Opacity(
-        opacity: 1.0,
-        child: Material(
-          color: AppColors.background,
-          shape: const CircleBorder(),
-          child: Ink(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.border,
-                width: 1.0,
-              ),
-            ),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () {
-                HapticFeedback.lightImpact();
-                onTap?.call();
-              },
-              child: Center(child: child),
-            ),
+      child: Material(
+        color: AppColors.background,
+        shape: CircleBorder(
+          side: BorderSide(color: AppColors.border),
+        ),
+        child: Ink(
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              onTap?.call();
+            },
+            child: Center(child: child),
           ),
         ),
       ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MIC BUTTON — Extracted from ActionButtonWidget for use in the central zone
+// -----------------------------------------------------------------------------
+class MicButton extends StatelessWidget {
+  final TextEditingController controller;
+  final bool isSending;
+  final double? recordingProgress;
+
+  const MicButton({
+    super.key,
+    required this.controller,
+    required this.isSending,
+    this.recordingProgress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final speechService = context.watch<SpeechService>();
+    final inputProvider = context.watch<InputProvider>();
+
+    final bool isDeviceSupported = speechService.isDeviceSupported;
+    final bool isRecording = inputProvider.isVoiceRecording;
+
+    bool showMic = isDeviceSupported &&
+        !isSending &&
+        (recordingProgress != null || !isRecording);
+
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final double buttonSize = (screenWidth * 0.086).clamp(32.0, 38.0);
+
+    final mic = Padding(
+      padding: const EdgeInsetsDirectional.only(end: 4.0),
+      child: _ToolCircleButton(
+        size: buttonSize,
+        onTap: () async {
+          final localeCode =
+              context.read<ChatSessionProvider>().getLocale().languageCode;
+          final currentText = controller.text;
+
+          inputProvider.setVoiceRecording(true);
+
+          await speechService.startListening(
+            locale: localeCode,
+            onResult: (String text) {
+              String spacer =
+                  (currentText.isNotEmpty && !currentText.endsWith(' '))
+                      ? ' '
+                      : '';
+              if (currentText.isEmpty) spacer = '';
+              controller.text = "$currentText$spacer$text";
+              controller.selection = TextSelection.fromPosition(
+                TextPosition(offset: controller.text.length),
+              );
+            },
+          );
+        },
+        child: SvgPicture.asset(
+          'assets/icons/microphone.svg',
+          width: CortexDesign.icon,
+          height: CortexDesign.icon,
+          colorFilter: ColorFilter.mode(
+              AppColors.primaryColor.inverted, BlendMode.srcIn),
+        ),
+      ),
+    );
+
+    final micVisibility = 1 -
+        const Interval(0, 0.4, curve: Curves.easeOut)
+            .transform(recordingProgress ?? 0);
+
+    if (recordingProgress != null) {
+      return IgnorePointer(
+        ignoring: isRecording || recordingProgress! > 0,
+        child: ClipRect(
+          child: Align(
+            alignment: AlignmentDirectional.centerEnd,
+            widthFactor: micVisibility,
+            child: Opacity(opacity: micVisibility, child: mic),
+          ),
+        ),
+      );
+    }
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      reverseDuration: const Duration(milliseconds: 200),
+      switchInCurve: Curves.easeOutQuad,
+      switchOutCurve: Curves.easeInQuad,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: AnimatedBuilder(
+            animation: animation,
+            builder: (context, child) {
+              return ClipRect(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  widthFactor: animation.value,
+                  child: child,
+                ),
+              );
+            },
+            child: child,
+          ),
+        );
+      },
+      child: showMic
+          ? mic
+          : const SizedBox.shrink(key: ValueKey('mic_hidden')),
     );
   }
 }
@@ -79,6 +187,7 @@ class ActionButtonWidget extends StatelessWidget {
   final VoidCallback onSend;
   final VoidCallback onStop;
   final TextEditingController controller;
+  final bool includeMic;
 
   const ActionButtonWidget({
     super.key,
@@ -91,6 +200,7 @@ class ActionButtonWidget extends StatelessWidget {
     required this.onSend,
     required this.onStop,
     required this.controller,
+    this.includeMic = true,
   });
 
   @override
@@ -100,7 +210,7 @@ class ActionButtonWidget extends StatelessWidget {
     final inputProvider = context.watch<InputProvider>();
 
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final double buttonSize = screenWidth * 0.096;
+    final double buttonSize = (screenWidth * 0.086).clamp(32.0, 38.0);
 
     bool isDeviceSupported = speechService.isDeviceSupported;
 
@@ -135,82 +245,36 @@ class ActionButtonWidget extends StatelessWidget {
       }
     }
 
-    // Only show Mic if device supported AND we are not currently busy
-    bool showMic = isDeviceSupported &&
-        !isSending &&
-        (recordingProgress != null || !isRecording);
-
-    final mic = AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
-      reverseDuration: const Duration(milliseconds: 200),
+    final rightAction = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
       switchInCurve: Curves.easeOutQuad,
       switchOutCurve: Curves.easeInQuad,
-      transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: AnimatedBuilder(
-            animation: animation,
-            builder: (context, child) {
-              return ClipRect(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  widthFactor: animation.value,
-                  child: child,
-                ),
-              );
-            },
-            child: child,
-          ),
-        );
-      },
-      child: showMic
-          ? Padding(
-              key: const ValueKey('mic_visible'),
-              padding: const EdgeInsetsDirectional.only(end: 8.0),
-              child: _ToolCircleButton(
-                size: buttonSize,
-                onTap: () async {
-                  final localeCode = context
-                      .read<ChatSessionProvider>()
-                      .getLocale()
-                      .languageCode;
-                  final currentText = controller.text;
-
-                  inputProvider.setVoiceRecording(true);
-
-                  await speechService.startListening(
-                    locale: localeCode,
-                    onResult: (String text) {
-                      String spacer =
-                          (currentText.isNotEmpty && !currentText.endsWith(' '))
-                              ? ' '
-                              : '';
-                      if (currentText.isEmpty) spacer = '';
-                      controller.text = "$currentText$spacer$text";
-                      controller.selection = TextSelection.fromPosition(
-                          TextPosition(offset: controller.text.length));
-                    },
-                  );
-                },
-                child: SvgPicture.asset(
-                  'assets/icons/microphone.svg',
-                  width: CortexDesign.icon,
-                  height: CortexDesign.icon,
-                  colorFilter: ColorFilter.mode(
-                      AppColors.primaryColor.inverted, BlendMode.srcIn),
-                ),
-              ),
-            )
-          : const SizedBox.shrink(key: ValueKey('mic_hidden')),
+      transitionBuilder: (child, animation) =>
+          FadeTransition(opacity: animation, child: child),
+      child: KeyedSubtree(
+        key: rightButtonKey,
+        child: rightButton,
+      ),
     );
+
+    if (!includeMic) {
+      return rightAction;
+    }
+
+    final mic = MicButton(
+      controller: controller,
+      isSending: isSending,
+      recordingProgress: recordingProgress,
+    );
+
     final micVisibility = 1 -
         const Interval(0, 0.4, curve: Curves.easeOut)
             .transform(recordingProgress ?? 0);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // UPDATED: Uses AnimatedSwitcher for Slide + Fade transition
         if (recordingProgress != null)
           IgnorePointer(
             ignoring: isRecording || recordingProgress! > 0,
@@ -226,17 +290,7 @@ class ActionButtonWidget extends StatelessWidget {
           mic,
 
         // Main Action Button (Send/Stop/Voice)
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          switchInCurve: Curves.easeOutQuad,
-          switchOutCurve: Curves.easeInQuad,
-          transitionBuilder: (child, animation) =>
-              FadeTransition(opacity: animation, child: child),
-          child: KeyedSubtree(
-            key: rightButtonKey,
-            child: rightButton,
-          ),
-        ),
+        rightAction,
       ],
     );
   }
@@ -253,7 +307,10 @@ class ActionButtonWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.circular(size / 2),
-          border: Border.all(color: AppColors.border, width: 1.0),
+          border: Border.all(
+            color: AppColors.border,
+            width: 1.0,
+          ),
         ),
         child: Center(
           child: SvgPicture.asset(
@@ -270,8 +327,8 @@ class ActionButtonWidget extends StatelessWidget {
 
   Widget _buildSendButton(double size, bool enabled, bool isConnected) {
     final backgroundColor = AppColors.primaryColor.inverted;
-    final iconColor =
-        AppColors.primaryColor.withValues(alpha: enabled ? 1 : 0.45);
+    final iconColor = AppColors.primaryColor.withValues(
+        alpha: enabled ? 1 : 0.45);
 
     return GestureDetector(
       onTap: enabled
@@ -285,7 +342,8 @@ class ActionButtonWidget extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: backgroundColor,
-          border: Border.all(color: AppColors.primaryColor.inverted),
+          border: Border.all(
+              color: AppColors.primaryColor.inverted),
           shape: BoxShape.circle,
         ),
         child: Padding(
@@ -358,10 +416,6 @@ class ActionButtonWidget extends StatelessWidget {
               await voiceService.startSession(
                 context: context,
                 locale: localeCode,
-                voiceSystemPrompt: localizations.voiceSystemPrompt,
-                flowPromptBuilder: (agentName, previousResponse) =>
-                    localizations.flowModeContextParams(
-                        agentName, previousResponse),
                 onFinalSentence: (String text) {
                   if (!context.mounted) return;
                   if (text.trim().isNotEmpty) {
@@ -382,7 +436,8 @@ class ActionButtonWidget extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: AppColors.primaryColor.inverted,
-          border: Border.all(color: AppColors.primaryColor.inverted),
+          border: Border.all(
+              color: AppColors.primaryColor.inverted),
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -391,7 +446,8 @@ class ActionButtonWidget extends StatelessWidget {
             width: CortexDesign.icon,
             height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.withValues(alpha: isEnabled ? 1.0 : 0.3),
+                AppColors.primaryColor.withValues(
+                    alpha: isEnabled ? 1.0 : 0.3),
                 BlendMode.srcIn),
           ),
         ),
@@ -408,6 +464,7 @@ class AddPhotoButton extends StatefulWidget {
   final bool isPhotoLoading;
   final AppLocalizations localizations;
   final TextEditingController controller;
+  final bool hasSelectedFeature;
 
   const AddPhotoButton({
     super.key,
@@ -415,6 +472,7 @@ class AddPhotoButton extends StatefulWidget {
     required this.isPhotoLoading,
     required this.localizations,
     required this.controller,
+    this.hasSelectedFeature = false,
   });
 
   @override
@@ -433,7 +491,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     final currentModel = sessionProvider.selectedModel;
 
     final bool isFeatureActive =
-        inputProvider.featureMode != ChatInputMode.none ||
+        widget.hasSelectedFeature ||
+            inputProvider.featureMode != ChatInputMode.none ||
             inputProvider.enableWebSearch ||
             inputProvider.ragEnabled ||
             currentModel?.type == 'offline' ||
@@ -454,7 +513,7 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
     final bool buttonDisabled =
         widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
-    final double size = screenWidth * 0.096;
+    final double size = (screenWidth * 0.086).clamp(32.0, 38.0);
 
     return GestureDetector(
       onTap: buttonDisabled || widget.isPhotoLoading
@@ -476,7 +535,9 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         decoration: BoxDecoration(
           color: backgroundColor,
           border: Border.all(
-              color: AppColors.border, width: isFeatureActive ? 2 : 1),
+            color: AppColors.border,
+            width: isFeatureActive ? 2 : 1,
+          ),
           shape: BoxShape.circle,
         ),
         child: Center(

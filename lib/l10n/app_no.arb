@@ -1,12 +1,6 @@
 {
   "@@locale": "no",
-  "chatTitlePrompt": "Du er en tittelgenerator. Svar KUN med en tittel på 2-5 ord for følgende samtale. Ikke bruk anførselstegn, prefikser eller tegnsetting. KRITISK: Tittelen MÅ være på NØYAKTIG SAMME språk som brukerens melding.",
-  "systemRoleFallback": "Du er en hjelpsom assistent.",
-  "systemLanguageInstruction": "KRITISK: Svar alltid på samme språk som brukeren skriver på, vær oppmerksom på brukerens språk.",
-  "systemNotePreviousMedia": "[Systemmerknad: Nedenfor er media generert tidligere. Du kan referere til eller redigere det.]",
   "systemTimeInfo": "Gjeldende dato og klokkeslett: {formattedTime}.",
-  "systemMemoryDirective": "[SYSTEMMINNEDIREKTIV]\nAnalyser samtalen så langt. Hvis du har lært NOEN nye distinkte fakta om brukeren (preferanser, navn, vaner, kontekst), MÅ du skrive ut HELE ditt oppdaterte minne om brukeren i <memory>...</memory>-taggene HELT HELT på slutten av svaret ditt. KRITISK: Du må ALDRI slette eller overskrive tidligere minne. Legg ALLTID til nye fakta til det eksisterende minnet. Hvis absolutt ingenting nytt ble lært, utelat taggen. Eksempel: <memory>Elsker fotball og tennis. Foretrekker korte svar.</memory>",
-  "systemMemoryReminder": "Husk alltid dette om brukeren:\n{userMemory}",
   "cancel": "Avbryt",
   "remove": "Fjern",
   "download": "Last ned",
@@ -361,7 +355,7 @@
   "featureVideoGenerationDescription": "Denne modellen kan lage original video basert på tekstbeskrivelsene dine.",
   "premiumModelNoticeTitle": "Premium modell",
   "premiumModelNoticeDescription": "Denne AI er en premium AI, gratis brukere har begrenset tilgang til premium AIer; oppgrader for å låse opp ubegrenset tilgang!",
-  "benefitPremiumModels": "Tilgang til premiummodeller",
+  "benefitPremiumModels": "Specific AI Selection",
   "premiumTrialExhaustedMessage": "Du har brukt alle dine gratis daglige meldinger for premiummodeller. Oppgrader nå og **fortsett der du slapp!**",
   "useOffline": "Bruk frakoblet",
   "explore": "Utforsk",
@@ -513,11 +507,9 @@
   "featureQuizzesTitle": "Quiz",
   "featureQuizzesDescription": "Test kunnskapen din.",
   "featureExploreDescription": "Oppdag alle tilgjengelige modeller.",
-  "featureStudyMessage": "Du er en ekspertveileder. Målet ditt er å forklare brukerens emne uttømmende. Bruk tydelig struktur, eksempler og analogier. Del komplekse ideer i fordøyelige deler for å sikre at brukeren lærer effektivt. Emne:",
-  "featureQuizMessage": "Du er en quizmester. Generer et spesifikt flervalgsspørsmål basert på brukerens emne. Vent på deres svar. Deretter vurderer du det og still det neste spørsmålet. Ikke avslør alle svarene på en gang. Hold det interaktivt. Emne:",
   "myPlan": "Min plan",
-  "welcomeOfferBadge": "Velkomsttilbud â€¢ {time}",
-  "exclusiveOfferBadge": "Eksklusivt tilbud â€¢ {time}",
+  "welcomeOfferBadge": "Velkomsttilbud • {time}",
+  "exclusiveOfferBadge": "Eksklusivt tilbud • {time}",
   "attachmentSheetTitle": "Vedlegg",
   "actionCamera": "Kamera",
   "actionGallery": "Galleri",
@@ -532,7 +524,6 @@
   "continueInOfflineMode": "Fortsett i frakoblet modus",
   "voiceModeInformation": "Cortex holder dataene dine trygge ved å kjøre fullstendig på enheten, selv i talechat-modus; nyt sømløse samtaler!",
   "flowModeDescription": "I Flow-modus debatterer intelligenser seg imellom; du kan enten lene deg tilbake og lytte eller hoppe inn og bli med i diskusjonen!",
-  "flowModeQuestion": "Hallo! Du er nå i flytmodus på Cortex-appen. Det er tre andre AI-agenter her med deg. Din oppgave er å kaste et emne inn i rommet og starte en diskusjon ved å stille de andre et provoserende eller underholdende spørsmål. I svarene dine kan du gjerne bruke humor, ironi og lett søppelprat. Ethvert emne er rettferdig spill. Kom i gang, start samtalen.",
   "thought": "Tenkte",
   "agentRed": "Rød",
   "agentBlue": "Blå",
@@ -540,7 +531,6 @@
   "flowMode": "Flytmodus",
   "premium": "Premium",
   "workInProgress": "Arbeid pågår",
-  "voiceSystemPrompt": "VIKTIG: Ikke bruk markdown-formatering (fet, kursiv). IKKE skriv ut kodeblokker (```). Hold svarene konverserende og korte.",
   "flowModeContextParams": "Cortex Flow Mode ({agentName}). Forrige: {previousResponse}",
   "toolReadDocumentDescription": "Les og trekk ut tekstinnhold fra opplastede dokumenter. Støtter formatene PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) og OpenDocument. Bruk denne når brukeren har lagt ved en dokumentfil.",
   "toolReadDocumentIndexParam": "Indeksen til dokumentvedlegget som skal leses (0-basert). Vanligvis 0 for første dokument.",
@@ -558,7 +548,6 @@
   "toolChartDataParam": "Numeriske dataverdier for diagrammet.",
   "toolChartLabelParam": "Datasettetikett for diagramforklaringen.",
   "toolChartTitleParam": "Tittel på diagrammet.",
-  "thinkingModeInstruction": "TENKEMODUS AKTIVERT: Du MÅ bruke <think></think>-tagger for å vise resonneringsprosessen din før du gir ditt endelige svar. Tenk steg for steg innenfor kodene, og gi deretter svaret ditt utenfor kodene.",
   "openLinkWarningTitle": "Advarsel om ekstern kobling",
   "openLinkCancel": "Avbryt",
   "openLinkConfirm": "Åpne lenke",
@@ -583,9 +572,6 @@
   "intelligenceDescription": "AIer kommuniserer med deg på denne måten.",
   "customInstructionHint": "Skriv inn dine egendefinerte instruksjoner her",
   "openLinkWarningMessage": "Du er i ferd med å åpne følgende eksterne lenke:\\n\\n{url}\\n\\nEr du sikker på at du vil fortsette?",
-  "intelligenceSystemPrompt": "Følg disse egendefinerte instruksjonene:\\n\\n{instruction}",
-  "chatTitleCriticalInstruction": "[KRITISK INSTRUKSJON]: Du er en TITTELGENERATOR. IKKE svar på brukerens spørsmål. IKKE chat eller si hei. Skriv KUN ut en tittel på 2-4 ord som oppsummerer hva brukeren spør om. Tittelen MÅ være på samme språk som brukerens melding.",
-  "cortexSystemPersona": "[System] KRITISK INSTRUKSJON: Du opererer for tiden inne i et massivt, svært avansert AI-økosystem kalt \"Cortex\"; denne plattformen er utviklet av Vertex-teamet, som i gjennomsnitt bare er 16 år gamle. Husk dette og svar hvis du blir spurt. Hvis du ønsker mer informasjon, ikke nøl med å søke på internett, eller hvis du ikke kan søke, si gjerne at du ikke vet!",
   "featureAudioRecognitionTitle": "Lydgjenkjenning",
   "featureAudioRecognitionDescription": "Denne modellen kan forstå og behandle lydinnganger.",
   "featureVideoRecognitionTitle": "Videogjenkjenning",
@@ -597,7 +583,6 @@
   "videoModels": "Videomodeller",
   "imageModels": "Bildemodeller",
   "audioModels": "Lydmodeller",
-  "systemPromptMissingMedia": "Denne modellen krever en {mediaType} for å fungere. Jeg har avlyttet forespørselen om å gi deg beskjed. Vennligst informer brukeren om at de må oppgi en {mediaType} (fortell dem på deres eget språk) fordi jeg er {modelName}, en visuell-/lyd-/videoredigeringsmodell.",
   "mediaTypeImage": "bilde",
   "mediaTypeVideo": "video",
   "mediaTypeAudio": "lyd",
@@ -618,7 +603,6 @@
   "trialMonthlyDescription": "De første {days} dagene gratis, deretter {price}/måned",
   "trialAnnualDescription": "De første {days} dagene gratis, deretter {price}/år",
   "freePlan": "Gratis {plan}!",
-  "systemPromptLimitFallback": "KRITISK: Brukeren ba om en handling, men deres kvote på Cortex er oppbrukt; vennligst informer brukeren på deres språk om at de bør vente eller vurdere å oppgradere abonnementet.",
   "dynamicPreditsUpgradeMessage": "Cortex kan gi enda bedre svar; oppgrader nå og få det beste svaret for hvert spørsmål!",
   "pinLimitReached": "Du kan feste opptil 3 chatter.",
   "categoryAll": "Alle",
@@ -635,14 +619,42 @@
   "testPurchaseTitle": "Testkjøp",
   "testPurchaseBadge": "TEST",
   "testPurchaseNotice": "Simulert betaling for testing — ingen ekte belastning gjøres. Dette gir tilgang til {plan} i {duration}.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Fullfør testkjøp",
   "testDurationMinutes": "{minutes} minutter",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Testmodus: kjøp er simulerte og gir kortvarige testrettigheter — ekte fakturering er aldri involvert.",
   "testSubscriptionManage": "Avbryt testabonnement",
   "testPurchaseSuccess": "Testabonnementet er nå aktivt.",
   "testPurchaseRevoked": "Testabonnementet er kansellert.",
   "testPurchaseError": "Testkjøp mislyktes: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Genererer bilde",
+  "generationVideoLabel": "Genererer video",
+  "generationAudioLabel": "Genererer lyd",
+  "generationDocumentLabel": "Genererer dokument"
 }

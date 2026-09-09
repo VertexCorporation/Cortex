@@ -8,7 +8,6 @@ class _SendButtonSection extends StatelessWidget {
   final bool isEnabled;
   final bool isActionPermitted;
   final TextEditingController controller;
-
   const _SendButtonSection({
     this.recordingProgress,
     required this.screenWidth,
@@ -43,7 +42,7 @@ class _SendButtonSection extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsetsDirectional.only(
-        end: isTablet ? screenWidth * 0.02 : 16.0,
+        end: 8.0,
       ),
       child: ActionButtonWidget(
         isEnabled: effectiveEnabled,
