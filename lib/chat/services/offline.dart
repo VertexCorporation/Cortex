@@ -29,6 +29,8 @@ import '../../library/backend/data/defaults.dart';
 import 'context.dart';
 import 'offline_tuning.dart';
 import 'offline_request.dart';
+import 'reasoning_text.dart';
+import 'reasoning_instructions.dart';
 
 class SamplerPreset {
   final double temperature;
@@ -129,6 +131,7 @@ class OfflineService {
   int _lastVisibleChunkRepeatCount = 0;
   bool _forceAbortCurrentStream = false;
   bool _hasDeliveredOutput = false;
+  final StringBuffer _deliveredOutput = StringBuffer();
 
   // Repetition guard constants
   static const int _maxHistoryLength = 1024;
@@ -630,8 +633,13 @@ class OfflineService {
         if (tail != null && tail.isNotEmpty) {
           _deliverVisibleChunk(tail);
         }
+        final parsedOutput = ReasoningText.parse(_deliveredOutput.toString());
+        if (parsedOutput.isReasoningOpen) _deliverVisibleChunk('</think>');
         if ((call.arguments as Map)['error'] != null) {
           _deliverVisibleChunk('\n[Error: Local generation failed. Please retry.]');
+        } else if (parsedOutput.hasReasoning && parsedOutput.answer.trim().isEmpty) {
+          _deliverVisibleChunk('\n\n${ReasoningInstructions.noAnswer(
+              _sessionProvider.getLocale().languageCode)}');
         } else if (!_hasDeliveredOutput) {
           _deliverVisibleChunk('[Error: Local model returned no response. Please retry.]');
         }
@@ -645,6 +653,7 @@ class OfflineService {
         _responseService.finalizeResponse();
         _currentProcessor = null;
         _request?.cancel();
+        _deliveredOutput.clear();
         break;
 
       case 'onModelLoaded':
@@ -694,6 +703,7 @@ class OfflineService {
   // ===========================================================================
 
   void _deliverVisibleChunk(String chunk) {
+    _deliveredOutput.write(chunk);
     if (chunk.trim().isNotEmpty) _hasDeliveredOutput = true;
     if (kDebugMode && ++_visibleChunks == 1) {
       debugPrint('[OfflineService][delivery] firstVisibleChunkMs='
@@ -728,7 +738,10 @@ class OfflineService {
 
     // Short, direct instructions for better local model output
     final langName = _languageName(langCode);
-    if (langCode == 'tr') {
+    if (enableThinkingMode) {
+      systemPrompt += '\n\nRespond in $langName.\n'
+          '${ReasoningInstructions.forLanguage(langCode)}';
+    } else if (langCode == 'tr') {
       systemPrompt +=
           "\n\nSen Türkçe konuşan bir asistansın. Kısa ve doğal yanıt ver. Asla düşünce etiketi (<think>), işaretleme dili (markdown) veya biçimlendirme kullanma. Sadece düz metinle yanıtla. Konuşma geçmişini hatırla ve bağlamı koru.";
     } else if (langCode == 'de') {
@@ -849,6 +862,7 @@ class OfflineService {
   }
 
   void _resetRepetitionGuardState() {
+    _deliveredOutput.clear();
     _hasDeliveredOutput = false;
     _visibleHistory = '';
     _lastVisibleChunk = null;
