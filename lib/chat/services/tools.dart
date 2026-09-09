@@ -44,6 +44,32 @@ class ToolRegistry {
   static const String _executeToolUrl =
       "https://executetool-o5h7dmtija-ew.a.run.app";
 
+  /// Reuses the deployed Yahoo-backed tool without a model/OpenRouter call.
+  static Future<String> fetchLocalStockPrice(
+      String symbol, CancelToken cancelToken) async {
+    if (!RegExp(r'^[A-Z]{1,6}(?:[.-][A-Z]{1,4})?$').hasMatch(symbol)) {
+      throw ArgumentError('Invalid ticker');
+    }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw StateError('Authentication required');
+    final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 8),
+        sendTimeout: const Duration(seconds: 5)));
+    try {
+      final token = await user.getIdToken();
+      if (cancelToken.isCancelled || FirebaseAuth.instance.currentUser?.uid != user.uid) {
+        throw StateError('Request no longer active');
+      }
+      final response = await dio.post(_executeToolUrl,
+          data: {'name': 'get_stock_price', 'args': {'symbol': symbol}},
+          cancelToken: cancelToken,
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+      return response.data is String ? response.data as String : jsonEncode(response.data);
+    } finally {
+      dio.close(force: true);
+    }
+  }
+
   /// Returns localized tool definitions to send to the server.
   /// The server will use these definitions for the AI model.
   static List<Map<String, dynamic>> getLocalizedToolsJson(

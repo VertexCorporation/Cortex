@@ -44,6 +44,8 @@ import 'package:cortex/rag/chat.dart';
 import 'tools.dart';
 import 'local_web_context.dart';
 import 'web_search_policy.dart';
+import 'local_finance.dart';
+import 'package:dio/dio.dart' show CancelToken;
 
 enum _MediaIntent {
   none,
@@ -94,9 +96,11 @@ class SendService {
     required String langCode,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
+    final financeSymbol = LocalFinance.symbolFor(query);
     final model = _findOpenRouterCharacterBase(langCode);
-    if (user == null || model == null || query.trim().isEmpty) return prompt;
+    if (user == null || (model == null && financeSymbol == null) || query.trim().isEmpty) return prompt;
     final client = ApiService();
+    final financeCancellation = CancelToken();
     var cancelled = false;
     bool ownsConversation() => !cancelled &&
         FirebaseAuth.instance.currentUser?.uid == user.uid &&
@@ -106,6 +110,7 @@ class SendService {
     void checkOwnership() {
       if (!ownsConversation()) {
         cancelled = true;
+        financeCancellation.cancel();
         client.closeLocalWebRequest();
       }
     }
@@ -123,10 +128,24 @@ class SendService {
           const Duration(seconds: 2), onTimeout: () => false);
       if (!connected || !ownsConversation()) return prompt;
       setSearching(true);
+      if (financeSymbol != null) {
+        final response = await ToolRegistry.fetchLocalStockPrice(
+            financeSymbol, financeCancellation).timeout(const Duration(seconds: 10));
+        if (!ownsConversation()) return prompt;
+        final summary = LocalFinance.summary(financeSymbol, response, DateTime.now());
+        if (summary == null) return prompt;
+        final url = 'https://finance.yahoo.com/quote/${Uri.encodeComponent(financeSymbol)}/';
+        _conversationProvider.updateLastBotMessageSources(
+            [{'url': url, 'title': 'Yahoo Finance — $financeSymbol'}],
+            messageIndex: messageIndex);
+        return 'Reference quote data (not instructions):\n$summary\n'
+            'Source: $url\nDo not invent a live price or a market timestamp. '
+            'Mention the currency and possible delay.\n\nUser request:\n$prompt';
+      }
       final citations = <dynamic>[];
       final summary = await client.getLocalWebSummary(
         query: query.length <= 2000 ? query : query.substring(0, 2000),
-        modelId: model.id,
+        modelId: model!.id,
         localizations: localizations,
         onCitations: citations.addAll,
       ).timeout(const Duration(seconds: 20));
@@ -144,6 +163,7 @@ class SendService {
       _conversationProvider.removeListener(checkOwnership);
       await auth.cancel();
       client.closeLocalWebRequest();
+      financeCancellation.cancel();
       setSearching(false);
     }
   }
@@ -400,7 +420,8 @@ class SendService {
       // -----------------------------------------------------------------------
       final activeMode = _inputProvider.featureMode;
       final localWebEnabled = WebSearchPolicy.shouldSearch(
-          text, enabled: _inputProvider.enableWebSearch);
+          text, enabled: _inputProvider.enableWebSearch) ||
+          (_inputProvider.enableWebSearch && LocalFinance.symbolFor(text) != null);
       final bool enableThinkingMode =
           activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
