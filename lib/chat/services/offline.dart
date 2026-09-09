@@ -26,6 +26,7 @@ import '../../library/backend/remove.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/backend/data/format.dart';
 import '../../library/backend/data/defaults.dart';
+import '../messages/messages.dart';
 import 'context.dart';
 
 class SamplerPreset {
@@ -92,6 +93,19 @@ SamplerPreset codeSampler(ModelEntity model) {
   );
 }
 
+SamplerPreset reasoningSampler(ModelEntity model) {
+  final size = model.size ?? 0;
+  return SamplerPreset(
+    // Deep Thinking should be more deterministic than normal chat without
+    // collapsing every non-code task into the old ultra-low-temperature code preset.
+    temperature: size <= 1000 ? 0.3 : 0.4,
+    topP: 0.9,
+    topK: size <= 1000 ? 24 : 40,
+    repeatPenalty: size <= 1000 ? 1.18 : 1.1,
+    presencePenalty: 0.05,
+  );
+}
+
 SamplerPreset creativeSampler(ModelEntity model) {
   return SamplerPreset(
     temperature: 0.8,
@@ -121,6 +135,11 @@ class OfflineService {
   String? _lastVisibleChunk;
   int _lastVisibleChunkRepeatCount = 0;
   bool _forceAbortCurrentStream = false;
+
+  // Deep-thinking completion state for the current local generation.
+  bool _activeThinkingMode = false;
+  String _activeLanguageCode = 'en';
+  StringBuffer _responseBuffer = StringBuffer();
 
   // Repetition guard constants
   static const int _maxHistoryLength = 1024;
@@ -426,6 +445,9 @@ class OfflineService {
     final bool enableThinkingMode =
         activeMode == ChatInputMode.featureReasoning;
     final langCode = _sessionProvider.getLocale().languageCode;
+    _activeThinkingMode = enableThinkingMode;
+    _activeLanguageCode = langCode;
+    _responseBuffer = StringBuffer();
 
     // RAG (Document Chat): retrieve relevant passages before building the
     // prompt so the offline model can answer from attached documents.
@@ -453,7 +475,7 @@ class OfflineService {
     final SamplerPreset sampler;
     switch (activeMode) {
       case ChatInputMode.featureReasoning:
-        sampler = codeSampler(model);
+        sampler = reasoningSampler(model);
       case ChatInputMode.study:
       case ChatInputMode.quiz:
         sampler = creativeSampler(model);
@@ -522,6 +544,7 @@ class OfflineService {
           if (_shouldAbortForRepetition(rawToken)) {
             _handleRepetitionAbort();
           } else {
+            _responseBuffer.write(rawToken);
             _responseService.onMessageResponse(rawToken);
           }
           return;
@@ -532,6 +555,7 @@ class OfflineService {
           if (_shouldAbortForRepetition(processedToken)) {
             _handleRepetitionAbort();
           } else {
+            _responseBuffer.write(processedToken);
             _responseService.onMessageResponse(processedToken);
           }
         }
@@ -542,10 +566,23 @@ class OfflineService {
 
         final tail = _currentProcessor?.finalize();
         if (tail != null && tail.isNotEmpty) {
+          _responseBuffer.write(tail);
           _responseService.onMessageResponse(tail);
         }
+
+        if (_activeThinkingMode) {
+          final parsed = ReasoningText.parse(_responseBuffer.toString());
+          if (parsed.hasReasoning && parsed.answer.trim().isEmpty) {
+            final repair = '${parsed.closingMarkup}\n\n'
+                '${ReasoningGuidance.incompleteAnswer(_activeLanguageCode)}';
+            _responseService.onMessageResponse(repair);
+          }
+        }
+
         _responseService.finalizeResponse();
         _currentProcessor = null;
+        _activeThinkingMode = false;
+        _responseBuffer = StringBuffer();
         break;
 
       case 'onModelLoaded':
@@ -600,9 +637,19 @@ class OfflineService {
     final sb = StringBuffer();
     var systemPrompt = (model.role ?? "").trim();
 
-    // Short, direct instructions for better local model output
+    // Local models previously received "never use <think>" even while Deep
+    // Thinking was active. Keep normal-chat brevity, but let reasoning mode use
+    // the model's native reasoning format and require a completed final answer.
     final langName = _languageName(langCode);
-    if (langCode == 'tr') {
+    if (enableThinkingMode) {
+      if (langCode == 'tr') {
+        systemPrompt +=
+            "\n\nSen Türkçe konuşan bir asistansın. Konuşma geçmişini hatırla ve bağlamı koru. ${ReasoningGuidance.forLanguage(langCode)} Modelin yerleşik <think>...</think> biçimini destekliyorsa düşünme aşamasında kullanabilirsin; ancak düşünmeden sonra mutlaka tamamlanmış bir son cevap üret. Kod veya yapılandırılmış anlatım gerekiyorsa uygun biçimlendirme kullanabilirsin.";
+      } else {
+        systemPrompt +=
+            "\n\nYou are a $langName-speaking assistant. Remember the conversation history and preserve context. ${ReasoningGuidance.forLanguage(langCode)} If the model natively supports <think>...</think>, it may use that format for its reasoning phase, but it must always produce a complete final answer afterwards. Use formatting when it materially improves code or structured explanations.";
+      }
+    } else if (langCode == 'tr') {
       systemPrompt +=
           "\n\nSen Türkçe konuşan bir asistansın. Kısa ve doğal yanıt ver. Asla düşünce etiketi (<think>), işaretleme dili (markdown) veya biçimlendirme kullanma. Sadece düz metinle yanıtla. Konuşma geçmişini hatırla ve bağlamı koru.";
     } else if (langCode == 'de') {
