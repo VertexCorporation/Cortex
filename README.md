@@ -1,382 +1,762 @@
+# Cortex
+
+**A hybrid AI platform combining on-device inference, multi-provider orchestration, retrieval, memory, and model infrastructure.**
+
+[![License](https://img.shields.io/github/license/VertexCorporation/Cortex?style=flat-square&color=2f3136)](./LICENSE)
+[![Stars](https://img.shields.io/github/stars/VertexCorporation/Cortex?style=flat-square&color=2f3136)](https://github.com/VertexCorporation/Cortex/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/VertexCorporation/Cortex?style=flat-square&color=2f3136)](https://github.com/VertexCorporation/Cortex/commits/main)
+
+[Architecture](./architecture/general.md) ·
+[Generation](./architecture/fulcrum/generation.md) ·
+[Control Plane](./architecture/synapse/overview.md) ·
+[Client Runtime](./architecture/cortex/chat.md) ·
+[Source Map](./architecture/cortex/file-map.md)
+
+---
+
+## Overview
+
+Cortex is not a thin client around a single model API.
+
+It is a multi-layer AI system that combines a cross-platform client runtime, local inference, retrieval and memory, a trusted cloud execution plane, provider routing, streaming, commercial authorization, and a separate model-control plane.
+
+The system is divided into three primary architectural domains:
+
+| System | Role | Responsibilities |
+|---|---|---|
+| **Cortex** | Client runtime | UI state, conversations, local persistence, context assembly, RAG, memory, PII handling, offline inference, media and rendering |
+| **Fulcrum** | Execution plane | Authentication, authorization, routing, provider execution, SSE streaming, fallback, usage settlement, entitlements, tools, media and voice |
+| **Synapse** | Control plane | Provider ingestion, normalization, deduplication, metadata policy, curation, versioning, distributed coordination and catalog publication |
+
+The boundary is intentional: Cortex owns user experience and local state, Fulcrum owns trusted execution and commercial policy, and Synapse owns model knowledge and publication.
+
+### Production context
+
+Cortex is not an architecture exercise detached from a product.
+
+It runs behind a live consumer platform that has reached users in more than 190 countries and serves tens of thousands of active users.
+
+That means the architecture has to operate across real mobile devices, unreliable networks, third-party provider failures, purchase lifecycles, catalog drift, local model constraints and continuously changing upstream AI services.
+
+### Engineering scope
+
+| Domain | Representative concerns |
+|---|---|
+| **Hybrid inference** | Local and remote execution under one conversation model |
+| **Native runtime** | `llama.cpp`, JNI / NDK integration, GGUF execution and device constraints |
+| **Inference orchestration** | Intent analysis, capability matching, routing, retry, fallback and normalized streaming |
+| **Model control plane** | Multi-source ingestion, normalization, deduplication, curation, policy, versioning and publication |
+| **Commercial state** | Entitlements, credits, IAP verification, idempotent lifecycle handling and reconciliation |
+| **Client intelligence** | Context, memory, retrieval, local safety, persistence, media and response-state coordination |
+| **Reliability** | Circuit breaking, partial upstream failure, cache invalidation, conflict handling, backups and cleanup |
+
+---
+
+## System Architecture
+
+```mermaid
+flowchart TB
+    U["User"]
+
+    subgraph C["Cortex Client"]
+        UI["Interface / Input"]
+        STATE["Session and Conversation State"]
+        CTX["Context / Memory / RAG / PII"]
+        LOCAL["On-device inference\nllama.cpp / JNI"]
+        STORE["Local persistence"]
+        RESP["Response / Media / Rendering"]
+
+        UI --> STATE
+        STATE --> CTX
+        CTX --> LOCAL
+        STATE --> STORE
+        RESP --> STORE
+    end
+
+    subgraph F["Fulcrum — Execution Plane"]
+        GW["Gateway"]
+        AUTH["Authentication / Entitlements / Credits"]
+        ROUTE["Intent and Route Resolution"]
+        EXEC["Provider Execution"]
+        STREAM["Streaming / Retry / Fallback"]
+        COST["Usage and Cost Settlement"]
+        BILL["Billing / IAP / Scheduled Reconciliation"]
+
+        GW --> AUTH
+        AUTH --> ROUTE
+        ROUTE --> EXEC
+        EXEC --> STREAM
+        STREAM --> COST
+        BILL --> AUTH
+    end
+
+    subgraph S["Synapse — Control Plane"]
+        INGEST["Provider Ingestion"]
+        NORMALIZE["Normalization / Classification"]
+        DEDUPE["Deduplication / Merge"]
+        POLICY["Catalog Policy / Curation"]
+        VERSION["Hashing / Version Coordination"]
+        PUBLISH["KV / Edge Publication"]
+
+        INGEST --> NORMALIZE
+        NORMALIZE --> DEDUPE
+        DEDUPE --> POLICY
+        POLICY --> VERSION
+        VERSION --> PUBLISH
+    end
+
+    subgraph P["External Model and Media Providers"]
+        TEXT["Text / Reasoning"]
+        IMAGE["Image / Video"]
+        SPEECH["Speech / Audio"]
+    end
+
+    U --> UI
+
+    CTX --> GW
+    LOCAL --> RESP
+
+    GW --> ROUTE
+    STREAM --> RESP
+
+    PUBLISH --> C
+    PUBLISH --> F
+
+    EXEC --> TEXT
+    EXEC --> IMAGE
+    EXEC --> SPEECH
+```
+
+For the detailed system map, start with [`architecture/general.md`](./architecture/general.md).
+
+---
+
+## Generation Lifecycle
+
+A single online generation crosses multiple independent concerns before a response reaches the screen.
+
+```mermaid
+flowchart TD
+    A["User input"] --> B["Input and session state"]
+    B --> C["Context assembly"]
+    C --> D["Memory retrieval"]
+    D --> E["RAG"]
+    E --> F["PII / local safety processing"]
+    F --> G["Request construction"]
+    G --> H["Fulcrum gateway"]
+
+    H --> I["Authentication"]
+    I --> J["Entitlement / credit policy"]
+    J --> K["Intent analysis"]
+    K --> L["Model and provider routing"]
+    L --> M["Provider execution"]
+
+    M --> N{"Execution succeeds?"}
+    N -- "Yes" --> O["Normalized streaming"]
+    N -- "No" --> P["Retry / fallback policy"]
+    P --> M
+
+    O --> Q["Usage and cost reconciliation"]
+    Q --> R["SSE response"]
+    R --> S["Response processing"]
+    S --> T["Conversation state"]
+    T --> U["Persistence"]
+    T --> V["Rendering / media / tools"]
+```
+
+The important property is not the number of stages. Each stage owns a distinct responsibility and failure surface.
+
+A provider timeout, a stale catalog entry, an entitlement mismatch, a dropped SSE connection, a fallback transition and a local persistence failure are different problems handled by different layers.
+
+---
+
+## Cortex Client Runtime
+
+The public Cortex repository contains the user-facing runtime and the orchestration required to combine local and remote AI execution in one product.
+
+### Conversation orchestration
+
+The chat path coordinates responsibilities including:
+
+- input and session state
+- conversation state
+- context assembly
+- semantic memory
+- prompt compression
+- retrieval
+- local PII processing
+- moderation
+- streaming response processing
+- media routing
+- persistence
+- background behavior
+- metrics and limits
+
+The client is intentionally more than a renderer. It prepares and maintains the state required for both local and remote inference.
+
+See [`architecture/cortex/chat.md`](./architecture/cortex/chat.md).
+
+### On-device inference
+
+Cortex supports local model execution through `llama.cpp`, integrated into the mobile runtime through native bindings.
+
+This path allows supported models to execute without sending the conversation to a remote inference provider.
+
+The local stack includes:
+
+- GGUF model execution
+- native C/C++ integration
+- Android NDK / JNI integration
+- sampling configuration
+- local inference lifecycle management
+- offline moderation paths
+- local conversation and model state
+
+The `llama.cpp` source is maintained as a Git submodule under the repository's vendor tree.
+
+### Retrieval and memory
+
+Cortex includes a local retrieval pipeline for bringing user-provided information into model context.
+
+The current architecture separates:
+
+```text
+Input
+  -> extraction
+  -> chunking
+  -> local indexing
+  -> retrieval
+  -> context injection
+```
+
+The retrieval interface is designed so the ranking implementation can evolve independently from the rest of the chat pipeline.
+
+See [`architecture/cortex/rag.md`](./architecture/cortex/rag.md).
+
+### Source map
+
+The client architecture is catalogued separately so contributors can locate responsibilities without reverse-engineering the entire `lib/` tree.
+
+See [`architecture/cortex/file-map.md`](./architecture/cortex/file-map.md).
+
+---
+
+## Fulcrum
+
+Fulcrum is the trusted execution plane behind Cortex.
+
+The client may express intent, context and user choices. Fulcrum remains authoritative for operations that cannot safely depend on client state, including provider access, routing policy, commercial authorization and final usage settlement.
+
+### Gateway
+
+The gateway coordinates the request boundary:
+
+```text
+request
+  -> validation
+  -> authentication
+  -> feature authorization
+  -> credit policy
+  -> context / attachment handling
+  -> route resolution
+  -> provider execution
+  -> normalized stream
+  -> cost settlement
+```
+
+### Dynamic routing
+
+Routing is capability-aware rather than tied to a single provider.
+
+The routing layer can reason about:
+
+- requested task
+- model capabilities
+- provider availability
+- media compatibility
+- context constraints
+- dynamic model selection
+- fallback ordering
+
+This allows execution policy to change without requiring the client to understand provider-specific implementation details.
+
+### Provider execution
+
+Provider-specific behavior is normalized behind the execution layer.
+
+Depending on task and availability, the platform can interact with multiple text, media, speech and transcription providers while exposing a consistent contract to the client.
+
+### Streaming and failure handling
+
+Generation is streamed through Server-Sent Events.
+
+The stream layer is responsible for execution concerns including:
+
+- provider adapters
+- incremental output
+- retry decisions
+- fallback transitions
+- provider-specific response parsing
+- normalized event delivery
+- usage accounting
+- final cost reconciliation
+
+A failed provider request and a failed client connection are not treated as the same failure.
+
+### Billing and entitlements
+
+Commercial state is handled on the trusted side of the system rather than delegated to the client.
+
+The billing architecture covers:
+
+- Apple and Google purchase verification
+- subscription lifecycle handling
+- entitlement state
+- credit grants and consumption
+- idempotent webhook processing
+- scheduled reconciliation
+- expiry and cleanup jobs
+- refund and abuse-related maintenance paths
+
+See:
+
+- [`architecture/fulcrum/generation.md`](./architecture/fulcrum/generation.md)
+- [`architecture/fulcrum/billing.md`](./architecture/fulcrum/billing.md)
+- [`architecture/fulcrum/functions-map.md`](./architecture/fulcrum/functions-map.md)
+
+---
+
+## Synapse
+
+Synapse is Cortex's model control plane.
+
+Its job is not to execute user generations. Its job is to maintain the model knowledge that the rest of the platform can trust.
+
+The architecture is split into three primary responsibilities:
+
+| Worker | Responsibility |
+|---|---|
+| **Syncer** | Automated provider ingestion and deterministic catalog generation |
+| **Curator** | Human-authenticated editorial changes |
+| **Supervisor** | Enrichment, cleanup and maintenance workloads |
+
+### Catalog pipeline
+
+```mermaid
+flowchart TD
+    A["Provider inventories"] --> B["Concurrent ingestion"]
+    B --> C["Normalization"]
+    C --> D["Producer / series / variant classification"]
+    D --> E["Deduplication"]
+    E --> F["Curated metadata merge"]
+    F --> G["Catalog policy"]
+    G --> H["Content hash"]
+    H --> I["Version / conflict check"]
+    I --> J["Backup"]
+    J --> K["KV publication"]
+    K --> L["Edge cache"]
+```
+
+The ingestion path is designed for partial provider failure: one upstream source should not invalidate the entire catalog.
+
+### Coordination and publication
+
+Synapse uses multiple mechanisms to protect catalog integrity:
+
+- distributed locks
+- optimistic version checks
+- content hashing
+- backups
+- explicit cache invalidation
+- provider precedence
+- deterministic normalization
+- curated metadata preservation
+
+Automated synchronization is separated from human curation so machine-generated refreshes do not silently overwrite editorial metadata.
+
+See:
+
+- [`architecture/synapse/overview.md`](./architecture/synapse/overview.md)
+- [`architecture/synapse/syncer.md`](./architecture/synapse/syncer.md)
+- [`architecture/synapse/curator.md`](./architecture/synapse/curator.md)
+- [`architecture/synapse/supervisor.md`](./architecture/synapse/supervisor.md)
+
+---
+
+## Execution Boundaries
+
+Cortex intentionally separates client, execution and control responsibilities.
+
+```text
+Cortex
+  owns user experience, local state and on-device intelligence
+
+Fulcrum
+  owns trusted execution, authorization, routing and settlement
+
+Synapse
+  owns model knowledge, normalization, policy and publication
+```
+
+This separation keeps several invariants explicit:
+
+1. The client does not become the source of truth for paid entitlements.
+2. Provider credentials and privileged routing decisions remain server-side.
+3. A model catalog update is independent from the generation request path.
+4. Automated catalog ingestion cannot freely overwrite human curation.
+5. Provider-specific streaming formats do not leak into client state.
+6. Local inference can continue to exist independently from cloud execution.
+
+---
+
+## Failure Surfaces
+
+The architecture is designed around the fact that AI systems fail in more ways than ordinary request-response applications.
+
+| Failure | Owning layer |
+|---|---|
+| Upstream provider unavailable | Fulcrum routing / streaming |
+| Provider fails during a generation | Fulcrum fallback policy |
+| Usage differs after fallback | Fulcrum cost reconciliation |
+| Client disconnects during SSE | Streaming / client state |
+| Purchase webhook is retried | Billing idempotency |
+| Subscription state becomes stale | Billing reconciliation |
+| Provider catalog source is unavailable | Synapse ingestion |
+| Two catalog writers overlap | Synapse coordination |
+| Automated sync conflicts with manual metadata | Synapse merge policy |
+| Device is offline | Cortex local runtime |
+| Remote inference is unavailable | Cortex offline path, when supported |
+| Local retrieval has no useful context | Cortex retrieval pipeline |
+
+The goal is not to remove every failure. It is to make ownership of each failure explicit.
+
+---
+
+## Model and Provider Ecosystem
+
+Cortex is designed around provider heterogeneity rather than a single upstream API.
+
+The wider platform integrates capabilities across text inference, media generation, speech, transcription and model metadata.
+
+Provider integration is independent from the ecosystem support relationships listed later in this document.
+
+Examples include:
+
+- OpenRouter
+- Cloudflare Workers AI
+- Groq
+- fal
+- ElevenLabs
+- Deepgram
+- AssemblyAI
+
+Provider support is capability-dependent and may change independently of the client release cycle through the model control plane.
+
+---
+
+## Incubation and Ecosystem Support
+
+### Incubated by
+
+**Cube Incubation — Teknopark Istanbul**
+
+Cortex is incubated at Cube Incubation, the incubation center of Teknopark Istanbul.
+
+The incubation relationship is separate from the infrastructure and tooling support listed below.
+
+### Supported by
+
+Cortex have received infrastructure credits, developer tooling, startup-program access, platform access or other ecosystem support from companies including:
 
 <div align="center">
-  <i>"Bütün ümidim gençliktir."</i><br>
-  <b>— Mustafa Kemal Atatürk</b>
+
+<a href="https://www.cloudflare.com/"><img src="https://img.shields.io/badge/Cloudflare-Supported-2f3136?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare"></a>
+<a href="https://elevenlabs.io/"><img src="https://img.shields.io/badge/ElevenLabs-Supported-2f3136?style=for-the-badge&logo=elevenlabs&logoColor=white" alt="ElevenLabs"></a>
+<a href="https://deepgram.com/"><img src="https://img.shields.io/badge/Deepgram-Supported-2f3136?style=for-the-badge&logo=deepgram&logoColor=white" alt="Deepgram"></a>
+<a href="https://miro.com/"><img src="https://img.shields.io/badge/Miro-Supported-2f3136?style=for-the-badge&logo=miro&logoColor=white" alt="Miro"></a>
+<a href="https://www.assemblyai.com/"><img src="https://img.shields.io/badge/AssemblyAI-Supported-2f3136?style=for-the-badge" alt="AssemblyAI"></a>
+<a href="https://www.daytona.io/"><img src="https://img.shields.io/badge/Daytona-Supported-2f3136?style=for-the-badge" alt="Daytona"></a>
+<a href="https://about.gitlab.com/"><img src="https://img.shields.io/badge/GitLab-Supported-2f3136?style=for-the-badge&logo=gitlab&logoColor=white" alt="GitLab"></a>
+<a href="https://fal.ai/"><img src="https://img.shields.io/badge/fal-Supported-2f3136?style=for-the-badge" alt="fal"></a>
+
 </div>
 
-<br>
+<sub>Support relationships differ by company and may include credits, startup programs, tooling, infrastructure or platform access. Inclusion here does not imply product endorsement, investment or a commercial partnership unless separately stated.</sub>
+
+---
+
+## Product
+
+Architecture is only useful if it survives contact with a real product.
+
+Cortex exposes the underlying platform through a mobile interface built around conversations, multimodal creation, model selection, local execution and a persistent personal AI environment.
 
 <div align="center">
 
-  <h1>C O R T E X</h1>
-  <h3>C O R E &nbsp; O F &nbsp; A R T I F I C I A L &nbsp; I N T E L L I G E N C E</h3>
-  <p>
-    Privacy-first, hyper-personalized, and always available AI—right in your pocket.
-    <br/>
-    <strong>Step into the future of AI, on your terms.</strong>
-  </p>
+| | | |
+|:---:|:---:|:---:|
+| <img src="./assets/screenshots/1.png" width="210" alt="Chat Screen"> | <img src="./assets/screenshots/2.png" width="210" alt="Create Menu"> | <img src="./assets/screenshots/3.png" width="210" alt="Library"> |
+| **Chat** | **Create** | **Library** |
+| <img src="./assets/screenshots/4.png" width="210" alt="Model Select"> | <img src="./assets/screenshots/5.png" width="210" alt="Sidebar"> | <img src="./assets/screenshots/6.png" width="210" alt="Conversation"> |
+| **Models** | **Navigation** | **Conversation** |
 
-  <p>
-    <a href="https://github.com/VertexCorporation/Cortex/issues">Report Bug</a> · 
-    <a href="https://github.com/VertexCorporation/Cortex/issues">Request Feature</a> ·
-    <a href="https://vertexishere.com/tr/indir">Download App</a>
-  </p>
-
-  <p>
-    <a href="https://github.com/VertexCorporation/Cortex/blob/main/LICENSE">
-        <img src="https://img.shields.io/github/license/VertexCorporation/Cortex?style=for-the-badge&color=252529" alt="License">
-    </a>
-    <a href="https://github.com/VertexCorporation/Cortex/stargazers">
-        <img src="https://img.shields.io/github/stars/VertexCorporation/Cortex?style=for-the-badge&color=4F46E5" alt="Stars">
-    </a>
-    <a href="https://github.com/VertexCorporation/Cortex/network/members">
-        <img src="https://img.shields.io/github/forks/VertexCorporation/Cortex?style=for-the-badge&color=252529" alt="Forks">
-    </a>
-    <a href="https://play.google.com/store/apps/details?id=com.vertex.cortex">
-        <img src="https://img.shields.io/badge/Google_Play-Available-4F46E5.svg?style=for-the-badge&logo=google-play" alt="Get it on Google Play">
-    </a>
-  </p>
 </div>
 
----
+### Online and offline execution
 
-## Welcome to Cortex
+Cortex supports two execution domains.
 
-**Cortex** redefines your relationship with artificial intelligence. It's a revolutionary mobile application that places the power of cutting-edge AI directly in your hands, designed with three core principles: **Privacy, Personalization, and Performance.** Whether you're offline on a remote trail or connected to the cloud, Cortex ensures your AI companion is always there for you.
+**On-device**
 
-Control your data, customize your experience, and access the pinnacle of AI from anywhere.
+Supported local models run through `llama.cpp`. Model execution and the associated conversation path can remain on the device.
 
-### <img src="https://api.iconify.design/lucide:monitor-play.svg?color=%234F46E5" width="22" align="absmiddle" /> App Showcase
+**Cloud**
 
-> *Experience the redesigned interface and groundbreaking features in the latest update.*
+Remote tasks are sent through Cortex's trusted backend and routed to the appropriate execution provider according to task, capability, availability and policy.
 
-|                                                                                          |                                                                                    |                                                                                      |
-|:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
-|                   <img src="./assets/screenshots/1.png" width="200" alt="Chat Screen">                    |                <img src="./assets/screenshots/2.png" width="200" alt="Create Menu">                 |                 <img src="./assets/screenshots/3.png" width="200" alt="Library">                  |
-|                                     **Chat Screen**                                    |                                  **Create Menu**                                  |                                   **Library**                                   |
-|                   <img src="./assets/screenshots/4.png" width="200" alt="Model Select">                    |                <img src="./assets/screenshots/5.png" width="200" alt="Sidebar Menu">                 |                 <img src="./assets/screenshots/6.png" width="200" alt="Testing Chat">                  |
-|                                     **Model Select**                                     |                                  **Sidebar Menu**                                  |                                   **Testing Chat**                                   |
-
-*(Note: The showcase represents the latest features including live data integration and performance improvements.)*
+These paths share a product surface but have different privacy, availability and performance characteristics.
 
 ---
 
-## <img src="https://api.iconify.design/lucide:list.svg?color=%234F46E5" width="24" align="absmiddle" /> Table of Contents
+## Repository Structure
 
-- [Why Choose Cortex?](#-why-choose-cortex)
-- [Key Features](#-key-features)
-- [How It Works](#-how-it-works)
-  - [Offline Mode: The Privacy Fortress](#-offline-mode-the-privacy-fortress)
-  - [Online Mode: The Power of the Cloud](#-online-mode-the-power-of-the-cloud)
-- [Subscription Tiers](#-subscription-tiers)
-- [The Vision & Roadmap](#-the-vision--roadmap)
-- [A Note on Perseverance](#-a-note-on-perseverance)
-- [Technologies Used](#-technologies-used)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Legal & Attributions](#-legal--attributions)
-- [Stay Updated](#-stay-updated)
+```text
+Cortex/
+├── architecture/          System architecture and responsibility maps
+│   ├── general.md
+│   ├── cortex/
+│   ├── fulcrum/
+│   └── synapse/
+├── android/               Android host, native integration and build configuration
+├── ios/                   iOS host and platform configuration
+├── assets/                Models, images, screenshots and application assets
+├── lib/                   Flutter / Dart client runtime
+├── scripts/               Development and localization tooling
+├── test/                  Client tests
+├── vendor/                Native and vendored components, including llama.cpp
+├── web/                   Flutter web host
+├── pubspec.yaml
+└── README.md
+```
 
----
-
-## <img src="https://api.iconify.design/lucide:crosshair.svg?color=%234F46E5" width="24" align="absmiddle" /> Why Choose Cortex?
-
-- <img src="https://api.iconify.design/lucide:globe-2.svg" width="18" align="absmiddle" /> **AI, Anywhere:** Use powerful AI with or without an internet connection. True portability.
-- <img src="https://api.iconify.design/lucide:shield-check.svg" width="18" align="absmiddle" /> **Privacy-First by Design:** Your data is yours. With offline mode, your conversations never leave your device.
-- <img src="https://api.iconify.design/lucide:sliders-horizontal.svg" width="18" align="absmiddle" /> **Unmatched Personalization:** From visual themes to creating your own AI models, make Cortex uniquely yours.
-- <img src="https://api.iconify.design/lucide:github.svg" width="18" align="absmiddle" /> **Open Source & Transparent:** Built on trust and community. Our code is on GitHub for anyone to review.
-- <img src="https://api.iconify.design/lucide:smartphone.svg" width="18" align="absmiddle" /> **Sleek & Modern Interface:** Powerful features wrapped in a simple, fast, and beautiful package built with Flutter.
+The architecture documentation is the best entry point for understanding the codebase.
 
 ---
 
-## <img src="https://api.iconify.design/lucide:zap.svg?color=%234F46E5" width="24" align="absmiddle" /> Key Features
+## Architecture Index
 
-- **Dual AI Modes:**
-  - **Offline AI (Llama.cpp):** Run models directly on your device. 100% private, no internet needed.
-  - **Online AI (Cloud-Powered):** Access state-of-the-art models like GPT-4o and Amazon Nova via our secure servers.
-
-- **<img src="https://api.iconify.design/lucide:flask-conical.svg" width="18" align="absmiddle" /> Your Personal AI Laboratory:**
-  - **Create & Upload Models:** Craft your own AI assistant from scratch or upload an existing GGUF model. Create unique characters or expert advisors with full control and no technical expertise required.
-  - **Automated Safety:** To protect our community, all user-created and uploaded models are automatically reviewed against our content policies.
-
-- **<img src="https://api.iconify.design/lucide:palette.svg" width="18" align="absmiddle" /> True Customization:**
-  - Go beyond light and dark mode. Personalize your interface with a rich library of themes to create an aesthetic experience that's truly yours.
-
-- **<img src="https://api.iconify.design/lucide:users.svg" width="18" align="absmiddle" /> Interactive AI Characters:**
-  - Engage with a growing roster of AI characters, each with a unique personality and purpose. Get help from a lawyer, learn with a teacher, or have fun with creative personas.
-
----
-
-## <img src="https://api.iconify.design/lucide:settings-2.svg?color=%234F46E5" width="24" align="absmiddle" /> How It Works
-
-Cortex offers two distinct modes to balance privacy and power.
-
-### <img src="https://api.iconify.design/lucide:lock.svg" width="20" align="absmiddle" /> Offline Mode: The Privacy Fortress
-
-- **Engine:** Powered by a highly optimized `Llama.cpp` engine integrated via JNI (Java Native Interface).
-- **Data Flow:** All processing happens **100% locally**. Your prompts and AI responses never leave your device, ensuring absolute privacy.
-- **Safety:** To maintain a safe environment, the app periodically downloads an updated set of moderation rules from Google Firebase (when online). The safety check itself is then performed **locally on your device** without transmitting any of your private conversation data.
-
-### <img src="https://api.iconify.design/lucide:cloud-lightning.svg" width="20" align="absmiddle" /> Online Mode: The Power of the Cloud
-
-- **Gateway:** In this mode, prompts are sent to premium cloud-based AI models through **OpenRouter**, a third-party API gateway.
-- **Data Flow & Safety:**
-  1. Your prompt is first sent to our partners (e.g., OpenAI) for an automated safety review.
-  2. If it passes, it's securely relayed through our Cloudflare infrastructure to OpenRouter, which routes it to your selected AI provider (e.g., Anthropic, Google).
-- **Privacy Note:** This mode is **less privacy-focused** as your data is transmitted to external servers. We act as a secure relay and do not permanently store your conversation content. Please review the privacy policies of our partners.
+| Document | Scope |
+|---|---|
+| [`architecture/general.md`](./architecture/general.md) | System boundaries and top-level architecture |
+| [`architecture/cortex/chat.md`](./architecture/cortex/chat.md) | Conversation, streaming and client orchestration |
+| [`architecture/cortex/rag.md`](./architecture/cortex/rag.md) | Retrieval pipeline |
+| [`architecture/cortex/file-map.md`](./architecture/cortex/file-map.md) | Client source responsibility map |
+| [`architecture/fulcrum/generation.md`](./architecture/fulcrum/generation.md) | Gateway, routing, streaming and provider execution |
+| [`architecture/fulcrum/billing.md`](./architecture/fulcrum/billing.md) | Entitlements, purchases, credits and reconciliation |
+| [`architecture/fulcrum/functions-map.md`](./architecture/fulcrum/functions-map.md) | Fulcrum function map |
+| [`architecture/synapse/overview.md`](./architecture/synapse/overview.md) | Synapse control-plane overview |
+| [`architecture/synapse/syncer.md`](./architecture/synapse/syncer.md) | Automated catalog synchronization |
+| [`architecture/synapse/curator.md`](./architecture/synapse/curator.md) | Human curation path |
+| [`architecture/synapse/supervisor.md`](./architecture/synapse/supervisor.md) | Enrichment and maintenance |
 
 ---
 
-## <img src="https://api.iconify.design/lucide:gem.svg?color=%234F46E5" width="24" align="absmiddle" /> Subscription Tiers
+## Current Architecture and R&D Direction
 
-Cortex is accessible to everyone. Choose the level that fits you best.
+The repository architecture is the source of truth for behavior implemented today.
 
-- **<img src="https://api.iconify.design/lucide:box.svg" width="16" align="absmiddle" /> Free Tier:**
-  - Explore our online models with daily usage limits. A great way to get started.
+Vertex also maintains a broader R&D program around Cortex. That work explores deeper hardware-aware local inference, richer multimodal orchestration, expanded platform support, autonomous agents and increasingly expressive model metadata.
 
-- **<img src="https://api.iconify.design/lucide:layers.svg" width="16" align="absmiddle" /> Plus, Pro, & Ultra Tiers:**
-  - Unlock the full potential of Cortex with higher usage limits, the ability to create and upload your own models, access to premium themes, and much more. Cancel anytime.
+This distinction matters because research documents may describe work that is experimental, in progress or planned.
 
-> For the most up-to-date pricing and feature details, please check the products section within the app.
+For example, the current Cortex retrieval architecture documents a local BM25-based retrieval path behind a replaceable retrieval interface. Vector and embedding-based retrieval are therefore treated as an evolution path rather than implied here as a current production dependency.
 
----
+Current engineering and R&D areas include:
 
-## <img src="https://api.iconify.design/lucide:map.svg?color=%234F46E5" width="24" align="absmiddle" /> The Vision & Roadmap
+- improving on-device inference efficiency across constrained mobile hardware
+- hardware-aware native execution and compilation paths
+- extending Cortex beyond mobile while preserving local inference
+- richer cross-modal generation pipelines
+- autonomous multi-step agent execution
+- stronger provider and model metadata standardization
+- continued separation of automated ingestion, human curation and maintenance workloads
+- reducing client/server/catalog contract drift through explicit versioned boundaries
 
-Our mission is to make **Cortex the central hub for personal artificial intelligence**. We are just getting started. Here’s a glimpse of what the future holds:
-
-- **<img src="https://api.iconify.design/lucide:key.svg" width="16" align="absmiddle" /> Bring Your Own Key (BYOK):** Use your own API keys from various AI providers to bypass the Cortex credit system entirely.
-- **<img src="https://api.iconify.design/lucide:image.svg" width="16" align="absmiddle" /> Multi-Modal AI:** Go beyond text. Generate **images, voice, and video** directly within Cortex.
-- **<img src="https://api.iconify.design/lucide:graduation-cap.svg" width="16" align="absmiddle" /> Train from Scratch:** An advanced feature allowing users to train new models on their own datasets.
-- **<img src="https://api.iconify.design/lucide:mic.svg" width="16" align="absmiddle" /> Real-Time Interaction:** Engage in seamless **voice and video conversations** with your AI companions.
-- **<img src="https://api.iconify.design/lucide:bot.svg" width="16" align="absmiddle" /> Autonomous AI Agents:** Deploy AI agents that can understand complex goals and perform multi-step tasks for you.
-- **<img src="https://api.iconify.design/lucide:monitor.svg" width="16" align="absmiddle" /> Cortex for Web:** Access your personalized AI universe from any device with a web browser.
+The goal is to deepen the platform without collapsing these responsibilities back into a monolithic request path.
 
 ---
 
-> ### A Note on Perseverance
->
-> The journey to build Cortex has been a marathon, not a sprint. **We started this journey at just 15 years old,** pouring our passion into the project only to face a wall of resistance: **over 20 rejections from app stores, 2 account suspensions, and countless warnings.**
->
-> We could have given up, but we believed in the vision: an AI that serves the user, not the other way around. This project is a testament to resilience. For every developer, creator, or dreamer facing setbacks: **don't stop.** Your persistence is your greatest asset. Keep building.
+## Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Client | Flutter, Dart |
+| Native AI | C, C++, `llama.cpp`, JNI / Android NDK |
+| Backend runtime | Node.js |
+| Cloud and edge | Google Cloud, Cloudflare |
+| Authentication and data | Firebase |
+| Streaming | Server-Sent Events |
+| Local retrieval | Local indexing and BM25-based retrieval |
+| Model control plane | Cloudflare Workers / KV-based publication architecture |
+| Localization | Flutter localization / ARB |
+
+External AI providers are intentionally abstracted behind platform contracts and may evolve over time.
 
 ---
 
-## <img src="https://api.iconify.design/lucide:code-2.svg?color=%234F46E5" width="24" align="absmiddle" /> Tech Stack
+## Getting Started
 
-- **<img src="https://api.iconify.design/lucide:layout-template.svg" width="16" align="absmiddle" /> Frontend:** Flutter, Dart
-- **<img src="https://api.iconify.design/lucide:server.svg" width="16" align="absmiddle" /> Backend & Cloud:**
-  - **Runtime:** Node.js
-  - **Hosting & CDN:** Google Cloud, Cloudflare
-  - **Authentication & DB:** Google Firebase
-- **<img src="https://api.iconify.design/lucide:cpu.svg" width="16" align="absmiddle" /> AI Core:**
-  - **Online Gateway:** OpenRouter
-  - **Offline Engine:** Llama.cpp (C and C++ with JNI Bindings)
-- **<img src="https://api.iconify.design/lucide:languages.svg" width="16" align="absmiddle" /> Localization:** `flutter_localizations` (using ARB files)
+Cortex is not a clone-and-run example application.
 
----
+The public client depends on native components, Firebase configuration, Cortex backend services and provider infrastructure. A local build can be created, but reproducing the complete production environment requires replacing or configuring the services the client expects.
 
-## <img src="https://api.iconify.design/lucide:terminal.svg?color=%234F46E5" width="24" align="absmiddle" /> Getting Started
+### Requirements
 
-Welcome, developer! We are thrilled that you want to explore the inner workings of Cortex.
+- Flutter `3.32.7` or newer
+- Dart `3.8.1` or newer
+- Java JDK 11
+- Android Studio
+- Android NDK `26.1.1090125`
+- Git
 
-<img src="https://api.iconify.design/lucide:alert-triangle.svg?color=%23F59E0B" width="18" align="absmiddle" /> **Important Note:** Cortex is a complex application tightly integrated with a custom backend and several third-party services. This is **not a "clone and run"** project. Significant setup and configuration on your part are required to get a local development environment running.
-
-Follow these steps carefully to set up your own instance of Cortex.
-
-### 1. Prerequisites
-
-Make sure you have the following tools and versions installed on your system.
-
-- **Flutter SDK:** `3.32.7` or newer
-- **Dart SDK:** `3.8.1` or newer (comes with Flutter)
-- **Java JDK:** Version 11 (`JavaVersion.VERSION_11`)
-- **Android Studio:** Recommended for managing Android SDKs and emulators.
-- **Android NDK:** Version `26.1.1090125` is used in this project. You can install a specific version via the Android Studio SDK Manager (`Tools > SDK Manager > SDK Tools`).
-- **Git**
-
-### 2. Environment & Service Configuration
-
-Before you even run the app, you need to set up your own backend infrastructure. This is the most critical part of the setup.
-
-#### Step 2.1: Firebase Project
-The app heavily relies on Google Firebase for authentication, database, and safety rules.
-1.  Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
-2.  Enable **Authentication** (Email/Password), **Firestore Database**, and any other services you see used in the codebase.
-3.  Register a new Android app within your Firebase project.
-4.  Follow the instructions to download the `google-services.json` file. You will place this in the `android/app/` directory.
-
-#### Step 2.2: OpenRouter API Key
-Online AI models are accessed via OpenRouter.
-1.  Go to [OpenRouter.ai](https://openrouter.ai/) and create an account.
-2.  Get your personal API key. This key will be used by your backend server.
-
-#### Step 2.3: <img src="https://api.iconify.design/lucide:flame.svg?color=%23EF4444" width="16" align="absmiddle" /> Crucial Step: Your Own Backend Server
-Many features (like user login, name changes, and API key management) are handled by our custom server. **You will need to replicate or replace this logic.**
-1.  Review the Flutter codebase to identify all HTTP requests made to our servers.
-2.  Create your own backend server (e.g., using Node.js, Python, or your preferred stack) that handles these endpoints.
-3.  Your server will be responsible for securely storing user data and proxying requests to services like OpenRouter using your API key.
-4.  Update the API endpoint URLs in the Flutter codebase to point to your new server.
-
-### 3. Local Project Setup & Build
-
-Now you can set up the project on your local machine.
-
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/VertexCorporation/Cortex.git
-    cd Cortex
-    ```
-
-2.  **Initialize Submodules (Llama.cpp):**
-    Cortex uses `llama.cpp` for its offline AI engine, included as a Git submodule. You must initialize it:
-    ```bash
-    git submodule update --init --recursive
-    ```
-
-3.  **Configure Android:**
-  - Place the `google-services.json` file you downloaded in Step 2.1 into the `android/app/` directory.
-  - **Create a Keystore:** You need to sign your app for development. Follow the official Flutter guide to [create and reference a keystore](https://docs.flutter.dev/deployment/android#create-and-reference-a-keystore). This involves creating a `key.properties` file in the `android/` directory that should **NEVER** be committed to Git.
-
-4.  **Install Dependencies:**
-    ```bash
-    flutter pub get
-    ```
-
-5.  **Build and Run:**
-    You should now be able to run the app. The Android Gradle build process is configured to automatically compile the `llama.cpp` engine using the NDK.
-    ```bash
-    flutter run
-    ```
-
-### 4. Automatic Translation Setup (Optional)
-
-This project uses a semi-automated script to translate new localization keys into all supported languages using the Google Translate API. This is an optional but highly recommended step if you plan to contribute to the app's localization.
-
-Follow these one-time setup steps to enable the `translate` command on your local machine.
-
-#### Step 4.1: Prerequisites
-
-- **Python 3:** Ensure you have a modern version of Python 3 installed. You can check with `python3 --version`.
-- **Google Cloud API Key:** You need an active API Key from a Google Cloud project with the **"Cloud Translation API"** enabled. This project must have a billing account attached. The API has a generous free tier, but a billing account is required for activation.
-
-#### Step 4.2: Install Python Library
-
-Open your standard system terminal and run the following command to install the Google Translate library globally for your user.
+### Clone
 
 ```bash
-pip3 install --user google-cloud-translate
+git clone https://github.com/VertexCorporation/Cortex.git
+cd Cortex
+git submodule update --init --recursive
+flutter pub get
 ```
 
-#### Step 4.3: Configure the `translate` Command
+### Firebase
 
-This custom shell function automates the entire translation process.
+Create a Firebase project and configure the services used by your build.
 
-1.  Open your shell's configuration file (e.g., `~/.bashrc` or `~/.zshrc`).
-    ```bash
-    # For Bash users (most common on Linux)
-    nano ~/.bashrc
+For Android, place your own:
 
-    # For Zsh users (common on macOS)
-    nano ~/.zshrc
-    ```
-2.  Paste the entire function below at the very end of the file.
-3.  **Crucially, replace `"YOUR_GOOGLE_API_KEY_HERE"` with your actual API Key.**
+```text
+google-services.json
+```
 
-    ```bash
-    #
-    # --- Cortex Project: Automatic Translation Command ---
-    #
-    function translate() {
-        echo "--- Cortex Translation using Google API v2 ---"
-        
-        # 1. Navigate to the project directory.
-        #    Update this path if your project is located elsewhere.
-        cd ~/Documents/cortex || { echo "Error: Failed to navigate to project directory."; return 1; }
+under:
 
-        # 2. Set the API Key for this terminal session.
-        export GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY_HERE"
-        if [ -z "$GOOGLE_API_KEY" ]; then
-            echo "Error: GOOGLE_API_KEY is not set. Please edit your shell configuration file."
-            return 1
-        fi
+```text
+android/app/
+```
 
-        # 3. Run the master Dart script that handles all the logic.
-        echo "-> Running the master translation script..."
-        dart run scripts/translate.dart
-        
-        echo "--- Translation Process Finished ---"
-    }
-    ```
-4.  Save the file (`Ctrl+X`, `Y`, `Enter`) and refresh your terminal configuration by closing and reopening it, or by running `source ~/.bashrc` (or `source ~/.zshrc`).
+Do not commit credentials, signing keys, production configuration or private API keys.
 
-#### Step 4.4: Authenticate gCloud (One-Time Command)
+### Run
 
-To ensure the API correctly associates usage with your project for billing and quotas, you need to set your "quota project".
+```bash
+flutter run
+```
 
-1.  Find your **Project ID** from the [GCP Console Dashboard](https://console.cloud.google.com/home/dashboard).
-2.  Run the following command in your terminal, replacing `YOUR_PROJECT_ID_HERE` with your actual Project ID.
-    ```bash
-    gcloud auth application-default set-quota-project YOUR_PROJECT_ID_HERE
-    ```
+The Android build is configured to compile the native `llama.cpp` integration through the NDK.
 
-#### How to Use
+### Backend configuration
 
-Your setup is complete! To translate new keys:
+A fully functional independent deployment requires your own compatible backend and provider credentials.
 
-1.  Add your new English strings to the `lib/l10n/app_en.arb` file.
-2.  Open a **New System Terminal**.
-3.  Simply run the command:
-    ```bash
-    translate
-    ```
+Do not place provider secrets in the Flutter client.
 
-The script will automatically find the new keys and translate them.
-
-This is a complex setup, but once completed, you will have a fully functional, independent version of Cortex. Happy coding!
+The production Cortex backend is responsible for privileged operations such as authentication-sensitive actions, provider access, routing, billing and commercial policy.
 
 ---
 
-## <img src="https://api.iconify.design/lucide:git-pull-request.svg?color=%234F46E5" width="24" align="absmiddle" /> Contributing
+## Development Notes
 
-Cortex is built on the spirit of open-source collaboration and is now live! We actively welcome contributions that help us shape the future of personal AI. Here’s how you can help:
+Before making a cross-cutting change, identify the owning subsystem first.
 
-- <img src="https://api.iconify.design/lucide:star.svg" width="18" align="absmiddle" /> **Star the repository** to show your support.
-- <img src="https://api.iconify.design/lucide:bug.svg" width="18" align="absmiddle" /> **Open an issue** to report bugs, suggest features, or ask questions.
-- <img src="https://api.iconify.design/lucide:git-branch.svg" width="18" align="absmiddle" /> **Fork the repository and submit a Pull Request** with your bug fixes or new features. Please review our contribution guidelines or open an issue first to discuss significant changes.
-- <img src="https://api.iconify.design/lucide:message-square.svg" width="18" align="absmiddle" /> **Share your feedback** on the app to help us refine the user experience.
-- <img src="https://api.iconify.design/lucide:wallet.svg" width="18" align="absmiddle" /> you can also support us with a subscription or credits since our servers sadly dont run on github stars.
+```text
+UI or local state issue
+  -> Cortex architecture
+
+generation / provider / fallback issue
+  -> Fulcrum generation path
+
+purchase / entitlement / credit issue
+  -> Fulcrum billing path
+
+model metadata / series / availability issue
+  -> Synapse control plane
+```
+
+Changes that modify shared contracts should be reviewed across every consumer of that contract.
+
+High-risk examples include:
+
+- SSE event shape
+- model catalog schema
+- entitlement state
+- credit policy
+- provider capability metadata
+- local database schema
+- native inference lifecycle
 
 ---
 
-## <img src="https://api.iconify.design/lucide:file-text.svg?color=%234F46E5" width="24" align="absmiddle" /> License
+## Contributing
 
-Cortex is proudly open source and released under the **Apache 2.0 License**.
-See the [`LICENSE`](./LICENSE) file for full details.
+Contributions are welcome.
+
+Before submitting a large change:
+
+1. Read [`architecture/general.md`](./architecture/general.md).
+2. Locate the subsystem that owns the behavior.
+3. Keep provider-specific logic behind the relevant abstraction boundary.
+4. Avoid introducing secrets or production credentials.
+5. Add or update tests for behavior that changes.
+6. Update architecture documentation when a system boundary or contract changes.
+
+For bugs and feature proposals, use [GitHub Issues](https://github.com/VertexCorporation/Cortex/issues).
 
 ---
 
-## <img src="https://api.iconify.design/lucide:scale.svg?color=%234F46E5" width="24" align="absmiddle" /> Legal & Attributions
+## Security and Privacy
 
-Your trust is our priority. We are committed to transparency in how we operate and what we build with.
+Cortex has different privacy properties depending on execution mode.
 
-- [**Privacy Policy**](./PRIVACY_POLICY.md) - Understand how we handle your data.
-- [**Terms of Service**](./TERMS_OF_SERVICE.md) - The rules that govern your use of Cortex.
-- [**Full Attributions**](https://vertexishere.com/cortex-attributions) - A detailed list of third-party assets, icons, and their licenses.
+For supported offline models, inference can run locally on the device.
+
+Cloud execution necessarily transmits the information required for the requested operation to remote infrastructure and, where applicable, external AI providers.
+
+Do not assume an online request has the same privacy boundary as an offline request.
+
+See:
+
+- [Privacy Policy](./PRIVACY_POLICY.md)
+- [Terms of Service](./TERMS_OF_SERVICE.md)
+- [Attributions](https://vertexishere.com/cortex-attributions)
+
+Security issues should not be disclosed through public issue threads when doing so would expose users or infrastructure.
 
 ---
 
-## <img src="https://api.iconify.design/lucide:send.svg?color=%234F46E5" width="24" align="absmiddle" /> Stay Updated
+## License
 
-Follow the repository and our website for the latest news, updates, and feature announcements.
+Cortex is released under the Apache License 2.0.
 
-**[vertexishere.com](https://vertexishere.com)** &nbsp; | &nbsp; **contact@vertexishere.com**
+See [`LICENSE`](./LICENSE).
+
+---
+
+## About Vertex
+
+Cortex is developed by **Vertex**, a technology company operating from Istanbul and London and incubated at **Cube Incubation, Teknopark Istanbul**.
+
+The project began as an attempt to make advanced AI accessible through a single personal interface and has evolved into a broader hybrid AI platform spanning local execution, cloud orchestration and model infrastructure.
+
+Vertex's R&D work around Cortex focuses on hybrid AI orchestration, on-device inference, model infrastructure, reliability and reducing technical complexity at the product boundary.
+
+[Website](https://vertexishere.com) ·
+[GitHub](https://github.com/VertexCorporation) ·
+[Support](https://github.com/sponsors/VertexCorporation) ·
+[Contact](mailto:contact@vertexishere.com)
 
 <br>
-<div align="center">
-  <i>Join the revolution. Where personalization meets true AI freedom.</i>
-  <br><br>
-  <b>Thank you for exploring Cortex. Together, we are building the future of AI.</b>
-</div>
-```
 
+<div align="center">
+<i>"Hiç bir şeye ihtiyacımız yok, yalnız bir şeye ihtiyacımız vardır: Çalışkan Olmak."</i><br>
+<b>— Mustafa Kemal Atatürk</b>
+</div>
