@@ -24,6 +24,7 @@ Catalog of the Fulcrum backend (`functions/`). `index.js` requires every family 
 
 - **`src/user.js`** (1465) — `registerAnonymousDevice`, `onUserCreate`, `completeAnonymousRegistration`, `updateUsername`, `isUsernameAvailable`, `checkOrStartSpecialOffer`, `redeemCreatorCode`, `redeemPromoCode`, `addAdminRole`, `removeAdminRole`, `listAdmins`, `toggleVertexStatus`, `checkIfUserIsRegistered`, `requestAccountDeletion`, `verifyUserEmail`, `setPhoneNumber`.
 - **`src/helpers.js`** (728) — `PRODUCT_CATALOG`, `grantEntitlement`, `revokeEntitlement`, `deductUserCredits`, `deductDynamicCredits`, `refundUserCredits`, `deductPredits`, `deductDredits`, `getProductDetails`, `resolveSubscriptionExpiryMillis`, `deleteUserAndData`, `awardCreditsWithDebtCheck`, `deleteCollection`, `deleteQueryBatch`, `applyReferralReward`, `scheduleSubscriptionExpiryCheck`.
+- **`src/subscription.js`** (276, internal module — no exported Cloud Functions) — `TIER_LIMITS`, `TIER_ORDER`, `resolveSubscription`, `subscriptionPayload`, `subscriptionTerminalPayload`, `legacySubscriptionDeletes`, `parseTimestampMillis`: single source of truth for the nested `users/{uid}.subscription` entitlement map (see `billing.md`).
 - **`src/iap.js`** (1060) — `verifyPurchase`: Apple/Google purchase verification.
 - **`src/android/lifecycle.js`** (350) — `handlePlayNotifications`: Google Play billing notifications.
 - **`src/ios/lifecycle.js`** (213) — `handleAppStoreNotifications`: App Store notifications.

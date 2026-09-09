@@ -47,6 +47,8 @@ Markdown is split into `blocks.dart`/`inline.dart`/`parser.dart`/`patterns.dart`
 
 `ChatInputPanel` with `InputField`, attachment previews, buttons (`ModelSelectButton`, `AddPhotoButton`, `ActionButtonWidget`), `InputService`, waveform visualizer, `_RagStatusChip` (RAG status), guest-limit sheet, and feature/selection/edit/briefing panels (`AnimatedMessageOptionsPanel`, model selection sheet, `BriefingOverlay`).
 
+Recording entry and exit share the composer’s 600 ms controller. `RecordingLayout` measures both modes and interpolates their heights; opacity and microphone width use the same progress, with the idle layout retained throughout reversal.
+
 ## Rules
 
 - Preserve conversation-ID checks during streaming.

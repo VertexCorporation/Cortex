@@ -90,6 +90,7 @@ Use this document to locate code: when you know a symbol but not its file, searc
 - **`lib/chat/screen/widgets/bottom/input/rag.dart`** — Feature implementation for the chat/screen/widgets/bottom/input area. Declarations: `_RagStatusChip`.
 - **`lib/chat/screen/widgets/bottom/input/sections.dart`** — Feature/settings sections for the chat/screen/widgets/bottom/input area. Declarations: `WaveformSection, AttachmentPreviewSection, AttachmentListWithFog, _AttachmentListWithFogState, AttachmentItem, TextFieldSection, SendButtonSection, SequencedToolsTransition, _SequencedToolsTransitionState`.
 - **`lib/chat/screen/widgets/bottom/input/send.dart`** — Feature implementation for the chat/screen/widgets/bottom/input area. Declarations: `_SendButtonSection`.
+- **`lib/chat/screen/widgets/bottom/input/recording_layout.dart`** — Measures input and waveform heights and interpolates layout from the master recording animation. Declarations: `RecordingLayout, _RenderRecordingLayout`.
 - **`lib/chat/screen/widgets/bottom/input/service.dart`** — Service implementation for the chat/screen/widgets/bottom/input area. Declarations: `InputService`.
 - **`lib/chat/screen/widgets/bottom/input/waveform.dart`** — Feature implementation for the chat/screen/widgets/bottom/input area. Declarations: `_WaveformSection`.
 - **`lib/chat/screen/widgets/bottom/panels/attachments/button.dart`** — Feature implementation for the chat/screen/widgets/bottom/panels/attachments area. Declarations: `AttachmentSheetButton`.
@@ -221,7 +222,7 @@ Use this document to locate code: when you know a symbol but not its file, searc
 
 - **`lib/library/backend/data/crypto.dart`** — Feature implementation for the library/backend/data area. Declarations: `CryptoHelper`.
 - **`lib/library/backend/data/database.dart`** — Database access for the library/backend/data area. Declarations: `DatabaseHelper`.
-- **`lib/library/backend/data/defaults.dart`** — Feature implementation for the library/backend/data area. Declarations: `ModelDefaults`.
+- **`lib/library/backend/data/defaults.dart`** — Model defaults, central family aliases/normalization, family assets and fallback chat formats. Declarations: `ModelDefaults`.
 - **`lib/library/backend/data/entity.dart`** — Feature implementation for the library/backend/data area. Declarations: `ModelEntity`.
 - **`lib/library/backend/data/format.dart`** — Formatting and token helpers for the library/backend/data area. Declarations: `ChatTokens, ChatFormat`.
 - **`lib/library/backend/data/image.dart`** — Image cache/path handling for the library/backend/data area. Declarations: `ModelImageCache`.
@@ -237,7 +238,7 @@ Use this document to locate code: when you know a symbol but not its file, searc
 - **`lib/library/providers/details.dart`** — Feature implementation for the library/providers area. Declarations: `ModelDetailProvider`.
 - **`lib/library/providers/local.dart`** — Feature implementation for the library/providers area. Declarations: `_ProcessedStateData, ModelLocalStateProvider`.
 - **`lib/library/providers/new.dart`** — Feature implementation for the library/providers area. Declarations: `ModelCreationProvider`.
-- **`lib/library/screen/model/controller.dart`** — Controller and lifecycle/state orchestration for the library/screen/model area. Declarations: `ModelDetailPage, _ModelDetailViewWithTicker, __ModelDetailViewWithTickerState, ModelDetailView`.
+- **`lib/library/screen/model/controller.dart`** — Controller and lifecycle/state orchestration for the library/screen/model area. Declarations: `ModelDetailPage, ModelDetailContent, _ModelDetailContentState, ModelDetailView`.
 - **`lib/library/screen/model/widgets/appbar.dart`** — App bar UI for the library/screen/model/widgets area. Declarations: `_VariantOverlayPanel, _VariantOverlayPanelState, DetailAppBar, DetailAppBarState`.
 - **`lib/library/screen/model/widgets/banner.dart`** — Feature implementation for the library/screen/model/widgets area. Declarations: `WarningOverlays, _WarningOverlaysState`.
 - **`lib/library/screen/model/widgets/body.dart`** — Feature implementation for the library/screen/model/widgets area. Declarations: `BodyContent, _Spacing`.
@@ -378,7 +379,7 @@ Use this document to locate code: when you know a symbol but not its file, searc
 - **`lib/settings/services/auth.dart`** — Feature implementation for the settings/services area. Declarations: `AuthException, AuthUnknownException, AuthService`.
 - **`lib/settings/services/profile.dart`** — Feature implementation for the settings/services area. Declarations: `ProfileException, ProfileNotFoundException, ProfileUnknownException, ProfileService`.
 - **`lib/settings/skeleton.dart`** — Loading skeleton UI for the settings area. Declarations: `SkeletonLoader`.
-- **`lib/settings/widgets/grouped_button.dart`** — Feature implementation for the settings/widgets area. Declarations: `SettingsGroupedRow, SettingsGroupedColumn, SettingsRowPosition`.
+- **`lib/settings/widgets/grouped_button.dart`** — Feature implementation for the settings/widgets area. Declarations: `SettingsGroupedRow, SettingsGroupedColumn, SettingsRowPosition, SettingsActionRow`.
 ### `shake.dart/`
 
 - **`lib/shake.dart`** — Feature implementation for the  area. Declarations: `ShakeWidget, ShakeWidgetState`.
