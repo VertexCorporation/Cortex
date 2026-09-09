@@ -43,6 +43,7 @@ import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/rag/chat.dart';
 import 'tools.dart';
 import 'local_web_context.dart';
+import 'web_search_policy.dart';
 
 enum _MediaIntent {
   none,
@@ -398,7 +399,8 @@ class SendService {
       // 2. FEATURE MODES (Study, Quiz, etc.)
       // -----------------------------------------------------------------------
       final activeMode = _inputProvider.featureMode;
-      final localWebEnabled = _inputProvider.enableWebSearch;
+      final localWebEnabled = WebSearchPolicy.shouldSearch(
+          text, enabled: _inputProvider.enableWebSearch);
       final bool enableThinkingMode =
           activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
