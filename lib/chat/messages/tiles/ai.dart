@@ -11,6 +11,7 @@ import '../../../theme.dart';
 import '../messages.dart';
 import 'package:cortex/chat/messages/markdown/parser.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/chat/services/reasoning_text.dart';
 
 import 'package:flutter/services.dart';
 import 'package:cortex/chat/providers/conversation.dart';

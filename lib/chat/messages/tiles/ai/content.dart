@@ -1,7 +1,6 @@
 part of '../ai.dart';
 
 class _AiBodyContent extends StatelessWidget {
-  static final _thinkTag = 'think';
   static final _leadingColons = RegExp(r'^[\s:]+');
 
   final Message message;
@@ -27,34 +26,13 @@ class _AiBodyContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String fullText = stableText + animatingText;
-    String thinkContent = '';
+    final parsed = ReasoningText.parse(fullText, isFinished: !message.isThinking);
+    final thinkContent = parsed.reasoning.trim();
+    final split = parsed.answerLengthBefore(stableText.length);
+    String mainStable = parsed.answer.substring(0, split);
+    String mainAnimating = parsed.answer.substring(split);
 
-    String mainStable = stableText;
-    String mainAnimating = animatingText;
-
-    final thinkStart = fullText.indexOf('<$_thinkTag>');
-    if (thinkStart != -1) {
-      final contentStart = thinkStart + '<$_thinkTag>'.length;
-      final thinkEnd = fullText.indexOf('</$_thinkTag>', contentStart);
-      final contentEnd = thinkEnd != -1 ? thinkEnd : fullText.length;
-
-      thinkContent = fullText.substring(contentStart, contentEnd).trim();
-
-      final blockEnd =
-      thinkEnd != -1 ? thinkEnd + '</$_thinkTag>'.length : fullText.length;
-
-      final beforeThink = fullText.substring(0, thinkStart);
-      final afterThink = fullText.substring(blockEnd);
-      final remaining = beforeThink + afterThink;
-
-      if (remaining.length <= stableText.length) {
-        mainStable = remaining;
-        mainAnimating = '';
-      } else {
-        mainStable = remaining.substring(0, stableText.length);
-        mainAnimating = remaining.substring(stableText.length);
-      }
-
+    if (parsed.hasReasoning) {
       mainStable = mainStable.replaceFirst(_leadingColons, '');
       if (mainStable.isEmpty) {
         mainAnimating = mainAnimating.replaceFirst(_leadingColons, '');

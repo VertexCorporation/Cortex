@@ -10,6 +10,8 @@ import 'package:cortex/chat/services/memory_store.dart';
 import 'package:cortex/chat/services/compression.dart';
 import 'package:cortex/chat/services/metrics.dart';
 import 'package:cortex/chat/services/pii_filter.dart';
+import 'reasoning_text.dart';
+import 'reasoning_instructions.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -88,9 +90,10 @@ class ContextService {
     }
 
     // Thinking mode
-    if (enableThinkingMode && localizations != null) {
-      final thinkingInstruction =
-          "\n\n${localizations.thinkingModeInstruction}";
+    if (enableThinkingMode) {
+      final thinkingInstruction = '\n\n'
+          '${localizations?.thinkingModeInstruction ?? ''}\n'
+          '${ReasoningInstructions.forLanguage(langCode)}';
       systemRole = (systemRole ?? fallbackRole) + thinkingInstruction;
     }
 
@@ -218,12 +221,14 @@ class ContextService {
     List<Map<String, dynamic>> mediaParts = [];
 
     // 1. Text Content
-    if (message.text.isNotEmpty) {
+    final contentText = message.isUserMessage
+        ? message.text : ReasoningText.parse(message.text).answer;
+    if (contentText.trim().isNotEmpty) {
       final String processedText = message.isUserMessage
-          ? LocalPiiRedactionFilter.redact(message.text)
+          ? LocalPiiRedactionFilter.redact(contentText)
           : (message.model != null && message.model!.isNotEmpty
-              ? "[Model: ${message.model}] ${message.text}"
-              : message.text);
+              ? "[Model: ${message.model}] $contentText"
+              : contentText);
       textParts.add({"type": "text", "text": processedText});
     }
 
@@ -258,7 +263,7 @@ class ContextService {
         });
       }
     } else {
-      if (textParts.isNotEmpty || mediaParts.isEmpty) {
+      if (textParts.isNotEmpty) {
         results.add({
           "role": "assistant",
           "content": textParts.isNotEmpty ? textParts.first["text"] : " "

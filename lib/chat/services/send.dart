@@ -45,6 +45,8 @@ import 'tools.dart';
 import 'local_web_context.dart';
 import 'web_search_policy.dart';
 import 'local_finance.dart';
+import 'reasoning_text.dart';
+import 'reasoning_instructions.dart';
 import 'package:dio/dio.dart' show CancelToken;
 
 enum _MediaIntent {
@@ -1280,16 +1282,29 @@ class SendService {
       }
     }
 
+    // Close visible reasoning even if a provider/tool fails mid-stream.
+    try {
     // --- THE LOOP ---
     while (shouldContinue && loopCount < maxLoops) {
+      if (_isConversationActive(targetConvId) &&
+          _conversationProvider.wasResponseStopped) {
+        throw UserCancelledException();
+      }
       shouldContinue = false; // Stop unless tools are called
       loopCount++;
+      final isFinalToolRound = loopCount == maxLoops;
+      if (isFinalToolRound) {
+        contextMessages.add({'role': 'system',
+          'content': ReasoningInstructions.finalToolRound});
+      }
 
       List<dynamic> turnToolCalls = [];
+      final turnAnswer = StringBuffer();
 
       // Handler Functions (defined here to capture scope)
 
       void onfeatureReasoning(String featureReasoningText) {
+        if (featureReasoningText.isEmpty) return;
         if (_conversationProvider.wasResponseStopped &&
             _isConversationActive(targetConvId)) {
           return;
@@ -1316,6 +1331,7 @@ class SendService {
           return;
         }
         if (text.isEmpty) return; // Ignore empty keep-alive chunks
+        turnAnswer.write(text);
 
         // If we were reasoning and now switched to actual content, close the tag.
         if (isfeatureReasoningBlockActive) {
@@ -1592,7 +1608,7 @@ class SendService {
         }
         // --------------------------------------------------
 
-        final enableWebSearch = !isMediaModel && webSearchRequested;
+        final enableWebSearch = !isMediaModel && webSearchRequested && !isFinalToolRound;
         if (enableWebSearch) {
           setWebSearchActive(true);
         }
@@ -1608,7 +1624,7 @@ class SendService {
           enablefeatureReasoning: enablefeatureReasoning,
           enableWebSearch: enableWebSearch,
           enableRag: ragActive,
-          useTools: !isMediaModel && !_voiceService.isFlowActive,
+          useTools: !isMediaModel && !_voiceService.isFlowActive && !isFinalToolRound,
           // Disable tools in Flow Mode
           onTextChunk: onTextChunk,
           onfeatureReasoning: onfeatureReasoning,
@@ -1626,7 +1642,7 @@ class SendService {
       }
 
       // Post-Response: Check for Tools
-      if (turnToolCalls.isNotEmpty) {
+      if (turnToolCalls.isNotEmpty && !isFinalToolRound) {
         shouldContinue = true; // We need to loop again to send results
 
         // Close reasoning block before tool execution if it's still open.
@@ -1638,12 +1654,16 @@ class SendService {
         // 1. Add Assistant Request to History
         contextMessages.add({
           "role": "assistant",
-          "content": "", // Usually empty when calling tools
+          "content": turnAnswer.toString(),
           "tool_calls": turnToolCalls
         });
 
         // 2. Execute Tools & Add Results
         for (var call in turnToolCalls) {
+          if (_isConversationActive(targetConvId) &&
+              _conversationProvider.wasResponseStopped) {
+            throw UserCancelledException();
+          }
           final String callId = call['id'];
           final String name = call['function']['name'];
           final String argsStr = call['function']['arguments'];
@@ -1704,6 +1724,7 @@ class SendService {
       }
     }
 
+    } finally {
     // Ensure reasoning block is closed at the end of all iterations.
     if (isfeatureReasoningBlockActive) {
       appendStreamChunk("</think>");
@@ -1713,6 +1734,7 @@ class SendService {
     // Clear documents context after processing
     ToolRegistry.clearDocumentsContext();
     setWebSearchActive(false);
+    }
 
     // CRITICAL: The background buffer mirrors every chunk, including chunks
     // that arrived while this chat was foregrounded. This prevents a late tab
@@ -1755,6 +1777,15 @@ class SendService {
 
     // CHECK FOR EMPTY RESPONSE
     final cleanResponse = finalResponseText.replaceAll(memoryExp, '').trim();
+    final parsedResponse = ReasoningText.parse(cleanResponse);
+    if (parsedResponse.hasReasoning && parsedResponse.answer.trim().isEmpty &&
+        !hasGeneratedMedia &&
+        !(_isConversationActive(targetConvId) && _conversationProvider.wasResponseStopped)) {
+      // Preserve the delivered thinking, but don't silently call it a complete
+      // answer or trigger another paid model request through EMPTY_RESPONSE.
+      appendStreamChunk('${parsedResponse.isReasoningOpen ? '</think>' : ''}'
+          '\n\n${ReasoningInstructions.noAnswer(langCode)}');
+    }
     if (cleanResponse.isEmpty && !hasGeneratedMedia) {
       throw ApiException(localizations.errorServer, code: 'EMPTY_RESPONSE');
     }
