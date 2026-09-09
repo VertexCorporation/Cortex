@@ -11,10 +11,17 @@ class DbHelper {
   DbHelper._internal();
 
   Database? _db;
+  Future<Database>? _openingDb;
   static const int _latestVersion = 11; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
+    return _openingDb ??= _open().whenComplete(() {
+      _openingDb = null;
+    });
+  }
+
+  Future<Database> _open() async {
     final dir = await getApplicationDocumentsDirectory();
     final path = join(dir.path, 'chat.sqlite');
     _db = await openDatabase(

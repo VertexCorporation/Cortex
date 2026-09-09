@@ -45,6 +45,7 @@ class ModelService with ChangeNotifier {
   List<ModelEntity>? _cachedEntities;
   String? _cachedEntitiesLangCode;
   Future<List<ModelEntity>?>? _pendingFetch;
+  String? _pendingFetchLanguage;
   final Map<String, bool> _imageFileChecks = {};
 
   bool _imageFileExists(String path) {
@@ -73,13 +74,21 @@ class ModelService with ChangeNotifier {
   ///
   /// Returns a list of [ModelEntity] objects, or null on a critical failure.
   Future<List<ModelEntity>?> getModels({required String langCode}) {
-    if (_pendingFetch != null) return _pendingFetch!;
+    final language = _normalizeLangCode(langCode);
+    if (_pendingFetch != null) {
+      if (_pendingFetchLanguage == language) return _pendingFetch!;
+      // A request in another language must not receive the first caller's
+      // localized list. Serialize it, then re-use/rebuild the proper cache.
+      return _pendingFetch!.then((_) => getModels(langCode: langCode));
+    }
     if (!_hasError && _cachedEntities?.isNotEmpty == true &&
-        _cachedEntitiesLangCode == _normalizeLangCode(langCode)) {
+        _cachedEntitiesLangCode == language) {
       return Future.value(_cachedEntities);
     }
+    _pendingFetchLanguage = language;
     _pendingFetch = _getModelsInternal(langCode: langCode).whenComplete(() {
       _pendingFetch = null;
+      _pendingFetchLanguage = null;
     });
     return _pendingFetch!;
   }
