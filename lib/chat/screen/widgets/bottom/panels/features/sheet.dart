@@ -564,7 +564,9 @@ void _handleGenerationFeatureAction(BuildContext context,
 /// Logic for "Study" & "Quizzes": Formats input with prefix and sends.
 void _handleFeatureSelection(BuildContext context, ChatInputMode mode) {
   final provider = context.read<InputProvider>();
-  provider.clearWebSearch();
+  if (mode != ChatInputMode.featureReasoning) {
+    provider.clearWebSearch();
+  }
 
   // [CHANGED] Toggle logic: If already selected, clear it.
   if (provider.featureMode == mode) {
