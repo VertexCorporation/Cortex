@@ -134,6 +134,9 @@ class OfflineService {
   Completer<bool>? _modelLoadCompleter;
   Completer<bool>? _singleLoadAttemptCompleter;
   Timer? _retryTimer;
+  Stopwatch? _deliveryClock;
+  int _nativeChunks = 0;
+  int _visibleChunks = 0;
   String? _loadedModelPath;
   int _loadedContextSize = 0;
   String? _pendingLoadPath;
@@ -499,6 +502,11 @@ class OfflineService {
         ? _speculativeConfig.toNativeArgs()
         : <String, dynamic>{};
 
+    if (kDebugMode) {
+      _deliveryClock = Stopwatch()..start();
+      _nativeChunks = 0;
+      _visibleChunks = 0;
+    }
     await _llamaChannel.invokeMethod<void>(
       'sendMessage',
       {
@@ -541,6 +549,10 @@ class OfflineService {
       case 'onMessageResponse':
         final String rawToken = call.arguments as String? ?? '';
         if (_forceAbortCurrentStream) return;
+        if (kDebugMode && rawToken.isNotEmpty && ++_nativeChunks == 1) {
+          debugPrint('[OfflineService][delivery] firstNativeChunkMs='
+              '${_deliveryClock?.elapsedMilliseconds}');
+        }
 
         final processor = _currentProcessor;
         if (processor == null) {
@@ -548,7 +560,7 @@ class OfflineService {
           if (_shouldAbortForRepetition(rawToken)) {
             _handleRepetitionAbort();
           } else {
-            _responseService.onMessageResponse(rawToken);
+            _deliverVisibleChunk(rawToken);
           }
           return;
         }
@@ -558,7 +570,7 @@ class OfflineService {
           if (_shouldAbortForRepetition(processedToken)) {
             _handleRepetitionAbort();
           } else {
-            _responseService.onMessageResponse(processedToken);
+            _deliverVisibleChunk(processedToken);
           }
         }
         break;
@@ -568,7 +580,14 @@ class OfflineService {
 
         final tail = _currentProcessor?.finalize();
         if (tail != null && tail.isNotEmpty) {
-          _responseService.onMessageResponse(tail);
+          _deliverVisibleChunk(tail);
+        }
+        if (kDebugMode) {
+          _deliveryClock?.stop();
+          debugPrint('[OfflineService][delivery] nativeChunks=$_nativeChunks '
+              'visibleChunks=$_visibleChunks '
+              'elapsedMs=${_deliveryClock?.elapsedMilliseconds}');
+          _deliveryClock = null;
         }
         _responseService.finalizeResponse();
         _currentProcessor = null;
@@ -619,6 +638,14 @@ class OfflineService {
   // ===========================================================================
   // Prompt & Repetition Check (Same as before but cleaner)
   // ===========================================================================
+
+  void _deliverVisibleChunk(String chunk) {
+    if (kDebugMode && ++_visibleChunks == 1) {
+      debugPrint('[OfflineService][delivery] firstVisibleChunkMs='
+          '${_deliveryClock?.elapsedMilliseconds}');
+    }
+    _responseService.onMessageResponse(chunk);
+  }
 
   Future<String> _buildFormattedPrompt({
     required ModelEntity model,

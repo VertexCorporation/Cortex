@@ -46,6 +46,8 @@ class ChatFormatProcessor {
   Set<String> _stopPatterns = const {};
 
   bool _patternsInitialized = false;
+  RegExp? _ignorePattern;
+  Set<int> _controlStartChars = const {};
 
   ChatFormatProcessor(this._format, {this.onStopTokenDetected});
 
@@ -77,26 +79,11 @@ class ChatFormatProcessor {
     _ensurePatternsInitialized(tokens);
 
     // --- ignore_regex short-circuit (same semantics as before) ---
-    final ignoreRegex = tokens.ignoreRegex;
-    if (ignoreRegex != null && ignoreRegex.isNotEmpty) {
-      try {
-        final regex = RegExp(ignoreRegex);
-        if (regex.hasMatch(token)) {
-          debugPrint(
-            "[ChatFormatProcessor] Ignoring token via ignore_regex: '$token'",
-          );
-          return null;
-        }
-      } catch (e) {
-        debugPrint(
-          "[ChatFormatProcessor] Invalid ignore_regex pattern: $ignoreRegex",
-        );
-      }
-    }
+    if (_ignorePattern?.hasMatch(token) ?? false) return null;
 
     final visibleBuffer = StringBuffer();
 
-    final controlStartChars = _getControlStartChars(tokens);
+    final controlStartChars = _controlStartChars;
     final tokenStr = token.toString();
     int i = 0;
     while (i < tokenStr.length) {
@@ -222,6 +209,20 @@ class ChatFormatProcessor {
     }
 
     _controlPatterns = patterns.toList(growable: false);
+    _controlStartChars = {
+      for (final pattern in _controlPatterns)
+        if (pattern.isNotEmpty) pattern.codeUnitAt(0),
+    };
+    final ignoreRegex = tokens.ignoreRegex as String?;
+    if (ignoreRegex != null && ignoreRegex.isNotEmpty) {
+      try {
+        _ignorePattern = RegExp(ignoreRegex);
+      } on FormatException {
+        if (kDebugMode) {
+          debugPrint('[ChatFormatProcessor] Invalid ignore_regex; filter disabled.');
+        }
+      }
+    }
     _patternsInitialized = true;
 
     debugPrint(
@@ -229,16 +230,6 @@ class ChatFormatProcessor {
     );
   }
 
-  Set<int> _getControlStartChars(dynamic tokens) {
-    _ensurePatternsInitialized(tokens);
-    final chars = <int>{};
-    for (final pattern in _controlPatterns) {
-      if (pattern.isNotEmpty) {
-        chars.add(pattern.codeUnitAt(0));
-      }
-    }
-    return chars;
-  }
 
   void _processBatch(String batch, dynamic tokens, StringBuffer output) {
     if (_generationStopped) return;
