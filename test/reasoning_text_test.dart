@@ -28,6 +28,15 @@ void main() {
     expect(parsed.isReasoningOpen, isTrue);
   });
 
+  test('completion repair closes every open block and an unfinished code span', () {
+    for (final text in ['<think>one<think>two', '<think>```python\nx = 1']) {
+      final parsed = ReasoningText.parse(text);
+      final repaired = ReasoningText.parse('${text}${parsed.closingMarkup}Status');
+      expect(repaired.isReasoningOpen, isFalse);
+      expect(repaired.answer, 'Status');
+    }
+  });
+
   test('reasoning length does not consume the answer animation', () {
     const raw = '<think>Many reasoning words here</think>Final answer';
     final parsed = ReasoningText.parse(raw);

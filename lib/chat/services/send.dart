@@ -1783,7 +1783,7 @@ class SendService {
         !(_isConversationActive(targetConvId) && _conversationProvider.wasResponseStopped)) {
       // Preserve the delivered thinking, but don't silently call it a complete
       // answer or trigger another paid model request through EMPTY_RESPONSE.
-      appendStreamChunk('${parsedResponse.isReasoningOpen ? '</think>' : ''}'
+      appendStreamChunk('${parsedResponse.closingMarkup}'
           '\n\n${ReasoningInstructions.noAnswer(langCode)}');
     }
     if (cleanResponse.isEmpty && !hasGeneratedMedia) {

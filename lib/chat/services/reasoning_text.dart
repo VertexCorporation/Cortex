@@ -6,10 +6,11 @@ class ReasoningText {
   final String reasoning;
   final bool hasReasoning;
   final bool isReasoningOpen;
+  final String closingMarkup;
   final List<(int, int)> _answerSpans;
 
   ReasoningText._(this.answer, this.reasoning, this.hasReasoning,
-      this.isReasoningOpen, this._answerSpans);
+      this.isReasoningOpen, this.closingMarkup, this._answerSpans);
 
   static final _markers = RegExp(r'`+|~{3,}|<think>|</think>', caseSensitive: false);
 
@@ -74,7 +75,9 @@ class ReasoningText {
     }
     append(cursor, end);
     return ReasoningText._(answer.toString(), reasoning.toString(),
-        hasReasoning, depth > 0, spans);
+        hasReasoning, depth > 0,
+        depth == 0 ? '' : '${codeWidth == 0 ? '' : '\n${codeCharacter * codeWidth}\n'}'
+            '${'</think>' * depth}', spans);
   }
 
   int answerLengthBefore(int rawOffset) {
