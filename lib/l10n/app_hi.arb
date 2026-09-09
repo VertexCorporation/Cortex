@@ -884,5 +884,21 @@
   "workInProgress": "काम जारी है",
   "wrongPassword": "गलत पासवर्ड।",
   "yes": "हाँ",
-  "you": "आप"
+  "you": "आप",
+  "premiumChatGateTitle": "और सुविधाएँ अनलॉक करें",
+  "premiumChatGateDescription": "इस शक्तिशाली AI मॉडल और अन्य सुविधाओं का उपयोग करने के लिए Cortex Premium में अपग्रेड करें।",
+  "premiumChatGateCta": "Premium से जुड़ें",
+  "testPurchaseTitle": "टेस्ट खरीदारी",
+  "testPurchaseBadge": "टेस्ट",
+  "testPurchaseNotice": "परीक्षण के लिए अनुकरणित भुगतान — कोई वास्तविक शुल्क नहीं लिया जाएगा। यह {duration} के लिए {plan} एक्सेस देता है।",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "टेस्ट खरीदारी पूरी करें",
+  "testDurationMinutes": "{minutes} मिनट",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "टेस्ट मोड: खरीदारी अनुकरणित हैं और अल्पकालिक टेस्ट अधिकार देती हैं — वास्तविक बिलिंग शामिल नहीं है।",
+  "testSubscriptionManage": "टेस्ट सदस्यता रद्द करें",
+  "testPurchaseSuccess": "टेस्ट सदस्यता अब सक्रिय है।",
+  "testPurchaseRevoked": "टेस्ट सदस्यता रद्द कर दी गई।",
+  "testPurchaseError": "टेस्ट खरीदारी विफल: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

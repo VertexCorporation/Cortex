@@ -2171,4 +2171,51 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Desbloquea más posibilidades';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Pásate a Cortex Premium para acceder a este potente modelo de IA y mucho más.';
+
+  @override
+  String get premiumChatGateCta => 'Únete a Premium';
+
+  @override
+  String get testPurchaseTitle => 'Compra de prueba';
+
+  @override
+  String get testPurchaseBadge => 'TEST';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Pago simulado para pruebas — no se realizará ningún cargo real. Esto otorga acceso a $plan durante $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Completar compra de prueba';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes minutos';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Modo de prueba: las compras son simuladas y otorgan derechos de prueba de corta duración — nunca implican facturación real.';
+
+  @override
+  String get testSubscriptionManage => 'Cancelar suscripción de prueba';
+
+  @override
+  String get testPurchaseSuccess => 'La suscripción de prueba ya está activa.';
+
+  @override
+  String get testPurchaseRevoked => 'Suscripción de prueba cancelada.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'La compra de prueba falló: $message';
+  }
 }

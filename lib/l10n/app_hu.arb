@@ -598,5 +598,21 @@
   "categoryPhoto": "Fotó",
   "categoryMasculine": "Férfias",
   "categoryFeminine": "Nőies",
-  "categoryInanimate": "Élettelen"
+  "categoryInanimate": "Élettelen",
+  "premiumChatGateTitle": "Fedezz fel több lehetőséget",
+  "premiumChatGateDescription": "Válts Cortex Premiumra, hogy hozzáférj ehhez a hatékony AI-modellhez és még sok máshoz.",
+  "premiumChatGateCta": "Előfizetés a Premiumra",
+  "testPurchaseTitle": "Tesztvásárlás",
+  "testPurchaseBadge": "TESZT",
+  "testPurchaseNotice": "Tesztelési célból szimulált fizetés — valódi terhelés nem történik. Ez {plan} hozzáférést ad {duration} időtartamra.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Tesztvásárlás befejezése",
+  "testDurationMinutes": "{minutes} perc",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Tesztmód: a vásárlások szimuláltak és rövid idejű tesztjogosultságokat adnak — valódi számlázás soha nem történik.",
+  "testSubscriptionManage": "Teszt-előfizetés lemondása",
+  "testPurchaseSuccess": "A teszt-előfizetés mostantól aktív.",
+  "testPurchaseRevoked": "A teszt-előfizetés lemondva.",
+  "testPurchaseError": "A tesztvásárlás sikertelen: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

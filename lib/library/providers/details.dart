@@ -144,9 +144,9 @@ class ModelDetailProvider extends ChangeNotifier {
     return _mainModel?.size;
   }
 
-  /// The unique ID of the currently selected offline variant.
+  /// The routing ID of the selected variant, for both online and offline families.
   String get selectedVariantId {
-    if (isOfflineSeries && selectedVariantName != null) {
+    if (isPluralModel && selectedVariantName != null) {
       return selectedVariantName!;
     }
     return _modelId;
@@ -188,7 +188,7 @@ class ModelDetailProvider extends ChangeNotifier {
     dev.log("[ModelDetailProvider] Initializing for ID '$_modelId'",
         name: 'ModelDetail');
 
-    _isUserSubscribed = _userProvider.isSubscriptionActive;
+    _isUserSubscribed = _userProvider.subscription.isActive;
 
     await _loadAndProcessData();
 
@@ -347,6 +347,10 @@ class ModelDetailProvider extends ChangeNotifier {
   }
 
   void selectVariant(BuildContext context, String newVariantName) {
+    if (_isDisposed ||
+        !(_mainModel?.variants?.containsKey(newVariantName) ?? false)) {
+      return;
+    }
     selectedVariantName = newVariantName;
     final localizations = AppLocalizations.of(context)!;
     _processData(localizations); // Re-process data based on the new selection
@@ -409,7 +413,7 @@ class ModelDetailProvider extends ChangeNotifier {
   /// Reactive listener for user subscription status changes.
   void _onUserStatusChanged() {
     if (_isDisposed) return;
-    final newSubscriptionStatus = _userProvider.isSubscriptionActive;
+    final newSubscriptionStatus = _userProvider.subscription.isActive;
     if (_isUserSubscribed != newSubscriptionStatus) {
       _isUserSubscribed = newSubscriptionStatus;
       dev.log(

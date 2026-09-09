@@ -139,7 +139,14 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
     return Stack(
       children: [
         // 1. Content defines the stack size
-        widget.child,
+        NotificationListener<ScrollMetricsNotification>(
+          onNotification: (_) {
+            WidgetsBinding.instance
+                .addPostFrameCallback((_) => _updateFogVisibility());
+            return false;
+          },
+          child: widget.child,
+        ),
 
         // 2. Top Fog Overlay
         if (widget.showTop)

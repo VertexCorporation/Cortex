@@ -14,6 +14,7 @@ import 'dart:developer' as dev;
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 import 'package:cortex/server/user.dart';
+import 'package:cortex/server/subscription.dart';
 import '../../../../internet.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
@@ -53,7 +54,7 @@ class ModelCreationProvider extends ChangeNotifier {
 
   bool _isSaving = false;
   bool _isSubscriptionLoading = true;
-  int _subscriptionTier = 0;
+  SubscriptionTier _subscriptionTier = SubscriptionTier.free;
   bool _isBaseModelPanelExpanded = false;
   bool _isPickerActive = false;
 
@@ -174,7 +175,7 @@ class ModelCreationProvider extends ChangeNotifier {
   }
 
   void syncUserSubscription(UserProvider userProvider) {
-    final nextTier = userProvider.activeSubscriptionLevel;
+    final nextTier = userProvider.subscription.effectiveTier;
     if (_subscriptionTier == nextTier && !_isSubscriptionLoading) return;
     _subscriptionTier = nextTier;
     _isSubscriptionLoading = false;
@@ -466,7 +467,7 @@ class ModelCreationProvider extends ChangeNotifier {
       return false;
     }
 
-    if (![3, 6].contains(_subscriptionTier)) {
+    if (_subscriptionTier != SubscriptionTier.ultra) {
       notificationService.showNotification(
           message: localizations.ultraFeatureOnly,
           type: NotificationType.error);

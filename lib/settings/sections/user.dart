@@ -1,4 +1,3 @@
-import 'package:cortex/design.dart';
 import 'package:cortex/funds/backend.dart';
 import 'package:cortex/funds/funds.dart';
 import 'package:cortex/navigation.dart';
@@ -13,6 +12,7 @@ import '../../theme.dart';
 import '../providers/general.dart';
 import '../providers/actions.dart';
 import '../services/auth.dart';
+import '../widgets/grouped_button.dart';
 
 part 'user/edit.dart';
 
@@ -48,38 +48,13 @@ class UserSection extends StatelessWidget {
       {required String text,
       required VoidCallback onPressed,
       bool enabled = true}) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return Opacity(
-      opacity: enabled ? 1.0 : 0.5,
-      child: Material(
-        color: AppColors.background,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CortexDesign.radius),
-            side: BorderSide(color: AppColors.border)),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: enabled ? onPressed : null,
-          borderRadius: BorderRadius.circular(CortexDesign.radius),
-          splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.04, vertical: screenWidth * 0.045),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(text,
-                    style: TextStyle(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500)),
-                Icon(Icons.arrow_forward_ios,
-                    color: AppColors.primaryColor.inverted,
-                    size: CortexDesign.icon),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return SettingsActionRow(
+      label: text,
+      enabled: enabled,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onPressed();
+      },
     );
   }
 

@@ -198,6 +198,7 @@ class ModelService with ChangeNotifier {
     List<Map<String, dynamic>> rawModels,
     String langCode,
   ) async {
+    rawModels = ModelDefaults.normalizeModelFamilies(rawModels);
     var finalEntities = <ModelEntity>[];
     for (int i = 0; i < rawModels.length; i++) {
       final rawMap = rawModels[i];
@@ -259,6 +260,7 @@ class ModelService with ChangeNotifier {
     List<Map<String, dynamic>> rawModels,
     String langCode,
   ) {
+    rawModels = ModelDefaults.normalizeModelFamilies(rawModels);
     var finalEntities = <ModelEntity>[];
     for (int i = 0; i < rawModels.length; i++) {
       final rawMap = rawModels[i];
@@ -333,18 +335,25 @@ class ModelService with ChangeNotifier {
     final imagePath = (model.imagePath ?? '').toLowerCase();
     final hasSelfPlaceholder = imagePath.endsWith('/self.svg') ||
         imagePath.endsWith('assets/icons/self.svg');
-    if (hasSelfPlaceholder) return null;
+    final family = (model.series ?? model.displayTitle).toLowerCase();
+    if (hasSelfPlaceholder && family != 'next') return null;
 
     final ram = model.ram;
-    if (ram != null && ram > maxOfflineRamMb) return null;
+    if ((model.variants?.isEmpty ?? true) &&
+        ram != null &&
+        ram > maxOfflineRamMb) {
+      return null;
+    }
 
     Map<String, dynamic>? filteredVariants;
     int? effectiveSize = model.size;
+    int? effectiveRam = model.ram;
 
     final variants = model.variants;
     if (variants != null && variants.isNotEmpty) {
       filteredVariants = <String, dynamic>{};
       final keptVariantSizes = <int>[];
+      final keptVariantRams = <int>[];
 
       for (final entry in variants.entries) {
         final variantData = entry.value;
@@ -365,6 +374,7 @@ class ModelService with ChangeNotifier {
         }
 
         filteredVariants[entry.key] = variantMap;
+        if (variantRam != null) keptVariantRams.add(variantRam);
         if (variantSize != null) {
           keptVariantSizes.add(variantSize);
         }
@@ -372,6 +382,9 @@ class ModelService with ChangeNotifier {
 
       if (filteredVariants.isEmpty) return null;
 
+      if (keptVariantRams.isNotEmpty) {
+        effectiveRam = keptVariantRams.reduce(math.min);
+      }
       if (keptVariantSizes.isNotEmpty) {
         effectiveSize = keptVariantSizes.reduce(math.min);
       }
@@ -386,6 +399,7 @@ class ModelService with ChangeNotifier {
 
     return model.copyWith(
       size: effectiveSize,
+      ram: effectiveRam,
       variants: filteredVariants ?? model.variants,
     );
   }
@@ -554,6 +568,8 @@ class ModelService with ChangeNotifier {
   /// 4. As a final fallback, it returns a default icon.
   /// Determines the definitive image path for a model.
   String getModelImagePath(ModelEntity model) {
+    final familyAsset = ModelDefaults.familyAssets[model.series];
+    if (familyAsset != null) return familyAsset;
     final cachedImagePaths = ModelImageCache.getPathsSync();
 
     if (cachedImagePaths.containsKey(model.id)) {

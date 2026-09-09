@@ -466,63 +466,27 @@ class DeleteSection extends StatelessWidget {
     ).whenComplete(restoreNavBar);
   }
 
-  Widget _buildDeleteAllConversationsButton(
-      BuildContext context, SettingsRowPosition position) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    return SettingsGroupedRow(
-      position: position,
-      scale: (screenWidth / 375).clamp(0.85, 1.25),
+  Widget _buildDeleteAllConversationsButton(BuildContext context) {
+    return SettingsActionRow(
+      label: AppLocalizations.of(context)!.deleteAllConversationsButton,
       backgroundColor: AppColors.septenaryColor.withValues(alpha: 0.4),
       borderColor: AppColors.septenaryColor,
       onTap: () {
         HapticFeedback.lightImpact();
         _showDialog(context, child: const _DeleteAllConversationsDialog());
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            appLocalizations.deleteAllConversationsButton,
-            style: TextStyle(
-                color: AppColors.primaryColor.inverted,
-                fontSize: screenWidth * 0.04,
-                fontWeight: FontWeight.w500),
-          ),
-          Icon(Icons.arrow_forward_ios,
-              color: AppColors.primaryColor.inverted, size: CortexDesign.icon),
-        ],
-      ),
     );
   }
 
-  Widget _buildDeleteAccountButton(
-      BuildContext context, SettingsRowPosition position) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    return SettingsGroupedRow(
-      position: position,
-      scale: (screenWidth / 375).clamp(0.85, 1.25),
+  Widget _buildDeleteAccountButton(BuildContext context) {
+    return SettingsActionRow(
+      label: AppLocalizations.of(context)!.deleteAccount,
       backgroundColor: AppColors.septenaryColor.withValues(alpha: 0.4),
       borderColor: AppColors.septenaryColor,
       onTap: () {
         HapticFeedback.lightImpact();
         _showDialog(context, child: const _DeleteAccountDialog());
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            appLocalizations.deleteAccount,
-            style: TextStyle(
-                color: AppColors.primaryColor.inverted,
-                fontSize: screenWidth * 0.04,
-                fontWeight: FontWeight.w500),
-          ),
-          Icon(Icons.arrow_forward_ios,
-              color: AppColors.primaryColor.inverted, size: CortexDesign.icon),
-        ],
-      ),
     );
   }
 
@@ -594,18 +558,13 @@ class DeleteSection extends StatelessWidget {
         if (isFromActiveChat)
           _buildDisabledInfoText(context)
         else
-          SettingsGroupedColumn(
-            scale: (screenWidth / 375).clamp(0.85, 1.25),
-            borderColor: AppColors.septenaryColor,
+          Column(
             children: [
-              _buildDeleteAllConversationsButton(
-                context,
-                hasInternet && !isAnonymous
-                    ? SettingsRowPosition.first
-                    : SettingsRowPosition.standalone,
-              ),
-              if (hasInternet && !isAnonymous)
-                _buildDeleteAccountButton(context, SettingsRowPosition.last),
+              _buildDeleteAllConversationsButton(context),
+              if (hasInternet && !isAnonymous) ...[
+                SizedBox(height: screenHeight * 0.015),
+                _buildDeleteAccountButton(context),
+              ],
             ],
           ),
       ],

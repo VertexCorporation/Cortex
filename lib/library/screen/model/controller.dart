@@ -16,7 +16,7 @@ import '../../providers/local.dart';
 ///
 /// Its primary responsibility is to receive a model ID and set up the
 /// corresponding `ModelDetailProvider` which will manage the screen's state
-/// and business logic. It then delegates the UI rendering to `_ModelDetailViewWithTicker`.
+/// and business logic. It then delegates the UI rendering to `ModelDetailContent`.
 class ModelDetailPage extends StatelessWidget {
   final String id;
 
@@ -46,39 +46,57 @@ class ModelDetailPage extends StatelessWidget {
         );
       },
       // The child of the provider is the view that will consume its state.
-      child: const _ModelDetailViewWithTicker(),
+      child: const ModelDetailContent(),
     );
   }
 }
 
-/// A private helper widget that provides a `TickerProvider` to the view.
+/// Provider-backed detail content, owning the scroll and variant animation state.
 ///
 /// This is a clean pattern to supply a TickerProvider to a widget tree
 /// that is otherwise stateless, without cluttering the main view logic.
-class _ModelDetailViewWithTicker extends StatefulWidget {
-  const _ModelDetailViewWithTicker();
+class ModelDetailContent extends StatefulWidget {
+  const ModelDetailContent({super.key});
 
   @override
-  State<_ModelDetailViewWithTicker> createState() =>
-      __ModelDetailViewWithTickerState();
+  State<ModelDetailContent> createState() => _ModelDetailContentState();
 }
 
-class __ModelDetailViewWithTickerState extends State<_ModelDetailViewWithTicker>
+class _ModelDetailContentState extends State<ModelDetailContent>
     with TickerProviderStateMixin {
   final GlobalKey<DetailAppBarState> _appBarKey =
       GlobalKey<DetailAppBarState>();
 
   // A controller to manage the scroll position for the fog effect.
   late final ScrollController _scrollController;
+  late final AnimationController _variantFade;
+  int _selectionRevision = 0;
+
+  Future<void> _selectVariant(String id) async {
+    final revision = ++_selectionRevision;
+    try {
+      // Fade out the current provider values before committing the next variant.
+      // A newer request cancels this ticker and wins without adding any routes.
+      await _variantFade.reverse().orCancel;
+      if (!mounted || revision != _selectionRevision) return;
+      context.read<ModelDetailProvider>().selectVariant(context, id);
+      await _variantFade.forward().orCancel;
+    } on TickerCanceled {
+      // Rapid selection or disposal superseded this transition.
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _variantFade = AnimationController(
+        vsync: this, value: 1, duration: const Duration(milliseconds: 150));
   }
 
   @override
   void dispose() {
+    _variantFade.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -88,6 +106,8 @@ class __ModelDetailViewWithTickerState extends State<_ModelDetailViewWithTicker>
     // Pass the key and the controller to the ModelDetailView
     return ModelDetailView(
       appBarKey: _appBarKey,
+      variantFade: _variantFade,
+      onVariantSelected: _selectVariant,
       scrollController: _scrollController,
     );
   }
@@ -96,11 +116,15 @@ class __ModelDetailViewWithTickerState extends State<_ModelDetailViewWithTicker>
 class ModelDetailView extends StatelessWidget {
   final GlobalKey<DetailAppBarState> appBarKey;
   final ScrollController scrollController;
+  final Animation<double> variantFade;
+  final ValueChanged<String> onVariantSelected;
 
   const ModelDetailView({
     super.key,
     required this.appBarKey,
     required this.scrollController,
+    required this.variantFade,
+    required this.onVariantSelected,
   });
 
   @override
@@ -142,21 +166,35 @@ class ModelDetailView extends StatelessWidget {
               key: appBarKey,
               provider: provider,
               onBackPressed: handlePop,
+              onVariantSelected: onVariantSelected,
               scrollController: scrollController,
             ),
-            bottomNavigationBar: const BottomActionButtons(),
+            bottomNavigationBar: AnimatedBuilder(
+              animation: variantFade,
+              builder: (context, child) => IgnorePointer(
+                ignoring: variantFade.status != AnimationStatus.completed,
+                child: child,
+              ),
+              child: FadeTransition(
+                  opacity: variantFade, child: const BottomActionButtons()),
+            ),
             body: SizedBox.expand(
               child: Stack(
                 children: [
                   ScrollFog(
                     scrollController: scrollController,
-                    topFogHeight: screenHeight * 0.02,
+                    topFogHeight:
+                        MediaQuery.paddingOf(context).top + kToolbarHeight,
                     showTop: true,
-                    showBottom: false,
-                    child: BodyContent(
-                      key: const ValueKey('content'),
-                      provider: provider,
-                      scrollController: scrollController,
+                    bottomFogHeight: screenHeight * 0.06,
+                    showBottom: true,
+                    child: FadeTransition(
+                      opacity: variantFade,
+                      child: BodyContent(
+                        key: const ValueKey('content'),
+                        provider: provider,
+                        scrollController: scrollController,
+                      ),
                     ),
                   ),
                   // Position the banners at the bottom of the screen.

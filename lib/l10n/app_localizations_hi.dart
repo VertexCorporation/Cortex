@@ -2144,4 +2144,51 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'और सुविधाएँ अनलॉक करें';
+
+  @override
+  String get premiumChatGateDescription =>
+      'इस शक्तिशाली AI मॉडल और अन्य सुविधाओं का उपयोग करने के लिए Cortex Premium में अपग्रेड करें।';
+
+  @override
+  String get premiumChatGateCta => 'Premium से जुड़ें';
+
+  @override
+  String get testPurchaseTitle => 'टेस्ट खरीदारी';
+
+  @override
+  String get testPurchaseBadge => 'टेस्ट';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'परीक्षण के लिए अनुकरणित भुगतान — कोई वास्तविक शुल्क नहीं लिया जाएगा। यह $duration के लिए $plan एक्सेस देता है।';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'टेस्ट खरीदारी पूरी करें';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes मिनट';
+  }
+
+  @override
+  String get testModeInfo =>
+      'टेस्ट मोड: खरीदारी अनुकरणित हैं और अल्पकालिक टेस्ट अधिकार देती हैं — वास्तविक बिलिंग शामिल नहीं है।';
+
+  @override
+  String get testSubscriptionManage => 'टेस्ट सदस्यता रद्द करें';
+
+  @override
+  String get testPurchaseSuccess => 'टेस्ट सदस्यता अब सक्रिय है।';
+
+  @override
+  String get testPurchaseRevoked => 'टेस्ट सदस्यता रद्द कर दी गई।';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'टेस्ट खरीदारी विफल: $message';
+  }
 }

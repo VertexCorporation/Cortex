@@ -523,7 +523,9 @@ List<SingleChildWidget> _buildCoreProviders(
     ),
 
     ChangeNotifierProxyProvider<IntrovertNotificationService, FundsBackend>(
-      create: (BuildContext context) => FundsBackend(),
+      create: (BuildContext context) => FundsBackend(
+        userProvider: context.read<UserProvider>(),
+      ),
       update: (
         BuildContext context,
         IntrovertNotificationService notificationService,

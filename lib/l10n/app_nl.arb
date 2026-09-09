@@ -884,5 +884,21 @@
   "workInProgress": "Werk in uitvoering",
   "wrongPassword": "Onjuist wachtwoord.",
   "yes": "Ja",
-  "you": "Jij"
+  "you": "Jij",
+  "premiumChatGateTitle": "Ontgrendel meer mogelijkheden",
+  "premiumChatGateDescription": "Upgrade naar Cortex Premium voor toegang tot dit krachtige AI-model en meer.",
+  "premiumChatGateCta": "Word Premium-lid",
+  "testPurchaseTitle": "Testaankoop",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Gesimuleerde betaling voor testdoeleinden — er wordt niets in rekening gebracht. Dit geeft {plan}-toegang voor {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Testaankoop voltooien",
+  "testDurationMinutes": "{minutes} minuten",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Testmodus: aankopen zijn gesimuleerd en verlenen kortlopende testrechten — echte facturering is nooit betrokken.",
+  "testSubscriptionManage": "Testabonnement opzeggen",
+  "testPurchaseSuccess": "Het testabonnement is nu actief.",
+  "testPurchaseRevoked": "Testabonnement opgezegd.",
+  "testPurchaseError": "Testaankoop mislukt: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

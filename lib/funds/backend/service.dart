@@ -17,6 +17,8 @@ import '../../cache.dart';
 import '../../internet.dart';
 import '../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
+import '../../server/subscription.dart';
+import '../../server/user.dart';
 
 part 'receipt.dart';
 
@@ -30,26 +32,27 @@ part 'verification.dart';
 
 part 'user.dart';
 
+part 'testgrants.dart';
+
 class FundsBackend with ChangeNotifier {
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseFunctions _functions =
       FirebaseFunctions.instanceFor(region: 'europe-west1');
   final FirebaseCrashlytics _crashlytics = FirebaseCrashlytics.instance;
 
+  /// The shared owner of the `users/{uid}` snapshot — the backend attaches to
+  /// it instead of opening its own Firestore listener.
+  final UserProvider? _userProvider;
+
   StreamSubscription<List<PurchaseDetails>>? _purchaseStreamSubscription;
-  StreamSubscription<DocumentSnapshot>? _userSubscription;
   StreamSubscription<User?>? _authSubscription;
 
   bool _isLoading = true;
   bool _isPurchasePending = false;
   String? _errorMessage;
   List<ProductDetails> _products = [];
-  int _currentUserSubscriptionLevel = 0;
-  String? _activeSubscriptionOption;
-
-  String? _activeSubscriptionProductId;
+  SubscriptionEntitlement _subscription = SubscriptionEntitlement.none;
 
   bool _initialized = false;
   bool _disposed = false;
@@ -71,11 +74,11 @@ class FundsBackend with ChangeNotifier {
   List<ProductDetails> get subscriptionProducts =>
       _products.where((p) => _subscriptionIds.contains(p.id)).toList();
 
-  int get currentUserSubscriptionLevel => _currentUserSubscriptionLevel;
+  /// The user's current subscription entitlement (free when none).
+  SubscriptionEntitlement get subscription => _subscription;
 
-  String? get activeSubscriptionOption => _activeSubscriptionOption;
-
-  String? get activeSubscriptionProductId => _activeSubscriptionProductId;
+  /// Product ID of the active subscription, used by the store upgrade flow.
+  String? get activeSubscriptionProductId => _subscription.productId;
 
   bool get isSpecialOfferActive => _isSpecialOfferActive;
 
@@ -84,7 +87,7 @@ class FundsBackend with ChangeNotifier {
   bool get shouldShowSpecialOfferEntryPoint {
     final user = _auth.currentUser;
     if (user == null || user.isAnonymous) return false;
-    return _currentUserSubscriptionLevel == 0 &&
+    return !_subscription.isPaid &&
         (_isSpecialOfferActive || _isSpecialOfferEligible);
   }
 
@@ -144,6 +147,16 @@ class FundsBackend with ChangeNotifier {
 
   Stream<String> get onPurchaseCompleted => _purchaseCompletedController.stream;
 
+  /// Fired when a simulated (test) purchase completes, so the funds screen can
+  /// run the same confetti/optimistic-UI path as a real store purchase.
+  final _testGrantCompletedController = StreamController<String>.broadcast();
+
+  Stream<String> get onTestGrantCompleted => _testGrantCompletedController.stream;
+
+  /// Duration of simulated test subscriptions granted by the debug-only test
+  /// purchase flow. Mirrors DEFAULT_TEST_GRANT_MINUTES on the server.
+  static const int testGrantDurationMinutes = 60;
+
   IntrovertNotificationService? _notificationService;
   AppLocalizations? _localizations;
 
@@ -152,43 +165,43 @@ class FundsBackend with ChangeNotifier {
         id: 'vertex_ai_monthly_sub',
         title: 'Plus Monthly',
         description: 'Test',
-        price: '\$4.99',
-        rawPrice: 4.99,
+        price: '\$9.99',
+        rawPrice: 9.99,
         currencyCode: 'USD'),
     ProductDetails(
         id: 'vertex_ai_annual_sub',
         title: 'Plus Annual',
         description: 'Test',
-        price: '\$49.99',
-        rawPrice: 49.99,
+        price: '\$99.99',
+        rawPrice: 99.99,
         currencyCode: 'USD'),
     ProductDetails(
         id: 'cortex_pro_monthly',
         title: 'Pro Monthly',
         description: 'Test',
-        price: '\$9.99',
-        rawPrice: 9.99,
+        price: '\$19.99',
+        rawPrice: 19.99,
         currencyCode: 'USD'),
     ProductDetails(
         id: 'cortex_pro_annual',
         title: 'Pro Annual',
         description: 'Test',
-        price: '\$99.99',
-        rawPrice: 99.99,
+        price: '\$199.99',
+        rawPrice: 199.99,
         currencyCode: 'USD'),
     ProductDetails(
         id: 'cortex_ultra_monthly',
         title: 'Ultra Monthly',
         description: 'Test',
-        price: '\$19.99',
-        rawPrice: 19.99,
+        price: '\$99.99',
+        rawPrice: 99.99,
         currencyCode: 'USD'),
     ProductDetails(
         id: 'cortex_ultra_annual',
         title: 'Ultra Annual',
         description: 'Test',
-        price: '\$199.99',
-        rawPrice: 199.99,
+        price: '\$999.99',
+        rawPrice: 999.99,
         currencyCode: 'USD'),
   ];
 
@@ -196,7 +209,7 @@ class FundsBackend with ChangeNotifier {
 
   static VoidCallback? onPreloadComplete;
 
-  FundsBackend() {
+  FundsBackend({UserProvider? userProvider}) : _userProvider = userProvider {
     // Pre-populate state from cache so synchronous UI renders correctly before fetch
     loadFromCache();
     // Re-load if a background preload finishes after the instance is created
@@ -232,26 +245,7 @@ class FundsBackend with ChangeNotifier {
       final data = snapshot.data();
       if (data == null || data['accountType'] == 'anonymous') return false;
 
-      final rawLevel = data['hasCortexSubscription'];
-      final int level = rawLevel is int
-          ? rawLevel
-          : rawLevel is num
-              ? rawLevel.toInt()
-              : rawLevel is String
-                  ? int.tryParse(rawLevel) ?? 0
-                  : 0;
-      if (level <= 0) return false;
-
-      final rawExpiry = data['subscriptionExpiresAt'];
-      final DateTime? expiry = rawExpiry is Timestamp
-          ? rawExpiry.toDate()
-          : rawExpiry is DateTime
-              ? rawExpiry
-              : rawExpiry is String
-                  ? DateTime.tryParse(rawExpiry)
-                  : null;
-      if (expiry == null) return level >= 4 && level <= 6;
-      return expiry.isAfter(DateTime.now());
+      return SubscriptionEntitlement.fromUserData(data).isPaid;
     }
 
     final suppressOfferPreload =
@@ -399,10 +393,10 @@ class FundsBackend with ChangeNotifier {
 
     _authSubscription?.cancel();
     _authSubscription = _auth.authStateChanges().listen((user) {
-      _listenToUserChanges();
+      _attachUserProvider();
     });
 
-    _listenToUserChanges();
+    _attachUserProvider();
   }
 
   Future<void> initialize({
@@ -440,9 +434,10 @@ class FundsBackend with ChangeNotifier {
   void dispose() {
     _disposed = true;
     _purchaseStreamSubscription?.cancel();
-    _userSubscription?.cancel();
+    _userProvider?.removeListener(_onUserDataChanged);
     _authSubscription?.cancel();
     _purchaseCompletedController.close();
+    _testGrantCompletedController.close();
     super.dispose();
   }
 }

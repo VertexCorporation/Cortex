@@ -884,5 +884,21 @@
   "workInProgress": "Lavori in corso",
   "wrongPassword": "Password errata.",
   "yes": "Sì",
-  "you": "Tu"
+  "you": "Tu",
+  "premiumChatGateTitle": "Sblocca più possibilità",
+  "premiumChatGateDescription": "Passa a Cortex Premium per accedere a questo potente modello di IA e molto altro.",
+  "premiumChatGateCta": "Passa a Premium",
+  "testPurchaseTitle": "Acquisto di prova",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Pagamento simulato a scopo di test — non verrà addebitato alcun importo reale. Concede l'accesso {plan} per {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Completa acquisto di prova",
+  "testDurationMinutes": "{minutes} minuti",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Modalità test: gli acquisti sono simulati e concedono diritti di prova di breve durata — la fatturazione reale non è mai coinvolta.",
+  "testSubscriptionManage": "Annulla abbonamento di prova",
+  "testPurchaseSuccess": "L'abbonamento di prova è ora attivo.",
+  "testPurchaseRevoked": "Abbonamento di prova annullato.",
+  "testPurchaseError": "Acquisto di prova non riuscito: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

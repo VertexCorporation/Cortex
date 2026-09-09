@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
+import '../../app.dart';
+import '../../design.dart';
 
 /// The position of a row inside a thin, vertically stacked settings group.
 enum SettingsRowPosition { standalone, first, middle, last }
@@ -139,6 +141,50 @@ class SettingsGroupedColumn extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Shared standalone action used by language, profile, plan and destructive rows.
+class SettingsActionRow extends StatelessWidget {
+  const SettingsActionRow(
+      {super.key,
+      required this.label,
+      required this.onTap,
+      this.enabled = true,
+      this.backgroundColor,
+      this.borderColor});
+  final String label;
+  final VoidCallback onTap;
+  final bool enabled;
+  final Color? backgroundColor;
+  final Color? borderColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    return Opacity(
+      opacity: enabled ? 1 : 0.5,
+      child: SettingsGroupedRow(
+        position: SettingsRowPosition.standalone,
+        scale: (width / 375).clamp(0.85, 1.25),
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        onTap: enabled ? onTap : null,
+        child: Row(children: [
+          Expanded(
+              child: Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: AppColors.primaryColor.inverted,
+                      fontSize: width * 0.041,
+                      fontWeight: FontWeight.w500))),
+          Icon(Icons.arrow_forward_ios,
+              color: AppColors.primaryColor.inverted,
+              size: CortexDesign.iconSize(width, tier: 1)),
+        ]),
       ),
     );
   }

@@ -2133,4 +2133,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'افتح المزيد من الإمكانات';
+
+  @override
+  String get premiumChatGateDescription =>
+      'قم بالترقية إلى Cortex Premium للوصول إلى نموذج الذكاء الاصطناعي القوي هذا والمزيد.';
+
+  @override
+  String get premiumChatGateCta => 'اشترك في Premium';
+
+  @override
+  String get testPurchaseTitle => 'شراء تجريبي';
+
+  @override
+  String get testPurchaseBadge => 'اختبار';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'عملية دفع محاكاة لأغراض الاختبار — لن يتم أي خصم حقيقي. يمنحك هذا الوصول إلى $plan لمدة $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'إتمام الشراء التجريبي';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
+  String get testModeInfo =>
+      'وضع الاختبار: عمليات الشراء محاكاة وتمنح اشتراكات اختبارية قصيرة الأمد — لا تنطوي على فوترة حقيقية إطلاقًا.';
+
+  @override
+  String get testSubscriptionManage => 'إلغاء الاشتراك التجريبي';
+
+  @override
+  String get testPurchaseSuccess => 'الاشتراك التجريبي مُفعّل الآن.';
+
+  @override
+  String get testPurchaseRevoked => 'تم إلغاء الاشتراك التجريبي.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'فشل الشراء التجريبي: $message';
+  }
 }

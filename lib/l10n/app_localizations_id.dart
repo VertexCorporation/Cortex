@@ -2155,4 +2155,51 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Buka lebih banyak fitur';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Beralih ke Cortex Premium untuk mengakses model AI canggih ini dan lebih banyak lagi.';
+
+  @override
+  String get premiumChatGateCta => 'Bergabung dengan Premium';
+
+  @override
+  String get testPurchaseTitle => 'Pembelian Uji';
+
+  @override
+  String get testPurchaseBadge => 'TES';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Pembayaran simulasi untuk pengujian — tidak ada biaya sungguhan. Ini memberikan akses $plan selama $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Selesaikan Pembelian Uji';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes menit';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Mode uji: pembelian disimulasikan dan memberikan hak uji berdurasi singkat — penagihan sungguhan tidak pernah terlibat.';
+
+  @override
+  String get testSubscriptionManage => 'Batalkan Langganan Uji';
+
+  @override
+  String get testPurchaseSuccess => 'Langganan uji kini aktif.';
+
+  @override
+  String get testPurchaseRevoked => 'Langganan uji dibatalkan.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Pembelian uji gagal: $message';
+  }
 }

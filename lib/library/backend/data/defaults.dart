@@ -4,6 +4,278 @@
 // Separating this data from the service layer keeps the logic clean and readable.
 
 class ModelDefaults {
+  // Client model-family rules, shared by catalog parsing and cache hydration.
+  // Provider/routing metadata stays attached to individual variants.
+  static String _familyKey(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+
+  static const _familyAliases = {
+    'arceeai': 'Arcee AI',
+    'arcee': 'Arcee AI',
+    'grok': 'Grok',
+    'grokimagine': 'Grok',
+    'minimax': 'MiniMax',
+    'hailuo': 'MiniMax',
+    'hailuovideo': 'MiniMax',
+    'minimaxspeech': 'MiniMax',
+    'stable': 'Stable',
+    'stablediffusion': 'Stable',
+    'stableaudio': 'Stable',
+    'muse': 'Muse',
+    'mai': 'MAI',
+    'nemotron': 'Nemotron',
+    'gptimage': 'GPT Image',
+  };
+  static const _providerFamilies = {
+    'cloudflare',
+    'cloudflareai',
+    'groq',
+    'meta',
+    'microsoft',
+    'nvidia',
+    'tencent',
+    'ctt',
+  };
+  static const familyAssets = {
+    'Arcee AI': 'assets/producers/arceeai.webp',
+    'Muse': 'assets/models/muse.webp',
+    'MAI': 'assets/models/mai.webp',
+    'Grok': 'assets/models/grok.webp',
+    'MiniMax': 'assets/producers/minimax.webp',
+    'Stable': 'assets/models/stable.webp',
+    'Nemotron': 'assets/producers/nvidia.webp',
+    'GPT Image': 'assets/producers/openai.webp',
+  };
+
+  static String? _detectFamilyIdentity(String value) {
+    final text = value.toLowerCase();
+    // Match model tokens, not substrings of company names (e.g. mai in domain).
+    const names = {
+      'gpt[-_ ]?image': 'GPT Image',
+      'grok|xai[-_ ]image': 'Grok',
+      'minimax|hailuo': 'MiniMax',
+      'stable(?:[-_ ](?:diffusion|audio))?': 'Stable',
+      'muse': 'Muse',
+      'mai': 'MAI',
+      'nemotron': 'Nemotron',
+      'cosmos': 'Cosmos',
+      'nova': 'Nova',
+      'llama': 'Llama',
+      'phi': 'Phi',
+      'qwen': 'Qwen',
+      'gemma': 'Gemma',
+      'deepseek': 'DeepSeek',
+      'gpt[-_ ]oss': 'GPT OSS',
+      'whisper': 'Whisper',
+      'orpheus': 'Orpheus',
+      'hunyuan': 'Hunyuan',
+      'm2m100': 'M2M100',
+      'resnet': 'ResNet',
+      'musicgen': 'MusicGen',
+      'bark': 'Bark',
+      'aura': 'Aura',
+    };
+    for (final entry in names.entries) {
+      if (RegExp('(?:^|[^a-z0-9])(?:${entry.key})(?=[^a-z]|\$)')
+          .hasMatch(text)) {
+        return entry.value;
+      }
+    }
+    return null;
+  }
+
+  static String resolveModelFamily(String series, String id,
+      [String title = '']) {
+    final key = _familyKey(series);
+    // Actual model identity takes precedence over an erroneous provider bucket.
+    final identity = _detectFamilyIdentity(id) ?? _detectFamilyIdentity(title);
+    if (_providerFamilies.contains(key)) {
+      if (identity != null) return identity;
+      // Unknown identities remain individual models, never a provider family.
+      final leaf =
+          id.split('/').where((p) => p.isNotEmpty).lastOrNull ?? 'Other';
+      return _providerFamilies.contains(_familyKey(leaf)) ? 'Other' : leaf;
+    }
+    if (_familyAliases.containsKey(key)) return _familyAliases[key]!;
+    if (identity != null &&
+        allowedOnlineFamilies.containsKey(_familyKey(identity))) {
+      return allowedOnlineFamilies[_familyKey(identity)]!;
+    }
+    return series;
+  }
+
+  /// Approved online series; company names and unknown model slugs never become cards.
+  static const allowedOnlineFamilies = {
+    'arceeai': 'Arcee AI',
+    'chatgpt': 'ChatGPT',
+    'gpt': 'ChatGPT',
+    'gptoss': 'ChatGPT',
+    'claude': 'Claude',
+    'codex': 'Codex',
+    'deepseek': 'DeepSeek',
+    'gptimage': 'GPT Image',
+    'qwen': 'Qwen',
+    'qwenimage': 'Qwen',
+    'gemini': 'Gemini',
+    'lyria': 'Lyria',
+    'gemma': 'Gemma',
+    'grok': 'Grok',
+    'hermes': 'Hermes',
+    'mai': 'MAI',
+    'muse': 'Muse',
+    'nemotron': 'Nemotron',
+    'mistral': 'Mistral',
+    'ministral': 'Ministral',
+    'mixtral': 'Mixtral',
+    'pixtral': 'Pixtral',
+    'magistral': 'Magistral',
+    'devstral': 'Devstral',
+    'codestral': 'Codestral',
+    'phi': 'Phi',
+    'wizardlm': 'WizardLM',
+    'tinyllama': 'TinyLlama',
+    'llama': 'Llama',
+    'command': 'Command',
+    'nova': 'Nova',
+    'perplexity': 'Perplexity',
+    'sonar': 'Perplexity',
+    'lfm': 'LFM',
+    'flux': 'Flux',
+    'ideogram': 'Ideogram',
+    'imagen': 'Imagen',
+    'kling': 'Kling',
+    'klingvideo': 'Kling',
+    'pixverse': 'PixVerse',
+    'sdxl': 'Stable',
+    'stable': 'Stable',
+    'sora': 'Sora',
+    'topaz': 'Topaz',
+    'topazupscale': 'Topaz',
+    'wan': 'Wan',
+    'wanvideo': 'Wan',
+    'zimage': 'Z Image',
+    'bria': 'Bria',
+    'seedance': 'Seedance',
+    'seedream': 'Seedream',
+    'minimax': 'MiniMax',
+    'elevenlabs': 'ElevenLabs',
+    'ernie': 'Ernie',
+    'fabric': 'Fabric',
+    'veo': 'Veo',
+    'seedvr': 'SeedVR',
+    'suno': 'Suno',
+    'musicgen': 'MusicGen',
+    'whisper': 'Whisper',
+    'banana': 'Nano Banana',
+    'nanobanana': 'Nano Banana',
+    'kimi': 'Kimi',
+    'glm': 'GLM',
+    'granite': 'Granite',
+    'runway': 'Runway',
+  };
+
+  static String offlineModelFamily(Map<String, dynamic> model, String series) {
+    final id = '${model['id'] ?? ''}';
+    // Legacy curated IDs also belong to a base family (jannano128k -> Jan).
+    if (RegExp(r'(?:^|[^a-z])jan(?:[-_ ]?nano|(?=[^a-z]|$))',
+            caseSensitive: false)
+        .hasMatch(id)) {
+      return 'Jan';
+    }
+    if (id.toLowerCase().contains('supernova')) return 'SuperNova';
+    if (RegExp(r'(?:^|[^a-z])zeta(?=[^a-z]|$)', caseSensitive: false)
+        .hasMatch(id)) {
+      return 'Zeta';
+    }
+    // Priority matters: Llama-Nemotron is Nemotron; Qwen-Next remains Qwen.
+    const names = [
+      'glm',
+      'kimi',
+      'granite',
+      'ministral',
+      'magistral',
+      'devstral',
+      'codestral',
+      'pixtral',
+      'hermes',
+      'lfm',
+      'nemotron',
+      'tinyllama',
+      'gemma',
+      'llama',
+      'qwen',
+      'next',
+      'deepseek',
+      'mixtral',
+      'mistral',
+      'phi',
+      'command',
+      'aya'
+    ];
+    for (final name in names) {
+      if (RegExp('(?:^|[^a-z])$name(?=[^a-z]|\$)', caseSensitive: false)
+          .hasMatch(id)) {
+        return allowedOnlineFamilies[name] ?? (name == 'next' ? 'Next' : 'Aya');
+      }
+    }
+    if (id.toLowerCase().contains('gpt-oss')) return 'ChatGPT';
+    return series;
+  }
+
+  static List<Map<String, dynamic>> normalizeModelFamilies(
+      List<Map<String, dynamic>> models) {
+    final untouched = <Map<String, dynamic>>[];
+    final groups = <String, Map<String, dynamic>>{};
+    for (final model in models) {
+      final id = '${model['id']}';
+      if (model['category'] == 'self' ||
+          model['category'] == 'roleplay' ||
+          model['type'] == 'roleplay' ||
+          id.startsWith('self_') ||
+          id.startsWith('local_') ||
+          id.startsWith('cortex/')) {
+        untouched.add(model);
+        continue;
+      }
+      final series = (model['series'] ?? model['title'] ?? id).toString();
+      final variants = model['variants'];
+      final entries = variants is Map && variants.isNotEmpty
+          ? variants.values.whereType<Map>()
+          : [model];
+      for (final entry in entries) {
+        final variant = <String, dynamic>{
+          ...model,
+          ...Map<String, dynamic>.from(entry)
+        }..remove('variants');
+        final variantId = '${variant['id']}';
+        final offline = variant['type'] == 'offline';
+        final resolved =
+            resolveModelFamily(series, variantId, '${variant['title'] ?? ''}');
+        final name = offline
+            ? offlineModelFamily(variant, series)
+            : allowedOnlineFamilies[_familyKey(resolved)];
+        if (name == null) continue;
+        variant['series'] = name;
+        final groupKey =
+            '${_familyKey(name)}:${offline ? 'offline' : 'online'}';
+        final group = groups.putIfAbsent(
+            groupKey,
+            () => {
+                  ...variant,
+                  'id':
+                      '${name.toLowerCase().replaceAll(' ', '-')}${offline ? '-offline' : ''}',
+                  'series': name,
+                  'title': name,
+                  'variants': <String, dynamic>{},
+                });
+        group.remove('details');
+        (group['variants'] as Map<String, dynamic>)[variantId] = variant;
+        if (group['id'] == variantId) group['id'] = '${group['id']}-family';
+      }
+    }
+    return [...untouched, ...groups.values];
+  }
+
   /// A map of predefined local asset paths for common models, structured by matching priority.
   /// The matching logic will check these in order:
   /// 1. Exact ID matches for specific models.
@@ -69,6 +341,8 @@ class ModelDefaults {
     'xai-image': 'assets/producers/xai.webp',
     'hermes': 'assets/models/hermes.webp',
     'codestral': 'assets/models/codestral.webp',
+    'muse': 'assets/models/muse.webp',
+    'nemotron': 'assets/producers/nvidia.webp',
     'mai': 'assets/models/mai.webp',
     'ministral': 'assets/models/ministral.webp',
     'mixtral': 'assets/models/mixtral.webp',

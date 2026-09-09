@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/cache.dart';
+import 'subscription.dart';
 
 /// A provider class to manage the authenticated user's state and data.
 ///
@@ -34,21 +35,6 @@ class UserProvider with ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _userSubscription;
   String? _activeUid;
   int _listenerGeneration = 0;
-
-  int _readSubscriptionLevel(Map<String, dynamic> data) {
-    final value = data['hasCortexSubscription'];
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
-  }
-
-  DateTime? _readSubscriptionExpiry(dynamic value) {
-    if (value is Timestamp) return value.toDate();
-    if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value);
-    return null;
-  }
 
   String _cacheKeyForUid(String uid) => 'cached_user_data_$uid';
 
@@ -111,6 +97,11 @@ class UserProvider with ChangeNotifier {
   /// The user's display name. Defaults to 'Guest' if unavailable.
   String get username => _userData?['username'] as String? ?? 'Guest';
 
+  /// Whether the server has flagged this account as an internal Vertex test
+  /// account. Gates debug-only simulated purchase flows (server re-checks it
+  /// on every call — never a client-side security boundary).
+  bool get isVertex => _userData?['isVertex'] == true;
+
   /// Checks if the current user is in 'Guest/Anonymous' mode.
   /// First checks the auth provider, then falls back to accountType.
   bool get isAnonymous {
@@ -121,40 +112,16 @@ class UserProvider with ChangeNotifier {
     return _userData!['accountType'] == 'anonymous';
   }
 
-  /// Returns true if the user has any active, non-free subscription tier.
+  /// The user's subscription entitlement, resolved from the nested
+  /// `users/{uid}.subscription` map.
   ///
-  /// UPDATED LOGIC: This now correctly handles data sources from both Firestore
-  /// (where dates are [Timestamp]) and local Cache (where dates are ISO [String]s).
-  bool get isSubscriptionActive {
-    return activeSubscriptionLevel > 0;
-  }
-
-  /// The effective subscription tier after auth/account-type and expiry checks.
-  ///
-  /// This is the getter UI code should use instead of reading
-  /// `hasCortexSubscription` directly. Anonymous users are always treated as
-  /// free, while real signed-in users keep their server-side tier unless an
-  /// explicit expiry exists and is already in the past.
-  int get activeSubscriptionLevel {
-    final data = _userData;
-    if (data == null) {
-      return 0;
-    }
-
-    if (isAnonymous) return 0; // Anonymous users cannot hold a subscription.
-
-    final int level = _readSubscriptionLevel(data);
-
-    if (level > 0) {
-      final expiryDate = _readSubscriptionExpiry(data['subscriptionExpiresAt']);
-      if (expiryDate == null) {
-        return level >= 4 && level <= 6 ? level : 0;
-      }
-      return expiryDate.isAfter(DateTime.now()) ? level : 0;
-    }
-
-    return 0;
-  }
+  /// Anonymous users and missing maps resolve to the free entitlement. This
+  /// is the getter UI code should use instead of reading the raw document —
+  /// it tolerates both Firestore timestamps and cached ISO strings.
+  SubscriptionEntitlement get subscription => SubscriptionEntitlement.fromUserData(
+        _userData,
+        isAnonymous: isAnonymous,
+      );
 
   /// The first initial of the user's name for use in avatars. Defaults to '?'.
   String get profileInitial {

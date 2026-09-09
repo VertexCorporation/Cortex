@@ -598,5 +598,21 @@
   "categoryPhoto": "Foto",
   "categoryMasculine": "Mužský",
   "categoryFeminine": "Ženský",
-  "categoryInanimate": "Neživý"
+  "categoryInanimate": "Neživý",
+  "premiumChatGateTitle": "Odemkněte více možností",
+  "premiumChatGateDescription": "Přejděte na Cortex Premium a získejte přístup k tomuto výkonnému modelu AI a dalším možnostem.",
+  "premiumChatGateCta": "Přejít na Premium",
+  "testPurchaseTitle": "Testovací nákup",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Simulovaná platba pro testování — žádná skutečná platba nebude provedena. Získáte tak přístup k {plan} na dobu {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Dokončit testovací nákup",
+  "testDurationMinutes": "{minutes} minut",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Testovací režim: nákupy jsou simulované a poskytují krátkodobé testovací nároky — skutečná platba se nikdy neprovádí.",
+  "testSubscriptionManage": "Zrušit testovací předplatné",
+  "testPurchaseSuccess": "Testovací předplatné je nyní aktivní.",
+  "testPurchaseRevoked": "Testovací předplatné bylo zrušeno.",
+  "testPurchaseError": "Testovací nákup se nezdařil: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

@@ -2093,4 +2093,51 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'もっと多くの機能を利用';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Cortex Premiumにアップグレードして、この高性能AIモデルやその他の機能をご利用ください。';
+
+  @override
+  String get premiumChatGateCta => 'Premiumに登録';
+
+  @override
+  String get testPurchaseTitle => 'テスト購入';
+
+  @override
+  String get testPurchaseBadge => 'テスト';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'テスト用のシミュレートされた決済です。実際の請求は発生しません。$plan へのアクセスが $duration 付与されます。';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'テスト購入を完了';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes分';
+  }
+
+  @override
+  String get testModeInfo =>
+      'テストモード：購入はシミュレートされ、短期間のテスト特権が付与されます。実際の請求は発生しません。';
+
+  @override
+  String get testSubscriptionManage => 'テストサブスクリプションを解約';
+
+  @override
+  String get testPurchaseSuccess => 'テストサブスクリプションが有効になりました。';
+
+  @override
+  String get testPurchaseRevoked => 'テストサブスクリプションを解約しました。';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'テスト購入に失敗しました：$message';
+  }
 }

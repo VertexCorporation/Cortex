@@ -1,3 +1,4 @@
+import '../panel/actions/rename.dart';
 import 'package:cortex/design.dart';
 // lib/axon/inbox/widgets/tiles/view.dart
 
@@ -237,89 +238,15 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     );
   }
 
-  void _showRenameDialog(ConversationManager manager) {
-    final l10n = AppLocalizations.of(context)!;
-    final TextEditingController controller = TextEditingController(
-      text: manager.conversationTitle,
-    );
-
-    showDialog(
+  Future<void> _showRenameDialog(ConversationManager manager) async {
+    final rename = context.read<InboxViewModel>().editConversation;
+    final conversationId = manager.conversationID;
+    final initialTitle = manager.conversationTitle;
+    final title = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.secondaryColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: AppColors.border),
-        ),
-        title: Text(
-          l10n.renameConversation,
-          style: TextStyle(color: AppColors.primaryColor.inverted),
-        ),
-        content: Material(
-          color: Colors.transparent,
-          child: TextField(
-            controller: controller,
-            autofocus: true,
-            style: TextStyle(color: AppColors.primaryColor.inverted),
-            decoration: InputDecoration(
-              hintText: l10n.conversationName,
-              hintStyle: TextStyle(
-                color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.border),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.border),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.primaryColor.inverted),
-              ),
-            ),
-            onSubmitted: (value) {
-              if (value.trim().isNotEmpty) {
-                context.read<InboxViewModel>().editConversation(
-                      manager.conversationID,
-                      value.trim(),
-                    );
-                Navigator.of(ctx).pop();
-              }
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              l10n.cancel,
-              style: TextStyle(
-                color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-              ),
-            ),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryColor.inverted,
-              foregroundColor: AppColors.primaryColor,
-            ),
-            onPressed: () {
-              final value = controller.text.trim();
-              if (value.isNotEmpty) {
-                context.read<InboxViewModel>().editConversation(
-                      manager.conversationID,
-                      value,
-                    );
-                Navigator.of(ctx).pop();
-              }
-            },
-            child: Text(l10n.save),
-          ),
-        ],
-      ),
+      builder: (_) => ConversationRenameDialog(initialTitle: initialTitle),
     );
+    if (title != null) await rename(conversationId, title);
   }
 
   @override
@@ -449,20 +376,20 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isSelected
-                            ? AppColors.senaryColor
+                            ? AppColors.primaryColor.inverted
                             : Colors.transparent,
                         border: Border.all(
                           color: isSelected
-                              ? AppColors.senaryColor
+                              ? AppColors.primaryColor.inverted
                               : AppColors.border.withValues(alpha: 0.5),
                           width: 2.0,
                         ),
                       ),
                       child: isSelected
-                          ? const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: CortexDesign.icon,
+                          ? Icon(
+                              Icons.check_rounded,
+                              color: AppColors.primaryColor,
+                              size: 15,
                             )
                           : null,
                     ),
@@ -503,7 +430,10 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                               return LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
-                                colors: const [Colors.white, Colors.transparent],
+                                colors: const [
+                                  Colors.white,
+                                  Colors.transparent
+                                ],
                                 stops: [
                                   (edge - 0.2).clamp(0.0, 1.0),
                                   edge.clamp(0.0, 1.0),
@@ -516,7 +446,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                       },
                       child: widget.manager.shouldAnimateTitle
                           ? TweenAnimationBuilder<double>(
-                              key: ValueKey<String>(widget.manager.conversationTitle),
+                              key: ValueKey<String>(
+                                  widget.manager.conversationTitle),
                               tween: Tween(begin: 0, end: 1),
                               duration: const Duration(milliseconds: 350),
                               onEnd: () {
@@ -525,7 +456,10 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                               builder: (context, value, child) => ShaderMask(
                                 blendMode: BlendMode.dstIn,
                                 shaderCallback: (bounds) => LinearGradient(
-                                  colors: const [Colors.white, Colors.transparent],
+                                  colors: const [
+                                    Colors.white,
+                                    Colors.transparent
+                                  ],
                                   stops: [
                                     (value * 1.2 - 0.2).clamp(0.0, 1.0),
                                     (value * 1.2).clamp(0.0, 1.0),
@@ -543,8 +477,9 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                                       ? textColor
                                       : textColor.withValues(alpha: 0.85),
                                   fontSize: fontSize,
-                                  fontWeight:
-                                      isActive ? FontWeight.w600 : FontWeight.w500,
+                                  fontWeight: isActive
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
                                 ),
                               ),
                             )
@@ -558,8 +493,9 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                                     ? textColor
                                     : textColor.withValues(alpha: 0.85),
                                 fontSize: fontSize,
-                                fontWeight:
-                                    isActive ? FontWeight.w600 : FontWeight.w500,
+                                fontWeight: isActive
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
                               ),
                             ),
                     ),

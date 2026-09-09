@@ -884,5 +884,21 @@
   "workInProgress": "In Arbeit",
   "wrongPassword": "Falsches Passwort.",
   "yes": "Ja",
-  "you": "Du"
+  "you": "Du",
+  "premiumChatGateTitle": "Mehr Möglichkeiten freischalten",
+  "premiumChatGateDescription": "Wechsle zu Cortex Premium, um auf dieses leistungsstarke KI-Modell und mehr zuzugreifen.",
+  "premiumChatGateCta": "Premium abonnieren",
+  "testPurchaseTitle": "Testkauf",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Simulierte Zahlung zu Testzwecken — es wird keine echte Abbuchung vorgenommen. Du erhältst {plan} für {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Testkauf abschließen",
+  "testDurationMinutes": "{minutes} Minuten",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Testmodus: Käufe sind simuliert und gewähren kurzzeitige Test-Berechtigungen — echte Abbuchungen erfolgen nie.",
+  "testSubscriptionManage": "Testabo kündigen",
+  "testPurchaseSuccess": "Das Testabo ist jetzt aktiv.",
+  "testPurchaseRevoked": "Das Testabo wurde gekündigt.",
+  "testPurchaseError": "Testkauf fehlgeschlagen: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

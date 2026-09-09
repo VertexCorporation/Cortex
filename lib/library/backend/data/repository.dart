@@ -13,6 +13,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'defaults.dart';
 import 'package:cortex/library/backend/data/crypto.dart';
 import 'package:cortex/library/backend/data/database.dart';
 import 'package:cortex/library/backend/data/image.dart';
@@ -693,10 +694,11 @@ class ModelRepository {
       Map<String, dynamic> params) {
     final rawData = params['data'] as Map<String, dynamic>;
     final langCode = params['langCode'] as String;
-    return _staticParseAndGroupServerModels(rawData, langCode);
+    return parseServerModels(rawData, langCode);
   }
 
-  static List<Map<String, dynamic>> _staticParseAndGroupServerModels(
+  @visibleForTesting
+  static List<Map<String, dynamic>> parseServerModels(
       Map<String, dynamic> rawData, String langCode) {
     final List<Map<String, dynamic>> finalList = [];
     final producers = rawData['producers'] != null
@@ -730,7 +732,9 @@ class ModelRepository {
         if (model != null) finalList.add(model);
       }
     }
-    return finalList;
+    // Normalize before persistence so duplicate legacy series IDs from
+    // different producers cannot overwrite each other in the model table.
+    return ModelDefaults.normalizeModelFamilies(finalList);
   }
 
   static Map<String, dynamic>? _staticParseSingleVariantModel(String seriesName,

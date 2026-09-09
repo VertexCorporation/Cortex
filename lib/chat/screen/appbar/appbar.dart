@@ -103,7 +103,7 @@ class AppbarState extends State<Appbar> {
     final bool isChatActive = conversation.messages.isNotEmpty;
     final bool isUserStateReady = userProvider.isUserStateReady;
     final bool isAnonymous = userProvider.isAnonymous;
-    final bool isSubscribed = userProvider.isSubscriptionActive;
+    final bool isSubscribed = userProvider.subscription.isActive;
     final bool showCenterButton =
         isUserStateReady && !isChatActive && (isAnonymous || !isSubscribed);
 

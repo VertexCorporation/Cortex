@@ -2157,4 +2157,51 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Откройте больше возможностей';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Перейдите на Cortex Premium, чтобы получить доступ к этой мощной модели ИИ и другим возможностям.';
+
+  @override
+  String get premiumChatGateCta => 'Подключить Premium';
+
+  @override
+  String get testPurchaseTitle => 'Тестовая покупка';
+
+  @override
+  String get testPurchaseBadge => 'ТЕСТ';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Симулированная оплата для тестирования — реальное списание не производится. Это даёт доступ к $plan на $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Завершить тестовую покупку';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes мин.';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Тестовый режим: покупки симулируются и предоставляют кратковременные тестовые права — реальное списание исключено.';
+
+  @override
+  String get testSubscriptionManage => 'Отменить тестовую подписку';
+
+  @override
+  String get testPurchaseSuccess => 'Тестовая подписка активирована.';
+
+  @override
+  String get testPurchaseRevoked => 'Тестовая подписка отменена.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Не удалось выполнить тестовую покупку: $message';
+  }
 }

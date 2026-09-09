@@ -1,5 +1,6 @@
 // test/server_test.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/user.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -18,7 +19,8 @@ void main() {
       expect(userProvider.isAnonymous, false);
       expect(userProvider.username, 'Guest');
       expect(userProvider.profileInitial, '?');
-      expect(userProvider.isSubscriptionActive, false);
+      expect(userProvider.subscription.isActive, false);
+      expect(userProvider.subscription.effectiveTier, SubscriptionTier.free);
     });
 
     test('Anonymous User Logic', () {
@@ -43,58 +45,147 @@ void main() {
       expect(userProvider.profileInitial, 'J');
     });
 
+    test('isVertex defaults to false and toggles with the document flag', () {
+      userProvider.userData = {
+        'accountType': 'standard',
+        'username': 'John Doe'
+      };
+      expect(userProvider.isVertex, false);
+
+      userProvider.userData = {
+        'accountType': 'standard',
+        'username': 'John Doe',
+        'isVertex': true
+      };
+      expect(userProvider.isVertex, true);
+
+      // Falsy values must not leak through as true.
+      userProvider.userData = {
+        'accountType': 'standard',
+        'username': 'John Doe',
+        'isVertex': false
+      };
+      expect(userProvider.isVertex, false);
+    });
+
     group('Subscription Logic', () {
-      test('Free Tier', () {
-        userProvider.userData = {'hasCortexSubscription': 0};
-        expect(userProvider.isSubscriptionActive, false);
-      });
-
-      test('Lifetime Tier (Level 4)', () {
-        userProvider.userData = {'hasCortexSubscription': 4};
-        expect(userProvider.isSubscriptionActive, true);
-      });
-
-      test('Premium Tier - Active (Future Date)', () {
+      test('Free Tier (explicit free map)', () {
         userProvider.userData = {
-          'hasCortexSubscription': 1,
-          'subscriptionExpiresAt':
-              Timestamp.fromDate(DateTime.now().add(const Duration(days: 1)))
+          'subscription': {'tier': 'free'}
         };
-        expect(userProvider.isSubscriptionActive, true);
+        expect(userProvider.subscription.isActive, false);
       });
 
-      test('Premium Tier - Active (Cached String Date)', () {
+      test('Missing Map (Free)', () {
+        userProvider.userData = {};
+        expect(userProvider.subscription.isActive, false);
+        expect(userProvider.subscription.effectiveTier, SubscriptionTier.free);
+      });
+
+      test('Lifetime Tier (No expiresAt)', () {
+        userProvider.userData = {
+          'subscription': {
+            'tier': 'pro',
+            'mode': 'lifetime',
+            'status': 'active',
+            'source': 'admin',
+          }
+        };
+        expect(userProvider.subscription.isActive, true);
+        expect(userProvider.subscription.effectiveTier, SubscriptionTier.pro);
+      });
+
+      test('Renewable - Active (Future Date)', () {
+        userProvider.userData = {
+          'subscription': {
+            'tier': 'plus',
+            'mode': 'renewable',
+            'status': 'active',
+            'expiresAt':
+                Timestamp.fromDate(DateTime.now().add(const Duration(days: 1))),
+            'productId': 'vertex_ai_monthly_sub',
+            'billingPeriod': 'monthly',
+            'source': 'app_store',
+          }
+        };
+        expect(userProvider.subscription.isActive, true);
+      });
+
+      test('Renewable - Active (Cached ISO String Date)', () {
         final futureDate =
             DateTime.now().add(const Duration(days: 1)).toIso8601String();
         userProvider.userData = {
-          'hasCortexSubscription': 1,
-          'subscriptionExpiresAt': futureDate
+          'subscription': {
+            'tier': 'plus',
+            'mode': 'renewable',
+            'status': 'active',
+            'expiresAt': futureDate,
+          }
         };
-        expect(userProvider.isSubscriptionActive, true);
+        expect(userProvider.subscription.isActive, true);
       });
 
-      test('Premium Tier - Expired (Past Date)', () {
+      test('Renewable - Expired (Past Date)', () {
         userProvider.userData = {
-          'hasCortexSubscription': 1,
-          'subscriptionExpiresAt': Timestamp.fromDate(
-              DateTime.now().subtract(const Duration(days: 1)))
+          'subscription': {
+            'tier': 'plus',
+            'mode': 'renewable',
+            'status': 'active',
+            'expiresAt': Timestamp.fromDate(
+                DateTime.now().subtract(const Duration(days: 1))),
+          }
         };
-        expect(userProvider.isSubscriptionActive, false);
+        expect(userProvider.subscription.isActive, false);
+        expect(userProvider.subscription.effectiveTier, SubscriptionTier.free);
       });
 
-      test('Premium Tier - Invalid Date', () {
+      test('Renewable - Invalid Date', () {
         userProvider.userData = {
-          'hasCortexSubscription': 1,
-          'subscriptionExpiresAt': 'not-a-date'
+          'subscription': {
+            'tier': 'plus',
+            'mode': 'renewable',
+            'status': 'active',
+            'expiresAt': 'not-a-date',
+          }
         };
-        expect(userProvider.isSubscriptionActive, false);
+        expect(userProvider.subscription.isActive, false);
       });
 
-      test('Premium Tier - Missing Date', () {
+      test('Renewable - Missing expiresAt', () {
         userProvider.userData = {
-          'hasCortexSubscription': 1,
+          'subscription': {
+            'tier': 'plus',
+            'mode': 'renewable',
+            'status': 'active',
+          }
         };
-        expect(userProvider.isSubscriptionActive, false);
+        expect(userProvider.subscription.isActive, false);
+      });
+
+      test('Terminal Status (expired)', () {
+        userProvider.userData = {
+          'subscription': {
+            'tier': 'ultra',
+            'mode': 'renewable',
+            'status': 'expired',
+          }
+        };
+        expect(userProvider.subscription.isActive, false);
+        // The nominal tier is kept for history.
+        expect(userProvider.subscription.tier, SubscriptionTier.ultra);
+      });
+
+      test('Anonymous Account (Free even with a paid map)', () {
+        userProvider.userData = {
+          'accountType': 'anonymous',
+          'subscription': {
+            'tier': 'ultra',
+            'mode': 'lifetime',
+            'status': 'active',
+          }
+        };
+        expect(userProvider.subscription.isActive, false);
+        expect(userProvider.subscription.effectiveTier, SubscriptionTier.free);
       });
     });
   });

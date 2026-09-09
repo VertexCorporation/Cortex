@@ -1,7 +1,6 @@
 // lib/chat/providers/session.dart
 
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/chat/services/limit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/utils.dart';
 import '../../library/providers/local.dart';
+import '../../server/subscription.dart';
 import '../../variants.dart';
 import '../services/storage.dart';
 
@@ -706,63 +706,20 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   void updateUserData(Map<String, dynamic> data) {
-    final int subscriptionLevel = _activeSubscriptionLevelFrom(data);
-    _isUserSubscribed = subscriptionLevel > 0;
+    final entitlement = SubscriptionEntitlement.fromUserData(
+      data,
+      isAnonymous: (FirebaseAuth.instance.currentUser?.isAnonymous ?? false) ||
+          data['accountType'] == 'anonymous',
+    );
+    _isUserSubscribed = entitlement.isPaid;
 
     _displayName =
         data['displayName'] as String? ?? data['username'] as String?;
     _email = data['email'] as String?;
 
-    final dynamic expiresValue = data['subscriptionExpiresAt'];
-    Timestamp? subscriptionExpiresAt;
-    if (expiresValue is Timestamp) {
-      subscriptionExpiresAt = expiresValue;
-    } else if (expiresValue is String) {
-      final parsedDate = DateTime.tryParse(expiresValue);
-      if (parsedDate != null) {
-        subscriptionExpiresAt = Timestamp.fromDate(parsedDate);
-      }
-    }
-
-    _chatLimitManager = ChatLimitManager(
-      cortexSubscription: subscriptionLevel,
-      subscriptionExpiresAt: subscriptionExpiresAt,
-    );
+    _chatLimitManager = ChatLimitManager(subscription: entitlement);
 
     notifyListeners();
-  }
-
-  int _parseSubscriptionLevel(dynamic value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
-  }
-
-  Timestamp? _parseSubscriptionTimestamp(dynamic value) {
-    if (value is Timestamp) return value;
-    if (value is DateTime) return Timestamp.fromDate(value);
-    if (value is String) {
-      final parsedDate = DateTime.tryParse(value);
-      if (parsedDate != null) {
-        return Timestamp.fromDate(parsedDate);
-      }
-    }
-    return null;
-  }
-
-  int _activeSubscriptionLevelFrom(Map<String, dynamic> data) {
-    final user = FirebaseAuth.instance.currentUser;
-    final isAnonymous =
-        (user?.isAnonymous ?? false) || data['accountType'] == 'anonymous';
-    if (isAnonymous) return 0;
-
-    final level = _parseSubscriptionLevel(data['hasCortexSubscription']);
-    if (level <= 0) return 0;
-
-    final expiry = _parseSubscriptionTimestamp(data['subscriptionExpiresAt']);
-    if (expiry == null) return level >= 4 && level <= 6 ? level : 0;
-    return expiry.toDate().isAfter(DateTime.now()) ? level : 0;
   }
 
   void setStorageSufficient(bool isSufficient) {

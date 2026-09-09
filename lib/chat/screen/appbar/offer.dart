@@ -65,7 +65,7 @@ class _ClaimOfferButtonState extends State<ClaimOfferButton>
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
     final funds = context.watch<FundsBackend>();
-    if (funds.currentUserSubscriptionLevel > 0) {
+    if (funds.subscription.isPaid) {
       return const SizedBox.shrink();
     }
     final shouldUseSpecialOfferCopy = funds.shouldShowSpecialOfferEntryPoint;

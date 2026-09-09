@@ -2143,4 +2143,51 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Odemkněte více možností';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Přejděte na Cortex Premium a získejte přístup k tomuto výkonnému modelu AI a dalším možnostem.';
+
+  @override
+  String get premiumChatGateCta => 'Přejít na Premium';
+
+  @override
+  String get testPurchaseTitle => 'Testovací nákup';
+
+  @override
+  String get testPurchaseBadge => 'TEST';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Simulovaná platba pro testování — žádná skutečná platba nebude provedena. Získáte tak přístup k $plan na dobu $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Dokončit testovací nákup';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes minut';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Testovací režim: nákupy jsou simulované a poskytují krátkodobé testovací nároky — skutečná platba se nikdy neprovádí.';
+
+  @override
+  String get testSubscriptionManage => 'Zrušit testovací předplatné';
+
+  @override
+  String get testPurchaseSuccess => 'Testovací předplatné je nyní aktivní.';
+
+  @override
+  String get testPurchaseRevoked => 'Testovací předplatné bylo zrušeno.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Testovací nákup se nezdařil: $message';
+  }
 }

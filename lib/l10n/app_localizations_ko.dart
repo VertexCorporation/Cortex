@@ -2097,4 +2097,51 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => '더 많은 기능 이용하기';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Cortex Premium으로 업그레이드하여 이 강력한 AI 모델과 더 많은 기능을 이용하세요.';
+
+  @override
+  String get premiumChatGateCta => 'Premium 가입';
+
+  @override
+  String get testPurchaseTitle => '테스트 구매';
+
+  @override
+  String get testPurchaseBadge => '테스트';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return '테스트용 시뮬레이션 결제입니다 — 실제 결제가 청구되지 않습니다. $duration 동안 $plan 액세스 권한이 부여됩니다.';
+  }
+
+  @override
+  String get testPurchaseConfirm => '테스트 구매 완료';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes분';
+  }
+
+  @override
+  String get testModeInfo =>
+      '테스트 모드: 구매는 시뮬레이션되며 단기 테스트 권한을 부여합니다 — 실제 결제는 절대 발생하지 않습니다.';
+
+  @override
+  String get testSubscriptionManage => '테스트 구독 취소';
+
+  @override
+  String get testPurchaseSuccess => '테스트 구독이 활성화되었습니다.';
+
+  @override
+  String get testPurchaseRevoked => '테스트 구독이 취소되었습니다.';
+
+  @override
+  String testPurchaseError(String message) {
+    return '테스트 구매 실패: $message';
+  }
 }

@@ -256,7 +256,7 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
               start: 0.2,
               end: 0.7,
               child: Text(
-                "Sınırları Kaldırın!",
+                loc.premiumChatGateTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: textColor,
@@ -275,7 +275,7 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: w * 0.02),
                 child: Text(
-                  "Bu güçlü yapay zeka modeline ve çok daha fazlasına sınırsız erişim sağlamak için Cortex Premium'a geçiş yapın.",
+                  loc.premiumChatGateDescription,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: subTextColor,
@@ -287,7 +287,7 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
             ),
             SizedBox(height: w * 0.08),
 
-            // Primary Button (Premium'u İncele)
+            // Primary subscription button
             _buildAnimatedItem(
               start: 0.4,
               end: 0.9,
@@ -329,7 +329,7 @@ class _PremiumBottomSheetContentState extends State<PremiumBottomSheetContent>
                               children: [
                                 Flexible(
                                   child: Text(
-                                    "Premium'a Katıl",
+                                    loc.premiumChatGateCta,
                                     style: TextStyle(
                                       color: AppColors.premium,
                                       fontSize: w * 0.045,

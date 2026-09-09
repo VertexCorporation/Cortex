@@ -1,6 +1,7 @@
 part of 'input.dart';
 
 class _SendButtonSection extends StatelessWidget {
+  final double? recordingProgress;
   final double screenWidth;
   final bool isTablet;
   final InputField widget;
@@ -9,6 +10,7 @@ class _SendButtonSection extends StatelessWidget {
   final TextEditingController controller;
 
   const _SendButtonSection({
+    this.recordingProgress,
     required this.screenWidth,
     required this.isTablet,
     required this.widget,
@@ -48,6 +50,7 @@ class _SendButtonSection extends StatelessWidget {
         isActionPermitted: isActionPermitted,
         isSending: widget.isSending,
         isRecording: inputProvider.isVoiceRecording,
+        recordingProgress: recordingProgress,
         isTextEmpty: controller.text.trim().isEmpty,
         onSend: widget.onSend,
         onStop: effectiveOnStop,

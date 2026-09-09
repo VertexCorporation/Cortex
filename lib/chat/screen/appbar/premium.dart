@@ -9,10 +9,18 @@ import 'package:cortex/theme.dart';
 
 class PremiumButton extends StatefulWidget {
   final VoidCallback onTap;
+  final String label;
+  final String iconPath;
+  final double? height;
+  final double? radius;
 
   const PremiumButton({
     super.key,
     required this.onTap,
+    this.label = "Cortex Premium",
+    this.iconPath = "assets/icons/sparkle.svg",
+    this.height,
+    this.radius,
   });
 
   @override
@@ -71,11 +79,11 @@ class _PremiumButtonState extends State<PremiumButton>
 
     final double scale = (screenWidth / 375.0).clamp(0.85, 1.2);
 
-    final double buttonHeight = 36.0 * scale;
+    final double buttonHeight = widget.height ?? 36.0 * scale;
     final double fontSize = 13.0 * scale;
     final double paddingH = 14.0 * scale;
     final double gap = 6.0 * scale;
-    final double borderRadius = 36.0 * scale;
+    final double borderRadius = widget.radius ?? 36.0 * scale;
     final double borderWidth = 0.8 * scale;
 
     final Color baseColor = AppColors.premium.withValues(alpha: 0.15);
@@ -113,7 +121,7 @@ class _PremiumButtonState extends State<PremiumButton>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SvgPicture.asset(
-                        'assets/icons/sparkle.svg',
+                        widget.iconPath,
                         colorFilter: ColorFilter.mode(
                           contentColor,
                           BlendMode.srcIn,
@@ -123,8 +131,10 @@ class _PremiumButtonState extends State<PremiumButton>
                       ),
                       SizedBox(width: gap),
                       Flexible(
+                        child: FittedBox(
+                        fit: BoxFit.scaleDown,
                         child: Text(
-                          "Cortex Premium",
+                          widget.label,
                           style: TextStyle(
                             fontSize: fontSize,
                             fontWeight: FontWeight.w500,
@@ -132,7 +142,8 @@ class _PremiumButtonState extends State<PremiumButton>
                             color: contentColor,
                           ),
                           maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
                         ),
                       ),
                     ],

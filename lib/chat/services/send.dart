@@ -1379,6 +1379,7 @@ class SendService {
           'audio' => MediaGenerationType.audio,
           'image' => MediaGenerationType.image,
           'video' => MediaGenerationType.video,
+          'document' => MediaGenerationType.document,
           _ => MediaGenerationType.none,
         };
         if (mediaType == MediaGenerationType.none) return;

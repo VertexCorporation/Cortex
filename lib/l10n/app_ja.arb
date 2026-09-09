@@ -884,5 +884,21 @@
   "workInProgress": "進行中",
   "wrongPassword": "パスワードが正しくありません。",
   "yes": "はい",
-  "you": "あなた"
+  "you": "あなた",
+  "premiumChatGateTitle": "もっと多くの機能を利用",
+  "premiumChatGateDescription": "Cortex Premiumにアップグレードして、この高性能AIモデルやその他の機能をご利用ください。",
+  "premiumChatGateCta": "Premiumに登録",
+  "testPurchaseTitle": "テスト購入",
+  "testPurchaseBadge": "テスト",
+  "testPurchaseNotice": "テスト用のシミュレートされた決済です。実際の請求は発生しません。{plan} へのアクセスが {duration} 付与されます。",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "テスト購入を完了",
+  "testDurationMinutes": "{minutes}分",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "テストモード：購入はシミュレートされ、短期間のテスト特権が付与されます。実際の請求は発生しません。",
+  "testSubscriptionManage": "テストサブスクリプションを解約",
+  "testPurchaseSuccess": "テストサブスクリプションが有効になりました。",
+  "testPurchaseRevoked": "テストサブスクリプションを解約しました。",
+  "testPurchaseError": "テスト購入に失敗しました：{message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

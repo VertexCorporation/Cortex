@@ -62,12 +62,12 @@ class AppThemeSection extends StatelessWidget {
     }
   }
 
-  /// Checks if a specific theme is enabled based on the user's active subscription status.
+  /// Checks if a specific theme is enabled based on the user's active tier.
   bool _isThemeEnabled(SettingsGeneralProvider provider, String themeCode) {
-    final int activeUserLevel = provider.activeSubscriptionLevel;
+    final int activeTierIndex = provider.subscription.effectiveTier.planIndex;
     final int requiredLevel = _getRequiredSubscriptionLevelForTheme(themeCode);
 
-    return activeUserLevel >= requiredLevel;
+    return activeTierIndex >= requiredLevel;
   }
 
   /// Sorts themes: Base > Enabled Alphabetical > Locked.

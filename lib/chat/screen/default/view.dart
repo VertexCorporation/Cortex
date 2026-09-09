@@ -1,3 +1,4 @@
+import '../appbar/premium.dart';
 import 'package:cortex/design.dart';
 // lib/chat/screen/default/view.dart
 
@@ -17,10 +18,12 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/select.dart';
 import 'package:cortex/chat/services/generation.dart';
 import 'package:cortex/main.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/login/upgrade.dart';
 import 'package:cortex/app.dart';
+import 'package:cortex/funds/funds.dart';
 
 class ChatEmptyState extends StatefulWidget {
   final double bottomPadding;
@@ -47,9 +50,6 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   // 2.6 Bounce Animation (Cortex Icon Tap)
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
-
-  // 2.7 Rainbow Border Animation
-  late AnimationController _rainbowController;
 
   // 3. Mode Transition Animation (Standard <-> Flux)
   late AnimationController _modeController;
@@ -101,12 +101,6 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       parent: _bounceController,
       curve: Curves.easeInOut,
     ));
-
-    // --- Rainbow Setup ---
-    _rainbowController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat();
 
     // --- Mode Transition Setup ---
     _modeController = AnimationController(
@@ -254,9 +248,11 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // Dynamic generation is routed by the server, independently of the
     // downloadable model catalog (which may still be loading or empty).
     final userProvider = context.read<UserProvider>();
-    final int subLevel = userProvider.activeSubscriptionLevel;
-    // Lifetime or Ultra
-    final bool isUltra = subLevel >= 3;
+    final subscription = userProvider.subscription;
+    // Ultra tier, or any lifetime grant.
+    final bool isUltra = subscription.isActive &&
+        (subscription.tier == SubscriptionTier.ultra ||
+            subscription.mode == SubscriptionMode.lifetime);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -301,7 +297,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
                   isDisabled: false,
-                  isAnimatedRainbowBorder: !isUltra,
+                  usePremiumStyle: !isUltra,
                   onTap: () => _handleGeneration(context, 'video'),
                 ),
               ),
@@ -369,12 +365,28 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     required bool isDisabled,
     required VoidCallback onTap,
     bool isPremiumFeature = false,
-    bool isAnimatedRainbowBorder = false,
+    bool usePremiumStyle = false,
   }) {
+    if (usePremiumStyle) {
+      return SizedBox(
+        width: width,
+        height: height,
+        child: IgnorePointer(
+          ignoring: isDisabled,
+          child: Opacity(
+              opacity: isDisabled ? 0.4 : 1,
+              child: PremiumButton(
+                  onTap: onTap,
+                  label: title,
+                  iconPath: iconPath,
+                  height: height,
+                  radius: borderRadius)),
+        ),
+      );
+    }
     final horizontalPadding = MediaQuery.sizeOf(context).width * 0.018;
 
     final border = BorderRadius.circular(borderRadius);
-    final innerBorder = BorderRadius.circular(borderRadius - 1.5);
 
     final innerContent = Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -424,20 +436,16 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     );
 
     final innerContainer = Ink(
-      width: isAnimatedRainbowBorder ? null : width,
-      height: isAnimatedRainbowBorder ? null : height,
+      width: width,
+      height: height,
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       decoration: BoxDecoration(
-        color: isAnimatedRainbowBorder
-            ? AppColors.background
-            : AppColors.background.withValues(alpha: 0.4),
-        border: isAnimatedRainbowBorder
-            ? null
-            : Border.all(
-                color: AppColors.border,
-                width: 0.5,
-              ),
-        borderRadius: isAnimatedRainbowBorder ? innerBorder : border,
+        color: AppColors.background.withValues(alpha: 0.4),
+        border: Border.all(
+          color: AppColors.border,
+          width: 0.5,
+        ),
+        borderRadius: border,
       ),
       child: innerContent,
     );
@@ -452,37 +460,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
           onTap: isDisabled ? null : onTap,
           splashColor: iconColor.withValues(alpha: 0.14),
           highlightColor: iconColor.withValues(alpha: 0.06),
-          child: isAnimatedRainbowBorder
-              ? AnimatedBuilder(
-                  animation: _rainbowController,
-                  builder: (context, child) {
-                    return Ink(
-                      width: width,
-                      height: height,
-                      padding: const EdgeInsets.all(1.5),
-                      decoration: BoxDecoration(
-                        borderRadius: border,
-                        gradient: SweepGradient(
-                          transform: GradientRotation(
-                              _rainbowController.value * 2 * math.pi),
-                          colors: const [
-                            Color(0xFFFF0080), // Pink
-                            Color(0xFFFF4D4D), // Red
-                            Color(0xFFFFAA00), // Orange
-                            Color(0xFFFFDD00), // Yellow
-                            Color(0xFF00CC76), // Green
-                            Color(0xFF00AAFF), // Cyan
-                            Color(0xFF7B61FF), // Purple
-                            Color(0xFFFF0080), // Pink
-                          ],
-                        ),
-                      ),
-                      child: child,
-                    );
-                  },
-                  child: innerContainer,
-                )
-              : innerContainer,
+          child: innerContainer,
         ),
       ),
     );
@@ -494,6 +472,15 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       if (userProvider.isAnonymous) {
         navigateToScreen(const UpgradeAccountScreen(showLoginFirst: true),
             direction: const Offset(0, 1));
+        return;
+      }
+      final subscription = userProvider.subscription;
+      final bool isUltra = subscription.isActive &&
+          (subscription.tier == SubscriptionTier.ultra ||
+              subscription.mode == SubscriptionMode.lifetime);
+      if (!isUltra) {
+        navigateToScreen(const FundsScreen(initialPlanType: 'ultra'),
+            direction: const Offset(1.0, 0.0));
         return;
       }
     }
@@ -567,7 +554,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _entranceController.dispose();
     _swapController.dispose();
     _bounceController.dispose();
-    _rainbowController.dispose();
+
     _modeController.dispose();
     super.dispose();
   }

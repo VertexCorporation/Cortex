@@ -507,6 +507,10 @@ class ApiService {
                     trackCallback(onMediaGenerating?.call('image'));
                     break;
 
+                  case 'generating_document':
+                    trackCallback(onMediaGenerating?.call('document'));
+                    break;
+
                   case 'generating_video':
                     trackCallback(onMediaGenerating?.call('video'));
                     break;

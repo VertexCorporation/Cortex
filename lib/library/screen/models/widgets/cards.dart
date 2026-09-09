@@ -239,7 +239,7 @@ class _ModelTileState extends State<ModelTile> {
           if (widget.model.isPremium || isOnlineOrRP) {
             final userProvider =
                 Provider.of<UserProvider>(context, listen: false);
-            if (!userProvider.isSubscriptionActive) {
+            if (!userProvider.subscription.isActive) {
               showPremiumBottomSheet(context);
               return;
             }

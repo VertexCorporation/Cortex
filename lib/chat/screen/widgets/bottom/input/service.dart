@@ -6,6 +6,7 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/server/credits.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -311,7 +312,7 @@ class InputService {
     required bool isPremiumModel,
     required bool isSubscribed,
     required bool isVideoModel,
-    required int userTier,
+    required SubscriptionTier userTier,
     required int? totalCredits,
     required int? availablePredits,
     required int? availableDredits,
@@ -321,7 +322,7 @@ class InputService {
       return false;
     }
 
-    if (isVideoModel && userTier != 3 && userTier != 6) {
+    if (isVideoModel && userTier != SubscriptionTier.ultra) {
       return false;
     }
 
@@ -399,7 +400,7 @@ class InputService {
     required bool isPremiumModel,
     required bool isSubscribed,
     required bool isVideoModel,
-    required int userTier,
+    required SubscriptionTier userTier,
     required int? totalCredits,
     required int? availablePredits,
     required int? availableDredits,
@@ -409,7 +410,7 @@ class InputService {
       return false;
     }
 
-    if (isVideoModel && userTier != 3 && userTier != 6) {
+    if (isVideoModel && userTier != SubscriptionTier.ultra) {
       return false;
     }
 

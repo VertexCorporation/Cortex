@@ -293,7 +293,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     final model = _findModelById(modelId);
     if (model != null && model.isPremium && mounted) {
       final userProvider = context.read<UserProvider>();
-      if (!userProvider.isSubscriptionActive) {
+      if (!userProvider.subscription.isActive) {
         showPremiumBottomSheet(context);
         return;
       }

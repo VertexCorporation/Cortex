@@ -2151,4 +2151,51 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Daha çox imkan əldə edin';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Bu güclü süni intellekt modelinə və daha çoxuna giriş üçün Cortex Premium-a keçin.';
+
+  @override
+  String get premiumChatGateCta => 'Premium-a qoşul';
+
+  @override
+  String get testPurchaseTitle => 'Sınaq alışı';
+
+  @override
+  String get testPurchaseBadge => 'TEST';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Sınaq üçün simulyasiya olunmuş ödəniş — real ödəniş aparılmır. Bu, $duration müddətində $plan girişini təmin edir.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Sınaq alışını tamamla';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes dəqiqə';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Test rejimi: alışlar simulyasiya olunur və qısa müddətli test imtiyazları verir — real ödəniş heç vaxt tələb olunmur.';
+
+  @override
+  String get testSubscriptionManage => 'Sınaq abunəliyini ləğv et';
+
+  @override
+  String get testPurchaseSuccess => 'Sınaq abunəliyi artıq aktivdir.';
+
+  @override
+  String get testPurchaseRevoked => 'Sınaq abunəliyi ləğv edildi.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Sınaq alışı alınmadı: $message';
+  }
 }

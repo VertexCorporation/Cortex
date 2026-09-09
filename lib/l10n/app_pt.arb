@@ -884,5 +884,21 @@
   "workInProgress": "Trabalho em andamento",
   "wrongPassword": "Palavra-passe incorreta.",
   "yes": "Sim",
-  "you": "Você"
+  "you": "Você",
+  "premiumChatGateTitle": "Desbloqueie mais possibilidades",
+  "premiumChatGateDescription": "Mude para o Cortex Premium para acessar este poderoso modelo de IA e muito mais.",
+  "premiumChatGateCta": "Assinar Premium",
+  "testPurchaseTitle": "Compra de teste",
+  "testPurchaseBadge": "TESTE",
+  "testPurchaseNotice": "Pagamento simulado para testes — nenhuma cobrança real será feita. Isso concede acesso ao {plan} por {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Concluir compra de teste",
+  "testDurationMinutes": "{minutes} minutos",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Modo de teste: as compras são simuladas e concedem direitos de teste de curta duração — o faturamento real nunca está envolvido.",
+  "testSubscriptionManage": "Cancelar assinatura de teste",
+  "testPurchaseSuccess": "A assinatura de teste agora está ativa.",
+  "testPurchaseRevoked": "Assinatura de teste cancelada.",
+  "testPurchaseError": "Falha na compra de teste: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

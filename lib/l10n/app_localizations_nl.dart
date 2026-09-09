@@ -2161,4 +2161,51 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Ontgrendel meer mogelijkheden';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Upgrade naar Cortex Premium voor toegang tot dit krachtige AI-model en meer.';
+
+  @override
+  String get premiumChatGateCta => 'Word Premium-lid';
+
+  @override
+  String get testPurchaseTitle => 'Testaankoop';
+
+  @override
+  String get testPurchaseBadge => 'TEST';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Gesimuleerde betaling voor testdoeleinden — er wordt niets in rekening gebracht. Dit geeft $plan-toegang voor $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Testaankoop voltooien';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes minuten';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Testmodus: aankopen zijn gesimuleerd en verlenen kortlopende testrechten — echte facturering is nooit betrokken.';
+
+  @override
+  String get testSubscriptionManage => 'Testabonnement opzeggen';
+
+  @override
+  String get testPurchaseSuccess => 'Het testabonnement is nu actief.';
+
+  @override
+  String get testPurchaseRevoked => 'Testabonnement opgezegd.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Testaankoop mislukt: $message';
+  }
 }

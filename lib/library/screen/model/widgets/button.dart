@@ -25,12 +25,10 @@ class BottomActionButtons extends StatelessWidget {
   /// A unified method to handle starting a chat and navigating away.
   void _startChat(BuildContext context, ModelDetailProvider provider) {
     final userProvider = context.read<UserProvider>();
-    final bool isSubscribed = userProvider.isSubscriptionActive;
+    final bool isSubscribed = userProvider.subscription.isActive;
 
-    // For offline series, use the selected variant ID instead of the parent series ID.
-    final String chatModelId = provider.isOfflineSeries
-        ? provider.selectedVariantId
-        : provider.mainModel!.id;
+    // Route the selected model, including mixed-media online families.
+    final String chatModelId = provider.selectedVariantId;
 
     // Enforce Premium Restriction
     final isOnlineOrRP = provider.mainModel!.isServerSide ||
@@ -298,8 +296,7 @@ class BottomActionButtons extends StatelessWidget {
         child: Text(
           buttonText,
           style: TextStyle(
-              fontSize: screenWidth * 0.04,
-              fontWeight: FontWeight.bold),
+              fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold),
         ),
       ),
     );

@@ -1,50 +1,11 @@
 part of 'service.dart';
 
 extension FundsUserData on FundsBackend {
-  int _parseSubscriptionLevel(dynamic value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
-  }
-
-  DateTime? _parseSubscriptionExpiry(dynamic value) {
+  DateTime? _parseTimestamp(dynamic value) {
     if (value is Timestamp) return value.toDate();
     if (value is DateTime) return value;
     if (value is String) return DateTime.tryParse(value);
     return null;
-  }
-
-  int _effectiveSubscriptionLevel({
-    required User user,
-    required Map<String, dynamic>? data,
-  }) {
-    if (data == null) return 0;
-    if (user.isAnonymous || data['accountType'] == 'anonymous') return 0;
-
-    final level = _parseSubscriptionLevel(data['hasCortexSubscription']);
-    if (level <= 0) return 0;
-
-    final expiry = _parseSubscriptionExpiry(data['subscriptionExpiresAt']);
-    if (expiry == null) return level >= 4 && level <= 6 ? level : 0;
-    return expiry.isAfter(DateTime.now()) ? level : 0;
-  }
-
-  String? _inferSubscriptionOption({
-    required int level,
-    required String? option,
-    required String? productId,
-  }) {
-    if (option == 'monthly' || option == 'annual') return option;
-
-    final normalizedProductId = productId?.toLowerCase() ?? '';
-    if (normalizedProductId.contains('annual')) return 'annual';
-    if (normalizedProductId.contains('monthly')) return 'monthly';
-
-    // If the server says the account is subscribed but the store metadata is
-    // unavailable on this device, still show the active plan instead of making
-    // the Funds screen look unsubscribed.
-    return level > 0 ? 'monthly' : null;
   }
 
   void _syncSpecialOfferStateFromUserData({
@@ -52,7 +13,7 @@ extension FundsUserData on FundsBackend {
     required Map<String, dynamic>? data,
   }) {
     final shouldSuppressOffer =
-        data == null || user.isAnonymous || _currentUserSubscriptionLevel > 0;
+        data == null || user.isAnonymous || _subscription.isPaid;
     if (shouldSuppressOffer) {
       _isSpecialOfferActive = false;
       _isSpecialOfferEligible = false;
@@ -62,7 +23,7 @@ extension FundsUserData on FundsBackend {
     }
 
     final now = DateTime.now();
-    final offerExpiry = _parseSubscriptionExpiry(data['specialOfferExpiresAt']);
+    final offerExpiry = _parseTimestamp(data['specialOfferExpiresAt']);
 
     if (offerExpiry == null) {
       _isSpecialOfferActive = false;
@@ -84,59 +45,46 @@ extension FundsUserData on FundsBackend {
         now.isAfter(offerExpiry.add(const Duration(days: 21)));
   }
 
-  void _listenToUserChanges() {
-    _userSubscription?.cancel();
-    _userSubscription = null;
+  void _resetSubscriptionState() {
+    _subscription = SubscriptionEntitlement.none;
+    _isSpecialOfferActive = false;
+    _isSpecialOfferEligible = false;
+    _specialOfferExpiresAt = null;
+  }
 
-    final user = _auth.currentUser;
-
-    if (user == null) {
-      _currentUserSubscriptionLevel = 0;
-      _activeSubscriptionOption = null;
-      _activeSubscriptionProductId = null;
-      _isSpecialOfferActive = false;
-      _isSpecialOfferEligible = false;
-      _specialOfferExpiresAt = null;
+  /// Attaches to the shared UserProvider instead of opening a second
+  /// `users/{uid}` snapshot. The provider owns the single Firestore listener;
+  /// the backend reacts to its change notifications.
+  void _attachUserProvider() {
+    final provider = _userProvider;
+    if (provider == null) {
+      _resetSubscriptionState();
       _notify();
       return;
     }
 
-    _userSubscription = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .snapshots()
-        .listen((snapshot) {
-      if (!snapshot.exists) {
-        _currentUserSubscriptionLevel = 0;
-        _activeSubscriptionOption = null;
-        _activeSubscriptionProductId = null;
-        _syncSpecialOfferStateFromUserData(user: user, data: null);
-      } else {
-        final data = snapshot.data();
-        _currentUserSubscriptionLevel = _effectiveSubscriptionLevel(
-          user: user,
-          data: data,
-        );
-        _syncSpecialOfferStateFromUserData(user: user, data: data);
+    provider.removeListener(_onUserDataChanged);
+    provider.addListener(_onUserDataChanged);
+    _onUserDataChanged();
+  }
 
-        if (_currentUserSubscriptionLevel > 0) {
-          _activeSubscriptionProductId =
-              data?['activeSubscriptionProductId']?.toString();
-          _activeSubscriptionOption = _inferSubscriptionOption(
-            level: _currentUserSubscriptionLevel,
-            option: data?['activeSubscriptionOption']?.toString(),
-            productId: _activeSubscriptionProductId,
-          );
-        } else {
-          _activeSubscriptionProductId = null;
-          _activeSubscriptionOption = null;
-        }
-      }
+  /// Reacts to UserProvider updates (live snapshots, cache loads, sign-out).
+  void _onUserDataChanged() {
+    final user = _auth.currentUser;
+    final provider = _userProvider;
+
+    if (user == null || provider == null || provider.userData == null) {
+      _resetSubscriptionState();
       _notify();
-    }, onError: (error) {
-      if (error.toString().contains("permission-denied")) {
-        _userSubscription?.cancel();
-      }
-    });
+      return;
+    }
+
+    final data = provider.userData;
+    _subscription = SubscriptionEntitlement.fromUserData(
+      data,
+      isAnonymous: user.isAnonymous || data?['accountType'] == 'anonymous',
+    );
+    _syncSpecialOfferStateFromUserData(user: user, data: data);
+    _notify();
   }
 }

@@ -256,6 +256,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
         if (_selectedCategory == 'categoryFree') return !m.isPremium;
         if (_selectedCategory == 'categoryPremium') return m.isPremium;
         if (_selectedCategory == 'categoryVideo') {
+          if (m.supportsOutput('video')) return true;
           final t = m.displayTitle.toLowerCase();
           final id = m.id.toLowerCase();
           return t.contains('video') ||
@@ -265,6 +266,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
               t.contains('veo');
         }
         if (_selectedCategory == 'categoryPhoto') {
+          if (m.supportsOutput('image')) return true;
           final t = m.displayTitle.toLowerCase();
           final id = m.id.toLowerCase();
           return t.contains('image') ||

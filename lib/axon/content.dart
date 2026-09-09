@@ -90,7 +90,7 @@ class AxonContent extends StatelessWidget {
     final isAnonymous =
         context.select<UserProvider, bool>((u) => u.isAnonymous);
     final isSubscribed =
-        context.select<UserProvider, bool>((u) => u.isSubscriptionActive);
+        context.select<UserProvider, bool>((u) => u.subscription.isActive);
     final shouldShowSpecialOfferEntryPoint = context
         .select<FundsBackend, bool>((f) => f.shouldShowSpecialOfferEntryPoint);
     final hasFreeTrial =
@@ -386,8 +386,8 @@ class AxonContent extends StatelessWidget {
             right: horizontalPadding,
             bottom: screenHeight * 0.03,
             child: Material(
-              color: AppColors.background,
-              shape: StadiumBorder(side: BorderSide(color: AppColors.border)),
+              color: AppColors.primaryColor.inverted,
+              shape: StadiumBorder(side: BorderSide(color: AppColors.primaryColor.inverted)),
               elevation: 0,
               shadowColor: Colors.black54,
               clipBehavior: Clip.antiAlias,
@@ -397,6 +397,7 @@ class AxonContent extends StatelessWidget {
                   onNewChatTap();
                 },
                 customBorder: const StadiumBorder(),
+                splashFactory: InkRipple.splashFactory,
                 splashColor: AppColors.primaryColor.withValues(alpha: 0.15),
                 highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
                 child: Padding(
@@ -412,7 +413,7 @@ class AxonContent extends StatelessWidget {
                         width: CortexDesign.icon,
                         height: CortexDesign.icon,
                         colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.inverted,
+                          AppColors.primaryColor,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -420,7 +421,7 @@ class AxonContent extends StatelessWidget {
                       Text(
                         localizations.newChat,
                         style: TextStyle(
-                          color: AppColors.primaryColor.inverted,
+                          color: AppColors.primaryColor,
                           fontSize: referenceWidth * 0.04,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inter',

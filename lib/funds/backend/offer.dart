@@ -18,7 +18,7 @@ extension FundsSpecialOffer on FundsBackend {
     if (cachedState != null) {
       final user = _auth.currentUser;
       final shouldSuppressOffer =
-          (user?.isAnonymous ?? false) || _currentUserSubscriptionLevel > 0;
+          (user?.isAnonymous ?? false) || _subscription.isPaid;
       _isSpecialOfferActive = shouldSuppressOffer
           ? false
           : cachedState['specialOfferActive'] ?? false;
@@ -44,7 +44,7 @@ extension FundsSpecialOffer on FundsBackend {
       return;
     }
 
-    if (user.isAnonymous || _currentUserSubscriptionLevel > 0) {
+    if (user.isAnonymous || _subscription.isPaid) {
       _isSpecialOfferActive = false;
       _isSpecialOfferEligible = false;
       _specialOfferExpiresAt = null;

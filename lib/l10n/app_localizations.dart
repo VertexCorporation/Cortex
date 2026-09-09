@@ -3932,6 +3932,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Female voices'**
   String get voiceFemale;
+
+  /// No description provided for @premiumChatGateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock more'**
+  String get premiumChatGateTitle;
+
+  /// No description provided for @premiumChatGateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Cortex Premium to access this powerful AI model and more.'**
+  String get premiumChatGateDescription;
+
+  /// No description provided for @premiumChatGateCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Premium'**
+  String get premiumChatGateCta;
+
+  /// No description provided for @testPurchaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Purchase'**
+  String get testPurchaseTitle;
+
+  /// No description provided for @testPurchaseBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'TEST'**
+  String get testPurchaseBadge;
+
+  /// No description provided for @testPurchaseNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulated checkout for testing — no real charge is made. This grants {plan} access for {duration}.'**
+  String testPurchaseNotice(String plan, String duration);
+
+  /// No description provided for @testPurchaseConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Test Purchase'**
+  String get testPurchaseConfirm;
+
+  /// No description provided for @testDurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} minutes'**
+  String testDurationMinutes(int minutes);
+
+  /// No description provided for @testModeInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Test mode: purchases are simulated and grant short-lived test entitlements — real billing is never involved.'**
+  String get testModeInfo;
+
+  /// No description provided for @testSubscriptionManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Test Subscription'**
+  String get testSubscriptionManage;
+
+  /// No description provided for @testPurchaseSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Test subscription is now active.'**
+  String get testPurchaseSuccess;
+
+  /// No description provided for @testPurchaseRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Test subscription cancelled.'**
+  String get testPurchaseRevoked;
+
+  /// No description provided for @testPurchaseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Test purchase failed: {message}'**
+  String testPurchaseError(String message);
 }
 
 class _AppLocalizationsDelegate

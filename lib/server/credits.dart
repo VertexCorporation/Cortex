@@ -1,9 +1,10 @@
 // lib/server/credits.dart
 
-import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+
+import 'subscription.dart';
+import 'user.dart';
 
 /// The access bands of the daily credit engine, mirroring `ACCESS` in
 /// functions/src/credits.js. The strings are the server's, not ours, so a
@@ -48,7 +49,7 @@ class CreditsManager {
   /// engine. Migration is lazy and per-user, so both systems are live at once
   /// and every gate has to ask which one it is looking at.
   final ValueNotifier<bool> billingV2Notifier = ValueNotifier<bool>(false);
-  int _subscriptionLevel = 0;
+  String _subscriptionTier = 'free';
 
   /// Whether the daily credit engine is the one billing this account. Set by
   /// the server the first time it renews the allowance, so it turns on for a
@@ -123,13 +124,12 @@ class CreditsManager {
     if (billingV2Notifier.value) {
       return (spendableNotifier.value ?? 0) >= minTextBalance;
     }
-    const allowances = <int, int>{0: 100, 1: 500, 2: 1000, 3: 10000};
-    final allowance = allowances[_subscriptionLevel] ?? allowances[0]!;
+    final allowance = _dailyGrants[_subscriptionTier] ?? _dailyGrants['free']!;
     return (totalCreditsNotifier.value ?? 0) > -allowance;
   }
 
   // --- Internal State ---
-  StreamSubscription? _creditsSubscription;
+  UserProvider? _userProvider;
   String? _activeUid;
   int _listenerGeneration = 0;
 
@@ -153,32 +153,14 @@ class CreditsManager {
     return fallback;
   }
 
-  /// Mirrors `resolveTier` in functions/src/credits.js. Levels 4-6 are lifetime
-  /// grants and carry no expiry; 1-3 lapse back to free.
+  /// Resolves the effective tier from the nested `subscription` map.
+  /// Terminal statuses (expired/revoked) and lapsed renewables resolve to
+  /// 'free'; lifetime entitlements have no expiry and stay active.
   String _resolveTier(Map<String, dynamic> data) {
-    final level = _readInt(data['hasCortexSubscription'], 0);
-    if (level == 0) return 'free';
-
-    final lifetime = level >= 4 && level <= 6;
-    if (!lifetime) {
-      final raw = data['subscriptionExpiresAt'];
-      final expiry = raw is Timestamp ? raw.toDate() : null;
-      if (expiry == null || !expiry.isAfter(DateTime.now())) return 'free';
-    }
-
-    switch (level) {
-      case 1:
-      case 4:
-        return 'plus';
-      case 2:
-      case 5:
-        return 'pro';
-      case 3:
-      case 6:
-        return 'ultra';
-      default:
-        return 'free';
-    }
+    return SubscriptionEntitlement.fromUserData(
+      data,
+      isAnonymous: data['accountType'] == 'anonymous',
+    ).effectiveTier.value;
   }
 
   /// Mirrors `accessFor` in functions/src/credits.js. The floor is measured on
@@ -210,12 +192,13 @@ class CreditsManager {
         currentUid != uid;
   }
 
-  /// Initializes the credit listener.
+  /// Initializes the credit engine.
   /// Call this once when the user logs in.
-  void listenToCredits() {
+  void listenToCredits(UserProvider userProvider) {
     // Cancel any existing listener before starting a new one.
     _listenerGeneration++;
-    _creditsSubscription?.cancel();
+    _userProvider?.removeListener(_onUserDataChanged);
+    _userProvider = userProvider;
 
     final user = FirebaseAuth.instance.currentUser;
     _activeUid = user?.uid;
@@ -228,36 +211,46 @@ class CreditsManager {
       return;
     }
 
-    final uid = user.uid;
-    final generation = _listenerGeneration;
-
     // Set to null to indicate that we are now fetching data for a new user.
     totalCreditsNotifier.value = null;
     preditsNotifier.value = null;
     dreditsNotifier.value = null;
     spendableNotifier.value = null;
 
-    // Listen to the user's document for real-time changes.
-    _creditsSubscription = FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .snapshots()
-        .listen((snapshot) {
-      if (_isStaleListener(generation, uid)) {
-        debugPrint("CreditsManager: Ignored stale credit snapshot for $uid.");
-        return;
-      }
+    userProvider.addListener(_onUserDataChanged);
+    _onUserDataChanged();
+  }
 
-      if (snapshot.exists) {
-        final data = snapshot.data() ?? {};
-        final billingV2 = data['billingV2'] == true;
-        final creditsV3 = data['creditsV3'] == true;
-        final main = _readInt(data['credits'], 0);
-        _subscriptionLevel = _readInt(data['hasCortexSubscription'], 0);
-        billingV2Notifier.value = billingV2;
-        creditsV3Notifier.value = creditsV3;
+  /// Reacts to UserProvider updates (live snapshots, cache loads, sign-out).
+  ///
+  /// Only UserProvider holds the `users/{uid}` snapshot; this manager
+  /// consumes the same document data through its change notifications.
+  void _onUserDataChanged() {
+    final uid = _activeUid;
+    if (uid == null || _isStaleListener(_listenerGeneration, uid)) {
+      debugPrint("CreditsManager: Ignored stale user data update.");
+      return;
+    }
 
-        if (creditsV3) {
+    final data = _userProvider?.userData;
+    if (data == null) {
+      debugPrint("CreditsManager: No user data available for $uid yet.");
+      totalCreditsNotifier.value = 0;
+      preditsNotifier.value = 0;
+      dreditsNotifier.value = 0;
+      spendableNotifier.value = 0;
+      _resetEngineFlags();
+      return;
+    }
+
+    final billingV2 = data['billingV2'] == true;
+    final creditsV3 = data['creditsV3'] == true;
+    final main = _readInt(data['credits'], 0);
+    _subscriptionTier = _resolveTier(data);
+    billingV2Notifier.value = billingV2;
+    creditsV3Notifier.value = creditsV3;
+
+    if (creditsV3) {
           // One balance: the daily allowance plus whatever was purchased.
           // `credits` is the wallet and never renews, which is why the two are
           // kept apart on the server and only added up for display here.
@@ -306,36 +299,13 @@ class CreditsManager {
           debugPrint(
               "Balances updated: Credits=${totalCreditsNotifier.value}, Predits=${preditsNotifier.value}, Dredits=${dreditsNotifier.value}");
         }
-      } else {
-        // User document doesn't exist yet, so they have 0 credits.
-        debugPrint("CreditsManager: User document does not exist for $uid.");
-        totalCreditsNotifier.value = 0;
-        preditsNotifier.value = 0;
-        dreditsNotifier.value = 0;
-        spendableNotifier.value = 0;
-        _resetEngineFlags();
-      }
-    }, onError: (error) {
-      if (_isStaleListener(generation, uid)) {
-        debugPrint("CreditsManager: Ignored stale credit error for $uid.");
-        return;
-      }
-
-      debugPrint("Error listening to credits: $error");
-      // On error, we might want to set to a known state, like 0.
-      totalCreditsNotifier.value = 0;
-      preditsNotifier.value = 0;
-      dreditsNotifier.value = 0;
-      spendableNotifier.value = 0;
-      _resetEngineFlags();
-    });
   }
 
   /// Call this when the user logs out to clean up resources.
   void dispose() {
     _listenerGeneration++;
-    _creditsSubscription?.cancel();
-    _creditsSubscription = null;
+    _userProvider?.removeListener(_onUserDataChanged);
+    _userProvider = null;
     _activeUid = null;
     totalCreditsNotifier.value = null; // Reset to null on dispose
     preditsNotifier.value = null;
