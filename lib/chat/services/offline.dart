@@ -634,7 +634,7 @@ class OfflineService {
           _deliverVisibleChunk(tail);
         }
         final parsedOutput = ReasoningText.parse(_deliveredOutput.toString());
-        if (parsedOutput.isReasoningOpen) _deliverVisibleChunk('</think>');
+        if (parsedOutput.isReasoningOpen) _deliverVisibleChunk(parsedOutput.closingMarkup);
         if ((call.arguments as Map)['error'] != null) {
           _deliverVisibleChunk('\n[Error: Local generation failed. Please retry.]');
         } else if (parsedOutput.hasReasoning && parsedOutput.answer.trim().isEmpty) {
