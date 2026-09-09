@@ -4,14 +4,16 @@ import android.llama.cpp.LLamaAndroid
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instance) : ViewModel() {
 
     private val tag: String? = this::class.simpleName
 
-    private var currentMessage: String = ""
+    private var generationJob: Job? = null
 
     override fun onCleared() {
         super.onCleared()
@@ -39,20 +41,13 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
 
     fun stop() {
         Log.d(tag, "ViewModel received stop command.")
-        viewModelScope.launch {
-            try {
-                llamaAndroid.requestStop()
-            } catch (e: Throwable) {
-                Log.e(tag, "Error stopping llama: ${e.message}")
-            }
-        }
-    }
-
-    fun updateMessage(newMessage: String) {
-        currentMessage = newMessage
+        llamaAndroid.requestStop()
+        generationJob?.cancel()
     }
 
     fun send(
+        requestId: String,
+        text: String,
         photoBase64: String?,
         temp: Float,
         topP: Float,
@@ -65,16 +60,13 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         mirostatEta: Float = 0.1f,
         debugPerf: Boolean = false
     ) {
-        val text = currentMessage
-        currentMessage = ""
-
-        viewModelScope.launch {
-            if (photoBase64 != null && photoBase64.isNotEmpty()) {
-                llamaAndroid.setImage(photoBase64)
-            }
-
+        val previous = generationJob
+        llamaAndroid.requestStop()
+        generationJob = viewModelScope.launch {
+            var error: String? = null
             try {
-
+                previous?.cancelAndJoin()
+                if (!photoBase64.isNullOrEmpty()) llamaAndroid.setImage(photoBase64)
                 llamaAndroid.send(
                     message = text,
                     temp = temp,
@@ -88,19 +80,16 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
                     mirostatEta = mirostatEta,
                     debugPerf = debugPerf
                 )
-                    .catch { exception ->
-                        Log.e(tag, "send() failed via Flow", exception)
-                        LlamaService.sendCompletionToFlutter()
-                    }
                     .collect { token ->
-                        LlamaService.sendTokenToFlutter(token)
+                        LlamaService.sendTokenToFlutter(requestId, token)
                     }
-
-                LlamaService.sendCompletionToFlutter()
-
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Log.e(tag, "General error in send() coroutine", e)
-                LlamaService.sendCompletionToFlutter()
+                error = "generation_failed"
+            } finally {
+                LlamaService.sendCompletionToFlutter(requestId, error)
             }
         }
     }

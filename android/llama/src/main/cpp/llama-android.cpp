@@ -645,6 +645,7 @@ if (!la_int_var_inc) la_int_var_inc = env->GetMethodID(la_int_var, "inc", "()V")
 // check that batch has tokens before sampling
 if (batch->n_tokens == 0) {
     LOGe("completion_loop() called with empty batch");
+    env->ThrowNew(env->FindClass("java/lang/IllegalStateException"), "Empty decode batch");
     return nullptr;
 }
 
@@ -694,6 +695,9 @@ if (env->ExceptionCheck()) {
 if (llama_decode(context, *batch) != 0) {
     LOGe("llama_decode() returned null");
     if (new_token) env->DeleteLocalRef(new_token);
+    llama_kv_self_clear(context);
+    g_cached_sequence_tokens.clear();
+    env->ThrowNew(env->FindClass("java/lang/IllegalStateException"), "Token decode failed");
     return nullptr;
 }
 

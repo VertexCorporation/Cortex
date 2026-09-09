@@ -172,6 +172,7 @@ class MainActivity : FlutterFragmentActivity() {
 
                         val intent = Intent(this, LlamaService::class.java).apply {
                             putExtra("action", "sendMessage")
+                            putExtra("requestId", call.argument<String>("requestId"))
                             putExtra("message", msg)
                             putExtra("photoPath", photoPath ?: "")
                             putExtra("temp", temp)

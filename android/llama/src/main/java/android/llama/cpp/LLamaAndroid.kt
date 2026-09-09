@@ -358,6 +358,9 @@ class LLamaAndroid {
                         if (firstTokenNs == 0L) firstTokenNs = System.nanoTime()
                         if (str.isNotEmpty()) emit(str)
                     }
+                    if (ncur.value >= nlen) {
+                        throw IllegalStateException("Generation reached context capacity")
+                    }
                 } finally {
                     if (debugPerf || state.debugPerf) {
                         val endNs = System.nanoTime()
@@ -378,7 +381,7 @@ class LLamaAndroid {
                     }
                 }
             }
-            else -> Log.e(tag, "send() called but model is not loaded.")
+            else -> throw IllegalStateException("Model is not loaded")
         }
     }.flowOn(runLoop)
 

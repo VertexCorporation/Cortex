@@ -12,6 +12,8 @@ import 'package:cortex/chat/services/metrics.dart';
 /// into meaningful state changes within the `ConversationProvider` and orchestrates
 /// related side-effects like auto-scrolling.
 class ResponseService {
+  String? get conversationId => _conversationProvider.conversationID;
+
   final ConversationProvider _conversationProvider;
   final ScrollService _scrollService;
 

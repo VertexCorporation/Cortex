@@ -23,11 +23,11 @@ class LlamaService : Service() {
         private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
         @JvmStatic
-        fun sendTokenToFlutter(token: String) {
+        fun sendTokenToFlutter(requestId: String, token: String) {
             if (isChannelInitialized) {
                 mainHandler.post {
                     try {
-                        resultChannel.invokeMethod("onMessageResponse", token)
+                        resultChannel.invokeMethod("onMessageResponse", mapOf("requestId" to requestId, "token" to token))
                     } catch (e: Exception) {
                         Log.e("LlamaService", "Error sending token to Flutter: ${e.message}")
                     }
@@ -36,11 +36,11 @@ class LlamaService : Service() {
         }
 
         @JvmStatic
-        fun sendCompletionToFlutter() {
+        fun sendCompletionToFlutter(requestId: String, error: String? = null) {
             if (isChannelInitialized) {
                 mainHandler.post {
                     try {
-                        resultChannel.invokeMethod("onMessageComplete", null)
+                        resultChannel.invokeMethod("onMessageComplete", mapOf("requestId" to requestId, "error" to error))
                     } catch (e: Exception) {
                         Log.e("LlamaService", "Error sending completion to Flutter: ${e.message}")
                     }
@@ -87,6 +87,7 @@ class LlamaService : Service() {
     }
 
     private lateinit var viewModel: MainViewModel
+    private var preparationJob: Job? = null
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate() {
@@ -138,6 +139,7 @@ class LlamaService : Service() {
                     val debugPerf = it.getBooleanExtra("debugPerf", false)
 
                     sendMessage(
+                        it.getStringExtra("requestId") ?: "",
                         message,
                         photoPath,
                         temp,
@@ -205,6 +207,7 @@ class LlamaService : Service() {
     }
 
     private fun stopGeneration() {
+        preparationJob?.cancel()
         viewModel.stop()
     }
 
@@ -225,6 +228,7 @@ class LlamaService : Service() {
     }
 
     private fun sendMessage(
+        requestId: String,
         message: String?,
         photoPath: String?,
         temp: Float,
@@ -239,9 +243,8 @@ class LlamaService : Service() {
         debugPerf: Boolean = false
     ) {
         val safeMessage = message ?: ""
-        serviceScope.launch {
-            viewModel.updateMessage(safeMessage)
-
+        stopGeneration()
+        preparationJob = serviceScope.launch {
             var photoBase64: String? = null
 
             if (!photoPath.isNullOrBlank()) {
@@ -262,6 +265,8 @@ class LlamaService : Service() {
             }
             // Trigger the generation
             viewModel.send(
+                requestId,
+                safeMessage,
                 photoBase64,
                 temp,
                 topP,

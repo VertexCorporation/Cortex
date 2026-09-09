@@ -6,6 +6,7 @@ class LlamaService: NSObject, FlutterPlugin {
     private var llamaContext: LlamaContext?
     private var loadedModelPath: String?
     private var resultChannel: FlutterMethodChannel?
+    private var generationTask: Task<Void, Never>?
 
     static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
@@ -24,8 +25,11 @@ class LlamaService: NSObject, FlutterPlugin {
         case "sendMessage":
             sendMessage(call, result: result)
         case "stopGeneration":
+            generationTask?.cancel()
+            let pending = generationTask
             Task {
                 await self.llamaContext?.stop()
+                await pending?.value
                 DispatchQueue.main.async { result(nil) }
             }
         case "releaseModel":
@@ -172,6 +176,7 @@ class LlamaService: NSObject, FlutterPlugin {
         }
 
         let photoPath = args["photoPath"] as? String
+        let requestId = args["requestId"] as? String ?? ""
         let temp = floatArgument(args, "temp", default: 0.7)
         let topP = floatArgument(args, "topP", default: 0.95)
         let topK = int32Argument(args, "topK", default: 40)
@@ -197,8 +202,13 @@ class LlamaService: NSObject, FlutterPlugin {
 
         result(nil)
 
-        Task(priority: .userInitiated) {
+        let previous = generationTask
+        previous?.cancel()
+        generationTask = Task(priority: .userInitiated) {
+            await previous?.value
+            guard !Task.isCancelled else { return }
             let requestStart = DispatchTime.now().uptimeNanoseconds
+            var generationError: String?
             let photoData: Data?
             if let photoPath = photoPath, !photoPath.isEmpty {
                 photoData = try? Data(contentsOf: URL(fileURLWithPath: photoPath))
@@ -219,6 +229,7 @@ class LlamaService: NSObject, FlutterPlugin {
             )
 
             do {
+                try Task.checkCancellation()
                 let promptStats = try await context.completion_init(
                     text: message,
                     imageData: photoData
@@ -228,7 +239,8 @@ class LlamaService: NSObject, FlutterPlugin {
                 var generatedTokens = 0
 
                 while !(await context.is_done) {
-                    guard let token = await context.completion_loop() else {
+                    try Task.checkCancellation()
+                    guard let token = try await context.completion_loop() else {
                         break
                     }
                     generatedTokens += 1
@@ -239,7 +251,7 @@ class LlamaService: NSObject, FlutterPlugin {
                         DispatchQueue.main.async {
                             self.resultChannel?.invokeMethod(
                                 "onMessageResponse",
-                                arguments: token
+                                arguments: ["requestId": requestId, "token": token]
                             )
                         }
                     }
@@ -260,17 +272,24 @@ class LlamaService: NSObject, FlutterPlugin {
                     enabled: debugPerformance,
                     "[LlamaService][perf] ctx=\(info.nCtx) threads=\(info.nThreads)/\(info.nThreadsBatch) gpu=\(info.nGpuLayers) batch=\(info.nBatch)/\(info.nUbatch) promptTokens=\(promptStats.promptTokens) prefillMs=\(promptStats.prefillMilliseconds) ttftMs=\(timeToFirstToken) generationTps=\(tokensPerSecond) cache=\(cacheStatus) cacheTokens=\(promptStats.cacheHitTokens)"
                 )
+            } catch is CancellationError {
+                await context.stop()
             } catch {
+                generationError = "generation_failed"
                 self.debugPerformanceLog(
                     enabled: debugPerformance,
                     "[LlamaService] Generation failed: \(error.localizedDescription)"
                 )
             }
 
+            let completion: [String: Any] = [
+                "requestId": requestId,
+                "error": generationError.map { $0 as Any } ?? NSNull()
+            ]
             DispatchQueue.main.async {
                 self.resultChannel?.invokeMethod(
                     "onMessageComplete",
-                    arguments: nil
+                    arguments: completion
                 )
             }
         }

@@ -400,7 +400,7 @@ actor LlamaContext {
         )
     }
 
-    func completion_loop() -> String? {
+    func completion_loop() throws -> String? {
         if is_interrupted {
             is_done = true
             return nil
@@ -408,7 +408,14 @@ actor LlamaContext {
 
         guard batch.n_tokens > 0 else {
             is_done = true
-            return nil
+            throw NSError(domain: "LlamaContext", code: 2,
+                          userInfo: [NSLocalizedDescriptionKey: "Empty decode batch"])
+        }
+
+        guard n_cur < n_len else {
+            is_done = true
+            throw NSError(domain: "LlamaContext", code: 3,
+                          userInfo: [NSLocalizedDescriptionKey: "Generation reached context capacity"])
         }
 
         let newTokenID = llama_sampler_sample(sampling, context, -1)
@@ -438,7 +445,8 @@ actor LlamaContext {
             llama_kv_self_clear(context)
             cachedTokens.removeAll(keepingCapacity: true)
             is_done = true
-            return nil
+            throw NSError(domain: "LlamaContext", code: 4,
+                          userInfo: [NSLocalizedDescriptionKey: "Token decode failed"])
         }
         llama_synchronize(context)
 

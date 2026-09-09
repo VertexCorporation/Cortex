@@ -28,6 +28,7 @@ import '../../library/backend/data/format.dart';
 import '../../library/backend/data/defaults.dart';
 import 'context.dart';
 import 'offline_tuning.dart';
+import 'offline_request.dart';
 
 class SamplerPreset {
   final double temperature;
@@ -107,6 +108,11 @@ SamplerPreset creativeSampler(ModelEntity model) {
 }
 
 class OfflineService {
+  OfflineRequest? _request;
+
+  bool _ownsRequest(String requestId) =>
+      _request?.accepts(requestId, _responseService.conversationId) ?? false;
+
   final ResponseService _responseService;
   final ChatSessionProvider _sessionProvider;
   final ModelService _modelService;
@@ -122,6 +128,7 @@ class OfflineService {
   String? _lastVisibleChunk;
   int _lastVisibleChunkRepeatCount = 0;
   bool _forceAbortCurrentStream = false;
+  bool _hasDeliveredOutput = false;
 
   // Repetition guard constants
   static const int _maxHistoryLength = 1024;
@@ -422,6 +429,35 @@ class OfflineService {
     bool ragEnabled = false,
     List<String> ragDocumentIds = const [],
   ]) async {
+    _request?.cancel();
+    final request = OfflineRequest(_responseService.conversationId);
+    _request = request;
+    final requestId = request.id;
+    _currentProcessor = null;
+    try {
+      await _llamaChannel.invokeMethod<void>('stopGeneration');
+      if (!_ownsRequest(requestId)) return;
+      await _sendMessage(requestId, text, photoPath, activeMode,
+          attachmentPaths, ragEnabled, ragDocumentIds);
+    } catch (e) {
+      if (_ownsRequest(requestId)) {
+        _responseService.onMessageResponse('[Error: Local generation failed. Please retry.]');
+        _responseService.finalizeResponse();
+        _request?.cancel();
+      }
+      if (kDebugMode) debugPrint('[OfflineService] Generation failed: $e');
+    }
+  }
+
+  Future<void> _sendMessage(
+    String requestId,
+    String text,
+    String? photoPath,
+    ChatInputMode? activeMode,
+    List<String> attachmentPaths,
+    bool ragEnabled,
+    List<String> ragDocumentIds,
+  ) async {
     final String? modelId = _sessionProvider.modelId;
     if (modelId == null) {
       _responseService.onMessageResponse("[Error: No model selected.]");
@@ -450,6 +486,7 @@ class OfflineService {
       toggleDocumentIds: ragDocumentIds,
       attachmentPaths: attachmentPaths,
     );
+    if (!_ownsRequest(requestId)) return;
 
     // Prepare Prompt
     final String finalPrompt = await _buildFormattedPrompt(
@@ -459,6 +496,7 @@ class OfflineService {
       langCode: langCode,
       ragContext: ragContext,
     );
+    if (!_ownsRequest(requestId)) return;
     if (finalPrompt.isEmpty) {
       _responseService.finalizeResponse();
       return;
@@ -469,7 +507,9 @@ class OfflineService {
       prompt: finalPrompt,
       modelContext: model.context,
     );
+    if (!_ownsRequest(requestId)) return;
     if (!modelReady) {
+      _responseService.onMessageResponse('[Error: Local model could not prepare this conversation. Please retry.]');
       _responseService.finalizeResponse();
       return;
     }
@@ -477,7 +517,7 @@ class OfflineService {
     // Setup Processor (Stops formatting tokens)
     _currentProcessor = ChatFormatProcessor(
       model.chatFormat,
-      onStopTokenDetected: stopGeneration,
+      onStopTokenDetected: () => _llamaChannel.invokeMethod<void>('stopGeneration'),
     );
     _resetRepetitionGuardState();
 
@@ -511,6 +551,7 @@ class OfflineService {
       'sendMessage',
       {
         'message': finalPrompt,
+        'requestId': requestId,
         'photoPath': photoPath,
         'temp': sampler.temperature,
         'topP': sampler.topP,
@@ -528,8 +569,9 @@ class OfflineService {
   }
 
   Future<void> stopGeneration() async {
+    _request?.cancel();
+    _currentProcessor = null;
     debugPrint("[OfflineService] Invoking 'stopGeneration'.");
-    _retryTimer?.cancel();
     await _llamaChannel.invokeMethod('stopGeneration');
   }
 
@@ -545,9 +587,15 @@ class OfflineService {
 
   @pragma('vm:entry-point')
   Future<void> methodCallHandler(MethodCall call) async {
+    if (call.method == 'onMessageResponse' ||
+        call.method == 'onMessageComplete') {
+      final event = call.arguments;
+      if (event is! Map || event['requestId'] is! String ||
+          !_ownsRequest(event['requestId'] as String)) return;
+    }
     switch (call.method) {
       case 'onMessageResponse':
-        final String rawToken = call.arguments as String? ?? '';
+        final String rawToken = (call.arguments as Map)['token'] as String? ?? '';
         if (_forceAbortCurrentStream) return;
         if (kDebugMode && rawToken.isNotEmpty && ++_nativeChunks == 1) {
           debugPrint('[OfflineService][delivery] firstNativeChunkMs='
@@ -582,6 +630,11 @@ class OfflineService {
         if (tail != null && tail.isNotEmpty) {
           _deliverVisibleChunk(tail);
         }
+        if ((call.arguments as Map)['error'] != null) {
+          _deliverVisibleChunk('\n[Error: Local generation failed. Please retry.]');
+        } else if (!_hasDeliveredOutput) {
+          _deliverVisibleChunk('[Error: Local model returned no response. Please retry.]');
+        }
         if (kDebugMode) {
           _deliveryClock?.stop();
           debugPrint('[OfflineService][delivery] nativeChunks=$_nativeChunks '
@@ -591,6 +644,7 @@ class OfflineService {
         }
         _responseService.finalizeResponse();
         _currentProcessor = null;
+        _request?.cancel();
         break;
 
       case 'onModelLoaded':
@@ -640,6 +694,7 @@ class OfflineService {
   // ===========================================================================
 
   void _deliverVisibleChunk(String chunk) {
+    if (chunk.trim().isNotEmpty) _hasDeliveredOutput = true;
     if (kDebugMode && ++_visibleChunks == 1) {
       debugPrint('[OfflineService][delivery] firstVisibleChunkMs='
           '${_deliveryClock?.elapsedMilliseconds}');
@@ -794,6 +849,7 @@ class OfflineService {
   }
 
   void _resetRepetitionGuardState() {
+    _hasDeliveredOutput = false;
     _visibleHistory = '';
     _lastVisibleChunk = null;
     _lastVisibleChunkRepeatCount = 0;
@@ -829,6 +885,6 @@ class OfflineService {
     if (_forceAbortCurrentStream) return;
     _forceAbortCurrentStream = true;
     debugPrint("[OfflineService] Repetition Guard Abort.");
-    stopGeneration();
+    unawaited(_llamaChannel.invokeMethod<void>('stopGeneration'));
   }
 }
