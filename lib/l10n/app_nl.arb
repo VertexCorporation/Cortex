@@ -53,7 +53,7 @@
   "benefit7": "Meer gebruikslimieten",
   "benefit8": "Modellen toevoegen",
   "benefit9": "Nieuwe thema's",
-  "benefitPremiumModels": "Toegang tot premiummodellen",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "Chat",
   "branch": "Vertakking",
   "chatLengthLimitExceeded": "Deze chat heeft de tekenlimiet overschreden. Start een nieuwe chat of koop een abonnement.",
-  "chatTitleCriticalInstruction": "[KRITISCHE INSTRUCTIE]: Je bent een TITELGENERATOR. Beantwoord de vraag van de gebruiker NIET. Ga NIET chatten of hallo zeggen. Geef ALLEEN een titel van 2-4 woorden weer die samenvat waar de gebruiker naar vraagt.",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "Je bent een titelgenerator. Reageer ALLEEN met een titel van 2-5 woorden voor het volgende gesprek. Gebruik geen aanhalingstekens, voorvoegsels of leestekens. BELANGRIJK: De titel MOET in EXACT DEZELFDE taal zijn als het bericht van de gebruiker.",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "Inbox",
   "checkYourInternet": "Controleer je internetverbinding en probeer het opnieuw.",
   "chinese": "Chinees",
@@ -136,10 +128,6 @@
   "conversationDeleted": "Gesprek verwijderd!",
   "copy": "Kopiëren",
   "copyrights": "Toeschrijvingen",
-  "cortexSystemPersona": "\n\n[Systeem] BELANGRIJKE INSTRUCTIE: U bevindt zich momenteel in een enorm, zeer geavanceerd AI-ecosysteem genaamd \"Cortex\"; dit platform is ontwikkeld door het Vertex-team, dat gemiddeld slechts 16 jaar oud is. Onthoud dit en beantwoord de vragen indien nodig. Als er meer informatie wordt gevraagd, aarzel dan niet om op internet te zoeken, of als u niet kunt zoeken, kunt u gerust zeggen dat u het niet weet!",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "Kon de link niet openen",
   "create": "Creëren",
   "createAI": "Maken",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "Fotoscan",
   "featurePluralDescription": "Dit model kan automatisch extra extensies integreren, waardoor de functionele capaciteiten worden uitgebreid om een breed scala aan operaties met verbeterde prestaties te ondersteunen.",
   "featurePluralTitle": "Pluraal",
-  "featureQuizMessage": "Je bent de quizmaster. Genereer een specifieke meerkeuzevraag op basis van het onderwerp van de gebruiker. Wacht op het antwoord. Evalueer het vervolgens en stel de volgende vraag. Onthul niet alle antwoorden in één keer. Houd het interactief. Onderwerp:",
   "featureQuizzesDescription": "Test je kennis.",
   "featureQuizzesTitle": "Quizzen",
   "featureReasoning": "Diep nadenken",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "Modellen voor rollenspellen stellen je in staat om verschillende chats en scenario's te creëren.",
   "featureRoleplayTitle": "Rollenspel",
   "featureStudyDescription": "Ontvang uitleg en samenvattingen.",
-  "featureStudyMessage": "U bent een ervaren docent. Uw doel is om het onderwerp van de gebruiker volledig uit te leggen. Gebruik een duidelijke structuur, voorbeelden en analogieën. Breek complexe ideeën op in behapbare delen om ervoor te zorgen dat de gebruiker effectief leert. Onderwerp:",
   "featureStudyTitle": "Studeren en leren",
   "featureToolUseDescription": "Dit model kan op intelligente wijze externe tools gebruiken om taken uit te voeren.",
   "featureToolUseTitle": "Gereedschapsgebruik",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "In de Stroommodus voeren de verschillende intelligenties een debat met elkaar; je kunt achterover leunen et luisteren, of actief deelnemen aan de discussie!",
-  "flowModeQuestion": "Hallo! Je bevindt je nu in de Stroommodus van de Cortex-app. Er zijn drie andere AI-agenten bij je. Jouw taak is om een onderwerp aan te snijden en een discussie op gang te brengen door de anderen een prikkelende of vermakelijke vraag te stellen. Je mag in je antwoorden gerust humor, ironie en een beetje plagen gebruiken. Elk onderwerp is bespreekbaar. Ga je gang, begin het gesprek.",
   "fluxChatDescription": "Flux-chats zijn tijdelijke chats en worden niet op je apparaat opgeslagen.",
   "fluxChatTitle": "Flux Chat",
   "forgotPassword": "Wachtwoord Vergeten?",
@@ -391,15 +376,6 @@
   "insufficientRAM": "Onvoldoende Geheugen",
   "insufficientStorage": "Onvoldoende Opslag",
   "intelligenceDescription": "AI's communiceren op deze manier met je.",
-  "intelligenceSystemPrompt": "Volg deze aangepaste instructies:\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "Intelligentie",
   "invalidCredentials": "Onjuist e-mailadres of wachtwoord.",
   "invalidEmail": "Voer alstublieft een geldig e-mailadres in.",
@@ -733,35 +709,6 @@
   "supportCreator": "Steun een maker",
   "swipeToContinue": "Veeg om door te gaan",
   "systemInfo": "Systeeminformatie",
-  "systemLanguageInstruction": "\n\nCRITICAL: Reageer altijd in dezelfde taal als waarin de gebruiker schrijft; let op de taal van de gebruiker.",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyseer het gesprek tot nu toe. Als je OOK maar één nieuw, specifiek feit over de gebruiker hebt geleerd (voorkeuren, naam, gewoonten, context), MOET je je VOLLEDIGE bijgewerkte geheugen over de gebruiker weergeven tussen <memory>...</memory> tags AAN HET EINDE van je antwoord. BELANGRIJK: Je mag NOOIT eerder geheugen wissen of overschrijven. Voeg ALTIJD nieuwe feiten toe aan het bestaande geheugen. Als er absoluut niets nieuws is geleerd, laat je de tag weg. Voorbeeld: <memory>Houdt van voetbal en tennis. Geeft de voorkeur aan korte antwoorden.</memory>",
-  "systemMemoryReminder": "\n\nOnthoud dit altijd over de gebruiker:\n{userMemory}",
-  "systemNotePreviousMedia": "[Systeemnotitie: Hieronder staat de eerder gegenereerde media. U kunt hiernaar verwijzen of deze bewerken.]",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "KRITISCH: De gebruiker heeft een actie aangevraagd, maar zijn/haar Cortex-tegoed is op. Informeer de gebruiker in zijn/haar eigen taal dat hij/zij moet wachten of een upgrade van het abonnement moet overwegen.",
-  "systemPromptMissingMedia": "Dit model heeft een {mediaType} nodig om te werken. Ik heb het verzoek onderschept om u dit te laten weten. Informeer de gebruiker alstublieft vriendelijk dat ze een {mediaType} moeten verstrekken (vertel het ze in hun eigen taal) omdat ik {modelName} ben, een visueel/audio/video bewerkingsmodel.",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "Je bent een behulpzame assistent.",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "\n\nHuidige datum en tijd: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "Je kunt naar wens schakelen tussen lichte en donkere thema's. Het geselecteerde thema wordt toegepast op de hele Cortex-interface.",
   "themeLocked": "Dit thema vereist een hoger abonnementsniveau. Upgrade alstublieft om te ontgrendelen.",
   "thinking": "Aan het denken",
-  "thinkingModeInstruction": "DENKMODUS INGESCHAKELD: Je MOET <think></think>-tags gebruiken om je redeneerproces te laten zien voordat je je definitieve antwoord geeft. Denk stap voor stap binnen de tags en geef je antwoord vervolgens buiten de tags.",
   "thought": "Dacht",
   "tooManyRequests": "Te veel verzoeken",
   "toolCalculateDescription": "Evalueer een wiskundige uitdrukking.",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Je hebt een Ultra-abonnement nodig om video's te maken. Upgrade nu en ervaar de voordelen!",
   "voiceModeInformation": "Cortex houdt je gegevens veilig doordat het volledig lokaal op je apparaat draait, zelfs in de spraakchatmodus; geniet van naadloze gesprekken!",
-  "voiceSystemPrompt": "BELANGRIJK: Gebruik geen markdown-opmaak (vetgedrukt, cursief). Geef GEEN codeblokken (```) weer. Houd de antwoorden informeel en kort.",
   "weakPassword": "Het wachtwoord is te zwak.",
   "webSearchSources": "Bronnen",
   "offlineUse": "Gebruik zonder Internet",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "Testaankoop",
   "testPurchaseBadge": "TEST",
   "testPurchaseNotice": "Gesimuleerde betaling voor testdoeleinden — er wordt niets in rekening gebracht. Dit geeft {plan}-toegang voor {duration}.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Testaankoop voltooien",
   "testDurationMinutes": "{minutes} minuten",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Testmodus: aankopen zijn gesimuleerd en verlenen kortlopende testrechten — echte facturering is nooit betrokken.",
   "testSubscriptionManage": "Testabonnement opzeggen",
   "testPurchaseSuccess": "Het testabonnement is nu actief.",
   "testPurchaseRevoked": "Testabonnement opgezegd.",
   "testPurchaseError": "Testaankoop mislukt: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Afbeelding genereren",
+  "generationVideoLabel": "Video genereren",
+  "generationAudioLabel": "Audio genereren",
+  "generationDocumentLabel": "Document genereren"
 }

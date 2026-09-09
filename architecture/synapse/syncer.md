@@ -21,6 +21,18 @@ The syncer refreshes Hugging Face metadata, hashes the final data, skips unchang
 
 Serves cache hits first, falls back to KV, filters blacklisted models, adds ETag/cache headers and repopulates the Cloudflare edge cache.
 
+## Execution-mode classification
+
+Synapse normalization schema v7 writes `executionModes` as a triplet with `source` and `confidence`:
+
+- `supportsInteractive` — `true` / `false` / `null`
+- `supportsBatch` — `true` / `false` / `null`
+- Each field carries `source` (e.g. `"openrouter"` or `"heuristic"`) and `confidence` (`0..1`).
+
+Batch-only classification lives in `processing/normalize/openrouter.js`. The heuristic detects `:batch` suffixes or explicit `batch_only` flags from the provider. The resulting record marks `supportsInteractive: false` with `confidence: 0.85` (heuristic) or `1` (explicit flag). Fulcrum does **not** duplicate this heuristic; it trusts the catalog field and filters via `queryModels(..., { supportsInteractive: true })`.
+
+As of the latest backfill, all **721** catalog records include `executionModes`; **0** are currently batch-only.
+
 ## Files
 
 `syncer.js` · `core/sync.js` · `core/serve.js` · `config.js` (+ `config/client-assets.js`) · `types.js` · `processing/` (`catalog-policy`, `cloudflare`, `dedup`, `deepgram`, `elevenlabs`, `fal-models`, `fal`, `groq`, `huggingface-chat`, `huggingface-discovery`, `huggingface`, `manual`, `merge`, `offline`, `online`, `parser`) · `kv/` (`data`, `lock`) · `utils/` (`api`, `helpers`). Tests: `tests/` (catalog-policy, fal-models, huggingface).

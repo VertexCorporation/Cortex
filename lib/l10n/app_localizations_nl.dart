@@ -9,32 +9,8 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Je bent een titelgenerator. Reageer ALLEEN met een titel van 2-5 woorden voor het volgende gesprek. Gebruik geen aanhalingstekens, voorvoegsels of leestekens. BELANGRIJK: De titel MOET in EXACT DEZELFDE taal zijn als het bericht van de gebruiker.';
-
-  @override
-  String get systemRoleFallback => 'Je bent een behulpzame assistent.';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nCRITICAL: Reageer altijd in dezelfde taal als waarin de gebruiker schrijft; let op de taal van de gebruiker.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Systeemnotitie: Hieronder staat de eerder gegenereerde media. U kunt hiernaar verwijzen of deze bewerken.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nHuidige datum en tijd: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyseer het gesprek tot nu toe. Als je OOK maar één nieuw, specifiek feit over de gebruiker hebt geleerd (voorkeuren, naam, gewoonten, context), MOET je je VOLLEDIGE bijgewerkte geheugen over de gebruiker weergeven tussen <memory>...</memory> tags AAN HET EINDE van je antwoord. BELANGRIJK: Je mag NOOIT eerder geheugen wissen of overschrijven. Voeg ALTIJD nieuwe feiten toe aan het bestaande geheugen. Als er absoluut niets nieuws is geleerd, laat je de tag weg. Voorbeeld: <memory>Houdt van voetbal en tennis. Geeft de voorkeur aan korte antwoorden.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\nOnthoud dit altijd over de gebruiker:\n$userMemory';
   }
 
   @override
@@ -1133,7 +1109,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze AI is een premium AI, gratis gebruikers hebben beperkte toegang tot premium AI\'s; upgrade om onbeperkte toegang te ontgrendelen!';
 
   @override
-  String get benefitPremiumModels => 'Toegang tot premiummodellen';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1668,14 +1644,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get featureExploreDescription => 'Ontdek alle beschikbare modellen.';
 
   @override
-  String get featureStudyMessage =>
-      'U bent een ervaren docent. Uw doel is om het onderwerp van de gebruiker volledig uit te leggen. Gebruik een duidelijke structuur, voorbeelden en analogieën. Breek complexe ideeën op in behapbare delen om ervoor te zorgen dat de gebruiker effectief leert. Onderwerp:';
-
-  @override
-  String get featureQuizMessage =>
-      'Je bent de quizmaster. Genereer een specifieke meerkeuzevraag op basis van het onderwerp van de gebruiker. Wacht op het antwoord. Evalueer het vervolgens en stel de volgende vraag. Onthul niet alle antwoorden in één keer. Houd het interactief. Onderwerp:';
-
-  @override
   String get myPlan => 'Mijn plan';
 
   @override
@@ -1735,10 +1703,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'In de Stroommodus voeren de verschillende intelligenties een debat met elkaar; je kunt achterover leunen et luisteren, of actief deelnemen aan de discussie!';
 
   @override
-  String get flowModeQuestion =>
-      'Hallo! Je bevindt je nu in de Stroommodus van de Cortex-app. Er zijn drie andere AI-agenten bij je. Jouw taak is om een onderwerp aan te snijden en een discussie op gang te brengen door de anderen een prikkelende of vermakelijke vraag te stellen. Je mag in je antwoorden gerust humor, ironie en een beetje plagen gebruiken. Elk onderwerp is bespreekbaar. Ga je gang, begin het gesprek.';
-
-  @override
   String get thought => 'Dacht';
 
   @override
@@ -1758,10 +1722,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get workInProgress => 'Werk in uitvoering';
-
-  @override
-  String get voiceSystemPrompt =>
-      'BELANGRIJK: Gebruik geen markdown-opmaak (vetgedrukt, cursief). Geef GEEN codeblokken (```) weer. Houd de antwoorden informeel en kort.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1826,10 +1786,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Titel van de grafiek.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'DENKMODUS INGESCHAKELD: Je MOET <think></think>-tags gebruiken om je redeneerproces te laten zien voordat je je definitieve antwoord geeft. Denk stap voor stap binnen de tags en geef je antwoord vervolgens buiten de tags.';
 
   @override
   String get openLinkWarningTitle => 'Waarschuwing voor externe links';
@@ -1969,19 +1925,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Volg deze aangepaste instructies:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[KRITISCHE INSTRUCTIE]: Je bent een TITELGENERATOR. Beantwoord de vraag van de gebruiker NIET. Ga NIET chatten of hallo zeggen. Geef ALLEEN een titel van 2-4 woorden weer die samenvat waar de gebruiker naar vraagt.';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[Systeem] BELANGRIJKE INSTRUCTIE: U bevindt zich momenteel in een enorm, zeer geavanceerd AI-ecosysteem genaamd \"Cortex\"; dit platform is ontwikkeld door het Vertex-team, dat gemiddeld slechts 16 jaar oud is. Onthoud dit en beantwoord de vragen indien nodig. Als er meer informatie wordt gevraagd, aarzel dan niet om op internet te zoeken, of als u niet kunt zoeken, kunt u gerust zeggen dat u het niet weet!';
-
-  @override
   String get featureAudioRecognitionTitle => 'Audiorecognitie';
 
   @override
@@ -2017,11 +1960,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Dit model heeft een $mediaType nodig om te werken. Ik heb het verzoek onderschept om u dit te laten weten. Informeer de gebruiker alstublieft vriendelijk dat ze een $mediaType moeten verstrekken (vertel het ze in hun eigen taal) omdat ik $modelName ben, een visueel/audio/video bewerkingsmodel.';
-  }
 
   @override
   String get mediaTypeImage => 'afbeelding';
@@ -2099,10 +2037,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String freePlan(String plan) {
     return 'Gratis $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'KRITISCH: De gebruiker heeft een actie aangevraagd, maar zijn/haar Cortex-tegoed is op. Informeer de gebruiker in zijn/haar eigen taal dat hij/zij moet wachten of een upgrade van het abonnement moet overwegen.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2208,4 +2142,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'Testaankoop mislukt: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Afbeelding genereren';
+
+  @override
+  String get generationVideoLabel => 'Video genereren';
+
+  @override
+  String get generationAudioLabel => 'Audio genereren';
+
+  @override
+  String get generationDocumentLabel => 'Document genereren';
 }

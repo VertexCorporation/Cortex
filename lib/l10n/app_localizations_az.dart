@@ -9,32 +9,8 @@ class AppLocalizationsAz extends AppLocalizations {
   AppLocalizationsAz([String locale = 'az']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Siz başlıq generatorusunuz. Növbəti söhbət üçün YALNIZ 2-5 sözdən ibarət başlıqla cavab verin. Sitat, ön söz və ya durğu işarələrindən istifadə etməyin. VACİB: Başlıq istifadəçinin mesajı ilə TAM EYNİ dildə olmalıdır.';
-
-  @override
-  String get systemRoleFallback => 'Siz faydalı köməkçisiniz.';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nMÜHÜM: Həmişə istifadəçinin yazdığı dildə cavab verin, istifadəçinin dilinə diqqət yetirin.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Sistem Qeydi: Aşağıda əvvəllər yaradılmış media verilmişdir. Ona istinad edə bilər və ya onu redaktə edə bilərsiniz.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nHazırkı tarix və vaxt: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nİndiyə qədərki söhbəti təhlil edin. İstifadəçi haqqında hər hansı yeni fərqli faktlar (üstünlüklər, ad, vərdişlər, kontekst) öyrənmisinizsə, cavabınızın ƏN SONUNDA istifadəçi haqqında BÜTÜN yenilənmiş yaddaşınızı <memory>...</memory> etiketləri daxilində çıxarmalısınız. TƏNQİD: Əvvəlki yaddaşı HEÇ VAXT silməməli və ya üzərindən yazmamalısınız. Mövcud yaddaşa HƏMİŞƏ yeni faktlar əlavə etməlisiniz. Əgər tamamilə yeni bir şey öyrənilməyibsə, etiketi buraxın. Misal: <memory>Futbol və tennisi sevir. Qısa cavablara üstünlük verir.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\nİstifadəçi haqqında həmişə bunu xatırlayın:\n$userMemory';
   }
 
   @override
@@ -1127,7 +1103,7 @@ class AppLocalizationsAz extends AppLocalizations {
       'Bu süni zəka premium süni zəkadır, pulsuz istifadəçilərin premium süni zəkalara girişi məhduddur; limitsiz giriş üçün yüksəldin!';
 
   @override
-  String get benefitPremiumModels => 'Premium modellərə giriş';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1659,14 +1635,6 @@ class AppLocalizationsAz extends AppLocalizations {
       'Mövcud olan bütün modelləri kəşf edin.';
 
   @override
-  String get featureStudyMessage =>
-      'Siz peşəkar repetitorsunuz. Məqsədiniz istifadəçinin mövzusunu hərtərəfli izah etməkdir. Aydın struktur, nümunələr və bənzətmələrdən istifadə edin. İstifadəçinin effektiv şəkildə öyrənməsini təmin etmək üçün mürəkkəb fikirləri asanlıqla başa düşülən hissələrə ayırın. Mövzu:';
-
-  @override
-  String get featureQuizMessage =>
-      'Siz viktorina ustasısınız. İstifadəçinin mövzusuna əsasən müəyyən bir çoxseçimli sual yaradın. Cavabını gözləyin. Sonra onu qiymətləndirin və növbəti sualı verin. Bütün cavabları birdən açıqlamayın. İnteraktiv saxlayın. Mövzu:';
-
-  @override
   String get myPlan => 'Planım';
 
   @override
@@ -1726,10 +1694,6 @@ class AppLocalizationsAz extends AppLocalizations {
       'Axın rejimində zəkalar öz aralarında mübahisə edirlər; ya arxayın oturub dinləyə, ya da müzakirəyə qoşula bilərsiniz!';
 
   @override
-  String get flowModeQuestion =>
-      'Salam! Artıq Cortex tətbiqində Axın Rejimindəsiniz. Burada sizinlə birlikdə daha üç süni intellekt agenti var. Tapşırığınız otağa bir mövzu əlavə etmək və digərlərinə təxribatçı və ya əyləncəli bir sual verərək müzakirəyə başlamaqdır. Cavablarınızda yumor, istehza və yüngül cəfəngiyatdan istifadə etməkdən çəkinməyin. İstənilən mövzu ədalətli oyundur. Davam edin, söhbətə başlayın.';
-
-  @override
   String get thought => 'Düşündü';
 
   @override
@@ -1749,10 +1713,6 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get workInProgress => 'İşlər Davam Edir';
-
-  @override
-  String get voiceSystemPrompt =>
-      'VACİBDİR: Markdown formatlamasından (qalın, kursiv) istifadə etməyin. Kod bloklarını (```) ÇIXARMAYIN. Cavabları danışıq xarakterli və qısa saxlayın.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1816,10 +1776,6 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Diaqramın başlığı.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'DÜŞÜNMƏ REJİMİ AKTİVDİR: Son cavabınızı verməzdən əvvəl mühakimə prosesinizi göstərmək üçün <think></think> etiketlərindən istifadə etməlisiniz. Etiketlərin içərisində addım-addım düşünün, sonra cavabınızı etiketlərin xaricində verin.';
 
   @override
   String get openLinkWarningTitle => 'Xarici Link Xəbərdarlığı';
@@ -1960,19 +1916,6 @@ class AppLocalizationsAz extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Bu xüsusi təlimatları izləyin:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[KRİTİK TƏLİMAT]: Siz BAŞLIQ GENERATORUSUZ. İstifadəçinin sualına CAVAB VERMƏYİN. SÖHBƏT EDİN VƏ YA SALAM VERMƏYİN. YALNIZ istifadəçinin nə haqqında soruşduğunu xülasə edən 2-4 sözdən ibarət başlıq çıxarın.';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[Sistem] ƏHƏMİYYƏTLİ TƏLİMAT: Hal-hazırda \"Cortex\" adlı nəhəng, yüksək inkişaf etmiş süni intellekt ekosistemində fəaliyyət göstərirsiniz; bu platforma orta hesabla cəmi 16 yaşında olan Vertex komandası tərəfindən hazırlanmışdır. Bunu yadda saxlayın və soruşulsa, cavab verin. Daha çox məlumat istənildikdə, internetdə axtarış etməkdən çəkinməyin və ya axtarış edə bilmirsinizsə, bilmədiyinizi deməkdən çəkinməyin!';
-
-  @override
   String get featureAudioRecognitionTitle => 'Səs Tanıma';
 
   @override
@@ -2008,11 +1951,6 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Bu modelin işləməsi üçün bir $mediaType lazımdır. Bunu bildirmək üçün sorğunu tutdum. Zəhmət olmasa istifadəçiyə nəzakətlə bir $mediaType təmin etməli olduqlarını bildirin (öz dillərində deyin) çünki mən $modelName, vizual/audio/video redaktə modeliyəm.';
-  }
 
   @override
   String get mediaTypeImage => 'şəkil';
@@ -2089,10 +2027,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String freePlan(String plan) {
     return 'Pulsuz $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'TƏNİDLİ: İstifadəçi əməliyyat tələb etdi, lakin Cortex-də limitləri tükənib; xahiş edirik istifadəçiyə onların dilində gözləməli olduqlarını və ya abunə planlarını təkmilləşdirməyi düşünməli olduqlarını bildirin.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2198,4 +2132,16 @@ class AppLocalizationsAz extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'Sınaq alışı alınmadı: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Şəkil yaradılır';
+
+  @override
+  String get generationVideoLabel => 'Video yaradılır';
+
+  @override
+  String get generationAudioLabel => 'Səs yaradılır';
+
+  @override
+  String get generationDocumentLabel => 'Sənəd yaradılır';
 }

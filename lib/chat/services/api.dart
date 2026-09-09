@@ -83,6 +83,13 @@ class ApiService {
     Function(String title)? onTitleReceived,
     Function()? onServerFallback,
     required AppLocalizations localizations,
+    // Delegated behavioral metadata – owned by Fulcrum/Synapse, not localized here
+    String? customInstruction,
+    String? userMemory,
+    String? characterRole,
+    bool voiceMode = false,
+    String? featureMode,
+    String langCode = 'en',
   }) async {
     _cancelToken = CancelToken();
 
@@ -310,8 +317,16 @@ class ApiService {
             "enableWebSearch": enableWebSearch,
             "isCharacterModel": isCharacterModel,
             if (generationTarget != null) "generationTarget": generationTarget,
-            "systemPromptLimitFallback":
-                localizations.systemPromptLimitFallback,
+            if (customInstruction != null && customInstruction.isNotEmpty)
+              "customInstruction": customInstruction,
+            if (userMemory != null && userMemory.isNotEmpty)
+              "userMemory": userMemory,
+            if (characterRole != null && characterRole.isNotEmpty)
+              "characterRole": characterRole,
+            "voiceMode": voiceMode,
+            if (featureMode != null && featureMode.isNotEmpty)
+              "featureMode": featureMode,
+            "langCode": langCode,
           }),
           cancelToken: _cancelToken,
           options: options,
@@ -958,6 +973,11 @@ class ApiService {
     bool enableWebSearch = false,
     String? generationTarget,
     bool isRetry = false,
+    String? customInstruction,
+    String? userMemory,
+    String? characterRole,
+    bool voiceMode = false,
+    String? featureMode,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -1010,6 +1030,12 @@ class ApiService {
       onWebSearchActive: onWebSearchActive,
       onTitleReceived: onTitleReceived,
       onServerFallback: onServerFallback,
+      customInstruction: customInstruction,
+      userMemory: userMemory,
+      characterRole: characterRole,
+      voiceMode: voiceMode,
+      featureMode: featureMode,
+      langCode: langCode,
     );
   }
 }

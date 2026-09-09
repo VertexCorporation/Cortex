@@ -237,8 +237,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                               if (!voiceService.isFlowActive) {
                                 // Start Flow Mode
                                 voiceService.startFlowWithPrompt(
-                                    AppLocalizations.of(context)!
-                                        .flowModeQuestion);
+                                    "Let's start a multi-agent discussion. What topic would you like to explore with the Cortex Flow agents?");
                               } else {
                                 // Interrupt Flow (Stop speaking)
                                 voiceService.stopSpeaking(context: context);

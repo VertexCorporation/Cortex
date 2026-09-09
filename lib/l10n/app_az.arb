@@ -53,7 +53,7 @@
   "benefit7": "Daha çox istifadə limitləri",
   "benefit8": "Modellər əlavə edin",
   "benefit9": "Yeni mövzular",
-  "benefitPremiumModels": "Premium modellərə giriş",
+  "benefitPremiumModels": "Specific AI Selection",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -104,14 +104,6 @@
   "chat": "Söhbət",
   "branch": "Filial",
   "chatLengthLimitExceeded": "Bu söhbət simvol limitini keçib. Zəhmət olmasa, yeni bir söhbətə başlayın və ya abunəlik alın.",
-  "chatTitleCriticalInstruction": "[KRİTİK TƏLİMAT]: Siz BAŞLIQ GENERATORUSUZ. İstifadəçinin sualına CAVAB VERMƏYİN. SÖHBƏT EDİN VƏ YA SALAM VERMƏYİN. YALNIZ istifadəçinin nə haqqında soruşduğunu xülasə edən 2-4 sözdən ibarət başlıq çıxarın.",
-  "@chatTitleCriticalInstruction": {
-    "description": "Critical system instruction appended to force the AI to only output a title"
-  },
-  "chatTitlePrompt": "Siz başlıq generatorusunuz. Növbəti söhbət üçün YALNIZ 2-5 sözdən ibarət başlıqla cavab verin. Sitat, ön söz və ya durğu işarələrindən istifadə etməyin. VACİB: Başlıq istifadəçinin mesajı ilə TAM EYNİ dildə olmalıdır.",
-  "@chatTitlePrompt": {
-    "description": "Prompt for AI to generate a chat title"
-  },
   "chats": "Gələnlər",
   "checkYourInternet": "Zəhmət olmasa internet bağlantınızı yoxlayın və yenidən cəhd edin.",
   "chinese": "Çin dili",
@@ -136,10 +128,6 @@
   "conversationDeleted": "Söhbət silindi!",
   "copy": "Kopyala",
   "copyrights": "İstinadlar",
-  "cortexSystemPersona": "\n\n[Sistem] ƏHƏMİYYƏTLİ TƏLİMAT: Hal-hazırda \"Cortex\" adlı nəhəng, yüksək inkişaf etmiş süni intellekt ekosistemində fəaliyyət göstərirsiniz; bu platforma orta hesabla cəmi 16 yaşında olan Vertex komandası tərəfindən hazırlanmışdır. Bunu yadda saxlayın və soruşulsa, cavab verin. Daha çox məlumat istənildikdə, internetdə axtarış etməkdən çəkinməyin və ya axtarış edə bilmirsinizsə, bilmədiyinizi deməkdən çəkinməyin!",
-  "@cortexSystemPersona": {
-    "description": "System persona string added to online models"
-  },
   "couldNotOpenLink": "Link açıla bilmədi",
   "create": "Yarat",
   "createAI": "Yarat",
@@ -318,7 +306,6 @@
   "featurePhotoTitle": "Foto Skan",
   "featurePluralDescription": "Bu model avtomatik olaraq əlavə genişləndirmələri inteqrasiya edə bilir, bununla da funksional imkanlarını artıraraq müxtəlif əməliyyatları daha yüksək performansla dəstəkləyir.",
   "featurePluralTitle": "Çoxşaxəli",
-  "featureQuizMessage": "Siz viktorina ustasısınız. İstifadəçinin mövzusuna əsasən müəyyən bir çoxseçimli sual yaradın. Cavabını gözləyin. Sonra onu qiymətləndirin və növbəti sualı verin. Bütün cavabları birdən açıqlamayın. İnteraktiv saxlayın. Mövzu:",
   "featureQuizzesDescription": "Biliklərinizi sınayın.",
   "featureQuizzesTitle": "Testlər",
   "featureReasoning": "Dərin Düşüncə",
@@ -326,7 +313,6 @@
   "featureRoleplayDescription": "Rol oyunu modelləri müxtəlif söhbətlər və ssenarilər yaratmağınıza imkan verir.",
   "featureRoleplayTitle": "Rol Oyunu",
   "featureStudyDescription": "İzahatlar və xülasələr alın.",
-  "featureStudyMessage": "Siz peşəkar repetitorsunuz. Məqsədiniz istifadəçinin mövzusunu hərtərəfli izah etməkdir. Aydın struktur, nümunələr və bənzətmələrdən istifadə edin. İstifadəçinin effektiv şəkildə öyrənməsini təmin etmək üçün mürəkkəb fikirləri asanlıqla başa düşülən hissələrə ayırın. Mövzu:",
   "featureStudyTitle": "Oxu və Öyrən",
   "featureToolUseDescription": "Bu model tapşırıqları yerinə yetirmək üçün xarici vasitələrdən ağıllı şəkildə istifadə edə bilər.",
   "featureToolUseTitle": "Alət İstifadəsi",
@@ -360,7 +346,6 @@
     }
   },
   "flowModeDescription": "Axın rejimində zəkalar öz aralarında mübahisə edirlər; ya arxayın oturub dinləyə, ya da müzakirəyə qoşula bilərsiniz!",
-  "flowModeQuestion": "Salam! Artıq Cortex tətbiqində Axın Rejimindəsiniz. Burada sizinlə birlikdə daha üç süni intellekt agenti var. Tapşırığınız otağa bir mövzu əlavə etmək və digərlərinə təxribatçı və ya əyləncəli bir sual verərək müzakirəyə başlamaqdır. Cavablarınızda yumor, istehza və yüngül cəfəngiyatdan istifadə etməkdən çəkinməyin. İstənilən mövzu ədalətli oyundur. Davam edin, söhbətə başlayın.",
   "fluxChatDescription": "Flux söhbətləri müvəqqəti söhbətlərdir və cihazınızda saxlanılmır.",
   "fluxChatTitle": "Flux Chat",
   "forgotPassword": "Şifrəni unutmusunuz?",
@@ -391,15 +376,6 @@
   "insufficientRAM": "Aşağı Yaddaş",
   "insufficientStorage": "Aşağı Depolama",
   "intelligenceDescription": "Süni intellekt sizinlə bu şəkildə ünsiyyət qurur.",
-  "intelligenceSystemPrompt": "Bu xüsusi təlimatları izləyin:\\n\\n{instruction}",
-  "@intelligenceSystemPrompt": {
-    "placeholders": {
-      "instruction": {
-        "type": "String",
-        "example": "Always answer in uppercase"
-      }
-    }
-  },
   "intelligenceTitle": "Kəşfiyyat",
   "invalidCredentials": "Yanlış e-poçt və ya şifrə.",
   "invalidEmail": "Zəhmət olmasa, etibarlı bir e-poçt ünvanı daxil edin.",
@@ -733,35 +709,6 @@
   "supportCreator": "Yaradanı dəstəkləyin",
   "swipeToContinue": "Davam etmək üçün sürüşdür",
   "systemInfo": "Sistem Məlumatı",
-  "systemLanguageInstruction": "\n\nMÜHÜM: Həmişə istifadəçinin yazdığı dildə cavab verin, istifadəçinin dilinə diqqət yetirin.",
-  "@systemLanguageInstruction": {
-    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
-  },
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nİndiyə qədərki söhbəti təhlil edin. İstifadəçi haqqında hər hansı yeni fərqli faktlar (üstünlüklər, ad, vərdişlər, kontekst) öyrənmisinizsə, cavabınızın ƏN SONUNDA istifadəçi haqqında BÜTÜN yenilənmiş yaddaşınızı <memory>...</memory> etiketləri daxilində çıxarmalısınız. TƏNQİD: Əvvəlki yaddaşı HEÇ VAXT silməməli və ya üzərindən yazmamalısınız. Mövcud yaddaşa HƏMİŞƏ yeni faktlar əlavə etməlisiniz. Əgər tamamilə yeni bir şey öyrənilməyibsə, etiketi buraxın. Misal: <memory>Futbol və tennisi sevir. Qısa cavablara üstünlük verir.</memory>",
-  "systemMemoryReminder": "\n\nİstifadəçi haqqında həmişə bunu xatırlayın:\n{userMemory}",
-  "systemNotePreviousMedia": "[Sistem Qeydi: Aşağıda əvvəllər yaradılmış media verilmişdir. Ona istinad edə bilər və ya onu redaktə edə bilərsiniz.]",
-  "@systemNotePreviousMedia": {
-    "description": "System note prepended to a synthetic user message containing AI-generated media."
-  },
-  "systemPromptLimitFallback": "TƏNİDLİ: İstifadəçi əməliyyat tələb etdi, lakin Cortex-də limitləri tükənib; xahiş edirik istifadəçiyə onların dilində gözləməli olduqlarını və ya abunə planlarını təkmilləşdirməyi düşünməli olduqlarını bildirin.",
-  "systemPromptMissingMedia": "Bu modelin işləməsi üçün bir {mediaType} lazımdır. Bunu bildirmək üçün sorğunu tutdum. Zəhmət olmasa istifadəçiyə nəzakətlə bir {mediaType} təmin etməli olduqlarını bildirin (öz dillərində deyin) çünki mən {modelName}, vizual/audio/video redaktə modeliyəm.",
-  "@systemPromptMissingMedia": {
-    "description": "System prompt sent to fallback model when user forgets to upload media.",
-    "placeholders": {
-      "mediaType": {
-        "type": "String",
-        "example": "image"
-      },
-      "modelName": {
-        "type": "String",
-        "example": "Stable Diffusion"
-      }
-    }
-  },
-  "systemRoleFallback": "Siz faydalı köməkçisiniz.",
-  "@systemRoleFallback": {
-    "description": "Fallback system role when no specific role is defined."
-  },
   "systemTimeInfo": "\n\nHazırkı tarix və vaxt: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",
@@ -781,7 +728,6 @@
   "themeDescription": "İstəyinizə uyğun olaraq işıqlı və qaranlıq mövzular arasında keçid edə bilərsiniz. Seçilmiş mövzu bütün Cortex interfeysində tətbiq olunacaq.",
   "themeLocked": "Bu mövzu daha yüksək abunəlik səviyyəsi tələb edir. Kilidi açmaq üçün lütfən planınızı yüksəldin.",
   "thinking": "Düşünür",
-  "thinkingModeInstruction": "DÜŞÜNMƏ REJİMİ AKTİVDİR: Son cavabınızı verməzdən əvvəl mühakimə prosesinizi göstərmək üçün <think></think> etiketlərindən istifadə etməlisiniz. Etiketlərin içərisində addım-addım düşünün, sonra cavabınızı etiketlərin xaricində verin.",
   "thought": "Düşündü",
   "tooManyRequests": "Həddindən artıq sorğu",
   "toolCalculateDescription": "Riyazi ifadəni qiymətləndirin.",
@@ -864,7 +810,6 @@
   "videoModels": "Video Models",
   "videoPremiumWarning": "Videolar yaratmaq, indi təkmilləşdirmək və axını hiss etmək üçün Ultra abunəliyinə ehtiyacınız var!",
   "voiceModeInformation": "Cortex, səsli söhbət rejimində belə cihazınızda tam işləyərək məlumatlarınızı təhlükəsiz saxlayır; problemsiz söhbətlərdən zövq alın!",
-  "voiceSystemPrompt": "VACİBDİR: Markdown formatlamasından (qalın, kursiv) istifadə etməyin. Kod bloklarını (```) ÇIXARMAYIN. Cavabları danışıq xarakterli və qısa saxlayın.",
   "weakPassword": "Şifrə çox zəifdir.",
   "webSearchSources": "Mənbələr",
   "offlineUse": "İnternetsiz istifadə",
@@ -891,14 +836,42 @@
   "testPurchaseTitle": "Sınaq alışı",
   "testPurchaseBadge": "TEST",
   "testPurchaseNotice": "Sınaq üçün simulyasiya olunmuş ödəniş — real ödəniş aparılmır. Bu, {duration} müddətində {plan} girişini təmin edir.",
-  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "@testPurchaseNotice": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro Monthly"
+      },
+      "duration": {
+        "type": "String",
+        "example": "60 minutes"
+      }
+    }
+  },
   "testPurchaseConfirm": "Sınaq alışını tamamla",
   "testDurationMinutes": "{minutes} dəqiqə",
-  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "@testDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
   "testModeInfo": "Test rejimi: alışlar simulyasiya olunur və qısa müddətli test imtiyazları verir — real ödəniş heç vaxt tələb olunmur.",
   "testSubscriptionManage": "Sınaq abunəliyini ləğv et",
   "testPurchaseSuccess": "Sınaq abunəliyi artıq aktivdir.",
   "testPurchaseRevoked": "Sınaq abunəliyi ləğv edildi.",
   "testPurchaseError": "Sınaq alışı alınmadı: {message}",
-  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
+  "@testPurchaseError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "generationImageLabel": "Şəkil yaradılır",
+  "generationVideoLabel": "Video yaradılır",
+  "generationAudioLabel": "Səs yaradılır",
+  "generationDocumentLabel": "Sənəd yaradılır"
 }

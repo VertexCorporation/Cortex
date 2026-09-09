@@ -9,32 +9,8 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Sie generieren Titel. Antworten Sie AUSSCHLIESSLICH mit einem Titel von 2–5 Wörtern für die folgende Konversation. Verwenden Sie keine Anführungszeichen, Präfixe oder Satzzeichen. WICHTIG: Der Titel MUSS in GENAU DERSELBEN Sprache wie die Nachricht des Nutzers verfasst sein.';
-
-  @override
-  String get systemRoleFallback => 'Sie sind ein hilfreicher Assistent.';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\nCRITICAL: Antworten Sie immer in der Sprache, in der der Benutzer schreibt, und achten Sie auf die Sprache des Benutzers.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Systemhinweis: Unten sehen Sie die zuvor generierten Medien. Sie können diese referenzieren oder bearbeiten.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nAktuelles Datum und Uhrzeit: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalysieren Sie den bisherigen Gesprächsverlauf. Wenn Sie neue, eindeutige Informationen über den Benutzer erhalten haben (Präferenzen, Name, Gewohnheiten, Kontext), müssen Sie diese aktualisierten Informationen innerhalb der Tags `<memory>...</memory>` ganz am Ende Ihrer Antwort ausgeben. WICHTIG: Sie dürfen niemals vorherige Informationen löschen oder überschreiben. Fügen Sie neue Informationen immer den bestehenden Informationen hinzu. Wenn Sie absolut nichts Neues erfahren haben, lassen Sie den Tag weg. Beispiel: `<memory>Liebt Fußball und Tennis. Bevorzugt kurze Antworten.</memory>`';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\nDenken Sie immer an Folgendes über den Benutzer:\n$userMemory';
   }
 
   @override
@@ -1136,7 +1112,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese KI ist eine Premium-KI, kostenlose Nutzer haben nur eingeschränkten Zugriff auf Premium-KIs; upgraden Sie für unbegrenzten Zugriff!';
 
   @override
-  String get benefitPremiumModels => 'Zugang zu Premium-Modellen';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1676,14 +1652,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Entdecken Sie alle verfügbaren Modelle.';
 
   @override
-  String get featureStudyMessage =>
-      'Sie sind ein erfahrener Tutor. Ihr Ziel ist es, dem Nutzer das Thema umfassend zu erklären. Verwenden Sie eine klare Struktur, Beispiele und Analogien. Zerlegen Sie komplexe Ideen in verständliche Teile, um sicherzustellen, dass der Nutzer effektiv lernt. Thema:';
-
-  @override
-  String get featureQuizMessage =>
-      'Sie sind der Quizmaster. Erstellen Sie eine passende Multiple-Choice-Frage zum Thema des Nutzers. Warten Sie auf seine Antwort. Werten Sie diese anschließend aus und stellen Sie die nächste Frage. Zeigen Sie nicht alle Antworten auf einmal an. Gestalten Sie das Quiz interaktiv. Thema:';
-
-  @override
   String get myPlan => 'Mein Plan';
 
   @override
@@ -1743,10 +1711,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Im Flussmodus debattieren die verschiedenen Intelligenzen untereinander; Sie können sich entweder zurücklehnen und zuhören oder sich aktiv an der Diskussion beteiligen!';
 
   @override
-  String get flowModeQuestion =>
-      'Hallo! Du befindest dich jetzt im Flussmodus der Cortex-App. Drei weitere KI-Agenten sind ebenfalls anwesend. Deine Aufgabe ist es, ein Thema in den Raum zu werfen und eine Diskussion anzustoßen, indem du den anderen eine provokante oder unterhaltsame Frage stellst. In deinen Antworten kannst du gerne Humor, Ironie und ein bisschen neckischen Spott verwenden. Jedes Thema ist erlaubt. Leg los und starte das Gespräch!';
-
-  @override
   String get thought => 'Nachgedacht';
 
   @override
@@ -1766,10 +1730,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get workInProgress => 'In Arbeit';
-
-  @override
-  String get voiceSystemPrompt =>
-      'WICHTIG: Bitte keine Markdown-Formatierung (fett, kursiv) verwenden. Codeblöcke (```) nicht ausgeben. Antworten sollten kurz und in einem lockeren, natürlichen Stil verfasst sein.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1835,10 +1795,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Titel des Diagramms.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'DENKMODUS AKTIVIERT: Sie MÜSSEN <think></think>-Tags verwenden, um Ihren Gedankengang darzustellen, bevor Sie Ihre endgültige Antwort geben. Denken Sie innerhalb der Tags Schritt für Schritt und geben Sie Ihre Antwort anschließend außerhalb der Tags an.';
 
   @override
   String get openLinkWarningTitle => 'Warnung vor externen Links';
@@ -1978,19 +1934,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Befolgen Sie diese benutzerdefinierten Anweisungen:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[KRITISCHE ANWEISUNG]: Sie sind ein Titelgenerator. Beantworten Sie NICHT die Frage des Nutzers. Führen Sie KEINEN Chat und begrüßen Sie ihn nicht. Geben Sie AUSSCHLIESSLICH einen Titel mit 2–4 Wörtern aus, der die Frage des Nutzers zusammenfasst.';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[System] WICHTIGER HINWEIS: Sie befinden sich in einem riesigen, hochmodernen KI-Ökosystem namens „Cortex“. Diese Plattform wurde vom Vertex-Team entwickelt, dessen Mitglieder im Durchschnitt erst 16 Jahre alt sind. Merken Sie sich das und antworten Sie, falls Sie danach gefragt werden. Sollten weitere Informationen benötigt werden, zögern Sie nicht, im Internet zu recherchieren. Falls Sie nicht recherchieren können, geben Sie einfach an, dass Sie es nicht wissen!';
-
-  @override
   String get featureAudioRecognitionTitle => 'Audioerkennung';
 
   @override
@@ -2026,11 +1969,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Dieses Modell benötigt ein(e) $mediaType, um zu funktionieren. Ich habe die Anfrage abgefangen, um Sie darüber zu informieren. Bitte informieren Sie den Benutzer freundlich, dass er ein(e) $mediaType bereitstellen muss (sagen Sie es ihm in seiner eigenen Sprache), da ich $modelName bin, ein visuelles/Audio-/Video-Bearbeitungsmodell.';
-  }
 
   @override
   String get mediaTypeImage => 'Bild';
@@ -2108,10 +2046,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String freePlan(String plan) {
     return 'Kostenloses $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'KRITISCH: Der Benutzer hat eine Aktion angefordert, aber sein Datenvolumen bei Cortex ist aufgebraucht. Bitte informieren Sie den Benutzer in seiner Sprache, dass er warten oder ein Upgrade seines Abonnements in Betracht ziehen sollte.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2217,4 +2151,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'Testkauf fehlgeschlagen: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Bild wird erstellt';
+
+  @override
+  String get generationVideoLabel => 'Video wird erstellt';
+
+  @override
+  String get generationAudioLabel => 'Audio wird erstellt';
+
+  @override
+  String get generationDocumentLabel => 'Dokument wird erstellt';
 }

@@ -12,6 +12,7 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../initialization.dart';
+import '../main.dart' show mainScreenKey;
 import '../library/backend/data/service.dart';
 import '../news/service.dart';
 import '../theme.dart';
@@ -150,7 +151,10 @@ class ChatControllerState extends State<ChatController>
 
     final newsFuture =
         context.read<NewsService>().loadNewsForLanguage(langCode);
-    await newsFuture;
+    // News loading must not delay the initial composer or keyboard.
+    unawaited(newsFuture.catchError((Object error, StackTrace stack) {
+      debugPrint('[ChatController] News refresh failed: $error');
+    }));
 
     if (!mounted) return;
 
@@ -176,6 +180,7 @@ class ChatControllerState extends State<ChatController>
       // Logic for new chat
       context.read<InputProvider>().resetInputState();
       await _sessionProvider.initializeDefaultSession();
+      if (mounted) mainScreenKey.currentState?.focusInitialChat();
     }
   }
 

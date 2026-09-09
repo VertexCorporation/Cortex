@@ -1,9 +1,11 @@
 import 'package:cortex/design.dart';
 import 'dart:async';
+import 'dart:ui' show lerpDouble;
 import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/internet.dart';
 import 'package:cortex/theme.dart';
@@ -112,6 +114,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   late Animation<double> _inputOpacityAnim;
   late Animation<double> _waveOpacityAnim;
 
+  // Morphing composer expand/collapse animation
+  late AnimationController _expandController;
+  late Animation<double> _expandAnimation;
+
   @override
   void initState() {
     super.initState();
@@ -139,6 +145,19 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
       ),
     );
+
+    // Composer expand/collapse animation (ChatGPT-style morph)
+    _expandController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _expandController,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+
+    widget.textFieldFocusNode.addListener(_onFocusChange);
 
     // PERFORMANCE: Only rebuild when the send button enabled state actually changes,
     // not on every single keystroke. This prevents full widget tree rebuilds during typing.
@@ -170,6 +189,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   @override
   void didUpdateWidget(covariant InputField oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.textFieldFocusNode != widget.textFieldFocusNode) {
+      oldWidget.textFieldFocusNode.removeListener(_onFocusChange);
+      widget.textFieldFocusNode.addListener(_onFocusChange);
+    }
     if (oldWidget.isSending != widget.isSending ||
         oldWidget.isLimitExceeded != widget.isLimitExceeded ||
         oldWidget.modelMissing != widget.modelMissing ||
@@ -197,7 +220,9 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   @override
   void dispose() {
     _modeController.dispose();
+    _expandController.dispose();
     _speechService?.removeListener(_onSpeechStatusChange);
+    widget.textFieldFocusNode.removeListener(_onFocusChange);
     super.dispose();
   }
 
@@ -237,6 +262,32 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       if (_modeController.status != AnimationStatus.reverse &&
           _modeController.status != AnimationStatus.dismissed) {
         _modeController.reverse();
+      }
+    }
+  }
+
+  void _onFocusChange() {
+    if (!mounted) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+    } else {
+      setState(() {});
+    }
+  }
+
+  void _syncExpandAnimation(bool shouldExpand) {
+    if (shouldExpand) {
+      if (_expandController.status != AnimationStatus.forward &&
+          _expandController.status != AnimationStatus.completed) {
+        _expandController.forward();
+      }
+    } else {
+      if (_expandController.status != AnimationStatus.reverse &&
+          _expandController.status != AnimationStatus.dismissed) {
+        _expandController.reverse();
       }
     }
   }
@@ -333,8 +384,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-                vertical: 8.0), // Extra padding to make it bigger
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -350,130 +400,43 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                     final progress =
                         const Interval(0.4, 0.8, curve: Curves.easeInOutCubic)
                             .transform(_modeController.value);
-                    return ClipRect(
-                      child: Stack(
-                        alignment: Alignment.bottomCenter,
-                        children: [
-                          RecordingLayout(
-                            progress: progress,
-                            input:
-                                // 1. INPUT CONTENT
-                                IgnorePointer(
-                              ignoring:
-                                  isRecording || _modeController.value > 0,
-                              child: FadeTransition(
-                                opacity: _inputOpacityAnim,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  EdgeInsetsDirectional.only(
-                                                start: isTablet
-                                                    ? screenWidth * 0.02
-                                                    : 12.0,
-                                              ),
-                                              child: AddPhotoButton(
-                                                isLimitExceeded:
-                                                    widget.isLimitExceeded,
-                                                isPhotoLoading:
-                                                    widget.isPhotoLoading,
-                                                localizations:
-                                                    widget.localizations,
-                                                controller: widget.controller,
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: isTablet
-                                                        ? screenWidth * 0.02
-                                                        : 8.0),
-                                                child: _TextFieldSection(
-                                                  key: const ValueKey(
-                                                      'textfield'),
-                                                  controller: widget.controller,
-                                                  focusNode:
-                                                      widget.textFieldFocusNode,
-                                                  localizations:
-                                                      widget.localizations,
-                                                  screenWidth: screenWidth,
-                                                  isTablet: isTablet,
-                                                  showHintText: true,
-                                                  onEnterPressed: () {
-                                                    if (isSendButtonEnabled) {
-                                                      widget.onSend();
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Visibility(
-                                              visible: false,
-                                              maintainSize: true,
-                                              maintainAnimation: true,
-                                              maintainState: true,
-                                              child: _SendButtonSection(
-                                                screenWidth: screenWidth,
-                                                isTablet: isTablet,
-                                                widget: widget,
-                                                recordingProgress: 0,
-                                                isEnabled: isSendButtonEnabled,
-                                                isActionPermitted:
-                                                    isActionPermitted,
-                                                controller: widget.controller,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            waveform: IgnorePointer(
-                              ignoring:
-                                  !isRecording || _waveOpacityAnim.value < 0.1,
-                              child: FadeTransition(
-                                opacity: _waveOpacityAnim,
-                                child: TickerMode(
-                                  enabled: _modeController.value > 0,
-                                  child: const _WaveformSection(
-                                      key: ValueKey('waveform')),
-                                ),
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        RecordingLayout(
+                          progress: progress,
+                          input:
+                              // 1. INPUT CONTENT
+                              IgnorePointer(
+                            ignoring:
+                                isRecording || _modeController.value > 0,
+                            child: FadeTransition(
+                              opacity: _inputOpacityAnim,
+                              child: _buildExpandingComposerRow(
+                                context,
+                                screenWidth,
+                                isTablet,
+                                isSendButtonEnabled,
+                                isActionPermitted,
+                                progress,
                               ),
                             ),
                           ),
-
-                          // 3. MAIN ACTION BUTTON (PERSISTENT)
-                          Positioned(
-                            top: 0,
-                            bottom: 0,
-                            right: 0,
-                            child: Center(
-                              child: _SendButtonSection(
-                                screenWidth: screenWidth,
-                                isTablet: isTablet,
-                                widget: widget,
-                                recordingProgress: _modeController.value,
-                                isEnabled: isSendButtonEnabled,
-                                isActionPermitted: isActionPermitted,
-                                controller: widget.controller,
+                          waveform: IgnorePointer(
+                            ignoring:
+                                !isRecording || _waveOpacityAnim.value < 0.1,
+                            child: FadeTransition(
+                              opacity: _waveOpacityAnim,
+                              child: TickerMode(
+                                enabled: _modeController.value > 0,
+                                child: const _WaveformSection(
+                                    key: ValueKey('waveform')),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 ),
@@ -482,6 +445,109 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildExpandingComposerRow(
+    BuildContext context,
+    double screenWidth,
+    bool isTablet,
+    bool isSendButtonEnabled,
+    bool isActionPermitted,
+    double recordingProgress,
+  ) {
+    final inputProvider = context.read<InputProvider>();
+    final bool isComposerExpanded = widget.textFieldFocusNode.hasFocus ||
+        inputProvider.featureMode != ChatInputMode.none;
+    final bool hasSelectedFeature =
+        inputProvider.featureMode != ChatInputMode.none;
+
+    _syncExpandAnimation(isComposerExpanded);
+
+    final double buttonSize = (screenWidth * 0.086).clamp(32.0, 38.0);
+    const double buttonTravel = 28.0;
+    const double collapsedExtraInset = 0.0;
+    const double expandedExtraInset = 32.0;
+
+    return AnimatedBuilder(
+      animation: _expandAnimation,
+      builder: (context, child) {
+        final double t = _expandAnimation.value;
+        final double extraInset =
+            lerpDouble(collapsedExtraInset, expandedExtraInset, t)!;
+        final double travel = lerpDouble(0, buttonTravel, t)!;
+        final double leftPlaceholder = lerpDouble(buttonSize + 4, 0, t)!;
+        final double rightPlaceholder = lerpDouble(buttonSize + 4, 0, t)!;
+        final double leftButtonLeft =
+            (leftPlaceholder - buttonSize) / 2 - travel;
+        final double rightButtonRight =
+            (rightPlaceholder - buttonSize) / 2 - travel;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: extraInset),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(width: leftPlaceholder),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      child: _TextFieldSection(
+                        key: const ValueKey('textfield'),
+                        controller: widget.controller,
+                        focusNode: widget.textFieldFocusNode,
+                        localizations: widget.localizations,
+                        screenWidth: screenWidth,
+                        isTablet: isTablet,
+                        showHintText: true,
+                        onEnterPressed: () {
+                          if (isSendButtonEnabled) {
+                            widget.onSend();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: rightPlaceholder),
+                ],
+              ),
+              Positioned(
+                left: leftButtonLeft,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: AddPhotoButton(
+                    isLimitExceeded: widget.isLimitExceeded,
+                    isPhotoLoading: widget.isPhotoLoading,
+                    localizations: widget.localizations,
+                    controller: widget.controller,
+                    hasSelectedFeature: hasSelectedFeature,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: rightButtonRight,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: _SendButtonSection(
+                    screenWidth: screenWidth,
+                    isTablet: isTablet,
+                    widget: widget,
+                    recordingProgress: recordingProgress,
+                    isEnabled: isSendButtonEnabled,
+                    isActionPermitted: isActionPermitted,
+                    controller: widget.controller,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

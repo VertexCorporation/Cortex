@@ -704,7 +704,6 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ),
     Provider<ContextService>(
       create: (BuildContext context) => ContextService(
-        sessionProvider: context.read<ChatSessionProvider>(),
         conversationProvider: context.read<ConversationProvider>(),
         modelService: context.read<ModelService>(),
       ),

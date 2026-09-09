@@ -9,32 +9,8 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      '제목 생성기입니다. 다음 대화에 2~5단어로 된 제목만 입력하세요. 따옴표, 접두사, 구두점은 사용하지 마세요. 중요: 제목은 사용자의 메시지와 정확히 동일한 언어로 작성해야 합니다.';
-
-  @override
-  String get systemRoleFallback => '당신은 도움을 주는 조력자입니다.';
-
-  @override
-  String get systemLanguageInstruction =>
-      '\n\n중요: 항상 사용자가 작성한 언어와 동일한 언어로 응답하고, 사용자의 언어에 주의를 기울이십시오.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[시스템 참고: 아래는 이전에 생성된 미디어입니다. 참고하거나 편집할 수 있습니다.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\n현재 날짜 및 시간: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\n지금까지의 대화를 분석합니다. 사용자에 대한 새로운 사실(선호도, 이름, 습관, 상황)을 알게 된 경우, 응답의 맨 마지막에 <memory>...</memory> 태그 안에 업데이트된 사용자 정보를 모두 출력해야 합니다. 중요: 이전 메모리를 절대 지우거나 덮어쓰면 안 됩니다. 항상 새로운 사실을 기존 메모리에 추가해야 합니다. 새로운 정보를 전혀 알지 못하는 경우에는 태그를 생략합니다. 예: <memory>축구와 테니스를 좋아합니다. 짧은 답변을 선호합니다.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return '\n\n사용자에 대해 항상 다음을 기억하세요:\n$userMemory';
   }
 
   @override
@@ -1099,7 +1075,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 AI는 프리미엄 AI이며, 무료 사용자는 프리미엄 AI에 대한 접근이 제한됩니다. 업그레이드하여 무제한 접근을 해제하세요!';
 
   @override
-  String get benefitPremiumModels => '프리미엄 모델에 대한 액세스';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1617,14 +1593,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get featureExploreDescription => '모든 모델을 확인해 보세요.';
 
   @override
-  String get featureStudyMessage =>
-      '당신은 전문 강사입니다. 당신의 목표는 사용자가 원하는 주제를 완벽하게 설명하는 것입니다. 명확한 구성, 예시 및 비유를 활용하세요. 복잡한 개념을 이해하기 쉬운 부분으로 나누어 사용자가 효과적으로 학습할 수 있도록 하세요. 주제:';
-
-  @override
-  String get featureQuizMessage =>
-      '당신은 퀴즈 진행자입니다. 사용자가 선택한 주제에 따라 특정한 객관식 문제를 생성하세요. 사용자의 답변을 기다린 후, 답변을 평가하고 다음 문제를 제시하세요. 모든 정답을 한 번에 공개하지 마세요. 상호작용적인 방식으로 진행하세요. 주제:';
-
-  @override
   String get myPlan => '내 계획';
 
   @override
@@ -1684,10 +1652,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '몰입 모드에서는 지능들이 서로 토론을 벌입니다. 당신은 가만히 앉아서 듣기만 하거나, 직접 토론에 참여할 수도 있습니다!';
 
   @override
-  String get flowModeQuestion =>
-      '안녕하세요! 지금 Cortex 앱의 플로우 모드에 접속하셨습니다. 다른 세 명의 AI 에이전트가 함께하고 있습니다. 여러분의 임무는 주제를 하나 제시하고, 다른 에이전트들에게 도발적이거나 재미있는 질문을 던져 토론을 시작하는 것입니다. 답변할 때는 유머, 아이러니, 가벼운 농담도 자유롭게 사용하세요. 어떤 주제든 상관없습니다. 자, 이제 대화를 시작해 보세요!';
-
-  @override
   String get thought => '생각했다';
 
   @override
@@ -1707,10 +1671,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get workInProgress => '작업 진행 중';
-
-  @override
-  String get voiceSystemPrompt =>
-      '중요: 마크다운 서식(굵게, 기울임체)을 사용하지 마세요. 코드 블록(```)을 출력하지 마세요. 답변은 대화체로 간결하게 작성하세요.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1767,10 +1727,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => '차트 제목.';
-
-  @override
-  String get thinkingModeInstruction =>
-      '사고 모드 활성화: 최종 답변을 작성하기 전에 <think></think> 태그를 사용하여 사고 과정을 반드시 보여주세요. 태그 안에서 단계별로 생각한 후, 태그 바깥에 답변을 작성하세요.';
 
   @override
   String get openLinkWarningTitle => '외부 링크 경고';
@@ -1907,19 +1863,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return '다음 사용자 지정 지침을 따르세요:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[중요 지시사항]: 당신은 제목 생성기입니다. 사용자의 질문에 답하거나, 채팅을 하거나, 인사하지 마세요. 사용자가 묻는 내용을 요약하는 2~4단어 분량의 제목만 출력하세요.';
-
-  @override
-  String get cortexSystemPersona =>
-      '\n\n[시스템] 중요 지침: 현재 귀하는 \"Cortex\"라는 거대하고 고도로 발전된 AI 생태계 내에서 작업하고 있습니다. 이 플랫폼은 평균 연령이 16세에 불과한 Vertex 팀에서 개발했습니다. 이 점을 기억하고 질문을 받으면 답변하십시오. 추가 정보가 요청되면 주저하지 말고 인터넷을 검색하십시오. 검색할 수 없는 경우 모른다고 답해도 괜찮습니다!';
-
-  @override
   String get featureAudioRecognitionTitle => '음성 인식';
 
   @override
@@ -1955,11 +1898,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio Models';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return '이 모델이 작동하려면 $mediaType이(가) 필요합니다. 이를 알려드리기 위해 요청을 가로챘습니다. 저는 시각/오디오/비디오 편집 모델인 $modelName이므로 $mediaType을(를) 제공해야 한다고 사용자에게 정중하게 (그들의 언어로) 알려주십시오.';
-  }
 
   @override
   String get mediaTypeImage => '이미지';
@@ -2035,10 +1973,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String freePlan(String plan) {
     return '무료 $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      '중요: 사용자가 작업을 요청했지만 Cortex 사용량이 소진되었습니다. 해당 사용자에게 모국어로 기다리거나 구독 플랜 업그레이드를 고려하도록 안내해 주세요.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2144,4 +2078,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String testPurchaseError(String message) {
     return '테스트 구매 실패: $message';
   }
+
+  @override
+  String get generationImageLabel => '이미지 생성 중';
+
+  @override
+  String get generationVideoLabel => '동영상 생성 중';
+
+  @override
+  String get generationAudioLabel => '오디오 생성 중';
+
+  @override
+  String get generationDocumentLabel => '문서 생성 중';
 }

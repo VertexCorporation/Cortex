@@ -202,13 +202,11 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
               fillColor: AppColors.secondaryColor,
               contentPadding: EdgeInsets.all(12 * scale),
               enabledBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: AppColors.border, width: scale),
+                borderSide: BorderSide(color: AppColors.border, width: scale),
                 borderRadius: BorderRadius.circular(8 * scale),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: AppColors.border, width: scale),
+                borderSide: BorderSide(color: AppColors.border, width: scale),
                 borderRadius: BorderRadius.circular(8 * scale),
               ),
             ),

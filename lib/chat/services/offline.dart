@@ -630,8 +630,6 @@ class OfflineService {
       includeLastUser: false,
       targetModelId: model.id,
       langCode: langCode,
-      isServerSide: false,
-      enableThinkingMode: enableThinkingMode,
     );
 
     for (final msg in history) {

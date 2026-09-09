@@ -9,32 +9,8 @@ class AppLocalizationsCs extends AppLocalizations {
   AppLocalizationsCs([String locale = 'cs']) : super(locale);
 
   @override
-  String get chatTitlePrompt =>
-      'Jste generátor titulků. Odpovězte POUZE 2-5 slovním názvem pro následující konverzaci. Nepoužívejte uvozovky, předpony ani interpunkci. KRITICKÉ: Název MUSÍ být ve PŘESNĚ STEJNÉM jazyce jako zpráva uživatele.';
-
-  @override
-  String get systemRoleFallback => 'Jste užitečný pomocník.';
-
-  @override
-  String get systemLanguageInstruction =>
-      'KRITICKÉ: Vždy odpovídejte ve stejném jazyce, ve kterém uživatel píše, věnujte pozornost jazyku uživatele.';
-
-  @override
-  String get systemNotePreviousMedia =>
-      '[Poznámka k systému: Níže jsou média vygenerovaná dříve. Můžete na něj odkazovat nebo jej upravovat.]';
-
-  @override
   String systemTimeInfo(String formattedTime) {
     return 'Aktuální datum a čas: $formattedTime.';
-  }
-
-  @override
-  String get systemMemoryDirective =>
-      '[SMĚRNICE O SYSTÉMOVÉ PAMĚTI]\nAnalyzujte dosavadní rozhovor. Pokud jste se dozvěděli JAKÉKOLI nová odlišná fakta o uživateli (preference, jméno, zvyky, kontext), MUSÍTE vypsat CELOU aktualizovanou paměť o uživateli uvnitř tagů <memory>...</memory> NA ÚPLNÉM KONCI vaší odpovědi. KRITICKÉ: NIKDY nesmíte vymazat nebo přepsat předchozí paměť. VŽDY přidejte nová fakta do stávající paměti. Pokud jste se nenaučili absolutně nic nového, značku vynechejte. Příklad: <memory>Miluje fotbal a tenis. Preferuje krátké odpovědi.</memory>';
-
-  @override
-  String systemMemoryReminder(Object userMemory) {
-    return 'Vždy si pamatujte toto o uživateli:\n$userMemory';
   }
 
   @override
@@ -1125,7 +1101,7 @@ class AppLocalizationsCs extends AppLocalizations {
       'Tato AI je prémiová AI, bezplatní uživatelé mají omezený přístup k prémiovým AI; upgradujte a odemkněte neomezený přístup!';
 
   @override
-  String get benefitPremiumModels => 'Přístup k prémiovým modelům';
+  String get benefitPremiumModels => 'Specific AI Selection';
 
   @override
   String get premiumTrialExhaustedMessage =>
@@ -1657,14 +1633,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get featureExploreDescription => 'Objevte všechny dostupné modely.';
 
   @override
-  String get featureStudyMessage =>
-      'Jste odborný lektor. Vaším cílem je vysvětlit uživateli téma komplexně. Používejte jasnou strukturu, příklady a analogie. Rozdělte složité myšlenky na stravitelné části, abyste zajistili, že se uživatel bude efektivně učit. Téma:';
-
-  @override
-  String get featureQuizMessage =>
-      'Jste mistrem kvízu. Vygenerujte konkrétní otázku s možností výběru na základě tématu uživatele. Počkejte na jejich odpověď. Poté to vyhodnoťte a položte další otázku. Neodhalujte všechny odpovědi najednou. Udržujte to interaktivní. Téma:';
-
-  @override
   String get myPlan => 'Můj plán';
 
   @override
@@ -1724,10 +1692,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'V režimu Flow mezi sebou inteligence debatují; můžete buď sedět a poslouchat, nebo skočit a zapojit se do diskuze!';
 
   @override
-  String get flowModeQuestion =>
-      'Ahoj! Nyní jste v režimu Flow v aplikaci Cortex. Jsou tu s vámi další tři agenti AI. Vaším úkolem je vhodit do místnosti téma a zahájit diskuzi tím, že ostatním položíte provokativní nebo zábavnou otázku. Ve svých odpovědích klidně používejte humor, ironii a lehké nesmyslné řeči. Jakékoli téma je férová hra. Pokračujte, začněte konverzaci.';
-
-  @override
   String get thought => 'Myšlenka';
 
   @override
@@ -1747,10 +1711,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get workInProgress => 'Probíhající práce';
-
-  @override
-  String get voiceSystemPrompt =>
-      'DŮLEŽITÉ: Nepoužívejte formátování markdown (tučné, kurzíva). NEVYSTUPUJTE bloky kódu (```). Udržujte odpovědi konverzační a stručné.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
@@ -1811,10 +1771,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Název grafu.';
-
-  @override
-  String get thinkingModeInstruction =>
-      'REŽIM MYŠLENÍ ZAPNUT: Před poskytnutím konečné odpovědi MUSÍTE použít značky <think></think> k zobrazení procesu uvažování. Přemýšlejte krok za krokem uvnitř značek a poté poskytněte svou odpověď mimo značky.';
 
   @override
   String get openLinkWarningTitle => 'Upozornění na externí odkaz';
@@ -1952,19 +1908,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String intelligenceSystemPrompt(String instruction) {
-    return 'Postupujte podle těchto vlastních pokynů:\\n\\n$instruction';
-  }
-
-  @override
-  String get chatTitleCriticalInstruction =>
-      '[KRITICKÝ POKYN]: Jste GENERÁTOR TITULŮ. NEODPOVÍDEJTE na otázku uživatele. NEchatujte ani nezdravte. Vydejte POUZE 2-4 slovní název shrnující, na co se uživatel ptá. Název MUSÍ být ve stejném jazyce jako uživatelova zpráva.';
-
-  @override
-  String get cortexSystemPersona =>
-      '[Systém] KRITICKÝ POKYN: V současné době působíte v masivním, vysoce pokročilém ekosystému umělé inteligence s názvem „Cortex“; tato platforma je vyvinuta týmem Vertex, kterým je v průměru pouhých 16 let. Pamatujte si to a na dotaz odpovězte. Pokud požadujete více informací, neváhejte prohledat internet, nebo pokud hledat nemůžete, klidně řekněte, že nevíte!';
-
-  @override
   String get featureAudioRecognitionTitle => 'Rozpoznávání zvuku';
 
   @override
@@ -2000,11 +1943,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get audioModels => 'Audio modely';
-
-  @override
-  String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Tento model ke svému fungování vyžaduje $mediaType. Zachytil jsem žádost, abych vás informoval. Informujte prosím uživatele slušně, že musí poskytnout $mediaType (řekněte jim to v jejich vlastním jazyce), protože jsem $modelName a modeluji vizuální/audio/video úpravy.';
-  }
 
   @override
   String get mediaTypeImage => 'obrázek';
@@ -2081,10 +2019,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String freePlan(String plan) {
     return 'Zdarma $plan!';
   }
-
-  @override
-  String get systemPromptLimitFallback =>
-      'KRITICKÉ: Uživatel požádal o akci, ale jeho povolenka na Cortex se vyčerpala; laskavě informujte uživatele v jejich jazyce, že by měl počkat nebo zvážit upgrade svého plánu předplatného.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
@@ -2190,4 +2124,16 @@ class AppLocalizationsCs extends AppLocalizations {
   String testPurchaseError(String message) {
     return 'Testovací nákup se nezdařil: $message';
   }
+
+  @override
+  String get generationImageLabel => 'Generování obrázku';
+
+  @override
+  String get generationVideoLabel => 'Generování videa';
+
+  @override
+  String get generationAudioLabel => 'Generování zvuku';
+
+  @override
+  String get generationDocumentLabel => 'Generování dokumentu';
 }

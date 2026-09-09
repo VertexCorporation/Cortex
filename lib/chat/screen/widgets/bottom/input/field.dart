@@ -23,12 +23,11 @@ class _TextFieldSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double fontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
-    final double verticalPadding = isTablet ? screenWidth * 0.015 : 12.0;
-    final double horizontalPadding = isTablet ? screenWidth * 0.015 : 8.0;
+    final double verticalPadding = 8.0;
+    final double horizontalPadding = 4.0;
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: isTablet ? screenWidth * 0.02 : screenWidth * 0.02),
+      padding: EdgeInsets.symmetric(horizontal: 2.0),
       child: TextField(
         key: const ValueKey('chat_input_field'),
         focusNode: focusNode,
