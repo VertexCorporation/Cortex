@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/edit.dart';
 import 'package:cortex/chat/services/review.dart';
@@ -171,8 +172,8 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       );
     });
 
-    final userTier = context.select<UserProvider, int>(
-      (p) => p.activeSubscriptionLevel,
+    final userTier = context.select<UserProvider, SubscriptionTier>(
+      (p) => p.subscription.effectiveTier,
     );
 
     final creditsManager = context.read<CreditsManager>();

@@ -2155,4 +2155,51 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Fedezz fel több lehetőséget';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Válts Cortex Premiumra, hogy hozzáférj ehhez a hatékony AI-modellhez és még sok máshoz.';
+
+  @override
+  String get premiumChatGateCta => 'Előfizetés a Premiumra';
+
+  @override
+  String get testPurchaseTitle => 'Tesztvásárlás';
+
+  @override
+  String get testPurchaseBadge => 'TESZT';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Tesztelési célból szimulált fizetés — valódi terhelés nem történik. Ez $plan hozzáférést ad $duration időtartamra.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Tesztvásárlás befejezése';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes perc';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Tesztmód: a vásárlások szimuláltak és rövid idejű tesztjogosultságokat adnak — valódi számlázás soha nem történik.';
+
+  @override
+  String get testSubscriptionManage => 'Teszt-előfizetés lemondása';
+
+  @override
+  String get testPurchaseSuccess => 'A teszt-előfizetés mostantól aktív.';
+
+  @override
+  String get testPurchaseRevoked => 'A teszt-előfizetés lemondva.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'A tesztvásárlás sikertelen: $message';
+  }
 }

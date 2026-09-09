@@ -134,7 +134,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                   hintStyle: TextStyle(
                       color: AppColors.quinaryColor, fontSize: 14 * scale),
                   filled: true,
-                  fillColor: AppColors.border,
+                  fillColor: AppColors.secondaryColor,
                   contentPadding: EdgeInsets.all(12 * scale),
                   enabledBorder: OutlineInputBorder(
                     borderSide:
@@ -199,7 +199,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
               hintStyle: TextStyle(
                   color: AppColors.quinaryColor, fontSize: 14 * scale),
               filled: true,
-              fillColor: AppColors.border,
+              fillColor: AppColors.secondaryColor,
               contentPadding: EdgeInsets.all(12 * scale),
               enabledBorder: OutlineInputBorder(
                 borderSide:

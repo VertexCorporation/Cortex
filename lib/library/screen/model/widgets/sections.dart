@@ -539,7 +539,7 @@ class _BaseModelSelectionSectionState extends State<BaseModelSelectionSection> {
                 HapticFeedback.lightImpact();
                 final userProvider = context.read<UserProvider>();
                 if (variantId != 'cortex/auto' &&
-                    !userProvider.isSubscriptionActive) {
+                    !userProvider.subscription.isActive) {
                   final target =
                       const UpgradeAccountScreen(showLoginFirst: false);
                   navigateToScreen(target, direction: const Offset(0.0, 1.0));

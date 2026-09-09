@@ -558,7 +558,7 @@ class AppInitializer with ChangeNotifier {
           return;
         }
         _startFalStatusListener();
-        CreditsManager.instance.listenToCredits();
+        CreditsManager.instance.listenToCredits(_userProvider);
         _userProvider.listenToUserData(user);
         _determineUserFlow();
       }

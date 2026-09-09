@@ -350,31 +350,12 @@ class AppLanguageSection extends StatelessWidget {
         ),
         SizedBox(height: screenHeight * 0.02),
         // The main button to open the selection dialog.
-        SettingsGroupedRow(
-          position: SettingsRowPosition.standalone,
-          scale: (screenWidth / 375).clamp(0.85, 1.25),
+        SettingsActionRow(
+          label: currentLanguageName,
           onTap: () {
             HapticFeedback.lightImpact();
             _showLanguageSelectionDialog(context);
           },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                currentLanguageName,
-                style: TextStyle(
-                  color: AppColors.primaryColor.inverted,
-                  fontSize: screenWidth * 0.041,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: AppColors.primaryColor.inverted,
-                size: CortexDesign.iconSize(screenWidth, tier: 1),
-              ),
-            ],
-          ),
         ),
       ],
     );

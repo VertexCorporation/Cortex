@@ -12,11 +12,14 @@ import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/screen/widgets/wave.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/service.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:cortex/fog.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/rag/screens/documents.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'recording_layout.dart';
 
 part 'waveform.dart';
 
@@ -43,7 +46,7 @@ class InputField extends StatefulWidget {
   final bool isSending;
   final bool isPremiumModel;
   final bool isSubscribed;
-  final int userTier;
+  final SubscriptionTier userTier;
   final String? originalMessageText;
   final bool isStorageSufficient;
   final int? totalCredits;
@@ -125,7 +128,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       CurvedAnimation(
         parent: _modeController,
         curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-        reverseCurve: const Interval(0.0, 0.4, curve: Curves.easeIn),
       ),
     );
 
@@ -135,7 +137,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       CurvedAnimation(
         parent: _modeController,
         curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
-        reverseCurve: const Interval(0.5, 1.0, curve: Curves.easeOut),
       ),
     );
 
@@ -156,8 +157,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final speechService = context.read<SpeechService>();
-      speechService.addListener(_onSpeechStatusChange);
+      if (!mounted) return;
 
       // Initialize state based on provider
       final inputProvider = context.read<InputProvider>();
@@ -347,28 +347,20 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                 AnimatedBuilder(
                   animation: _modeController,
                   builder: (context, child) {
-                    final bool isForward =
-                        _modeController.status == AnimationStatus.forward ||
-                            _modeController.status == AnimationStatus.completed;
-                    final double inputCutoff = isForward ? 0.5 : 0.9;
-
-                    final bool showInputLayout =
-                        _modeController.value < inputCutoff;
-                    final bool showWaveLayout = _modeController.value > 0.1;
-
-                    return AnimatedSize(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOutCubic,
-                      alignment: Alignment.bottomCenter,
+                    final progress =
+                        const Interval(0.4, 0.8, curve: Curves.easeInOutCubic)
+                            .transform(_modeController.value);
+                    return ClipRect(
                       child: Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
-                          // 1. INPUT CONTENT
-                          Visibility(
-                            visible: showInputLayout,
-                            maintainState: true,
-                            child: IgnorePointer(
-                              ignoring: _inputOpacityAnim.value < 0.1,
+                          RecordingLayout(
+                            progress: progress,
+                            input:
+                                // 1. INPUT CONTENT
+                                IgnorePointer(
+                              ignoring:
+                                  isRecording || _modeController.value > 0,
                               child: FadeTransition(
                                 opacity: _inputOpacityAnim,
                                 child: Column(
@@ -434,6 +426,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                                 screenWidth: screenWidth,
                                                 isTablet: isTablet,
                                                 widget: widget,
+                                                recordingProgress: 0,
                                                 isEnabled: isSendButtonEnabled,
                                                 isActionPermitted:
                                                     isActionPermitted,
@@ -448,18 +441,16 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                 ),
                               ),
                             ),
-                          ),
-
-                          // 2. WAVEFORM CONTENT
-                          Visibility(
-                            visible: showWaveLayout,
-                            maintainState: true,
-                            child: IgnorePointer(
-                              ignoring: _waveOpacityAnim.value < 0.1,
+                            waveform: IgnorePointer(
+                              ignoring:
+                                  !isRecording || _waveOpacityAnim.value < 0.1,
                               child: FadeTransition(
                                 opacity: _waveOpacityAnim,
-                                child: const _WaveformSection(
-                                    key: ValueKey('waveform')),
+                                child: TickerMode(
+                                  enabled: _modeController.value > 0,
+                                  child: const _WaveformSection(
+                                      key: ValueKey('waveform')),
+                                ),
                               ),
                             ),
                           ),
@@ -474,6 +465,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                 screenWidth: screenWidth,
                                 isTablet: isTablet,
                                 widget: widget,
+                                recordingProgress: _modeController.value,
                                 isEnabled: isSendButtonEnabled,
                                 isActionPermitted: isActionPermitted,
                                 controller: widget.controller,

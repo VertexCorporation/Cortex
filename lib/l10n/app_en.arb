@@ -940,5 +940,21 @@
   "voiceMale": "Male voices",
   "@voiceMale": { "description": "Voice picker group heading" },
   "voiceFemale": "Female voices",
-  "@voiceFemale": { "description": "Voice picker group heading" }
+  "@voiceFemale": { "description": "Voice picker group heading" },
+  "premiumChatGateTitle": "Unlock more",
+  "premiumChatGateDescription": "Upgrade to Cortex Premium to access this powerful AI model and more.",
+  "premiumChatGateCta": "Join Premium",
+  "testPurchaseTitle": "Test Purchase",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Simulated checkout for testing — no real charge is made. This grants {plan} access for {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Complete Test Purchase",
+  "testDurationMinutes": "{minutes} minutes",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Test mode: purchases are simulated and grant short-lived test entitlements — real billing is never involved.",
+  "testSubscriptionManage": "Cancel Test Subscription",
+  "testPurchaseSuccess": "Test subscription is now active.",
+  "testPurchaseRevoked": "Test subscription cancelled.",
+  "testPurchaseError": "Test purchase failed: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

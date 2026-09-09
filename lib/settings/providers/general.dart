@@ -7,6 +7,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 
 // Provider & Service Imports
 import '../../internet.dart';
+import '../../server/subscription.dart';
 import '../../server/user.dart';
 import '../../notifications/introvert.dart';
 import '../services/auth.dart';
@@ -34,7 +35,7 @@ class SettingsGeneralProvider with ChangeNotifier {
   Map<String, dynamic>? _frozenUserData;
   bool _frozenIsAnonymous = false;
   bool _frozenIsVerified = true;
-  int _frozenSubscriptionLevel = 0;
+  SubscriptionEntitlement _frozenSubscription = SubscriptionEntitlement.none;
   String? _frozenAuthUid;
 
   /// Constructor: Injects services and starts the initialization process.
@@ -64,8 +65,8 @@ class SettingsGeneralProvider with ChangeNotifier {
     _frozenIsVerified = _authService.isCurrentUserVerified();
     _frozenAuthUid = _authService.currentUser?.uid;
 
-    // Snapshot subscription level logic
-    _frozenSubscriptionLevel = _userProvider.activeSubscriptionLevel;
+    // Snapshot subscription entitlement
+    _frozenSubscription = _userProvider.subscription;
 
     _isFrozen = true;
     notifyListeners();
@@ -86,27 +87,10 @@ class SettingsGeneralProvider with ChangeNotifier {
 
   // --- Computed Properties ---
 
-  /// The expiration date of the user's subscription, if any.
-  /// Accesses `userData` via the getter, so it respects the frozen state.
-  Timestamp? get subscriptionExpiresAt {
-    final data = userData;
-    if (data == null) return null;
-
-    final expires = data['subscriptionExpiresAt'];
-    if (expires is Timestamp) return expires; // Live data
-    if (expires is String) {
-      final parsedDate = DateTime.tryParse(expires); // Cached data
-      return parsedDate != null ? Timestamp.fromDate(parsedDate) : null;
-    }
-    return null;
-  }
-
-  /// The user's **active** subscription level (e.g., 0 for Free, 1 for Plus).
-  int get activeSubscriptionLevel {
-    if (_isFrozen) return _frozenSubscriptionLevel;
-
-    return _userProvider.activeSubscriptionLevel;
-  }
+  /// The user's **active** subscription entitlement. Respects the frozen
+  /// state so the settings UI stays static during logout.
+  SubscriptionEntitlement get subscription =>
+      _isFrozen ? _frozenSubscription : _userProvider.subscription;
 
   /// The number of times a verification email has been resent.
   int get verificationAttempts => userData?['verifyAttempts'] as int? ?? 0;
@@ -222,7 +206,7 @@ class SettingsGeneralProvider with ChangeNotifier {
     _frozenUserData = null;
     _frozenIsAnonymous = false;
     _frozenIsVerified = true;
-    _frozenSubscriptionLevel = 0;
+    _frozenSubscription = SubscriptionEntitlement.none;
     _frozenAuthUid = null;
     notifyListeners();
   }

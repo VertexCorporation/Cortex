@@ -192,7 +192,9 @@ class ModelEntity {
     final hasUsableSeriesTitle = seriesSource != null &&
         seriesSource.trim().isNotEmpty &&
         !_looksLikeRawId(seriesSource, id);
-    final titleSource = _looksLikeRawId(rawTitle, id) && hasUsableSeriesTitle
+    final titleSource = map['type'] != 'offline' &&
+            _looksLikeRawId(rawTitle, id) &&
+            hasUsableSeriesTitle
         ? seriesSource
         : rawTitle ?? seriesSource ?? id;
 
@@ -360,6 +362,15 @@ class ModelEntity {
       source == 'user' || id.startsWith('self_') || id.startsWith('local_');
 
   bool get isServerSide => type != 'offline';
+
+  /// Family filters reflect every variant, including mixed media families.
+  bool supportsOutput(String output) {
+    if (outputs[output] == true || category == output) return true;
+    return variants?.values.whereType<Map>().any((variant) =>
+            (variant['outputs'] is Map && variant['outputs'][output] == true) ||
+            variant['category'] == output) ??
+        false;
+  }
 
   bool get isPremium {
     return false;

@@ -293,7 +293,8 @@ class _SearchingLabel extends StatelessWidget {
             style: TextStyle(
                 color: AppColors.primaryColor.inverted.withValues(alpha: 0.55),
                 fontSize: 14 * scale,
-                fontWeight: FontWeight.w700,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
                 letterSpacing: 0)),
       ),
     );

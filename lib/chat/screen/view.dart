@@ -559,7 +559,7 @@ class _BriefingOverlayWrapper extends StatelessWidget {
               usesDynamicChatAllowance ? false : session.isCurrentModelPremium,
           isVideoModel: usesDynamicChatAllowance ? false : isVideoModel,
           isSubscribed: session.isUserSubscribed,
-          userTier: userProvider.activeSubscriptionLevel,
+          userTier: userProvider.subscription.effectiveTier,
           isDynamicChat: usesDynamicChatAllowance,
           isSearchEnabled: input.enableWebSearch,
           isFalOffline: appInitializer.isFalOffline && isCurrentModelFal,

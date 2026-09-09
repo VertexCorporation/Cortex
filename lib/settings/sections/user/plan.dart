@@ -60,8 +60,8 @@ class _MyPlanButtonState extends State<_MyPlanButton>
 
     return Consumer<FundsBackend>(
       builder: (context, backend, child) {
-        // Level 0 implies "Free" or "No Active Plan".
-        final isFreeUser = backend.currentUserSubscriptionLevel == 0;
+        // No active entitlement implies "Free" or "No Active Plan".
+        final isFreeUser = !backend.subscription.isPaid;
 
         // Resource management:
         // 1. If user is Premium, STOP the animation immediately to save resources.
@@ -75,89 +75,54 @@ class _MyPlanButtonState extends State<_MyPlanButton>
           _shineController.forward();
         }
 
-        return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              navigateToScreen(const FundsScreen(),
-                  direction: const Offset(1.0, 0.0));
-            },
-            borderRadius: BorderRadius.circular(10.0),
-            child: Stack(
-              children: [
-                // 1. BASE CONTAINER (Identical visual for ALL users)
-                // This ensures the button always looks "Premium"
-                Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.04,
-                      vertical: screenWidth * 0.045),
-                  decoration: BoxDecoration(
-                    // Unified background color
-                    color: AppColors.premium.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(10.0),
-                    // Unified border
-                    border: Border.all(
-                      color: AppColors.premium,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        appLocalizations.myPlan,
-                        style: TextStyle(
-                          color: AppColors.primaryColor.inverted,
-                          fontSize: screenWidth * 0.041,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: AppColors.primaryColor.inverted,
-                        size: CortexDesign.icon,
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 2. SHINE OVERLAY (Visible ONLY to Free users)
-                if (isFreeUser)
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: AnimatedBuilder(
-                        animation: _shineAnimation,
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset: Offset(
-                                screenWidth * _shineAnimation.value, 0.0),
-                            child: child,
-                          );
-                        },
-                        child: Container(
-                          width: screenWidth * 0.4, // Width of the light beam
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.white.withValues(alpha: 0.0),
-                                Colors.white.withValues(alpha: 0.4),
-                                // Intense shine
-                                Colors.white.withValues(alpha: 0.0),
-                              ],
-                              stops: const [0.1, 0.5, 0.9],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+        return Stack(
+          children: [
+            SettingsActionRow(
+              label: appLocalizations.myPlan,
+              backgroundColor: AppColors.premium.withValues(alpha: 0.15),
+              borderColor: AppColors.premium,
+              onTap: () {
+                HapticFeedback.lightImpact();
+                navigateToScreen(const FundsScreen(),
+                    direction: const Offset(1.0, 0.0));
+              },
             ),
-          ),
+            // 2. SHINE OVERLAY (Visible ONLY to Free users)
+            if (isFreeUser)
+              Positioned.fill(
+                child: IgnorePointer(
+                    child: ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                      10 * (screenWidth / 375).clamp(0.85, 1.25)),
+                  child: AnimatedBuilder(
+                    animation: _shineAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset:
+                            Offset(screenWidth * _shineAnimation.value, 0.0),
+                        child: child,
+                      );
+                    },
+                    child: Container(
+                      width: screenWidth * 0.4, // Width of the light beam
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.0),
+                            Colors.white.withValues(alpha: 0.4),
+                            // Intense shine
+                            Colors.white.withValues(alpha: 0.0),
+                          ],
+                          stops: const [0.1, 0.5, 0.9],
+                        ),
+                      ),
+                    ),
+                  ),
+                )),
+              ),
+          ],
         );
       },
     );

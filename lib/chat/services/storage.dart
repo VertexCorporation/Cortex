@@ -528,6 +528,7 @@ class ChatStorageService {
         FROM messages m
         LEFT JOIN conversations c ON c.id = m.conversationId
         WHERE m.photoPath IS NOT NULL AND length(m.photoPath) > 0 AND m.isUser = 0
+        ORDER BY m.ts DESC, m.id DESC
       ''');
       return rows;
     } catch (e) {

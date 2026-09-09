@@ -1,3 +1,4 @@
+import 'video_preview.dart';
 import 'package:cortex/design.dart';
 // lib/arts/screen.dart
 
@@ -192,20 +193,23 @@ class _ArtsScreenState extends State<ArtsScreen>
         // Grid
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: padding),
-          sliver: SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount:
-                  CortexDesign.columns(screenWidth, target: 180, minimum: 3),
-              crossAxisSpacing: spacing,
-              mainAxisSpacing: spacing,
-              childAspectRatio: 1.0,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final item = artsProvider.items[index];
-                return _ArtTile(item: item);
-              },
-              childCount: artsProvider.items.length,
+          sliver: Directionality(
+            textDirection: TextDirection.ltr,
+            child: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount:
+                    CortexDesign.columns(screenWidth, target: 180, minimum: 3),
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                childAspectRatio: 1.0,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final item = artsProvider.items[index];
+                  return _ArtTile(key: ValueKey(item.path), item: item);
+                },
+                childCount: artsProvider.items.length,
+              ),
             ),
           ),
         ),
@@ -223,7 +227,7 @@ class _ArtsScreenState extends State<ArtsScreen>
 class _ArtTile extends StatelessWidget {
   final ArtItem item;
 
-  const _ArtTile({required this.item});
+  const _ArtTile({super.key, required this.item});
 
   Future<void> _openSourceChatAndAttach({
     required File file,
@@ -355,9 +359,7 @@ class _ArtTile extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Container(
-                color: AppColors.senaryColor.withValues(alpha: 0.5),
-              ),
+              ArtVideoPreview(path: item.path),
               Center(
                 child: Icon(
                   Icons.play_circle_filled_rounded,

@@ -47,6 +47,11 @@ class MediaShimmerPlaceholder extends StatelessWidget {
         height = width * 0.7;
         borderRadius = 24.0;
         break;
+      case MediaGenerationType.document:
+        width = isTablet ? screenWidth * 0.45 : screenWidth * 0.7;
+        height = isTablet ? screenWidth * 0.3 : screenWidth * 0.5;
+        borderRadius = 16.0;
+        break;
       case MediaGenerationType.none:
         return const SizedBox.shrink();
     }

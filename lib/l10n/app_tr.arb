@@ -930,5 +930,21 @@
   "voicePreviewText": "Merhaba, ben Cortex. Bugün sana nasıl yardımcı olabilirim?",
   "voicePreviewFailed": "Örnek çalınamadı. Bağlantını veya bakiyeni kontrol et.",
   "voiceMale": "Erkek sesleri",
-  "voiceFemale": "Kadın sesleri"
+  "voiceFemale": "Kadın sesleri",
+  "premiumChatGateTitle": "Sınırları kaldırın",
+  "premiumChatGateDescription": "Bu güçlü yapay zeka modeline ve daha fazlasına erişmek için Cortex Premium’a geçin.",
+  "premiumChatGateCta": "Premium’a katıl",
+  "testPurchaseTitle": "Test Satın Alması",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Test için simüle edilmiş ödeme — gerçek bir ücret alınmaz. Bu, {duration} boyunca {plan} erişimi sağlar.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Test Satın Almasını Tamamla",
+  "testDurationMinutes": "{minutes} dakika",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Test modu: satın almalar simüle edilir ve kısa süreli test yetkileri verir — gerçek faturalandırma asla söz konusu değildir.",
+  "testSubscriptionManage": "Test Aboneliğini İptal Et",
+  "testPurchaseSuccess": "Test aboneliği artık etkin.",
+  "testPurchaseRevoked": "Test aboneliği iptal edildi.",
+  "testPurchaseError": "Test satın alması başarısız oldu: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

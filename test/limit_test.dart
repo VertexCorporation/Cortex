@@ -1,12 +1,13 @@
 // test/limit_test.dart
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/chat/services/limit.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('ChatLimitManager Tests', () {
     test('calculateTotalCharacters with text only', () {
-      final manager = ChatLimitManager(cortexSubscription: 0);
+      final manager = ChatLimitManager(subscription: SubscriptionEntitlement.none);
       final messages = [
         Message(isUserMessage: true, text: 'Hello'), // 5 chars
         Message(isUserMessage: false, text: 'World'), // 5 chars
@@ -16,7 +17,7 @@ void main() {
     });
 
     test('calculateTotalCharacters with attachments', () {
-      final manager = ChatLimitManager(cortexSubscription: 0);
+      final manager = ChatLimitManager(subscription: SubscriptionEntitlement.none);
       final messages = [
         Message(
           isUserMessage: true,
@@ -30,7 +31,7 @@ void main() {
     });
 
     test('calculateTotalCharacters with multiple attachments', () {
-      final manager = ChatLimitManager(cortexSubscription: 0);
+      final manager = ChatLimitManager(subscription: SubscriptionEntitlement.none);
       final messages = [
         Message(
           isUserMessage: true,
@@ -43,7 +44,7 @@ void main() {
     });
 
     test('calculateTotalCharacters mixed', () {
-      final manager = ChatLimitManager(cortexSubscription: 0);
+      final manager = ChatLimitManager(subscription: SubscriptionEntitlement.none);
       final messages = [
         Message(
             isUserMessage: true,

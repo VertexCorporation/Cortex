@@ -884,5 +884,21 @@
   "workInProgress": "Sedang dalam pengerjaan",
   "wrongPassword": "Kata sandi salah.",
   "yes": "Ya",
-  "you": "Anda"
+  "you": "Anda",
+  "premiumChatGateTitle": "Buka lebih banyak fitur",
+  "premiumChatGateDescription": "Beralih ke Cortex Premium untuk mengakses model AI canggih ini dan lebih banyak lagi.",
+  "premiumChatGateCta": "Bergabung dengan Premium",
+  "testPurchaseTitle": "Pembelian Uji",
+  "testPurchaseBadge": "TES",
+  "testPurchaseNotice": "Pembayaran simulasi untuk pengujian — tidak ada biaya sungguhan. Ini memberikan akses {plan} selama {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Selesaikan Pembelian Uji",
+  "testDurationMinutes": "{minutes} menit",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Mode uji: pembelian disimulasikan dan memberikan hak uji berdurasi singkat — penagihan sungguhan tidak pernah terlibat.",
+  "testSubscriptionManage": "Batalkan Langganan Uji",
+  "testPurchaseSuccess": "Langganan uji kini aktif.",
+  "testPurchaseRevoked": "Langganan uji dibatalkan.",
+  "testPurchaseError": "Pembelian uji gagal: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

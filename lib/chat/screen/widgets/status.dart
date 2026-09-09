@@ -88,7 +88,7 @@ class _ToolStatusWidgetState extends State<ToolStatusWidget>
             fontSize: widget.fontSize * 0.9,
             fontWeight: FontWeight.w400,
             color: AppColors.tertiaryColor,
-            fontStyle: FontStyle.italic,
+            fontFamily: 'Inter',
           ),
         ),
       ),

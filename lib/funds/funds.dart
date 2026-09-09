@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
 // Local Imports
@@ -23,20 +24,27 @@ import '../login/upgrade.dart';
 import '../navigation.dart';
 import '../notifications/introvert.dart';
 import '../server/user.dart';
+import '../server/subscription.dart';
 import '../theme.dart';
 import 'backend.dart';
 
 class FundsScreen extends StatelessWidget {
-  const FundsScreen({super.key});
+  /// Optionally pre-select a plan tier when opening the screen.
+  /// 'plus' | 'pro' | 'ultra'. Defaults to 'pro'.
+  final String? initialPlanType;
+
+  const FundsScreen({super.key, this.initialPlanType});
 
   @override
   Widget build(BuildContext context) {
-    return const FundsScreenView();
+    return FundsScreenView(initialPlanType: initialPlanType);
   }
 }
 
 class FundsScreenView extends StatefulWidget {
-  const FundsScreenView({super.key});
+  final String? initialPlanType;
+
+  const FundsScreenView({super.key, this.initialPlanType});
 
   @override
   State<FundsScreenView> createState() => _FundsScreenViewState();
@@ -66,9 +74,25 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   bool _hasAnyBenefitListAnimated = false;
   late final ConfettiController _confettiController;
   StreamSubscription? _purchaseCompletedSubscription;
+  StreamSubscription? _testGrantCompletedSubscription;
 
-  int _uiActiveSubscriptionLevel = 0;
-  String? _uiActiveSubscriptionOption;
+  SubscriptionEntitlement _uiSubscription = SubscriptionEntitlement.none;
+
+  /// Plan index of the currently active tier (0 free, 1 plus, 2 pro, 3 ultra).
+  int get _uiActiveSubscriptionLevel =>
+      _uiSubscription.effectiveTier.planIndex;
+
+  /// Billing cadence of the active plan; the 'monthly' fallback mirrors the
+  /// old inference for paid grants without a stored billing period.
+  String? get _uiActiveSubscriptionOption => _uiSubscription.isPaid
+      ? (_uiSubscription.billingPeriod?.value ?? 'monthly')
+      : null;
+
+  /// Whether the active entitlement is a lifetime grant.
+  bool get _uiIsLifetime =>
+      _uiSubscription.isActive &&
+      _uiSubscription.mode == SubscriptionMode.lifetime;
+
   late FundsBackend _backend;
   bool _isEmulator = false;
 
@@ -76,13 +100,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   Timer? _countdownTimer;
   final ValueNotifier<String> _countdownNotifier = ValueNotifier<String>('');
   bool _isSpecialOfferChecked = false;
-
-  int _planLevelFromSubscriptionLevel(int level) {
-    if (level == 4) return 1;
-    if (level == 5) return 2;
-    if (level == 6) return 3;
-    return level;
-  }
 
   Future<void> _checkIfEmulator() async {
     final deviceInfo = DeviceInfoPlugin();
@@ -105,21 +122,30 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   void initState() {
     super.initState();
 
-    // Check if data is already preloaded BEFORE first frame
-    // If preloaded: skip skeleton entirely
-    // If not preloaded: show skeleton until data loads
-    final isPreloaded = FundsBackend.isPreloaded;
-    log('[FundsScreen] initState - isPreloaded: $isPreloaded');
+    // If opened with an explicit plan, jump there; default remains Pro (index 1).
+    final initialType = widget.initialPlanType;
+    if (initialType != null) {
+      final idx = _planTypes.indexOf(initialType);
+      if (idx >= 0) _currentPage = idx;
+    }
 
-    if (isPreloaded) {
+    // Access the provider synchronously — safe in initState with listen: false.
+    _backend = Provider.of<FundsBackend>(context, listen: false);
+
+    // If the backend already has products in memory or the cache is warm,
+    // skip the skeleton immediately. This prevents shimmer flicker when
+    // revisiting the screen after the first load.
+    final hasData = _backend.allProducts.isNotEmpty ||
+        !_backend.isLoading ||
+        FundsBackend.isPreloaded;
+    if (hasData) {
       _isSpecialOfferChecked = true;
       _isContentLoaded = true;
-      log('[FundsScreen] Data preloaded, skipping skeleton');
+      log('[FundsScreen] Data ready (warm), skipping skeleton');
     } else {
-      // Will show skeleton until data loads
       _isSpecialOfferChecked = false;
       _isContentLoaded = false;
-      log('[FundsScreen] Data NOT preloaded, will show skeleton');
+      log('[FundsScreen] Data cold, will show skeleton');
     }
 
     _checkIfEmulator();
@@ -132,11 +158,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     // Log screen view
     AnalyticsService().logFundsScreen();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
       _backend = Provider.of<FundsBackend>(context, listen: false);
 
       final localizations = AppLocalizations.of(context)!;
-      _backend.updateLocalizationAndRefresh(localizations: localizations);
+      await _backend.updateLocalizationAndRefresh(localizations: localizations);
+      if (!mounted) return;
 
       _backend.addListener(_onBackendUpdate);
       _initializeUiStateFromBackend();
@@ -151,6 +179,22 @@ class _FundsScreenViewState extends State<FundsScreenView> {
             productId: purchasedProductId,
             productType: 'subscription',
             value: 0.0, // Backend doesn't expose price here
+            currency: 'USD',
+          );
+        }
+      });
+
+      // Simulated (test) purchases complete through the same UX path so the
+      // whole lifecycle is exercised identically to a real store purchase.
+      _testGrantCompletedSubscription =
+          _backend.onTestGrantCompleted.listen((String productId) {
+        if (mounted) {
+          _confettiController.play();
+          _updateUiAfterTestGrant(productId);
+          AnalyticsService().logPurchaseSuccess(
+            productId: productId,
+            productType: 'subscription',
+            value: 0.0, // Simulated purchase — no real charge.
             currency: 'USD',
           );
         }
@@ -310,6 +354,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       controller.dispose();
     }
     _purchaseCompletedSubscription?.cancel();
+    _testGrantCompletedSubscription?.cancel();
     _confettiController.dispose();
     super.dispose();
   }
@@ -318,8 +363,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (!mounted) return;
     final backend = Provider.of<FundsBackend>(context, listen: false);
     setState(() {
-      _uiActiveSubscriptionLevel = backend.currentUserSubscriptionLevel;
-      _uiActiveSubscriptionOption = backend.activeSubscriptionOption;
+      _uiSubscription = backend.subscription;
       final userLevel = _uiActiveSubscriptionLevel;
       final activeOption = _uiActiveSubscriptionOption;
 
@@ -335,19 +379,17 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   void _onBackendUpdate() {
     if (!mounted) return;
     final backend = Provider.of<FundsBackend>(context, listen: false);
-    final newLevel = backend.currentUserSubscriptionLevel;
-    final newOption = backend.activeSubscriptionOption;
-    final bool hasDataChanged = newLevel != _uiActiveSubscriptionLevel ||
-        newOption != _uiActiveSubscriptionOption;
-    if (hasDataChanged) {
+    final newSubscription = backend.subscription;
+    if (newSubscription != _uiSubscription) {
       setState(() {
-        _uiActiveSubscriptionLevel = newLevel;
-        _uiActiveSubscriptionOption = newOption;
-        if (newLevel > 0 &&
-            newOption != null &&
-            newLevel - 1 < _planTypes.length) {
-          final activePlanType = _planTypes[newLevel - 1];
-          _selectedBillingOptions[activePlanType] = newOption;
+        _uiSubscription = newSubscription;
+        final userLevel = _uiActiveSubscriptionLevel;
+        final activeOption = _uiActiveSubscriptionOption;
+        if (userLevel > 0 &&
+            activeOption != null &&
+            userLevel - 1 < _planTypes.length) {
+          final activePlanType = _planTypes[userLevel - 1];
+          _selectedBillingOptions[activePlanType] = activeOption;
         }
       });
     }
@@ -394,10 +436,75 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (planType != null && billingOption != null && planLevel != null) {
       setState(() {
         _selectedBillingOptions[planType!] = billingOption!;
-        _uiActiveSubscriptionLevel = planLevel!;
-        _uiActiveSubscriptionOption = billingOption;
+        // Optimistic entitlement so the UI reflects the purchase immediately;
+        // the backend's authoritative write replaces it on the next update.
+        _uiSubscription = SubscriptionEntitlement(
+          tier: SubscriptionTier.values[planLevel!],
+          mode: SubscriptionMode.renewable,
+          status: SubscriptionStatus.active,
+          expiresAt: DateTime.now().add(const Duration(days: 370)),
+          billingPeriod: billingOption == 'annual'
+              ? SubscriptionBillingPeriod.annual
+              : SubscriptionBillingPeriod.monthly,
+        );
       });
     }
+  }
+
+  /// Optimistic entitlement after a simulated purchase: mirrors what the
+  /// server wrote (short-lived promotional `internal_test` grant), so the
+  /// UI is accurate even before the Firestore listener catches up.
+  void _updateUiAfterTestGrant(String productId) {
+    final SubscriptionTier tier;
+    switch (productId) {
+      case FundsBackend.monthlySubscriptionPlus:
+      case FundsBackend.annualSubscriptionPlus:
+        tier = SubscriptionTier.plus;
+        break;
+      case FundsBackend.monthlySubscriptionPro:
+      case FundsBackend.annualSubscriptionPro:
+        tier = SubscriptionTier.pro;
+        break;
+      case FundsBackend.monthlySubscriptionUltra:
+      case FundsBackend.annualSubscriptionUltra:
+        tier = SubscriptionTier.ultra;
+        break;
+      default:
+        return;
+    }
+
+    setState(() {
+      _uiSubscription = SubscriptionEntitlement(
+        tier: tier,
+        mode: SubscriptionMode.promotional,
+        status: SubscriptionStatus.active,
+        expiresAt: DateTime.now().add(
+            const Duration(minutes: FundsBackend.testGrantDurationMinutes)),
+        source: SubscriptionSource.internalTest,
+        testGrant: true,
+      );
+    });
+  }
+
+  /// Maps a (plan, billing) selection to the store product ID.
+  String? _resolveSubscriptionProductId(String planType, String billingOption) {
+    final bool isAnnual = billingOption == 'annual';
+    if (planType == 'plus') {
+      return isAnnual
+          ? FundsBackend.annualSubscriptionPlus
+          : FundsBackend.monthlySubscriptionPlus;
+    }
+    if (planType == 'pro') {
+      return isAnnual
+          ? FundsBackend.annualSubscriptionPro
+          : FundsBackend.monthlySubscriptionPro;
+    }
+    if (planType == 'ultra') {
+      return isAnnual
+          ? FundsBackend.annualSubscriptionUltra
+          : FundsBackend.monthlySubscriptionUltra;
+    }
+    return null;
   }
 
   void _onPrimaryButtonPressed() {
@@ -412,6 +519,15 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       return;
     }
     if (backend.isPurchasePending) return;
+
+    // Debug test accounts replace the store checkout with the simulated one
+    // (server-verified via `isVertex`; see FundsTestGrants). Products may be
+    // empty on emulators — the simulated flow does not need store details.
+    if (backend.isTestPurchaseAvailable) {
+      _onTestModePrimaryButtonPressed();
+      return;
+    }
+
     if (backend.allProducts.isEmpty) {
       _showCustomNotification(
           message: localizations.productNotFound,
@@ -422,35 +538,18 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final planType = _planTypes[_currentPage];
     final int planLevel = _currentPage + 1;
     final billingOption = _selectedBillingOptions[planType]!;
-    final int activePlanLevel =
-        _planLevelFromSubscriptionLevel(_uiActiveSubscriptionLevel);
-
-    String? productIdToPurchase;
+    final int activePlanLevel = _uiActiveSubscriptionLevel;
 
     if (activePlanLevel > planLevel ||
         (activePlanLevel == planLevel &&
-            (_uiActiveSubscriptionLevel >= 4 ||
+            (_uiIsLifetime ||
                 billingOption == _uiActiveSubscriptionOption))) {
       backend.manageSubscription();
       return;
     }
 
-    final isAnnual = billingOption == 'annual';
-    if (planType == 'plus') {
-      productIdToPurchase = isAnnual
-          ? FundsBackend.annualSubscriptionPlus
-          : FundsBackend.monthlySubscriptionPlus;
-    }
-    if (planType == 'pro') {
-      productIdToPurchase = isAnnual
-          ? FundsBackend.annualSubscriptionPro
-          : FundsBackend.monthlySubscriptionPro;
-    }
-    if (planType == 'ultra') {
-      productIdToPurchase = isAnnual
-          ? FundsBackend.annualSubscriptionUltra
-          : FundsBackend.monthlySubscriptionUltra;
-    }
+    final String? productIdToPurchase =
+        _resolveSubscriptionProductId(planType, billingOption);
 
     if (productIdToPurchase != null) {
       try {
@@ -486,6 +585,57 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     await showAppWebViewModal(context, localizations.termsOfService, termsUrl);
     if (!mounted) return;
     await showAppWebViewModal(context, localizations.privacyPolicy, policyUrl);
+  }
+
+  /// Primary button behavior while the simulated (test) flow is active:
+  /// an active test entitlement is "managed" by revoking it — the store's
+  /// management page is meaningless for test grants.
+  void _onTestModePrimaryButtonPressed() {
+    final backend = Provider.of<FundsBackend>(context, listen: false);
+
+    if (_uiSubscription.isTestEntitlement && _uiSubscription.isActive) {
+      HapticFeedback.lightImpact();
+      backend.revokeTestSubscription();
+      return;
+    }
+
+    final planType = _planTypes[_currentPage];
+    final billingOption = _selectedBillingOptions[planType]!;
+    _showTestPurchaseSheet(planType, billingOption);
+  }
+
+  /// Opens the simulated checkout sheet: plan/period/price plus an explicit
+  /// "no real charge" disclosure. Confirming calls the Fulcrum test grant.
+  Future<void> _showTestPurchaseSheet(
+      String planType, String billingOption) async {
+    final backend = Provider.of<FundsBackend>(context, listen: false);
+    final productId = _resolveSubscriptionProductId(planType, billingOption);
+    if (productId == null) return;
+
+    // Price is displayed when store products are available (physical debug
+    // devices); on emulators the sheet falls back to plan/period only.
+    ProductDetails? product;
+    for (final p in backend.allProducts) {
+      if (p.id == productId) {
+        product = p;
+        break;
+      }
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (sheetContext) {
+        return TestPurchaseSheet(
+          planType: planType,
+          billingOption: billingOption,
+          price: product?.price,
+          onConfirmed: () => backend.purchaseTestSubscription(productId),
+        );
+      },
+    );
   }
 
   void _showCustomNotification(
@@ -524,15 +674,24 @@ class _FundsScreenViewState extends State<FundsScreenView> {
               body: Stack(
                 children: [
                   if (!backend.hasError) _buildMainContent(context, backend),
-                  IgnorePointer(
-                    ignoring: _isContentLoaded,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 500),
-                      opacity: _isContentLoaded ? 0.0 : 1.0,
-                      curve: Curves.easeOutCubic,
-                      child:
-                          const FundsSkeletonLoader(key: ValueKey('skeleton')),
-                    ),
+                  // AnimatedSwitcher fully removes the skeleton from the tree
+                  // after fade-out, stopping the internal Shimmer animation and
+                  // preventing render-object lifecycle conflicts.
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeOutCubic,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                    child: _isContentLoaded
+                        ? const SizedBox.shrink(
+                            key: ValueKey('skeleton_gone'))
+                        : const FundsSkeletonLoader(
+                            key: ValueKey('skeleton')),
                   ),
                   if (backend.hasError)
                     _buildErrorScreen(context, backend.errorMessage!),
@@ -615,14 +774,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0)),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         HapticFeedback.lightImpact();
                         final backend =
                             Provider.of<FundsBackend>(context, listen: false);
                         final notificationService =
                             Provider.of<IntrovertNotificationService>(context,
                                 listen: false);
-                        backend.initialize(
+                        await backend.initialize(
                             notificationService: notificationService,
                             localizations: localizations);
                       },
@@ -662,7 +821,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     // Determine visual active state locally to ensure instant UI update when timer hits 0
     // even if backend state lags slightly.
     final bool isOfferVisuallyActive =
-        backend.currentUserSubscriptionLevel == 0 &&
+        !backend.subscription.isPaid &&
             backend.isSpecialOfferActive &&
             _countdownNotifier.value.isNotEmpty;
 
@@ -689,8 +848,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       availableProducts: backend.subscriptionProducts,
                       selectedBillingOption:
                           _selectedBillingOptions[_planTypes[i]]!,
-                      activeSubscriptionLevel: _uiActiveSubscriptionLevel,
-                      activeSubscriptionOption: _uiActiveSubscriptionOption,
+                      subscription: _uiSubscription,
                       onBillingOptionChanged: (newOption) {
                         setState(() {
                           _selectedBillingOptions[_planTypes[i]] = newOption;
@@ -734,7 +892,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                         1.0,
                       ),
                     child: ElevatedButton(
-                      onPressed: (backend.isPurchasePending || _isEmulator)
+                      onPressed: (backend.isPurchasePending ||
+                              (_isEmulator && !backend.isTestPurchaseAvailable))
                           ? null
                           : () {
                               HapticFeedback.lightImpact();
@@ -772,10 +931,39 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                           else ...[
                             AnimatedSwitcher(
                               duration: const Duration(milliseconds: 250),
+                              layoutBuilder: (currentChild, previousChildren) {
+                                return Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    ...previousChildren,
+                                    if (currentChild != null) currentChild,
+                                  ],
+                                );
+                              },
                               child: _buildButtonText(
                                   context, backend, screenWidth),
                             ),
-                            if (_isEmulator) ...[
+                            if (backend.isTestPurchaseAvailable) ...[
+                              SizedBox(height: screenHeight * 0.002),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.04),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    localizations.testModeInfo,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 3,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.025,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.primaryColor
+                                          .withValues(alpha: 0.8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ] else if (_isEmulator) ...[
                               SizedBox(height: screenHeight * 0.002),
                               Padding(
                                 padding: EdgeInsets.symmetric(
@@ -855,14 +1043,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       BuildContext context, double screenWidth, String countdownText) {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     // Rely on countdown text being present to show special offer badge
-    final bool showSpecialOffer = backend.currentUserSubscriptionLevel == 0 &&
+    final bool showSpecialOffer = !backend.subscription.isPaid &&
         backend.isSpecialOfferActive &&
         countdownText.isNotEmpty;
 
     bool showFreeTrialBadge = false;
     if (!showSpecialOffer &&
         !_isEmulator &&
-        backend.currentUserSubscriptionLevel == 0) {
+        !backend.subscription.isPaid) {
       try {
         final proMonthly = backend.subscriptionProducts
             .firstWhere((p) => p.id == FundsBackend.monthlySubscriptionPro);
@@ -1013,6 +1201,17 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final currentPlanType = _planTypes[planIndex];
     final selectedBillingOption = _selectedBillingOptions[currentPlanType]!;
 
+    // Simulated flow: an active test entitlement on the exact matching plan
+    // card is cancelled immediately. Lower-tier cards must NOT show the test
+    // cancel CTA — they fall through to normal purchase / manage text.
+    if (backend.isTestPurchaseAvailable &&
+        _uiSubscription.isTestEntitlement &&
+        _uiSubscription.isActive &&
+        _uiActiveSubscriptionLevel == currentPlanLevel) {
+      return Text(localizations.testSubscriptionManage,
+          key: ValueKey('test-cancel-$currentPlanType'), style: textStyle);
+    }
+
     if (_uiActiveSubscriptionLevel > currentPlanLevel) {
       return Text(localizations.manageSubscription,
           key: ValueKey('downgrade-$currentPlanType'), style: textStyle);
@@ -1048,3 +1247,232 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     );
   }
 }
+
+/// Simulated checkout sheet shown in place of the store payment sheet while
+/// the debug-only test purchase flow is active. Its single job is informed
+/// consent: show what would be "bought", that no real charge happens and how
+/// long the test access lasts.
+class TestPurchaseSheet extends StatefulWidget {
+  const TestPurchaseSheet({
+    super.key,
+    required this.planType,
+    required this.billingOption,
+    required this.onConfirmed,
+    this.price,
+  });
+
+  /// 'plus' | 'pro' | 'ultra'.
+  final String planType;
+
+  /// 'monthly' | 'annual'.
+  final String billingOption;
+
+  /// Formatted store price when available; null on emulators without store
+  /// access.
+  final String? price;
+
+  /// Runs the simulated purchase (calls the Fulcrum test grant).
+  final Future<bool> Function() onConfirmed;
+
+  @override
+  State<TestPurchaseSheet> createState() => _TestPurchaseSheetState();
+}
+
+class _TestPurchaseSheetState extends State<TestPurchaseSheet> {
+  bool _isSubmitting = false;
+
+  Future<void> _confirm() async {
+    if (_isSubmitting) return;
+    HapticFeedback.lightImpact();
+    setState(() => _isSubmitting = true);
+    await widget.onConfirmed();
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+
+    final planDisplayName = widget.planType.capitalize();
+    final billingName = widget.billingOption == 'annual'
+        ? localizations.annual
+        : localizations.monthly;
+    final fullPlanName = "$planDisplayName $billingName";
+    final durationText = localizations
+        .testDurationMinutes(FundsBackend.testGrantDurationMinutes);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+          screenWidth * 0.06,
+          screenHeight * 0.015,
+          screenWidth * 0.06,
+          screenHeight * 0.02 + MediaQuery.paddingOf(context).bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Container(
+              width: screenWidth * 0.12,
+              height: screenWidth * 0.012,
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(screenWidth * 0.02),
+              ),
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          _buildTitleRow(context, localizations, screenWidth),
+          SizedBox(height: screenHeight * 0.025),
+          _buildPlanRow(context, localizations, screenWidth, fullPlanName),
+          SizedBox(height: screenHeight * 0.02),
+          Text(
+            localizations.testPurchaseNotice(fullPlanName, durationText),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: screenWidth * 0.034,
+              height: 1.4,
+              color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.03),
+          _buildConfirmButton(context, localizations, screenWidth, screenHeight),
+          SizedBox(height: screenHeight * 0.01),
+          TextButton(
+            onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+            child: Text(
+              localizations.cancel,
+              style: TextStyle(
+                color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                fontSize: screenWidth * 0.035,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTitleRow(
+      BuildContext context, AppLocalizations localizations, double screenWidth) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Flexible(
+          child: Text(
+            localizations.testPurchaseTitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: screenWidth * 0.05,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryColor.inverted,
+            ),
+          ),
+        ),
+        SizedBox(width: screenWidth * 0.02),
+        Container(
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.02, vertical: screenWidth * 0.006),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            border: Border.all(
+                color: AppColors.primaryColor.withValues(alpha: 0.5)),
+          ),
+          child: Text(
+            localizations.testPurchaseBadge,
+            style: TextStyle(
+              fontSize: screenWidth * 0.022,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlanRow(BuildContext context, AppLocalizations localizations,
+      double screenWidth, String fullPlanName) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04, vertical: screenWidth * 0.035),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.inverted.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14.0),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              fullPlanName,
+              style: TextStyle(
+                fontSize: screenWidth * 0.042,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryColor.inverted,
+              ),
+            ),
+          ),
+          if (widget.price != null) ...[
+            SizedBox(width: screenWidth * 0.03),
+            Text(
+              widget.price!,
+              style: TextStyle(
+                fontSize: screenWidth * 0.042,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryColor.inverted,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConfirmButton(BuildContext context,
+      AppLocalizations localizations, double screenWidth, double screenHeight) {
+    return ElevatedButton(
+      onPressed: _isSubmitting ? null : _confirm,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.primaryColor.inverted,
+        disabledBackgroundColor:
+            AppColors.primaryColor.inverted.withValues(alpha: 0.6),
+        disabledForegroundColor:
+            AppColors.primaryColor.withValues(alpha: 0.6),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
+        minimumSize: Size(double.infinity, screenHeight * 0.055),
+      ),
+      child: _isSubmitting
+          ? SizedBox(
+              width: screenWidth * 0.05,
+              height: screenWidth * 0.05,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primaryColor,
+              ),
+            )
+          : Text(
+              localizations.testPurchaseConfirm,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: screenWidth * 0.04,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+    );
+  }
+}
+

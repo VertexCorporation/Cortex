@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/funds/funds.dart';
 import 'package:cortex/navigation.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/login/upgrade.dart';
 import 'package:cortex/server/user.dart';
@@ -36,7 +37,7 @@ class BriefingOverlay extends StatefulWidget {
   final ValueChanged<double>? onVisibleHeightChanged;
 
   final bool isVideoModel;
-  final int userTier;
+  final SubscriptionTier userTier;
 
   const BriefingOverlay({
     super.key,
@@ -270,7 +271,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       return null;
     }
 
-    if (widget.isVideoModel && widget.userTier != 3 && widget.userTier != 6) {
+    if (widget.isVideoModel && widget.userTier != SubscriptionTier.ultra) {
       return loc.videoPremiumWarning;
     }
     if (_isPremiumUpgradeMessage) return loc.premiumTrialExhaustedMessage;

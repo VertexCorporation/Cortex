@@ -598,5 +598,21 @@
   "categoryPhoto": "Foto",
   "categoryMasculine": "Maskulin",
   "categoryFeminine": "Feminin",
-  "categoryInanimate": "Livlös"
+  "categoryInanimate": "Livlös",
+  "premiumChatGateTitle": "Lås upp fler möjligheter",
+  "premiumChatGateDescription": "Uppgradera till Cortex Premium för att få tillgång till den här kraftfulla AI-modellen och mer.",
+  "premiumChatGateCta": "Skaffa Premium",
+  "testPurchaseTitle": "Testköp",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Simulerad betalning för testning — ingen riktig avgift debiteras. Detta ger {plan}-åtkomst i {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Slutför testköp",
+  "testDurationMinutes": "{minutes} minuter",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Testläge: köp är simulerade och beviljar kortvariga testrättigheter — verklig fakturering förekommer aldrig.",
+  "testSubscriptionManage": "Avsluta testprenumeration",
+  "testPurchaseSuccess": "Testprenumerationen är nu aktiv.",
+  "testPurchaseRevoked": "Testprenumerationen avslutad.",
+  "testPurchaseError": "Testköp misslyckades: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

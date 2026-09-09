@@ -1,5 +1,6 @@
 // test/skeleton_test.dart
 
+import 'package:cortex/server/subscription.dart';
 import 'package:cortex/settings/providers/general.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -38,7 +39,7 @@ class MockSettingsGeneralProvider extends ChangeNotifier
   bool get isVerified => true;
 
   @override
-  int get activeSubscriptionLevel => 0;
+  SubscriptionEntitlement get subscription => SubscriptionEntitlement.none;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

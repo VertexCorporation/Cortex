@@ -884,5 +884,21 @@
   "workInProgress": "العمل قيد التنفيذ",
   "wrongPassword": "كلمة مرور غير صحيحة.",
   "yes": "نعم",
-  "you": "أنت"
+  "you": "أنت",
+  "premiumChatGateTitle": "افتح المزيد من الإمكانات",
+  "premiumChatGateDescription": "قم بالترقية إلى Cortex Premium للوصول إلى نموذج الذكاء الاصطناعي القوي هذا والمزيد.",
+  "premiumChatGateCta": "اشترك في Premium",
+  "testPurchaseTitle": "شراء تجريبي",
+  "testPurchaseBadge": "اختبار",
+  "testPurchaseNotice": "عملية دفع محاكاة لأغراض الاختبار — لن يتم أي خصم حقيقي. يمنحك هذا الوصول إلى {plan} لمدة {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "إتمام الشراء التجريبي",
+  "testDurationMinutes": "{minutes} دقيقة",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "وضع الاختبار: عمليات الشراء محاكاة وتمنح اشتراكات اختبارية قصيرة الأمد — لا تنطوي على فوترة حقيقية إطلاقًا.",
+  "testSubscriptionManage": "إلغاء الاشتراك التجريبي",
+  "testPurchaseSuccess": "الاشتراك التجريبي مُفعّل الآن.",
+  "testPurchaseRevoked": "تم إلغاء الاشتراك التجريبي.",
+  "testPurchaseError": "فشل الشراء التجريبي: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

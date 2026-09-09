@@ -628,5 +628,21 @@
   "categoryPhoto": "Foto",
   "categoryMasculine": "Maskulin",
   "categoryFeminine": "Feminin",
-  "categoryInanimate": "Leveløst"
+  "categoryInanimate": "Leveløst",
+  "premiumChatGateTitle": "Lås opp flere muligheter",
+  "premiumChatGateDescription": "Oppgrader til Cortex Premium for å få tilgang til denne kraftige KI-modellen og mer.",
+  "premiumChatGateCta": "Bli Premium-medlem",
+  "testPurchaseTitle": "Testkjøp",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Simulert betaling for testing — ingen ekte belastning gjøres. Dette gir tilgang til {plan} i {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Fullfør testkjøp",
+  "testDurationMinutes": "{minutes} minutter",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Testmodus: kjøp er simulerte og gir kortvarige testrettigheter — ekte fakturering er aldri involvert.",
+  "testSubscriptionManage": "Avbryt testabonnement",
+  "testPurchaseSuccess": "Testabonnementet er nå aktivt.",
+  "testPurchaseRevoked": "Testabonnementet er kansellert.",
+  "testPurchaseError": "Testkjøp mislyktes: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

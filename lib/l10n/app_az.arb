@@ -884,5 +884,21 @@
   "workInProgress": "İşlər Davam Edir",
   "wrongPassword": "Yanlış şifrə.",
   "yes": "Bəli",
-  "you": "Sən"
+  "you": "Sən",
+  "premiumChatGateTitle": "Daha çox imkan əldə edin",
+  "premiumChatGateDescription": "Bu güclü süni intellekt modelinə və daha çoxuna giriş üçün Cortex Premium-a keçin.",
+  "premiumChatGateCta": "Premium-a qoşul",
+  "testPurchaseTitle": "Sınaq alışı",
+  "testPurchaseBadge": "TEST",
+  "testPurchaseNotice": "Sınaq üçün simulyasiya olunmuş ödəniş — real ödəniş aparılmır. Bu, {duration} müddətində {plan} girişini təmin edir.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Sınaq alışını tamamla",
+  "testDurationMinutes": "{minutes} dəqiqə",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Test rejimi: alışlar simulyasiya olunur və qısa müddətli test imtiyazları verir — real ödəniş heç vaxt tələb olunmur.",
+  "testSubscriptionManage": "Sınaq abunəliyini ləğv et",
+  "testPurchaseSuccess": "Sınaq abunəliyi artıq aktivdir.",
+  "testPurchaseRevoked": "Sınaq abunəliyi ləğv edildi.",
+  "testPurchaseError": "Sınaq alışı alınmadı: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

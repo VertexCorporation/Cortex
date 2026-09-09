@@ -425,7 +425,8 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
                           style: TextStyle(
                             color: AppColors.tertiaryColor,
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       )
@@ -435,7 +436,8 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
                         style: TextStyle(
                           color: AppColors.tertiaryColor,
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
                         ),
                       ),
                     const SizedBox(width: 8),

@@ -2142,4 +2142,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Unlock more';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Upgrade to Cortex Premium to access this powerful AI model and more.';
+
+  @override
+  String get premiumChatGateCta => 'Join Premium';
+
+  @override
+  String get testPurchaseTitle => 'Test Purchase';
+
+  @override
+  String get testPurchaseBadge => 'TEST';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Simulated checkout for testing — no real charge is made. This grants $plan access for $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Complete Test Purchase';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes minutes';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Test mode: purchases are simulated and grant short-lived test entitlements — real billing is never involved.';
+
+  @override
+  String get testSubscriptionManage => 'Cancel Test Subscription';
+
+  @override
+  String get testPurchaseSuccess => 'Test subscription is now active.';
+
+  @override
+  String get testPurchaseRevoked => 'Test subscription cancelled.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Test purchase failed: $message';
+  }
 }

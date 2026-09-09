@@ -129,6 +129,7 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
 class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
   final ModelDetailProvider provider;
   final VoidCallback onBackPressed;
+  final ValueChanged<String> onVariantSelected;
   final ScrollController? scrollController;
 
   // Pre-calculated metrics for PreferredSize
@@ -140,6 +141,7 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
     required BuildContext context, // Context required for sizing
     required this.provider,
     required this.onBackPressed,
+    required this.onVariantSelected,
     this.scrollController,
   })  : _isTablet = MediaQuery.sizeOf(context).width >= 600,
         _toolbarHeight = MediaQuery.sizeOf(context).width >= 600
@@ -237,7 +239,7 @@ class DetailAppBarState extends State<DetailAppBar>
           modelTitle: provider.displayTitle,
           onClosed: _removeOverlayEntry,
           onSelect: (selectedMap) {
-            provider.selectVariant(context, selectedMap['id'] as String);
+            widget.onVariantSelected(selectedMap['id'] as String);
           },
         );
       },

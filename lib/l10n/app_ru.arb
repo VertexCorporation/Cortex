@@ -884,5 +884,21 @@
   "workInProgress": "Работа в процессе",
   "wrongPassword": "Неправильный пароль.",
   "yes": "Да",
-  "you": "Ты"
+  "you": "Ты",
+  "premiumChatGateTitle": "Откройте больше возможностей",
+  "premiumChatGateDescription": "Перейдите на Cortex Premium, чтобы получить доступ к этой мощной модели ИИ и другим возможностям.",
+  "premiumChatGateCta": "Подключить Premium",
+  "testPurchaseTitle": "Тестовая покупка",
+  "testPurchaseBadge": "ТЕСТ",
+  "testPurchaseNotice": "Симулированная оплата для тестирования — реальное списание не производится. Это даёт доступ к {plan} на {duration}.",
+  "@testPurchaseNotice": {"placeholders": {"plan": {"type": "String", "example": "Pro Monthly"}, "duration": {"type": "String", "example": "60 minutes"}}},
+  "testPurchaseConfirm": "Завершить тестовую покупку",
+  "testDurationMinutes": "{minutes} мин.",
+  "@testDurationMinutes": {"placeholders": {"minutes": {"type": "int", "example": "60"}}},
+  "testModeInfo": "Тестовый режим: покупки симулируются и предоставляют кратковременные тестовые права — реальное списание исключено.",
+  "testSubscriptionManage": "Отменить тестовую подписку",
+  "testPurchaseSuccess": "Тестовая подписка активирована.",
+  "testPurchaseRevoked": "Тестовая подписка отменена.",
+  "testPurchaseError": "Не удалось выполнить тестовую покупку: {message}",
+  "@testPurchaseError": {"placeholders": {"message": {"type": "String"}}}
 }

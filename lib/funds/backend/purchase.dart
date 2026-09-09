@@ -88,9 +88,9 @@ extension FundsPurchase on FundsBackend {
 
         ChangeSubscriptionParam? changeParam;
 
-        if (_activeSubscriptionProductId != null &&
-            _activeSubscriptionProductId!.isNotEmpty) {
-          log('Detected active subscription: $_activeSubscriptionProductId. Attempting upgrade flow.',
+        if (_subscription.productId != null &&
+            _subscription.productId!.isNotEmpty) {
+          log('Detected active subscription: ${_subscription.productId}. Attempting upgrade flow.',
               name: FundsBackend._logName);
 
           GooglePlayPurchaseDetails? oldPurchase;
@@ -106,7 +106,7 @@ extension FundsPurchase on FundsBackend {
                 oldPurchase = pastPurchasesResponse.pastPurchases
                     .map((e) => e)
                     .firstWhere((p) =>
-                        p.productID == _activeSubscriptionProductId &&
+                        p.productID == _subscription.productId &&
                         p.status == PurchaseStatus.purchased);
               } catch (_) {}
             }

@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/server/user.dart';
+import 'package:cortex/server/subscription.dart';
+import 'package:cortex/funds/funds.dart';
 
 import '../../../../../providers/input.dart';
 import '../selection/sheet.dart';
@@ -369,18 +371,34 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     ),
 
                     // 4.5. CREATE VIDEO
-                    FeaturesSheetButton(
-                      iconPath: 'assets/icons/transition.svg',
-                      title: l10n.featureCreateVideoTitle,
-                      description: l10n.featureCreateVideoDescription,
-                      isSelected:
-                          currentMode == ChatInputMode.videoGeneration,
-                      isDisabled: false,
-                      onTap: () {
-                        Navigator.pop(context);
-                        setGenerationFeatureMode(
-                          widget.parentContext,
-                          targetType: 'video',
+                    Builder(
+                      builder: (context) {
+                        final subscription = userProvider.subscription;
+                        final bool isUltra = subscription.isActive &&
+                            (subscription.tier == SubscriptionTier.ultra ||
+                                subscription.mode ==
+                                    SubscriptionMode.lifetime);
+                        return FeaturesSheetButton(
+                          iconPath: 'assets/icons/transition.svg',
+                          title: l10n.featureCreateVideoTitle,
+                          description: l10n.featureCreateVideoDescription,
+                          isSelected:
+                              currentMode == ChatInputMode.videoGeneration,
+                          isDisabled: false,
+                          onTap: () {
+                            Navigator.pop(context);
+                            if (isUltra) {
+                              setGenerationFeatureMode(
+                                widget.parentContext,
+                                targetType: 'video',
+                              );
+                            } else {
+                              navigateToScreen(
+                                const FundsScreen(initialPlanType: 'ultra'),
+                                direction: const Offset(1.0, 0.0),
+                              );
+                            }
+                          },
                         );
                       },
                     ),
@@ -412,7 +430,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     ),
 
                     // 7. EXPLORE
-                    if (userProvider.isSubscriptionActive)
+                    if (userProvider.subscription.isActive)
                       FeaturesSheetButton(
                         iconData: Icons.visibility,
                         title: l10n.explore,

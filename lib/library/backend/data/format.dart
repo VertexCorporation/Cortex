@@ -98,7 +98,6 @@ String formatName(String? name, {bool isOfflineVariant = false}) {
     final words = source
         .replaceAll('_', ' ')
         .replaceAll('-', ' ')
-        .replaceAll('.', ' ')
         .split(RegExp(r'\s+'))
         .where((w) => w.isNotEmpty);
 
@@ -177,6 +176,15 @@ String formatName(String? name, {bool isOfflineVariant = false}) {
     }
     return limitedWords.join(" ").trim();
   }
+
+  const displayNames = {
+    'gpt image': 'GPT Image',
+    'mai': 'MAI',
+    'minimax': 'MiniMax'
+  };
+  final canonical =
+      displayNames[name.toLowerCase().replaceAll('-', ' ').trim()];
+  if (canonical != null) return canonical;
 
   final words = name
       .replaceAll('-', ' ')

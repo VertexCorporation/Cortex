@@ -266,7 +266,7 @@ class LoginBackendService {
       }
 
       userProvider.listenToUserData(user);
-      CreditsManager.instance.listenToCredits();
+      CreditsManager.instance.listenToCredits(userProvider);
       dev.log(
         '[Auth.Register] Manually attached UserProvider & CreditsManager listeners for new user (UID: ${user.uid}).',
         name: 'LoginBackend',

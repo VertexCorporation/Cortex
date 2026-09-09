@@ -186,7 +186,7 @@ class LibraryScreenState extends State<LibraryScreen>
       final isOnlineOrRP = model.isServerSide || model.category == 'roleplay';
       if (model.isPremium || isOnlineOrRP) {
         final userProvider = context.read<UserProvider>();
-        if (!userProvider.isSubscriptionActive) {
+        if (!userProvider.subscription.isActive) {
           HapticFeedback.lightImpact();
           navigateToScreen(const FundsScreen(),
               direction: const Offset(0.0, 1.0));

@@ -74,6 +74,7 @@ class ActionButtonWidget extends StatelessWidget {
   final bool isActionPermitted;
   final bool isSending;
   final bool isTextEmpty;
+  final double? recordingProgress;
   final bool isRecording; // To toggle Stop button during voice
   final VoidCallback onSend;
   final VoidCallback onStop;
@@ -86,6 +87,7 @@ class ActionButtonWidget extends StatelessWidget {
     required this.isSending,
     required this.isTextEmpty,
     this.isRecording = false,
+    this.recordingProgress,
     required this.onSend,
     required this.onStop,
     required this.controller,
@@ -134,76 +136,94 @@ class ActionButtonWidget extends StatelessWidget {
     }
 
     // Only show Mic if device supported AND we are not currently busy
-    bool showMic = isDeviceSupported && !isSending && !isRecording;
+    bool showMic = isDeviceSupported &&
+        !isSending &&
+        (recordingProgress != null || !isRecording);
 
+    final mic = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      reverseDuration: const Duration(milliseconds: 200),
+      switchInCurve: Curves.easeOutQuad,
+      switchOutCurve: Curves.easeInQuad,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: AnimatedBuilder(
+            animation: animation,
+            builder: (context, child) {
+              return ClipRect(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  widthFactor: animation.value,
+                  child: child,
+                ),
+              );
+            },
+            child: child,
+          ),
+        );
+      },
+      child: showMic
+          ? Padding(
+              key: const ValueKey('mic_visible'),
+              padding: const EdgeInsetsDirectional.only(end: 8.0),
+              child: _ToolCircleButton(
+                size: buttonSize,
+                onTap: () async {
+                  final localeCode = context
+                      .read<ChatSessionProvider>()
+                      .getLocale()
+                      .languageCode;
+                  final currentText = controller.text;
+
+                  inputProvider.setVoiceRecording(true);
+
+                  await speechService.startListening(
+                    locale: localeCode,
+                    onResult: (String text) {
+                      String spacer =
+                          (currentText.isNotEmpty && !currentText.endsWith(' '))
+                              ? ' '
+                              : '';
+                      if (currentText.isEmpty) spacer = '';
+                      controller.text = "$currentText$spacer$text";
+                      controller.selection = TextSelection.fromPosition(
+                          TextPosition(offset: controller.text.length));
+                    },
+                  );
+                },
+                child: SvgPicture.asset(
+                  'assets/icons/microphone.svg',
+                  width: CortexDesign.icon,
+                  height: CortexDesign.icon,
+                  colorFilter: ColorFilter.mode(
+                      AppColors.primaryColor.inverted, BlendMode.srcIn),
+                ),
+              ),
+            )
+          : const SizedBox.shrink(key: ValueKey('mic_hidden')),
+    );
+    final micVisibility = 1 -
+        const Interval(0, 0.4, curve: Curves.easeOut)
+            .transform(recordingProgress ?? 0);
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // UPDATED: Uses AnimatedSwitcher for Slide + Fade transition
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          reverseDuration: const Duration(milliseconds: 200),
-          switchInCurve: Curves.easeOutQuad,
-          switchOutCurve: Curves.easeInQuad,
-          transitionBuilder: (child, animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: AnimatedBuilder(
-                animation: animation,
-                builder: (context, child) {
-                  return ClipRect(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      widthFactor: animation.value,
-                      child: child,
-                    ),
-                  );
-                },
-                child: child,
+        if (recordingProgress != null)
+          IgnorePointer(
+            ignoring: isRecording || recordingProgress! > 0,
+            child: ClipRect(
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                widthFactor: micVisibility,
+                child: Opacity(opacity: micVisibility, child: mic),
               ),
-            );
-          },
-          child: showMic
-              ? Padding(
-                  key: const ValueKey('mic_visible'),
-                  padding: const EdgeInsetsDirectional.only(end: 8.0),
-                  child: _ToolCircleButton(
-                    size: buttonSize,
-                    onTap: () async {
-                      final localeCode = context
-                          .read<ChatSessionProvider>()
-                          .getLocale()
-                          .languageCode;
-                      final currentText = controller.text;
-
-                      inputProvider.setVoiceRecording(true);
-
-                      await speechService.startListening(
-                        locale: localeCode,
-                        onResult: (String text) {
-                          String spacer = (currentText.isNotEmpty &&
-                                  !currentText.endsWith(' '))
-                              ? ' '
-                              : '';
-                          if (currentText.isEmpty) spacer = '';
-                          controller.text = "$currentText$spacer$text";
-                          controller.selection = TextSelection.fromPosition(
-                              TextPosition(offset: controller.text.length));
-                        },
-                      );
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/microphone.svg',
-                      width: CortexDesign.icon,
-                      height: CortexDesign.icon,
-                      colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.inverted, BlendMode.srcIn),
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(key: ValueKey('mic_hidden')),
-        ),
+            ),
+          )
+        else
+          mic,
 
         // Main Action Button (Send/Stop/Voice)
         AnimatedSwitcher(

@@ -258,6 +258,8 @@ class ModelsSearchController {
     if (lowerCaseQuery.isEmpty) return [];
 
     return data.where((model) {
+      final family = (model.series ?? '').toLowerCase();
+      if (family.startsWith(lowerCaseQuery)) return true;
       final List<String> words = model.displayTitle.toLowerCase().split(' ');
       return words.any((word) => word.startsWith(lowerCaseQuery));
     }).toList();

@@ -9,6 +9,7 @@ import '../../app.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme.dart';
 import '../providers/general.dart';
+import '../../server/subscription.dart';
 
 /// A self-contained, animated painter for creating a rotating gradient border.
 /// It is used by `ProfileHeaderSection` to indicate a subscription status.
@@ -59,9 +60,10 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
   late final Animation<double> _animation;
   bool _isAnimationInitialized = false;
 
-  /// Stores the last known active level to detect when the animation state needs to change.
-  /// This variable is a side-effect manager, not a data source for the UI.
-  int _lastKnownActiveLevel = 0;
+  /// Stores the last known subscribed state to detect when the animation
+  /// state needs to change. This variable is a side-effect manager, not a
+  /// data source for the UI.
+  bool _lastKnownSubscribed = false;
 
   @override
   void initState() {
@@ -76,18 +78,18 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
     super.didChangeDependencies();
     final generalProvider = Provider.of<SettingsGeneralProvider>(context);
 
-    // Read the definitive active level directly from the provider's smart getter.
-    final int newActiveLevel = generalProvider.activeSubscriptionLevel;
+    // Read the definitive subscription state directly from the provider's getter.
+    final bool newSubscribed = generalProvider.subscription.isPaid;
 
     // Compare with the last known state to decide if the animation needs to change.
-    if (newActiveLevel != _lastKnownActiveLevel) {
-      if (newActiveLevel >= 1 && !_isAnimationInitialized) {
+    if (newSubscribed != _lastKnownSubscribed) {
+      if (newSubscribed && !_isAnimationInitialized) {
         _initializeAnimation(); // User is now an active subscriber.
-      } else if (newActiveLevel == 0 && _isAnimationInitialized) {
+      } else if (!newSubscribed && _isAnimationInitialized) {
         _disposeAnimation(); // Subscription is no longer active.
       }
       // Update the state detector for the next change.
-      _lastKnownActiveLevel = newActiveLevel;
+      _lastKnownSubscribed = newSubscribed;
     }
   }
 
@@ -119,18 +121,15 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
     super.dispose();
   }
 
-  String _getSubscriptionLabel(int activeLevel) {
-    switch (activeLevel) {
-      case 1:
-      case 4:
+  String _getSubscriptionLabel(SubscriptionTier tier) {
+    switch (tier) {
+      case SubscriptionTier.plus:
         return "Plus";
-      case 2:
-      case 5:
+      case SubscriptionTier.pro:
         return "Pro";
-      case 3:
-      case 6:
+      case SubscriptionTier.ultra:
         return "Ultra";
-      default:
+      case SubscriptionTier.free:
         return "";
     }
   }
@@ -174,7 +173,9 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
 
     // The UI is now driven directly by the provider's state.
     final userData = generalProvider.userData;
-    final activeLevel = generalProvider.activeSubscriptionLevel;
+    final subscription = generalProvider.subscription;
+    final subscriptionTier = subscription.effectiveTier;
+    final isSubscribed = subscription.isPaid;
 
     // --- ANONYMOUS LOGIC ---
     final isAnonymous = generalProvider.isAnonymous;
@@ -218,7 +219,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
     );
 
     // Conditionally wrap the avatar with the animation if the subscription is active.
-    if (activeLevel >= 1 && _isAnimationInitialized) {
+    if (isSubscribed && _isAnimationInitialized) {
       avatar = AnimatedBuilder(
         animation: _animationController,
         builder: (context, child) {
@@ -271,16 +272,16 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                   SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   Row(
                     children: [
-                      if (activeLevel >= 1)
+                      if (isSubscribed)
                         _buildBadge(context, Icons.star_rounded,
-                            _getSubscriptionLabel(activeLevel)),
-                      if (activeLevel >= 1 && isAlphaUser)
+                            _getSubscriptionLabel(subscriptionTier)),
+                      if (isSubscribed && isAlphaUser)
                         SizedBox(width: screenWidth * 0.02),
                       if (isAlphaUser)
                         _buildBadge(context, Icons.explore, "Alpha"),
 
                       // Optional: Add a badge for Guest
-                      if (isAnonymous && activeLevel == 0)
+                      if (isAnonymous && !isSubscribed)
                         _buildBadge(context, Icons.person, l10n.guest),
                     ],
                   ),

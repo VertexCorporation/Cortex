@@ -2038,4 +2038,50 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => '解锁更多可能';
+
+  @override
+  String get premiumChatGateDescription =>
+      '升级至 Cortex Premium，即可使用这款强大的 AI 模型和更多功能。';
+
+  @override
+  String get premiumChatGateCta => '加入 Premium';
+
+  @override
+  String get testPurchaseTitle => '测试购买';
+
+  @override
+  String get testPurchaseBadge => '测试';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return '用于测试的模拟付款——不会产生任何真实扣费。此操作将授予 $plan 访问权限，有效期为 $duration。';
+  }
+
+  @override
+  String get testPurchaseConfirm => '完成测试购买';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes 分钟';
+  }
+
+  @override
+  String get testModeInfo => '测试模式：购买为模拟操作，授予短期测试权限——绝不涉及真实计费。';
+
+  @override
+  String get testSubscriptionManage => '取消测试订阅';
+
+  @override
+  String get testPurchaseSuccess => '测试订阅现已激活。';
+
+  @override
+  String get testPurchaseRevoked => '测试订阅已取消。';
+
+  @override
+  String testPurchaseError(String message) {
+    return '测试购买失败：$message';
+  }
 }

@@ -2147,4 +2147,51 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Female voices';
+
+  @override
+  String get premiumChatGateTitle => 'Lås upp fler möjligheter';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Uppgradera till Cortex Premium för att få tillgång till den här kraftfulla AI-modellen och mer.';
+
+  @override
+  String get premiumChatGateCta => 'Skaffa Premium';
+
+  @override
+  String get testPurchaseTitle => 'Testköp';
+
+  @override
+  String get testPurchaseBadge => 'TEST';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Simulerad betalning för testning — ingen riktig avgift debiteras. Detta ger $plan-åtkomst i $duration.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Slutför testköp';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes minuter';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Testläge: köp är simulerade och beviljar kortvariga testrättigheter — verklig fakturering förekommer aldrig.';
+
+  @override
+  String get testSubscriptionManage => 'Avsluta testprenumeration';
+
+  @override
+  String get testPurchaseSuccess => 'Testprenumerationen är nu aktiv.';
+
+  @override
+  String get testPurchaseRevoked => 'Testprenumerationen avslutad.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Testköp misslyckades: $message';
+  }
 }

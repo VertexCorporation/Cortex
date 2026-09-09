@@ -12,6 +12,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../fog.dart';
+import '../../server/subscription.dart';
 import '../../theme.dart';
 import '../backend.dart';
 
@@ -26,8 +27,7 @@ class SubscriptionContentWidget extends StatefulWidget {
   final String planType;
   final List<ProductDetails> availableProducts;
   final String selectedBillingOption;
-  final int activeSubscriptionLevel;
-  final String? activeSubscriptionOption;
+  final SubscriptionEntitlement subscription;
   final ValueChanged<String> onBillingOptionChanged;
   final ScrollController? scrollController;
   final bool animateBenefits;
@@ -39,8 +39,7 @@ class SubscriptionContentWidget extends StatefulWidget {
     required this.planType,
     required this.availableProducts,
     required this.selectedBillingOption,
-    required this.activeSubscriptionLevel,
-    this.activeSubscriptionOption,
+    required this.subscription,
     required this.onBillingOptionChanged,
     this.scrollController,
     required this.animateBenefits,
@@ -94,12 +93,12 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     }
   }
 
-  int _planLevelFromSubscriptionLevel(int level) {
-    if (level == 4) return 1;
-    if (level == 5) return 2;
-    if (level == 6) return 3;
-    return level;
-  }
+  /// Billing cadence of the active plan ('' when the user is free); the
+  /// 'monthly' fallback keeps the Funds screen coherent for paid grants
+  /// without a stored billing period.
+  String get _activeBillingOption => widget.subscription.isPaid
+      ? (widget.subscription.billingPeriod?.value ?? 'monthly')
+      : '';
 
   @override
   Widget build(BuildContext context) {
@@ -199,8 +198,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         : localizations
             .equivalentMonthlyDescription(formattedMonthlyEquivalentPrice);
     final bool isActivePlan =
-        _planLevelFromSubscriptionLevel(widget.activeSubscriptionLevel) ==
-            currentPlanLevel;
+        widget.subscription.effectiveTier.planIndex == currentPlanLevel;
 
     return ScrollFog(
       scrollController: widget.scrollController ?? ScrollController(),
@@ -278,8 +276,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   isBestValue: true,
                   isSelected: widget.selectedBillingOption == 'annual',
                   isSubscribedPlan: isActivePlan,
-                  activeSubscriptionOption:
-                      widget.activeSubscriptionOption ?? '',
+                  activeSubscriptionOption: _activeBillingOption,
                 ),
 
                 SizedBox(height: verticalSpacingMedium),
@@ -296,8 +293,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   isBestValue: false,
                   isSelected: widget.selectedBillingOption == 'monthly',
                   isSubscribedPlan: isActivePlan,
-                  activeSubscriptionOption:
-                      widget.activeSubscriptionOption ?? '',
+                  activeSubscriptionOption: _activeBillingOption,
                 ),
 
                 SizedBox(height: verticalSpacingLarge),
@@ -327,8 +323,8 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     final screenWidth = screenSize.width.clamp(0.0, 500.0);
     final screenHeight = screenSize.height;
 
-    final bool isVirtualSubscription = widget.activeSubscriptionLevel >= 4 &&
-        widget.activeSubscriptionLevel <= 6;
+    final bool isVirtualSubscription = widget.subscription.isActive &&
+        widget.subscription.mode == SubscriptionMode.lifetime;
     final bool isEffectivelyDisabled = !isVirtualSubscription &&
         isSubscribedPlan &&
         activeSubscriptionOption == 'annual' &&

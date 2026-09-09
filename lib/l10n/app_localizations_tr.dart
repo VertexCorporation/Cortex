@@ -2145,4 +2145,51 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get voiceFemale => 'Kadın sesleri';
+
+  @override
+  String get premiumChatGateTitle => 'Sınırları kaldırın';
+
+  @override
+  String get premiumChatGateDescription =>
+      'Bu güçlü yapay zeka modeline ve daha fazlasına erişmek için Cortex Premium’a geçin.';
+
+  @override
+  String get premiumChatGateCta => 'Premium’a katıl';
+
+  @override
+  String get testPurchaseTitle => 'Test Satın Alması';
+
+  @override
+  String get testPurchaseBadge => 'TEST';
+
+  @override
+  String testPurchaseNotice(String plan, String duration) {
+    return 'Test için simüle edilmiş ödeme — gerçek bir ücret alınmaz. Bu, $duration boyunca $plan erişimi sağlar.';
+  }
+
+  @override
+  String get testPurchaseConfirm => 'Test Satın Almasını Tamamla';
+
+  @override
+  String testDurationMinutes(int minutes) {
+    return '$minutes dakika';
+  }
+
+  @override
+  String get testModeInfo =>
+      'Test modu: satın almalar simüle edilir ve kısa süreli test yetkileri verir — gerçek faturalandırma asla söz konusu değildir.';
+
+  @override
+  String get testSubscriptionManage => 'Test Aboneliğini İptal Et';
+
+  @override
+  String get testPurchaseSuccess => 'Test aboneliği artık etkin.';
+
+  @override
+  String get testPurchaseRevoked => 'Test aboneliği iptal edildi.';
+
+  @override
+  String testPurchaseError(String message) {
+    return 'Test satın alması başarısız oldu: $message';
+  }
 }
