@@ -89,11 +89,18 @@ class ContextService {
       systemRole = (systemRole ?? fallbackRole) + toneDirective;
     }
 
-    // Thinking mode
-    if (enableThinkingMode && localizations != null) {
-      final thinkingInstruction =
-          "\n\n${localizations.thinkingModeInstruction}";
-      systemRole = (systemRole ?? fallbackRole) + thinkingInstruction;
+    // Deep Thinking is quality guidance in addition to the provider-native
+    // enableReasoning switch. Keep it provider agnostic so unsupported budget or
+    // effort fields are never invented client-side.
+    if (enableThinkingMode) {
+      final localizedInstruction =
+          localizations?.thinkingModeInstruction.trim() ?? '';
+      final thinkingInstruction = StringBuffer('\n\n');
+      if (localizedInstruction.isNotEmpty) {
+        thinkingInstruction.writeln(localizedInstruction);
+      }
+      thinkingInstruction.write(ReasoningGuidance.forLanguage(langCode));
+      systemRole = (systemRole ?? fallbackRole) + thinkingInstruction.toString();
     }
 
     // Read the message list from the conversation provider and filter for valid context.
@@ -219,13 +226,18 @@ class ContextService {
     List<Map<String, dynamic>> textParts = [];
     List<Map<String, dynamic>> mediaParts = [];
 
-    // 1. Text Content
-    if (message.text.isNotEmpty) {
+    // 1. Text Content. Model-provided reasoning is display-only; feeding it
+    // back on every turn wastes context and can cause the next answer to mimic
+    // or continue an old chain instead of solving the new user request.
+    final String contentText = message.isUserMessage
+        ? message.text
+        : ReasoningText.parse(message.text).answer;
+    if (contentText.trim().isNotEmpty) {
       final String processedText = message.isUserMessage
-          ? LocalPiiRedactionFilter.redact(message.text)
+          ? LocalPiiRedactionFilter.redact(contentText)
           : (message.model != null && message.model!.isNotEmpty
-              ? "[Model: ${message.model}] ${message.text}"
-              : message.text);
+              ? "[Model: ${message.model}] $contentText"
+              : contentText);
       final contextText = message.isUserMessage
           ? processedText
           : processedText.replaceAll(_toolWidgetMarker, '').trim();
@@ -265,10 +277,10 @@ class ContextService {
         });
       }
     } else {
-      if (textParts.isNotEmpty || mediaParts.isEmpty) {
+      if (textParts.isNotEmpty) {
         results.add({
           "role": "assistant",
-          "content": textParts.isNotEmpty ? textParts.first["text"] : " "
+          "content": textParts.first["text"]
         });
       }
 
