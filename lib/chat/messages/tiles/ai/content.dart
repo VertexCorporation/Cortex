@@ -2,8 +2,6 @@ part of '../ai.dart';
 
 class _AiBodyContent extends StatelessWidget {
   static final _leadingColons = RegExp(r'^[\s:]+');
-  static final _thinkStart = RegExp(r'<think\b[^>]*>', caseSensitive: false);
-  static final _thinkEnd = RegExp(r'</think\s*>', caseSensitive: false);
 
   final Message message;
   final Widget? embeddedMedia;
@@ -23,24 +21,16 @@ class _AiBodyContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String fullText = reveal.visibleText;
-    String thinkContent = '';
+    final String fullText = reveal.visibleText;
+    final parsed = ReasoningText.parse(
+      fullText,
+      isFinished: !message.isThinking,
+    );
+    final String thinkContent = parsed.reasoning.trim();
+    String mainText = parsed.answer;
 
-    String mainText = fullText;
-
-    final thinkStartMatch = _thinkStart.firstMatch(fullText);
-    if (thinkStartMatch != null) {
-      final contentStart = thinkStartMatch.end;
-      final thinkEndMatch =
-          _thinkEnd.firstMatch(fullText.substring(contentStart));
-      final thinkEnd =
-          thinkEndMatch == null ? -1 : contentStart + thinkEndMatch.start;
-      final contentEnd = thinkEnd != -1 ? thinkEnd : fullText.length;
-
-      thinkContent = fullText.substring(contentStart, contentEnd).trim();
-
-      mainText =
-          _withoutThinkingBlocks(fullText).replaceFirst(_leadingColons, '');
+    if (parsed.hasReasoning) {
+      mainText = mainText.replaceFirst(_leadingColons, '');
     }
 
     final bool hasMainText = mainText.isNotEmpty;
@@ -110,26 +100,6 @@ class _AiBodyContent extends StatelessWidget {
         if (hasMedia && !mediaAboveText) mediaBlock,
       ],
     );
-  }
-
-  String _withoutThinkingBlocks(String text) {
-    final result = StringBuffer();
-    var cursor = 0;
-    while (cursor < text.length) {
-      final start = _thinkStart.firstMatch(text.substring(cursor));
-      if (start == null) {
-        result.write(text.substring(cursor));
-        break;
-      }
-
-      final startOffset = cursor + start.start;
-      result.write(text.substring(cursor, startOffset));
-      final contentStart = cursor + start.end;
-      final end = _thinkEnd.firstMatch(text.substring(contentStart));
-      if (end == null) break;
-      cursor = contentStart + end.end;
-    }
-    return result.toString();
   }
 
   Widget _buildContent(BuildContext context, double s, String text) {
