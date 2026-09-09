@@ -10,7 +10,8 @@ Catalog of the Fulcrum backend (`functions/`). `index.js` requires every family 
 
 - **`src/message.js`** (16) — backward-compatible re-export: `sendMessage`, `proxyOpenRouterRequest` (both delegate to gateway.js).
 - **`src/gateway.js`** (933) — `sendMessage`: the central chat gateway (validation, routing, context, credit rules, SSE).
-- **`src/router.js`** (612) — `getDynamicModels`, `pickBestModelList`, `analyzeIntent`, `resolveRoute`, `getProviderCatalog`, `workersAIModels`: provider/model policy engine.
+- **`src/router.js`** (612) — `getDynamicModels`, `pickBestModelList`, `analyzeIntent`, `analyzeMediaParams`, `resolveRoute`, `getProviderCatalog`, `workersAIModels`: provider/model policy engine.
+- **`src/media-params.js`** (558) — `parseMediaDirective`, `closestAspectRatio`, `buildElevenLabsMediaPayload`, `applyFalSchemaMediaParams`, `ELEVENLABS_MEDIA_CAPABILITIES`: media parameter normalization. Maps analyzed user directives (aspect ratio / duration / resolution) onto each provider's supported values with Cortex defaults (image 1:1, video closest-to-1:1, music 30s, sound 5s); research-backed ElevenLabs per-model enums.
 - **`src/stream.js`** (1709) — `executeApiStream`, `executeFalRequest`, `executeElevenLabsRequest`, `detectFalOutputType`, `deductDynamicCost`, `refundUserCredits`: provider execution, SSE parsing, retries, fallbacks, cost reconciliation.
 - **`src/routing.js`** (72) — `findFalModel`, `candidatesFor`, `inputSchema`, `buildSchemaPayload`, `prepareFalRequest`, `endpointOutput`: Fal request helpers.
 - **`src/sse.js`** (7) — `splitSseEvents`.
