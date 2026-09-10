@@ -30,6 +30,7 @@ class ChatInputPanel extends StatefulWidget {
   final ScrollService scrollService;
   final AnimationController editPanelController;
   final Animation<Offset> slideAnimation;
+  final Animation<double> fadeAnimation;
 
   const ChatInputPanel({
     super.key,
@@ -37,6 +38,7 @@ class ChatInputPanel extends StatefulWidget {
     required this.scrollService,
     required this.editPanelController,
     required this.slideAnimation,
+    required this.fadeAnimation,
   });
 
   @override
@@ -224,6 +226,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                     axis: Axis.vertical,
                     child: EditPanelWidget(
                       slideAnimation: widget.slideAnimation,
+                      fadeAnimation: widget.fadeAnimation,
                       onCancel: () {
                         widget.editService.cancelEditingMode();
                         widget.scrollService.updateButtonVisibility();

@@ -43,21 +43,55 @@ class _AttachmentListWithFog extends StatefulWidget {
   State<_AttachmentListWithFog> createState() => _AttachmentListWithFogState();
 }
 
-class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
+class _AttachmentListWithFogState extends State<_AttachmentListWithFog>
+    with TickerProviderStateMixin {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final ScrollController _scrollController = ScrollController();
   late List<InputAttachment> _displayedItems;
+
+  // The whole strip rides in on fade + motion together: one reveal clock
+  // drives both the vertical grow and the opacity, while each item layers
+  // its own fade + horizontal slide on top of that.
+  late final AnimationController _revealController;
+  late final Animation<double> _reveal;
 
   @override
   void initState() {
     super.initState();
     _displayedItems = List.from(widget.attachments);
+    _revealController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _reveal = CurvedAnimation(
+        parent: _revealController, curve: Curves.easeOutCubic);
+    // Mounting with content already in hand (a restored draft): show it
+    // settled instead of replaying an entrance the user never saw begin.
+    _revealController.value = widget.attachments.isNotEmpty ? 1.0 : 0.0;
+  }
+
+  /// Grows-and-fades the strip in when content appears, and back out when
+  /// the list empties. Guarded like the composer's expand sync so a change
+  /// mid-reveal simply retargets the same clock.
+  void _syncReveal() {
+    if (widget.attachments.isNotEmpty) {
+      if (_revealController.status != AnimationStatus.forward &&
+          _revealController.status != AnimationStatus.completed) {
+        _revealController.forward();
+      }
+    } else {
+      if (_revealController.status != AnimationStatus.reverse &&
+          _revealController.status != AnimationStatus.dismissed) {
+        _revealController.reverse();
+      }
+    }
   }
 
   @override
   void didUpdateWidget(_AttachmentListWithFog oldWidget) {
     super.didUpdateWidget(oldWidget);
     _syncList();
+    _syncReveal();
   }
 
   void _syncList() {
@@ -67,7 +101,10 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
       for (int i = 0; i < newItems.length; i++) {
         if (i >= _displayedItems.length || newItems[i] != _displayedItems[i]) {
           _displayedItems.insert(i, newItems[i]);
-          _listKey.currentState?.insertItem(i);
+          _listKey.currentState?.insertItem(
+            i,
+            duration: const Duration(milliseconds: 200),
+          );
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (_scrollController.hasClients) {
@@ -91,7 +128,7 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
             i,
             (context, animation) =>
                 _buildItem(removedItem, animation, i, isRemoving: true),
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 200),
           );
           if (newItems.length == _displayedItems.length) break;
           i--;
@@ -102,6 +139,7 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
 
   @override
   void dispose() {
+    _revealController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -158,31 +196,50 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
-      alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        height: widget.attachments.isNotEmpty
-            ? widget.itemSize + (widget.padding * 2)
-            : 0,
-        width: double.infinity,
-        child: ScrollFogHorizontal(
-          scrollController: _scrollController,
-          child: AnimatedList(
-            key: _listKey,
-            controller: _scrollController,
-            clipBehavior: Clip.none,
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(
-                horizontal: widget.padding, vertical: widget.padding),
-            initialItemCount: _displayedItems.length,
-            itemBuilder: (context, index, animation) {
-              if (index >= _displayedItems.length) {
-                return const SizedBox.shrink();
-              }
-              return _buildItem(_displayedItems[index], animation, index);
-            },
+    // SizeTransition + FadeTransition on one clock: the strip rises and
+    // dissolves in together — and collapses and dissolves out together — so
+    // it never pops or blinks at either end of the ride. The EdgeFogs below
+    // are static strips, so they simply ride along with this reveal.
+    return SizeTransition(
+      key: const ValueKey('attachment_strip_reveal'),
+      sizeFactor: _reveal,
+      axis: Axis.vertical,
+      child: FadeTransition(
+        // Keyed for tests: the composer subtree already mounts several
+        // FadeTransitions above this strip (idle overlays, the placeholder
+        // fog) that an ancestor search would happily catch instead.
+        key: const ValueKey('attachment_strip_fade'),
+        opacity: _reveal,
+        child: SizedBox(
+          height: widget.attachments.isNotEmpty
+              ? widget.itemSize + (widget.padding * 2)
+              : 0,
+          width: double.infinity,
+          child: EdgeFog(
+            startFogWidth: 24.0,
+            endFogWidth: 24.0,
+            // Static edge fogs: the strip's far ends dissolve into the bar
+            // background even at rest, so a scrolled strip never reads as
+            // hard-cut at the screen edge. The composer subtree mounts other
+            // EdgeFogs with the shared default strip keys (the placeholder's,
+            // the dictation wave's) — the strip claims its own pair.
+            startStripKey: const ValueKey('attachment_fog_start'),
+            endStripKey: const ValueKey('attachment_fog_end'),
+            child: AnimatedList(
+              key: _listKey,
+              controller: _scrollController,
+              clipBehavior: Clip.none,
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(
+                  horizontal: widget.padding, vertical: widget.padding),
+              initialItemCount: _displayedItems.length,
+              itemBuilder: (context, index, animation) {
+                if (index >= _displayedItems.length) {
+                  return const SizedBox.shrink();
+                }
+                return _buildItem(_displayedItems[index], animation, index);
+              },
+            ),
           ),
         ),
       ),

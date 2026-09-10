@@ -11,11 +11,16 @@ import 'package:cortex/sheet.dart';
 
 class EditPanelWidget extends StatelessWidget {
   final Animation<Offset> slideAnimation;
+
+  /// Fades in lockstep with [slideAnimation]: the banner glides up while it
+  /// dissolves in, and glides down while it dissolves out.
+  final Animation<double> fadeAnimation;
   final VoidCallback onCancel;
 
   const EditPanelWidget({
     super.key,
     required this.slideAnimation,
+    required this.fadeAnimation,
     required this.onCancel,
   });
 
@@ -70,7 +75,13 @@ class EditPanelWidget extends StatelessWidget {
       child: Center(
         child: SlideTransition(
           position: slideAnimation,
-          child: LiquidGlassPanel(
+          child: FadeTransition(
+            // Keyed for tests: LiquidGlassPanel hides its own dismissed
+            // FadeTransitions deeper in, and traversal order must not decide
+            // which fade the suite is reading.
+            key: const ValueKey('edit_banner_fade'),
+            opacity: fadeAnimation,
+            child: LiquidGlassPanel(
             borderRadius: BorderRadius.circular(radius),
             child: Container(
               key: const ValueKey('edit_banner'),
@@ -121,6 +132,7 @@ class EditPanelWidget extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         ),
       ),

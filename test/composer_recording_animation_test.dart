@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/speech.dart';
@@ -894,6 +896,8 @@ void main() {
         CurvedAnimation(parent: controller, curve: Curves.easeOut);
     final slide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
         .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+    final fade = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
 
     // Mirrors bottom.dart: a plain SizeTransition with the default
     // (start-pressing) alignment wrapping the banner inside the bottom bar.
@@ -906,7 +910,8 @@ void main() {
           child: SizeTransition(
             sizeFactor: sizeFactor,
             axis: Axis.vertical,
-            child: EditPanelWidget(slideAnimation: slide, onCancel: () {}),
+            child: EditPanelWidget(
+                slideAnimation: slide, fadeAnimation: fade, onCancel: () {}),
           ),
         ),
       ),
@@ -942,6 +947,8 @@ void main() {
         CurvedAnimation(parent: controller, curve: Curves.easeOut);
     final slide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
         .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+    final fade = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
 
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -956,7 +963,8 @@ void main() {
             SizeTransition(
               sizeFactor: sizeFactor,
               axis: Axis.vertical,
-              child: EditPanelWidget(slideAnimation: slide, onCancel: () {}),
+              child: EditPanelWidget(
+                  slideAnimation: slide, fadeAnimation: fade, onCancel: () {}),
             ),
           ],
         ),
@@ -1030,6 +1038,131 @@ void main() {
     input.setVoiceRecording(false);
     await tester.pumpAndSettle();
     expect(tester.getRect(fieldFinder).width, closeTo(collapsed.width, 0.5));
+    expect(tester.takeException(), isNull);
+  });
+
+  // Regression: the attachment strip reveals on fade + motion together (one
+  // quicker 200ms clock), and static EdgeFogs frame its far ends so a long
+  // strip dissolves into the background instead of looking cut off.
+  testWidgets('attachment strip reveals with fade, motion and edge fogs',
+      (tester) async {
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+
+    // The visible strip is the reveal box itself: SizeTransition clips its
+    // child, so the child's own rect stays at full height mid-flight while
+    // this box truly reflects what is on screen.
+    final stripBox = find.byKey(const ValueKey('attachment_strip_reveal'));
+    // Empty strip: fully collapsed.
+    expect(tester.getRect(stripBox).height, 0.0);
+
+    // The provider only needs a path to book-keep the slot; the preview
+    // paints its fallback shell immediately and the image bytes never
+    // load in the test VM (fake-async), which none of the geometry below
+    // cares about. Creating real bytes would need `tester.runAsync`, and
+    // plain `File.writeAsBytes` would deadlock the fake clock.
+    input.addAttachment(
+        File('${Directory.systemTemp.path}/cortex_attachment_test.png'),
+        isImage: true);
+    await tester.pump(); // the reveal clock starts
+    // Mid-flight: the strip is growing AND dissolving in at once.
+    await tester.pump(const Duration(milliseconds: 100));
+    final stripFade = find.byKey(const ValueKey('attachment_strip_fade'));
+    expect(stripFade, findsOneWidget);
+    final halfIn = tester.widget<FadeTransition>(stripFade).opacity.value;
+    expect(halfIn, greaterThan(0.0));
+    expect(halfIn, lessThan(1.0));
+    final midHeight = tester.getRect(stripBox).height;
+    expect(midHeight, greaterThan(0.0));
+
+    // Settled: fully grown, fully opaque, framed by both static fogs.
+    await tester.pumpAndSettle();
+    expect(tester.widget<FadeTransition>(stripFade).opacity.value, 1.0);
+    final strip = tester.getRect(stripBox);
+    expect(strip.height, greaterThan(midHeight));
+    final startFog = find.byKey(const ValueKey('attachment_fog_start'));
+    final endFog = find.byKey(const ValueKey('attachment_fog_end'));
+    expect(startFog, findsOneWidget);
+    expect(endFog, findsOneWidget);
+    expect(tester.getRect(startFog).width, 24.0);
+    expect(tester.getRect(endFog).width, 24.0);
+    expect(tester.getRect(startFog).left, closeTo(strip.left, 0.5));
+    expect(tester.getRect(endFog).right, closeTo(strip.right, 0.5));
+
+    // Removing the last attachment collapses the strip back out.
+    input.removeAttachmentAt(0);
+    await tester.pumpAndSettle();
+    expect(tester.getRect(stripBox).height, 0.0);
+    expect(tester.widget<FadeTransition>(stripFade).opacity.value, 0.0);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Regression: the banner must fade in and out in lockstep with its slide —
+  // one clock, two effects — so it glides up while dissolving in and glides
+  // down while dissolving out, on the quicker 200ms ride.
+  testWidgets('edit banner fades in and out with its slide', (tester) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = AnimationController(
+        vsync: tester, duration: const Duration(milliseconds: 200));
+    addTearDown(controller.dispose);
+    final sizeFactor =
+        CurvedAnimation(parent: controller, curve: Curves.easeOut);
+    final slide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+    final fade = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: SizeTransition(
+            sizeFactor: sizeFactor,
+            axis: Axis.vertical,
+            child: EditPanelWidget(
+              slideAnimation: slide,
+              fadeAnimation: fade,
+              onCancel: () {},
+            ),
+          ),
+        ),
+      ),
+    ));
+
+    // The banner's own fade — keyed so the dismissed FadeTransitions hidden
+    // deeper inside LiquidGlassPanel can't shadow it in finder order.
+    final bannerFade = find.byKey(const ValueKey('edit_banner_fade'));
+
+    // Halfway in: the banner is riding up AND dissolving in at once.
+    controller.forward();
+    await tester.pump(); // the ticker's first tick lands with zero elapsed
+    await tester.pump(const Duration(milliseconds: 100));
+    final halfIn = tester.widget<FadeTransition>(bannerFade).opacity.value;
+    expect(halfIn, greaterThan(0.0));
+    expect(halfIn, lessThan(1.0));
+    await tester.pumpAndSettle();
+    expect(tester.widget<FadeTransition>(bannerFade).opacity.value, 1.0);
+
+    // Halfway out: still dissolving, never blinking off.
+    controller.reverse();
+    await tester.pump(); // same: the reverse ride starts at zero elapsed
+    await tester.pump(const Duration(milliseconds: 100));
+    final halfOut = tester.widget<FadeTransition>(bannerFade).opacity.value;
+    expect(halfOut, greaterThan(0.0));
+    expect(halfOut, lessThan(1.0));
+    await tester.pumpAndSettle();
+    expect(tester.widget<FadeTransition>(bannerFade).opacity.value, 0.0);
     expect(tester.takeException(), isNull);
   });
 }
