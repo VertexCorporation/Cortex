@@ -10,7 +10,9 @@ import 'package:cortex/server/subscription.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../panels/selection/sheet.dart';
 
 /// Service responsible for handling input actions:
@@ -196,12 +198,42 @@ class InputService {
         return;
       }
 
+      // Pickers hand out files in the OS-purgeable cache directory; the
+      // attachment and the chat history that references it have to survive
+      // app restarts, so the file is copied into app Documents before it
+      // becomes an attachment.
+      final durableFile = await _copyToDurableStorage(file);
+
       // Add to provider
       debugPrint(
-          "InputService: File validated. Adding to provider: ${file.path}");
-      inputProvider.addAttachment(file, isImage: isImage);
+          "InputService: File validated. Adding to provider: ${durableFile.path}");
+      inputProvider.addAttachment(durableFile, isImage: isImage);
     } catch (e) {
       debugPrint("Error validating file: $e");
+    }
+  }
+
+  /// Copies a freshly picked file from the volatile picker cache into
+  /// `<appDocuments>/attachments/` so the path stored in the message stays
+  /// valid across restarts. Falls back to the original path when the copy
+  /// fails, so a valid pick is never lost to disk trouble.
+  Future<File> _copyToDurableStorage(File source) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final attachmentsDir = Directory('${dir.path}/attachments');
+      if (!await attachmentsDir.exists()) {
+        await attachmentsDir.create(recursive: true);
+      }
+      final int lastSlash = source.path.lastIndexOf('/');
+      final int lastDot = source.path.lastIndexOf('.');
+      final String ext = (lastDot > lastSlash && lastDot >= 0)
+          ? source.path.substring(lastDot)
+          : '';
+      return await source
+          .copy('${attachmentsDir.path}/${const Uuid().v4()}$ext');
+    } catch (e) {
+      debugPrint("InputService: Durable copy failed, keeping original: $e");
+      return source;
     }
   }
 

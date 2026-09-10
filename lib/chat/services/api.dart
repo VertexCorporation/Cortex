@@ -829,10 +829,10 @@ class ApiService {
       {bool isRetry = false}) async {
     try {
       debugPrint(
-          '[TitleGen] 🚀 Starting title generation for: "${userInput.length > 20 ? userInput.substring(0, 20) : userInput}..."');
+          '[TitleGen] Starting title generation for: "${userInput.length > 20 ? userInput.substring(0, 20) : userInput}..."');
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        debugPrint('[TitleGen] ❌ Error: User is null');
+        debugPrint('[TitleGen] Error: User is null');
         return null;
       }
 
@@ -858,7 +858,7 @@ class ApiService {
         ]
       };
 
-      debugPrint('[TitleGen] 🚀 Sending DIO POST request to fast endpoint...');
+      debugPrint('[TitleGen] Sending DIO POST request to fast endpoint...');
 
       final dioForTitle = _titleDio;
       final response = await dioForTitle.post(
@@ -868,27 +868,27 @@ class ApiService {
       );
 
       debugPrint(
-          '[TitleGen] 🟢 Response received! Status: ${response.statusCode}');
+          '[TitleGen] Response received! Status: ${response.statusCode}');
 
       final data = response.data;
       if (data != null && data['title'] != null) {
         final result = data['title'].toString().trim();
-        debugPrint('[TitleGen] 🎉 Title successfully generated: $result');
+        debugPrint('[TitleGen] Title successfully generated: $result');
         return result.isNotEmpty ? result : null;
       } else {
-        debugPrint('[TitleGen] ⚠️ Generated title data was missing/empty!');
+        debugPrint('[TitleGen] Warning: Generated title data was missing/empty!');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401 && !isRetry) {
         debugPrint(
-            '[TitleGen] ⚠️ 401 Unauthorized detected! Refreshing token silently and retrying...');
+            '[TitleGen] Warning: 401 Unauthorized detected! Refreshing token silently and retrying...');
         return generateChatTitle(userInput, systemPrompt, criticalInstruction,
             isRetry: true);
       } else {
-        debugPrint('[TitleGen] ❌ DioException generating title: $e');
+        debugPrint('[TitleGen] DioException generating title: $e');
       }
     } catch (e) {
-      debugPrint('[TitleGen] ❌ Error generating title: $e');
+      debugPrint('[TitleGen] Error generating title: $e');
     }
     return null;
   }
@@ -938,11 +938,21 @@ class ApiService {
 
         final decoded = jsonDecode(result);
         if (decoded is List) {
+          // MEMORY LIFECYCLE LOG: this endpoint is the primary memory
+          // extraction path. (The server previously quote-stripped the
+          // response, which silently broke every extraction — fixed on the
+          // Fulcrum side; this log will surface any residual failure.)
+          debugPrint(
+              '[MemoryExtraction] Extracted ${decoded.length} fact(s) from user message.');
           return decoded.map((e) => e.toString()).toList();
         }
+        debugPrint(
+            '[MemoryExtraction] Unexpected payload (not a JSON array); extraction failed.');
+      } else {
+        debugPrint('[MemoryExtraction] Response missing title field: $data');
       }
     } catch (e) {
-      debugPrint('[MemoryExtraction] ❌ Error extracting memory: $e');
+      debugPrint('[MemoryExtraction] Error extracting memory: $e');
     }
     return null;
   }

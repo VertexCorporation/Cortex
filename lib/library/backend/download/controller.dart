@@ -286,13 +286,18 @@ class ModelDownloadController {
         // If the task is gone from the DB, and we don't think it's downloaded,
         // and we are starting fresh... the file is likely a zombie partial.
         if (isFreshStart) {
-          final isDownloaded = groundTruthDownloadStates[id] ?? false;
+          // DURABLE STATE CHECK (bug fix): the catalog-derived map alone is
+          // not sufficient — a Synapse id change empties it even though the
+          // model is downloaded. The persisted UserModels record is durable.
+          final isDownloaded =
+              (await UserModels.loadDownloadedModelPaths()).containsKey(id) ||
+                  (groundTruthDownloadStates[id] ?? false);
           if (!isDownloaded) {
             final path = getFilePathById(id);
             final file = File(path);
             if (await file.exists()) {
               debugPrint(
-                  "[DownloadController] Fresh Start Cleanup: Deleting ORPHANED file for '$id' (No task found).");
+                  "[DL-SYNC] orphan cleanup | id='$id' | deleting zombie partial (no record, no task): '$path'");
               try {
                 await file.delete();
               } catch (e) {
@@ -333,11 +338,35 @@ class ModelDownloadController {
           needsUIRefresh = true;
           break;
 
-        case DownloadTaskStatus.complete:
-          final bool fileActuallyExists =
-              groundTruthDownloadStates[id] ?? false;
+        case DownloadTaskStatus.complete: {
+          // DURABLE STATE CHECK (bug fix): the passed-in groundTruth map is
+          // derived from the CURRENT catalog snapshot. If Synapse renamed or
+          // removed the model/variant id — or the reconciliation ran before
+          // the file-state scan populated the map — `?? false` wrongly
+          // concluded "file missing" and DELETED the persisted UserModels
+          // record. That resurrected the reported bug: a downloaded model
+          // showing as not-downloaded after app restart. Disk existence and
+          // the persisted record are the durable sources of truth; reconcile
+          // against them directly and heal inconsistencies.
+          final expectedPath = getFilePathById(id);
+          final bool fileOnDisk = expectedPath.isNotEmpty
+              ? await File(expectedPath).exists()
+              : false;
+          final downloadedPaths = await UserModels.loadDownloadedModelPaths();
+          final bool recordExists = downloadedPaths.containsKey(id);
 
-          if (fileActuallyExists) {
+          debugPrint(
+              "[DL-SYNC] complete | id='$id' | expectedPath='$expectedPath' | "
+              "fileOnDisk=$fileOnDisk | recordExists=$recordExists | "
+              "catalogUiState=${groundTruthDownloadStates[id] ?? false}");
+
+          if (fileOnDisk) {
+            if (!recordExists) {
+              // Heal: the file is durable but the record was lost (e.g. an
+              // earlier buggy cleanup, or process death racing the write).
+              await UserModels.addDownloadedModel(id, expectedPath);
+              debugPrint("[DL-SYNC] Healed missing UserModels record for '$id'.");
+            }
             effectiveManager
               ..setDownloading(false)
               ..setPaused(false)
@@ -345,9 +374,25 @@ class ModelDownloadController {
               ..setProgress(100);
             await prefs.remove('download_task_id_$id');
             needsUIRefresh = true;
+          } else if (recordExists) {
+            // File is genuinely gone (externally deleted / OS cleanup) — the
+            // record is stale; remove it so the UI truthfully reflects that
+            // the model must be re-downloaded.
+            debugPrint(
+                "[DL-SYNC] Task complete but file missing on disk. Removing stale record for '$id'.");
+            await FlutterDownloader.remove(
+                taskId: task.taskId, shouldDeleteContent: false);
+            await prefs.remove('download_task_id_$id');
+            await UserModels.removeDownloadedModel(id);
+            effectiveManager
+              ..setDownloading(false)
+              ..setPaused(false)
+              ..setDownloaded(false)
+              ..setProgress(0);
+            needsUIRefresh = true;
           } else {
             debugPrint(
-                "[DownloadController] Conflict found for '$id'. Task complete but file missing. Cleaning up.");
+                "[DL-SYNC] Conflict found for '$id'. Task complete but file missing. Cleaning up.");
             // FIX: Ensure we clean up the zombie task from the downloader DB
             await FlutterDownloader.remove(
                 taskId: task.taskId, shouldDeleteContent: false);
@@ -363,8 +408,9 @@ class ModelDownloadController {
             needsUIRefresh = true;
           }
           break;
+        }
 
-        case DownloadTaskStatus.failed:
+        case DownloadTaskStatus.failed: {
           debugPrint(
               "[DownloadController] Sync: Task '$id' failed while backgrounded.");
           effectiveManager
@@ -373,36 +419,61 @@ class ModelDownloadController {
             ..setProgress(0);
 
           if (isFreshStart) {
+            // DURABLE STATE CHECK (bug fix): only purge the persisted record
+            // (and file) when the download has no durable result on disk. A
+            // user can hold a successfully downloaded model while a stale
+            // failed task lingers in the downloader DB; deleting the record
+            // here resurrected the "downloaded model shows as not-downloaded
+            // after restart" bug.
+            final expectedPath = getFilePathById(id);
+            final bool fileOnDisk = expectedPath.isNotEmpty
+                ? await File(expectedPath).exists()
+                : false;
             debugPrint(
-                "[DownloadController] Fresh Start Cleanup: Deleting stale failed task '$id'.");
+                "[DL-SYNC] failed(isFreshStart) | id='$id' | expectedPath='$expectedPath' | fileOnDisk=$fileOnDisk");
             await FlutterDownloader.remove(
-                taskId: task.taskId, shouldDeleteContent: true);
+                taskId: task.taskId,
+                shouldDeleteContent: !fileOnDisk);
             await prefs.remove('download_task_id_$id');
-            await UserModels.removeDownloadedModel(id);
+            if (!fileOnDisk) {
+              await UserModels.removeDownloadedModel(id);
+            }
           } else {
             // Keep for resume if simple lifecycle resume
             needsUIRefresh = true;
           }
           break;
+        }
 
-        case DownloadTaskStatus.canceled:
+        case DownloadTaskStatus.canceled: {
           effectiveManager
             ..setDownloading(false)
             ..setPaused(false)
             ..setProgress(0);
 
           if (isFreshStart) {
+            // DURABLE STATE CHECK (bug fix): see the failed-case comment —
+            // never delete a working download's record because a stale
+            // canceled task lingers in the downloader DB.
+            final expectedPath = getFilePathById(id);
+            final bool fileOnDisk = expectedPath.isNotEmpty
+                ? await File(expectedPath).exists()
+                : false;
             debugPrint(
-                "[DownloadController] Fresh Start Cleanup: Deleting stale canceled task '$id'.");
+                "[DL-SYNC] canceled(isFreshStart) | id='$id' | expectedPath='$expectedPath' | fileOnDisk=$fileOnDisk");
             await FlutterDownloader.remove(
-                taskId: task.taskId, shouldDeleteContent: true);
+                taskId: task.taskId,
+                shouldDeleteContent: !fileOnDisk);
             await prefs.remove('download_task_id_$id');
-            await UserModels.removeDownloadedModel(id);
+            if (!fileOnDisk) {
+              await UserModels.removeDownloadedModel(id);
+            }
           } else {
             await prefs.remove('download_task_id_$id');
           }
           needsUIRefresh = true;
           break;
+        }
 
         default: // undefined
           break;
@@ -469,6 +540,11 @@ class ModelDownloadController {
           }
           try {
             await UserModels.addDownloadedModel(id, filePath);
+            // Clear the task-id marker immediately. If it lingers, the next
+            // cold-start reconciliation finds a stale "complete" task and
+            // may run destructive cleanup against a perfectly good file.
+            await prefs.remove('download_task_id_$id');
+            _downloadTaskIds.remove(id);
             // CRITICAL FIX: Update the downloadCompleted map IMMEDIATELY so
             // that any UI rebuild triggered by onStateChange() sees the
             // correct state. Previously, this map was only updated

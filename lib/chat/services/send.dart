@@ -31,7 +31,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/chat/screen/widgets/bottom/guest.dart';
 import '../messages/messages.dart';
 import 'package:cortex/chat/providers/memory.dart';
-import 'package:cortex/chat/services/memory_store.dart';
 import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/rag/chat.dart';
 import 'tools.dart';
@@ -588,9 +587,9 @@ class SendService {
               modelImagePathForStorage: modelImagePathForStorage,
             );
 
-            // 🚀 ASYNC AI CHAT TITLE GENERATION
+            // ASYNC AI CHAT TITLE GENERATION
             if (isServerSide && text.isNotEmpty) {
-              debugPrint("🚀 Triggering TitleGen for new chat...");
+              debugPrint("[SendService] Triggering TitleGen for new chat...");
               _apiService
                   .generateChatTitle(
                       text,
@@ -665,7 +664,7 @@ class SendService {
           text.isNotEmpty &&
           !isHidden &&
           _isMemoryWorthy(text)) {
-        debugPrint("🚀 Triggering Memory Extraction...");
+        debugPrint("[SendService] Triggering Memory Extraction...");
         _apiService.extractUserMemory(text, langCode).then((facts) async {
           if (facts != null && facts.isNotEmpty) {
             bool memoryAdded = false;
@@ -703,6 +702,19 @@ class SendService {
       // -----------------------------------------------------------------------
       // 5. EXECUTION ROUTING
       // -----------------------------------------------------------------------
+
+      // MEDIA REQUEST INSTRUMENTATION (safe metadata only — never content).
+      // Mirrors the server's [MEDIA] log so any media failure can be traced
+      // end-to-end: what the client attached, which model was pinned, whether
+      // the pin was manual or dynamic, and where execution went.
+      debugPrint(
+          '[MediaTrace] attachments: image='
+          '${currentAttachmentPaths.where(_mediaRouter.isImageFile).length} '
+          'video=${currentAttachmentPaths.where(_mediaRouter.isVideoFile).length} '
+          'audio=${currentAttachmentPaths.where(_mediaRouter.isAudioFile).length} | '
+          'pinnedModel=$apiModelIdForSend '
+          '(${isAutoRouter ? 'dynamic' : 'manual'}) | '
+          'serverSide=$isServerSide | generationTarget=$generationTarget');
 
       if (!isServerSide) {
         // Offline Flow
@@ -1721,15 +1733,16 @@ class SendService {
         for (final line in lines) {
           await _userMemoryProvider.addMemory(line);
         }
-        try {
-          final semanticMemService = SemanticMemoryService();
-          await semanticMemService.saveFromMemoryBlock(newMemory);
-          debugPrint('[Memory] Saved memory block to SQLite semantic memory.');
-        } catch (e) {
-          debugPrint('[Memory] Error saving to SQLite semantic memory: $e');
-        }
-        debugPrint(
-            '[Memory] Successfully extracted and updated memory from response.');
+        // MEMORY LIFECYCLE LOG: UserMemoryProvider (SharedPreferences) is the
+        // single authoritative memory store. It is persisted, rendered and
+        // editable in Settings → Memory, and injected as `userMemory` into
+        // every future request. The former duplicate write into the SQLite
+        // `semantic_memories` table was removed: that store had no readers
+        // (SemanticMemoryService.queryRelevantMemories had zero callers), so
+        // it was effectively write-only dead weight.
+        debugPrint('[Memory] Lifecycle: extracted ${lines.length} fact(s) '
+            'from a <memory> block -> UserMemoryProvider (persisted + '
+            'injected into future prompts).');
       }
     }
 
@@ -1781,6 +1794,23 @@ class SendService {
     required String mediaPath,
     required String targetConvId,
   }) async {
+    // GENERATED MEDIA PERSISTENCE LOG (item: media disappearing after app
+    // restart). A local path under the app's Documents directory is durable;
+    // a remote URL is NOT — MediaSaver falls back to it only when the file
+    // download failed, and the URL is typically a short-lived signed CDN
+    // link. Arts intentionally skips http(s) paths, so a URL fallback means
+    // the item will not survive restart. This log makes the degradation
+    // visible in production logs.
+    if (mediaPath.startsWith('http://') || mediaPath.startsWith('https://')) {
+      debugPrint('[SendService] MEDIA PERSISTENCE WARNING: generated media '
+          'stored as a remote URL (local download failed) — it will render '
+          'this session but will NOT survive as a local file. conv='
+          '$targetConvId index=$aiMessageIndex');
+    } else {
+      debugPrint('[SendService] Generated media attached (conv='
+          '$targetConvId, index=$aiMessageIndex, '
+          'file=${mediaPath.split('/').last})');
+    }
     _backgroundTaskService.addMediaAttachment(targetConvId, mediaPath);
     _backgroundTaskService.setPendingMediaType(
         targetConvId, MediaGenerationType.none);

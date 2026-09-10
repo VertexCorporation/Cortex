@@ -1,12 +1,14 @@
 // lib/chat/services/read.dart
 
 import 'dart:async';
+import 'dart:io';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/background.dart';
 import 'package:cortex/chat/services/database.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../axon/inbox/logic/manager.dart';
 import '../../library/backend/data/entity.dart';
@@ -250,10 +252,18 @@ class ReadService {
         }
       }
 
-      _conversationProvider.loadMessages(loadedMessages);
+      // Heal stale absolute attachment paths (generated-media persistence:
+      // the OS can relocate the app container on updates, e.g. iOS, leaving
+      // recorded absolute paths pointing at a nonexistent location while the
+      // file still exists under the new Documents directory with the same
+      // basename). Re-rooting in memory keeps media visible in chat history;
+      // the next full save persists the healed paths.
+      final healedMessages = await _healAttachmentPaths(loadedMessages);
+
+      _conversationProvider.loadMessages(healedMessages);
 
       if (needsDbUpdate) {
-        await ChatStorageService.saveCurrentMessages(convId, loadedMessages);
+        await ChatStorageService.saveCurrentMessages(convId, healedMessages);
       }
       return true;
     } catch (e, stacktrace) {
@@ -261,6 +271,60 @@ class ReadService {
       if (loadGeneration != _loadGeneration) return false;
       _conversationProvider.loadMessages([]);
       return true;
+    }
+  }
+
+  /// Re-roots stale absolute attachment paths against the current Documents
+  /// directory. Attachment file names are stable across app-container moves,
+  /// so a missing path whose basename exists under the current Documents
+  /// directory is healed to that location instead of rendering broken media
+  /// in chat history.
+  Future<List<Message>> _healAttachmentPaths(List<Message> messages) async {
+    if (messages.every((m) => m.attachmentPaths.isEmpty)) return messages;
+    try {
+      final docsDir = await getApplicationDocumentsDirectory();
+      var changed = false;
+      final healed = <Message>[];
+      for (final m in messages) {
+        if (m.attachmentPaths.isEmpty) {
+          healed.add(m);
+          continue;
+        }
+        var touched = false;
+        final newPaths = <String>[];
+        for (final path in m.attachmentPaths) {
+          if (path.startsWith('http://') || path.startsWith('https://')) {
+            newPaths.add(path);
+            continue;
+          }
+          if (File(path).existsSync()) {
+            newPaths.add(path);
+            continue;
+          }
+          final basename = path.split('/').last;
+          final candidate = '${docsDir.path}/$basename';
+          if (basename.isNotEmpty && File(candidate).existsSync()) {
+            newPaths.add(candidate);
+            touched = true;
+          } else {
+            newPaths.add(path);
+          }
+        }
+        if (touched) {
+          changed = true;
+          healed.add(m.copyWith(attachmentPaths: newPaths));
+        } else {
+          healed.add(m);
+        }
+      }
+      if (changed) {
+        debugPrint('[ReadService] Healed stale attachment paths against the '
+            'current Documents directory.');
+      }
+      return healed;
+    } catch (e) {
+      debugPrint('[ReadService] Attachment path healing skipped: $e');
+      return messages;
     }
   }
 }

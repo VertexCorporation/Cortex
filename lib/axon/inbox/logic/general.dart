@@ -281,7 +281,7 @@ class InboxViewModel extends ChangeNotifier {
         notifyListeners();
         _updateConversationCache();
       } else {
-        await loadConversations(langCode: _currentLangCode, isReload: true);
+        await _handleUnknownConversationEvent(convId, newTitle: newTitle);
       }
     });
 
@@ -292,7 +292,11 @@ class InboxViewModel extends ChangeNotifier {
       final manager = _conversationManagers[convId];
 
       if (manager == null) {
-        await loadConversations(langCode: _currentLangCode, isReload: true);
+        // A message was just persisted for a conversation the inbox has
+        // never seen (a brand-new chat's first message). Insert it
+        // immediately instead of waiting for a full reload — see
+        // [_handleUnknownConversationEvent].
+        await _handleUnknownConversationEvent(convId);
         return;
       }
 
@@ -310,6 +314,82 @@ class InboxViewModel extends ChangeNotifier {
         ChatStorageService.conversationResetStream.listen((_) {
       _clearConversationsAfterStorageReset();
     });
+  }
+
+  // Serializes background reloads triggered by stream events so a rapid
+  // event burst (first message + AI completion + title rename within the
+  // first seconds of a new chat) cannot overlap two full reloads and
+  // momentarily resurrect a stale ordering.
+  bool _isBackgroundReloadRunning = false;
+  bool _backgroundReloadPending = false;
+
+  Future<void> _reloadInBackground() async {
+    if (_isBackgroundReloadRunning) {
+      _backgroundReloadPending = true;
+      return;
+    }
+    _isBackgroundReloadRunning = true;
+    try {
+      await loadConversations(langCode: _currentLangCode, isReload: true);
+    } finally {
+      _isBackgroundReloadRunning = false;
+      if (_backgroundReloadPending) {
+        _backgroundReloadPending = false;
+        await _reloadInBackground();
+      }
+    }
+  }
+
+  /// Handles a stream event for a conversation the inbox has not seen yet —
+  /// typically the FIRST message of a brand-new chat.
+  ///
+  /// The previous implementation awaited a full [loadConversations] reload,
+  /// which first awaits `ModelService.getModels()` — a network round-trip on
+  /// a cold catalog. During that window (hundreds of ms to seconds) the new
+  /// chat was completely invisible in Axon: the reported "new chats don't
+  /// appear at the top" symptom. Instead, materialize the manager directly
+  /// from the already-committed DB row (the stream event only fires after
+  /// the insert commits), insert it at the top immediately, then reconcile
+  /// everything else with a background reload.
+  Future<void> _handleUnknownConversationEvent(String convId,
+      {String? newTitle}) async {
+    if (_conversationManagers.containsKey(convId)) {
+      // Another event won the race while we were awaiting I/O.
+      if (newTitle != null) {
+        _conversationManagers[convId]?.updateConversationTitle(newTitle);
+        notifyListeners();
+      }
+      return;
+    }
+
+    final optimistic = await ConversationManager.fromId(convId,
+        langCode: _currentLangCode, modelService: _modelService);
+
+    if (optimistic == null) {
+      debugPrint('[Axon] Could not materialize conversation $convId from the '
+          'DB row; falling back to full reload.');
+      await _reloadInBackground();
+      return;
+    }
+
+    if (newTitle != null) {
+      optimistic.updateConversationTitle(newTitle);
+    }
+
+    _conversationManagers[convId] = optimistic;
+    if (!_allConversationIDs.contains(convId)) {
+      _allConversationIDs.add(convId);
+    }
+    _sortConversations();
+    _updateConversationCache();
+    debugPrint('[Axon] Optimistic insert: conversation $convId ('
+        'lastMessageDate=${optimistic.lastMessageDate}) shown at the top of '
+        'the inbox immediately.');
+    notifyListeners();
+
+    // Reconcile the rest of the list (snippets, removals, snapshot updates)
+    // off the critical path.
+    await _reloadInBackground();
   }
 
   void _clearConversationsAfterStorageReset() {
