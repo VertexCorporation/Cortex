@@ -78,13 +78,17 @@ class ChatFormatProcessor {
     final tokens = _format!.tokens!;
     _ensurePatternsInitialized(tokens);
 
-    // --- ignore_regex short-circuit (same semantics as before) ---
-    if (_ignorePattern?.hasMatch(token) ?? false) return null;
+    // Native chunks may contain both an ignored artifact and the answer.
+    // Drop only matching spans, never the entire mixed-content chunk.
+    final filteredToken = _ignorePattern == null
+        ? token
+        : token.replaceAll(_ignorePattern!, '');
+    if (filteredToken.isEmpty) return null;
 
     final visibleBuffer = StringBuffer();
 
     final controlStartChars = _controlStartChars;
-    final tokenStr = token.toString();
+    final tokenStr = filteredToken;
     int i = 0;
     while (i < tokenStr.length) {
       if (_generationStopped) break;
