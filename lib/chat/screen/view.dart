@@ -42,6 +42,7 @@ class ChatViewState extends State<ChatView>
   // --- Animations ---
   late AnimationController editPanelController;
   late Animation<Offset> slideAnimation;
+  late Animation<double> fadeAnimation;
 
   // --- Services ---
   late final EditService editService;
@@ -87,11 +88,16 @@ class ChatViewState extends State<ChatView>
     );
 
     editPanelController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+        vsync: this, duration: const Duration(milliseconds: 200));
 
     slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
         .animate(CurvedAnimation(
             parent: editPanelController, curve: Curves.easeOut));
+
+    // The banner dissolves in and out alongside its slide — one clock, two
+    // effects — so it never pops on or blinks off at either end of the ride.
+    fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+        parent: editPanelController, curve: Curves.easeOut));
 
     // Initialize EditService. Note: The actual TextEditingController is provided
     // by the ChatInputPanel later via updateControllers.
@@ -439,6 +445,7 @@ class ChatViewState extends State<ChatView>
                   scrollService: _scrollService,
                   editPanelController: editPanelController,
                   slideAnimation: slideAnimation,
+                  fadeAnimation: fadeAnimation,
                 ),
               ),
             ),
