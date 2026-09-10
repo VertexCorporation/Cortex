@@ -15,11 +15,17 @@ class WaveformVisualizer extends StatefulWidget {
   final WaveOrigin origin; // [NEW] Control origin
   final bool simulatePlaying;
 
+  /// Vertical footprint of the painted band. Defaults to the historical 50;
+  /// `double.infinity` makes the visualizer fill whatever bounded box it is
+  /// given (the composer's field slot, for dictation).
+  final double height;
+
   const WaveformVisualizer({
     super.key,
     this.color,
     this.origin = WaveOrigin.right, // Default to old behavior (Right)
     this.simulatePlaying = false,
+    this.height = 50.0,
   });
 
   @override
@@ -101,16 +107,25 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
 
   @override
   Widget build(BuildContext context) {
+    // The ticker mutates [_history] and [_animationValue] and then pings
+    // [_notifier]; rebuilding the painter through that listenable is what
+    // actually schedules the repaints. Without this listener the ticker
+    // kept firing but the canvas only repainted on unrelated rebuilds.
     return SizedBox(
-      height: 50,
+      height: widget.height,
       width: double.infinity,
-      child: CustomPaint(
-        painter: _ModernWavePainter(
-          history: _history,
-          animationValue: _animationValue,
-          color: widget.color ?? AppColors.primaryColor.inverted,
-          origin: widget.origin,
-        ),
+      child: ListenableBuilder(
+        listenable: _notifier,
+        builder: (context, _) {
+          return CustomPaint(
+            painter: _ModernWavePainter(
+              history: _history,
+              animationValue: _animationValue,
+              color: widget.color ?? AppColors.primaryColor.inverted,
+              origin: widget.origin,
+            ),
+          );
+        },
       ),
     );
   }

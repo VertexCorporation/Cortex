@@ -746,19 +746,22 @@ class RemoteSttService {
   /// RMS of a little-endian 16-bit PCM chunk, normalised to 0..1 and eased so
   /// the meter responds the way the on-device one does.
   double _levelOf(Uint8List chunk) {
-    if (chunk.length < 2) return 0.0;
-    final samples = chunk.buffer.asInt16List(
-      chunk.offsetInBytes,
-      chunk.lengthInBytes ~/ 2,
-    );
-    if (samples.isEmpty) return 0.0;
+    final int byteCount = chunk.lengthInBytes;
+    final int sampleCount = byteCount ~/ 2;
+    if (sampleCount == 0) return 0.0;
 
+    // The recorder can hand us views whose byte offset is odd (seen live as
+    // "Offset (5) must be a multiple of BYTES_PER_ELEMENT"), which
+    // asInt16List rejects outright and took the whole app down with it.
+    // ByteData reads are alignment-agnostic, so walk the samples directly
+    // instead of slicing an Int16 view.
+    final bytes = ByteData.view(chunk.buffer, chunk.offsetInBytes, byteCount);
     var sum = 0.0;
-    for (final sample in samples) {
-      final normalised = sample / 32768.0;
+    for (var i = 0; i < sampleCount; i++) {
+      final normalised = bytes.getInt16(i * 2, Endian.little) / 32768.0;
       sum += normalised * normalised;
     }
-    final rms = math.sqrt(sum / samples.length);
+    final rms = math.sqrt(sum / sampleCount);
     return (rms * 3.0).clamp(0.0, 1.0);
   }
 }

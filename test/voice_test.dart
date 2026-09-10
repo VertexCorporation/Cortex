@@ -116,8 +116,6 @@ void main() {
     await voiceService.startSession(
       locale: 'en-US',
       onFinalSentence: (text) {},
-      voiceSystemPrompt: "SUFFIX",
-      flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev",
     );
     // Context is null in test, so we need to manually start listening
     voiceService.startListening();
@@ -129,9 +127,7 @@ void main() {
     // 1. Start Session
     await voiceService.startSession(
         locale: 'en-US',
-        onFinalSentence: (_) {},
-        voiceSystemPrompt: "SUFFIX",
-        flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
+        onFinalSentence: (_) {},);
 
     // 2. Simulate AI Streaming text
     // "Hello world. How are you?"
@@ -159,16 +155,12 @@ void main() {
   test('VoiceService restarts listening after AI finishes', () async {
     await voiceService.startSession(
         locale: 'en-US',
-        onFinalSentence: (_) {},
-        voiceSystemPrompt: "SUFFIX",
-        flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
+        onFinalSentence: (_) {},);
     await voiceService.stopSession(); // Reset
 
     await voiceService.startSession(
         locale: 'en-US',
-        onFinalSentence: (_) {},
-        voiceSystemPrompt: "SUFFIX",
-        flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
+        onFinalSentence: (_) {},);
 
     voiceService.onAiStreamCallback("Hello.");
     await Future.delayed(Duration.zero);

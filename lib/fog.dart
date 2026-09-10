@@ -3,6 +3,27 @@
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 
+/// The one fog recipe shared by every fog widget in this file: solid
+/// [fogColor] at [begin], softened to fully transparent at [end] with the
+/// same easing stops. A single definition keeps the vertical, horizontal
+/// and static edge fogs from ever drifting apart visually.
+BoxDecoration _fogDecoration(
+    Color fogColor, AlignmentGeometry begin, AlignmentGeometry end) {
+  return BoxDecoration(
+    gradient: LinearGradient(
+      begin: begin,
+      end: end,
+      // Non-linear gradient for smoother "fog" feel
+      stops: const [0.0, 0.4, 1.0],
+      colors: [
+        fogColor,
+        fogColor.withValues(alpha: 0.8),
+        fogColor.withValues(alpha: 0),
+      ],
+    ),
+  );
+}
+
 // --- VERTICAL FOG ---
 class ScrollFog extends StatefulWidget {
   final Widget child;
@@ -167,19 +188,8 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
               },
               child: IgnorePointer(
                 child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      // Non-linear gradient for smoother "fog" feel
-                      stops: const [0.0, 0.4, 1.0],
-                      colors: [
-                        fogColor,
-                        fogColor.withValues(alpha: 0.8),
-                        fogColor.withValues(alpha: 0),
-                      ],
-                    ),
-                  ),
+                  decoration: _fogDecoration(
+                      fogColor, Alignment.topCenter, Alignment.bottomCenter),
                 ),
               ),
             ),
@@ -205,18 +215,8 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
               },
               child: IgnorePointer(
                 child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      stops: const [0.0, 0.4, 1.0],
-                      colors: [
-                        fogColor,
-                        fogColor.withValues(alpha: 0.8),
-                        fogColor.withValues(alpha: 0),
-                      ],
-                    ),
-                  ),
+                  decoration: _fogDecoration(
+                      fogColor, Alignment.bottomCenter, Alignment.topCenter),
                 ),
               ),
             ),
@@ -376,18 +376,8 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
               },
               child: IgnorePointer(
                 child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      stops: const [0.0, 0.4, 1.0],
-                      colors: [
-                        fogColor,
-                        fogColor.withValues(alpha: 0.8),
-                        fogColor.withValues(alpha: 0),
-                      ],
-                    ),
-                  ),
+                  decoration: _fogDecoration(
+                      fogColor, Alignment.centerLeft, Alignment.centerRight),
                 ),
               ),
             ),
@@ -410,19 +400,79 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
               },
               child: IgnorePointer(
                 child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerRight,
-                      end: Alignment.centerLeft,
-                      stops: const [0.0, 0.4, 1.0],
-                      colors: [
-                        fogColor,
-                        fogColor.withValues(alpha: 0.8),
-                        fogColor.withValues(alpha: 0),
-                      ],
-                    ),
-                  ),
+                  decoration: _fogDecoration(
+                      fogColor, Alignment.centerRight, Alignment.centerLeft),
                 ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// --- STATIC EDGE FOG ---
+/// Horizontal edge fog for content that does not scroll, e.g. the live
+/// dictation waveform: fixed gradient strips on the left and/or right edge
+/// of [child]'s box that dissolve it into [color] (the capsule background
+/// by default). Unlike the scroll fogs above, visibility is not tied to a
+/// [ScrollController] — the strips are painted whenever [child] is, so
+/// they simply ride along with whatever entrance/exit animation the
+/// caller already gives [child]. Both strips are pointer-transparent and
+/// the stack clips hard, so the fog never takes part in hit testing and
+/// never extends past [child]'s bounds.
+class EdgeFog extends StatelessWidget {
+  final Widget child;
+  final double startFogWidth;
+  final double endFogWidth;
+  final bool showStart;
+  final bool showEnd;
+  final Color? color;
+
+  const EdgeFog({
+    super.key,
+    required this.child,
+    this.startFogWidth = 20.0,
+    this.endFogWidth = 20.0,
+    this.showStart = true,
+    this.showEnd = true,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fogColor = color ?? AppColors.background;
+    return Stack(
+      // Unlike [ScrollFogHorizontal] there is no edge overflow: the strips
+      // sit flush inside [child]'s box and the hard clip keeps them there.
+      clipBehavior: Clip.hardEdge,
+      children: [
+        child,
+        if (showStart)
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: startFogWidth,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                key: const ValueKey('fog_start'),
+                decoration: _fogDecoration(
+                    fogColor, Alignment.centerLeft, Alignment.centerRight),
+              ),
+            ),
+          ),
+        if (showEnd)
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: endFogWidth,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                key: const ValueKey('fog_end'),
+                decoration: _fogDecoration(
+                    fogColor, Alignment.centerRight, Alignment.centerLeft),
               ),
             ),
           ),
