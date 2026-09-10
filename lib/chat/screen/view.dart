@@ -539,6 +539,7 @@ class _BriefingOverlayWrapper extends StatelessWidget {
         final totalCredits = creditsManager.totalCreditsNotifier.value;
         return BriefingOverlay(
           availableCredits: totalCredits,
+          debtFloor: creditsManager.debtFloor,
           photoSelected: input.hasAttachments,
           isOfflineModel: isOffline,
           modelMissing: modelMissing,

@@ -23,7 +23,6 @@ import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
-import 'panels/credit_warning.dart';
 import 'input/input.dart';
 
 class ChatInputPanel extends StatefulWidget {
@@ -229,9 +228,6 @@ class _ChatInputPanelState extends State<ChatInputPanel>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Credit warning banner
-                  const CreditWarningPanel(),
-
                   // 1. Edit Panel (Slides down when editing)
                   SizeTransition(
                     sizeFactor: _editPanelSizeFactor,
