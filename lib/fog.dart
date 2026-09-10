@@ -429,6 +429,13 @@ class EdgeFog extends StatelessWidget {
   final bool showEnd;
   final Color? color;
 
+  /// Optional strip keys. Consumers that mount a second [EdgeFog] in the
+  /// same subtree — the composer's placeholder fog versus the dictation
+  /// wave's — disambiguate their strips for tests; the defaults keep the
+  /// shared 'fog_start'/'fog_end' pair.
+  final Key? startStripKey;
+  final Key? endStripKey;
+
   const EdgeFog({
     super.key,
     required this.child,
@@ -437,6 +444,8 @@ class EdgeFog extends StatelessWidget {
     this.showStart = true,
     this.showEnd = true,
     this.color,
+    this.startStripKey,
+    this.endStripKey,
   });
 
   @override
@@ -456,7 +465,7 @@ class EdgeFog extends StatelessWidget {
             width: startFogWidth,
             child: IgnorePointer(
               child: DecoratedBox(
-                key: const ValueKey('fog_start'),
+                key: startStripKey ?? const ValueKey('fog_start'),
                 decoration: _fogDecoration(
                     fogColor, Alignment.centerLeft, Alignment.centerRight),
               ),
@@ -470,7 +479,7 @@ class EdgeFog extends StatelessWidget {
             width: endFogWidth,
             child: IgnorePointer(
               child: DecoratedBox(
-                key: const ValueKey('fog_end'),
+                key: endStripKey ?? const ValueKey('fog_end'),
                 decoration: _fogDecoration(
                     fogColor, Alignment.centerRight, Alignment.centerLeft),
               ),

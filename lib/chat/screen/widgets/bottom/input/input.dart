@@ -93,6 +93,16 @@ class InputField extends StatefulWidget {
 class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   final InputService _inputService = InputService();
 
+  // The capsule occupies a share of the available reading width: a compact
+  // pill while collapsed (every control inside), opening to a slightly
+  // wider share once expanded. The detachable bubbles float outside its
+  // border in the freed space on both sides. Collapsed share bumped from
+  // 0.6: the compact pill was starving the text field (the hint scaled to
+  // under half size), so the pill keeps a bit more width and the
+  // collapsed/expanded gap narrows.
+  static const double collapsedCapsuleShare = 0.68;
+  static const double expandedCapsuleShare = 0.7;
+
   // Morphing composer expand/collapse animation
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
@@ -297,15 +307,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       animation: _expandAnimation,
       builder: (context, child) {
         final double t = _expandAnimation.value;
-        // The capsule occupies a share of the available reading width:
-        // a compact pill while collapsed (every control inside), opening
-        // to a slightly wider share once expanded. The detachable bubbles
-        // float outside its border in the freed space on both sides.
-        // Collapsed share bumped from 0.6: the compact pill was starving
-        // the text field (the hint scaled to under half size), so the pill
-        // keeps a bit more width and the collapsed/expanded gap narrows.
-        const double collapsedCapsuleShare = 0.68;
-        const double expandedCapsuleShare = 0.7;
         final double available =
             viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
         final double capsuleInset = lerpDouble(
@@ -492,10 +493,31 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
             // The text field fills the space left between the controls; the
             // compact capsule itself provides the small overall footprint.
-            final double inputLeft =
-                lerpDouble(edgeGap + buttonSize + inputGap, inputEdgeGap, t)!;
+            // While collapsed the field now starts from 0.7 of the width it
+            // used to fill: the freed 30% folds into its collapsed insets —
+            // split evenly, so the field narrows around its own center and
+            // every control gap widens — which makes the capsule morph
+            // visibly widen the input itself. The expanded insets, and
+            // therefore the expanded field width, are untouched.
+            final double collapsedInputLeft = edgeGap + buttonSize + inputGap;
+            final double collapsedInputRight =
+                edgeGap + buttonSize * 2 + buttonGap + inputGap;
+            final double viewportWidth = MediaQuery.sizeOf(context).width;
+            final double availableWidth =
+                viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
+            // The capsule's collapsed interior, minus the capsule's 1px
+            // border gap plus the field section's own 2px horizontal
+            // padding per side, is the width the field used to fill while
+            // collapsed.
+            final double collapsedField = availableWidth * collapsedCapsuleShare -
+                6.0 -
+                collapsedInputLeft -
+                collapsedInputRight;
+            final double freedHalfWidth = collapsedField * 0.3 / 2.0;
+            final double inputLeft = lerpDouble(
+                collapsedInputLeft + freedHalfWidth, inputEdgeGap, t)!;
             final double inputRight = lerpDouble(
-                edgeGap + buttonSize * 2 + buttonGap + inputGap,
+                collapsedInputRight + freedHalfWidth,
                 edgeGap + buttonSize + inputGap,
                 t)!;
 

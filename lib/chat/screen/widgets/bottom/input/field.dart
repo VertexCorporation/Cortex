@@ -76,6 +76,7 @@ class _TextFieldSection extends StatelessWidget {
           showStart: false,
           showEnd: showFog,
           endFogWidth: fontSize * 0.75,
+          endStripKey: const ValueKey('hint_fog_end'),
           child: TextField(
             key: const ValueKey('chat_input_field'),
             focusNode: focusNode,

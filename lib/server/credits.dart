@@ -115,6 +115,12 @@ class CreditsManager {
     return spendable > _creditLimits.debtFloor;
   }
 
+  /// The effective subscription tier resolved from the last user-data
+  /// snapshot ('free', 'plus', 'pro', 'ultra'). Presentation-only: it feeds
+  /// tier-specific copy (credit briefings, send-failure recovery), never
+  /// credit state — the server stays the single source of truth for that.
+  String get subscriptionTier => _subscriptionTier;
+
   // --- Internal State ---
   UserProvider? _userProvider;
   String? _activeUid;
@@ -239,3 +245,19 @@ class CreditsManager {
     _resetEngineFlags();
   }
 }
+
+/// "23h 14m" / "5h 42m" / "47m" — never negative: if the renewal instant has
+/// already passed but the refreshed snapshot has not landed yet, the countdown
+/// holds at one minute instead of counting below zero.
+///
+/// Shared by every surface that shows the time until the daily credit renewal
+/// (briefing overlay, send-failure recovery) so the format stays identical.
+String formatRenewalRemaining(Duration remaining) {
+  if (remaining < const Duration(minutes: 1)) return '1m';
+  final hours = remaining.inHours;
+  final minutes = remaining.inMinutes % 60;
+  if (hours == 0) return '${minutes}m';
+  if (minutes == 0) return '${hours}h';
+  return '${hours}h ${minutes}m';
+}
+
