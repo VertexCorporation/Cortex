@@ -919,4 +919,54 @@ void main() {
     expect(banner.left, closeTo(inset, 0.5));
     expect(banner.right, closeTo(390 - inset, 0.5));
   });
+
+  // Regression: the banner needs breathing room over the composer capsule
+  // below it. The panel's total height must exceed the banner by a visible
+  // proportional gap, and that gap must sit strictly BELOW the banner — it
+  // rides inside the panel's SizeTransition, so it collapses away with the
+  // banner and never lingers once edit mode closes.
+  testWidgets('edit banner keeps breathing room above the composer capsule',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = AnimationController(
+        vsync: tester, duration: const Duration(milliseconds: 300));
+    addTearDown(controller.dispose);
+    final sizeFactor =
+        CurvedAnimation(parent: controller, curve: Curves.easeOut);
+    final slide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(
+        body: Column(
+          // Mirrors bottom.dart: the panel column hands the SizeTransition
+          // an unbounded height, so the panel shrink-wraps to its natural
+          // (banner + gap) height instead of stretching to the screen.
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            SizeTransition(
+              sizeFactor: sizeFactor,
+              axis: Axis.vertical,
+              child: EditPanelWidget(slideAnimation: slide, onCancel: () {}),
+            ),
+          ],
+        ),
+      ),
+    ));
+    controller.forward();
+    await tester.pumpAndSettle();
+
+    final banner = tester.getRect(find.byKey(const ValueKey('edit_banner')));
+    final panel = tester.getRect(find.byType(EditPanelWidget));
+    final double expectedGap = 1000 * 0.015; // phone: screenHeight * 0.015
+    // A visible gap between the banner and the capsule below it…
+    expect(panel.height - banner.height, closeTo(expectedGap, 0.5));
+    // …placed strictly below the banner: the banner tops the panel.
+    expect(banner.top, closeTo(panel.top, 0.5));
+  });
 }

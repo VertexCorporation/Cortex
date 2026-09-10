@@ -52,62 +52,74 @@ class EditPanelWidget extends StatelessWidget {
     // full-width sheet fragment.
     final double radius = CortexDesign.cardRadius;
 
+    // Breathing room between the banner and the composer capsule below: the
+    // same tablet-from-width / phone-from-height convention as every other
+    // dimension above.
+    final double bottomGap =
+        isTablet ? screenWidth * 0.015 : screenHeight * 0.015;
+
     // The capsule-width banner must float exactly over the composer capsule.
     // SizeTransition's vertical-axis default alignment presses any child
     // narrower than the bar to the start edge, so this widget centers
-    // itself instead of trusting the parent to align it.
-    return Center(
-      child: SlideTransition(
-        position: slideAnimation,
-        child: LiquidGlassPanel(
-          borderRadius: BorderRadius.circular(radius),
-          child: Container(
-            key: const ValueKey('edit_banner'),
-            width: bannerWidth,
-            height: height,
-            // Same material as the composer capsule: opaque background,
-            // full border, matching radius.
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(radius),
-              border: Border.all(
-                color: AppColors.border,
-                width: 1,
+    // itself instead of trusting the parent to align it. The Padding adds
+    // breathing room above the composer capsule; it lives inside the panel's
+    // SizeTransition, so it appears and collapses with the banner and never
+    // lingers once edit mode closes.
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomGap),
+      child: Center(
+        child: SlideTransition(
+          position: slideAnimation,
+          child: LiquidGlassPanel(
+            borderRadius: BorderRadius.circular(radius),
+            child: Container(
+              key: const ValueKey('edit_banner'),
+              width: bannerWidth,
+              height: height,
+              // Same material as the composer capsule: opaque background,
+              // full border, matching radius.
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(radius),
+                border: Border.all(
+                  color: AppColors.border,
+                  width: 1,
+                ),
               ),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-            child: Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/edit.svg',
-                  width: iconSize,
-                  height: iconSize,
-                  colorFilter: ColorFilter.mode(
-                      AppColors.primaryColor.inverted, BlendMode.srcIn),
-                ),
-                Expanded(
-                  child: Text(
-                    localizations.editingNotification,
-                    style: TextStyle(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/edit.svg',
+                    width: iconSize,
+                    height: iconSize,
+                    colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor.inverted, BlendMode.srcIn),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(right: screenWidth * 0.007),
-                  child: GestureDetector(
-                    onTap: onCancel,
-                    child: Icon(
-                      Icons.cancel,
-                      size: CortexDesign.iconSmall,
-                      color: AppColors.primaryColor.inverted,
+                  Expanded(
+                    child: Text(
+                      localizations.editingNotification,
+                      style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.only(right: screenWidth * 0.007),
+                    child: GestureDetector(
+                      onTap: onCancel,
+                      child: Icon(
+                        Icons.cancel,
+                        size: CortexDesign.iconSmall,
+                        color: AppColors.primaryColor.inverted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
