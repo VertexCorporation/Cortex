@@ -4,6 +4,8 @@ import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/input.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
+import 'package:cortex/chat/screen/widgets/bottom/panels/edit.dart';
+import 'package:cortex/design.dart';
 import 'package:cortex/chat/screen/widgets/wave.dart';
 import 'package:cortex/internet.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -868,5 +870,53 @@ void main() {
     expect(endFog, findsNothing);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
+  });
+
+  // Regression: SizeTransition's vertical-axis default alignment is
+  // AlignmentDirectional(-1, 0), which presses a child narrower than the
+  // bar to the start edge. The edit banner is capsule-width, so it must
+  // defend its own centering — exactly over the expanded capsule, never
+  // flush against the left edge of the control bar.
+  testWidgets('edit banner hugs the capsule and stays centered over the bar',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = AnimationController(
+        vsync: tester, duration: const Duration(milliseconds: 300));
+    addTearDown(controller.dispose);
+    final sizeFactor =
+        CurvedAnimation(parent: controller, curve: Curves.easeOut);
+    final slide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+
+    // Mirrors bottom.dart: a plain SizeTransition with the default
+    // (start-pressing) alignment wrapping the banner inside the bottom bar.
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: SizeTransition(
+            sizeFactor: sizeFactor,
+            axis: Axis.vertical,
+            child: EditPanelWidget(slideAnimation: slide, onCancel: () {}),
+          ),
+        ),
+      ),
+    ));
+    controller.forward();
+    await tester.pumpAndSettle();
+
+    final banner = tester.getRect(find.byKey(const ValueKey('edit_banner')));
+    final double inset = CortexDesign.readingInset(390) +
+        composerCapsuleInset(390, expanded: true);
+    // Same width as the expanded capsule…
+    expect(banner.width, closeTo(390 - 2 * inset, 0.5));
+    // …and centered on it, never pressed to the bar's start edge.
+    expect(banner.left, closeTo(inset, 0.5));
+    expect(banner.right, closeTo(390 - inset, 0.5));
   });
 }
