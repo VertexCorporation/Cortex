@@ -623,8 +623,8 @@
       }
     }
   },
-  "generationImageLabel": "Kép készítése",
-  "generationVideoLabel": "Videó készítése",
-  "generationAudioLabel": "Hang készítése",
-  "generationDocumentLabel": "Dokumentum készítése"
+  "generationImageLabel": "Kép Készítése",
+  "generationVideoLabel": "Videó Készítése",
+  "generationAudioLabel": "Hang Készítése",
+  "generationDocumentLabel": "Dokumentum Készítése"
 }

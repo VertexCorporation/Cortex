@@ -2138,4 +2138,32 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get generationDocumentLabel => 'Belge Oluşturuluyor';
+
+  @override
+  String get creditWarningFreeDecliningTitle => 'Krediler Azalıyor';
+
+  @override
+  String get creditWarningFreeDecliningMessage =>
+      'Kredileriniz azalıyor. Zekâ performansı düşebilir.';
+
+  @override
+  String get creditWarningFreeExhaustedTitle => 'Günlük Limit Doldu';
+
+  @override
+  String get creditWarningFreeExhaustedMessage =>
+      'Sohbet hakkınız günlük limitiniz yenilenene kadar kısıtlıdır. Daha fazlası için abone olun.';
+
+  @override
+  String get creditWarningPaidUpgradeTitle => 'Planı Yükselt';
+
+  @override
+  String get creditWarningPaidUpgradeMessage =>
+      'Daha fazla kredi için planınızı yükseltin.';
+
+  @override
+  String get creditWarningUltraTitle => 'Krediler Düşük';
+
+  @override
+  String get creditWarningUltraMessage =>
+      'Kredileriniz azalıyor. Performans düşebilir.';
 }

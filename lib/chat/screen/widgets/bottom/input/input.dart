@@ -11,7 +11,6 @@ import 'package:cortex/internet.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/services/speech.dart';
-import 'package:cortex/chat/screen/widgets/wave.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/service.dart';
 import 'package:cortex/server/subscription.dart';
@@ -20,10 +19,6 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/rag/screens/documents.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import 'recording_layout.dart';
-
-part 'waveform.dart';
 
 part 'attachments.dart';
 
@@ -52,8 +47,6 @@ class InputField extends StatefulWidget {
   final String? originalMessageText;
   final bool isStorageSufficient;
   final int? totalCredits;
-  final int? availablePredits;
-  final int? availableDredits;
   final String? role;
   final bool isServerSideModel;
   final VoidCallback onStop;
@@ -84,8 +77,6 @@ class InputField extends StatefulWidget {
     this.originalMessageText,
     required this.isStorageSufficient,
     required this.totalCredits,
-    this.availablePredits,
-    this.availableDredits,
     this.role,
     required this.isServerSideModel,
     required this.onStop,
@@ -108,12 +99,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   final InputService _inputService = InputService();
   final GlobalKey _inputFieldKey = GlobalKey();
 
-  // Master controller for Input <-> Voice transition
-  late AnimationController _modeController;
-
-  late Animation<double> _inputOpacityAnim;
-  late Animation<double> _waveOpacityAnim;
-
   // Morphing composer expand/collapse animation
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
@@ -121,30 +106,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
-    // 600ms total transition duration
-    _modeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-
-    // 1. Input Opacity (Fade Out 0.0 -> 0.4)
-    // Reverse: Fade In (0.4 -> 0.0) -> Buttons appear last
-    _inputOpacityAnim = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _modeController,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-      ),
-    );
-
-    // 2. Wave Opacity (Fade In 0.5 -> 1.0)
-    // Reverse: Fade Out (1.0 -> 0.5) -> Wave disappears first
-    _waveOpacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _modeController,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
-      ),
-    );
 
     // Composer expand/collapse animation (ChatGPT-style morph)
     _expandController = AnimationController(
@@ -175,15 +136,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       }
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      // Initialize state based on provider
-      final inputProvider = context.read<InputProvider>();
-      if (inputProvider.isVoiceRecording) {
-        _modeController.value = 1.0;
-      }
-    });
   }
 
   @override
@@ -197,8 +149,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         oldWidget.isLimitExceeded != widget.isLimitExceeded ||
         oldWidget.modelMissing != widget.modelMissing ||
         oldWidget.totalCredits != widget.totalCredits ||
-        oldWidget.availablePredits != widget.availablePredits ||
-        oldWidget.availableDredits != widget.availableDredits ||
         oldWidget.isServerSideModel != widget.isServerSideModel ||
         oldWidget.isDynamicChatMode != widget.isDynamicChatMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -219,7 +169,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _modeController.dispose();
     _expandController.dispose();
     _speechService?.removeListener(_onSpeechStatusChange);
     widget.textFieldFocusNode.removeListener(_onFocusChange);
@@ -251,21 +200,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     }
   }
 
-  // Monitor provider state changes to drive animation
-  void _syncAnimationWithState(bool isRecording) {
-    if (isRecording) {
-      if (_modeController.status != AnimationStatus.forward &&
-          _modeController.status != AnimationStatus.completed) {
-        _modeController.forward();
-      }
-    } else {
-      if (_modeController.status != AnimationStatus.reverse &&
-          _modeController.status != AnimationStatus.dismissed) {
-        _modeController.reverse();
-      }
-    }
-  }
-
   void _onFocusChange() {
     if (!mounted) return;
     if (SchedulerBinding.instance.schedulerPhase ==
@@ -279,16 +213,27 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   }
 
   void _syncExpandAnimation(bool shouldExpand) {
-    if (shouldExpand) {
-      if (_expandController.status != AnimationStatus.forward &&
-          _expandController.status != AnimationStatus.completed) {
-        _expandController.forward();
+    void animate() {
+      if (shouldExpand) {
+        if (_expandController.status != AnimationStatus.forward &&
+            _expandController.status != AnimationStatus.completed) {
+          _expandController.forward();
+        }
+      } else {
+        if (_expandController.status != AnimationStatus.reverse &&
+            _expandController.status != AnimationStatus.dismissed) {
+          _expandController.reverse();
+        }
       }
+    }
+
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) animate();
+      });
     } else {
-      if (_expandController.status != AnimationStatus.reverse &&
-          _expandController.status != AnimationStatus.dismissed) {
-        _expandController.reverse();
-      }
+      animate();
     }
   }
 
@@ -317,8 +262,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       isVideoModel: isVideoModel,
       userTier: widget.userTier,
       totalCredits: widget.totalCredits,
-      availablePredits: widget.availablePredits,
-      availableDredits: widget.availableDredits,
     );
   }
 
@@ -344,8 +287,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       isVideoModel: isVideoModel,
       userTier: widget.userTier,
       totalCredits: widget.totalCredits,
-      availablePredits: widget.availablePredits,
-      availableDredits: widget.availableDredits,
     );
   }
 
@@ -355,10 +296,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     final screenWidth = viewportWidth.clamp(0.0, CortexDesign.readingWidth);
     final bool isTablet = screenWidth >= 600;
 
-    final inputProvider = context.watch<InputProvider>();
-    final bool isRecording = inputProvider.isVoiceRecording;
-
-    _syncAnimationWithState(isRecording);
+    // Watched so provider flips (dictation, feature modes) rebuild this
+    // subtree: the row reads the provider directly, but the capsule
+    // expansion trigger inside it depends on this rebuild.
+    context.watch<InputProvider>();
 
     final bool shouldShow = widget.isModelSelected || widget.isDynamicChatMode;
 
@@ -366,83 +307,109 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
     return Offstage(
       offstage: !shouldShow,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          CortexDesign.readingInset(viewportWidth),
-          0,
-          CortexDesign.readingInset(viewportWidth),
-          12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
-        ),
-        child: Container(
-          key: _inputFieldKey,
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(
-              color: AppColors.border,
-              width: 1,
+      child: AnimatedBuilder(
+        animation: _expandAnimation,
+        builder: (context, child) {
+          final double t = _expandAnimation.value;
+          // The capsule occupies a share of the available reading width:
+          // a compact pill while collapsed (every control inside), opening
+          // to a slightly wider share once expanded. The detachable bubbles
+          // float outside its border in the freed space on both sides.
+          // Collapsed share bumped from 0.6: the compact pill was starving
+          // the text field (the hint scaled to under half size), so the pill
+          // keeps a bit more width and the collapsed/expanded gap narrows.
+          const double collapsedCapsuleShare = 0.68;
+          const double expandedCapsuleShare = 0.7;
+          final double available =
+              viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
+          final double capsuleInset = lerpDouble(
+            available * (1.0 - collapsedCapsuleShare) / 2.0,
+            available * (1.0 - expandedCapsuleShare) / 2.0,
+            t,
+          )!;
+          // The capsule is a painted backdrop: the interactive row beneath
+          // it spans the full bar width so the detached "+" and action
+          // bubbles stay inside the hit-test bounds of every ancestor.
+          // (Painting outside a box is legal with Clip.none, but hit
+          // testing is bounds-checked at every level — a control that
+          // paints outside its parent simply cannot receive taps.)
+          return Padding(
+            padding: const EdgeInsets.only(
+              bottom: 12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Stack(
+              clipBehavior: Clip.none,
               children: [
-                _AttachmentPreviewSection(
-                    screenWidth: screenWidth, isTablet: isTablet),
-
-                _RagStatusChip(screenWidth: screenWidth),
-
-                // Main Animated Area
-                AnimatedBuilder(
-                  animation: _modeController,
-                  builder: (context, child) {
-                    final progress =
-                        const Interval(0.4, 0.8, curve: Curves.easeInOutCubic)
-                            .transform(_modeController.value);
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        RecordingLayout(
-                          progress: progress,
-                          input:
-                              // 1. INPUT CONTENT
-                              IgnorePointer(
-                            ignoring:
-                                isRecording || _modeController.value > 0,
-                            child: FadeTransition(
-                              opacity: _inputOpacityAnim,
-                              child: _buildExpandingComposerRow(
-                                context,
-                                screenWidth,
-                                isTablet,
-                                isSendButtonEnabled,
-                                isActionPermitted,
-                                progress,
-                              ),
-                            ),
-                          ),
-                          waveform: IgnorePointer(
-                            ignoring:
-                                !isRecording || _waveOpacityAnim.value < 0.1,
-                            child: FadeTransition(
-                              opacity: _waveOpacityAnim,
-                              child: TickerMode(
-                                enabled: _modeController.value > 0,
-                                child: const _WaveformSection(
-                                    key: ValueKey('waveform')),
-                              ),
-                            ),
-                          ),
+                // Painted capsule border/background, inset exactly where the
+                // old container sat. The ±1 matches the 1px border that used
+                // to wrap this box around the 4px vertical padding.
+                Positioned(
+                  left: CortexDesign.readingInset(viewportWidth) + capsuleInset,
+                  right:
+                      CortexDesign.readingInset(viewportWidth) + capsuleInset,
+                  top: -1.0,
+                  bottom: -1.0,
+                  child: DecoratedBox(
+                    key: _inputFieldKey,
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(radius),
+                      border: Border.all(
+                        color: AppColors.border,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ),
+                // Interactive content. Attachments and the RAG chip are
+                // pinned to the capsule interior; the composer row below
+                // is deliberately full bar width so its detached bubbles
+                // remain inside the hit-test region.
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: CortexDesign.readingInset(viewportWidth) +
+                              capsuleInset +
+                              1.0,
                         ),
-                      ],
-                    );
-                  },
+                        child: child!,
+                      ),
+                      // The composer row is the only mode now. Dictation no
+                      // longer swaps it for a waveform: the capsule expands
+                      // instead, the "+" dims to show it is inactive, and
+                      // the action button turns into Stop, so the live
+                      // transcript stays visible throughout.
+                      _buildExpandingComposerRow(
+                        context,
+                        screenWidth,
+                        isTablet,
+                        isSendButtonEnabled,
+                        isActionPermitted,
+                        0.0,
+                        capsuleInset,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
+          );
+        },
+        // Attachments and the RAG chip stay off the animation's rebuild
+        // path; the composer row is built inside the builder because it
+        // needs the animated capsule inset to re-anchor its geometry.
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _AttachmentPreviewSection(
+                screenWidth: screenWidth, isTablet: isTablet),
+
+            _RagStatusChip(screenWidth: screenWidth),
+          ],
         ),
       ),
     );
@@ -454,98 +421,170 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     bool isTablet,
     bool isSendButtonEnabled,
     bool isActionPermitted,
+    // Pinned to 0 since the waveform swap was retired: a non-null value
+    // keeps the microphone visible while dictation runs, and the mic dims
+    // and ignores taps for the duration.
     double recordingProgress,
+    // Animated inset between the bar edge and the capsule border. The row
+    // is wider than the capsule, so it re-anchors every interior-relative
+    // control back to the capsule with this.
+    double capsuleInset,
   ) {
     final inputProvider = context.read<InputProvider>();
+    // Dictation expands the capsule as well, so the speech transcript
+    // lands in the roomy field instead of the compact pill.
+    final bool isDictating = inputProvider.isVoiceRecording;
     final bool isComposerExpanded = widget.textFieldFocusNode.hasFocus ||
+        isDictating ||
         inputProvider.featureMode != ChatInputMode.none;
     final bool hasSelectedFeature =
         inputProvider.featureMode != ChatInputMode.none;
 
     _syncExpandAnimation(isComposerExpanded);
 
+    // Shared composer geometry. The capsule is compact while collapsed (all
+    // controls inside) and opens slightly once expanded, at which point the
+    // detachable "+" and action bubbles float outside its border while the
+    // microphone stays anchored inside.
     final double buttonSize = (screenWidth * 0.086).clamp(32.0, 38.0);
-    const double buttonTravel = 28.0;
-    const double collapsedExtraInset = 0.0;
-    const double expandedExtraInset = 32.0;
+    const double edgeGap = 8.0; // control -> capsule interior edge
+    const double buttonGap = 4.0; // mic -> action while both are inside
+    const double inputGap = 14.0; // breathing room around the text field
+    const double inputEdgeGap = 14.0; // text field -> capsule border (expanded)
+    const double screenEdgeGap = 8.0; // detached bubble -> screen edge
+    // Detached bubbles split the margin between the capsule border and the
+    // screen edge 0.25 / 0.75 (capsule side / screen side), so the screen-side
+    // gap reads about three times the capsule-side one.
+    const double detachedScreenShare = 0.75;
+    // The detachable "+" and action bubbles swell to this multiple of their
+    // base size as the capsule opens (the whole bubble grows, icon included).
+    const double expandedButtonGrow = 1.25;
 
-    return AnimatedBuilder(
-      animation: _expandAnimation,
-      builder: (context, child) {
-        final double t = _expandAnimation.value;
-        final double extraInset =
-            lerpDouble(collapsedExtraInset, expandedExtraInset, t)!;
-        final double travel = lerpDouble(0, buttonTravel, t)!;
-        final double leftPlaceholder = lerpDouble(buttonSize + 4, 0, t)!;
-        final double rightPlaceholder = lerpDouble(buttonSize + 4, 0, t)!;
-        final double leftButtonLeft =
-            (leftPlaceholder - buttonSize) / 2 - travel;
-        final double rightButtonRight =
-            (rightPlaceholder - buttonSize) / 2 - travel;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // The row spans the FULL bar width (the capsule is only a painted
+        // backdrop behind it), so the detached bubbles stay inside the
+        // hit-test bounds of the row and of every ancestor above it.
+        //
+        // Offset from the row edge to the capsule interior — reading inset
+        // + animated capsule inset + the 1px capsule border — which is
+        // also the horizontal room between the capsule border and the
+        // screen edge, per side. Every interior-relative control below is
+        // re-anchored to the capsule border with it.
+        final double base = CortexDesign.readingInset(
+                MediaQuery.sizeOf(context).width) +
+            capsuleInset +
+            1.0;
+        final double outerMargin = base;
 
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: extraInset),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(width: leftPlaceholder),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                      child: _TextFieldSection(
-                        key: const ValueKey('textfield'),
-                        controller: widget.controller,
-                        focusNode: widget.textFieldFocusNode,
-                        localizations: widget.localizations,
-                        screenWidth: screenWidth,
-                        isTablet: isTablet,
-                        showHintText: true,
-                        onEnterPressed: () {
-                          if (isSendButtonEnabled) {
-                            widget.onSend();
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: rightPlaceholder),
-                ],
-              ),
-              Positioned(
-                left: leftButtonLeft,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: AddPhotoButton(
-                    isLimitExceeded: widget.isLimitExceeded,
-                    isPhotoLoading: widget.isPhotoLoading,
-                    localizations: widget.localizations,
+        return AnimatedBuilder(
+          animation: _expandAnimation,
+          builder: (context, child) {
+            final double t = _expandAnimation.value;
+
+            // The detachable bubbles swell slowly along with the expansion.
+            final double buttonScale = lerpDouble(1.0, expandedButtonGrow, t)!;
+            final double grownButtonSize = buttonSize * buttonScale;
+
+            // Detached bubbles ride in the margin between the capsule border
+            // and the screen edge, offset so the screen-side gap is ~3x the
+            // capsule-side gap (0.25 / 0.75 of the free space). The clamp
+            // keeps them inside the screen on narrow viewports.
+            final double freeSpace = outerMargin - 1 - grownButtonSize;
+            final double screenSideGap = freeSpace * detachedScreenShare;
+            final double detach = outerMargin -
+                (screenSideGap > screenEdgeGap
+                    ? screenSideGap
+                    : screenEdgeGap);
+
+            // Left "+" control: inside while collapsed, floats out left.
+            final double plusLeft = lerpDouble(edgeGap, -detach, t)!;
+            // Right action button: inside while collapsed, floats out right.
+            final double actionRight = lerpDouble(edgeGap, -detach, t)!;
+            // The microphone never detaches; it slides to the interior right
+            // edge once the action button vacates its collapsed slot.
+            final double micRight =
+                lerpDouble(edgeGap + buttonSize + buttonGap, edgeGap, t)!;
+
+            // The text field fills the space left between the controls; the
+            // compact capsule itself provides the small overall footprint.
+            final double inputLeft =
+                lerpDouble(edgeGap + buttonSize + inputGap, inputEdgeGap, t)!;
+            final double inputRight = lerpDouble(
+                edgeGap + buttonSize * 2 + buttonGap + inputGap,
+                edgeGap + buttonSize + inputGap,
+                t)!;
+
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: base + inputLeft, right: base + inputRight),
+                  child: _TextFieldSection(
+                    key: const ValueKey('textfield'),
                     controller: widget.controller,
-                    hasSelectedFeature: hasSelectedFeature,
-                  ),
-                ),
-              ),
-              Positioned(
-                right: rightButtonRight,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: _SendButtonSection(
+                    focusNode: widget.textFieldFocusNode,
+                    localizations: widget.localizations,
                     screenWidth: screenWidth,
                     isTablet: isTablet,
-                    widget: widget,
-                    recordingProgress: recordingProgress,
-                    isEnabled: isSendButtonEnabled,
-                    isActionPermitted: isActionPermitted,
-                    controller: widget.controller,
+                    showHintText: true,
+                    onEnterPressed: () {
+                      if (isSendButtonEnabled) {
+                        widget.onSend();
+                      }
+                    },
                   ),
                 ),
-              ),
-            ],
-          ),
+                Positioned(
+                  left: base + plusLeft,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: AddPhotoButton(
+                      isLimitExceeded: widget.isLimitExceeded,
+                      isPhotoLoading: widget.isPhotoLoading,
+                      localizations: widget.localizations,
+                      controller: widget.controller,
+                      hasSelectedFeature: hasSelectedFeature,
+                      isDimmed: isDictating,
+                      bubbleProgress: t,
+                      bubbleScale: buttonScale,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: base + micRight,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: MicButton(
+                      controller: widget.controller,
+                      isSending: widget.isSending,
+                      recordingProgress: recordingProgress,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: base + actionRight,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: _SendButtonSection(
+                      screenWidth: screenWidth,
+                      isTablet: isTablet,
+                      widget: widget,
+                      recordingProgress: recordingProgress,
+                      isEnabled: isSendButtonEnabled,
+                      isActionPermitted: isActionPermitted,
+                      controller: widget.controller,
+                      bubbleScale: buttonScale,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );

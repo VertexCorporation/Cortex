@@ -870,8 +870,8 @@
       }
     }
   },
-  "generationImageLabel": "Создание изображения",
-  "generationVideoLabel": "Создание видео",
-  "generationAudioLabel": "Создание аудио",
-  "generationDocumentLabel": "Создание документа"
+  "generationImageLabel": "Создание Изображения",
+  "generationVideoLabel": "Создание Видео",
+  "generationAudioLabel": "Создание Аудио",
+  "generationDocumentLabel": "Создание Документа"
 }

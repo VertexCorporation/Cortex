@@ -919,5 +919,13 @@
   "generationImageLabel": "Görsel Oluşturuluyor",
   "generationVideoLabel": "Video Oluşturuluyor",
   "generationAudioLabel": "Ses Oluşturuluyor",
-  "generationDocumentLabel": "Belge Oluşturuluyor"
+  "generationDocumentLabel": "Belge Oluşturuluyor",
+  "creditWarningFreeDecliningTitle": "Krediler Azalıyor",
+  "creditWarningFreeDecliningMessage": "Kredileriniz azalıyor. Zekâ performansı düşebilir.",
+  "creditWarningFreeExhaustedTitle": "Günlük Limit Doldu",
+  "creditWarningFreeExhaustedMessage": "Sohbet hakkınız günlük limitiniz yenilenene kadar kısıtlıdır. Daha fazlası için abone olun.",
+  "creditWarningPaidUpgradeTitle": "Planı Yükselt",
+  "creditWarningPaidUpgradeMessage": "Daha fazla kredi için planınızı yükseltin.",
+  "creditWarningUltraTitle": "Krediler Düşük",
+  "creditWarningUltraMessage": "Kredileriniz azalıyor. Performans düşebilir."
 }

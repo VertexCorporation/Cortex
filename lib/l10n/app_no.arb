@@ -653,8 +653,8 @@
       }
     }
   },
-  "generationImageLabel": "Genererer bilde",
-  "generationVideoLabel": "Genererer video",
-  "generationAudioLabel": "Genererer lyd",
-  "generationDocumentLabel": "Genererer dokument"
+  "generationImageLabel": "Genererer Bilde",
+  "generationVideoLabel": "Genererer Video",
+  "generationAudioLabel": "Genererer Lyd",
+  "generationDocumentLabel": "Genererer Dokument"
 }

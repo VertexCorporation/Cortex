@@ -259,14 +259,6 @@ class SubscriptionEntitlement {
         SubscriptionTier.ultra => 1000000,
       };
 
-  /// Daily credit grant for the tier, mirroring `TIER_LIMITS` on the server.
-  int get dailyGrant => switch (effectiveTier) {
-        SubscriptionTier.free => 100,
-        SubscriptionTier.plus => 500,
-        SubscriptionTier.pro => 1000,
-        SubscriptionTier.ultra => 10000,
-      };
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -297,4 +289,58 @@ class SubscriptionEntitlement {
       'SubscriptionEntitlement(tier: ${tier.value}, effective: '
       '${effectiveTier.value}, mode: ${mode?.value}, status: ${status?.value}, '
       'expiresAt: $expiresAt, productId: $productId, testGrant: $testGrant)';
+}
+
+/// Credit limits for the user's effective tier, published by the server onto
+/// the top-level `users/{uid}.creditLimits` map (via `creditLimitsForTier` in
+/// `functions/src/subscription.js`) at every tier/credit write-point and
+/// re-asserted on each daily renewal.
+///
+/// The server stays the single source of truth: [UserProvider] merely caches
+/// this map from the normal user-data snapshot, and UI code uses it for
+/// warnings, gating and local UX math. Authorization always recomputes from
+/// `TIER_LIMITS` server-side — the map is never a security boundary.
+class CreditLimits {
+  const CreditLimits({required this.dailyGrant, required this.debtFloor});
+
+  /// Daily credit grant for the tier (`TIER_LIMITS.dailyCredits`).
+  final int dailyGrant;
+
+  /// Debt floor for the tier (`TIER_LIMITS.negativeCreditLimit`): at or
+  /// below this balance nothing is sendable until the allowance renews.
+  final int debtFloor;
+
+  /// Values used only while a user document predates the server's publication
+  /// of `creditLimits`; such documents converge on the next daily renewal.
+  /// These must match the free tier of `TIER_LIMITS` and are never
+  /// authoritative.
+  static const CreditLimits fallback =
+      CreditLimits(dailyGrant: 50, debtFloor: -50);
+
+  /// Parses the `creditLimits` map from a user document. Absent or partial
+  /// maps (legacy documents) resolve to [fallback].
+  static CreditLimits fromData(dynamic raw) {
+    if (raw is! Map) return fallback;
+    final grant = _readInt(raw['dailyGrant']);
+    final floor = _readInt(raw['debtFloor']);
+    if (grant == null || floor == null) return fallback;
+    return CreditLimits(dailyGrant: grant, debtFloor: floor);
+  }
+
+  static int? _readInt(dynamic value) =>
+      value is int ? value : value is num ? value.toInt() : null;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreditLimits &&
+          other.dailyGrant == dailyGrant &&
+          other.debtFloor == debtFloor;
+
+  @override
+  int get hashCode => Object.hash(dailyGrant, debtFloor);
+
+  @override
+  String toString() =>
+      'CreditLimits(dailyGrant: $dailyGrant, debtFloor: $debtFloor)';
 }

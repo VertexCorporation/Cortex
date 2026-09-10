@@ -56,15 +56,15 @@ Future<void> showModelSelectionDialog({
 
   final creditsManager = context.read<CreditsManager>();
 
-  // The daily credit engine hands model choice to paid tiers with credit left.
+  // The unified credit engine hands model choice to the `full` access band.
   // Below that the gateway answers with Dynamic Chat whatever is picked here,
   // so a dialog would only offer a choice that gets overridden on send.
   if (!creditsManager.canChooseModel) return;
 
-  // Premium access. Billing v2 has no premium lane — anything the user can
-  // afford is allowed — so this asks the balance, not a separate currency.
+  // Premium access is a balance question under the unified engine: any model
+  // may be picked while manual model selection is allowed.
   final hasPremiumAccess =
-      session.isUserSubscribed || creditsManager.canUsePremiumModel;
+      session.isUserSubscribed || creditsManager.modelSelectionAllowed;
   final Set<String> downloadedModelIds =
       (await UserModels.loadDownloadedModelPaths()).keys.toSet();
 

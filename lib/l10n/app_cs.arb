@@ -623,8 +623,8 @@
       }
     }
   },
-  "generationImageLabel": "Generování obrázku",
-  "generationVideoLabel": "Generování videa",
-  "generationAudioLabel": "Generování zvuku",
-  "generationDocumentLabel": "Generování dokumentu"
+  "generationImageLabel": "Generování Obrázku",
+  "generationVideoLabel": "Generování Videa",
+  "generationAudioLabel": "Generování Zvuku",
+  "generationDocumentLabel": "Generování Dokumentu"
 }

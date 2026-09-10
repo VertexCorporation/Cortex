@@ -533,23 +533,12 @@ class _BriefingOverlayWrapper extends StatelessWidget {
       } catch (_) {}
     }
 
-    // PERF: Replaced 3 nested ValueListenableBuilders with a single
-    // AnimatedBuilder + Listenable.merge. A credit update now causes exactly
-    // 1 rebuild instead of 3 cascading passes.
     return AnimatedBuilder(
-      animation: Listenable.merge([
-        creditsManager.totalCreditsNotifier,
-        creditsManager.preditsNotifier,
-        creditsManager.dreditsNotifier,
-      ]),
+      animation: creditsManager.totalCreditsNotifier,
       builder: (context, _) {
         final totalCredits = creditsManager.totalCreditsNotifier.value;
-        final predits = creditsManager.preditsNotifier.value;
-        final dredits = creditsManager.dreditsNotifier.value;
         return BriefingOverlay(
-          availableCredits: usesDynamicChatAllowance ? null : totalCredits,
-          availablePredits: predits,
-          availableDredits: dredits,
+          availableCredits: totalCredits,
           photoSelected: input.hasAttachments,
           isOfflineModel: isOffline,
           modelMissing: modelMissing,

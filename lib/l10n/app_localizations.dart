@@ -3918,26 +3918,74 @@ abstract class AppLocalizations {
   /// No description provided for @generationImageLabel.
   ///
   /// In en, this message translates to:
-  /// **'Generating image'**
+  /// **'Generating Image'**
   String get generationImageLabel;
 
   /// No description provided for @generationVideoLabel.
   ///
   /// In en, this message translates to:
-  /// **'Generating video'**
+  /// **'Generating Video'**
   String get generationVideoLabel;
 
   /// No description provided for @generationAudioLabel.
   ///
   /// In en, this message translates to:
-  /// **'Generating audio'**
+  /// **'Generating Audio'**
   String get generationAudioLabel;
 
   /// No description provided for @generationDocumentLabel.
   ///
   /// In en, this message translates to:
-  /// **'Generating document'**
+  /// **'Generating Document'**
   String get generationDocumentLabel;
+
+  /// No description provided for @creditWarningFreeDecliningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits Declining'**
+  String get creditWarningFreeDecliningTitle;
+
+  /// No description provided for @creditWarningFreeDecliningMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your credits are declining. Intelligence performance may decrease.'**
+  String get creditWarningFreeDecliningMessage;
+
+  /// No description provided for @creditWarningFreeExhaustedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Limit Reached'**
+  String get creditWarningFreeExhaustedTitle;
+
+  /// No description provided for @creditWarningFreeExhaustedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your chat allowance will renew with your daily limit. Subscribe for more access.'**
+  String get creditWarningFreeExhaustedMessage;
+
+  /// No description provided for @creditWarningPaidUpgradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Plan'**
+  String get creditWarningPaidUpgradeTitle;
+
+  /// No description provided for @creditWarningPaidUpgradeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade your plan for more credits.'**
+  String get creditWarningPaidUpgradeMessage;
+
+  /// No description provided for @creditWarningUltraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits Low'**
+  String get creditWarningUltraTitle;
+
+  /// No description provided for @creditWarningUltraMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your credits are running low. Performance may decrease.'**
+  String get creditWarningUltraMessage;
 }
 
 class _AppLocalizationsDelegate

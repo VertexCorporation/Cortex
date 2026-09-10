@@ -116,13 +116,13 @@ class OptionsPanelViewModel {
 
     final creditsManager = context.read<CreditsManager>();
 
-    // Billing v2 has no premium lane, so this is a balance question. The
-    // getter keeps the old predit check for unmigrated accounts.
+    // Under the unified engine premium access is a balance question: any
+    // model may be picked while manual model selection is allowed.
     final hasPreditsForPremium =
-        session.isUserSubscribed || creditsManager.canUsePremiumModel;
+        session.isUserSubscribed || creditsManager.modelSelectionAllowed;
 
-    // Under the daily engine, model choice is a paid feature that also closes
-    // when a paid balance runs out.
+    // Model choice closes when the balance drops below zero, along with the
+    // rest of the `full` band's privileges.
     final canChooseModel = creditsManager.canChooseModel;
 
     final isCurrentModelPremium = currentModel.isPremium;

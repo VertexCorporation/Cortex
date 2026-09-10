@@ -23,6 +23,7 @@ import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
+import 'panels/credit_warning.dart';
 import 'input/input.dart';
 
 class ChatInputPanel extends StatefulWidget {
@@ -228,6 +229,9 @@ class _ChatInputPanelState extends State<ChatInputPanel>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Credit warning banner
+                  const CreditWarningPanel(),
+
                   // 1. Edit Panel (Slides down when editing)
                   SizeTransition(
                     sizeFactor: _editPanelSizeFactor,
@@ -242,95 +246,83 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                   ),
 
                   // 2. Main Input Field
-                  // Wrapped in ValueListenableBuilders so that credit changes
+                  // Wrapped in a ValueListenableBuilder so that credit changes
                   // (e.g. after account switch) reactively rebuild the input.
                   ValueListenableBuilder<int?>(
                     valueListenable: creditsManager.totalCreditsNotifier,
                     builder: (context, totalCredits, _) {
-                      return ValueListenableBuilder<int?>(
-                        valueListenable: creditsManager.preditsNotifier,
-                        builder: (context, availablePredits, _) {
-                          return ValueListenableBuilder<int?>(
-                            valueListenable: creditsManager.dreditsNotifier,
-                            builder: (context, availableDredits, _) {
-                              return InputField(
-                                key: _inputFieldKey,
-                                localizations: localizations,
-                                isDynamicChatMode: isDynamicChat,
-                                isModelSelected: true,
-                                isLimitExceeded: isLimitExceeded,
-                                isPhotoLoading: isAttachmentLoading,
-                                isSending: isWaitingForResponse,
-                                canHandleImage:
-                                    isDynamicChat ? true : canHandleImage,
-                                isEditingMode: isEditingMode,
-                                originalMessageText: originalMessageText,
-                                // Legacy photo support for UI
-                                preselectedPhoto: preselectedPhoto != null
-                                    ? File(preselectedPhoto)
-                                    : null,
-                                isStorageSufficient: isStorageSufficient,
-                                modelMissing: modelMissing,
-                                role: role,
-                                isPremiumModel: isDynamicChat
-                                    ? false
-                                    : isCurrentModelPremium,
-                                isSubscribed: isUserSubscribed,
-                                userTier: userTier,
-                                isServerSideModel: Utils.isServerSideModel(
-                                  modelId,
-                                  langCode: langCode,
-                                  modelService: modelService,
-                                ),
-                                totalCredits: totalCredits,
-                                availablePredits: availablePredits,
-                                availableDredits: availableDredits,
-                                controller: _textController,
-                                textFieldFocusNode: _focusNode,
-                                slideAnimation: widget.slideAnimation,
-                                fadeAnimation: _warningFadeAnimation,
+                      return InputField(
+                        key: _inputFieldKey,
+                        localizations: localizations,
+                        isDynamicChatMode: isDynamicChat,
+                        isModelSelected: true,
+                        isLimitExceeded: isLimitExceeded,
+                        isPhotoLoading: isAttachmentLoading,
+                        isSending: isWaitingForResponse,
+                        canHandleImage:
+                            isDynamicChat ? true : canHandleImage,
+                        isEditingMode: isEditingMode,
+                        originalMessageText: originalMessageText,
+                        // Legacy photo support for UI
+                        preselectedPhoto: preselectedPhoto != null
+                            ? File(preselectedPhoto)
+                            : null,
+                        isStorageSufficient: isStorageSufficient,
+                        modelMissing: modelMissing,
+                        role: role,
+                        isPremiumModel: isDynamicChat
+                            ? false
+                            : isCurrentModelPremium,
+                        isSubscribed: isUserSubscribed,
+                        userTier: userTier,
+                        isServerSideModel: Utils.isServerSideModel(
+                          modelId,
+                          langCode: langCode,
+                          modelService: modelService,
+                        ),
+                        totalCredits: totalCredits,
+                        controller: _textController,
+                        textFieldFocusNode: _focusNode,
+                        slideAnimation: widget.slideAnimation,
+                        fadeAnimation: _warningFadeAnimation,
 
-                                // --- Actions ---
-                                onSend: () async => _handleSend(
-                                    localizations,
-                                    isLimitExceeded,
-                                    langCode,
-                                    modelService,
-                                    context.read<InputProvider>(),
-                                    conversationProvider),
-                                onApplyEditedMessage: () async => await widget
-                                    .editService
-                                    .applyEditedMessage(context),
-                                onStop: () {
-                                  final voiceService =
-                                      context.read<VoiceService>();
-                                  if (voiceService.isFlowActive) {
-                                    // [NEW] Flow Mode: Pause & Listen (Interruption)
-                                    voiceService.interruptFlowAndListen();
-                                    // Stop any text generation but keep session alive
-                                    context
-                                        .read<ConversationProvider>()
-                                        .stopGenerating();
-                                  } else {
-                                    // Standard Mode: Stop Everything
-                                    context.read<StopService>().stopResponse();
-                                  }
-                                },
-                                // Logic Update: Null check before adding
-                                onPhotoSelected: (photo) {
-                                  if (photo != null) {
-                                    context
-                                        .read<InputProvider>()
-                                        .addAttachment(photo, isImage: true);
-                                  }
-                                },
-                                onCancelEditing: () {
-                                  widget.editService.cancelEditingMode();
-                                  widget.scrollService.updateButtonVisibility();
-                                },
-                              );
-                            },
-                          );
+                        // --- Actions ---
+                        onSend: () async => _handleSend(
+                            localizations,
+                            isLimitExceeded,
+                            langCode,
+                            modelService,
+                            context.read<InputProvider>(),
+                            conversationProvider),
+                        onApplyEditedMessage: () async => await widget
+                            .editService
+                            .applyEditedMessage(context),
+                        onStop: () {
+                          final voiceService =
+                              context.read<VoiceService>();
+                          if (voiceService.isFlowActive) {
+                            // [NEW] Flow Mode: Pause & Listen (Interruption)
+                            voiceService.interruptFlowAndListen();
+                            // Stop any text generation but keep session alive
+                            context
+                                .read<ConversationProvider>()
+                                .stopGenerating();
+                          } else {
+                            // Standard Mode: Stop Everything
+                            context.read<StopService>().stopResponse();
+                          }
+                        },
+                        // Logic Update: Null check before adding
+                        onPhotoSelected: (photo) {
+                          if (photo != null) {
+                            context
+                                .read<InputProvider>()
+                                .addAttachment(photo, isImage: true);
+                          }
+                        },
+                        onCancelEditing: () {
+                          widget.editService.cancelEditingMode();
+                          widget.scrollService.updateButtonVisibility();
                         },
                       );
                     },

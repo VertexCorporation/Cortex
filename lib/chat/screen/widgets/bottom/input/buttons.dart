@@ -26,11 +26,13 @@ class _ToolCircleButton extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget child;
   final double size;
+  final bool showBorder;
 
   const _ToolCircleButton({
     required this.onTap,
     required this.child,
     this.size = 36.0,
+    this.showBorder = true,
   });
 
   @override
@@ -41,7 +43,9 @@ class _ToolCircleButton extends StatelessWidget {
       child: Material(
         color: AppColors.background,
         shape: CircleBorder(
-          side: BorderSide(color: AppColors.border),
+          side: showBorder
+              ? BorderSide(color: AppColors.border)
+              : BorderSide.none,
         ),
         child: Ink(
           decoration: const BoxDecoration(
@@ -91,45 +95,49 @@ class MicButton extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final double buttonSize = (screenWidth * 0.086).clamp(32.0, 38.0);
 
-    final mic = Padding(
-      padding: const EdgeInsetsDirectional.only(end: 4.0),
-      child: _ToolCircleButton(
-        size: buttonSize,
-        onTap: () async {
-          final localeCode =
-              context.read<ChatSessionProvider>().getLocale().languageCode;
-          final currentText = controller.text;
+    // The microphone is a permanent inside-the-capsule control: plain icon,
+    // ripple and haptics only — never a bordered bubble.
+    final mic = _ToolCircleButton(
+      showBorder: false,
+      size: buttonSize,
+      onTap: () async {
+        final localeCode =
+            context.read<ChatSessionProvider>().getLocale().languageCode;
+        final currentText = controller.text;
 
-          inputProvider.setVoiceRecording(true);
+        inputProvider.setVoiceRecording(true);
 
-          await speechService.startListening(
-            locale: localeCode,
-            onResult: (String text) {
-              String spacer =
-                  (currentText.isNotEmpty && !currentText.endsWith(' '))
-                      ? ' '
-                      : '';
-              if (currentText.isEmpty) spacer = '';
-              controller.text = "$currentText$spacer$text";
-              controller.selection = TextSelection.fromPosition(
-                TextPosition(offset: controller.text.length),
-              );
-            },
-          );
-        },
-        child: SvgPicture.asset(
-          'assets/icons/microphone.svg',
-          width: CortexDesign.icon,
-          height: CortexDesign.icon,
-          colorFilter: ColorFilter.mode(
-              AppColors.primaryColor.inverted, BlendMode.srcIn),
-        ),
+        await speechService.startListening(
+          locale: localeCode,
+          onResult: (String text) {
+            String spacer =
+                (currentText.isNotEmpty && !currentText.endsWith(' '))
+                    ? ' '
+                    : '';
+            if (currentText.isEmpty) spacer = '';
+            controller.text = "$currentText$spacer$text";
+            controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: controller.text.length),
+            );
+          },
+        );
+      },
+      child: SvgPicture.asset(
+        'assets/icons/microphone.svg',
+        width: CortexDesign.icon,
+        height: CortexDesign.icon,
+        colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted, BlendMode.srcIn),
       ),
     );
 
     final micVisibility = 1 -
         const Interval(0, 0.4, curve: Curves.easeOut)
             .transform(recordingProgress ?? 0);
+    // While dictation runs the mic stays visible but is locked and dimmed
+    // like the "+", leaving Stop as the only exit from the session.
+    final double micOpacity =
+        isRecording ? micVisibility * 0.4 : micVisibility;
 
     if (recordingProgress != null) {
       return IgnorePointer(
@@ -138,7 +146,7 @@ class MicButton extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
             widthFactor: micVisibility,
-            child: Opacity(opacity: micVisibility, child: mic),
+            child: Opacity(opacity: micOpacity, child: mic),
           ),
         ),
       );
@@ -188,6 +196,7 @@ class ActionButtonWidget extends StatelessWidget {
   final VoidCallback onStop;
   final TextEditingController controller;
   final bool includeMic;
+  final double bubbleScale;
 
   const ActionButtonWidget({
     super.key,
@@ -201,6 +210,7 @@ class ActionButtonWidget extends StatelessWidget {
     required this.onStop,
     required this.controller,
     this.includeMic = true,
+    this.bubbleScale = 1.0,
   });
 
   @override
@@ -210,7 +220,10 @@ class ActionButtonWidget extends StatelessWidget {
     final inputProvider = context.watch<InputProvider>();
 
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final double buttonSize = (screenWidth * 0.086).clamp(32.0, 38.0);
+    // The whole bubble grows with the capsule expansion (bubbleScale); the
+    // icon and its padding are size-relative, so they scale along.
+    final double buttonSize =
+        (screenWidth * 0.086).clamp(32.0, 38.0) * bubbleScale;
 
     bool isDeviceSupported = speechService.isDeviceSupported;
 
@@ -288,6 +301,8 @@ class ActionButtonWidget extends StatelessWidget {
           )
         else
           mic,
+        // MicButton no longer carries trailing padding of its own.
+        const SizedBox(width: 4.0),
 
         // Main Action Button (Send/Stop/Voice)
         rightAction,
@@ -405,13 +420,6 @@ class ActionButtonWidget extends StatelessWidget {
               // Activate UI mode (triggers Overlay)
               inputProvider.setVoiceModeActive(true);
 
-              // Set Localized Agent Names
-              voiceService.setAgentNames([
-                localizations.agentRed,
-                localizations.agentBlue,
-                localizations.agentPurple
-              ]);
-
               // Start Voice Session
               await voiceService.startSession(
                 context: context,
@@ -425,6 +433,7 @@ class ActionButtonWidget extends StatelessWidget {
                       messageText: text,
                       isHidden: voiceService.shouldNextMessageBeHidden,
                       overrideModelId: 'cortex/auto',
+                      flowMode: voiceService.isFlowActive,
                     );
                   }
                 },
@@ -465,6 +474,13 @@ class AddPhotoButton extends StatefulWidget {
   final AppLocalizations localizations;
   final TextEditingController controller;
   final bool hasSelectedFeature;
+  final double bubbleProgress;
+  final double bubbleScale;
+
+  /// Inactive state used while dictation is running: the bubble stays
+  /// visible but fades out and refuses taps so the speech session cannot
+  /// be interrupted from here — Stop on the action slot is the only exit.
+  final bool isDimmed;
 
   const AddPhotoButton({
     super.key,
@@ -473,6 +489,9 @@ class AddPhotoButton extends StatefulWidget {
     required this.localizations,
     required this.controller,
     this.hasSelectedFeature = false,
+    this.bubbleProgress = 1.0,
+    this.bubbleScale = 1.0,
+    this.isDimmed = false,
   });
 
   @override
@@ -503,19 +522,31 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
             currentModel?.category == 'audio' ||
             currentModel?.category == 'video';
 
-    final Color backgroundColor = isFeatureActive
+    final double progress = widget.bubbleProgress.clamp(0.0, 1.0);
+    final Color rawBackgroundColor = isFeatureActive
         ? AppColors.primaryColor.inverted
         : AppColors.background;
+    final Color backgroundColor = rawBackgroundColor.withValues(
+        alpha: rawBackgroundColor.a * progress);
+    final Color rawBorderColor = isFeatureActive
+        ? AppColors.primaryColor.inverted
+        : AppColors.border;
+    final Color borderColor =
+        rawBorderColor.withValues(alpha: rawBorderColor.a * progress);
     final Color iconColor = isFeatureActive
         ? AppColors.primaryColor
         : AppColors.primaryColor.inverted;
 
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
-    final bool buttonDisabled =
-        widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
-    final double size = (screenWidth * 0.086).clamp(32.0, 38.0);
+    final bool buttonDisabled = widget.isLimitExceeded ||
+        (widget.isPhotoLoading && isMaxAttachments) ||
+        widget.isDimmed;
+    // The whole bubble grows with the capsule expansion (bubbleScale); the
+    // "+" glyph and padding are size-relative, so they scale along.
+    final double size =
+        (screenWidth * 0.086).clamp(32.0, 38.0) * widget.bubbleScale;
 
-    return GestureDetector(
+    final Widget bubble = GestureDetector(
       onTap: buttonDisabled || widget.isPhotoLoading
           ? () {
               HapticFeedback.heavyImpact();
@@ -527,15 +558,13 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
                   context: context, controller: widget.controller);
               if (mounted) setState(() => _isOpened = false);
             },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
+      child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
           color: backgroundColor,
           border: Border.all(
-            color: AppColors.border,
+            color: borderColor,
             width: isFeatureActive ? 2 : 1,
           ),
           shape: BoxShape.circle,
@@ -552,8 +581,10 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
               builder: (context, color, child) {
                 return SvgPicture.asset(
                   'assets/icons/add.svg',
-                  width: CortexDesign.icon,
-                  height: CortexDesign.icon,
+                  // The "+" glyph fills more of its circle so the hollow
+                  // bubble reads the same size as the filled action button.
+                  width: size * 0.75,
+                  height: size * 0.75,
                   colorFilter:
                       ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
                 );
@@ -563,6 +594,9 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         ),
       ),
     );
+    return widget.isDimmed
+        ? Opacity(opacity: 0.4, child: bubble)
+        : bubble;
   }
 }
 

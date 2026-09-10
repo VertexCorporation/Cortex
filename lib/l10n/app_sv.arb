@@ -623,8 +623,8 @@
       }
     }
   },
-  "generationImageLabel": "Genererar bild",
-  "generationVideoLabel": "Genererar video",
-  "generationAudioLabel": "Genererar ljud",
-  "generationDocumentLabel": "Genererar dokument"
+  "generationImageLabel": "Genererar Bild",
+  "generationVideoLabel": "Genererar Video",
+  "generationAudioLabel": "Genererar Ljud",
+  "generationDocumentLabel": "Genererar Dokument"
 }

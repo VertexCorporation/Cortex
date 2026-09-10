@@ -2124,14 +2124,42 @@ class AppLocalizationsNo extends AppLocalizations {
   }
 
   @override
-  String get generationImageLabel => 'Genererer bilde';
+  String get generationImageLabel => 'Genererer Bilde';
 
   @override
-  String get generationVideoLabel => 'Genererer video';
+  String get generationVideoLabel => 'Genererer Video';
 
   @override
-  String get generationAudioLabel => 'Genererer lyd';
+  String get generationAudioLabel => 'Genererer Lyd';
 
   @override
-  String get generationDocumentLabel => 'Genererer dokument';
+  String get generationDocumentLabel => 'Genererer Dokument';
+
+  @override
+  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+
+  @override
+  String get creditWarningFreeDecliningMessage =>
+      'Your credits are declining. Intelligence performance may decrease.';
+
+  @override
+  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+
+  @override
+  String get creditWarningFreeExhaustedMessage =>
+      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+
+  @override
+  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
+
+  @override
+  String get creditWarningPaidUpgradeMessage =>
+      'Upgrade your plan for more credits.';
+
+  @override
+  String get creditWarningUltraTitle => 'Credits Low';
+
+  @override
+  String get creditWarningUltraMessage =>
+      'Your credits are running low. Performance may decrease.';
 }

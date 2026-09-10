@@ -870,8 +870,8 @@
       }
     }
   },
-  "generationImageLabel": "Bild wird erstellt",
-  "generationVideoLabel": "Video wird erstellt",
-  "generationAudioLabel": "Audio wird erstellt",
-  "generationDocumentLabel": "Dokument wird erstellt"
+  "generationImageLabel": "Bild Wird Erstellt",
+  "generationVideoLabel": "Video Wird Erstellt",
+  "generationAudioLabel": "Audio Wird Erstellt",
+  "generationDocumentLabel": "Dokument Wird Erstellt"
 }

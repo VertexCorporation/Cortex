@@ -870,8 +870,8 @@
       }
     }
   },
-  "generationImageLabel": "Membuat gambar",
-  "generationVideoLabel": "Membuat video",
-  "generationAudioLabel": "Membuat audio",
-  "generationDocumentLabel": "Membuat dokumen"
+  "generationImageLabel": "Membuat Gambar",
+  "generationVideoLabel": "Membuat Video",
+  "generationAudioLabel": "Membuat Audio",
+  "generationDocumentLabel": "Membuat Dokumen"
 }
