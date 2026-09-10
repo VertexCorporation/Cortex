@@ -353,8 +353,11 @@ class ChatViewState extends State<ChatView>
         child: AnimatedBuilder(
           animation: _combinedLayoutNotifier,
           builder: (context, _) {
+            // Briefings are pure overlays: the message area reserves room for
+            // the input panel only and lets a briefing draw on top of it, so
+            // no briefing may ever shift the chat up. (The scroll-down button
+            // still dodges a visible briefing via the combined height.)
             final bottomPadding = bottomPanelHeightNotifier.value +
-                briefingVisibleHeightNotifier.value +
                 MediaQuery.paddingOf(context).bottom;
             if (isLoading) {
               return const MessageListSkeleton(key: ValueKey('skeleton'));

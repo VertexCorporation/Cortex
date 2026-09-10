@@ -275,6 +275,7 @@ class SendService {
     int? regenerateAiIndex,
     String? overrideModelId,
     bool isHidden = false,
+    bool flowMode = false,
   }) async {
     final sessionProvider = context.read<ChatSessionProvider>();
 
@@ -397,10 +398,10 @@ class SendService {
         apiModelIdForSend = sessionProvider.modelId;
       }
 
-      // Under the daily credit engine, model choice belongs to paid tiers with
-      // credit left; everyone else is answered by Dynamic Chat. The gateway
-      // applies this regardless, so applying it here too keeps the message
-      // labelled with the model that actually answered it.
+      // Under the unified credit engine, model choice belongs to the `full`
+      // access band; below zero everyone is answered by Dynamic Chat. The
+      // gateway applies this regardless, so applying it here too keeps the
+      // message labelled with the model that actually answered it.
       //
       // The session's preferred model is left alone on purpose — when the
       // allowance renews tomorrow the user gets it back without having to pick
@@ -785,6 +786,7 @@ class SendService {
               generationTarget: generationTarget,
               onTitleReceived: handleServerTitle,
               activeMode: activeMode,
+              flowMode: flowMode,
             );
             success = true;
           } catch (e) {
@@ -1094,6 +1096,7 @@ class SendService {
     String? generationTarget,
     Function(String)? onTitleReceived,
     required ChatInputMode activeMode,
+    bool flowMode = false,
   }) async {
     final ModelEntity modelData =
         _modelService.getPreciseModelData(modelId, langCode: langCode);
@@ -1499,6 +1502,7 @@ class SendService {
           onAudioReceived: onAudioReceived,
           onMediaGenerating: onMediaGenerating,
           onTitleReceived: onTitleReceived,
+          flowMode: flowMode,
         );
         // Characters exit loop immediately
         shouldContinue = false;
@@ -1575,6 +1579,7 @@ class SendService {
           generationTarget: generationTarget,
           useTools: !isMediaModel && !_voiceService.isFlowActive,
           // Disable tools in Flow Mode
+          flowMode: flowMode,
           onTextChunk: onTextChunk,
           onfeatureReasoning: onfeatureReasoning,
           onImageReceived: onImageReceived,

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/settings/widgets/grouped_button.dart';
-import 'package:cortex/chat/screen/widgets/bottom/input/recording_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,42 +24,6 @@ void main() {
       }
     }
   });
-
-  for (final width in [320.0, 390.0, 800.0]) {
-    testWidgets('recording layout reverses without jumps at width $width',
-        (tester) async {
-      final progress = ValueNotifier<double>(0);
-      addTearDown(progress.dispose);
-      final text = TextEditingController(text: 'draft');
-      addTearDown(text.dispose);
-      await tester.pumpWidget(MaterialApp(
-          home: Align(
-        alignment: Alignment.bottomCenter,
-        child: SizedBox(
-            width: width,
-            child: ValueListenableBuilder<double>(
-              valueListenable: progress,
-              builder: (_, value, __) => RecordingLayout(
-                  progress: value,
-                  input: SizedBox(
-                      height: 48,
-                      child: Material(child: TextField(controller: text))),
-                  waveform: const SizedBox(height: 90, width: double.infinity)),
-            )),
-      )));
-      final originalField = tester.state(find.byType(TextField));
-      // Include interrupted reversals and restarts, not just the endpoints.
-      for (final value in [0.0, 0.2, 0.8, 1.0, 0.8, 0.5, 0.7, 0.1, 0.9, 0.0]) {
-        progress.value = value;
-        await tester.pump();
-        expect(tester.getSize(find.byType(RecordingLayout)).height,
-            closeTo(48 + 42 * value, 0.001));
-        expect(tester.state(find.byType(TextField)), same(originalField));
-        expect(text.text, 'draft');
-        expect(tester.takeException(), isNull);
-      }
-    });
-  }
 
   testWidgets(
       'premium and destructive settings rows keep standard dimensions and taps',

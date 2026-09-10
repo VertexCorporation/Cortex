@@ -9,6 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// below the floor) each get tier-aware copy with a live {renewalTime}
 /// countdown; dismissal is keyed to the logical briefing kind, so a ticking
 /// countdown never resurrects a dismissed panel, while crossing bands does.
+/// A dismissed credit briefing then sits out a session-wide one-hour
+/// cooldown that no rebuild, chat switch or countdown tick can bypass; a
+/// different kind still appears immediately, and recovering to a healthy
+/// balance clears the cooldown so a later dip warns afresh.
 
 /// A renewal instant [hours]/[minutes] from now, with 30 seconds of slack
 /// inside the current minute: the formatter floors, so the rendered
@@ -72,6 +76,12 @@ Future<void> _tearDown(WidgetTester tester) async {
 }
 
 void main() {
+  setUp(() {
+    // Credit dismissal cooldowns live for the whole app session: never leak
+    // records between tests.
+    BriefingOverlay.debugResetCreditDismissals();
+  });
+
   group('tier × declining band (zero or negative credits above the floor)',
       () {
     testWidgets('Free gets the free-tier warning with the renewal countdown',
@@ -303,7 +313,7 @@ void main() {
       await _tearDown(tester);
     });
 
-    testWidgets('swiping the panel down fades it out for good',
+    testWidgets('swiping the panel down dismisses it like a tap does',
         (tester) async {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
@@ -341,12 +351,209 @@ void main() {
       expect(
           _txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
 
-      // Recovery clears the dismissal, so a later dip warns afresh.
+      // Recovery clears the cooldown, so a later dip warns afresh.
       await tester.pumpWidget(_app(credits: 25));
       await tester.pumpAndSettle();
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       expect(_txt(declining), findsOneWidget);
+      await _tearDown(tester);
+    });
+  });
+
+  group('credit dismissal cooldown (session-wide, one hour)', () {
+    testWidgets(
+        'the same kind stays hidden within the hour across rebuilds, chat '
+        'switches and countdown ticks', (tester) async {
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(hours: 5, minutes: 42)));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      expect(_txt(msg), findsOneWidget);
+
+      await tester.tap(_txt(msg));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // An input focus or ordinary rebuild re-runs the evaluation, never
+      // the cooldown.
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // Opening another chat evaluates again: still within the hour.
+      await tester.pumpWidget(_app(credits: 0, conversationId: 'other'));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // A countdown tick is not a state change either.
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(hours: 3, minutes: 5)));
+      await tester.pumpAndSettle();
+      expect(_txt(loc.creditWarningFreeDecliningMessage('3h 5m')),
+          findsNothing);
+      await _tearDown(tester);
+    });
+
+    testWidgets('the cooldown is owned by the app session, not the widget',
+        (tester) async {
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      expect(_txt(msg), findsOneWidget);
+
+      await tester.tap(_txt(msg));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // The overlay's State is recreated whenever a chat screen remounts:
+      // a per-widget dismissal would reset here and re-show the briefing.
+      await tester.pumpWidget(Container());
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(
+          _app(credits: 0, conversationId: 'freshly-opened-chat'));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+      await _tearDown(tester);
+    });
+
+    testWidgets(
+        'the same kind may reappear after the hour, via the normal trigger '
+        'flow', (tester) async {
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(hours: 5, minutes: 42)));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      expect(_txt(msg), findsOneWidget);
+
+      await tester.tap(_txt(msg));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // An hour and a minute pass with the user doing nothing else: the
+      // panel must not pop back open on its own once it becomes eligible.
+      BriefingOverlay.debugAgeCreditDismissals(
+          const Duration(hours: 1, minutes: 1));
+      await tester.pump(const Duration(hours: 1, minutes: 1));
+      expect(_txt(msg), findsNothing);
+
+      // The next ordinary evaluation (input focus, rebuild…) shows it again.
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(hours: 4, minutes: 41)));
+      await tester.pumpAndSettle();
+      expect(_txt(loc.creditWarningFreeDecliningMessage('4h 41m')),
+          findsOneWidget);
+      await _tearDown(tester);
+    });
+
+    testWidgets('a different kind appears immediately during the cooldown',
+        (tester) async {
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      final declining = loc.creditWarningFreeDecliningMessage('5h 42m');
+      expect(_txt(declining), findsOneWidget);
+
+      await tester.tap(_txt(declining));
+      await tester.pumpAndSettle();
+      expect(_txt(declining), findsNothing);
+
+      // Reaching the debt floor is a different logical kind: it shows even
+      // seconds after the previous dismissal.
+      await tester.pumpWidget(_app(credits: -50));
+      await tester.pumpAndSettle();
+      expect(_txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+      await _tearDown(tester);
+    });
+
+    testWidgets('a healthy recovery followed by a later dip warns afresh',
+        (tester) async {
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      final declining = loc.creditWarningFreeDecliningMessage('5h 42m');
+      expect(_txt(declining), findsOneWidget);
+
+      await tester.tap(_txt(declining));
+      await tester.pumpAndSettle();
+      expect(_txt(declining), findsNothing);
+
+      // Back to a healthy balance: the recovery clears the cooldown, so
+      // re-entering the band is a fresh state transition, well within the
+      // hour.
+      await tester.pumpWidget(_app(credits: 25));
+      await tester.pumpAndSettle();
+      expect(_txt(declining), findsNothing);
+
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      expect(_txt(declining), findsOneWidget);
+      await _tearDown(tester);
+    });
+
+    testWidgets(
+        'a swipe dismissal starts the same cooldown and expires with it',
+        (tester) async {
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      expect(_txt(msg), findsOneWidget);
+
+      await tester.fling(_txt(msg), const Offset(0, 300), 2000.0);
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // Within the hour the swipe keeps it hidden, exactly like a tap.
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // Past the hour it is eligible again, on the next rebuild.
+      BriefingOverlay.debugAgeCreditDismissals(
+          const Duration(hours: 1, minutes: 1));
+      await tester.pumpWidget(_app(credits: 0));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsOneWidget);
+      await _tearDown(tester);
+    });
+
+    testWidgets(
+        'non-credit dismissals keep their hide-until-state-changes behavior',
+        (tester) async {
+      Widget videoApp() =>
+          _app(credits: 100, isDynamicChat: false, isVideoModel: true);
+
+      await tester.pumpWidget(videoApp());
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      expect(_txt(loc.videoPremiumWarning), findsOneWidget);
+
+      await tester.tap(_txt(loc.videoPremiumWarning));
+      await tester.pumpAndSettle();
+      expect(_txt(loc.videoPremiumWarning), findsNothing);
+
+      // Rebuilds keep it dismissed…
+      await tester.pumpWidget(videoApp());
+      await tester.pumpAndSettle();
+      expect(_txt(loc.videoPremiumWarning), findsNothing);
+
+      // …and it never adopted the credit cooldown: even past the hour it
+      // stays hidden until its underlying condition changes.
+      BriefingOverlay.debugAgeCreditDismissals(
+          const Duration(hours: 1, minutes: 1));
+      await tester.pumpWidget(videoApp());
+      await tester.pumpAndSettle();
+      expect(_txt(loc.videoPremiumWarning), findsNothing);
+
+      // Leaving the video model resolves no briefing, as before.
+      await tester.pumpWidget(
+          _app(credits: 100, isDynamicChat: false, isVideoModel: false));
+      await tester.pumpAndSettle();
+      expect(_txt(loc.videoPremiumWarning), findsNothing);
       await _tearDown(tester);
     });
   });

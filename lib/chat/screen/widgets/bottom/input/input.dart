@@ -11,6 +11,7 @@ import 'package:cortex/internet.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/services/speech.dart';
+import '../../wave.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/service.dart';
 import 'package:cortex/server/subscription.dart';
@@ -97,7 +98,6 @@ class InputField extends StatefulWidget {
 
 class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   final InputService _inputService = InputService();
-  final GlobalKey _inputFieldKey = GlobalKey();
 
   // Morphing composer expand/collapse animation
   late AnimationController _expandController;
@@ -350,7 +350,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                   top: -1.0,
                   bottom: -1.0,
                   child: DecoratedBox(
-                    key: _inputFieldKey,
                     decoration: BoxDecoration(
                       color: AppColors.background,
                       borderRadius: BorderRadius.circular(radius),
@@ -378,11 +377,12 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                         ),
                         child: child!,
                       ),
-                      // The composer row is the only mode now. Dictation no
-                      // longer swaps it for a waveform: the capsule expands
-                      // instead, the "+" dims to show it is inactive, and
-                      // the action button turns into Stop, so the live
-                      // transcript stays visible throughout.
+                      // The composer row is the only mode now. Dictation
+                      // keeps the row and the capsule expansion, dims the
+                      // "+" for the duration, turns the action button into
+                      // Stop, and overlays the field itself with the live
+                      // waveform (see [_DictationWave]) — the transcript
+                      // reappears once the session ends.
                       _buildExpandingComposerRow(
                         context,
                         screenWidth,
@@ -521,19 +521,45 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                 Padding(
                   padding: EdgeInsets.only(
                       left: base + inputLeft, right: base + inputRight),
-                  child: _TextFieldSection(
-                    key: const ValueKey('textfield'),
-                    controller: widget.controller,
-                    focusNode: widget.textFieldFocusNode,
-                    localizations: widget.localizations,
-                    screenWidth: screenWidth,
-                    isTablet: isTablet,
-                    showHintText: true,
-                    onEnterPressed: () {
-                      if (isSendButtonEnabled) {
-                        widget.onSend();
-                      }
-                    },
+                  child: Stack(
+                    children: [
+                      _TextFieldSection(
+                        key: const ValueKey('textfield'),
+                        controller: widget.controller,
+                        focusNode: widget.textFieldFocusNode,
+                        localizations: widget.localizations,
+                        screenWidth: screenWidth,
+                        isTablet: isTablet,
+                        showHintText: true,
+                        onEnterPressed: () {
+                          if (isSendButtonEnabled) {
+                            widget.onSend();
+                          }
+                        },
+                      ),
+                      // While dictation runs the field is covered by the
+                      // animated waveform — the takeover the retired
+                      // recording layout used to perform, now confined to
+                      // the field slot so the capsule, the dimmed "+" and
+                      // Stop all stay where they were. The switcher gives
+                      // the sheet its fade in/out; the wave itself
+                      // undulates with the detected sound level.
+                      Positioned.fill(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          switchInCurve: Curves.easeOutQuad,
+                          switchOutCurve: Curves.easeInQuad,
+                          transitionBuilder: (child, animation) =>
+                              FadeTransition(
+                                  opacity: animation, child: child),
+                          child: isDictating
+                              ? const _DictationWave(
+                                  key: ValueKey('dictation_wave'))
+                              : const SizedBox.shrink(
+                                  key: ValueKey('dictation_idle')),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Positioned(

@@ -89,6 +89,7 @@ class ApiService {
     String? characterRole,
     bool voiceMode = false,
     String? featureMode,
+    bool flowMode = false,
     String langCode = 'en',
   }) async {
     _cancelToken = CancelToken();
@@ -326,6 +327,7 @@ class ApiService {
             "voiceMode": voiceMode,
             if (featureMode != null && featureMode.isNotEmpty)
               "featureMode": featureMode,
+            "flowMode": flowMode,
             "langCode": langCode,
           }),
           cancelToken: _cancelToken,
@@ -740,6 +742,7 @@ class ApiService {
     Function(String)? onMediaGenerating,
     Function(String)? onTitleReceived,
     required AppLocalizations localizations,
+    bool flowMode = false,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -771,6 +774,7 @@ class ApiService {
       onAudioReceived: onAudioReceived,
       onMediaGenerating: onMediaGenerating,
       onTitleReceived: onTitleReceived,
+      flowMode: flowMode,
     );
   }
 
@@ -988,6 +992,7 @@ class ApiService {
     String? characterRole,
     bool voiceMode = false,
     String? featureMode,
+    bool flowMode = false,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -1045,6 +1050,7 @@ class ApiService {
       characterRole: characterRole,
       voiceMode: voiceMode,
       featureMode: featureMode,
+      flowMode: flowMode,
       langCode: langCode,
     );
   }

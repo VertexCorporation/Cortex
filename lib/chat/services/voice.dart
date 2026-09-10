@@ -676,15 +676,9 @@ class VoiceService with ChangeNotifier {
           final previousResponse = _fullAiResponseBuffer.toString();
           _fullAiResponseBuffer.clear();
 
-          // LOCALIZATION INJECTION POINT
-          // We need localized names: "Red", "Blue", "Purple"
-          // We don't have context here. We must store the localized names when starting the session.
-
-          final agentName = _getAgentName(currentFlowAgentIndex);
-
-          // Context prefix for the loop
-          final String prompt =
-              "Cortex Flow Mode ($agentName). Previous: $previousResponse";
+          // Flow Mode turn: previous response is already in conversation context,
+          // so we only re-inject it here to satisfy the non-empty message guard.
+          final String prompt = previousResponse;
 
           _updateState(VoiceState.processing);
 
@@ -739,19 +733,7 @@ class VoiceService with ChangeNotifier {
     );
   }
 
-  // Store localized names
-  List<String> _agentNames = ["Agent 1", "Agent 2", "Agent 3"];
 
-  void setAgentNames(List<String> names) {
-    if (names.length == 3) {
-      _agentNames = names;
-    }
-  }
 
-  String _getAgentName(int index) {
-    if (index >= 0 && index < _agentNames.length) {
-      return _agentNames[index];
-    }
-    return "Agent $index";
-  }
+
 }

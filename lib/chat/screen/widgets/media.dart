@@ -4,6 +4,8 @@ import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shimmer/shimmer.dart';
 
 /// Stable generation label over evenly spaced, independently pulsing dots.
 class MediaShimmerPlaceholder extends StatefulWidget {
@@ -38,24 +40,24 @@ class _MediaShimmerPlaceholderState extends State<MediaShimmerPlaceholder>
   Widget build(BuildContext context) {
     if (widget.type == MediaGenerationType.none) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
-    final (label, icon) = switch (widget.type) {
+    final (label, iconPath) = switch (widget.type) {
       MediaGenerationType.image => (
           l10n.generationImageLabel,
-          Icons.image_outlined
+          'assets/icons/make.svg'
         ),
       MediaGenerationType.video => (
           l10n.generationVideoLabel,
-          Icons.videocam_outlined
+          'assets/icons/transition.svg'
         ),
       MediaGenerationType.audio => (
           l10n.generationAudioLabel,
-          Icons.graphic_eq_rounded
+          'assets/icons/voice.svg'
         ),
       MediaGenerationType.document => (
           l10n.generationDocumentLabel,
-          Icons.description_outlined
+          'assets/icons/world.svg'
         ),
-      MediaGenerationType.none => ('', Icons.hourglass_empty),
+      MediaGenerationType.none => ('', ''),
     };
     final width = math.min(MediaQuery.sizeOf(context).width * 0.65, 340.0);
     final foreground = AppColors.primaryColor.inverted;
@@ -80,15 +82,25 @@ class _MediaShimmerPlaceholderState extends State<MediaShimmerPlaceholder>
                 child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(icon, size: 34, color: foreground),
+                      SvgPicture.asset(
+                        iconPath,
+                        width: 34,
+                        height: 34,
+                        colorFilter: ColorFilter.mode(foreground, BlendMode.srcIn),
+                      ),
                       const SizedBox(height: 12),
-                      Text(label,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: foreground)),
+                      Shimmer.fromColors(
+                        baseColor: foreground.withValues(alpha: 0.38),
+                        highlightColor: foreground.withValues(alpha: 0.90),
+                        period: const Duration(milliseconds: 1250),
+                        child: Text(label,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: foreground.withValues(alpha: 0.55))),
+                      ),
                     ]))),
           ]),
         )),

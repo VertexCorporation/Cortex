@@ -14,6 +14,8 @@ import '../../../../../../theme.dart';
 /// per rendered string: a ticking `{renewalTime}` countdown changes the text
 /// but never the kind, so a dismissed briefing stays dead while its state
 /// holds, while crossing into another band surfaces the new briefing.
+/// Dismissed credit briefings additionally sit out a one-hour, session-wide
+/// cooldown (see [_creditDismissedAt]).
 enum _BriefingKind {
   freeDeclining,
   paidUpgrade,
@@ -36,6 +38,34 @@ class _BriefingResolution {
   final _BriefingKind kind;
   final String text;
 }
+
+/// The credit briefings: the five kinds that render the live
+/// `{renewalTime}` countdown. Dismissing one of them starts the
+/// session-wide cooldown below; they also decide whether the countdown
+/// timer runs.
+const Set<_BriefingKind> _creditBriefingKinds = {
+  _BriefingKind.freeDeclining,
+  _BriefingKind.paidUpgrade,
+  _BriefingKind.ultraLow,
+  _BriefingKind.exhausted,
+  _BriefingKind.ultraExhausted,
+};
+
+/// How long a dismissed credit briefing stays hidden before the same kind
+/// may appear again through the normal trigger flow (input focus, rebuild,
+/// chat switch, credit change…). No timer waits out this window: eligibility
+/// is re-derived from the recorded timestamp on every ordinary evaluation,
+/// so the panel never pops back open on its own once the hour passes.
+const Duration _creditDismissalCooldown = Duration(hours: 1);
+
+/// Session-wide record of dismissed credit briefings: the logical kind and
+/// the moment the user dismissed it (tap or downward swipe). It lives at
+/// library level because the overlay's [State] is recreated whenever chats
+/// open and close — per-widget state would reset the cooldown on every
+/// switch — while the app session is the owner. Kept in memory only, never
+/// persisted to the server, and cleared as soon as the credit state
+/// recovers, so a later dip into a warning band is a fresh transition.
+final Map<_BriefingKind, DateTime> _creditDismissedAt = {};
 
 class BriefingOverlay extends StatefulWidget {
   final int? availableCredits;
@@ -91,6 +121,18 @@ class BriefingOverlay extends StatefulWidget {
     this.onVisibleHeightChanged,
   });
 
+  /// Test-only: clears every session dismissal record, so each test starts
+  /// with an empty cooldown.
+  @visibleForTesting
+  static void debugResetCreditDismissals() => _creditDismissedAt.clear();
+
+  /// Test-only: shifts every recorded dismissal [by] into the past, as if
+  /// the user had dismissed those briefings that much earlier. The cooldown
+  /// has no clock of its own, so this is the only way to cross the hour.
+  @visibleForTesting
+  static void debugAgeCreditDismissals(Duration by) =>
+      _creditDismissedAt.updateAll((kind, dismissed) => dismissed.subtract(by));
+
   @override
   State<BriefingOverlay> createState() => _BriefingOverlayState();
 }
@@ -104,22 +146,18 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   String? _currentMessageText;
   _BriefingKind? _currentKind;
 
-  /// The kind the user dismissed (tap or downward swipe). It stays hidden
-  /// across rebuilds and conversation switches until the underlying state
-  /// resolves to a different kind.
+  /// The non-credit kind the user dismissed (tap or downward swipe). It
+  /// stays hidden across rebuilds and conversation switches until the
+  /// underlying state resolves to a different kind. Credit briefings use
+  /// the session-wide cooldown map instead: they become eligible again an
+  /// hour after dismissal.
   _BriefingKind? _dismissedKind;
 
   /// Refreshes the visible `{renewalTime}` countdown without replaying the
-  /// slide/fade. Runs only while a credit briefing is on screen.
+  /// slide/fade. Runs only while a credit briefing is on screen; stopped
+  /// as soon as it is dismissed, so a cooling briefing has no timer left
+  /// that could pop it back open.
   Timer? _countdownTimer;
-
-  static const Set<_BriefingKind> _countdownKinds = {
-    _BriefingKind.freeDeclining,
-    _BriefingKind.paidUpgrade,
-    _BriefingKind.ultraLow,
-    _BriefingKind.exhausted,
-    _BriefingKind.ultraExhausted,
-  };
 
   final GlobalKey _panelKey = GlobalKey();
   double _measuredPanelHeight = 0.0;
@@ -296,6 +334,21 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     return '${hours}h ${minutes}m';
   }
 
+  /// Whether a resolved briefing [kind] is currently hidden by a dismissal.
+  /// Credit kinds sit out the session-wide hour after their dismissal — no
+  /// rebuild, input focus, chat switch or countdown tick can bypass it;
+  /// every other kind keeps the widget-local hide-until-the-condition-
+  /// changes behavior. Identity is the logical kind, never the rendered
+  /// message, so the ticking countdown text cannot dodge a dismissal.
+  bool _isSuppressed(_BriefingKind kind) {
+    if (_creditBriefingKinds.contains(kind)) {
+      final dismissed = _creditDismissedAt[kind];
+      return dismissed != null &&
+          DateTime.now().difference(dismissed) < _creditDismissalCooldown;
+    }
+    return kind == _dismissedKind;
+  }
+
   void _evaluateAndAnimate() {
     if (!mounted) return;
     if (!widget.isUserStateReady) {
@@ -319,9 +372,12 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     final loc = AppLocalizations.of(context)!;
     final next = _resolveBriefing(loc);
 
-    // A dismissed kind stays hidden until the underlying state resolves to
-    // something else; the changing countdown text never resurrects it.
-    if (next != null && next.kind == _dismissedKind) {
+    // A dismissed briefing stays hidden: credit kinds sit out the
+    // session-wide cooldown hour — input focus, rebuilds, chat switches and
+    // countdown ticks re-run this evaluation but never bypass it — while
+    // every other kind waits until its underlying state resolves to
+    // something else. The ticking countdown text never resurrects either.
+    if (next != null && _isSuppressed(next.kind)) {
       _syncCountdownTimer(null);
       if (_currentMessageText != null || _currentKind != null) {
         setState(() {
@@ -339,6 +395,13 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       return;
     }
     _dismissedKind = null;
+
+    // No briefing resolves: the credit state recovered, so a later dip
+    // into a warning band is a fresh state transition — no old cooldown
+    // may outlive the recovery.
+    if (next == null) {
+      _creditDismissedAt.clear();
+    }
 
     // Keep the visible countdown ticking while a credit briefing is shown.
     _syncCountdownTimer(next?.kind);
@@ -398,7 +461,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   void _syncCountdownTimer(_BriefingKind? kind) {
-    final needed = kind != null && _countdownKinds.contains(kind);
+    final needed = kind != null && _creditBriefingKinds.contains(kind);
     if (needed) {
       _countdownTimer ??= Timer.periodic(const Duration(seconds: 30), (_) {
         if (mounted) _evaluateAndAnimate();
@@ -426,10 +489,19 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   void _handleDismiss() {
     if (_slideController.isDismissed) return;
-    // Remember the dismissed kind so rebuilds do not resurrect it until the
-    // underlying condition actually changes; the ticking countdown text
-    // never counts as a change.
-    _dismissedKind = _currentKind;
+    final kind = _currentKind;
+    // Remember the dismissal, keyed to the logical kind so the ticking
+    // countdown text never counts as a change. Credit briefings enter the
+    // session-wide one-hour cooldown, which survives chat switches because
+    // the overlay's State is recreated per chat; every other kind keeps the
+    // widget-local hide-until-the-condition-changes behavior.
+    if (kind != null && _creditBriefingKinds.contains(kind)) {
+      _creditDismissedAt[kind] = DateTime.now();
+    } else {
+      _dismissedKind = kind;
+    }
+    // The panel is leaving the screen: its countdown timer goes with it.
+    _syncCountdownTimer(null);
     _slideController.reverse().then((_) {
       if (!mounted) return;
       setState(() {});

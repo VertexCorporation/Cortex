@@ -594,9 +594,15 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         ),
       ),
     );
-    return widget.isDimmed
-        ? Opacity(opacity: 0.4, child: bubble)
-        : bubble;
+    // One stable root for both states: swapping Opacity in and out on the
+    // dictation toggle would destroy and rebuild the whole bubble subtree
+    // (its semantics included) twice per session. Keeping the shape
+    // constant and animating only the opacity value leaves the element and
+    // semantics trees untouched while dimming exactly as before.
+    return Opacity(
+      opacity: widget.isDimmed ? 0.4 : 1.0,
+      child: bubble,
+    );
   }
 }
 
