@@ -1,5 +1,6 @@
 import 'package:cortex/chat/screen/widgets/bottom/panels/briefing.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,14 +10,16 @@ import 'package:flutter_test/flutter_test.dart';
 /// below the floor) each get tier-aware copy with a live {renewalTime}
 /// countdown; dismissal is keyed to the logical briefing kind, so a ticking
 /// countdown never resurrects a dismissed panel, while crossing bands does.
-/// A dismissed credit briefing then sits out a session-wide one-hour
-/// cooldown that no rebuild, chat switch or countdown tick can bypass; a
-/// different kind still appears immediately, and recovering to a healthy
-/// balance clears the cooldown so a later dip warns afresh.
+/// A dismissed credit briefing then sits out an app-session-wide two-hour
+/// cooldown owned by the credit engine (CreditsManager) that no rebuild,
+/// chat switch, overlay remount or countdown tick can bypass; a different
+/// kind still appears immediately, and only a genuinely recovered balance
+/// clears the cooldown so a later dip warns afresh.
 
 /// A renewal instant [hours]/[minutes] from now, with 30 seconds of slack
 /// inside the current minute: the formatter floors, so the rendered
-/// "Xh Ym" stays stable for the few real seconds the test takes.
+/// "X hours Y minutes" stays stable for the few real seconds the test
+/// takes.
 DateTime _renewalIn({int hours = 0, int minutes = 0}) => DateTime.now()
     .add(Duration(hours: hours, minutes: minutes, seconds: 30));
 
@@ -77,9 +80,9 @@ Future<void> _tearDown(WidgetTester tester) async {
 
 void main() {
   setUp(() {
-    // Credit dismissal cooldowns live for the whole app session: never leak
-    // records between tests.
-    BriefingOverlay.debugResetCreditDismissals();
+    // Credit dismissal cooldowns live for the whole app session, owned by
+    // the credit engine: never leak records between tests.
+    CreditsManager.instance.debugResetCreditBriefingDismissals();
   });
 
   group('tier × declining band (zero or negative credits above the floor)',
@@ -89,10 +92,10 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h 42m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')),
           findsOneWidget);
       expect(_txt(loc.reachedLimit), findsNothing);
-      expect(_txt(loc.creditWarningExhaustedMessage('5h 42m')), findsNothing);
+      expect(_txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsNothing);
       await _tearDown(tester);
     });
 
@@ -100,7 +103,7 @@ void main() {
       await tester.pumpWidget(_app(credits: -49));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h 42m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')),
           findsOneWidget);
       await _tearDown(tester);
     });
@@ -111,8 +114,8 @@ void main() {
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningPaidUpgradeMessage('5h 42m')), findsOneWidget);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h 42m')),
+          _txt(loc.creditWarningPaidUpgradeMessage('5 hours 42 minutes')), findsOneWidget);
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')),
           findsNothing);
       await _tearDown(tester);
     });
@@ -123,7 +126,7 @@ void main() {
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningPaidUpgradeMessage('5h 42m')), findsOneWidget);
+          _txt(loc.creditWarningPaidUpgradeMessage('5 hours 42 minutes')), findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -134,18 +137,18 @@ void main() {
           .pumpWidget(_app(credits: 0, userTier: SubscriptionTier.ultra));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningUltraMessage('5h 42m')), findsOneWidget);
-      expect(_txt(loc.creditWarningPaidUpgradeMessage('5h 42m')), findsNothing);
+      expect(_txt(loc.creditWarningUltraMessage('5 hours 42 minutes')), findsOneWidget);
+      expect(_txt(loc.creditWarningPaidUpgradeMessage('5 hours 42 minutes')), findsNothing);
       // Copy contract: Ultra never sells an upgrade, the other tiers do.
-      expect(loc.creditWarningUltraMessage('5h').contains('Upgrade'), isFalse);
-      expect(loc.creditWarningUltraExhaustedMessage('5h').contains('Upgrade'),
+      expect(loc.creditWarningUltraMessage('5 hours').contains('Upgrade'), isFalse);
+      expect(loc.creditWarningUltraExhaustedMessage('5 hours').contains('Upgrade'),
           isFalse);
       expect(
-          loc.creditWarningPaidUpgradeMessage('5h').contains('Upgrade'),
+          loc.creditWarningPaidUpgradeMessage('5 hours').contains('Upgrade'),
           isTrue);
-      expect(loc.creditWarningExhaustedMessage('5h').contains('Upgrade'),
+      expect(loc.creditWarningExhaustedMessage('5 hours').contains('Upgrade'),
           isTrue);
-      expect(loc.creditWarningFreeDecliningMessage('5h').contains('Upgrade'),
+      expect(loc.creditWarningFreeDecliningMessage('5 hours').contains('Upgrade'),
           isTrue);
       await _tearDown(tester);
     });
@@ -158,9 +161,9 @@ void main() {
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+          _txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsOneWidget);
       expect(_txt(loc.reachedLimit), findsNothing);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h 42m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')),
           findsNothing);
       await _tearDown(tester);
     });
@@ -170,7 +173,7 @@ void main() {
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+          _txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -181,7 +184,7 @@ void main() {
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+          _txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -191,9 +194,9 @@ void main() {
           _app(credits: -50, userTier: SubscriptionTier.ultra));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningUltraExhaustedMessage('5h 42m')),
+      expect(_txt(loc.creditWarningUltraExhaustedMessage('5 hours 42 minutes')),
           findsOneWidget);
-      expect(_txt(loc.creditWarningExhaustedMessage('5h 42m')), findsNothing);
+      expect(_txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsNothing);
       await _tearDown(tester);
     });
   });
@@ -205,7 +208,7 @@ void main() {
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningFreeDecliningMessage('47m')), findsOneWidget);
+          _txt(loc.creditWarningFreeDecliningMessage('47 minutes')), findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -214,7 +217,49 @@ void main() {
           .pumpWidget(_app(credits: 0, renewalAt: _renewalIn(hours: 5)));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h')), findsOneWidget);
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours')), findsOneWidget);
+      await _tearDown(tester);
+    });
+
+    testWidgets('single units word the countdown fully, no abbreviations',
+        (tester) async {
+      // The contract for every user-facing renewal time: full words with
+      // grammatical plurals — never "4m"-style abbreviations.
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(minutes: 1)));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      expect(
+          _txt(loc.creditWarningFreeDecliningMessage('1 minute')),
+          findsOneWidget);
+      await _tearDown(tester);
+
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(minutes: 2)));
+      await tester.pumpAndSettle();
+      expect(
+          _txt(loc.creditWarningFreeDecliningMessage('2 minutes')),
+          findsOneWidget);
+      await _tearDown(tester);
+
+      await tester
+          .pumpWidget(_app(credits: 0, renewalAt: _renewalIn(hours: 2)));
+      await tester.pumpAndSettle();
+      expect(
+          _txt(loc.creditWarningFreeDecliningMessage('2 hours')),
+          findsOneWidget);
+      await _tearDown(tester);
+    });
+
+    testWidgets('mixed remainders render both words', (tester) async {
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(hours: 2, minutes: 14)));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      expect(
+          _txt(
+              loc.creditWarningFreeDecliningMessage('2 hours 14 minutes')),
+          findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -222,11 +267,11 @@ void main() {
         (tester) async {
       await tester.pumpWidget(_app(
           credits: 0,
-          renewalAt: DateTime.now().subtract(const Duration(hours: 1))));
+          renewalAt: DateTime.now().subtract(const Duration(hours: 2))));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningFreeDecliningMessage('1m')), findsOneWidget);
+          _txt(loc.creditWarningFreeDecliningMessage('1 minute')), findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -237,7 +282,7 @@ void main() {
           _app(credits: 0, renewalAt: _renewalIn(hours: 5, minutes: 42)));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h 42m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')),
           findsOneWidget);
 
       // Same logical briefing, different countdown: the text swaps without
@@ -245,9 +290,9 @@ void main() {
       await tester.pumpWidget(
           _app(credits: 0, renewalAt: _renewalIn(hours: 47, minutes: 20)));
       await tester.pumpAndSettle();
-      expect(_txt(loc.creditWarningFreeDecliningMessage('47h 20m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('47 hours 20 minutes')),
           findsOneWidget);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h 42m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')),
           findsNothing);
       await _tearDown(tester);
     });
@@ -257,7 +302,7 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final first = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final first = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(first), findsOneWidget);
 
       // Fire one periodic refresh: the briefing must stay put.
@@ -275,7 +320,7 @@ void main() {
           _app(credits: 0, renewalAt: _renewalIn(hours: 5, minutes: 42)));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final old = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final old = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(old), findsOneWidget);
 
       await tester.tap(_txt(old));
@@ -286,7 +331,7 @@ void main() {
       await tester.pumpWidget(
           _app(credits: 0, renewalAt: _renewalIn(hours: 3, minutes: 5)));
       await tester.pumpAndSettle();
-      expect(_txt(loc.creditWarningFreeDecliningMessage('3h 5m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('3 hours 5 minutes')),
           findsNothing);
       await _tearDown(tester);
     });
@@ -296,7 +341,7 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final msg = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(msg), findsOneWidget);
 
       await tester.tap(_txt(msg));
@@ -318,7 +363,7 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final msg = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(msg), findsOneWidget);
 
       await tester.fling(_txt(msg), const Offset(0, 300), 2000.0);
@@ -338,7 +383,7 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final declining = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final declining = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(declining), findsOneWidget);
 
       await tester.tap(_txt(declining));
@@ -349,7 +394,7 @@ void main() {
       await tester.pumpWidget(_app(credits: -50));
       await tester.pumpAndSettle();
       expect(
-          _txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+          _txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsOneWidget);
 
       // Recovery clears the cooldown, so a later dip warns afresh.
       await tester.pumpWidget(_app(credits: 25));
@@ -361,15 +406,15 @@ void main() {
     });
   });
 
-  group('credit dismissal cooldown (session-wide, one hour)', () {
+  group('credit dismissal cooldown (app-session-wide, two hours)', () {
     testWidgets(
-        'the same kind stays hidden within the hour across rebuilds, chat '
+        'the same kind stays hidden within the two hours across rebuilds, chat '
         'switches and countdown ticks', (tester) async {
       await tester.pumpWidget(
           _app(credits: 0, renewalAt: _renewalIn(hours: 5, minutes: 42)));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final msg = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(msg), findsOneWidget);
 
       await tester.tap(_txt(msg));
@@ -382,7 +427,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(_txt(msg), findsNothing);
 
-      // Opening another chat evaluates again: still within the hour.
+      // Opening another chat evaluates again: still within the window.
       await tester.pumpWidget(_app(credits: 0, conversationId: 'other'));
       await tester.pumpAndSettle();
       expect(_txt(msg), findsNothing);
@@ -391,7 +436,7 @@ void main() {
       await tester.pumpWidget(
           _app(credits: 0, renewalAt: _renewalIn(hours: 3, minutes: 5)));
       await tester.pumpAndSettle();
-      expect(_txt(loc.creditWarningFreeDecliningMessage('3h 5m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('3 hours 5 minutes')),
           findsNothing);
       await _tearDown(tester);
     });
@@ -401,7 +446,7 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final msg = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(msg), findsOneWidget);
 
       await tester.tap(_txt(msg));
@@ -420,31 +465,60 @@ void main() {
     });
 
     testWidgets(
-        'the same kind may reappear after the hour, via the normal trigger '
-        'flow', (tester) async {
-      await tester.pumpWidget(
-          _app(credits: 0, renewalAt: _renewalIn(hours: 5, minutes: 42)));
+        'a transient missing balance never resurrects a dismissed briefing',
+        (tester) async {
+      await tester.pumpWidget(_app(credits: 0, conversationId: 'chat-a'));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final msg = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(msg), findsOneWidget);
 
       await tester.tap(_txt(msg));
       await tester.pumpAndSettle();
       expect(_txt(msg), findsNothing);
 
-      // An hour and a minute pass with the user doing nothing else: the
+      // Opening another chat can evaluate through a momentary snapshot gap
+      // (the balance is still unknown, so no briefing resolves). Resolving
+      // no briefing must not be mistaken for recovery — that is exactly
+      // what wiped the dismissal mid-session when the overlay owned the
+      // records.
+      await tester.pumpWidget(_app(credits: null, conversationId: 'chat-b'));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // The snapshot lands back in the same band: still inside the window.
+      await tester.pumpWidget(_app(credits: 0, conversationId: 'chat-b'));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+      await _tearDown(tester);
+    });
+
+    testWidgets(
+        'the same kind may reappear after the two-hour window, via the normal '
+        'trigger flow', (tester) async {
+      await tester.pumpWidget(
+          _app(credits: 0, renewalAt: _renewalIn(hours: 5, minutes: 42)));
+      await tester.pumpAndSettle();
+      final loc = _loc(tester);
+      final msg = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
+      expect(_txt(msg), findsOneWidget);
+
+      await tester.tap(_txt(msg));
+      await tester.pumpAndSettle();
+      expect(_txt(msg), findsNothing);
+
+      // Two hours and a minute pass with the user doing nothing else: the
       // panel must not pop back open on its own once it becomes eligible.
-      BriefingOverlay.debugAgeCreditDismissals(
-          const Duration(hours: 1, minutes: 1));
-      await tester.pump(const Duration(hours: 1, minutes: 1));
+      CreditsManager.instance.debugAgeCreditBriefingDismissals(
+          const Duration(hours: 2, minutes: 1));
+      await tester.pump(const Duration(hours: 2, minutes: 1));
       expect(_txt(msg), findsNothing);
 
       // The next ordinary evaluation (input focus, rebuild…) shows it again.
       await tester.pumpWidget(
           _app(credits: 0, renewalAt: _renewalIn(hours: 4, minutes: 41)));
       await tester.pumpAndSettle();
-      expect(_txt(loc.creditWarningFreeDecliningMessage('4h 41m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('4 hours 41 minutes')),
           findsOneWidget);
       await _tearDown(tester);
     });
@@ -454,7 +528,7 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final declining = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final declining = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(declining), findsOneWidget);
 
       await tester.tap(_txt(declining));
@@ -465,7 +539,7 @@ void main() {
       // seconds after the previous dismissal.
       await tester.pumpWidget(_app(credits: -50));
       await tester.pumpAndSettle();
-      expect(_txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+      expect(_txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -474,7 +548,7 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final declining = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final declining = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(declining), findsOneWidget);
 
       await tester.tap(_txt(declining));
@@ -483,7 +557,7 @@ void main() {
 
       // Back to a healthy balance: the recovery clears the cooldown, so
       // re-entering the band is a fresh state transition, well within the
-      // hour.
+      // two-hour window.
       await tester.pumpWidget(_app(credits: 25));
       await tester.pumpAndSettle();
       expect(_txt(declining), findsNothing);
@@ -500,21 +574,22 @@ void main() {
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      final msg = loc.creditWarningFreeDecliningMessage('5h 42m');
+      final msg = loc.creditWarningFreeDecliningMessage('5 hours 42 minutes');
       expect(_txt(msg), findsOneWidget);
 
       await tester.fling(_txt(msg), const Offset(0, 300), 2000.0);
       await tester.pumpAndSettle();
       expect(_txt(msg), findsNothing);
 
-      // Within the hour the swipe keeps it hidden, exactly like a tap.
+      // Within the two-hour window the swipe keeps it hidden, exactly like
+      // a tap.
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       expect(_txt(msg), findsNothing);
 
-      // Past the hour it is eligible again, on the next rebuild.
-      BriefingOverlay.debugAgeCreditDismissals(
-          const Duration(hours: 1, minutes: 1));
+      // Past the two-hour window it is eligible again, on the next rebuild.
+      CreditsManager.instance.debugAgeCreditBriefingDismissals(
+          const Duration(hours: 2, minutes: 1));
       await tester.pumpWidget(_app(credits: 0));
       await tester.pumpAndSettle();
       expect(_txt(msg), findsOneWidget);
@@ -541,10 +616,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(_txt(loc.videoPremiumWarning), findsNothing);
 
-      // …and it never adopted the credit cooldown: even past the hour it
-      // stays hidden until its underlying condition changes.
-      BriefingOverlay.debugAgeCreditDismissals(
-          const Duration(hours: 1, minutes: 1));
+      // …and it never adopted the credit cooldown: even past the two-hour
+      // window it stays hidden until its underlying condition changes.
+      CreditsManager.instance.debugAgeCreditBriefingDismissals(
+          const Duration(hours: 2, minutes: 1));
       await tester.pumpWidget(videoApp());
       await tester.pumpAndSettle();
       expect(_txt(loc.videoPremiumWarning), findsNothing);
@@ -565,8 +640,8 @@ void main() {
       final loc = _loc(tester);
       expect(_txt(loc.reachedLimit), findsNothing);
       expect(
-          _txt(loc.creditWarningFreeDecliningMessage('5h 42m')), findsNothing);
-      expect(_txt(loc.creditWarningExhaustedMessage('5h 42m')), findsNothing);
+          _txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')), findsNothing);
+      expect(_txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsNothing);
       await _tearDown(tester);
     });
 
@@ -574,13 +649,13 @@ void main() {
       await tester.pumpWidget(_app(credits: 0, isDynamicChat: false));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningFreeDecliningMessage('5h 42m')),
+      expect(_txt(loc.creditWarningFreeDecliningMessage('5 hours 42 minutes')),
           findsOneWidget);
 
       await tester.pumpWidget(_app(credits: -50, isDynamicChat: false));
       await tester.pumpAndSettle();
       expect(
-          _txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+          _txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsOneWidget);
       await _tearDown(tester);
     });
 
@@ -601,7 +676,7 @@ void main() {
       await tester.pumpAndSettle();
       final loc = _loc(tester);
       expect(
-          _txt(loc.creditWarningExhaustedMessage('5h 42m')), findsOneWidget);
+          _txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsOneWidget);
       expect(_txt(loc.videoPremiumWarning), findsNothing);
       await _tearDown(tester);
     });
@@ -611,7 +686,7 @@ void main() {
       await tester.pumpWidget(_app(credits: -50, isUserStateReady: false));
       await tester.pumpAndSettle();
       final loc = _loc(tester);
-      expect(_txt(loc.creditWarningExhaustedMessage('5h 42m')), findsNothing);
+      expect(_txt(loc.creditWarningExhaustedMessage('5 hours 42 minutes')), findsNothing);
       await _tearDown(tester);
     });
   });

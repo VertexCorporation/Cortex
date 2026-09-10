@@ -878,5 +878,7 @@
   "creditWarningPaidUpgradeMessage": "您的额度正在减少，回答可能会更简单。额度将在 {renewalTime} 后刷新。升级套餐以获得更多使用量。",
   "creditWarningUltraMessage": "您即将达到使用上限，回答可能会更简单。上限将在 {renewalTime} 后重置。",
   "creditWarningExhaustedMessage": "您已用完今日的全部额度。额度将在 {renewalTime} 后刷新。升级以继续无限畅聊。",
-  "creditWarningUltraExhaustedMessage": "您已达到今日的使用上限。上限将在 {renewalTime} 后重置。"
+  "creditWarningUltraExhaustedMessage": "您已达到今日的使用上限。上限将在 {renewalTime} 后重置。",
+  "creditRenewalDurationHour": "{count, plural, other {{count}小时}}",
+  "creditRenewalDurationMinute": "{count, plural, other {{count}分钟}}"
 }

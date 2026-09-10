@@ -2174,4 +2174,38 @@ class AppLocalizationsRu extends AppLocalizations {
   String creditWarningUltraExhaustedMessage(String renewalTime) {
     return 'Вы достигли лимита использования на сегодня. Он обновится через $renewalTime.';
   }
+
+  @override
+  String creditRenewalDurationHour(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString часа',
+      many: '$countString часов',
+      few: '$countString часа',
+      one: '$countString час',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String creditRenewalDurationMinute(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString минуты',
+      many: '$countString минут',
+      few: '$countString минуты',
+      one: '$countString минута',
+    );
+    return '$_temp0';
+  }
 }

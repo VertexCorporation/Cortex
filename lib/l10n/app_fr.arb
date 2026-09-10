@@ -878,5 +878,7 @@
   "creditWarningPaidUpgradeMessage": "Vos crédits diminuent, les réponses peuvent être plus simples. Ils se renouvellent dans {renewalTime}. Améliorez votre abonnement pour plus d'utilisation.",
   "creditWarningUltraMessage": "Vous approchez de votre limite d'utilisation, les réponses peuvent être plus simples. Elle se renouvelle dans {renewalTime}.",
   "creditWarningExhaustedMessage": "Vous avez utilisé tous vos crédits pour aujourd'hui. Ils se renouvellent dans {renewalTime}. Passez à un abonnement payant pour continuer sans limite.",
-  "creditWarningUltraExhaustedMessage": "Vous avez atteint votre limite d'utilisation pour aujourd'hui. Elle se renouvelle dans {renewalTime}."
+  "creditWarningUltraExhaustedMessage": "Vous avez atteint votre limite d'utilisation pour aujourd'hui. Elle se renouvelle dans {renewalTime}.",
+  "creditRenewalDurationHour": "{count, plural, one {{count} heure} many {{count} heures} other {{count} heures}}",
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minute} many {{count} minutes} other {{count} minutes}}"
 }

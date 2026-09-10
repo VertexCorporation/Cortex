@@ -2172,4 +2172,32 @@ class AppLocalizationsId extends AppLocalizations {
   String creditWarningUltraExhaustedMessage(String renewalTime) {
     return 'Anda telah mencapai batas penggunaan hari ini. Batas pulih dalam $renewalTime.';
   }
+
+  @override
+  String creditRenewalDurationHour(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString jam',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String creditRenewalDurationMinute(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString menit',
+    );
+    return '$_temp0';
+  }
 }

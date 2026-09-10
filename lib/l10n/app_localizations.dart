@@ -3968,6 +3968,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You\'ve reached your usage limit for today. It renews in {renewalTime}.'**
   String creditWarningUltraExhaustedMessage(String renewalTime);
+
+  /// Fully worded, localized hour part of the time until the daily credit renewal, filling the {renewalTime} placeholder of the credit warning messages, e.g. '1 hour / 2 hours'. Composed with creditRenewalDurationMinute into a single countdown string — never abbreviated like '4m'.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one {{count} hour} other {{count} hours}}'**
+  String creditRenewalDurationHour(int count);
+
+  /// Fully worded, localized minute part of the time until the daily credit renewal, filling the {renewalTime} placeholder of the credit warning messages, e.g. '1 minute / 47 minutes'. Composed with creditRenewalDurationHour into a single countdown string — never abbreviated like '4m'.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one {{count} minute} other {{count} minutes}}'**
+  String creditRenewalDurationMinute(int count);
 }
 
 class _AppLocalizationsDelegate

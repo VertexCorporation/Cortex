@@ -878,5 +878,7 @@
   "creditWarningPaidUpgradeMessage": "Je credits raken op, antwoorden kunnen eenvoudiger zijn. Ze worden vernieuwd over {renewalTime}. Upgrade je abonnement voor meer gebruik.",
   "creditWarningUltraMessage": "Je nadert je gebruikerslimiet, antwoorden kunnen eenvoudiger zijn. Ze wordt vernieuwd over {renewalTime}.",
   "creditWarningExhaustedMessage": "Je hebt alle credits voor vandaag gebruikt. Ze worden vernieuwd over {renewalTime}. Upgrade om zonder limieten door te gaan.",
-  "creditWarningUltraExhaustedMessage": "Je hebt je gebruikerslimiet voor vandaag bereikt. Hij wordt vernieuwd over {renewalTime}."
+  "creditWarningUltraExhaustedMessage": "Je hebt je gebruikerslimiet voor vandaag bereikt. Hij wordt vernieuwd over {renewalTime}.",
+  "creditRenewalDurationHour": "{count, plural, one {{count} uur} other {{count} uur}}",
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minuut} other {{count} minuten}}"
 }

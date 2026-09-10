@@ -2150,4 +2150,42 @@ class AppLocalizationsAr extends AppLocalizations {
   String creditWarningUltraExhaustedMessage(String renewalTime) {
     return 'لقد وصلت إلى حد الاستخدام لهذا اليوم. يُجدد خلال $renewalTime.';
   }
+
+  @override
+  String creditRenewalDurationHour(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString ساعة',
+      many: '$countString ساعة',
+      few: '$countString ساعات',
+      two: 'ساعتان',
+      one: 'ساعة واحدة',
+      zero: 'ساعة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String creditRenewalDurationMinute(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString دقيقة',
+      many: '$countString دقيقة',
+      few: '$countString دقائق',
+      two: 'دقيقتان',
+      one: 'دقيقة واحدة',
+      zero: 'دقيقة واحدة',
+    );
+    return '$_temp0';
+  }
 }

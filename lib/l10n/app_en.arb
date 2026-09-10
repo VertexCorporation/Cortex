@@ -995,5 +995,27 @@
         "description": "Human-readable time until the daily renewal, e.g. 23h 14m."
       }
     }
-  }
+  },
+  "creditRenewalDurationHour": "{count, plural, one {{count} hour} other {{count} hours}}",
+    "@creditRenewalDurationHour": {
+      "description": "Fully worded, localized hour part of the time until the daily credit renewal, filling the {renewalTime} placeholder of the credit warning messages, e.g. '1 hour / 2 hours'. Composed with creditRenewalDurationMinute into a single countdown string — never abbreviated like '4m'.",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "format": "decimalPattern",
+          "description": "Number of hours."
+        }
+      }
+    },
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minute} other {{count} minutes}}",
+    "@creditRenewalDurationMinute": {
+      "description": "Fully worded, localized minute part of the time until the daily credit renewal, filling the {renewalTime} placeholder of the credit warning messages, e.g. '1 minute / 47 minutes'. Composed with creditRenewalDurationHour into a single countdown string — never abbreviated like '4m'.",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "format": "decimalPattern",
+          "description": "Number of minutes."
+        }
+      }
+    }
 }

@@ -878,5 +878,7 @@
   "creditWarningPaidUpgradeMessage": "أرصدتك تنفد، قد تكون الردود أبسط. تتجدد خلال {renewalTime}. قم بترقية خطتك للحصول على مزيد من الاستخدام.",
   "creditWarningUltraMessage": "أنت تقترب من حد الاستخدام، قد تكون الردود أبسط. يُجدد خلال {renewalTime}.",
   "creditWarningExhaustedMessage": "لقد استخدمت كل أرصدتك لهذا اليوم. تتجدد خلال {renewalTime}. قم بالترقية للمتابعة دون حدود.",
-  "creditWarningUltraExhaustedMessage": "لقد وصلت إلى حد الاستخدام لهذا اليوم. يُجدد خلال {renewalTime}."
+  "creditWarningUltraExhaustedMessage": "لقد وصلت إلى حد الاستخدام لهذا اليوم. يُجدد خلال {renewalTime}.",
+  "creditRenewalDurationHour": "{count, plural, zero {ساعة واحدة} one {ساعة واحدة} two {ساعتان} few {{count} ساعات} many {{count} ساعة} other {{count} ساعة}}",
+  "creditRenewalDurationMinute": "{count, plural, zero {دقيقة واحدة} one {دقيقة واحدة} two {دقيقتان} few {{count} دقائق} many {{count} دقيقة} other {{count} دقيقة}}"
 }
