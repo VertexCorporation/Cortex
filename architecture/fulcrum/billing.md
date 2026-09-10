@@ -6,13 +6,13 @@
 
 ## Transactional helpers (helpers.js)
 
-`helpers.js` provides transactional entitlement/credit mutations, expiry tasks and deletion workflows: `PRODUCT_CATALOG`, `grantEntitlement`, `revokeEntitlement`, `deductUserCredits`, `deductDynamicCredits`, `refundUserCredits`, `deductPredits`, `deductDredits`, `getProductDetails`, `resolveSubscriptionExpiryMillis`, `deleteUserAndData`, `awardCreditsWithDebtCheck`, `deleteCollection`, `deleteQueryBatch`, `applyReferralReward`, `scheduleSubscriptionExpiryCheck`.
+`helpers.js` provides transactional entitlement/credit mutations, expiry tasks and deletion workflows: `PRODUCT_CATALOG`, `getProductDetails`, `grantEntitlement`, `revokeEntitlement`, `deductUserCredits`, `deductDynamicCredits`, `refundUserCredits`, `awardCreditsWithDebtCheck`, `resolveSubscriptionExpiryMillis`, `scheduleSubscriptionExpiryCheck`, `deleteUserAndData`, `deleteCollection`, `deleteQueryBatch`, `applyReferralReward`.
 
 ## Subscription model (subscription.js)
 
 `subscription.js` is an internal module (no exported Cloud Functions) and the single source of truth for the nested `users/{uid}.subscription` entitlement map:
 
-- `TIER_LIMITS` — per-tier capabilities (`dailyCredits`: free 100 / plus 500 / pro 1000 / ultra 10000, plus `negativeCreditLimit`), merging the previously duplicated `DAILY_SUBSCRIPTION_CREDITS` / `NEGATIVE_CREDIT_LIMIT` / `DAILY_DYNAMIC_ALLOWANCE` maps.
+- `TIER_LIMITS` — per-tier capabilities (`dailyCredits`: free 50 / plus 125 / pro 250 / ultra 1250, plus `negativeCreditLimit`, its negation), merging the previously duplicated `DAILY_SUBSCRIPTION_CREDITS` / `NEGATIVE_CREDIT_LIMIT` / `DAILY_DYNAMIC_ALLOWANCE` maps. It is the single source of truth for tier limits: `evaluateCreditPolicy` enforces from it at request time, and `creditLimitsForTier` publishes `{ dailyGrant, debtFloor }` onto `users/{uid}.creditLimits` at every tier/credit write-point (user creation, entitlement grants/revocations/referrals, store purchases, expiry terminals, and both daily renewals) so the Flutter client caches authoritative values from its normal user-data snapshot instead of hardcoding them.
 - `TIER_ORDER` — relative tier weight (free 0 … ultra 3) for upgrade/downgrade comparisons.
 - `resolveSubscription(userData)` — the authoritative active/tier/expiry read used by every consumer (chat gating in `gateway.js`, `voice.js`, `models.js`, scheduled jobs, notifications).
 - `subscriptionPayload(...)` — builds the nested map for grants. Fields are conditional ("missing = not applicable"): free states collapse to `{tier, updatedAt}`, renewable/promotional grants carry `expiresAt`, lifetime grants never do, and store grants carry `productId`/`billingPeriod`/`source`.
@@ -30,11 +30,11 @@
 
 `initiateVerificationChecks` + `handleVerificationCheck` (Pub/Sub), `handleSubscriptionExpiry`, `backupSubscriptionSweeper`, `awardDailyBonusCredits`, `cleanupOrphanAndIncompleteUsers`, `detectAndActionRefundAbuse`, `processPendingDeletions`, `cleanupAbandonedAnonymousAccounts`.
 
-## Credit engines
+## Credit engine
 
-The Flutter `CreditsManager` (see `../cortex/payments.md`) mirrors the server's credit engines: access bands `full`/`low_only`/`blocked` and daily grants free 100 / plus 500 / pro 1000 / ultra 10000, with two engines live at once (single-currency `billingV2` and daily-allowance `creditsV3`; spendable = allowance + owned credits).
+A single unified `credits` field on `users/{uid}` drives everything. `evaluateCreditPolicy` (subscription.js) bands it: `full` (>= 0), `low_only` (negative but above the per-tier debt floor `-dailyGrant`, with grants free 50 / plus 125 / pro 250 / ultra 1250), `blocked` (at or below the floor). While negative, manual model selection is refused, Dynamic Chat stays open but capped at low/medium lanes, and media operations are refused. The Flutter `CreditsManager` (see `../cortex/payments.md`) mirrors these bands client-side.
 
-Caution: the client documents these mirrors as `functions/src/credits.js` (`ACCESS`, `DAILY_GRANTS`) and `functions/src/billing.js` (`MIN_TEXT_BALANCE`), but those files are not present in the current local Fulcrum checkout — the equivalent logic lives in `helpers.js` and `scheduled.js` here. Verify constants against the deployed revision before changing either side.
+The banding lives in `subscription.js` (`evaluateCreditPolicy`, `TIER_LIMITS`); the transactional credit mutations (`deductUserCredits`, `deductDynamicCredits`, `refundUserCredits`) live in `helpers.js`. `creditLimitsForTier` (same file as the banding) publishes the effective tier's limits onto `users/{uid}.creditLimits` for the client cache (see `../cortex/payments.md`). There is no `functions/src/credits.js` or `functions/src/billing.js` — do not reintroduce references to them.
 
 ## Credit diagnostics and idempotency
 
