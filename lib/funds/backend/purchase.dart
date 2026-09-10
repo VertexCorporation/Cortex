@@ -275,10 +275,8 @@ extension FundsPurchase on FundsBackend {
       oneLine: false,
     );
 
-    if (purchaseDetails.pendingCompletePurchase) {
-      _inAppPurchase.completePurchase(purchaseDetails);
-    }
-
+    // Never finalize an error update as delivered. Only purchased/restored
+    // transactions are eligible for server verification and completion.
     _setPurchasePending(false);
   }
 
@@ -294,7 +292,9 @@ extension FundsPurchase on FundsBackend {
   }
 
   void _handleCanceledPurchase(PurchaseDetails d) {
-    if (d.pendingCompletePurchase) _inAppPurchase.completePurchase(d);
+    // A canceled store flow is not a delivered purchase. In particular, do
+    // not call completePurchase here even if a platform wrapper reports a
+    // pending completion flag.
     _setPurchasePending(false);
   }
 }
