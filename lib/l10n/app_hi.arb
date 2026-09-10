@@ -198,7 +198,6 @@
   "@dynamicChatTitle": {
     "description": "The title for a conversation started in dynamic mode."
   },
-  "dynamicPreditsUpgradeMessage": "Cortex और भी बेहतर जवाब दे सकता है; अभी अपग्रेड करें और हर सवाल का सबसे अच्छा जवाब पाएं!",
   "edit": "संपादित करें",
   "editConversationTitle": "नाम बदलें",
   "editProfile": "प्रोफ़ाइल संपादित करें",
@@ -873,5 +872,10 @@
   "generationImageLabel": "चित्र बनाया जा रहा है",
   "generationVideoLabel": "वीडियो बनाया जा रहा है",
   "generationAudioLabel": "ऑडियो बनाया जा रहा है",
-  "generationDocumentLabel": "दस्तावेज़ बनाया जा रहा है"
+  "generationDocumentLabel": "दस्तावेज़ बनाया जा रहा है",
+  "creditWarningFreeDecliningMessage": "आज के आपके मुफ़्त क्रेडिट खत्म हो गए हैं, जवाब आसान हो सकते हैं। ये {renewalTime} में नवीनीकृत होंगे। बेहतरीन बुद्धिमत्ता के लिए अपग्रेड करें।",
+  "creditWarningPaidUpgradeMessage": "आपके क्रेडिट कम हो रहे हैं, जवाब आसान हो सकते हैं। ये {renewalTime} में नवीनीकृत होंगे। ज़्यादा उपयोग के लिए अपना प्लान अपग्रेड करें।",
+  "creditWarningUltraMessage": "आप अपनी उपयोग सीमा के पास पहुँच रहे हैं, जवाब आसान हो सकते हैं। यह {renewalTime} में नवीनीकृत होगी।",
+  "creditWarningExhaustedMessage": "आपने आज के सारे क्रेडिट इस्तेमाल कर लिए। ये {renewalTime} में नवीनीकृत होंगे। बिना सीमा जारी रखने के लिए अपग्रेड करें।",
+  "creditWarningUltraExhaustedMessage": "आप आज की उपयोग सीमा तक पहुँच गए हैं। यह {renewalTime} में नवीनीकृत होगी।"
 }

@@ -198,7 +198,6 @@
   "@dynamicChatTitle": {
     "description": "The title for a conversation started in dynamic mode."
   },
-  "dynamicPreditsUpgradeMessage": "Cortex 可以给出更好的回答；立即升级，为每个问题获得最佳答案！",
   "edit": "编辑",
   "editConversationTitle": "重命名",
   "editProfile": "编辑个人资料",
@@ -873,5 +872,10 @@
   "generationImageLabel": "正在生成图像",
   "generationVideoLabel": "正在生成视频",
   "generationAudioLabel": "正在生成音频",
-  "generationDocumentLabel": "正在生成文档"
+  "generationDocumentLabel": "正在生成文档",
+  "creditWarningFreeDecliningMessage": "您今日的免费额度已用完，回答可能会更简单。额度将在 {renewalTime} 后刷新。升级以保持最佳智能体验。",
+  "creditWarningPaidUpgradeMessage": "您的额度正在减少，回答可能会更简单。额度将在 {renewalTime} 后刷新。升级套餐以获得更多使用量。",
+  "creditWarningUltraMessage": "您即将达到使用上限，回答可能会更简单。上限将在 {renewalTime} 后重置。",
+  "creditWarningExhaustedMessage": "您已用完今日的全部额度。额度将在 {renewalTime} 后刷新。升级以继续无限畅聊。",
+  "creditWarningUltraExhaustedMessage": "您已达到今日的使用上限。上限将在 {renewalTime} 后重置。"
 }

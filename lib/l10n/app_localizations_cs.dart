@@ -953,7 +953,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'â€œ$modelNameâ€ bylo úspěšně odstraněno.';
+    return '“$modelName” bylo úspěšně odstraněno.';
   }
 
   @override
@@ -2021,10 +2021,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get dynamicPreditsUpgradeMessage =>
-      'Cortex může dát ještě lepší odpovědi; upgradujte nyní a získejte nejlepší odpověď na každou otázku!';
-
-  @override
   String get pinLimitReached => 'Můžete připnout až 3 chaty.';
 
   @override
@@ -2138,30 +2134,27 @@ class AppLocalizationsCs extends AppLocalizations {
   String get generationDocumentLabel => 'Generování Dokumentu';
 
   @override
-  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+  String creditWarningFreeDecliningMessage(String renewalTime) {
+    return 'Vaše bezplatné kredity na dnes jsou vyčerpané, odpovědi mohou být jednodušší. Obnoví se za $renewalTime. Upgradujte pro nejlepší inteligenci.';
+  }
 
   @override
-  String get creditWarningFreeDecliningMessage =>
-      'Your credits are declining. Intelligence performance may decrease.';
+  String creditWarningPaidUpgradeMessage(String renewalTime) {
+    return 'Vaše kredity se krátí, odpovědi mohou být jednodušší. Obnoví se za $renewalTime. Upgradujte předplatné pro více využití.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+  String creditWarningUltraMessage(String renewalTime) {
+    return 'Blížíte se limitu využití, odpovědi mohou být jednodušší. Obnoví se za $renewalTime.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedMessage =>
-      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+  String creditWarningExhaustedMessage(String renewalTime) {
+    return 'Využili jste všechny kredity na dnešek. Obnoví se za $renewalTime. Upgradujte, abyste mohli pokračovat bez omezení.';
+  }
 
   @override
-  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
-
-  @override
-  String get creditWarningPaidUpgradeMessage =>
-      'Upgrade your plan for more credits.';
-
-  @override
-  String get creditWarningUltraTitle => 'Credits Low';
-
-  @override
-  String get creditWarningUltraMessage =>
-      'Your credits are running low. Performance may decrease.';
+  String creditWarningUltraExhaustedMessage(String renewalTime) {
+    return 'Dosažili jste dnešního limitu využití. Obnoví se za $renewalTime.';
+  }
 }

@@ -540,6 +540,7 @@ class _BriefingOverlayWrapper extends StatelessWidget {
         return BriefingOverlay(
           availableCredits: totalCredits,
           debtFloor: creditsManager.debtFloor,
+          renewalAt: creditsManager.nextDailyRenewal(),
           photoSelected: input.hasAttachments,
           isOfflineModel: isOffline,
           modelMissing: modelMissing,

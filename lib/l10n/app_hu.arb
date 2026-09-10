@@ -284,7 +284,7 @@
   "noFoundTitle": "Nincs eredmény",
   "noFoundMessage": "Módosítsa a keresési kifejezéseket, vagy törölje a szűrőt.",
   "modelCreatedSuccess": "A modell sikeresen létrehozva!",
-  "modelRemovedSuccess": "â€œ{modelName}â€ sikeresen eltávolítva.",
+  "modelRemovedSuccess": "“{modelName}” sikeresen eltávolítva.",
   "errorCreatingModel": "Váratlan hiba történt a modell létrehozásakor.",
   "errorDeletingModel": "Váratlan hiba történt a modell törlése közben.",
   "ultraFeatureOnly": "Ez a funkció csak Ultra-tagok számára érhető el.",
@@ -573,7 +573,6 @@
   "trialMonthlyDescription": "Először {days} nap ingyenes, majd {price}/hó",
   "trialAnnualDescription": "Először {days} nap ingyenes, majd {price}/év",
   "freePlan": "Ingyenes {plan}!",
-  "dynamicPreditsUpgradeMessage": "A Cortex még jobb válaszokat tud adni; frissítsen most, és minden kérdésre a legjobb választ kapja!",
   "pinLimitReached": "Legfeljebb 3 csevegést rögzíthet.",
   "categoryAll": "Mind",
   "categoryFree": "Ingyenes",
@@ -626,5 +625,10 @@
   "generationImageLabel": "Kép Készítése",
   "generationVideoLabel": "Videó Készítése",
   "generationAudioLabel": "Hang Készítése",
-  "generationDocumentLabel": "Dokumentum Készítése"
+  "generationDocumentLabel": "Dokumentum Készítése",
+  "creditWarningFreeDecliningMessage": "Az ingyenes kreditei mára elfogytak, a válaszok egyszerűbbek lehetnek. {renewalTime} múlva megújulnak. A legjobb intelligenciáért frissítsen.",
+  "creditWarningPaidUpgradeMessage": "A kreditei fogynak, a válaszok egyszerűbbek lehetnek. {renewalTime} múlva megújulnak. Több használatért frissítse csomagját.",
+  "creditWarningUltraMessage": "Közeledik a használati limithez, a válaszok egyszerűbbek lehetnek. {renewalTime} múlva megújul.",
+  "creditWarningExhaustedMessage": "Mára az összes kreditjét elhasználta. {renewalTime} múlva megújulnak. Korlátok nélküli folytatáshoz frissítsen.",
+  "creditWarningUltraExhaustedMessage": "Elérte a mai használati limitjét. {renewalTime} múlva megújul."
 }

@@ -42,4 +42,33 @@ void main() {
       });
     }
   });
+
+  group('nextDailyRenewal', () {
+    // The daily credit allowance renews at midnight Istanbul time, which is
+    // 21:00 UTC: the zone has kept a fixed UTC+3 offset since 2016, so both
+    // the tz-database path and the fallback produce the same instant.
+    test('lands on the next Istanbul midnight', () {
+      final renewal = CreditsManager.instance.nextDailyRenewal();
+      final utc = renewal.toUtc();
+      expect(utc.hour, 21);
+      expect(utc.minute, 0);
+      expect(utc.second, 0);
+      expect(utc.millisecond, 0);
+    });
+
+    test('is always in the future and at most a day away', () {
+      final now = DateTime.now();
+      final renewal = CreditsManager.instance.nextDailyRenewal();
+      expect(renewal.isAfter(now), isTrue);
+      final minutes = renewal.difference(now).inMinutes;
+      expect(minutes, greaterThan(0));
+      expect(minutes, lessThanOrEqualTo(24 * 60));
+    });
+
+    test('is stable within the same renewal day', () {
+      final a = CreditsManager.instance.nextDailyRenewal();
+      final b = CreditsManager.instance.nextDailyRenewal();
+      expect(a, b);
+    });
+  });
 }

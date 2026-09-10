@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import 'subscription.dart';
 import 'user.dart';
@@ -79,6 +80,31 @@ class CreditsManager {
   /// server-published `creditLimits` map. At or below this balance nothing is
   /// sendable until the allowance renews.
   int get debtFloor => _creditLimits.debtFloor;
+
+  /// The instant of the next daily credit renewal.
+  ///
+  /// Mirrors the server's `awardDailyBonusCredits` cron (`"0 0 * * *"` in
+  /// `Europe/Istanbul`, functions/src/scheduled.js): the daily allowance
+  /// lands at midnight Istanbul time. Presentation-only — the server stays
+  /// the single source of truth for renewal; the client never derives credit
+  /// state from this. Istanbul has kept a fixed UTC+3 offset since 2016, so
+  /// the plain-UTC fallback remains exact even if the tz database is not
+  /// loaded yet.
+  DateTime nextDailyRenewal() {
+    try {
+      final istanbul = tz.getLocation('Europe/Istanbul');
+      final now = tz.TZDateTime.now(istanbul);
+      return tz.TZDateTime(istanbul, now.year, now.month, now.day)
+          .add(const Duration(days: 1));
+    } catch (_) {
+      final now = DateTime.now().toUtc();
+      var next = DateTime.utc(now.year, now.month, now.day, 21);
+      if (!now.isBefore(next)) {
+        next = next.add(const Duration(days: 1));
+      }
+      return next.toLocal();
+    }
+  }
 
   /// Whether the user can send a text request right now.
   ///

@@ -284,7 +284,7 @@
   "noFoundTitle": "Inga resultat",
   "noFoundMessage": "Prova att justera dina söktermer eller rensa filtret.",
   "modelCreatedSuccess": "Modell skapad framgångsrikt!",
-  "modelRemovedSuccess": "â€œ{modelName}â€ togs bort.",
+  "modelRemovedSuccess": "“{modelName}” togs bort.",
   "errorCreatingModel": "Ett oväntat fel inträffade när modellen skapades.",
   "errorDeletingModel": "Ett oväntat fel inträffade när modellen skulle raderas.",
   "ultraFeatureOnly": "Den här funktionen är endast tillgänglig för Ultra-medlemmar.",
@@ -573,7 +573,6 @@
   "trialMonthlyDescription": "Första {days} dagarna gratis, sedan {price}/månad",
   "trialAnnualDescription": "Första {days} dagarna gratis, sedan {price}/år",
   "freePlan": "Gratis {plan}!",
-  "dynamicPreditsUpgradeMessage": "Cortex kan ge ännu bättre svar; uppgradera nu och få det bästa svaret på varje fråga!",
   "pinLimitReached": "Du kan fästa upp till 3 chattar.",
   "categoryAll": "Alla",
   "categoryFree": "Gratis",
@@ -626,5 +625,10 @@
   "generationImageLabel": "Genererar Bild",
   "generationVideoLabel": "Genererar Video",
   "generationAudioLabel": "Genererar Ljud",
-  "generationDocumentLabel": "Genererar Dokument"
+  "generationDocumentLabel": "Genererar Dokument",
+  "creditWarningFreeDecliningMessage": "Dina gratiskrediter för idag har tagit slut, svaren kan bli enklare. De förnyas om {renewalTime}. Uppgradera för bästa intelligens.",
+  "creditWarningPaidUpgradeMessage": "Dina krediter börjar ta slut, svaren kan bli enklare. De förnyas om {renewalTime}. Uppgradera ditt abonnemang för mer användning.",
+  "creditWarningUltraMessage": "Du närmar dig din användningsgräns, svaren kan bli enklare. Den förnyas om {renewalTime}.",
+  "creditWarningExhaustedMessage": "Du har använt alla dina krediter för idag. De förnyas om {renewalTime}. Uppgradera för att fortsätta utan gränser.",
+  "creditWarningUltraExhaustedMessage": "Du har nått din användningsgräns för idag. Den förnyas om {renewalTime}."
 }

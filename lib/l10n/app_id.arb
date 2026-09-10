@@ -198,7 +198,6 @@
   "@dynamicChatTitle": {
     "description": "The title for a conversation started in dynamic mode."
   },
-  "dynamicPreditsUpgradeMessage": "Cortex dapat memberikan jawaban yang lebih baik; tingkatkan sekarang dan dapatkan jawaban terbaik untuk setiap pertanyaan!",
   "edit": "Edit",
   "editConversationTitle": "Ganti Nama",
   "editProfile": "Edit Profil",
@@ -873,5 +872,10 @@
   "generationImageLabel": "Membuat Gambar",
   "generationVideoLabel": "Membuat Video",
   "generationAudioLabel": "Membuat Audio",
-  "generationDocumentLabel": "Membuat Dokumen"
+  "generationDocumentLabel": "Membuat Dokumen",
+  "creditWarningFreeDecliningMessage": "Kredit gratis Anda untuk hari ini sudah habis, jawaban mungkin menjadi lebih sederhana. Kredit pulih dalam {renewalTime}. Upgrade untuk tetap mendapatkan kecerdasan terbaik.",
+  "creditWarningPaidUpgradeMessage": "Kredit Anda mulai menipis, jawaban mungkin menjadi lebih sederhana. Kredit pulih dalam {renewalTime}. Upgrade paket Anda untuk penggunaan lebih banyak.",
+  "creditWarningUltraMessage": "Anda hampir mencapai batas penggunaan, jawaban mungkin menjadi lebih sederhana. Batas pulih dalam {renewalTime}.",
+  "creditWarningExhaustedMessage": "Anda telah menggunakan semua kredit hari ini. Kredit pulih dalam {renewalTime}. Upgrade agar bisa terus tanpa batas.",
+  "creditWarningUltraExhaustedMessage": "Anda telah mencapai batas penggunaan hari ini. Batas pulih dalam {renewalTime}."
 }

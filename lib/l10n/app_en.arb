@@ -343,7 +343,7 @@
   "noFoundTitle": "No Results",
   "noFoundMessage": "Try adjusting your search terms or clearing the filter.",
   "modelCreatedSuccess": "Model created successfully!",
-  "modelRemovedSuccess": "â€œ{modelName}â€ was successfully removed.",
+  "modelRemovedSuccess": "“{modelName}” was successfully removed.",
   "errorCreatingModel": "An unexpected error occurred while creating the model.",
   "errorDeletingModel": "An unexpected error occurred while deleting the model.",
   "ultraFeatureOnly": "This feature is only available for Ultra members.",
@@ -860,7 +860,6 @@
       }
     }
   },
-  "dynamicPreditsUpgradeMessage": "Cortex can give even better answers; upgrade now and get the best answer for every question!",
   "pinLimitReached": "You can pin up to 3 chats.",
   "categoryAll": "All",
   "categoryFree": "Free",
@@ -946,12 +945,54 @@
   "generationVideoLabel": "Generating Video",
   "generationAudioLabel": "Generating Audio",
   "generationDocumentLabel": "Generating Document",
-  "creditWarningFreeDecliningTitle": "Credits Declining",
-  "creditWarningFreeDecliningMessage": "Your credits are declining. Intelligence performance may decrease.",
-  "creditWarningFreeExhaustedTitle": "Daily Limit Reached",
-  "creditWarningFreeExhaustedMessage": "Your chat allowance will renew with your daily limit. Subscribe for more access.",
-  "creditWarningPaidUpgradeTitle": "Upgrade Plan",
-  "creditWarningPaidUpgradeMessage": "Upgrade your plan for more credits.",
-  "creditWarningUltraTitle": "Credits Low",
-  "creditWarningUltraMessage": "Your credits are running low. Performance may decrease."
+  "creditWarningFreeDecliningMessage": "Your free credits for today are used up, so answers may be simpler. They renew in {renewalTime}. Upgrade to keep the best intelligence.",
+  "creditWarningPaidUpgradeMessage": "Your credits are running low, so answers may be simpler. They renew in {renewalTime}. Upgrade your plan for more usage.",
+  "creditWarningUltraMessage": "You're nearing your usage limit, so answers may be simpler. It renews in {renewalTime}.",
+  "creditWarningExhaustedMessage": "You've used all your credits for today. They renew in {renewalTime}. Upgrade to keep going without limits.",
+  "creditWarningUltraExhaustedMessage": "You've reached your usage limit for today. It renews in {renewalTime}.",
+  "@creditWarningFreeDecliningMessage": {
+    "description": "Free tier: daily credits dropped below zero while above the debt floor; Dynamic Chat stays open but degraded.",
+    "placeholders": {
+      "renewalTime": {
+        "type": "String",
+        "description": "Human-readable time until the daily renewal, e.g. 23h 14m."
+      }
+    }
+  },
+  "@creditWarningPaidUpgradeMessage": {
+    "description": "Plus/Pro tiers: credits dropped below zero while above the debt floor; nudges an upgrade.",
+    "placeholders": {
+      "renewalTime": {
+        "type": "String",
+        "description": "Human-readable time until the daily renewal, e.g. 23h 14m."
+      }
+    }
+  },
+  "@creditWarningUltraMessage": {
+    "description": "Ultra tier: usage dropped below zero while above the debt floor; no upgrade nudge.",
+    "placeholders": {
+      "renewalTime": {
+        "type": "String",
+        "description": "Human-readable time until the daily renewal, e.g. 23h 14m."
+      }
+    }
+  },
+  "@creditWarningExhaustedMessage": {
+    "description": "Free/Plus/Pro: at or below the debt floor, nothing is sendable until renewal; nudges an upgrade.",
+    "placeholders": {
+      "renewalTime": {
+        "type": "String",
+        "description": "Human-readable time until the daily renewal, e.g. 23h 14m."
+      }
+    }
+  },
+  "@creditWarningUltraExhaustedMessage": {
+    "description": "Ultra: at or below the debt floor; no higher plan exists, so no upgrade nudge.",
+    "placeholders": {
+      "renewalTime": {
+        "type": "String",
+        "description": "Human-readable time until the daily renewal, e.g. 23h 14m."
+      }
+    }
+  }
 }
