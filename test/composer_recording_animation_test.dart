@@ -137,13 +137,17 @@ void main() {
       final mic = find.byType(MicButton);
       final field = find.byType(TextField);
       final originalField = tester.state(find.byType(TextField));
-      final collapsedFieldWidth = tester.getSize(field).width;
+      // The pre-filled transcript already holds the capsule open (content
+      // in the field must never fall back into the compact pill), so this
+      // is the expanded width.
+      final expandedFieldWidth = tester.getSize(field).width;
       expect(addPhoto, findsOneWidget);
       expect(mic, findsOneWidget);
 
-      // Dictation starts: the capsule morphs wider, the "+" and the mic
-      // dim but stay put, Stop takes over the action slot, and the field
-      // is covered by the dictation waveform — nothing vanishes.
+      // Dictation starts: the "+" and the mic dim but stay put, Stop
+      // takes over the action slot, and the field is covered by the
+      // dictation waveform — nothing vanishes, and the already-expanded
+      // capsule holds its width.
       input.setVoiceRecording(true);
       // The waveform runs its own ticker, so pumpAndSettle would spin
       // forever while dictation runs; bounded pumps carry the 250ms
@@ -160,13 +164,13 @@ void main() {
       expect(_isDimmed(mic, tester), isTrue);
       expect(find.byKey(const ValueKey('stop')), findsOneWidget);
       expect(find.byType(WaveformVisualizer), findsOneWidget);
-      expect(tester.getSize(field).width, greaterThan(collapsedFieldWidth));
+      expect(tester.getSize(field).width, closeTo(expandedFieldWidth, 0.5));
       expect(tester.state(find.byType(TextField)), same(originalField));
       expect(text.text, 'original draft');
       expect(tester.takeException(), isNull);
 
       // Dictation ends: the wave clears, dim and Stop lift, and the
-      // capsule settles back.
+      // capsule stays where it was — the transcript still holds it open.
       input.setVoiceRecording(false);
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('stop')), findsNothing);
@@ -968,5 +972,64 @@ void main() {
     expect(panel.height - banner.height, closeTo(expectedGap, 0.5));
     // …placed strictly below the banner: the banner tops the panel.
     expect(banner.top, closeTo(panel.top, 0.5));
+  });
+
+  // Regression: content must never fall back into the compact pill. Text
+  // sitting in the field — or a running dictation wave — keeps the
+  // capsule and the input field expanded even without focus; only once
+  // the text is gone and nothing else holds it open may it collapse
+  // back into the resting pill.
+  testWidgets('text or dictation holds the capsule open without focus',
+      (tester) async {
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+
+    final fieldFinder = find.byKey(const ValueKey('chat_input_field'));
+    final collapsed = tester.getRect(fieldFinder);
+
+    // Focusing expands the capsule…
+    focus.requestFocus();
+    await tester.pumpAndSettle();
+    final expanded = tester.getRect(fieldFinder);
+    expect(expanded.width, greaterThan(collapsed.width));
+
+    // …and unfocusing while the words are still in the field must not
+    // shrink it back into the pill.
+    text.value = const TextEditingValue(text: 'hello cortex');
+    await tester.pumpAndSettle();
+    focus.unfocus();
+    await tester.pumpAndSettle();
+    expect(tester.getRect(fieldFinder).width, closeTo(expanded.width, 0.5));
+
+    // Words alone — the field never focused at all — hold it open too.
+    text.value = const TextEditingValue(text: '');
+    await tester.pumpAndSettle();
+    expect(tester.getRect(fieldFinder).width, closeTo(collapsed.width, 0.5));
+    text.value = const TextEditingValue(text: 'hello cortex');
+    await tester.pumpAndSettle();
+    expect(tester.getRect(fieldFinder).width, closeTo(expanded.width, 0.5));
+    text.value = const TextEditingValue(text: '');
+    await tester.pumpAndSettle();
+
+    // An empty field still expands for a running dictation wave —
+    // bounded pumps, the waveform owns an endless ticker.
+    input.setVoiceRecording(true);
+    await tester.pump(); // mounts the dictation frame; starts forward() post-frame
+    await tester.pump(); // the expand ticker's first frame, still zero elapsed
+    await tester
+        .pump(const Duration(milliseconds: 300)); // carries the morph to its end
+    expect(tester.getRect(fieldFinder).width, closeTo(expanded.width, 0.5));
+
+    // Dictation ends with nothing in the field: back to the resting pill.
+    input.setVoiceRecording(false);
+    await tester.pumpAndSettle();
+    expect(tester.getRect(fieldFinder).width, closeTo(collapsed.width, 0.5));
+    expect(tester.takeException(), isNull);
   });
 }
