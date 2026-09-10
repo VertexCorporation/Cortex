@@ -47,10 +47,10 @@ class AppLocalizationsAz extends AppLocalizations {
   String get theme => 'Mövzu';
 
   @override
-  String get lightTheme => 'Light theme';
+  String get lightTheme => 'Açıq mövzu';
 
   @override
-  String get darkTheme => 'Dark theme';
+  String get darkTheme => 'Tünd mövzu';
 
   @override
   String get no => 'Xeyr';
@@ -174,23 +174,23 @@ class AppLocalizationsAz extends AppLocalizations {
   String get unstarConversation => 'Ulduzdan silin';
 
   @override
-  String get renameConversation => 'Rename Conversation';
+  String get renameConversation => 'Söhbəti Yenidən Adlandır';
 
   @override
-  String get conversationName => 'Conversation name';
+  String get conversationName => 'Söhbət Adı';
 
   @override
-  String get deleteConversation => 'Delete Conversation';
+  String get deleteConversation => 'Söhbəti Sil';
 
   @override
   String get deleteConversationConfirm =>
-      'Are you sure you want to delete this conversation? This action cannot be undone.';
+      'Bu söhbəti silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.';
 
   @override
-  String get archive => 'Archive';
+  String get archive => 'Arxivlə';
 
   @override
-  String get multiSelect => 'Select Multiple';
+  String get multiSelect => 'Çoxlu seçim';
 
   @override
   String get loginToYourAccount => 'Daxil ol';
@@ -1815,63 +1815,64 @@ class AppLocalizationsAz extends AppLocalizations {
       'Real vaxt məlumatı üçün internetdə axtarış aparın';
 
   @override
-  String get ragFeatureTitle => 'Documents';
+  String get ragFeatureTitle => 'Sənədlər';
 
   @override
-  String get ragFeatureDescription => 'Chat about your own documents privately';
+  String get ragFeatureDescription =>
+      'Öz sənədləriniz haqqında məxfi şəkildə söhbət edin';
 
   @override
-  String get ragScreenTitle => 'Document Chat';
+  String get ragScreenTitle => 'Sənəd Söhbəti';
 
   @override
-  String get ragAddDocuments => 'Add documents';
+  String get ragAddDocuments => 'Sənəd əlavə et';
 
   @override
-  String get ragEmptyTitle => 'No documents yet';
+  String get ragEmptyTitle => 'Hələ sənəd yoxdur';
 
   @override
   String get ragEmptyDescription =>
-      'Add PDF, Word, Excel, PowerPoint or text files to chat about them.';
+      'Onlar haqqında söhbət aparmaq üçün PDF, Word, Excel, PowerPoint və ya mətn faylları əlavə edin.';
 
   @override
-  String get ragStatusReady => 'Ready';
+  String get ragStatusReady => 'Hazır';
 
   @override
-  String get ragStatusIndexing => 'Indexing…';
+  String get ragStatusIndexing => 'İndekslənir…';
 
   @override
-  String get ragStatusFailed => 'Failed';
+  String get ragStatusFailed => 'Uğursuz';
 
   @override
   String ragSelected(int count) {
-    return '$count selected';
+    return '$count seçilib';
   }
 
   @override
-  String get ragEnableChat => 'Enable document chat';
+  String get ragEnableChat => 'Sənəd söhbətini aktivləşdir';
 
   @override
-  String get ragDisableChat => 'Disable document chat';
+  String get ragDisableChat => 'Sənəd söhbətini deaktiv et';
 
   @override
   String ragActiveDocs(int count) {
-    return '$count documents';
+    return '$count sənəd';
   }
 
   @override
-  String get ragNoSelectionHint => 'Select documents to chat about';
+  String get ragNoSelectionHint => 'Söhbət üçün sənəd seçin';
 
   @override
-  String get ragDeleteConfirm => 'Delete this document from the library?';
+  String get ragDeleteConfirm => 'Bu sənəd kitabxanadan silinsin?';
 
   @override
-  String get ragFileTooBig => 'This file is larger than 10 MB.';
+  String get ragFileTooBig => 'Bu fayl 10 MB-dan böyükdür.';
 
   @override
-  String get ragUnsupportedType => 'This file type is not supported.';
+  String get ragUnsupportedType => 'Bu fayl növü dəstəklənmir.';
 
   @override
-  String get ragAddedToChat => 'Added to document chat';
+  String get ragAddedToChat => 'Sənəd söhbətinə əlavə edildi';
 
   @override
   String get clearMemory => 'Yaddaşı təmizləyin';
@@ -2059,31 +2060,31 @@ class AppLocalizationsAz extends AppLocalizations {
   String get categoryInanimate => 'Cansız';
 
   @override
-  String get voiceSelection => 'AI Voice';
+  String get voiceSelection => 'Süni İntellekt Səsi';
 
   @override
   String get voiceSelectionDescription =>
-      'Choose the voice Cortex speaks with in voice mode.';
+      'Səsli rejimdə Cortex-in istifadə edəcəyi səsi seçin.';
 
   @override
-  String get voiceDefaultOption => 'Default';
+  String get voiceDefaultOption => 'Standart';
 
   @override
-  String get voicePreview => 'Play sample';
+  String get voicePreview => 'Nümunəni dinlə';
 
   @override
   String get voicePreviewText =>
-      'Hello, I am Cortex. How can I help you today?';
+      'Salam, mən Cortex. Bu gün sizə necə kömək edə bilərəm?';
 
   @override
   String get voicePreviewFailed =>
-      'Could not play the sample. Check your connection or balance.';
+      'Nümunə çalınamadı. Bağlantınızı və ya balansınızı yoxlayın.';
 
   @override
-  String get voiceMale => 'Male voices';
+  String get voiceMale => 'Kişi səsləri';
 
   @override
-  String get voiceFemale => 'Female voices';
+  String get voiceFemale => 'Qadın səsləri';
 
   @override
   String get premiumChatGateTitle => 'Daha çox imkan əldə edin';

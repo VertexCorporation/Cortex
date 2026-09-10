@@ -115,6 +115,40 @@ class CreditsManager {
     return spendable > _creditLimits.debtFloor;
   }
 
+  /// Published default credit charge for a generation operation lane
+  /// ('image' | 'video' | 'music' | 'speech'), from the `operationCosts`
+  /// map Fulcrum publishes inside `creditLimits` (its DEFAULT_CREDIT_CHARGES
+  /// — image 100, video 1000, music 500, speech 100). The client's audio
+  /// generation maps to the server's 'speech' lane (gateway.js routes
+  /// audio_generation → speech). Null when the lane is unknown or the
+  /// user document predates the publication; the server remains the
+  /// enforcement point either way.
+  int? defaultCostFor(String operation) =>
+      _creditLimits.operationCosts[operation];
+
+  /// Whether an [operation] lane can plausibly afford its default charge
+  /// right now. Mirrors the server's charging model: the request must keep
+  /// the balance at or above the debt floor after the lane's published
+  /// default cost. Fail-open by design — without a live balance snapshot or
+  /// a published cost for the lane the answer is yes and the server stays
+  /// the final gate; a blocked band still means no.
+  bool canGenerate(String operation) {
+    if (accessNotifier.value == CreditAccess.blocked) return false;
+    final spendable = spendableNotifier.value;
+    if (spendable == null) return true;
+    final cost = defaultCostFor(operation);
+    if (cost == null) return true;
+    return spendable - cost >= _creditLimits.debtFloor;
+  }
+
+  /// Test seam: injects a limits snapshot without going through
+  /// UserProvider/Firebase. Production code must rely on the user-data
+  /// snapshot only — this is never called by app code.
+  @visibleForTesting
+  void debugSetCreditLimits(CreditLimits limits) {
+    _creditLimits = limits;
+  }
+
   /// The effective subscription tier resolved from the last user-data
   /// snapshot ('free', 'plus', 'pro', 'ultra'). Presentation-only: it feeds
   /// tier-specific copy (credit briefings, send-failure recovery), never

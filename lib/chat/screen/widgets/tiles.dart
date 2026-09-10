@@ -382,11 +382,13 @@ class Tiles {
               borderRadius: BorderRadius.circular(borderRadius),
               onTap: () async {
                 File? viewFile = file;
-                if (isNetworkImage || isDataImage) {
+                final bool madeCopy = isNetworkImage || isDataImage;
+                if (madeCopy) {
                   viewFile = await _saveToTempFile(path);
                 }
                 if (viewFile != null && context.mounted) {
-                  Navigator.push(
+                  bool attached = false;
+                  await Navigator.push(
                     context,
                     PhotoViewer.route(
                       viewFile,
@@ -394,9 +396,20 @@ class Tiles {
                         final inputProvider =
                             Provider.of<InputProvider>(context, listen: false);
                         inputProvider.addAttachment(imageFile, isImage: true);
+                        attached = true;
                       },
                     ),
                   );
+                  // Thumbnail cleanup: temp copies created only for viewing
+                  // are deleted once the viewer closes. Copies handed to the
+                  // composer (attached) stay — they back the preview & send.
+                  if (madeCopy && !attached && context.mounted) {
+                    try {
+                      if (await viewFile.exists()) await viewFile.delete();
+                    } catch (e) {
+                      debugPrint('[Tiles] temp thumbnail cleanup failed: $e');
+                    }
+                  }
                 }
               },
               child: ClipRRect(
@@ -447,16 +460,42 @@ class Tiles {
                           left: 12,
                           child: GestureDetector(
                             onTap: () async {
+                              // Unified preview: the pill opens the same
+                              // PhotoViewer as the tile tap; Edit inside it
+                              // hands the image to the composer. No silent
+                              // attach, no duplicated UX.
                               File? viewFile = file;
                               if (isNetworkImage || isDataImage) {
                                 viewFile = await _saveToTempFile(path);
                               }
                               if (viewFile != null && context.mounted) {
-                                final inputProvider =
-                                    Provider.of<InputProvider>(context,
-                                        listen: false);
-                                inputProvider.addAttachment(viewFile,
-                                    isImage: true);
+                                bool attached = false;
+                                await Navigator.push(
+                                  context,
+                                  PhotoViewer.route(
+                                    viewFile,
+                                    onEditImage: (imageFile) {
+                                      final inputProvider =
+                                          Provider.of<InputProvider>(context,
+                                              listen: false);
+                                      inputProvider.addAttachment(imageFile,
+                                          isImage: true);
+                                      attached = true;
+                                    },
+                                  ),
+                                );
+                                if ((isNetworkImage || isDataImage) &&
+                                    !attached &&
+                                    context.mounted) {
+                                  try {
+                                    if (await viewFile.exists()) {
+                                      await viewFile.delete();
+                                    }
+                                  } catch (e) {
+                                    debugPrint(
+                                        '[Tiles] temp thumbnail cleanup failed: $e');
+                                  }
+                                }
                               }
                             },
                             child: Container(
@@ -466,8 +505,8 @@ class Tiles {
                                 color: Colors.black.withValues(alpha: 0.35),
                                 borderRadius: BorderRadius.circular(24),
                               ),
-                              child: const Text(
-                                "Düzenle",
+                              child: Text(
+                                AppLocalizations.of(context)!.edit,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -488,11 +527,36 @@ class Tiles {
                                 viewFile = await _saveToTempFile(path);
                               }
                               if (viewFile != null && context.mounted) {
-                                Navigator.push(
+                                bool attached = false;
+                                await Navigator.push(
                                   context,
-                                  PhotoViewer.route(viewFile,
-                                      onEditImage: (imageFile) {}),
+                                  PhotoViewer.route(
+                                    viewFile,
+                                    onEditImage: (imageFile) {
+                                      // Edit-from-preview: hand the image to
+                                      // the composer, mirroring the main tap.
+                                      final inputProvider =
+                                          Provider.of<InputProvider>(context,
+                                              listen: false);
+                                      inputProvider.addAttachment(imageFile,
+                                          isImage: true);
+                                      attached = true;
+                                    },
+                                  ),
                                 );
+                                // Same temp-copy cleanup as the main tap.
+                                if ((isNetworkImage || isDataImage) &&
+                                    !attached &&
+                                    context.mounted) {
+                                  try {
+                                    if (await viewFile.exists()) {
+                                      await viewFile.delete();
+                                    }
+                                  } catch (e) {
+                                    debugPrint(
+                                        '[Tiles] temp thumbnail cleanup failed: $e');
+                                  }
+                                }
                               }
                             },
                             child: Container(

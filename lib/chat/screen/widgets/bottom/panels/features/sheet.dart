@@ -17,6 +17,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/server/subscription.dart';
+import 'package:cortex/server/credits.dart';
 import 'package:cortex/funds/funds.dart';
 
 import '../../../../../providers/input.dart';
@@ -97,6 +98,15 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
     final userProvider = context.watch<UserProvider>();
     final sessionProvider = context.watch<ChatSessionProvider>();
     final inputProvider = context.watch<InputProvider>();
+    // Credit band for media-generation gating. Media is refused server-side
+    // while credits are negative (low_only) and nothing is sendable at or
+    // below the floor (blocked), mirroring evaluateCreditPolicy: only the
+    // full band offers the credit-costing generation entries. Watching the
+    // manager rebuilds the sheet when the band flips, so a refill re-enables
+    // the entries without re-presenting the sheet.
+    final creditsManager = context.watch<CreditsManager>();
+    final bool mediaAvailable =
+        creditsManager.accessNotifier.value == CreditAccess.full;
     final currentMode = inputProvider.featureMode;
     final currentModel = sessionProvider.selectedModel;
     final bool isOfflineModelSelected = currentModel?.type == 'offline';
@@ -370,6 +380,19 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       isDisabled: false,
                       onTap: () {
                         Navigator.pop(context);
+                        // Band gate + per-operation affordability gate: the
+                        // server charges each lane its published default
+                        // (operationCosts), so a full band with a balance
+                        // too thin for the lane routes to Funds instead of
+                        // arming a request that would be refused.
+                        if (!mediaAvailable ||
+                            !creditsManager.canGenerate('image')) {
+                          navigateToScreen(
+                            const FundsScreen(),
+                            direction: const Offset(1.0, 0.0),
+                          );
+                          return;
+                        }
                         setGenerationFeatureMode(
                           widget.parentContext,
                           targetType: 'image',
@@ -387,6 +410,18 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       isDisabled: false,
                       onTap: () {
                         Navigator.pop(context);
+                        // Same band gate, plus the per-operation
+                        // affordability gate. The server routes audio
+                        // generation to its 'speech' lane, so the cost check
+                        // uses that lane's published default.
+                        if (!mediaAvailable ||
+                            !creditsManager.canGenerate('speech')) {
+                          navigateToScreen(
+                            const FundsScreen(),
+                            direction: const Offset(1.0, 0.0),
+                          );
+                          return;
+                        }
                         setGenerationFeatureMode(
                           widget.parentContext,
                           targetType: 'audio',
@@ -411,6 +446,18 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                           isDisabled: false,
                           onTap: () {
                             Navigator.pop(context);
+                            // Same band gate, plus the per-operation
+                            // affordability gate: video's published default
+                            // (1000 credits) can exceed a thin full-band
+                            // balance, which would be refused server-side.
+                            if (!mediaAvailable ||
+                                !creditsManager.canGenerate('video')) {
+                              navigateToScreen(
+                                const FundsScreen(),
+                                direction: const Offset(1.0, 0.0),
+                              );
+                              return;
+                            }
                             if (isUltra) {
                               setGenerationFeatureMode(
                                 widget.parentContext,

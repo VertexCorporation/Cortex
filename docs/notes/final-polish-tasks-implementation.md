@@ -1,12 +1,15 @@
 # Final Polish Tasks — Implementation Notes
 
 Grounded reconnaissance for the 7 final-polish tasks of the credit-engine rollout.
-Every claim below was verified against the working tree before editing (see file/line refs).
+Every claim below was verified against the working tree before editing (file/line refs).
+Status after implementation: **all 7 tasks implemented** (task 2 folded into the send
+pipeline; task 6 unified with the tile-tap preview UX).
 
-## Task 1 — Credit gating of generation features
+## Task 1 — Credit gating of generation features (IMPLEMENTED)
 
 **Surface (confirmed wider than the feature sheet alone):**
-- `lib/chat/features/features/sheet.dart` (445 lines) — the feature sheet.
+- `lib/chat/screen/widgets/bottom/panels/features/sheet.dart` (445 lines) — the
+  feature sheet (path corrected: never `lib/chat/features/features/sheet.dart`).
 - `lib/chat/screen/widgets/bottom/panels/briefing.dart` — reactive credit-warning surface
   (`_resolveBriefing` L228–290, exhausted/declining copy L292–330).
 - `lib/chat/screen/appbar/appbar.dart` — appbar credits area (L150–245).
@@ -62,20 +65,28 @@ deterministic client state:
 **Invariants:** non-recursive (string composition only), non-retrying (no resend, no
 Dynamic rewrite), deterministic (pure selection, explicit fallbacks).
 
-## Task 3 — Rename restyle
+## Task 3 — Rename restyle (IMPLEMENTED)
 
-Swap the ad-hoc rename dialog in `lib/chat/axon/inbox/tile/view.dart` for the shared
-`showEditTitleDialog`. Verify the call site and the shared dialog signature before editing.
+`lib/axon/inbox/tile/view.dart` `_showRenameDialog` now calls the shared
+`showEditTitleDialog({context, initialTitle})` (panel/actions/edit.dart);
+`ConversationRenameDialog` remains only for the direct regression test.
 
-## Task 4 — Greeting shimmer removal
+## Task 4 — Greeting shimmer removal (IMPLEMENTED)
 
-Pinned site: `lib/chat/screen/default/view.dart` ~L1176–1248 (shimmer block for the
-dynamic-chat greeting). Remove the shimmer, keep the greeting rendered directly.
+Pinned site: `lib/chat/screen/default/view.dart` — the greeting-title ShaderMask
+gradient was replaced with a plain `Text` filled with `contentColor`.
 
-## Tasks 5–7
+## Tasks 5–7 (IMPLEMENTED — re-grounded against the working tree)
 
-Per prior plan (unified preview UI, Edit-from-preview, attachment thumbnail cleanup) —
-re-confirm exact scope against the working tree when reached; not grounded in this pass.
+- **5. Unified preview UI:** `lib/chat/screen/widgets/tiles.dart` — the inline
+  "Edit" pill (hardcoded Turkish label) no longer attaches silently; it opens
+  the same `PhotoViewer` as the tile tap. Label localized via `l10n.edit`.
+- **6. Edit-from-preview → composer:** the share-overlay's `PhotoViewer` route
+  carried a dead `onEditImage: (imageFile) {}` callback — wired to
+  `InputProvider.addAttachment(file, isImage: true)`, mirroring the tile tap.
+- **7. Attachment thumbnail cleanup:** `_saveToTempFile` copies (network/data
+  images) leaked per preview. All three open paths now delete the temp copy
+  when the viewer closes unless the copy was attached to the composer.
 
 ## Verification
 

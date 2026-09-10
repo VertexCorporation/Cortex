@@ -4,7 +4,6 @@
 //
 // - Cortex: wraps [MaterialApp] with theming, localization, and navigator key.
 // - InvertedColor: small color utility variant used across the app.
-// - kUnsupportedMaterialLocales: locales with incomplete Material translations.
 
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -182,15 +181,6 @@ class Cortex extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          localeResolutionCallback:
-              (Locale? locale, Iterable<Locale> supportedLocales) {
-            final Locale chosenLocale = localeProvider.locale;
-            if (kUnsupportedMaterialLocales
-                .contains(chosenLocale.languageCode)) {
-              return const Locale('en');
-            }
-            return chosenLocale;
-          },
           home: startupScreen,
         );
       },
@@ -212,5 +202,3 @@ extension InvertedColor on Color {
   }
 }
 
-// List of locales with incomplete Material translations.
-const List<String> kUnsupportedMaterialLocales = <String>['az'];

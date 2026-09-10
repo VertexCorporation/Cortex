@@ -18,6 +18,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/select.dart';
 import 'package:cortex/chat/services/generation.dart';
 import 'package:cortex/main.dart';
+import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/navigation.dart';
@@ -483,6 +484,28 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
             direction: const Offset(1.0, 0.0));
         return;
       }
+    }
+
+    // Credit band gate (all target types): media is refused server-side
+    // while credits are negative and nothing is sendable at or below the
+    // floor, mirroring evaluateCreditPolicy. Only the full band arms a
+    // generation intent; otherwise the greeting cards route to Funds so the
+    // user can top up instead of arming a request that cannot go out.
+    final credits = context.read<CreditsManager>();
+    if (credits.accessNotifier.value != CreditAccess.full) {
+      navigateToScreen(const FundsScreen(), direction: const Offset(1.0, 0.0));
+      return;
+    }
+
+    // Per-operation affordability gate: even the full band can be too thin
+    // for a lane's published default charge (operationCosts — e.g. video's
+    // 1000-credit default against a small balance). Mirrors the
+    // FeatureSheet gate; the server routes audio generation to its
+    // 'speech' lane. Fail-open inside canGenerate keeps pre-publication
+    // user documents working — the server stays the final gate.
+    if (!credits.canGenerate(targetType == 'audio' ? 'speech' : targetType)) {
+      navigateToScreen(const FundsScreen(), direction: const Offset(1.0, 0.0));
+      return;
     }
 
     // Activates the matching input feature (like a Features sheet selection)
@@ -1187,40 +1210,23 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: [
-                                                    ShaderMask(
-                                                      shaderCallback:
-                                                          (bounds) =>
-                                                              LinearGradient(
-                                                        colors: [
-                                                          contentColor
-                                                              .withValues(
-                                                                  alpha: 0.55),
-                                                          contentColor,
-                                                          contentColor
-                                                              .withValues(
-                                                                  alpha: 0.55),
-                                                        ],
-                                                        stops: const [
-                                                          0.0,
-                                                          0.5,
-                                                          1.0
-                                                        ],
-                                                      ).createShader(bounds),
-                                                      blendMode:
-                                                          BlendMode.srcIn,
-                                                      child: Text(
-                                                        _getGreetingText(
-                                                            context, username),
-                                                        style: TextStyle(
-                                                          fontSize: titleSize,
-                                                          letterSpacing: 0.5,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
+                                                    // Title (Standard) —
+                                                    // plain fill; the old
+                                                    // ShaderMask "shimmer"
+                                                    // gradient was removed
+                                                    // per final-polish spec.
+                                                    Text(
+                                                      _getGreetingText(
+                                                          context, username),
+                                                      style: TextStyle(
+                                                        fontSize: titleSize,
+                                                        letterSpacing: 0.5,
+                                                        color: contentColor,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
+                                                      textAlign:
+                                                          TextAlign.center,
                                                     ),
                                                     SizedBox(
                                                         height:

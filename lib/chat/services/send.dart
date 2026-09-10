@@ -314,6 +314,13 @@ class SendService {
     String? targetModelIdForSend;
     bool targetIsServerSide = false;
 
+    // Generation lane ('image' | 'video' | 'audio') and conversation
+    // language, hoisted for the same reason: the catch reads them as the
+    // credit-recovery context when Fulcrum refuses the request with a
+    // insufficient-credit typed error.
+    String? generationTarget;
+    String? langCode;
+
     // Server-side title sync
     String? newConvIdForTitle;
     String? defaultTitleForServer;
@@ -365,7 +372,9 @@ class SendService {
       // the text on the client. Only a generation key is sent to the server,
       // which routes directly to the matching model group and prepends the
       // canonical prefix itself (see Fulcrum's gateway/router).
-      final String? generationTarget = switch (activeMode) {
+      // Hoisted above the try (see the target state block) so the catch can
+      // tell which operation the refused request was attempting.
+      generationTarget = switch (activeMode) {
         ChatInputMode.imageGeneration => 'image',
         ChatInputMode.videoGeneration => 'video',
         ChatInputMode.audioGeneration => 'audio',
@@ -379,7 +388,10 @@ class SendService {
       String errorMessage = localizations.errorNoModelsAvailable;
 
       final localState = context.read<ModelLocalStateProvider>();
-      final langCode = Localizations.localeOf(context).languageCode;
+      // Hoisted like generationTarget: the credit-recovery prompt needs the
+      // conversation's language when the lightweight model composes the
+      // natural refusal acknowledgment.
+      langCode = Localizations.localeOf(context).languageCode;
       // Read before the await below; the context must not be touched across it.
       final creditsManager = context.read<CreditsManager>();
       final hasInternet = await InternetConnection().hasInternetAccess;
@@ -1033,7 +1045,14 @@ class SendService {
       // CRITICAL: Only show error in UI if the user is still on this chat.
       // Otherwise the error message would corrupt a completely different chat!
       if (targetConvId == null || _isConversationActive(targetConvId)) {
-        _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
+        _handleSendError(
+          e,
+          isRegenerate,
+          regenerateAiIndex,
+          localizations,
+          generationTarget: generationTarget,
+          langCode: langCode,
+        );
       } else {
         if (targetAiMessageIndex != null) {
           await _persistBackgroundError(
@@ -1765,32 +1784,48 @@ class SendService {
     AppLocalizations localizations, {
     String? failedUserText,
     List<String>? failedAttachmentPaths,
+    String? generationTarget,
+    String? langCode,
   }) {
     String errorMessage =
         error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError = error is ApiException &&
         error.message == localizations.errorPromptFlagged;
 
-    // Credit-limit conversational recovery: a typed server refusal is answered
-    // with the same canonical credit copy the briefing overlay uses (what
-    // happened, when it renews, what to do) instead of the generic limit
-    // line. Pure string composition — nothing re-enters the send flow, so
-    // this can never recurse or retry. When the client credit state is too
-    // thin to be deterministic the original message is kept as-is.
+    // Credit-limit conversational recovery: a typed server refusal is
+    // answered with ONE natural assistant message instead of an error
+    // bubble. The bubble starts as the same canonical credit copy the
+    // briefing overlay uses (what happened, when it renews, what to do) and
+    // is refined in place by a lightweight-model reply composed from
+    // structured facts only — see `_recoverCreditRefusal`. When the client
+    // credit state is too thin to be deterministic, or the refusal came from
+    // a regenerate turn, the error styling with the canonical copy is kept.
     if (error is ApiException) {
       final credits = CreditsManager.instance;
-      errorMessage = creditRefusalRecoveryMessage(
-            code: error.code,
-            spendable: credits.spendableNotifier.value,
-            debtFloor: credits.debtFloor,
-            access: credits.accessNotifier.value,
-            tier: credits.subscriptionTier,
-            renewalRemaining: credits.nextDailyRenewal().difference(
-                  DateTime.now(),
-                ),
-            localizations: localizations,
-          ) ??
-          errorMessage;
+      final String? deterministicCopy = creditRefusalRecoveryMessage(
+        code: error.code,
+        spendable: credits.spendableNotifier.value,
+        debtFloor: credits.debtFloor,
+        access: credits.accessNotifier.value,
+        tier: credits.subscriptionTier,
+        renewalRemaining: credits.nextDailyRenewal().difference(
+              DateTime.now(),
+            ),
+        localizations: localizations,
+      );
+      if (deterministicCopy != null && !isRegenerate) {
+        _recoverCreditRefusal(
+          code: error.code ?? 'INSUFFICIENT_CREDITS',
+          deterministicCopy: deterministicCopy,
+          failedUserText: failedUserText ?? '',
+          failedAttachmentPaths:
+              failedAttachmentPaths ?? const <String>[],
+          generationTarget: generationTarget,
+          langCode: langCode,
+        );
+        return;
+      }
+      errorMessage = deterministicCopy ?? errorMessage;
     }
 
     if (isRegenerate && regenerateAiIndex != null) {
@@ -1813,6 +1848,80 @@ class SendService {
         errorMessage,
         isContentFlagError,
       );
+    }
+  }
+
+  /// One recovery in flight at a time, plus a dedupe key so the same refusal
+  /// surfacing twice within a few seconds (double dispatch, send + regenerate
+  /// overlap) inserts exactly one recovery pair.
+  static bool _recoveryInFlight = false;
+  static String? _lastRecoveryKey;
+  static DateTime _lastRecoveryAt = DateTime.fromMillisecondsSinceEpoch(0);
+
+  /// Credit-limit recovery for a recognized, typed server refusal.
+  ///
+  /// Shows the deterministic canonical copy as ONE in-context assistant
+  /// message immediately (so feedback never waits on the network), then
+  /// refines that same bubble in place with a natural reply composed by the
+  /// backend's lightweight model from STRUCTURED FACTS ONLY — no invented
+  /// prices, renewal dates, or policy, and never an answer to the original
+  /// request.
+  ///
+  /// Safety properties: the model call goes straight to the fast endpoint
+  /// (never through the send flow, so it cannot re-enter this code path and
+  /// cannot recurse); it is one-shot — any failure keeps the deterministic
+  /// copy with no retry and no resend of the original request; the in-flight
+  /// flag and dedupe key collapse duplicate refusals into one message.
+  Future<void> _recoverCreditRefusal({
+    required String code,
+    required String deterministicCopy,
+    required String failedUserText,
+    required List<String> failedAttachmentPaths,
+    required String? generationTarget,
+    required String? langCode,
+  }) async {
+    final credits = CreditsManager.instance;
+
+    final dedupeKey = '$code|${credits.spendableNotifier.value}';
+    final now = DateTime.now();
+    if (_recoveryInFlight) return;
+    if (_lastRecoveryKey == dedupeKey &&
+        now.difference(_lastRecoveryAt) < const Duration(seconds: 3)) {
+      return;
+    }
+    _recoveryInFlight = true;
+    _lastRecoveryKey = dedupeKey;
+    _lastRecoveryAt = now;
+
+    try {
+      final aiIndex = _conversationProvider.showCreditRecovery(
+        Message(
+          text: failedUserText,
+          isUserMessage: true,
+          attachmentPaths: failedAttachmentPaths,
+        ),
+        deterministicCopy,
+      );
+      if (aiIndex == null) return;
+
+      final naturalReply = await _apiService.getCreditRecoveryMessage(
+        failedUserText: failedUserText,
+        operation: generationTarget ?? 'text',
+        code: code,
+        spendable: credits.spendableNotifier.value ?? 0,
+        debtFloor: credits.debtFloor,
+        access: credits.accessNotifier.value,
+        tier: credits.subscriptionTier,
+        renewalRemaining: credits.nextDailyRenewal().difference(
+              DateTime.now(),
+            ),
+        langCode: langCode ?? 'en',
+      );
+      if (naturalReply == null || naturalReply.isEmpty) return;
+
+      _conversationProvider.updateCreditRecoveryText(aiIndex, naturalReply);
+    } finally {
+      _recoveryInFlight = false;
     }
   }
 
