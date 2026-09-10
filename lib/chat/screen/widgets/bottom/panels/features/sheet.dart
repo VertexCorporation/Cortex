@@ -1,4 +1,4 @@
-// lib/chat/screen/widgets/bottom/features/sheet.dart
+// lib/chat/screen/widgets/bottom/panels/features/sheet.dart
 
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -11,6 +11,7 @@ import 'package:cortex/main.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/rag/screens/documents.dart';
 import 'package:cortex/theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -71,6 +72,13 @@ class _FeaturesSheetContent extends StatefulWidget {
 class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
   final ScrollController _scrollController = ScrollController();
 
+  /// Camera availability is probed ONCE per sheet presentation. Creating the
+  /// future inline in build() re-probes the camera subsystem on every
+  /// rebuild (locale change, provider updates), which can flip the
+  /// attachments row back to the shimmer state mid-interaction.
+  late final Future<List<CameraDescription>> _camerasFuture =
+      availableCameras();
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -130,12 +138,23 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     bottom: MediaQuery.of(context).padding.bottom + 16.0),
                 child: Column(
                   children: [
-                    // --- ATTACHMENTS SECTION (Camera, Gallery, File) ---
+                    // --- ATTACHMENTS SECTION (File, Camera, Gallery) ---
                     FutureBuilder<List<CameraDescription>>(
-                      future: availableCameras(),
+                      future: _camerasFuture,
                       builder: (futureContext, snapshot) {
-                        final bool hasCamera =
-                            snapshot.hasData && snapshot.data!.isNotEmpty;
+                        // Show the Camera action on mobile even when the
+                        // camera probe fails or is still inconclusive: the
+                        // picker surfaces the real device state when tapped.
+                        // Previously a failed/empty availableCameras() probe
+                        // silently removed Camera from the sheet — the
+                        // reported "Camera exists in code but is not visible
+                        // in the actual + sheet" bug. Only a successful empty
+                        // probe (web/desktop) hides the entry.
+                        final bool hasCamera = kIsWeb
+                            ? (snapshot.hasData &&
+                                snapshot.data!.isNotEmpty)
+                            : !snapshot.hasData ||
+                                snapshot.data!.isNotEmpty;
                         final bool canHandleImages =
                             sessionProvider.isDynamicChat
                                 ? true
@@ -186,8 +205,27 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // 1. File — always available
+                              Expanded(
+                                child: AttachmentSheetButton(
+                                  iconPath: 'assets/icons/attachment.svg',
+                                  label: l10n.actionFile,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    inputService.pickFile(
+                                      context,
+                                      canHandleAudio: canHandleAudio,
+                                      canHandleVideo: canHandleVideo,
+                                    );
+                                  },
+                                ),
+                              ),
+                              // 2. Camera (Conditional) — sits between File
+                              //    and Gallery, wired to the same normal
+                              //    attachment pipeline as the Gallery picker.
                               if (hasCamera &&
                                   (canHandleImages || canHandleVideo)) ...[
+                                SizedBox(width: itemGap),
                                 Expanded(
                                   child: AttachmentSheetButton(
                                     iconPath: 'assets/icons/camera.svg',
@@ -204,9 +242,10 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                                     },
                                   ),
                                 ),
-                                SizedBox(width: itemGap),
                               ],
+                              // 3. Gallery (Conditional)
                               if (canHandleImages || canHandleVideo) ...[
+                                SizedBox(width: itemGap),
                                 Expanded(
                                   child: AttachmentSheetButton(
                                     iconPath: 'assets/icons/gallery.svg',
@@ -223,22 +262,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                                     },
                                   ),
                                 ),
-                                SizedBox(width: itemGap),
                               ],
-                              Expanded(
-                                child: AttachmentSheetButton(
-                                  iconPath: 'assets/icons/attachment.svg',
-                                  label: l10n.actionFile,
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    inputService.pickFile(
-                                      context,
-                                      canHandleAudio: canHandleAudio,
-                                      canHandleVideo: canHandleVideo,
-                                    );
-                                  },
-                                ),
-                              ),
                             ],
                           ),
                         );

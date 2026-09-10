@@ -69,22 +69,52 @@ class MediaSaver {
     }
 
     if (url.startsWith('http://') || url.startsWith('https://')) {
-      try {
-        final request = await HttpClient().getUrl(Uri.parse(url));
-        final response = await request.close();
-        if (response.statusCode < 200 || response.statusCode >= 300) {
-          throw HttpException(
-            'Unexpected HTTP status: ${response.statusCode}',
-            uri: Uri.parse(url),
-          );
+      // The remote URL is typically a short-lived signed CDN URL. The bytes
+      // MUST land in app-local storage now, or the media is effectively lost
+      // after this session: Arts explicitly skips http(s) paths and the URL
+      // will expire. Retry with timeouts so transient network hiccups don't
+      // silently degrade to the non-durable URL fallback — that fallback is
+      // the primary cause of "generated media disappears after app restart".
+      Object? lastError;
+      for (var attempt = 1; attempt <= 3; attempt++) {
+        HttpClient? client;
+        try {
+          client = HttpClient()
+            ..connectionTimeout = const Duration(seconds: 15);
+          final request = await client.getUrl(Uri.parse(url));
+          request.followRedirects = true;
+          request.maxRedirects = 5;
+          final response =
+              await request.close().timeout(const Duration(seconds: 60));
+          if (response.statusCode < 200 || response.statusCode >= 300) {
+            throw HttpException(
+              'Unexpected HTTP status: ${response.statusCode}',
+              uri: Uri.parse(url),
+            );
+          }
+          final bytes = await consolidateHttpClientResponseBytes(response)
+              .timeout(const Duration(seconds: 120));
+          await File(localPath).writeAsBytes(bytes);
+          debugPrint('[MediaSaver] Persisted generated media locally: '
+              '${localPath.split('/').last} (${bytes.length} bytes, '
+              'attempt $attempt).');
+          return localPath;
+        } catch (e) {
+          lastError = e;
+          debugPrint(
+              '[MediaSaver] Media download attempt $attempt failed: $e');
+          if (attempt < 3) {
+            await Future.delayed(Duration(milliseconds: 400 * attempt));
+          }
+        } finally {
+          client?.close();
         }
-        final bytes = await consolidateHttpClientResponseBytes(response);
-        await File(localPath).writeAsBytes(bytes);
-        return localPath;
-      } catch (e) {
-        debugPrint("Media download failed. Falling back to remote URL: $e");
-        return url;
       }
+      debugPrint(
+          'Media download failed after 3 attempts. Falling back to remote '
+          'URL (NON-DURABLE — this item will not survive app restart): '
+          '$lastError');
+      return url;
     }
 
     return url;
