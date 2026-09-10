@@ -77,6 +77,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get messageHint => 'Herhangi bir şey sor';
 
   @override
+  String get messageHintShort => 'Sor';
+
+  @override
   String get messageCopied => 'Mesaj panoya kopyalandı.';
 
   @override

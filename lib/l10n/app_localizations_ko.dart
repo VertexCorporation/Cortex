@@ -77,6 +77,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get messageHint => '무엇이든 물어보세요';
 
   @override
+  String get messageHintShort => '물어보세요';
+
+  @override
   String get messageCopied => '메시지가 클립보드에 복사되었습니다.';
 
   @override

@@ -77,6 +77,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get messageHint => '何でも聞いてください';
 
   @override
+  String get messageHintShort => '聞いてください';
+
+  @override
   String get messageCopied => 'メッセージをクリップボードにコピーしました。';
 
   @override

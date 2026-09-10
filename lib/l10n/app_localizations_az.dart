@@ -77,6 +77,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get messageHint => 'Hər şeyi soruş';
 
   @override
+  String get messageHintShort => 'Soruş';
+
+  @override
   String get messageCopied => 'Mesaj mübadilə buferinə kopyalandı.';
 
   @override

@@ -77,6 +77,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get messageHint => 'Zeptejte se na cokoli';
 
   @override
+  String get messageHintShort => 'Zeptejte se';
+
+  @override
   String get messageCopied => 'Zpráva zkopírována do schránky.';
 
   @override

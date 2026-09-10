@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'Ask anything'**
   String get messageHint;
 
+  /// No description provided for @messageHintShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get messageHintShort;
+
   /// No description provided for @messageCopied.
   ///
   /// In en, this message translates to:

@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "消息已复制到剪贴板。",
   "messageHint": "随便问点什么",
+  "messageHintShort": "问",
   "modality": "模态",
   "modelCreatedSuccess": "模型创建成功！",
   "modelDescription": "{description}",

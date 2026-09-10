@@ -53,21 +53,12 @@ class _ChatInputPanelState extends State<ChatInputPanel>
   final GlobalKey<InputFieldState> _inputFieldKey =
       GlobalKey<InputFieldState>();
 
-  // Animation for warning fade inside InputField
-  late AnimationController _warningController;
-  late Animation<double> _warningFadeAnimation;
-
   // PERFORMANCE: Cache the CurvedAnimation instead of recreating in build()
   late final Animation<double> _editPanelSizeFactor;
 
   @override
   void initState() {
     super.initState();
-    _warningController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
-    _warningFadeAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_warningController);
-
     _editPanelSizeFactor = CurvedAnimation(
       parent: widget.editPanelController,
       curve: Curves.easeOut,
@@ -103,7 +94,6 @@ class _ChatInputPanelState extends State<ChatInputPanel>
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
-    _warningController.dispose();
     super.dispose();
   }
 
@@ -251,7 +241,6 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                         key: _inputFieldKey,
                         localizations: localizations,
                         isDynamicChatMode: isDynamicChat,
-                        isModelSelected: true,
                         isLimitExceeded: isLimitExceeded,
                         isPhotoLoading: isAttachmentLoading,
                         isSending: isWaitingForResponse,
@@ -279,8 +268,6 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                         totalCredits: totalCredits,
                         controller: _textController,
                         textFieldFocusNode: _focusNode,
-                        slideAnimation: widget.slideAnimation,
-                        fadeAnimation: _warningFadeAnimation,
 
                         // --- Actions ---
                         onSend: () async => _handleSend(

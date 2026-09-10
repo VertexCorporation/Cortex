@@ -77,6 +77,9 @@ class AppLocalizationsNo extends AppLocalizations {
   String get messageHint => 'Spør hva som helst';
 
   @override
+  String get messageHintShort => 'Spør';
+
+  @override
   String get messageCopied => 'Meldingen er kopiert til utklippstavlen.';
 
   @override

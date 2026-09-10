@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "Message copié dans le presse-papiers.",
   "messageHint": "Demandez n'importe quoi",
+  "messageHintShort": "Demandez",
   "modality": "Modalité",
   "modelCreatedSuccess": "Modèle créé avec succès !",
   "modelDescription": "{description}",

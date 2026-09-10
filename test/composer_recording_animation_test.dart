@@ -67,8 +67,10 @@ Future<void> _pumpComposer(
   bool isLimitExceeded = true,
   bool isLocalModelLoaded = false,
   Future<void> Function()? onSend,
+  AppLocalizations? localizations,
 }) async {
-  final loc = await AppLocalizations.delegate.load(const Locale('en'));
+  final loc =
+      localizations ?? await AppLocalizations.delegate.load(const Locale('en'));
   await tester.pumpWidget(MultiProvider(
     providers: [
       ChangeNotifierProvider<InputProvider>.value(value: input),
@@ -87,7 +89,6 @@ Future<void> _pumpComposer(
           alignment: Alignment.bottomCenter,
           child: InputField(
             localizations: loc,
-            isModelSelected: true,
             isDynamicChatMode: false,
             isLimitExceeded: isLimitExceeded,
             controller: text,
@@ -95,8 +96,6 @@ Future<void> _pumpComposer(
             onSend: onSend ?? () async {},
             onApplyEditedMessage: () async {},
             isPhotoLoading: false,
-            slideAnimation: const AlwaysStoppedAnimation(Offset.zero),
-            fadeAnimation: const AlwaysStoppedAnimation(1),
             isSending: false,
             isPremiumModel: false,
             isSubscribed: false,
@@ -442,6 +441,7 @@ void main() {
 
   testWidgets('hint sits with equal padding above and below the text',
       (tester) async {
+    final loc = await AppLocalizations.delegate.load(const Locale('en'));
     for (final width in [320.0, 390.0, 800.0]) {
       tester.view.physicalSize = Size(width, 1000);
       tester.view.devicePixelRatio = 1;
@@ -454,25 +454,27 @@ void main() {
       await _pumpComposer(tester, input: input, text: text, focus: focus);
       await tester.pumpAndSettle();
 
-      void expectEqualPadding() {
+      void expectEqualPadding(String hintLabel) {
         final fieldRect = tester.getRect(find.byType(TextField));
-        final hintRect =
-            tester.getRect(find.byKey(const ValueKey('hint_overlay')));
+        // The decorator's own hint, sharing the field's exact style and
+        // slot — vertically centered by construction, not by an overlay.
+        final hintRect = tester.getRect(find.text(hintLabel));
         final topGap = hintRect.top - fieldRect.top;
         final bottomGap = fieldRect.bottom - hintRect.bottom;
         // The decorator's symmetric content padding still applies...
         expect(topGap, greaterThanOrEqualTo(7.5));
-        // ...and the overlay centers the hint, so the two gaps match.
+        // ...and the shared line metrics center the hint, so the gaps match.
         expect((topGap - bottomGap).abs(), lessThan(0.5));
       }
 
-      // Collapsed capsule.
-      expectEqualPadding();
+      // Collapsed capsule — the short semantic label.
+      expectEqualPadding(loc.messageHintShort);
 
-      // Expanded capsule — the field box changes width, not balance.
+      // Expanded capsule — the full label; the field box changes width,
+      // not balance.
       focus.requestFocus();
       await tester.pumpAndSettle();
-      expectEqualPadding();
+      expectEqualPadding(loc.messageHint);
 
       focus.unfocus();
       await tester.pumpAndSettle();
@@ -519,59 +521,328 @@ void main() {
     semantics.dispose();
   });
 
-  testWidgets('PROBE caret hint geometry', (tester) async {
+  testWidgets('caret, hint and typed text share one layout geometry',
+      (tester) async {
+    final loc = await AppLocalizations.delegate.load(const Locale('en'));
     for (final width in [320.0, 390.0, 800.0]) {
       tester.view.physicalSize = Size(width, 1000);
       tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
       final input = InputProvider();
       final text = TextEditingController();
       final focus = FocusNode();
       addTearDown(input.dispose);
       addTearDown(text.dispose);
       addTearDown(focus.dispose);
-      final loc = await AppLocalizations.delegate.load(const Locale('en'));
       await _pumpComposer(tester, input: input, text: text, focus: focus);
-      await tester.pumpAndSettle();
-
-      final hintCollapsed =
-          tester.getRect(find.byKey(const ValueKey('hint_overlay')));
-
       focus.requestFocus();
       await tester.pumpAndSettle();
 
+      // The field's responsive font size — the same formula the composer
+      // uses.
+      final base = width.clamp(0.0, 800.0);
+      final double fontSize = base >= 600 ? base * 0.025 : base * 0.04;
+
+      // The hint is the decorator's own — laid out in the editor's slot
+      // with the field's exact style — and the caret is a dynamic fraction
+      // of the same responsive font size: one geometry for hint, caret and
+      // typed text at every screen width.
+      final hint = tester.getRect(find.text(loc.messageHint));
       final editState =
           tester.state<EditableTextState>(find.byType(EditableText));
       final renderEditable = editState.renderEditable;
       final caretLocal =
           renderEditable.getLocalRectForCaret(const TextPosition(offset: 0));
-      final caretGlobal = Rect.fromPoints(
+      final caret = Rect.fromPoints(
         renderEditable.localToGlobal(caretLocal.topLeft),
         renderEditable.localToGlobal(caretLocal.bottomRight),
       );
-      final editorOrigin = renderEditable.localToGlobal(Offset.zero);
-      final hintExpanded =
-          tester.getRect(find.byKey(const ValueKey('hint_overlay')));
-      final fieldRect = tester.getRect(find.byType(TextField));
-      final base = width.clamp(0.0, 600.0);
-      final fontSize = base >= 600 ? base * 0.025 : base * 0.04;
-      final tp = TextPainter(
-        text: TextSpan(
-            text: loc.messageHint, style: TextStyle(fontSize: fontSize)),
-        textDirection: TextDirection.ltr,
-      )..layout();
 
+      // Same origin: the caret sits immediately before the first glyph,
+      // with no gap and no drift off the hint's line.
+      expect((caret.left - hint.left).abs(), lessThan(1.0));
+      expect((caret.top - hint.top).abs(), lessThan(2.0));
+      // Shared line metrics: the caret and the hint run in one line box.
+      expect((caret.height - hint.height).abs(), lessThan(2.0));
+      // The stroke is a fraction of the responsive font size — never a
+      // fixed fat bar — so at every screen width the bar stays a hairline.
+      expect(caret.width, moreOrLessEquals(fontSize * 0.04, epsilon: 0.05));
+      // Its reach past the hint's origin stays within a fraction of the
+      // same responsive font size (the old fixed 2px bar reached 0.13em).
+      expect(caret.right - hint.left, lessThan(fontSize * 0.07));
+
+      // Typing lands at the exact insertion origin the hint occupies.
       text.value = const TextEditingValue(text: 'X');
       await tester.pumpAndSettle();
-      final typedRect = tester.getRect(find.text('X'));
-
-      debugPrint('PROBE w=$width fontSize=$fontSize natural=${tp.width.toStringAsFixed(1)} '
-          'hintCollapsed=$hintCollapsed hintExpanded=$hintExpanded '
-          'scale=${(hintExpanded.width / tp.width).toStringAsFixed(3)} '
-          'caret=$caretGlobal editorOrigin=$editorOrigin field=$fieldRect typedX=$typedRect');
+      final typed = tester.getRect(find.text('X'));
+      expect((typed.left - hint.left).abs(), lessThan(1.0));
 
       await tester.pumpWidget(const SizedBox());
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     }
+  });
+
+  testWidgets('fresh load shows the collapsed composer with every control',
+      (tester) async {
+    for (final width in [320.0, 390.0, 800.0]) {
+      tester.view.physicalSize = Size(width, 1000);
+      tester.view.devicePixelRatio = 1;
+      final input = InputProvider();
+      final text = TextEditingController();
+      final focus = FocusNode();
+      addTearDown(input.dispose);
+      addTearDown(text.dispose);
+      addTearDown(focus.dispose);
+      // No focus, no feature mode, no taps — the state a cold app load
+      // produces. The composer lands on stage in its collapsed capsule on
+      // the very first frame: no third "absent" state, no entrance
+      // animation to wait for.
+      await _pumpComposer(tester, input: input, text: text, focus: focus);
+      await tester.pumpAndSettle();
+
+      // Findable (so not offstage anywhere) with real geometry, and every
+      // control of the collapsed pill is hit-testable.
+      final fieldFinder = find.byKey(const ValueKey('chat_input_field'));
+      expect(fieldFinder, findsOneWidget);
+      final collapsed = tester.getRect(fieldFinder);
+      expect(collapsed.width, greaterThan(0));
+      expect(find.byType(AddPhotoButton).hitTestable(), findsOneWidget);
+      expect(find.byType(MicButton).hitTestable(), findsOneWidget);
+      expect(
+          find
+              .byWidgetPredicate((w) =>
+                  w.key is ValueKey<String> &&
+                  const ['send', 'send_disabled', 'voice_chat', 'stop']
+                      .contains((w.key as ValueKey<String>).value))
+              .hitTestable()
+              .evaluate(),
+          isNotEmpty);
+
+      // Focus expands the capsule — the one other state — and unfocusing
+      // returns to the same collapsed geometry.
+      focus.requestFocus();
+      await tester.pumpAndSettle();
+      expect(tester.getRect(fieldFinder).width, greaterThan(collapsed.width));
+
+      focus.unfocus();
+      await tester.pumpAndSettle();
+      expect(tester.getRect(fieldFinder).width,
+          moreOrLessEquals(collapsed.width, epsilon: 0.5));
+
+      // A selected feature mode expands the capsule too, and clearing it
+      // collapses back — the two-state machine holds from every entry.
+      input.setFeatureMode(ChatInputMode.study);
+      await tester.pumpAndSettle();
+      expect(tester.getRect(fieldFinder).width, greaterThan(collapsed.width));
+      input.clearFeatureMode();
+      await tester.pumpAndSettle();
+      expect(tester.getRect(fieldFinder).width,
+          moreOrLessEquals(collapsed.width, epsilon: 0.5));
+
+      await tester.pumpWidget(const SizedBox());
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    }
+  });
+
+  testWidgets('provider churn never leaves the composer absent',
+      (tester) async {
+    const width = 390.0;
+    tester.view.physicalSize = const Size(width, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+    final field = find.byKey(const ValueKey('chat_input_field'));
+
+    // Dictation churn: the live waveform animates endlessly by design, so
+    // sample fixed frames while it runs instead of settling. Mid-morph and
+    // settled, the composer stays on stage; no state exists in which it
+    // disappears.
+    input.setVoiceRecording(true);
+    await tester.pump();
+    expect(tester.getRect(field).width, greaterThan(0));
+    await tester.pump(const Duration(milliseconds: 150));
+    expect(tester.getRect(field).width, greaterThan(0));
+    expect(tester.takeException(), isNull);
+
+    input.setVoiceRecording(false);
+    await tester.pumpAndSettle();
+    expect(tester.getRect(field).width, greaterThan(0));
+    expect(tester.takeException(), isNull);
+
+    // Feature-mode churn — the kind of flips a cold provider init can
+    // emit — settles cleanly at every step.
+    for (final churn in [
+      () => input.setFeatureMode(ChatInputMode.study),
+      () => input.clearFeatureMode(),
+      () => input.setFeatureMode(ChatInputMode.offline),
+      () => input.clearFeatureMode(),
+    ]) {
+      churn();
+      await tester.pump();
+      expect(tester.getRect(field).width, greaterThan(0));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(field).width, greaterThan(0));
+      expect(tester.takeException(), isNull);
+    }
+
+    // Navigation re-entry — teardown, then the panel rebuilt — lands
+    // visible again, in the collapsed geometry.
+    await tester.pumpWidget(const SizedBox());
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+    expect(field, findsOneWidget);
+    expect(tester.getRect(field).width, greaterThan(0));
+
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets(
+      'placeholder morphs between the two semantic labels with an anchored fade',
+      (tester) async {
+    final loc = await AppLocalizations.delegate.load(const Locale('en'));
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+
+    final double fontSize = 390.0 * 0.04;
+    final shortFinder = find.text(loc.messageHintShort);
+    final fullFinder = find.text(loc.messageHint);
+
+    // Collapsed: the short label at its normal intended size — rendered by
+    // the decorator's own hint slot, never scaled, fitted or ellipsized.
+    expect(shortFinder, findsOneWidget);
+    expect(fullFinder, findsNothing);
+    final shortText = tester.widget<Text>(shortFinder);
+    expect(shortText.style!.fontSize, fontSize);
+    expect(shortText.maxLines, 1);
+    expect(shortText.overflow, isNot(TextOverflow.ellipsis));
+    expect(
+        find.descendant(
+            of: find.byType(TextField), matching: find.byType(FittedBox)),
+        findsNothing);
+
+    // Expanding cross-fades to the full label on a shared start edge:
+    // mid-transition both labels are on stage, pinned to the same left
+    // origin, so the visible effect is the trailing portion fading in
+    // beside an unmoving "Ask".
+    focus.requestFocus();
+    await tester.pump(); // builds the expanded state, starts the cross-fade
+    await tester.pump(); // the cross-fade ticker's first frame (zero elapsed)
+    await tester.pump(const Duration(milliseconds: 125)); // mid-fade
+    final midShort = tester.getRect(shortFinder);
+    final midFull = tester.getRect(fullFinder);
+    expect(midFull.left, closeTo(midShort.left, 0.5));
+    final fades = tester.widgetList<FadeTransition>(
+        find.ancestor(of: fullFinder, matching: find.byType(FadeTransition)));
+    expect(fades.any((f) => f.opacity.value > 0.0 && f.opacity.value < 1.0),
+        isTrue);
+
+    await tester.pumpAndSettle();
+    expect(shortFinder, findsNothing);
+    expect(fullFinder, findsOneWidget);
+    final fullText = tester.widget<Text>(fullFinder);
+    expect(fullText.style!.fontSize, fontSize);
+    expect(fullText.overflow, isNot(TextOverflow.ellipsis));
+
+    // Collapsing reverses the transition back to the short label.
+    focus.unfocus();
+    await tester.pumpAndSettle();
+    expect(shortFinder, findsOneWidget);
+    expect(fullFinder, findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('a placeholder wider than the pill dissolves into right-edge fog',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final endFog = find.byKey(const ValueKey('fog_end'));
+    final startFog = find.byKey(const ValueKey('fog_start'));
+
+    // English fits in both states — no fog is ever mounted. The negative
+    // check runs at a roomy 800px width: the test font draws every glyph
+    // one em wide, so at 320 the full expanded label genuinely clips in
+    // tests even though the real proportional font fits.
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+    expect(endFog, findsNothing);
+    focus.requestFocus();
+    await tester.pumpAndSettle();
+    expect(endFog, findsNothing);
+    await tester.pumpWidget(const SizedBox());
+
+    // Narrow viewport for the overflow legs below.
+    tester.view.physicalSize = const Size(320, 1000);
+
+    // Czech's short label ("Zeptejte se") is wider than the collapsed
+    // pill's content box: instead of a hard clip the label dissolves into
+    // the field's own right-edge fog — painted, contained, never hit.
+    final csInput = InputProvider();
+    final csText = TextEditingController();
+    final csFocus = FocusNode();
+    addTearDown(csInput.dispose);
+    addTearDown(csText.dispose);
+    addTearDown(csFocus.dispose);
+    final csLoc = await AppLocalizations.delegate.load(const Locale('cs'));
+    await _pumpComposer(tester,
+        input: csInput, text: csText, focus: csFocus, localizations: csLoc);
+    await tester.pumpAndSettle();
+    expect(find.text(csLoc.messageHintShort), findsOneWidget);
+    final fieldRect = tester.getRect(find.byType(TextField));
+    final fogRect = tester.getRect(endFog);
+    expect(fogRect.right, lessThanOrEqualTo(fieldRect.right + 0.5));
+    expect(fogRect.left, greaterThan(fieldRect.left));
+    expect(endFog.hitTestable(), findsNothing);
+    expect(startFog, findsNothing);
+    await tester.pumpWidget(const SizedBox());
+
+    // Portuguese's full label ("Pergunte qualquer coisa") is wider than
+    // even the expanded capsule's content box, and typing lifts the fog.
+    final ptInput = InputProvider();
+    final ptText = TextEditingController();
+    final ptFocus = FocusNode();
+    addTearDown(ptInput.dispose);
+    addTearDown(ptText.dispose);
+    addTearDown(ptFocus.dispose);
+    final ptLoc = await AppLocalizations.delegate.load(const Locale('pt'));
+    await _pumpComposer(tester,
+        input: ptInput, text: ptText, focus: ptFocus, localizations: ptLoc);
+    await tester.pumpAndSettle();
+    ptFocus.requestFocus();
+    await tester.pumpAndSettle();
+    expect(find.text(ptLoc.messageHint), findsOneWidget);
+    expect(endFog, findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'olá');
+    await tester.pumpAndSettle();
+    expect(endFog, findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
   });
 }

@@ -77,6 +77,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get messageHint => 'Demandez n\'importe quoi';
 
   @override
+  String get messageHintShort => 'Demandez';
+
+  @override
   String get messageCopied => 'Message copié dans le presse-papiers.';
 
   @override

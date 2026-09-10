@@ -77,6 +77,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get messageHint => 'Ask anything';
 
   @override
+  String get messageHintShort => 'Спросите';
+
+  @override
   String get messageCopied => 'Сообщение скопировано в буфер обмена.';
 
   @override

@@ -77,6 +77,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get messageHint => 'कुछ भी पूछें';
 
   @override
+  String get messageHintShort => 'पूछें';
+
+  @override
   String get messageCopied => 'संदेश क्लिपबोर्ड पर कॉपी किया गया।';
 
   @override

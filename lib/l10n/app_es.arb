@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "Mensaje copiado al portapapeles.",
   "messageHint": "Pregunta lo que sea",
+  "messageHintShort": "Pregunta",
   "modality": "Modalidad",
   "modelCreatedSuccess": "¡Modelo creado con éxito!",
   "modelDescription": "{description}",

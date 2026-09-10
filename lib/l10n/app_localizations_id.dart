@@ -77,6 +77,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get messageHint => 'Tanyakan apa saja';
 
   @override
+  String get messageHintShort => 'Tanya';
+
+  @override
   String get messageCopied => 'Pesan disalin ke papan klip.';
 
   @override

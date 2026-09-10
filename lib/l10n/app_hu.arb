@@ -20,6 +20,7 @@
   "descriptionSection": "Leírás",
   "searchHint": "Keresés",
   "messageHint": "Kérdezz bármit",
+  "messageHintShort": "Kérdezz",
   "messageCopied": "Az üzenet a vágólapra másolva.",
   "retry": "Próbálja újra",
   "systemInfo": "Rendszerinformációk",
