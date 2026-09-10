@@ -2,6 +2,7 @@ import 'package:cortex/design.dart';
 // lib/inbox/widgets/tiles/avatar.dart
 
 import 'dart:io';
+import 'package:cortex/performance/file_probe_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,16 +29,16 @@ class TileAvatar extends StatelessWidget {
         color: AppColors.secondaryColor,
         borderRadius: BorderRadius.circular(size * 0.125),
       ),
-      clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
+      clipBehavior: Clip.hardEdge,
       alignment: Alignment.center,
       child: _buildImageWidget(),
     );
   }
 
   Widget _buildImageWidget() {
-    final String pathLower = imagePath.toLowerCase();
-    final bool isAsset = imagePath.startsWith('assets/');
-    final File imageFile = isAsset ? File('') : File(imagePath);
+    final pathLower = imagePath.toLowerCase();
+    final isAsset = imagePath.startsWith('assets/');
+    final imageFile = isAsset ? File('') : File(imagePath);
 
     if (pathLower.endsWith('.svg')) {
       return _buildSvgImage(isAsset, imageFile);
@@ -48,16 +49,15 @@ class TileAvatar extends StatelessWidget {
     }
   }
 
+  bool _localExists(bool isAsset) =>
+      !isAsset && !kIsWeb && FileProbeCache.shared.existsSync(imagePath);
+
   Widget _buildSvgImage(bool isAsset, File file) {
-    final String pathLower = imagePath.toLowerCase();
-    final bool isSelfIcon = pathLower.endsWith('self.svg');
-    final bool isCortexIcon = pathLower.endsWith('cortex.svg');
-
-    final double iconSize = (isSelfIcon || isCortexIcon) ? size * 0.8 : size;
-
-    ColorFilter? colorFilter;
-
-    colorFilter =
+    final pathLower = imagePath.toLowerCase();
+    final isSelfIcon = pathLower.endsWith('self.svg');
+    final isCortexIcon = pathLower.endsWith('cortex.svg');
+    final iconSize = (isSelfIcon || isCortexIcon) ? size * 0.8 : size;
+    final colorFilter =
         ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
 
     if (isAsset) {
@@ -68,7 +68,7 @@ class TileAvatar extends StatelessWidget {
         fit: BoxFit.contain,
         colorFilter: colorFilter,
       );
-    } else if (!kIsWeb && file.existsSync()) {
+    } else if (_localExists(isAsset)) {
       return SvgPicture.file(
         file as dynamic,
         width: iconSize,
@@ -86,27 +86,35 @@ class TileAvatar extends StatelessWidget {
       padding: EdgeInsets.all(size * 0.15),
       child: isAsset
           ? Image.asset(imagePath, fit: BoxFit.contain, cacheWidth: 120)
-          : (!kIsWeb && file.existsSync()
+          : (_localExists(isAsset)
               ? Image.file(file, fit: BoxFit.contain, cacheWidth: 120)
               : _buildFallbackIcon()),
     );
   }
 
   Widget _buildRasterImage(bool isAsset, File file) {
-    final String variant = imagePath.split('.').last.toLowerCase();
-    final bool isValidImage =
+    final variant = imagePath.split('.').last.toLowerCase();
+    final isValidImage =
         ['jpg', 'jpeg', 'webp', 'bmp', 'gif'].contains(variant);
 
-    if (!isValidImage && !isAsset) {
-      return _buildFallbackIcon();
-    }
+    if (!isValidImage && !isAsset) return _buildFallbackIcon();
 
     return isAsset
-        ? Image.asset(imagePath,
-            width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
-        : (!kIsWeb && file.existsSync()
-            ? Image.file(file,
-                width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
+        ? Image.asset(
+            imagePath,
+            width: size,
+            height: size,
+            fit: BoxFit.cover,
+            cacheWidth: 120,
+          )
+        : (_localExists(isAsset)
+            ? Image.file(
+                file,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                cacheWidth: 120,
+              )
             : _buildFallbackIcon());
   }
 

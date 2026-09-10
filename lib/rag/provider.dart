@@ -1,9 +1,9 @@
 // lib/rag/providers/rag_provider.dart
-//
-// UI-facing state for the RAG document library: document list, selection for
-// toggle mode, and indexing progress.
 
 import 'dart:async';
+
+import 'package:cortex/performance/async_coalescer.dart';
+import 'package:cortex/performance/stable_fingerprint.dart';
 import 'package:cortex/rag/ingestion.dart';
 import 'package:cortex/rag/models.dart';
 import 'package:cortex/rag/storage.dart';
@@ -12,11 +12,15 @@ import 'package:flutter/foundation.dart';
 class RagProvider extends ChangeNotifier {
   final RagStorageService _storage;
   final RagIngestionService _ingestion;
+  final AsyncCoalescer<List<RagDocument>> _loadCoalescer =
+      AsyncCoalescer<List<RagDocument>>();
+  final FingerprintGuard _documentsFingerprint = FingerprintGuard();
 
   List<RagDocument> _documents = [];
   final Set<String> _selectedDocumentIds = {};
   bool _isLoading = false;
   final Set<String> _indexingPaths = {};
+  bool _disposed = false;
 
   RagProvider({
     required RagStorageService storage,
@@ -24,12 +28,8 @@ class RagProvider extends ChangeNotifier {
   })  : _storage = storage,
         _ingestion = ingestion;
 
-  // ---- Getters ----------------------------------------------------------
-
   List<RagDocument> get documents => List.unmodifiable(_documents);
-
   Set<String> get selectedDocumentIds => Set.unmodifiable(_selectedDocumentIds);
-
   bool get isLoading => _isLoading;
 
   int get indexedCount =>
@@ -37,18 +37,35 @@ class RagProvider extends ChangeNotifier {
 
   bool isIndexing(String path) => _indexingPaths.contains(path);
 
-  // ---- Lifecycle ----------------------------------------------------------
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
+
+  void _setLoading(bool value) {
+    if (_isLoading == value) return;
+    _isLoading = value;
+    _notify();
+  }
+
+  bool _acceptDocuments(List<RagDocument> documents) {
+    final fingerprint = documents.map((d) => d.toMap()).toList(growable: false);
+    if (!_documentsFingerprint.changed(fingerprint)) return false;
+    _documents = List<RagDocument>.unmodifiable(documents);
+    return true;
+  }
 
   Future<void> loadDocuments() async {
-    _isLoading = true;
-    notifyListeners();
+    final ownedLoadingTransition = !_loadCoalescer.isBusy;
+    if (ownedLoadingTransition) _setLoading(true);
+
     try {
-      _documents = await _storage.getAllDocuments();
+      final documents = await _loadCoalescer.run(_storage.getAllDocuments);
+      if (_disposed) return;
+      if (_acceptDocuments(documents)) _notify();
     } catch (e) {
       debugPrint('[RagProvider] loadDocuments failed: $e');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (ownedLoadingTransition) _setLoading(false);
     }
   }
 
@@ -56,8 +73,8 @@ class RagProvider extends ChangeNotifier {
     required String filePath,
     String? title,
   }) async {
-    _indexingPaths.add(filePath);
-    notifyListeners();
+    final added = _indexingPaths.add(filePath);
+    if (added) _notify();
     try {
       final doc = await _ingestion.indexFile(
         filePath: filePath,
@@ -66,19 +83,17 @@ class RagProvider extends ChangeNotifier {
       await loadDocuments();
       return doc;
     } finally {
-      _indexingPaths.remove(filePath);
-      notifyListeners();
+      if (_indexingPaths.remove(filePath)) _notify();
     }
   }
 
   Future<bool> removeDocument(String id) async {
     await _storage.deleteDocument(id);
-    _selectedDocumentIds.remove(id);
+    final selectionChanged = _selectedDocumentIds.remove(id);
     await loadDocuments();
+    if (selectionChanged) _notify();
     return true;
   }
-
-  // ---- Selection (toggle mode) -------------------------------------------
 
   void toggleSelection(String id) {
     if (_selectedDocumentIds.contains(id)) {
@@ -86,23 +101,23 @@ class RagProvider extends ChangeNotifier {
     } else {
       _selectedDocumentIds.add(id);
     }
-    notifyListeners();
+    _notify();
   }
 
   void setSelection(Set<String> ids) {
+    if (setEquals(_selectedDocumentIds, ids)) return;
     _selectedDocumentIds
       ..clear()
       ..addAll(ids);
-    notifyListeners();
+    _notify();
   }
 
   void clearSelection() {
     if (_selectedDocumentIds.isEmpty) return;
     _selectedDocumentIds.clear();
-    notifyListeners();
+    _notify();
   }
 
-  /// Keeps only documents that exist and are indexed.
   void pruneSelection() {
     final validIds = _documents
         .where((d) => d.status == RagDocumentStatus.indexed)
@@ -110,8 +125,13 @@ class RagProvider extends ChangeNotifier {
         .toSet();
     final before = _selectedDocumentIds.length;
     _selectedDocumentIds.removeWhere((id) => !validIds.contains(id));
-    if (before != _selectedDocumentIds.length) {
-      notifyListeners();
-    }
+    if (before != _selectedDocumentIds.length) _notify();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _loadCoalescer.forget();
+    super.dispose();
   }
 }

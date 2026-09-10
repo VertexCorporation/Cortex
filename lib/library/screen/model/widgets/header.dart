@@ -2,8 +2,9 @@ import 'package:cortex/design.dart';
 // lib/library/screen/model/widgets/header.dart
 
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:cortex/app.dart';
+import 'package:cortex/performance/file_probe_cache.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -11,11 +12,6 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
 import '../../../providers/details.dart';
 
-/// The header section of the Model Detail screen.
-///
-/// Displays the model's image, title, producer, and key technical specs
-/// like RAM, size, context window, and modality. It gets all its data
-/// directly from the `ModelDetailProvider`.
 class ModelHeader extends StatelessWidget {
   final ModelDetailProvider provider;
 
@@ -29,13 +25,11 @@ class ModelHeader extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final mainModel = provider.mainModel!;
-
     final capabilitiesSource = provider.currentCapabilitiesSource ?? mainModel;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // --- Model Image ---
         Expanded(
           flex: 3,
           child: AspectRatio(
@@ -51,8 +45,6 @@ class ModelHeader extends StatelessWidget {
           ),
         ),
         SizedBox(width: screenWidth * 0.05),
-
-        // --- Model Title and Info ---
         Expanded(
           flex: 5,
           child: Column(
@@ -122,7 +114,6 @@ class ModelHeader extends StatelessWidget {
     );
   }
 
-  /// Builds the appropriate image widget based on the file path (SVG or raster).
   Widget _buildImage(String imagePath) {
     final svgColorFilter =
         ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
@@ -130,55 +121,61 @@ class ModelHeader extends StatelessWidget {
     final fallbackImage = Padding(
       padding: const EdgeInsets.all(12.0),
       child: SvgPicture.asset(
+        'assets/icons/self.svg',
         height: CortexDesign.icon,
         width: CortexDesign.icon,
-        'assets/icons/self.svg',
         fit: BoxFit.contain,
         colorFilter: svgColorFilter,
       ),
     );
 
+    final isAsset = imagePath.startsWith('assets/');
+    final localExists =
+        !isAsset && !kIsWeb && FileProbeCache.shared.existsSync(imagePath);
+
     if (imagePath.toLowerCase().endsWith('.svg')) {
-      if (imagePath.startsWith('assets/')) {
+      if (isAsset) {
         return Padding(
           padding: const EdgeInsets.all(12.0),
           child: SvgPicture.asset(
-              height: CortexDesign.icon,
-              width: CortexDesign.icon,
-              imagePath,
-              fit: BoxFit.contain,
-              colorFilter: svgColorFilter),
+            imagePath,
+            height: CortexDesign.icon,
+            width: CortexDesign.icon,
+            fit: BoxFit.contain,
+            colorFilter: svgColorFilter,
+          ),
         );
       }
-      final file = File(imagePath);
-      if (!kIsWeb && file.existsSync()) {
+      if (localExists) {
         return Padding(
           padding: const EdgeInsets.all(12.0),
-          child: SvgPicture.file(file,
-              fit: BoxFit.contain, colorFilter: svgColorFilter),
+          child: SvgPicture.file(
+            File(imagePath),
+            fit: BoxFit.contain,
+            colorFilter: svgColorFilter,
+          ),
         );
       }
-    } else {
-      ImageProvider provider;
-      if (imagePath.startsWith('assets/')) {
-        provider = AssetImage(imagePath);
-      } else {
-        final file = File(imagePath);
-        provider = (!kIsWeb && file.existsSync())
-            ? FileImage(file) as ImageProvider
-            : const AssetImage('assets/icons/transparent.png');
-      }
-      return Image(
-        image: provider,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => fallbackImage,
-      );
+      return fallbackImage;
     }
-    return fallbackImage;
+
+    final ImageProvider imageProvider;
+    if (isAsset) {
+      imageProvider = AssetImage(imagePath);
+    } else if (localExists) {
+      imageProvider = FileImage(File(imagePath));
+    } else {
+      imageProvider = const AssetImage('assets/icons/transparent.png');
+    }
+
+    return Image(
+      image: imageProvider,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => fallbackImage,
+    );
   }
 }
 
-/// A private helper widget to display a row of information with an icon, label, and value.
 class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
@@ -204,7 +201,6 @@ class _InfoRow extends StatelessWidget {
               ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
         ),
         SizedBox(width: screenWidth * 0.02),
-        // Use Expanded to prevent text overflow issues with long values.
         Expanded(
           child: Text(
             '$label: $value',

@@ -1,11 +1,14 @@
 // lib/rag/ingestion.dart
 //
-// Orchestrates document ingestion: text extraction → chunking → storage.
-// Provides a server-side fallback parser (read_document backend) for legacy
-// binary formats that cannot be parsed on-device.
+// Orchestrates document ingestion: text extraction -> chunking -> storage.
+// Concurrent requests for the same path share one indexing operation.
 
 import 'dart:convert';
 import 'dart:io';
+
+import 'package:cortex/performance/adaptive_batcher.dart';
+import 'package:cortex/performance/async_coalescer.dart';
+import 'package:cortex/performance/perf_trace.dart';
 import 'package:cortex/rag/chunker.dart';
 import 'package:cortex/rag/extractors.dart';
 import 'package:cortex/rag/models.dart';
@@ -21,8 +24,23 @@ class RagIngestionService {
   final DocTextExtractor _extractor;
   final DocumentChunker _chunker;
   final Uuid _uuid = const Uuid();
+  final AsyncKeyedCoalescer<String, RagDocument?> _indexCoalescer =
+      AsyncKeyedCoalescer<String, RagDocument?>();
 
-  static const int maxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
+  static const int maxFileSizeBytes = 10 * 1024 * 1024;
+  static const AdaptiveBatcher _entityBatcher = AdaptiveBatcher(
+    targetSlice: Duration(milliseconds: 3),
+    initialBatchSize: 32,
+    minBatchSize: 8,
+    maxBatchSize: 256,
+  );
+
+  static final Dio _fallbackDio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 20),
+      receiveTimeout: const Duration(minutes: 2),
+    ),
+  );
 
   RagIngestionService({
     required RagStorageService storage,
@@ -32,13 +50,11 @@ class RagIngestionService {
         _extractor = extractor ?? DocTextExtractor(),
         _chunker = chunker ?? const DocumentChunker();
 
-  /// Returns true if [path] can be indexed (exists, size ok, supported ext).
   Future<bool> isIndexable(String path) async {
     try {
-      final file = File(path);
-      if (!await file.exists()) return false;
-      final size = await file.length();
-      if (size > maxFileSizeBytes) return false;
+      final stat = await File(path).stat();
+      if (stat.type != FileSystemEntityType.file) return false;
+      if (stat.size > maxFileSizeBytes) return false;
       final extension = path.split('.').last.toLowerCase();
       return DocTextExtractor.supportsOnDevice(extension) ||
           DocTextExtractor.serverFallbackExtensions.contains(extension);
@@ -47,23 +63,39 @@ class RagIngestionService {
     }
   }
 
-  /// Indexes [path] and returns the created/updated document, or `null` on
-  /// failure. Re-indexes the file if [path] already has a document record.
   Future<RagDocument?> indexFile({
+    required String filePath,
+    String? title,
+  }) {
+    return _indexCoalescer.run(
+      filePath,
+      () => PerfTrace.measureAsync(
+        'rag.index_file',
+        () => _indexFileInternal(filePath: filePath, title: title),
+        metadata: {'extension': filePath.split('.').last.toLowerCase()},
+      ),
+    );
+  }
+
+  Future<RagDocument?> _indexFileInternal({
     required String filePath,
     String? title,
   }) async {
     final file = File(filePath);
-    if (!await file.exists()) return null;
+    final FileStat stat;
+    try {
+      stat = await file.stat();
+    } catch (_) {
+      return null;
+    }
+    if (stat.type != FileSystemEntityType.file ||
+        stat.size > maxFileSizeBytes) {
+      return null;
+    }
 
     final now = DateTime.now().millisecondsSinceEpoch;
     final fileName = filePath.split('/').last;
-    final sizeBytes = await file.length();
-
-    // Reuse the existing record when re-indexing the same path.
-    final existing = await _storage.getAllDocuments();
-    final prior = existing.where((d) => d.filePath == filePath).firstOrNull;
-
+    final prior = await _storage.getDocumentByPath(filePath);
     final documentId = prior?.id ?? _uuid.v4();
     final displayTitle = title ?? _stripExtension(fileName);
 
@@ -71,7 +103,7 @@ class RagIngestionService {
       id: documentId,
       title: displayTitle,
       filePath: filePath,
-      sizeBytes: sizeBytes,
+      sizeBytes: stat.size,
       mimeType: lookupMimeType(filePath) ?? 'application/octet-stream',
       status: RagDocumentStatus.pending,
       chunkCount: 0,
@@ -105,20 +137,22 @@ class RagIngestionService {
         return null;
       }
 
-      final chunkEntities = <RagChunk>[];
       var charStart = 0;
-      for (var i = 0; i < chunks.length; i++) {
-        final chunkText = chunks[i];
-        chunkEntities.add(RagChunk(
-          id: 0, // autoincrement
-          documentId: documentId,
-          chunkIndex: i,
-          text: chunkText,
-          charStart: charStart,
-          charEnd: charStart + chunkText.length,
-        ));
-        charStart += chunkText.length + 1;
-      }
+      final chunkEntities = await _entityBatcher.map<String, RagChunk>(
+        chunks,
+        (chunkText, index) {
+          final start = charStart;
+          charStart += chunkText.length + 1;
+          return RagChunk(
+            id: 0,
+            documentId: documentId,
+            chunkIndex: index,
+            text: chunkText,
+            charStart: start,
+            charEnd: start + chunkText.length,
+          );
+        },
+      );
 
       await _storage.insertChunks(chunkEntities);
       await _storage.updateDocumentStatus(
@@ -131,7 +165,6 @@ class RagIngestionService {
       return doc.copyWith(
         status: RagDocumentStatus.indexed,
         chunkCount: chunkEntities.length,
-        updatedAt: now,
       );
     } catch (e) {
       debugLog('Indexing failed for $filePath: $e');
@@ -143,8 +176,6 @@ class RagIngestionService {
     }
   }
 
-  /// Server-side fallback that reuses the existing `read_document` backend
-  /// to parse legacy binary formats (.doc, .xls, .odt, ...).
   Future<String?> _parseViaServer(String filePath) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -157,12 +188,7 @@ class RagIngestionService {
           'application/octet-stream';
 
       const url = 'https://executetool-o5h7dmtija-ew.a.run.app';
-      final dio = Dio(BaseOptions(
-        connectTimeout: const Duration(seconds: 20),
-        receiveTimeout: const Duration(minutes: 2),
-      ));
-
-      final response = await dio.post(
+      final response = await _fallbackDio.post(
         url,
         options: Options(headers: {
           'Authorization': 'Bearer $token',
@@ -185,7 +211,6 @@ class RagIngestionService {
       if (response.statusCode != 200) return null;
       final data = response.data;
       if (data is String) {
-        // The server sometimes wraps plain text in JSON; try to unwrap.
         try {
           final decoded = jsonDecode(data);
           return _stringifyServerResponse(decoded);

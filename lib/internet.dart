@@ -1,73 +1,68 @@
 // internet.dart
 
-import 'package:flutter/foundation.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'dart:async';
 
-/// A dedicated ChangeNotifier to manage and provide internet connectivity state.
+import 'package:cortex/performance/async_coalescer.dart';
+import 'package:cortex/performance/perf_trace.dart';
+import 'package:flutter/foundation.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+
 class InternetProvider with ChangeNotifier {
-  late final StreamSubscription<bool> _subscription;
+  StreamSubscription<bool>? _subscription;
   bool _forceOffline = false;
-  bool _isConnected = true; // Assume connected initially (Optimistic UI).
+  bool _isConnected = true;
+  bool _disposed = false;
 
   bool get isConnected => _forceOffline ? false : _isConnected;
 
-  /// Forces the app to behave as if it's offline.
-  /// Used for maintenance mode bypass.
   void setForceOffline(bool value) {
-    if (_forceOffline != value) {
-      _forceOffline = value;
-      notifyListeners();
-    }
+    if (_forceOffline == value) return;
+    final before = isConnected;
+    _forceOffline = value;
+    if (!_disposed && before != isConnected) notifyListeners();
   }
 
   InternetProvider() {
-    _initialize();
+    unawaited(_initialize());
   }
 
-  void _initialize() async {
-    // 1. Initial fast check
-    _isConnected = await InternetService().hasInternet();
-    notifyListeners();
+  Future<void> _initialize() async {
+    final service = InternetService();
+    final initial = await service.hasInternet();
+    if (_disposed) return;
 
-    // 2. Listen for live changes
-    _subscription = InternetService().onConnectivityChanged.listen((status) {
-      if (_isConnected != status) {
-        _isConnected = status;
-        // Only notify if we are NOT in forced offline mode.
-        // If forced offline, isConnected remains false regardless of real status.
-        // But we should still notify if the *real* status changes?
-        // Actually, if we are forced offline, isConnected is always false.
-        // So a change in _isConnected implementation detail shouldn't fire a notification
-        // if the public getter result doesn't change?
-        // But ChangeNotifier usually just notifies. Consumers check the value.
-        // If _forceOffline is true, isConnected returns false.
-        // If _isConnected flips true->false, isConnected is still false.
-        // So technically no change.
-        notifyListeners();
-      }
+    final before = isConnected;
+    _isConnected = initial;
+    if (before != isConnected) notifyListeners();
+
+    _subscription = service.onConnectivityChanged.listen((status) {
+      if (_disposed || _isConnected == status) return;
+      final visibleBefore = isConnected;
+      _isConnected = status;
+      if (visibleBefore != isConnected) notifyListeners();
     });
   }
 
-  /// --- NEW METHOD ---
-  /// Called by AppInitializer during startup to get the definitive
-  /// current status before running background tasks.
   Future<void> checkInternetConnection() async {
-    final bool currentStatus = await InternetService().hasInternet();
-    if (_isConnected != currentStatus) {
-      _isConnected = currentStatus;
-      notifyListeners();
-    }
+    final currentStatus = await InternetService().hasInternet();
+    if (_disposed || _isConnected == currentStatus) return;
+    final before = isConnected;
+    _isConnected = currentStatus;
+    if (before != isConnected) notifyListeners();
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _disposed = true;
+    _subscription?.cancel();
+    _subscription = null;
     super.dispose();
   }
 }
 
-/// Singleton service to centralize internet connectivity checks (No changes needed here, but kept for context)
+/// Singleton connectivity service. Simultaneous explicit probes share one
+/// platform/network operation, while stream updates remain the continuous
+/// source of connectivity changes.
 class InternetService {
   InternetService._internal() {
     _initialize();
@@ -80,33 +75,50 @@ class InternetService {
     checkInterval: const Duration(seconds: 2),
   );
   final StreamController<bool> _controller = StreamController<bool>.broadcast();
+  final AsyncCoalescer<bool> _probeCoalescer = AsyncCoalescer<bool>();
+
   bool _hasInternet = true;
-  late final StreamSubscription<InternetStatus> _subscription;
+  StreamSubscription<InternetStatus>? _subscription;
+  bool _disposed = false;
 
   void _initialize() {
     _subscription = _checker.onStatusChange.listen((status) {
-      final connected = status == InternetStatus.connected;
-      if (_hasInternet != connected) {
-        _hasInternet = connected;
-        _controller.add(connected);
-
-        // Only log significant changes to keep logs clean
-        if (kDebugMode) {
-          debugPrint(
-              "[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}");
-        }
-      }
+      if (_disposed) return;
+      _publish(status == InternetStatus.connected);
     });
   }
 
-  bool get currentStatus => _hasInternet;
+  void _publish(bool connected) {
+    if (_hasInternet == connected) return;
+    _hasInternet = connected;
+    if (!_controller.isClosed) _controller.add(connected);
+    if (kDebugMode) {
+      debugPrint(
+        '[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}',
+      );
+    }
+  }
 
+  bool get currentStatus => _hasInternet;
   Stream<bool> get onConnectivityChanged => _controller.stream;
 
-  Future<bool> hasInternet() => _checker.hasInternetAccess;
+  Future<bool> hasInternet() {
+    if (_disposed) return Future<bool>.value(_hasInternet);
+    return _probeCoalescer.run(() {
+      return PerfTrace.measureAsync('network.connectivity_probe', () async {
+        final connected = await _checker.hasInternetAccess;
+        if (!_disposed) _publish(connected);
+        return connected;
+      });
+    });
+  }
 
   void dispose() {
-    _subscription.cancel();
+    if (_disposed) return;
+    _disposed = true;
+    _subscription?.cancel();
+    _subscription = null;
+    _probeCoalescer.forget();
     _controller.close();
   }
 }
