@@ -101,10 +101,13 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   // was starving the text field (the hint scaled to under half size),
   // so the pill keeps a bit more width and the collapsed/expanded gap
   // narrows. The share the collapsed pill is actually DRAWN at is
-  // derived in build(): 70% of this base, floored on narrow phones
+  // derived in build(): 85% of this base, floored on narrow phones
   // where the fixed control footprint would crush the pill's interior.
   static const double collapsedCapsuleShare = 0.68;
   static const double expandedCapsuleShare = 0.7;
+  // The collapsed pill is drawn at this fraction of the share above, so
+  // the morph visibly grows the capsule itself (expanded untouched).
+  static const double collapsedCapsuleShrink = 0.85;
   // Control gaps, shared by the capsule share math in build() and the
   // row's own layout below.
   static const double edgeGap = 8.0; // control -> capsule interior edge
@@ -324,8 +327,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         final double t = _expandAnimation.value;
         final double available =
             viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
-        // The collapsed pill is drawn at 70% of the share it used to fill
-        // (0.68 -> 0.476 of the reading band), so the morph visibly grows
+        // The collapsed pill is drawn at 85% of the share it used to fill
+        // (0.68 -> 0.578 of the reading band), so the morph visibly grows
         // the capsule itself; the expanded share is untouched. On narrow
         // phones the share is floored: the three buttons, their gaps and
         // the field's own paddings consume a fixed ~150px of the pill's
@@ -348,7 +351,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         final double minCollapsedShare =
             (collapsedControlInsets + 6.0 + minCollapsedField) / available;
         final double drawnCollapsedShare =
-            (collapsedCapsuleShare * 0.7).clamp(minCollapsedShare, 1.0);
+            (collapsedCapsuleShare * collapsedCapsuleShrink)
+                .clamp(minCollapsedShare, 1.0);
         final double capsuleInset = lerpDouble(
           available * (1.0 - drawnCollapsedShare) / 2.0,
           available * (1.0 - expandedCapsuleShare) / 2.0,
