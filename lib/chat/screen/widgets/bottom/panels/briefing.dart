@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/server/subscription.dart';
+import 'package:cortex/server/credits.dart' show formatRenewalRemaining;
 import '../../../../../../theme.dart';
 
 /// The logical identity of a briefing. Dismissal is tracked per kind, not
@@ -325,14 +326,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   /// "23h 14m" / "5h 42m" / "47m" — never negative: if the renewal instant
   /// has already passed but the refreshed snapshot has not landed yet, the
   /// countdown holds at one minute instead of counting below zero.
-  static String _formatRenewalRemaining(Duration remaining) {
-    if (remaining < const Duration(minutes: 1)) return '1m';
-    final hours = remaining.inHours;
-    final minutes = remaining.inMinutes.remainder(60);
-    if (hours == 0) return '${minutes}m';
-    if (minutes == 0) return '${hours}h';
-    return '${hours}h ${minutes}m';
-  }
+  ///
+  /// Delegates to the shared formatter in `credits.dart` so the briefing and
+  /// the send-failure recovery copy always tick in the same format.
+  static String _formatRenewalRemaining(Duration remaining) =>
+      formatRenewalRemaining(remaining);
 
   /// Whether a resolved briefing [kind] is currently hidden by a dismissal.
   /// Credit kinds sit out the session-wide hour after their dismissal — no

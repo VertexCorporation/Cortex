@@ -1766,10 +1766,32 @@ class SendService {
     String? failedUserText,
     List<String>? failedAttachmentPaths,
   }) {
-    final String errorMessage =
+    String errorMessage =
         error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError = error is ApiException &&
         error.message == localizations.errorPromptFlagged;
+
+    // Credit-limit conversational recovery: a typed server refusal is answered
+    // with the same canonical credit copy the briefing overlay uses (what
+    // happened, when it renews, what to do) instead of the generic limit
+    // line. Pure string composition — nothing re-enters the send flow, so
+    // this can never recurse or retry. When the client credit state is too
+    // thin to be deterministic the original message is kept as-is.
+    if (error is ApiException) {
+      final credits = CreditsManager.instance;
+      errorMessage = creditRefusalRecoveryMessage(
+            code: error.code,
+            spendable: credits.spendableNotifier.value,
+            debtFloor: credits.debtFloor,
+            access: credits.accessNotifier.value,
+            tier: credits.subscriptionTier,
+            renewalRemaining: credits.nextDailyRenewal().difference(
+                  DateTime.now(),
+                ),
+            localizations: localizations,
+          ) ??
+          errorMessage;
+    }
 
     if (isRegenerate && regenerateAiIndex != null) {
       _conversationProvider.setErrorMessage(
@@ -2163,3 +2185,96 @@ class SendService {
         localizations: localizations,
       );
 }
+
+/// Typed server codes that mean a credit refusal. Mirrors the provider-limit
+/// set in `chat/services/api.dart` — that file decides that a failure *is* a
+/// credit refusal; this set decides how the refusal is worded. The two must
+/// stay in step.
+const Set<String> _creditRefusalCodes = {
+  'INSUFFICIENT_USER_CREDITS',
+  'PREDIT_EXHAUSTED',
+  'DREDIT_EXHAUSTED',
+  'PREMIUM_TRIAL_EXHAUSTED',
+  'DYNAMIC_CREDITS_EXHAUSTED',
+  'LIMIT_IMAGE_INSUFFICIENT',
+  'LIMIT_VIDEO_INSUFFICIENT',
+  'LIMIT_AUDIO_INSUFFICIENT',
+  'LIMIT_MEDIA_INSUFFICIENT',
+  'INSUFFICIENT_CREDITS',
+  'INSUFFICIENT_BALANCE',
+  'CREDITS_EXHAUSTED',
+  'CREDIT_EXHAUSTED',
+  'QUOTA_EXCEEDED',
+  'PAYMENT_REQUIRED',
+};
+
+/// Composes the conversational recovery copy for a typed credit refusal, or
+/// null when the refusal is not a credit one or the client credit state is
+/// too thin to be deterministic (the caller keeps the plain limit message
+/// then).
+///
+/// The wording is the canonical credit copy the briefing overlay uses,
+/// selected by the same access bands that mirror the server's
+/// `evaluateCreditPolicy`: at or below the debt floor nothing is sendable
+/// until renewal (exhausted copy), below zero intelligence is degraded but
+/// Dynamic Chat stays open (declining copy), and a non-negative balance means
+/// the refusal was about a specific lane (media/dynamic pool) rather than the
+/// daily allowance — the plain limit message already says that right.
+///
+/// Deterministic and side-effect free: it only reads the passed-in state and
+/// only composes a string. No resend, no retry, no recursion.
+String? creditRefusalRecoveryMessage({
+  required String? code,
+  required int? spendable,
+  required int debtFloor,
+  required String access,
+  required String tier,
+  required Duration renewalRemaining,
+  required AppLocalizations localizations,
+}) {
+  final normalizedCode = code?.toUpperCase();
+  if (normalizedCode == null ||
+      !_creditRefusalCodes.contains(normalizedCode)) {
+    return null;
+  }
+
+  // The premium-model trial running out is its own product story, worded
+  // independently of the daily balance bands.
+  if (normalizedCode == 'PREMIUM_TRIAL_EXHAUSTED') {
+    return localizations.premiumTrialExhaustedMessage;
+  }
+
+  // Without a live balance snapshot any band inference would be a guess;
+  // fall back to the plain limit message rather than inventing one.
+  if (spendable == null) return null;
+
+  final String renewal = formatRenewalRemaining(renewalRemaining);
+
+  if (access == CreditAccess.blocked || spendable <= debtFloor) {
+    // Nothing is sendable until the allowance renews. Ultra has no higher
+    // plan, so its copy carries no upgrade nudge.
+    return tier == 'ultra'
+        ? localizations.creditWarningUltraExhaustedMessage(renewal)
+        : localizations.creditWarningExhaustedMessage(renewal);
+  }
+
+  if (access == CreditAccess.lowOnly || spendable < 0) {
+    // Below zero but above the floor: intelligence is degraded, the
+    // conversation continues, and the tier decides the nudge.
+    switch (tier) {
+      case 'ultra':
+        return localizations.creditWarningUltraMessage(renewal);
+      case 'plus':
+      case 'pro':
+        return localizations.creditWarningPaidUpgradeMessage(renewal);
+      default:
+        return localizations.creditWarningFreeDecliningMessage(renewal);
+    }
+  }
+
+  // `full` band with a positive balance: the refusal was about a specific
+  // lane (media codes, dynamic pool), not the daily allowance — the generic
+  // limit message is already the correct wording.
+  return null;
+}
+

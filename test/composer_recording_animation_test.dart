@@ -606,6 +606,24 @@ void main() {
       expect(fieldFinder, findsOneWidget);
       final collapsed = tester.getRect(fieldFinder);
       expect(collapsed.width, greaterThan(0));
+
+      // The collapsed field starts from 0.7 of the width the capsule's
+      // collapsed share leaves between the controls (minus the capsule's
+      // 1px border gap and the field section's 2px horizontal padding per
+      // side), so expanding visibly widens the input itself. The freed 30%
+      // splits evenly into the field's collapsed insets; the expanded
+      // geometry is untouched.
+      final double buttonSize = (width * 0.086).clamp(32.0, 38.0);
+      expect(
+          collapsed.width,
+          moreOrLessEquals(
+              0.7 *
+                  ((width - 32) *
+                      0.68 -
+                      6 -
+                      (8 + buttonSize + 14) -
+                      (8 + buttonSize * 2 + 4 + 14)),
+              epsilon: 0.5));
       expect(find.byType(AddPhotoButton).hitTestable(), findsOneWidget);
       expect(find.byType(MicButton).hitTestable(), findsOneWidget);
       expect(
@@ -777,8 +795,12 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    final endFog = find.byKey(const ValueKey('fog_end'));
+    final endFog = find.byKey(const ValueKey('hint_fog_end'));
     final startFog = find.byKey(const ValueKey('fog_start'));
+
+    // The placeholder's strips carry their own keys: the dictation wave's
+    // fog owns the plain 'fog_start'/'fog_end' pair, so the wave tests stay
+    // unambiguous even when the placeholder fog is mounted.
 
     // English fits in both states — no fog is ever mounted. The negative
     // check runs at a roomy 800px width: the test font draws every glyph
