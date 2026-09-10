@@ -2,6 +2,7 @@ import 'package:cortex/design.dart';
 // lib/chat/screen/selected/widgets/input/panels/edit.dart
 
 import 'package:cortex/app.dart';
+import 'package:cortex/chat/screen/widgets/bottom/input/input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -25,6 +26,14 @@ class EditPanelWidget extends StatelessWidget {
     final bool isTablet = screenWidth >= 600;
     final localizations = AppLocalizations.of(context)!;
 
+    // The banner hugs the composer capsule exactly: the same reading-band
+    // inset and the same expanded share the composer paints while the edit
+    // field is active — it never spreads over the detached control bubbles.
+    final double capsuleInset =
+        composerCapsuleInset(screenWidth, expanded: true);
+    final double bannerWidth = screenWidth -
+        2 * (CortexDesign.readingInset(screenWidth) + capsuleInset);
+
     // --- DYNAMIC SCALING ---
     // Using screenWidth for height calculations on tablet to maintain proportions
 
@@ -46,7 +55,7 @@ class EditPanelWidget extends StatelessWidget {
       child: LiquidGlassPanel(
         borderRadius: BorderRadius.vertical(top: Radius.circular(radius)),
         child: Container(
-          width: screenWidth,
+          width: bannerWidth,
           height: height,
           decoration: BoxDecoration(
             color: AppColors.background.withValues(alpha: 0.86),

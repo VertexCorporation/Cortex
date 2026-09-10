@@ -29,6 +29,54 @@ part 'field.dart';
 
 part 'send.dart';
 
+/// The horizontal inset of the composer capsule's border from the edge of
+/// the reading band — the exact geometry build() paints for the pill in its
+/// two morph states. Shared with the edit-mode banner so the banner hugs
+/// the capsule instead of spanning the full bar.
+double composerCapsuleInset(double viewportWidth, {required bool expanded}) {
+  final double screenWidth =
+      viewportWidth.clamp(0.0, CortexDesign.readingWidth);
+  final double available =
+      viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
+  if (available <= 0) return 0;
+
+  final double share;
+  if (expanded) {
+    share = InputFieldState.expandedCapsuleShare;
+  } else {
+    // The collapsed pill is drawn at 85% of the share it used to fill
+    // (0.68 -> 0.578 of the reading band), so the morph visibly grows
+    // the capsule itself; the expanded share is untouched. On narrow
+    // phones the share is floored: the three buttons, their gaps and
+    // the field's own paddings consume a fixed ~150px of the pill's
+    // interior, so the pill only shrinks as far as a livable field
+    // (a few ems of the responsive font plus padding) allows. The
+    // floor derives from the same responsive font and button sizes
+    // the row uses — no fixed pixels.
+    final double buttonSize = InputFieldState.buttonSizeFor(screenWidth);
+    final double collapsedControlInsets =
+        (InputFieldState.edgeGap + buttonSize + InputFieldState.inputGap) +
+            (InputFieldState.edgeGap +
+                buttonSize * 2 +
+                InputFieldState.buttonGap +
+                InputFieldState.inputGap);
+    final double responsiveFont =
+        screenWidth >= 600 ? screenWidth * 0.025 : screenWidth * 0.04;
+    // A livable collapsed field: 1.2em of glyph room plus the field's
+    // own horizontal paddings (2x4 content + 2x2 section). A hint that
+    // outgrows it clips into the section's fog strip by design.
+    final double minCollapsedField = responsiveFont * 1.2 + 12.0;
+    // 6.0 = the capsule's 1px border gap plus the section's 2px
+    // horizontal padding, per side.
+    final double minCollapsedShare =
+        (collapsedControlInsets + 6.0 + minCollapsedField) / available;
+    share = (InputFieldState.collapsedCapsuleShare *
+            InputFieldState.collapsedCapsuleShrink)
+        .clamp(minCollapsedShare, 1.0);
+  }
+  return available * (1.0 - share) / 2.0;
+}
+
 class InputField extends StatefulWidget {
   final AppLocalizations localizations;
   final bool isDynamicChatMode;
@@ -101,8 +149,9 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   // was starving the text field (the hint scaled to under half size),
   // so the pill keeps a bit more width and the collapsed/expanded gap
   // narrows. The share the collapsed pill is actually DRAWN at is
-  // derived in build(): 85% of this base, floored on narrow phones
-  // where the fixed control footprint would crush the pill's interior.
+  // derived by composerCapsuleInset(): 85% of this base, floored on
+  // narrow phones where the fixed control footprint would crush the
+  // pill's interior.
   static const double collapsedCapsuleShare = 0.68;
   static const double expandedCapsuleShare = 0.7;
   // The collapsed pill is drawn at this fraction of the share above, so
@@ -325,37 +374,14 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       animation: _expandAnimation,
       builder: (context, child) {
         final double t = _expandAnimation.value;
-        final double available =
-            viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
-        // The collapsed pill is drawn at 85% of the share it used to fill
-        // (0.68 -> 0.578 of the reading band), so the morph visibly grows
-        // the capsule itself; the expanded share is untouched. On narrow
-        // phones the share is floored: the three buttons, their gaps and
-        // the field's own paddings consume a fixed ~150px of the pill's
-        // interior, so the pill only shrinks as far as a livable field
-        // (a few ems of the responsive font plus padding) allows. The
-        // floor derives from the same responsive font and button sizes
-        // the row uses — no fixed pixels.
-        final double buttonSize = buttonSizeFor(screenWidth);
-        final double collapsedControlInsets =
-            (edgeGap + buttonSize + inputGap) +
-                (edgeGap + buttonSize * 2 + buttonGap + inputGap);
-        final double responsiveFont =
-            isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
-        // A livable collapsed field: 1.2em of glyph room plus the field's
-        // own horizontal paddings (2x4 content + 2x2 section). A hint that
-        // outgrows it clips into the section's fog strip by design.
-        final double minCollapsedField = responsiveFont * 1.2 + 12.0;
-        // 6.0 = the capsule's 1px border gap plus the section's 2px
-        // horizontal padding, per side.
-        final double minCollapsedShare =
-            (collapsedControlInsets + 6.0 + minCollapsedField) / available;
-        final double drawnCollapsedShare =
-            (collapsedCapsuleShare * collapsedCapsuleShrink)
-                .clamp(minCollapsedShare, 1.0);
+        // The collapsed pill is drawn at the share composerCapsuleInset()
+        // computes (85% of the old share, floored on narrow phones); the
+        // expanded share is untouched, so the morph visibly grows the
+        // capsule itself. The helper is shared with the edit-mode banner,
+        // which hugs the pill exactly.
         final double capsuleInset = lerpDouble(
-          available * (1.0 - drawnCollapsedShare) / 2.0,
-          available * (1.0 - expandedCapsuleShare) / 2.0,
+          composerCapsuleInset(viewportWidth, expanded: false),
+          composerCapsuleInset(viewportWidth, expanded: true),
           t,
         )!;
         // The capsule is a painted backdrop: the interactive row beneath

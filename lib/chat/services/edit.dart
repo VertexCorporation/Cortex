@@ -7,7 +7,6 @@ import 'package:cortex/chat/services/regenerate.dart';
 import 'package:cortex/chat/services/scroll.dart';
 import 'package:flutter/foundation.dart'; // for listEquals
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/session.dart';
 import '../messages/messages.dart';
@@ -173,14 +172,21 @@ class EditService {
     });
   }
 
+  /// Whether the input's focus node currently holds focus.
+  bool get hasFocus => _focusNode.hasFocus;
+
   /// Public entry point to request focus on the chat input field.
+  ///
+  /// Deliberately never force-shows the soft keyboard (`TextInput.show`):
+  /// when the node already holds focus but the keyboard is down, the user
+  /// (or the system) closed it on purpose, and popping it back open here is
+  /// exactly the "app fights me" experience we removed. Requesting focus on
+  /// an already-focused node is a no-op, so the keyboard only ever opens
+  /// when the node is genuinely unfocused.
   void requestFocus() {
     if (!_focusNode.hasFocus) {
       _focusNode.requestFocus();
     }
-    // Forcefully show the keyboard, just in case the node thinks it is focused
-    // but the system hasn't actually shown the soft keyboard.
-    SystemChannels.textInput.invokeMethod('TextInput.show');
   }
 
   void _clearBackup() {

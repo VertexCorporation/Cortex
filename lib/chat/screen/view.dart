@@ -260,6 +260,17 @@ class ChatViewState extends State<ChatView>
       debugPrint("[KeyboardFocus] Attempt $attempt to show keyboard.");
       editService.requestFocus();
 
+      // Tekrarlar yalnızca istek hiç oturmamışken (alan henüz hazır değil,
+      // odak hiç verilmedi) için var. Odak bir kez verildiyse işimiz bitti:
+      // klavye o noktadan sonra kapalıysa bunu kullanıcı (veya sistem)
+      // yapmıştır ve yeni bir istek klavyeyi tam olarak zorla geri açar —
+      // kullanıcıya direniyormuş gibi görünen davranış budur. Tek bir
+      // başarılı istek zinciri bitirmek için yeterlidir.
+      if (editService.hasFocus) {
+        debugPrint("[KeyboardFocus] Focus granted on attempt $attempt; done.");
+        return;
+      }
+
       if (attempt < maxRetries) {
         Future.delayed(retryDelay, () {
           attemptFocus(attempt + 1);
