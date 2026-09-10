@@ -1,14 +1,20 @@
 // test/credit_recovery_test.dart
 //
 // Tests for the credit-limit conversational recovery: when a send fails with
-// a typed server credit refusal, the error bubble carries the canonical
-// credit copy (what happened, when it renews, what to do) instead of the
-// generic limit line. The selector is a pure function over the client credit
-// state, so every band/tier/fallback permutation is exercised without
-// Firebase or SendService.
+// a typed server credit refusal, the chat is answered with ONE natural
+// assistant message instead of an error bubble. The message starts as the
+// canonical credit copy (what happened, when it renews, what to do) and is
+// refined in place by a lightweight-model reply composed from structured
+// facts only. The selector is a pure function over the client credit state,
+// so every band/tier/fallback permutation is exercised without Firebase or
+// SendService; the provider tests cover exactly-one-insertion and the
+// refinement guards.
+import 'package:cortex/chat/messages/messages.dart';
+import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/services/send.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/server/credits.dart';
+import 'package:cortex/server/subscription.dart';
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -261,6 +267,168 @@ Future<void> main() async {
       expect(formatRenewalRemaining(Duration.zero), '1m');
       expect(formatRenewalRemaining(const Duration(seconds: 30)), '1m');
       expect(formatRenewalRemaining(const Duration(seconds: -90)), '1m');
+    });
+  });
+
+  group('CreditLimits.operationCosts — server-published pricing', () {
+    test('parses the operationCosts map from a creditLimits document', () {
+      final limits = CreditLimits.fromData({
+        'dailyGrant': 100,
+        'debtFloor': -100,
+        'operationCosts': {
+          'image': 100,
+          'video': 1000,
+          'music': 500,
+          'speech': 100,
+          'easy': 10,
+        },
+      });
+      expect(limits.dailyGrant, 100);
+      expect(limits.debtFloor, -100);
+      expect(limits.operationCosts['image'], 100);
+      expect(limits.operationCosts['video'], 1000);
+      expect(limits.operationCosts['speech'], 100);
+      expect(limits.operationCosts['easy'], 10);
+    });
+
+    test('missing or malformed operationCosts resolve to an empty map', () {
+      expect(
+        CreditLimits.fromData({'dailyGrant': 100, 'debtFloor': -100})
+            .operationCosts,
+        isEmpty,
+      );
+      expect(CreditLimits.fromData(null).operationCosts, isEmpty);
+      expect(CreditLimits.fallback.operationCosts, isEmpty);
+      // Non-integer costs are dropped rather than crashing the parse.
+      expect(
+        CreditLimits.fromData({
+          'dailyGrant': 100,
+          'debtFloor': -100,
+          'operationCosts': {'image': 'lots'},
+        }).operationCosts,
+        isEmpty,
+      );
+    });
+  });
+
+  group('CreditsManager.canGenerate — per-operation affordability gate', () {
+    final manager = CreditsManager.instance;
+    const costs = {'image': 100, 'video': 1000, 'speech': 100};
+
+    setUp(() {
+      manager.debugSetCreditLimits(const CreditLimits(
+        dailyGrant: 100,
+        debtFloor: -100,
+        operationCosts: costs,
+      ));
+      manager.spendableNotifier.value = null;
+      manager.accessNotifier.value = CreditAccess.full;
+    });
+
+    test('published cost is read per lane (audio → speech lane)', () {
+      expect(manager.defaultCostFor('image'), 100);
+      expect(manager.defaultCostFor('video'), 1000);
+      expect(manager.defaultCostFor('speech'), 100);
+      expect(manager.defaultCostFor('unknown'), isNull);
+    });
+
+    test('fail-open without a balance snapshot (server stays the gate)', () {
+      manager.spendableNotifier.value = null;
+      expect(manager.canGenerate('video'), isTrue);
+    });
+
+    test('affordability keeps the balance at or above the debt floor', () {
+      manager.spendableNotifier.value = 150;
+      // 150 - 100 = 50, well above the -100 floor.
+      expect(manager.canGenerate('image'), isTrue);
+      // 150 - 1000 = -850, below the floor: the server would refuse or
+      // overdraw, so the sheet/greeting routes to Funds instead.
+      expect(manager.canGenerate('video'), isFalse);
+    });
+
+    test('blocked band refuses regardless of the balance', () {
+      manager.spendableNotifier.value = 5000;
+      manager.accessNotifier.value = CreditAccess.blocked;
+      expect(manager.canGenerate('image'), isFalse);
+    });
+
+    test('unknown lane fails open (server still enforces the real cost)', () {
+      manager.spendableNotifier.value = 5;
+      // 'music' is absent from the published snapshot in this group.
+      expect(manager.canGenerate('music'), isTrue);
+    });
+  });
+
+  group('ConversationProvider credit recovery — one natural assistant message',
+      () {
+    test('inserts exactly one plain assistant reply with the user turn', () {
+      final provider = ConversationProvider();
+      final index = provider.showCreditRecovery(
+        Message(text: 'draw me a cat', isUserMessage: true),
+        'You have run out of credits today.',
+      );
+      expect(index, isNotNull);
+      expect(provider.messages.length, 2);
+      expect(provider.messages.first.isUserMessage, isTrue);
+      expect(provider.messages[index!].isUserMessage, isFalse);
+      expect(provider.messages[index].isError, isFalse);
+      expect(provider.messages[index].isThinking, isFalse);
+      // A recovery reply is a real conversational turn: it stays in context
+      // and is not styled as an error.
+      expect(provider.messages[index].includeInContext, isTrue);
+      expect(
+          provider.messages[index].text, 'You have run out of credits today.');
+    });
+
+    test('converts an in-flight thinking bubble instead of duplicating', () {
+      final provider = ConversationProvider();
+      provider.appendBackgroundRestoredMessage(
+          Message(text: '', isUserMessage: false, isThinking: true));
+      final index = provider.showCreditRecovery(
+        Message(text: 'hi', isUserMessage: true),
+        'out of credits',
+      );
+      // The thinking bubble became the recovery reply; no duplicate pair.
+      expect(provider.messages.length, 1);
+      expect(provider.messages[index!].isThinking, isFalse);
+      expect(provider.messages[index].isError, isFalse);
+      expect(provider.messages[index].text, 'out of credits');
+    });
+
+    test('refinement replaces the text; stale refinements are dropped', () {
+      final provider = ConversationProvider();
+      final index = provider.showCreditRecovery(
+        Message(text: 'hi', isUserMessage: true),
+        'deterministic copy',
+      )!;
+      provider.updateCreditRecoveryText(index, 'natural reply');
+      expect(provider.messages[index].text, 'natural reply');
+
+      // Out-of-range, unchanged and cross-conversation refinements are all
+      // dropped silently — a late reply after a conversation switch must
+      // never corrupt the active chat.
+      provider.updateCreditRecoveryText(index + 5, 'x');
+      provider.updateCreditRecoveryText(index, 'natural reply');
+      provider.updateCreditRecoveryText(
+        index,
+        'other conversation',
+        expectedConversationId: 'conv-1',
+      );
+      expect(provider.messages[index].text, 'natural reply');
+      expect(provider.messages.length, 2);
+    });
+
+    test('unrelated errors remain error bubbles', () {
+      final provider = ConversationProvider();
+      provider.showSendError(
+        Message(text: 'hi', isUserMessage: true),
+        'generic failure',
+        false,
+      );
+      expect(provider.messages.length, 2);
+      expect(provider.messages.last.isError, isTrue);
+      expect(provider.messages.last.includeInContext, isFalse);
+      expect(provider.messages.last.text, 'generic failure');
     });
   });
 }

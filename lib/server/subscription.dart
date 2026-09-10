@@ -1,6 +1,7 @@
 // lib/server/subscription.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 
 /// Tier of a Cortex subscription entitlement.
 enum SubscriptionTier {
@@ -301,7 +302,11 @@ class SubscriptionEntitlement {
 /// warnings, gating and local UX math. Authorization always recomputes from
 /// `TIER_LIMITS` server-side — the map is never a security boundary.
 class CreditLimits {
-  const CreditLimits({required this.dailyGrant, required this.debtFloor});
+  const CreditLimits({
+    required this.dailyGrant,
+    required this.debtFloor,
+    this.operationCosts = const {},
+  });
 
   /// Daily credit grant for the tier (`TIER_LIMITS.dailyCredits`).
   final int dailyGrant;
@@ -309,6 +314,15 @@ class CreditLimits {
   /// Debt floor for the tier (`TIER_LIMITS.negativeCreditLimit`): at or
   /// below this balance nothing is sendable until the allowance renews.
   final int debtFloor;
+
+  /// Server-published default credit cost per generation operation
+  /// (`DEFAULT_CREDIT_CHARGES` in Fulcrum's subscription.js): image, video,
+  /// music, speech and the text lanes (easy/medium/hard/extreme). The client
+  /// compares the spendable balance against these to stop offering what the
+  /// server would refuse — never hardcoded on the Flutter side. An empty map
+  /// means the document predates the publication; per-operation gating then
+  /// falls back to the access band (the server still enforces the real cost).
+  final Map<String, int> operationCosts;
 
   /// Values used only while a user document predates the server's publication
   /// of `creditLimits`; such documents converge on the next daily renewal.
@@ -324,7 +338,21 @@ class CreditLimits {
     final grant = _readInt(raw['dailyGrant']);
     final floor = _readInt(raw['debtFloor']);
     if (grant == null || floor == null) return fallback;
-    return CreditLimits(dailyGrant: grant, debtFloor: floor);
+    return CreditLimits(
+      dailyGrant: grant,
+      debtFloor: floor,
+      operationCosts: _readOperationCosts(raw['operationCosts']),
+    );
+  }
+
+  static Map<String, int> _readOperationCosts(dynamic raw) {
+    if (raw is! Map) return const {};
+    final costs = <String, int>{};
+    raw.forEach((key, value) {
+      final cost = _readInt(value);
+      if (key is String && cost != null) costs[key] = cost;
+    });
+    return costs;
   }
 
   static int? _readInt(dynamic value) =>
@@ -335,12 +363,15 @@ class CreditLimits {
       identical(this, other) ||
       other is CreditLimits &&
           other.dailyGrant == dailyGrant &&
-          other.debtFloor == debtFloor;
+          other.debtFloor == debtFloor &&
+          const MapEquality().equals(other.operationCosts, operationCosts);
 
   @override
-  int get hashCode => Object.hash(dailyGrant, debtFloor);
+  int get hashCode => Object.hash(
+      dailyGrant, debtFloor, const MapEquality().hash(operationCosts));
 
   @override
   String toString() =>
-      'CreditLimits(dailyGrant: $dailyGrant, debtFloor: $debtFloor)';
+      'CreditLimits(dailyGrant: $dailyGrant, debtFloor: $debtFloor, '
+      'operationCosts: $operationCosts)';
 }

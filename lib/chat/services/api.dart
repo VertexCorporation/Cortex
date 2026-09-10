@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/chat/services/tools.dart';
 import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/server/credits.dart' show formatRenewalRemaining;
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -893,6 +894,99 @@ class ApiService {
       }
     } catch (e) {
       debugPrint('[TitleGen] Error generating title: $e');
+    }
+    return null;
+  }
+
+  /// Composes a natural conversational recovery reply for a recognized
+  /// credit-limit refusal. Same lightweight pattern as title generation and
+  /// image-prompt optimization: one shot against the backend's fast
+  /// endpoint (`_titleBaseUrl`), non-streaming, tiny budget, short timeout.
+  ///
+  /// The model receives STRUCTURED FACTS ONLY — refusal code, operation
+  /// lane, live balance, debt floor, access band, tier and the time until
+  /// the daily renewal — and must acknowledge the failure naturally without
+  /// inventing prices, renewal dates or policy, and without answering or
+  /// retrying the original request. Returns null on any failure (missing
+  /// auth, network, empty body); the caller then keeps the deterministic
+  /// localized copy. One attempt, no retries.
+  Future<String?> getCreditRecoveryMessage({
+    required String failedUserText,
+    required String operation,
+    required String code,
+    required int spendable,
+    required int debtFloor,
+    required String access,
+    required String tier,
+    required Duration renewalRemaining,
+    required String langCode,
+  }) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return null;
+      final String? token = await user.getIdToken();
+
+      final options = Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        receiveTimeout: const Duration(seconds: 12),
+      );
+
+      final facts = jsonEncode({
+        'refusal_code': code,
+        'operation': operation,
+        'credits_spendable': spendable,
+        'credit_debt_floor': debtFloor,
+        'access_band': access,
+        'tier': tier,
+        'time_until_daily_renewal': formatRenewalRemaining(renewalRemaining),
+        'user_request': failedUserText.isEmpty
+            ? '(media-only request)'
+            : failedUserText,
+      });
+
+      final payload = {
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the assistant in a chat app. The user's "
+                "latest request was REJECTED because their AI credits are "
+                "insufficient. Compose ONE short, warm, natural assistant "
+                "message acknowledging this failure. Respond in ISO language "
+                "code '$langCode'; if the user request is in another "
+                "language, match the user's language instead. STRICT RULES: "
+                "Use ONLY the structured facts provided — never invent "
+                "prices, costs, renewal dates, deadlines, policies, or "
+                "offers not listed. Do NOT answer, retry, or promise to "
+                "fulfill the original request. Plain text only: no markdown, "
+                "no lists, no quotes. Maximum two sentences.",
+          },
+          {"role": "user", "content": facts}
+        ],
+        "model": "meta-llama/llama-3-8b-instruct",
+        "stream": false,
+        "max_tokens": 80,
+      };
+
+      final response = await _titleDio.post(
+        _titleBaseUrl,
+        options: options,
+        data: payload,
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        if (data['choices'] != null && data['choices'].isNotEmpty) {
+          final content = data['choices'][0]['message']['content'];
+          if (content != null && content.toString().trim().isNotEmpty) {
+            return content.toString().trim();
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('[CreditRecovery] Natural reply composition failed: $e');
     }
     return null;
   }

@@ -1,4 +1,4 @@
-import '../panel/actions/rename.dart';
+import '../panel/actions/edit.dart';
 import 'package:cortex/design.dart';
 // lib/axon/inbox/widgets/tiles/view.dart
 
@@ -242,9 +242,11 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     final rename = context.read<InboxViewModel>().editConversation;
     final conversationId = manager.conversationID;
     final initialTitle = manager.conversationTitle;
-    final title = await showDialog<String>(
+    // Shared polished rename dialog (darkened backdrop, keyboard-aware
+    // layout, submit-on-enter) — same one used by the panel actions.
+    final title = await showEditTitleDialog(
       context: context,
-      builder: (_) => ConversationRenameDialog(initialTitle: initialTitle),
+      initialTitle: initialTitle,
     );
     if (title != null) await rename(conversationId, title);
   }

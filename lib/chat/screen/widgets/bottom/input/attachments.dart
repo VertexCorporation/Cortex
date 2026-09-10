@@ -128,20 +128,23 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
                     onTap: () => widget.onRemove(index),
                     child: Container(
                       padding: const EdgeInsets.all(6.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: AppColors.background.withValues(alpha: 0.9),
                         shape: BoxShape.circle,
-                        boxShadow: [
+                        border: Border.all(
+                          color: AppColors.border.withValues(alpha: 0.3),
+                        ),
+                        boxShadow: const [
                           BoxShadow(
                               color: Colors.black26,
                               blurRadius: 4,
                               offset: Offset(0, 2))
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.close_rounded,
                         size: CortexDesign.icon,
-                        color: Colors.black,
+                        color: AppColors.primaryColor.inverted,
                       ),
                     ),
                   ),
@@ -196,19 +199,21 @@ class _AttachmentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (attachment.type == AttachmentType.image) {
+      // Square 1:1 thumbnail (spec: unified preview) — the same footprint
+      // the remove bubble is anchored to, themed like the composer.
       return Container(
-        width: size * 2.0, // Make it pill shaped (wider)
+        width: size,
         height: size,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100.0), // Fully rounded pill
+          borderRadius: BorderRadius.circular(12.0),
           border: Border.all(
               color: AppColors.border.withValues(alpha: 0.2), width: 1.0),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(100.0),
+          borderRadius: BorderRadius.circular(12.0),
           child: Image.file(
             attachment.file,
-            width: size * 2.0,
+            width: size,
             height: size,
             fit: BoxFit.cover,
             errorBuilder: (ctx, err, stack) => Icon(

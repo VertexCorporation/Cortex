@@ -663,4 +663,74 @@ class ConversationProvider with ChangeNotifier {
     _isWaitingForResponse = false;
     notifyListeners();
   }
+
+  /// Adds a user message and ONE in-context assistant recovery reply for a
+  /// recognized credit-limit refusal. Unlike [showSendError], the assistant
+  /// bubble is a normal reply (not an error state): the turn stays part of
+  /// the conversation history, so the chat reads naturally and the user can
+  /// simply continue. The [recoveryText] starts as the deterministic
+  /// canonical copy and is refined in place by [updateCreditRecoveryText]
+  /// when the lightweight model answers.
+  ///
+  /// Returns the index of the assistant message for that refinement, or null
+  /// when the conversation was torn down mid-flight (nothing inserted).
+  int? showCreditRecovery(Message userMessage, String recoveryText) {
+    // Mid-send failures leave the "thinking" bubble in place — convert it
+    // into the recovery reply instead of appending a duplicate pair.
+    if (_messages.isNotEmpty && _messages.last.isThinking) {
+      final index = _messages.length - 1;
+      _messages[index] = _messages.last.copyWith(
+        text: recoveryText,
+        isThinking: false,
+        isError: false,
+      );
+      if (_conversationID != null) {
+        ChatStorageService.updateStoredMessage(
+            _conversationID!, _messages[index], index);
+      }
+      _isWaitingForResponse = false;
+      notifyListeners();
+      return index;
+    }
+
+    final recoveryAiMessage = Message(text: recoveryText, isUserMessage: false);
+
+    _messages.add(userMessage);
+    _messages.add(recoveryAiMessage);
+
+    if (_conversationID != null) {
+      ChatStorageService.upsertMessage(
+          _conversationID!, _messages.length - 2, userMessage);
+      ChatStorageService.upsertMessage(
+          _conversationID!, _messages.length - 1, recoveryAiMessage);
+    }
+
+    _isWaitingForResponse = false;
+    notifyListeners();
+    return _messages.length - 1;
+  }
+
+  /// Replaces a credit-recovery assistant bubble's deterministic copy with
+  /// the refined natural reply. Guards: correct conversation, valid index,
+  /// still a plain assistant bubble (not error/thinking), and an actual
+  /// change — a stale refinement arriving after a switch or reset is
+  /// dropped silently.
+  void updateCreditRecoveryText(int index, String text,
+      {String? expectedConversationId}) {
+    if (expectedConversationId != null &&
+        _conversationID != expectedConversationId) {
+      return;
+    }
+    if (index < 0 || index >= _messages.length) return;
+    final message = _messages[index];
+    if (message.isUserMessage || message.isError || message.isThinking) return;
+    if (message.text == text) return;
+
+    _messages[index] = message.copyWith(text: text);
+    if (_conversationID != null) {
+      ChatStorageService.updateStoredMessage(
+          _conversationID!, _messages[index], index);
+    }
+    notifyListeners();
+  }
 }

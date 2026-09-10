@@ -301,8 +301,6 @@ class AppLanguageSection extends StatelessWidget {
       return;
     }
 
-    localeProvider.setLocale(Locale(selectedLangCode));
-
     // 1. Set the new locale. This will cause UI widgets that watch LocaleProvider to rebuild.
     await localeProvider.setLocale(Locale(selectedLangCode));
 
