@@ -449,23 +449,36 @@ class ChatViewState extends State<ChatView>
   }
 
   Widget _buildBriefingOverlay(double bottomSafe, bool isVoiceMode) {
-    return Positioned(
-      left: 16,
-      right: 16,
-      bottom:
-          bottomPanelHeightNotifier.value + bottomSafe + _briefingBottomOffset,
-      child: AnimatedSlide(
-        offset: isVoiceMode ? const Offset(0, 1.5) : Offset.zero,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        child: _BriefingOverlayWrapper(
-          onVisibleHeightChanged: (h) {
-            if (briefingVisibleHeightNotifier.value != h) {
-              briefingVisibleHeightNotifier.value = h;
-            }
-          },
-        ),
-      ),
+    // The briefing must track the panel's live height: opening edit mode
+    // grows the panel over 300ms and SizeChangedLayoutNotifier reports every
+    // frame, so this AnimatedBuilder keeps the briefing gliding up in
+    // lockstep with the banner — reading the notifier once would freeze the
+    // bottom offset at the last full rebuild and let the newly opened edit
+    // banner slide straight under the briefing. Only the briefing moves:
+    // the chat content keeps its own padding rule (see _buildMainContent).
+    return AnimatedBuilder(
+      animation: bottomPanelHeightNotifier,
+      builder: (context, _) {
+        return Positioned(
+          left: 16,
+          right: 16,
+          bottom: bottomPanelHeightNotifier.value +
+              bottomSafe +
+              _briefingBottomOffset,
+          child: AnimatedSlide(
+            offset: isVoiceMode ? const Offset(0, 1.5) : Offset.zero,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: _BriefingOverlayWrapper(
+              onVisibleHeightChanged: (h) {
+                if (briefingVisibleHeightNotifier.value != h) {
+                  briefingVisibleHeightNotifier.value = h;
+                }
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
