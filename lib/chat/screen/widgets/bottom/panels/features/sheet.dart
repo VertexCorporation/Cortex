@@ -323,14 +323,10 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                     ),
 
                     // 3. WEB SEARCH
-                    FeaturesSheetButton(
+                    if (!isOfflineModelSelected) FeaturesSheetButton(
                       iconPath: 'assets/icons/world.svg',
                       title: l10n.featureWebSearchTitle,
-                      description: isOfflineModelSelected
-                          ? (Localizations.localeOf(context).languageCode == 'tr'
-                              ? 'Arama sorusu çevrimiçi gönderilir; yanıt cihazda üretilir. Arama kredi kullanabilir. İnternetsiz normal çalışır.'
-                              : 'The search query goes online; the answer runs on device. Search may use credits. Works normally offline.')
-                          : l10n.featureWebSearchDescription,
+                      description: l10n.featureWebSearchDescription,
                       isSelected: inputProvider.enableWebSearch,
                       onTap: () {
                         _prepareForTextFeature(context);
@@ -511,7 +507,7 @@ void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
   }).toList();
 
   if (downloadedModels.isNotEmpty) {
-    // Web search is optional augmentation; the answer still runs locally.
+    inputProvider.clearWebSearch();
     inputProvider.setFeatureMode(ChatInputMode.offline);
 
     // Auto-select an available offline model.
