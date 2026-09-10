@@ -198,7 +198,6 @@
   "@dynamicChatTitle": {
     "description": "The title for a conversation started in dynamic mode."
   },
-  "dynamicPreditsUpgradeMessage": "Cortex çok daha iyi yanıtlar verebilir; şimdi hesabını yükselt ve her sorun için en iyi yanıtı al!",
   "edit": "Düzenle",
   "editConversationTitle": "Yeniden Adlandır",
   "editProfile": "Profili Düzenle",
@@ -920,12 +919,9 @@
   "generationVideoLabel": "Video Oluşturuluyor",
   "generationAudioLabel": "Ses Oluşturuluyor",
   "generationDocumentLabel": "Belge Oluşturuluyor",
-  "creditWarningFreeDecliningTitle": "Krediler Azalıyor",
-  "creditWarningFreeDecliningMessage": "Kredileriniz azalıyor. Zekâ performansı düşebilir.",
-  "creditWarningFreeExhaustedTitle": "Günlük Limit Doldu",
-  "creditWarningFreeExhaustedMessage": "Sohbet hakkınız günlük limitiniz yenilenene kadar kısıtlıdır. Daha fazlası için abone olun.",
-  "creditWarningPaidUpgradeTitle": "Planı Yükselt",
-  "creditWarningPaidUpgradeMessage": "Daha fazla kredi için planınızı yükseltin.",
-  "creditWarningUltraTitle": "Krediler Düşük",
-  "creditWarningUltraMessage": "Kredileriniz azalıyor. Performans düşebilir."
+  "creditWarningFreeDecliningMessage": "Bugünlük ücretsiz kredileriniz bitti, yanıtlar daha basit olabilir. {renewalTime} içinde yenilenir. En iyi zekâ performansı için hesabınızı yükseltin.",
+  "creditWarningPaidUpgradeMessage": "Kredileriniz azalıyor, yanıtlar daha basit olabilir. {renewalTime} içinde yenilenir. Daha fazla kullanım için planınızı yükseltin.",
+  "creditWarningUltraMessage": "Kullanım sınırınıza yaklaşıyorsunuz, yanıtlar daha basit olabilir. {renewalTime} içinde yenilenir.",
+  "creditWarningExhaustedMessage": "Bugünlük kredilerinizin tamamını kullandınız. {renewalTime} içinde yenilenir. Sınırsız devam etmek için hesabınızı yükseltin.",
+  "creditWarningUltraExhaustedMessage": "Bugünlük kullanım sınırınıza ulaştınız. {renewalTime} içinde yenilenir."
 }

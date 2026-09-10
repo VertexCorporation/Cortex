@@ -956,7 +956,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'â€œ$modelNameâ€ togs bort.';
+    return '“$modelName” togs bort.';
   }
 
   @override
@@ -2025,10 +2025,6 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get dynamicPreditsUpgradeMessage =>
-      'Cortex kan ge ännu bättre svar; uppgradera nu och få det bästa svaret på varje fråga!';
-
-  @override
   String get pinLimitReached => 'Du kan fästa upp till 3 chattar.';
 
   @override
@@ -2142,30 +2138,27 @@ class AppLocalizationsSv extends AppLocalizations {
   String get generationDocumentLabel => 'Genererar Dokument';
 
   @override
-  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+  String creditWarningFreeDecliningMessage(String renewalTime) {
+    return 'Dina gratiskrediter för idag har tagit slut, svaren kan bli enklare. De förnyas om $renewalTime. Uppgradera för bästa intelligens.';
+  }
 
   @override
-  String get creditWarningFreeDecliningMessage =>
-      'Your credits are declining. Intelligence performance may decrease.';
+  String creditWarningPaidUpgradeMessage(String renewalTime) {
+    return 'Dina krediter börjar ta slut, svaren kan bli enklare. De förnyas om $renewalTime. Uppgradera ditt abonnemang för mer användning.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+  String creditWarningUltraMessage(String renewalTime) {
+    return 'Du närmar dig din användningsgräns, svaren kan bli enklare. Den förnyas om $renewalTime.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedMessage =>
-      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+  String creditWarningExhaustedMessage(String renewalTime) {
+    return 'Du har använt alla dina krediter för idag. De förnyas om $renewalTime. Uppgradera för att fortsätta utan gränser.';
+  }
 
   @override
-  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
-
-  @override
-  String get creditWarningPaidUpgradeMessage =>
-      'Upgrade your plan for more credits.';
-
-  @override
-  String get creditWarningUltraTitle => 'Credits Low';
-
-  @override
-  String get creditWarningUltraMessage =>
-      'Your credits are running low. Performance may decrease.';
+  String creditWarningUltraExhaustedMessage(String renewalTime) {
+    return 'Du har nått din användningsgräns för idag. Den förnyas om $renewalTime.';
+  }
 }

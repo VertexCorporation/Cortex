@@ -957,7 +957,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return 'â€œ$modelNameâ€ sikeresen eltávolítva.';
+    return '“$modelName” sikeresen eltávolítva.';
   }
 
   @override
@@ -2033,10 +2033,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get dynamicPreditsUpgradeMessage =>
-      'A Cortex még jobb válaszokat tud adni; frissítsen most, és minden kérdésre a legjobb választ kapja!';
-
-  @override
   String get pinLimitReached => 'Legfeljebb 3 csevegést rögzíthet.';
 
   @override
@@ -2150,30 +2146,27 @@ class AppLocalizationsHu extends AppLocalizations {
   String get generationDocumentLabel => 'Dokumentum Készítése';
 
   @override
-  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+  String creditWarningFreeDecliningMessage(String renewalTime) {
+    return 'Az ingyenes kreditei mára elfogytak, a válaszok egyszerűbbek lehetnek. $renewalTime múlva megújulnak. A legjobb intelligenciáért frissítsen.';
+  }
 
   @override
-  String get creditWarningFreeDecliningMessage =>
-      'Your credits are declining. Intelligence performance may decrease.';
+  String creditWarningPaidUpgradeMessage(String renewalTime) {
+    return 'A kreditei fogynak, a válaszok egyszerűbbek lehetnek. $renewalTime múlva megújulnak. Több használatért frissítse csomagját.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+  String creditWarningUltraMessage(String renewalTime) {
+    return 'Közeledik a használati limithez, a válaszok egyszerűbbek lehetnek. $renewalTime múlva megújul.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedMessage =>
-      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+  String creditWarningExhaustedMessage(String renewalTime) {
+    return 'Mára az összes kreditjét elhasználta. $renewalTime múlva megújulnak. Korlátok nélküli folytatáshoz frissítsen.';
+  }
 
   @override
-  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
-
-  @override
-  String get creditWarningPaidUpgradeMessage =>
-      'Upgrade your plan for more credits.';
-
-  @override
-  String get creditWarningUltraTitle => 'Credits Low';
-
-  @override
-  String get creditWarningUltraMessage =>
-      'Your credits are running low. Performance may decrease.';
+  String creditWarningUltraExhaustedMessage(String renewalTime) {
+    return 'Elérte a mai használati limitjét. $renewalTime múlva megújul.';
+  }
 }

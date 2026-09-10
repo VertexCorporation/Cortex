@@ -2011,10 +2011,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get dynamicPreditsUpgradeMessage =>
-      'يمكن لـ Cortex تقديم إجابات أفضل؛ قم بالترقية الآن واحصل على أفضل إجابة لكل سؤال!';
-
-  @override
   String get pinLimitReached => 'يمكنك تثبيت ما يصل إلى 3 محادثات.';
 
   @override
@@ -2128,30 +2124,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get generationDocumentLabel => 'جارٍ إنشاء المستند';
 
   @override
-  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+  String creditWarningFreeDecliningMessage(String renewalTime) {
+    return 'انتهت أرصدتك المجانية لليوم، قد تكون الردود أبسط. تتجدد خلال $renewalTime. قم بالترقية للحفاظ على أفضل أداء ذكاء.';
+  }
 
   @override
-  String get creditWarningFreeDecliningMessage =>
-      'Your credits are declining. Intelligence performance may decrease.';
+  String creditWarningPaidUpgradeMessage(String renewalTime) {
+    return 'أرصدتك تنفد، قد تكون الردود أبسط. تتجدد خلال $renewalTime. قم بترقية خطتك للحصول على مزيد من الاستخدام.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+  String creditWarningUltraMessage(String renewalTime) {
+    return 'أنت تقترب من حد الاستخدام، قد تكون الردود أبسط. يُجدد خلال $renewalTime.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedMessage =>
-      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+  String creditWarningExhaustedMessage(String renewalTime) {
+    return 'لقد استخدمت كل أرصدتك لهذا اليوم. تتجدد خلال $renewalTime. قم بالترقية للمتابعة دون حدود.';
+  }
 
   @override
-  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
-
-  @override
-  String get creditWarningPaidUpgradeMessage =>
-      'Upgrade your plan for more credits.';
-
-  @override
-  String get creditWarningUltraTitle => 'Credits Low';
-
-  @override
-  String get creditWarningUltraMessage =>
-      'Your credits are running low. Performance may decrease.';
+  String creditWarningUltraExhaustedMessage(String renewalTime) {
+    return 'لقد وصلت إلى حد الاستخدام لهذا اليوم. يُجدد خلال $renewalTime.';
+  }
 }

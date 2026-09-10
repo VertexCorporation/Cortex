@@ -10,6 +10,33 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/server/subscription.dart';
 import '../../../../../../theme.dart';
 
+/// The logical identity of a briefing. Dismissal is tracked per kind, not
+/// per rendered string: a ticking `{renewalTime}` countdown changes the text
+/// but never the kind, so a dismissed briefing stays dead while its state
+/// holds, while crossing into another band surfaces the new briefing.
+enum _BriefingKind {
+  freeDeclining,
+  paidUpgrade,
+  ultraLow,
+  exhausted,
+  ultraExhausted,
+  usageLimitReached,
+  chatLengthLimit,
+  videoPremium,
+  premiumTrial,
+  inappropriate,
+  storage,
+  modelMissing,
+  falOffline,
+}
+
+class _BriefingResolution {
+  const _BriefingResolution(this.kind, this.text);
+
+  final _BriefingKind kind;
+  final String text;
+}
+
 class BriefingOverlay extends StatefulWidget {
   final int? availableCredits;
 
@@ -17,6 +44,11 @@ class BriefingOverlay extends StatefulWidget {
   /// on the user doc, cached by `CreditsManager`). At or below it nothing is
   /// sendable; between it and zero only degraded Dynamic Chat remains.
   final int debtFloor;
+
+  /// Instant of the next daily credit renewal, from
+  /// `CreditsManager.nextDailyRenewal` (mirrors the server's cron). Rendered
+  /// as the human-readable `{renewalTime}` countdown in credit briefings.
+  final DateTime renewalAt;
   final bool photoSelected;
   final bool isOfflineModel;
   final bool modelMissing;
@@ -40,6 +72,7 @@ class BriefingOverlay extends StatefulWidget {
     super.key,
     required this.availableCredits,
     required this.debtFloor,
+    required this.renewalAt,
     required this.photoSelected,
     required this.isOfflineModel,
     required this.modelMissing,
@@ -69,11 +102,24 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   late final Animation<double> _fadeAnimation;
 
   String? _currentMessageText;
+  _BriefingKind? _currentKind;
 
-  /// The last message the user dismissed (tap or downward swipe). It stays
-  /// hidden across rebuilds and conversation switches until the underlying
-  /// condition resolves to a different message.
-  String? _dismissedMessageText;
+  /// The kind the user dismissed (tap or downward swipe). It stays hidden
+  /// across rebuilds and conversation switches until the underlying state
+  /// resolves to a different kind.
+  _BriefingKind? _dismissedKind;
+
+  /// Refreshes the visible `{renewalTime}` countdown without replaying the
+  /// slide/fade. Runs only while a credit briefing is on screen.
+  Timer? _countdownTimer;
+
+  static const Set<_BriefingKind> _countdownKinds = {
+    _BriefingKind.freeDeclining,
+    _BriefingKind.paidUpgrade,
+    _BriefingKind.ultraLow,
+    _BriefingKind.exhausted,
+    _BriefingKind.ultraExhausted,
+  };
 
   final GlobalKey _panelKey = GlobalKey();
   double _measuredPanelHeight = 0.0;
@@ -123,6 +169,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       // Force re-evaluation and replay animation for new chats. Dismissed
       // messages stay dismissed: the state that produced them did not change.
       _currentMessageText = null;
+      _currentKind = null;
       _slideController.value = 0.0;
     }
     _evaluateAndAnimate();
@@ -134,55 +181,130 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     _slideController.removeListener(_reportVisibleHeightThrottled);
     _slideController.dispose();
     super.dispose();
   }
 
-  String? _evaluateMessageText(AppLocalizations loc) {
+  _BriefingResolution? _resolveBriefing(AppLocalizations loc) {
     if (!widget.isUserStateReady) return null;
 
+    final credits = widget.availableCredits;
+
+    // At or below the debt floor nothing is sendable at all: the exhausted
+    // briefing preempts every other consideration in both chat modes.
+    if (credits != null && credits <= widget.debtFloor) {
+      return _exhaustedBriefing(loc);
+    }
+
     if (widget.isDynamicChat) {
-      final credits = widget.availableCredits;
-      // At or below the plan's debt floor nothing is sendable: hard stop.
-      if (credits != null && credits <= widget.debtFloor) {
-        return loc.reachedLimit;
-      }
-      // Zero or negative (still above the floor): Dynamic Chat stays open,
-      // but the server caps the lanes, so Cortex's intelligence drops.
+      // Zero or negative but above the floor: Dynamic Chat stays open, the
+      // server caps the lanes, and the tier decides the wording.
       if (credits != null && credits < 1) {
-        return loc.creditWarningFreeDecliningMessage;
+        return _decliningBriefing(loc);
       }
-      if (widget.limitReached) return loc.chatLengthLimitExceeded;
+      if (widget.limitReached) {
+        return _BriefingResolution(
+            _BriefingKind.chatLengthLimit, loc.chatLengthLimitExceeded);
+      }
       return null;
     }
 
     if (widget.isVideoModel && widget.userTier != SubscriptionTier.ultra) {
-      return loc.videoPremiumWarning;
+      return _BriefingResolution(
+          _BriefingKind.videoPremium, loc.videoPremiumWarning);
     }
-    if (_isPremiumUpgradeMessage) return loc.premiumTrialExhaustedMessage;
-    if (widget.inappropriate) return loc.inappropriateContentDetected;
-    if (widget.limitReached) return loc.chatLengthLimitExceeded;
-    if (!widget.isStorageSufficient) return loc.notEnoughStorage;
-    if (widget.modelMissing) return loc.offlineModelNotInstalled;
-    if (widget.isFalOffline) return loc.falOfflineMessage;
+    if (_isPremiumUpgradeMessage) {
+      return _BriefingResolution(
+          _BriefingKind.premiumTrial, loc.premiumTrialExhaustedMessage);
+    }
+    if (widget.inappropriate) {
+      return _BriefingResolution(
+          _BriefingKind.inappropriate, loc.inappropriateContentDetected);
+    }
+    if (widget.limitReached) {
+      return _BriefingResolution(
+          _BriefingKind.chatLengthLimit, loc.chatLengthLimitExceeded);
+    }
+    if (!widget.isStorageSufficient) {
+      return _BriefingResolution(
+          _BriefingKind.storage, loc.notEnoughStorage);
+    }
+    if (widget.modelMissing) {
+      return _BriefingResolution(
+          _BriefingKind.modelMissing, loc.offlineModelNotInstalled);
+    }
+    if (widget.isFalOffline) {
+      return _BriefingResolution(
+          _BriefingKind.falOffline, loc.falOfflineMessage);
+    }
 
-    final credits = widget.availableCredits;
-    if (credits != null) {
-      // Same credit bands as Dynamic Chat: the floor blocks everything,
-      // zero-to-floor only degrades intelligence.
-      if (credits <= widget.debtFloor) return loc.reachedLimit;
-      if (credits < 1) return loc.creditWarningFreeDecliningMessage;
-      if (_requiredCredits() > credits) return loc.reachedLimit;
+    // Same credit bands as Dynamic Chat for manual models.
+    if (credits != null && credits < 1) {
+      return _decliningBriefing(loc);
+    }
+    if (credits != null && _requiredCredits() > credits) {
+      return _BriefingResolution(
+          _BriefingKind.usageLimitReached, loc.reachedLimit);
     }
     return null;
+  }
+
+  /// Full exhaustion: nothing is sendable until renewal. Ultra has no higher
+  /// plan to sell, so its copy carries no upgrade nudge.
+  _BriefingResolution _exhaustedBriefing(AppLocalizations loc) {
+    final renewal = _formatRenewalRemaining(
+        widget.renewalAt.difference(DateTime.now()));
+    if (widget.userTier == SubscriptionTier.ultra) {
+      return _BriefingResolution(_BriefingKind.ultraExhausted,
+          loc.creditWarningUltraExhaustedMessage(renewal));
+    }
+    return _BriefingResolution(_BriefingKind.exhausted,
+        loc.creditWarningExhaustedMessage(renewal));
+  }
+
+  /// Below zero but above the debt floor: intelligence is degraded but the
+  /// conversation continues. Free, Plus and Pro see an upgrade nudge, Ultra
+  /// gets the plain low-usage warning.
+  _BriefingResolution _decliningBriefing(AppLocalizations loc) {
+    final renewal = _formatRenewalRemaining(
+        widget.renewalAt.difference(DateTime.now()));
+    switch (widget.userTier) {
+      case SubscriptionTier.free:
+        return _BriefingResolution(_BriefingKind.freeDeclining,
+            loc.creditWarningFreeDecliningMessage(renewal));
+      case SubscriptionTier.plus:
+      case SubscriptionTier.pro:
+        return _BriefingResolution(_BriefingKind.paidUpgrade,
+            loc.creditWarningPaidUpgradeMessage(renewal));
+      case SubscriptionTier.ultra:
+        return _BriefingResolution(
+            _BriefingKind.ultraLow, loc.creditWarningUltraMessage(renewal));
+    }
+  }
+
+  /// "23h 14m" / "5h 42m" / "47m" — never negative: if the renewal instant
+  /// has already passed but the refreshed snapshot has not landed yet, the
+  /// countdown holds at one minute instead of counting below zero.
+  static String _formatRenewalRemaining(Duration remaining) {
+    if (remaining < const Duration(minutes: 1)) return '1m';
+    final hours = remaining.inHours;
+    final minutes = remaining.inMinutes.remainder(60);
+    if (hours == 0) return '${minutes}m';
+    if (minutes == 0) return '${hours}h';
+    return '${hours}h ${minutes}m';
   }
 
   void _evaluateAndAnimate() {
     if (!mounted) return;
     if (!widget.isUserStateReady) {
-      if (_currentMessageText != null) {
-        setState(() => _currentMessageText = null);
+      _syncCountdownTimer(null);
+      if (_currentMessageText != null || _currentKind != null) {
+        setState(() {
+          _currentMessageText = null;
+          _currentKind = null;
+        });
       }
       if (_slideController.value > 0.0) {
         _slideController.reverse().then((_) {
@@ -195,13 +317,17 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     }
 
     final loc = AppLocalizations.of(context)!;
-    final nextMessageText = _evaluateMessageText(loc);
+    final next = _resolveBriefing(loc);
 
-    // A message the user dismissed stays hidden until the underlying
-    // condition resolves to a different message (or clears entirely).
-    if (nextMessageText != null && nextMessageText == _dismissedMessageText) {
-      if (_currentMessageText != null) {
-        setState(() => _currentMessageText = null);
+    // A dismissed kind stays hidden until the underlying state resolves to
+    // something else; the changing countdown text never resurrects it.
+    if (next != null && next.kind == _dismissedKind) {
+      _syncCountdownTimer(null);
+      if (_currentMessageText != null || _currentKind != null) {
+        setState(() {
+          _currentMessageText = null;
+          _currentKind = null;
+        });
       }
       if (_slideController.value > 0.0) {
         _slideController.reverse().then((_) {
@@ -212,42 +338,74 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       }
       return;
     }
-    _dismissedMessageText = null;
+    _dismissedKind = null;
 
-    if (nextMessageText == _currentMessageText && _slideController.value > 0) {
+    // Keep the visible countdown ticking while a credit briefing is shown.
+    _syncCountdownTimer(next?.kind);
+
+    // Same kind already on screen: refresh only the countdown text, never
+    // replay the slide/fade — a minute tick is not a new briefing.
+    if (next != null &&
+        next.kind == _currentKind &&
+        _slideController.value > 0.0) {
+      if (next.text != _currentMessageText) {
+        setState(() => _currentMessageText = next.text);
+        _measurePanelHeightAndReport();
+      }
       return;
     }
 
-    if (nextMessageText != _currentMessageText) {
-      final bool isShowingMessage = _slideController.value > 0.0;
-      final bool hasNewMessage = nextMessageText?.trim().isNotEmpty == true;
+    // Nothing to show and nothing on screen: no transition needed.
+    if (next == null && _currentKind == null) {
+      return;
+    }
 
-      if (isShowingMessage) {
-        _slideController.reverse().then((_) {
-          if (!mounted) return;
+    final bool isShowingMessage = _slideController.value > 0.0;
+    final bool hasNewMessage = next?.text.trim().isNotEmpty == true;
 
-          if (hasNewMessage) {
-            setState(() {
-              _currentMessageText = nextMessageText;
-            });
-            _slideController.forward(from: 0.0);
-          } else {
-            setState(() => _currentMessageText = null);
-          }
-          _measurePanelHeightAndReport();
-        });
-      } else if (hasNewMessage) {
-        setState(() {
-          _currentMessageText = nextMessageText;
-        });
-        _slideController.forward(from: 0.0);
+    if (isShowingMessage) {
+      _slideController.reverse().then((_) {
+        if (!mounted) return;
+
+        if (hasNewMessage) {
+          setState(() {
+            _currentMessageText = next!.text;
+            _currentKind = next.kind;
+          });
+          _slideController.forward(from: 0.0);
+        } else {
+          setState(() {
+            _currentMessageText = null;
+            _currentKind = null;
+          });
+        }
         _measurePanelHeightAndReport();
-      } else {
-        setState(() {
-          _currentMessageText = null;
-        });
-        _measurePanelHeightAndReport();
-      }
+      });
+    } else if (hasNewMessage) {
+      setState(() {
+        _currentMessageText = next!.text;
+        _currentKind = next.kind;
+      });
+      _slideController.forward(from: 0.0);
+      _measurePanelHeightAndReport();
+    } else {
+      setState(() {
+        _currentMessageText = null;
+        _currentKind = null;
+      });
+      _measurePanelHeightAndReport();
+    }
+  }
+
+  void _syncCountdownTimer(_BriefingKind? kind) {
+    final needed = kind != null && _countdownKinds.contains(kind);
+    if (needed) {
+      _countdownTimer ??= Timer.periodic(const Duration(seconds: 30), (_) {
+        if (mounted) _evaluateAndAnimate();
+      });
+    } else {
+      _countdownTimer?.cancel();
+      _countdownTimer = null;
     }
   }
 
@@ -268,9 +426,10 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   void _handleDismiss() {
     if (_slideController.isDismissed) return;
-    // Remember what was dismissed so rebuilds do not resurrect it until the
-    // underlying condition actually changes.
-    _dismissedMessageText = _currentMessageText;
+    // Remember the dismissed kind so rebuilds do not resurrect it until the
+    // underlying condition actually changes; the ticking countdown text
+    // never counts as a change.
+    _dismissedKind = _currentKind;
     _slideController.reverse().then((_) {
       if (!mounted) return;
       setState(() {});
@@ -359,14 +518,20 @@ class _BriefingOverlayState extends State<BriefingOverlay>
           onVerticalDragEnd: _handlePanEnd,
           onTap: _handleDismiss,
           child: Builder(builder: (context) {
-            final loc = AppLocalizations.of(context)!;
             final bool usesPremiumUpgradeVisuals = _isPremiumUpgradeMessage;
-            final bool isPremiumMessage =
-                _currentMessageText == loc.videoPremiumWarning ||
-                    _currentMessageText == loc.premiumTrialExhaustedMessage ||
-                    _currentMessageText == loc.reachedLimit ||
-                    _currentMessageText ==
-                        loc.creditWarningFreeDecliningMessage;
+            final bool isPremiumMessage = _currentKind != null &&
+                switch (_currentKind!) {
+                  _BriefingKind.videoPremium ||
+                  _BriefingKind.premiumTrial ||
+                  _BriefingKind.usageLimitReached ||
+                  _BriefingKind.freeDeclining ||
+                  _BriefingKind.paidUpgrade ||
+                  _BriefingKind.ultraLow ||
+                  _BriefingKind.exhausted ||
+                  _BriefingKind.ultraExhausted =>
+                    true,
+                  _ => false,
+                };
             return _BriefingPanelContent(
               key: _panelKey,
               message: _currentMessageText ?? "",

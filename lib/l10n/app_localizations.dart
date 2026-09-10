@@ -1889,7 +1889,7 @@ abstract class AppLocalizations {
   /// No description provided for @modelRemovedSuccess.
   ///
   /// In en, this message translates to:
-  /// **'â€œ{modelName}â€ was successfully removed.'**
+  /// **'“{modelName}” was successfully removed.'**
   String modelRemovedSuccess(Object modelName);
 
   /// No description provided for @errorCreatingModel.
@@ -3729,12 +3729,6 @@ abstract class AppLocalizations {
   /// **'Free {plan}!'**
   String freePlan(String plan);
 
-  /// No description provided for @dynamicPreditsUpgradeMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Cortex can give even better answers; upgrade now and get the best answer for every question!'**
-  String get dynamicPreditsUpgradeMessage;
-
   /// No description provided for @pinLimitReached.
   ///
   /// In en, this message translates to:
@@ -3939,53 +3933,35 @@ abstract class AppLocalizations {
   /// **'Generating Document'**
   String get generationDocumentLabel;
 
-  /// No description provided for @creditWarningFreeDecliningTitle.
+  /// Free tier: daily credits dropped below zero while above the debt floor; Dynamic Chat stays open but degraded.
   ///
   /// In en, this message translates to:
-  /// **'Credits Declining'**
-  String get creditWarningFreeDecliningTitle;
+  /// **'Your free credits for today are used up, so answers may be simpler. They renew in {renewalTime}. Upgrade to keep the best intelligence.'**
+  String creditWarningFreeDecliningMessage(String renewalTime);
 
-  /// No description provided for @creditWarningFreeDecliningMessage.
+  /// Plus/Pro tiers: credits dropped below zero while above the debt floor; nudges an upgrade.
   ///
   /// In en, this message translates to:
-  /// **'Your credits are declining. Intelligence performance may decrease.'**
-  String get creditWarningFreeDecliningMessage;
+  /// **'Your credits are running low, so answers may be simpler. They renew in {renewalTime}. Upgrade your plan for more usage.'**
+  String creditWarningPaidUpgradeMessage(String renewalTime);
 
-  /// No description provided for @creditWarningFreeExhaustedTitle.
+  /// Ultra tier: usage dropped below zero while above the debt floor; no upgrade nudge.
   ///
   /// In en, this message translates to:
-  /// **'Daily Limit Reached'**
-  String get creditWarningFreeExhaustedTitle;
+  /// **'You\'re nearing your usage limit, so answers may be simpler. It renews in {renewalTime}.'**
+  String creditWarningUltraMessage(String renewalTime);
 
-  /// No description provided for @creditWarningFreeExhaustedMessage.
+  /// Free/Plus/Pro: at or below the debt floor, nothing is sendable until renewal; nudges an upgrade.
   ///
   /// In en, this message translates to:
-  /// **'Your chat allowance will renew with your daily limit. Subscribe for more access.'**
-  String get creditWarningFreeExhaustedMessage;
+  /// **'You\'ve used all your credits for today. They renew in {renewalTime}. Upgrade to keep going without limits.'**
+  String creditWarningExhaustedMessage(String renewalTime);
 
-  /// No description provided for @creditWarningPaidUpgradeTitle.
+  /// Ultra: at or below the debt floor; no higher plan exists, so no upgrade nudge.
   ///
   /// In en, this message translates to:
-  /// **'Upgrade Plan'**
-  String get creditWarningPaidUpgradeTitle;
-
-  /// No description provided for @creditWarningPaidUpgradeMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Upgrade your plan for more credits.'**
-  String get creditWarningPaidUpgradeMessage;
-
-  /// No description provided for @creditWarningUltraTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Credits Low'**
-  String get creditWarningUltraTitle;
-
-  /// No description provided for @creditWarningUltraMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Your credits are running low. Performance may decrease.'**
-  String get creditWarningUltraMessage;
+  /// **'You\'ve reached your usage limit for today. It renews in {renewalTime}.'**
+  String creditWarningUltraExhaustedMessage(String renewalTime);
 }
 
 class _AppLocalizationsDelegate

@@ -284,7 +284,7 @@
   "noFoundTitle": "Žádné výsledky",
   "noFoundMessage": "Zkuste upravit hledané výrazy nebo vymazat filtr.",
   "modelCreatedSuccess": "Model úspěšně vytvořen!",
-  "modelRemovedSuccess": "â€œ{modelName}â€ bylo úspěšně odstraněno.",
+  "modelRemovedSuccess": "“{modelName}” bylo úspěšně odstraněno.",
   "errorCreatingModel": "Při vytváření modelu došlo k neočekávané chybě.",
   "errorDeletingModel": "Při odstraňování modelu došlo k neočekávané chybě.",
   "ultraFeatureOnly": "Tato funkce je dostupná pouze pro členy Ultra.",
@@ -573,7 +573,6 @@
   "trialMonthlyDescription": "První {days} dny zdarma, poté {price}/měsíc",
   "trialAnnualDescription": "První {days} dny zdarma, poté {price}/rok",
   "freePlan": "Zdarma {plan}!",
-  "dynamicPreditsUpgradeMessage": "Cortex může dát ještě lepší odpovědi; upgradujte nyní a získejte nejlepší odpověď na každou otázku!",
   "pinLimitReached": "Můžete připnout až 3 chaty.",
   "categoryAll": "Vše",
   "categoryFree": "Zdarma",
@@ -626,5 +625,10 @@
   "generationImageLabel": "Generování Obrázku",
   "generationVideoLabel": "Generování Videa",
   "generationAudioLabel": "Generování Zvuku",
-  "generationDocumentLabel": "Generování Dokumentu"
+  "generationDocumentLabel": "Generování Dokumentu",
+  "creditWarningFreeDecliningMessage": "Vaše bezplatné kredity na dnes jsou vyčerpané, odpovědi mohou být jednodušší. Obnoví se za {renewalTime}. Upgradujte pro nejlepší inteligenci.",
+  "creditWarningPaidUpgradeMessage": "Vaše kredity se krátí, odpovědi mohou být jednodušší. Obnoví se za {renewalTime}. Upgradujte předplatné pro více využití.",
+  "creditWarningUltraMessage": "Blížíte se limitu využití, odpovědi mohou být jednodušší. Obnoví se za {renewalTime}.",
+  "creditWarningExhaustedMessage": "Využili jste všechny kredity na dnešek. Obnoví se za {renewalTime}. Upgradujte, abyste mohli pokračovat bez omezení.",
+  "creditWarningUltraExhaustedMessage": "Dosažili jste dnešního limitu využití. Obnoví se za {renewalTime}."
 }

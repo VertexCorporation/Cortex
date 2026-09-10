@@ -198,7 +198,6 @@
   "@dynamicChatTitle": {
     "description": "The title for a conversation started in dynamic mode."
   },
-  "dynamicPreditsUpgradeMessage": "Cortex daha da yaxşı cavablar verə bilər; indi yüksəlt və hər sual üçün ən yaxşı cavabı al!",
   "edit": "Redaktə et",
   "editConversationTitle": "Adını dəyiş",
   "editProfile": "Profili Redaktə et",
@@ -873,5 +872,10 @@
   "generationImageLabel": "Şəkil Yaradılır",
   "generationVideoLabel": "Video Yaradılır",
   "generationAudioLabel": "Səs Yaradılır",
-  "generationDocumentLabel": "Sənəd Yaradılır"
+  "generationDocumentLabel": "Sənəd Yaradılır",
+  "creditWarningFreeDecliningMessage": "Bu günlük pulsuz kreditləriniz tükəndi, cavablar daha sadə ola bilər. {renewalTime} sonra yenilənir. Ən yaxşı keyfiyyət üçün hesabınızı yüksəldin.",
+  "creditWarningPaidUpgradeMessage": "Kreditləriniz azalır, cavablar daha sadə ola bilər. {renewalTime} sonra yenilənir. Daha çox istifadə üçün planınızı yüksəldin.",
+  "creditWarningUltraMessage": "İstifadə həddinizə yaxınlaşırsınız, cavablar daha sadə ola bilər. {renewalTime} sonra yenilənir.",
+  "creditWarningExhaustedMessage": "Bu günlük bütün kreditlərinizi istifadə etdiniz. {renewalTime} sonra yenilənir. Limitsiz davam etmək üçün hesabınızı yüksəldin.",
+  "creditWarningUltraExhaustedMessage": "Bu günlük istifadə həddinizə çatdınız. {renewalTime} sonra yenilənir."
 }

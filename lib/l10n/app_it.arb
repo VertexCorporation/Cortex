@@ -198,7 +198,6 @@
   "@dynamicChatTitle": {
     "description": "The title for a conversation started in dynamic mode."
   },
-  "dynamicPreditsUpgradeMessage": "Cortex può dare risposte ancora migliori; fai l'upgrade ora e ottieni la risposta migliore per ogni domanda!",
   "edit": "Modifica",
   "editConversationTitle": "Rinomina",
   "editProfile": "Modifica Profilo",
@@ -873,5 +872,10 @@
   "generationImageLabel": "Generazione Immagine",
   "generationVideoLabel": "Generazione Video",
   "generationAudioLabel": "Generazione Audio",
-  "generationDocumentLabel": "Generazione Documento"
+  "generationDocumentLabel": "Generazione Documento",
+  "creditWarningFreeDecliningMessage": "I tuoi crediti gratuiti di oggi sono terminati, le risposte potrebbero essere più semplici. Si rinnovano tra {renewalTime}. Fai l'upgrade per mantenere la migliore intelligenza.",
+  "creditWarningPaidUpgradeMessage": "I tuoi crediti si stanno esaurendo, le risposte potrebbero essere più semplici. Si rinnovano tra {renewalTime}. Migliora il tuo piano per avere più utilizzo.",
+  "creditWarningUltraMessage": "Ti stai avvicinando al limite di utilizzo, le risposte potrebbero essere più semplici. Si rinnova tra {renewalTime}.",
+  "creditWarningExhaustedMessage": "Hai usato tutti i crediti di oggi. Si rinnovano tra {renewalTime}. Fai l'upgrade per continuare senza limiti.",
+  "creditWarningUltraExhaustedMessage": "Hai raggiunto il limite di utilizzo di oggi. Si rinnova tra {renewalTime}."
 }

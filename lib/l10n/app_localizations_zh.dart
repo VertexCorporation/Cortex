@@ -1917,10 +1917,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get dynamicPreditsUpgradeMessage =>
-      'Cortex 可以给出更好的回答；立即升级，为每个问题获得最佳答案！';
-
-  @override
   String get pinLimitReached => '您最多可以固定 3 个聊天。';
 
   @override
@@ -2033,30 +2029,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get generationDocumentLabel => '正在生成文档';
 
   @override
-  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+  String creditWarningFreeDecliningMessage(String renewalTime) {
+    return '您今日的免费额度已用完，回答可能会更简单。额度将在 $renewalTime 后刷新。升级以保持最佳智能体验。';
+  }
 
   @override
-  String get creditWarningFreeDecliningMessage =>
-      'Your credits are declining. Intelligence performance may decrease.';
+  String creditWarningPaidUpgradeMessage(String renewalTime) {
+    return '您的额度正在减少，回答可能会更简单。额度将在 $renewalTime 后刷新。升级套餐以获得更多使用量。';
+  }
 
   @override
-  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+  String creditWarningUltraMessage(String renewalTime) {
+    return '您即将达到使用上限，回答可能会更简单。上限将在 $renewalTime 后重置。';
+  }
 
   @override
-  String get creditWarningFreeExhaustedMessage =>
-      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+  String creditWarningExhaustedMessage(String renewalTime) {
+    return '您已用完今日的全部额度。额度将在 $renewalTime 后刷新。升级以继续无限畅聊。';
+  }
 
   @override
-  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
-
-  @override
-  String get creditWarningPaidUpgradeMessage =>
-      'Upgrade your plan for more credits.';
-
-  @override
-  String get creditWarningUltraTitle => 'Credits Low';
-
-  @override
-  String get creditWarningUltraMessage =>
-      'Your credits are running low. Performance may decrease.';
+  String creditWarningUltraExhaustedMessage(String renewalTime) {
+    return '您已达到今日的使用上限。上限将在 $renewalTime 后重置。';
+  }
 }

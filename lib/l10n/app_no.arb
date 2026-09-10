@@ -603,7 +603,6 @@
   "trialMonthlyDescription": "De første {days} dagene gratis, deretter {price}/måned",
   "trialAnnualDescription": "De første {days} dagene gratis, deretter {price}/år",
   "freePlan": "Gratis {plan}!",
-  "dynamicPreditsUpgradeMessage": "Cortex kan gi enda bedre svar; oppgrader nå og få det beste svaret for hvert spørsmål!",
   "pinLimitReached": "Du kan feste opptil 3 chatter.",
   "categoryAll": "Alle",
   "categoryFree": "Gratis",
@@ -656,5 +655,10 @@
   "generationImageLabel": "Genererer Bilde",
   "generationVideoLabel": "Genererer Video",
   "generationAudioLabel": "Genererer Lyd",
-  "generationDocumentLabel": "Genererer Dokument"
+  "generationDocumentLabel": "Genererer Dokument",
+  "creditWarningFreeDecliningMessage": "Dine gratis kreditter for i dag er brukt opp, svarene kan bli enklere. De fornyes om {renewalTime}. Oppgrader for best intelligens.",
+  "creditWarningPaidUpgradeMessage": "Kredittene dine er i ferd med å ta slutt, svarene kan bli enklere. De fornyes om {renewalTime}. Oppgrader abonnementet ditt for mer bruk.",
+  "creditWarningUltraMessage": "Du nærmer deg bruksgrensen din, svarene kan bli enklere. Den fornyes om {renewalTime}.",
+  "creditWarningExhaustedMessage": "Du har brukt alle kredittene dine for i dag. De fornyes om {renewalTime}. Oppgrader for å fortsette uten grenser.",
+  "creditWarningUltraExhaustedMessage": "Du har nådd dagens bruksgrense. Den fornyes om {renewalTime}."
 }

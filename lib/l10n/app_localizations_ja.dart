@@ -1971,10 +1971,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get dynamicPreditsUpgradeMessage =>
-      'Cortex はさらに優れた回答を提供できます。今すぐアップグレードして、すべての質問に最高の答えを得ましょう！';
-
-  @override
   String get pinLimitReached => '最大3つのチャットをピン留めできます。';
 
   @override
@@ -2088,30 +2084,27 @@ class AppLocalizationsJa extends AppLocalizations {
   String get generationDocumentLabel => 'ドキュメントを生成中';
 
   @override
-  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+  String creditWarningFreeDecliningMessage(String renewalTime) {
+    return '本日の無料クレジットを使い切りました。回答が簡易になる場合があります。$renewalTime後に回復します。最高のインテリジェンスを保つにはアップグレードしてください。';
+  }
 
   @override
-  String get creditWarningFreeDecliningMessage =>
-      'Your credits are declining. Intelligence performance may decrease.';
+  String creditWarningPaidUpgradeMessage(String renewalTime) {
+    return 'クレジットが少なくなっています。回答が簡易になる場合があります。$renewalTime後に回復します。より多くの利用のためにプランをアップグレードしましょう。';
+  }
 
   @override
-  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+  String creditWarningUltraMessage(String renewalTime) {
+    return '利用上限に近づいています。回答が簡易になる場合があります。$renewalTime後にリセットされます。';
+  }
 
   @override
-  String get creditWarningFreeExhaustedMessage =>
-      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+  String creditWarningExhaustedMessage(String renewalTime) {
+    return '本日のクレジットをすべて使いました。$renewalTime後に回復します。制限なく使い続けるにはアップグレードしてください。';
+  }
 
   @override
-  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
-
-  @override
-  String get creditWarningPaidUpgradeMessage =>
-      'Upgrade your plan for more credits.';
-
-  @override
-  String get creditWarningUltraTitle => 'Credits Low';
-
-  @override
-  String get creditWarningUltraMessage =>
-      'Your credits are running low. Performance may decrease.';
+  String creditWarningUltraExhaustedMessage(String renewalTime) {
+    return '本日の利用上限に達しました。$renewalTime後にリセットされます。';
+  }
 }

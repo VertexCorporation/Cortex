@@ -198,7 +198,6 @@
   "@dynamicChatTitle": {
     "description": "The title for a conversation started in dynamic mode."
   },
-  "dynamicPreditsUpgradeMessage": "Cortex는 더 나은 답변을 제공할 수 있습니다. 지금 업그레이드하고 모든 질문에 최고의 답을 받아보세요!",
   "edit": "수정",
   "editConversationTitle": "이름 변경",
   "editProfile": "프로필 수정",
@@ -873,5 +872,10 @@
   "generationImageLabel": "이미지 생성 중",
   "generationVideoLabel": "동영상 생성 중",
   "generationAudioLabel": "오디오 생성 중",
-  "generationDocumentLabel": "문서 생성 중"
+  "generationDocumentLabel": "문서 생성 중",
+  "creditWarningFreeDecliningMessage": "오늘의 무료 크레딧을 모두 사용했어요. 답변이 간단해질 수 있어요. {renewalTime} 후에 충전돼요. 최상의 지능을 위해 업그레이드하세요.",
+  "creditWarningPaidUpgradeMessage": "크레딧이 부족해요. 답변이 간단해질 수 있어요. {renewalTime} 후에 충전돼요. 더 많은 사용량을 위해 플랜을 업그레이드하세요.",
+  "creditWarningUltraMessage": "사용 한도에 가까워지고 있어요. 답변이 간단해질 수 있어요. {renewalTime} 후에 초기화돼요.",
+  "creditWarningExhaustedMessage": "오늘의 크레딧을 모두 사용했어요. {renewalTime} 후에 충전돼요. 제한 없이 계속하려면 업그레이드하세요.",
+  "creditWarningUltraExhaustedMessage": "오늘의 사용 한도에 도달했어요. {renewalTime} 후에 초기화돼요."
 }

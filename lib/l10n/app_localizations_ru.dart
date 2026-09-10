@@ -2035,10 +2035,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get dynamicPreditsUpgradeMessage =>
-      'Cortex может дать еще лучшие ответы; обновите сейчас и получите лучший ответ на каждый вопрос!';
-
-  @override
   String get pinLimitReached => 'Вы можете закрепить до 3 чатов.';
 
   @override
@@ -2152,30 +2148,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get generationDocumentLabel => 'Создание Документа';
 
   @override
-  String get creditWarningFreeDecliningTitle => 'Credits Declining';
+  String creditWarningFreeDecliningMessage(String renewalTime) {
+    return 'Ваши бесплатные кредиты на сегодня закончились, ответы могут быть проще. Они обновятся через $renewalTime. Перейдите на платный тариф, чтобы сохранить лучшую интеллектуальность.';
+  }
 
   @override
-  String get creditWarningFreeDecliningMessage =>
-      'Your credits are declining. Intelligence performance may decrease.';
+  String creditWarningPaidUpgradeMessage(String renewalTime) {
+    return 'Ваши кредиты заканчиваются, ответы могут быть проще. Они обновятся через $renewalTime. Улучшите тариф, чтобы получить больше использования.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedTitle => 'Daily Limit Reached';
+  String creditWarningUltraMessage(String renewalTime) {
+    return 'Вы приближаетесь к лимиту использования, ответы могут быть проще. Он обновится через $renewalTime.';
+  }
 
   @override
-  String get creditWarningFreeExhaustedMessage =>
-      'Your chat allowance will renew with your daily limit. Subscribe for more access.';
+  String creditWarningExhaustedMessage(String renewalTime) {
+    return 'Вы использовали все кредиты на сегодня. Они обновятся через $renewalTime. Перейдите на платный тариф, чтобы продолжить без ограничений.';
+  }
 
   @override
-  String get creditWarningPaidUpgradeTitle => 'Upgrade Plan';
-
-  @override
-  String get creditWarningPaidUpgradeMessage =>
-      'Upgrade your plan for more credits.';
-
-  @override
-  String get creditWarningUltraTitle => 'Credits Low';
-
-  @override
-  String get creditWarningUltraMessage =>
-      'Your credits are running low. Performance may decrease.';
+  String creditWarningUltraExhaustedMessage(String renewalTime) {
+    return 'Вы достигли лимита использования на сегодня. Он обновится через $renewalTime.';
+  }
 }
