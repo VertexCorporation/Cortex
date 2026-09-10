@@ -93,15 +93,30 @@ class InputField extends StatefulWidget {
 class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   final InputService _inputService = InputService();
 
-  // The capsule occupies a share of the available reading width: a compact
-  // pill while collapsed (every control inside), opening to a slightly
-  // wider share once expanded. The detachable bubbles float outside its
-  // border in the freed space on both sides. Collapsed share bumped from
-  // 0.6: the compact pill was starving the text field (the hint scaled to
-  // under half size), so the pill keeps a bit more width and the
-  // collapsed/expanded gap narrows.
+  // Shared composer geometry. The capsule occupies a share of the
+  // available reading width: a compact pill while collapsed (every
+  // control inside), opening to a slightly wider share once expanded.
+  // The detachable bubbles float outside its border in the freed space
+  // on both sides. Collapsed share bumped from 0.6: the compact pill
+  // was starving the text field (the hint scaled to under half size),
+  // so the pill keeps a bit more width and the collapsed/expanded gap
+  // narrows. The share the collapsed pill is actually DRAWN at is
+  // derived in build(): 70% of this base, floored on narrow phones
+  // where the fixed control footprint would crush the pill's interior.
   static const double collapsedCapsuleShare = 0.68;
   static const double expandedCapsuleShare = 0.7;
+  // Control gaps, shared by the capsule share math in build() and the
+  // row's own layout below.
+  static const double edgeGap = 8.0; // control -> capsule interior edge
+  static const double buttonGap = 4.0; // mic -> action while both are inside
+  static const double inputGap = 14.0; // breathing room around the text field
+  static const double inputEdgeGap = 14.0; // text field -> capsule border (expanded)
+  static const double screenEdgeGap = 8.0; // detached bubble -> screen edge
+  static const double detachedScreenShare = 0.75;
+  static const double expandedButtonGrow = 1.25;
+
+  static double buttonSizeFor(double screenWidth) =>
+      (screenWidth * 0.086).clamp(32.0, 38.0);
 
   // Morphing composer expand/collapse animation
   late AnimationController _expandController;
@@ -309,8 +324,33 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         final double t = _expandAnimation.value;
         final double available =
             viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
+        // The collapsed pill is drawn at 70% of the share it used to fill
+        // (0.68 -> 0.476 of the reading band), so the morph visibly grows
+        // the capsule itself; the expanded share is untouched. On narrow
+        // phones the share is floored: the three buttons, their gaps and
+        // the field's own paddings consume a fixed ~150px of the pill's
+        // interior, so the pill only shrinks as far as a livable field
+        // (a few ems of the responsive font plus padding) allows. The
+        // floor derives from the same responsive font and button sizes
+        // the row uses — no fixed pixels.
+        final double buttonSize = buttonSizeFor(screenWidth);
+        final double collapsedControlInsets =
+            (edgeGap + buttonSize + inputGap) +
+                (edgeGap + buttonSize * 2 + buttonGap + inputGap);
+        final double responsiveFont =
+            isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+        // A livable collapsed field: 1.2em of glyph room plus the field's
+        // own horizontal paddings (2x4 content + 2x2 section). A hint that
+        // outgrows it clips into the section's fog strip by design.
+        final double minCollapsedField = responsiveFont * 1.2 + 12.0;
+        // 6.0 = the capsule's 1px border gap plus the section's 2px
+        // horizontal padding, per side.
+        final double minCollapsedShare =
+            (collapsedControlInsets + 6.0 + minCollapsedField) / available;
+        final double drawnCollapsedShare =
+            (collapsedCapsuleShare * 0.7).clamp(minCollapsedShare, 1.0);
         final double capsuleInset = lerpDouble(
-          available * (1.0 - collapsedCapsuleShare) / 2.0,
+          available * (1.0 - drawnCollapsedShare) / 2.0,
           available * (1.0 - expandedCapsuleShare) / 2.0,
           t,
         )!;
@@ -336,6 +376,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                 top: -1.0,
                 bottom: -1.0,
                 child: DecoratedBox(
+                  key: const ValueKey('composer_capsule'),
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(radius),
@@ -431,19 +472,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     // controls inside) and opens slightly once expanded, at which point the
     // detachable "+" and action bubbles float outside its border while the
     // microphone stays anchored inside.
-    final double buttonSize = (screenWidth * 0.086).clamp(32.0, 38.0);
-    const double edgeGap = 8.0; // control -> capsule interior edge
-    const double buttonGap = 4.0; // mic -> action while both are inside
-    const double inputGap = 14.0; // breathing room around the text field
-    const double inputEdgeGap = 14.0; // text field -> capsule border (expanded)
-    const double screenEdgeGap = 8.0; // detached bubble -> screen edge
-    // Detached bubbles split the margin between the capsule border and the
-    // screen edge 0.25 / 0.75 (capsule side / screen side), so the screen-side
-    // gap reads about three times the capsule-side one.
-    const double detachedScreenShare = 0.75;
-    // The detachable "+" and action bubbles swell to this multiple of their
-    // base size as the capsule opens (the whole bubble grows, icon included).
-    const double expandedButtonGrow = 1.25;
+    final double buttonSize = buttonSizeFor(screenWidth);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -493,31 +522,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
             // The text field fills the space left between the controls; the
             // compact capsule itself provides the small overall footprint.
-            // While collapsed the field now starts from 0.7 of the width it
-            // used to fill: the freed 30% folds into its collapsed insets —
-            // split evenly, so the field narrows around its own center and
-            // every control gap widens — which makes the capsule morph
-            // visibly widen the input itself. The expanded insets, and
-            // therefore the expanded field width, are untouched.
-            final double collapsedInputLeft = edgeGap + buttonSize + inputGap;
-            final double collapsedInputRight =
-                edgeGap + buttonSize * 2 + buttonGap + inputGap;
-            final double viewportWidth = MediaQuery.sizeOf(context).width;
-            final double availableWidth =
-                viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
-            // The capsule's collapsed interior, minus the capsule's 1px
-            // border gap plus the field section's own 2px horizontal
-            // padding per side, is the width the field used to fill while
-            // collapsed.
-            final double collapsedField = availableWidth * collapsedCapsuleShare -
-                6.0 -
-                collapsedInputLeft -
-                collapsedInputRight;
-            final double freedHalfWidth = collapsedField * 0.3 / 2.0;
-            final double inputLeft = lerpDouble(
-                collapsedInputLeft + freedHalfWidth, inputEdgeGap, t)!;
+            final double inputLeft =
+                lerpDouble(edgeGap + buttonSize + inputGap, inputEdgeGap, t)!;
             final double inputRight = lerpDouble(
-                collapsedInputRight + freedHalfWidth,
+                edgeGap + buttonSize * 2 + buttonGap + inputGap,
                 edgeGap + buttonSize + inputGap,
                 t)!;
 

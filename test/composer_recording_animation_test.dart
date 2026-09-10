@@ -607,22 +607,24 @@ void main() {
       final collapsed = tester.getRect(fieldFinder);
       expect(collapsed.width, greaterThan(0));
 
-      // The collapsed field starts from 0.7 of the width the capsule's
-      // collapsed share leaves between the controls (minus the capsule's
-      // 1px border gap and the field section's 2px horizontal padding per
-      // side), so expanding visibly widens the input itself. The freed 30%
-      // splits evenly into the field's collapsed insets; the expanded
-      // geometry is untouched.
+      // The collapsed capsule is drawn at 70% of the share it used to fill
+      // (0.68 of the reading band), floored on narrow phones where the
+      // fixed control footprint — buttons, gaps, the field's own padding
+      // and a 1.2em livable field — would otherwise crush the pill. The
+      // expanded share is untouched, so the morph visibly grows the
+      // capsule itself.
+      final double available = width - 32; // readingInset is 16 at these widths
       final double buttonSize = (width * 0.086).clamp(32.0, 38.0);
+      final double font = width >= 600 ? width * 0.025 : width * 0.04;
+      final double minShare =
+          ((8 + buttonSize + 14) + (8 + buttonSize * 2 + 4 + 14) + 6 + font * 1.2 + 12) /
+              available;
       expect(
-          collapsed.width,
+          tester
+              .getRect(find.byKey(const ValueKey('composer_capsule')))
+              .width,
           moreOrLessEquals(
-              0.7 *
-                  ((width - 32) *
-                      0.68 -
-                      6 -
-                      (8 + buttonSize + 14) -
-                      (8 + buttonSize * 2 + 4 + 14)),
+              available * (0.68 * 0.7).clamp(minShare, 1.0),
               epsilon: 0.5));
       expect(find.byType(AddPhotoButton).hitTestable(), findsOneWidget);
       expect(find.byType(MicButton).hitTestable(), findsOneWidget);
