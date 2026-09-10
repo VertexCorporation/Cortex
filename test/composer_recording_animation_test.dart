@@ -607,7 +607,7 @@ void main() {
       final collapsed = tester.getRect(fieldFinder);
       expect(collapsed.width, greaterThan(0));
 
-      // The collapsed capsule is drawn at 70% of the share it used to fill
+      // The collapsed capsule is drawn at 85% of the share it used to fill
       // (0.68 of the reading band), floored on narrow phones where the
       // fixed control footprint — buttons, gaps, the field's own padding
       // and a 1.2em livable field — would otherwise crush the pill. The
@@ -624,7 +624,7 @@ void main() {
               .getRect(find.byKey(const ValueKey('composer_capsule')))
               .width,
           moreOrLessEquals(
-              available * (0.68 * 0.7).clamp(minShare, 1.0),
+              available * (0.68 * 0.85).clamp(minShare, 1.0),
               epsilon: 0.5));
       expect(find.byType(AddPhotoButton).hitTestable(), findsOneWidget);
       expect(find.byType(MicButton).hitTestable(), findsOneWidget);
