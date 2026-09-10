@@ -7,19 +7,16 @@ import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/funds/funds.dart';
-import 'package:cortex/navigation.dart';
 import 'package:cortex/server/subscription.dart';
-import 'package:provider/provider.dart';
-import 'package:cortex/login/upgrade.dart';
-import 'package:cortex/server/user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../../theme.dart';
 
 class BriefingOverlay extends StatefulWidget {
   final int? availableCredits;
-  final int? availablePredits;
-  final int? availableDredits;
+
+  /// Server-published debt floor for the user's tier (`creditLimits.debtFloor`
+  /// on the user doc, cached by `CreditsManager`). At or below it nothing is
+  /// sendable; between it and zero only degraded Dynamic Chat remains.
+  final int debtFloor;
   final bool photoSelected;
   final bool isOfflineModel;
   final bool modelMissing;
@@ -42,8 +39,7 @@ class BriefingOverlay extends StatefulWidget {
   const BriefingOverlay({
     super.key,
     required this.availableCredits,
-    required this.availablePredits,
-    required this.availableDredits,
+    required this.debtFloor,
     required this.photoSelected,
     required this.isOfflineModel,
     required this.modelMissing,
@@ -73,11 +69,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   late final Animation<double> _fadeAnimation;
 
   String? _currentMessageText;
-  bool _dynamicPreditsBriefingPrefsLoaded = false;
-  bool _hasShownInitialDynamicPreditsBriefing = false;
-  bool _shouldShowDynamicPreditsBriefing = false;
-  int _dynamicChatEntriesSincePreditsBriefing = 0;
-  String? _lastCountedDynamicPreditsConversationId;
+
+  /// The last message the user dismissed (tap or downward swipe). It stays
+  /// hidden across rebuilds and conversation switches until the underlying
+  /// condition resolves to a different message.
+  String? _dismissedMessageText;
 
   final GlobalKey _panelKey = GlobalKey();
   double _measuredPanelHeight = 0.0;
@@ -90,23 +86,9 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   bool get _isPremiumUpgradeMessage {
     if (widget.isDynamicChat) return false;
     if (widget.isSubscribed || !widget.isPremiumModel) return false;
-    // Free user using a premium model requires at least 10 predits
-    return (widget.availablePredits ?? 0) < 10;
+    // Free user using a premium model requires at least 10 credits
+    return (widget.availableCredits ?? 0) < 10;
   }
-
-  bool get _isDynamicPreditsUpgradeMessage {
-    if (widget.isSubscribed || !widget.isDynamicChat) return false;
-    final predits = widget.availablePredits;
-    if (predits == null) return false;
-    return predits <= 0;
-  }
-
-  static const String _dynamicPreditsInitialShownKey =
-      'dynamic_predits_upgrade_initial_shown';
-  static const String _dynamicPreditsEntryCountKey =
-      'dynamic_predits_upgrade_entry_count';
-  static const String _dynamicPreditsLastConversationKey =
-      'dynamic_predits_upgrade_last_conversation';
 
   @override
   void initState() {
@@ -126,8 +108,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
     _slideController.addListener(_reportVisibleHeightThrottled);
 
-    unawaited(_loadDynamicPreditsBriefingPrefs());
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _evaluateAndAnimate();
@@ -140,113 +120,16 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   void didUpdateWidget(covariant BriefingOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.conversationId != oldWidget.conversationId) {
-      // Force re-evaluation and replay animation for new chats
+      // Force re-evaluation and replay animation for new chats. Dismissed
+      // messages stay dismissed: the state that produced them did not change.
       _currentMessageText = null;
       _slideController.value = 0.0;
-    }
-    if (widget.conversationId != oldWidget.conversationId ||
-        widget.isUserStateReady != oldWidget.isUserStateReady ||
-        widget.isDynamicChat != oldWidget.isDynamicChat ||
-        widget.isSubscribed != oldWidget.isSubscribed ||
-        widget.availablePredits != oldWidget.availablePredits) {
-      unawaited(_updateDynamicPreditsBriefingGate());
     }
     _evaluateAndAnimate();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _measurePanelHeightAndReport();
     });
-  }
-
-  Future<void> _loadDynamicPreditsBriefingPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-
-    _hasShownInitialDynamicPreditsBriefing =
-        prefs.getBool(_dynamicPreditsInitialShownKey) ?? false;
-    _dynamicChatEntriesSincePreditsBriefing =
-        prefs.getInt(_dynamicPreditsEntryCountKey) ?? 0;
-    _lastCountedDynamicPreditsConversationId =
-        prefs.getString(_dynamicPreditsLastConversationKey);
-
-    setState(() => _dynamicPreditsBriefingPrefsLoaded = true);
-    await _updateDynamicPreditsBriefingGate();
-  }
-
-  bool get _isDynamicPreditsBriefingEligible {
-    if (!widget.isUserStateReady) return false;
-    if (!_dynamicPreditsBriefingPrefsLoaded) return false;
-    if (widget.isSubscribed || !widget.isDynamicChat) return false;
-    final predits = widget.availablePredits;
-    return predits != null && predits <= 0;
-  }
-
-  Future<void> _resetDynamicPreditsBriefingAfterRecovery() async {
-    if (!_dynamicPreditsBriefingPrefsLoaded) return;
-    final predits = widget.availablePredits;
-    if (widget.isSubscribed || predits == null || predits <= 0) return;
-    if (!_hasShownInitialDynamicPreditsBriefing &&
-        _dynamicChatEntriesSincePreditsBriefing == 0 &&
-        _lastCountedDynamicPreditsConversationId == null &&
-        !_shouldShowDynamicPreditsBriefing) {
-      return;
-    }
-
-    _hasShownInitialDynamicPreditsBriefing = false;
-    _dynamicChatEntriesSincePreditsBriefing = 0;
-    _lastCountedDynamicPreditsConversationId = null;
-    _shouldShowDynamicPreditsBriefing = false;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_dynamicPreditsInitialShownKey, false);
-    await prefs.setInt(_dynamicPreditsEntryCountKey, 0);
-    await prefs.remove(_dynamicPreditsLastConversationKey);
-  }
-
-  Future<void> _updateDynamicPreditsBriefingGate() async {
-    if (!_dynamicPreditsBriefingPrefsLoaded || !mounted) return;
-
-    if (!_isDynamicPreditsBriefingEligible) {
-      await _resetDynamicPreditsBriefingAfterRecovery();
-      if (!mounted) return;
-      if (_shouldShowDynamicPreditsBriefing) {
-        setState(() => _shouldShowDynamicPreditsBriefing = false);
-        _evaluateAndAnimate();
-      }
-      return;
-    }
-
-    final conversationKey = widget.conversationId?.isNotEmpty == true
-        ? widget.conversationId!
-        : 'dynamic-new-chat';
-    if (conversationKey == _lastCountedDynamicPreditsConversationId) {
-      return;
-    }
-
-    bool shouldShowNow = false;
-    if (!_hasShownInitialDynamicPreditsBriefing) {
-      _hasShownInitialDynamicPreditsBriefing = true;
-      _dynamicChatEntriesSincePreditsBriefing = 0;
-      shouldShowNow = true;
-    } else {
-      _dynamicChatEntriesSincePreditsBriefing += 1;
-      if (_dynamicChatEntriesSincePreditsBriefing >= 3) {
-        _dynamicChatEntriesSincePreditsBriefing = 0;
-        shouldShowNow = true;
-      }
-    }
-    _lastCountedDynamicPreditsConversationId = conversationKey;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(
-        _dynamicPreditsInitialShownKey, _hasShownInitialDynamicPreditsBriefing);
-    await prefs.setInt(
-        _dynamicPreditsEntryCountKey, _dynamicChatEntriesSincePreditsBriefing);
-    await prefs.setString(_dynamicPreditsLastConversationKey, conversationKey);
-
-    if (!mounted) return;
-    setState(() => _shouldShowDynamicPreditsBriefing = shouldShowNow);
-    _evaluateAndAnimate();
   }
 
   @override
@@ -260,12 +143,15 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     if (!widget.isUserStateReady) return null;
 
     if (widget.isDynamicChat) {
-      if (widget.availableDredits != null && widget.availableDredits! < 1) {
+      final credits = widget.availableCredits;
+      // At or below the plan's debt floor nothing is sendable: hard stop.
+      if (credits != null && credits <= widget.debtFloor) {
         return loc.reachedLimit;
       }
-      if (_isDynamicPreditsUpgradeMessage &&
-          _shouldShowDynamicPreditsBriefing) {
-        return loc.dynamicPreditsUpgradeMessage;
+      // Zero or negative (still above the floor): Dynamic Chat stays open,
+      // but the server caps the lanes, so Cortex's intelligence drops.
+      if (credits != null && credits < 1) {
+        return loc.creditWarningFreeDecliningMessage;
       }
       if (widget.limitReached) return loc.chatLengthLimitExceeded;
       return null;
@@ -281,9 +167,13 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     if (widget.modelMissing) return loc.offlineModelNotInstalled;
     if (widget.isFalOffline) return loc.falOfflineMessage;
 
-    if (widget.availableCredits != null &&
-        _requiredCredits() > widget.availableCredits!) {
-      return loc.reachedLimit;
+    final credits = widget.availableCredits;
+    if (credits != null) {
+      // Same credit bands as Dynamic Chat: the floor blocks everything,
+      // zero-to-floor only degrades intelligence.
+      if (credits <= widget.debtFloor) return loc.reachedLimit;
+      if (credits < 1) return loc.creditWarningFreeDecliningMessage;
+      if (_requiredCredits() > credits) return loc.reachedLimit;
     }
     return null;
   }
@@ -306,6 +196,23 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
     final loc = AppLocalizations.of(context)!;
     final nextMessageText = _evaluateMessageText(loc);
+
+    // A message the user dismissed stays hidden until the underlying
+    // condition resolves to a different message (or clears entirely).
+    if (nextMessageText != null && nextMessageText == _dismissedMessageText) {
+      if (_currentMessageText != null) {
+        setState(() => _currentMessageText = null);
+      }
+      if (_slideController.value > 0.0) {
+        _slideController.reverse().then((_) {
+          if (mounted) _reportVisibleHeight();
+        });
+      } else if (_measuredPanelHeight != 0.0) {
+        _scheduleVisibleHeightReport(0.0);
+      }
+      return;
+    }
+    _dismissedMessageText = null;
 
     if (nextMessageText == _currentMessageText && _slideController.value > 0) {
       return;
@@ -345,19 +252,30 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   void _handlePanEnd(DragEndDetails details) {
-    if (details.primaryVelocity != null && details.primaryVelocity! > 0) {
+    final double velocity = details.primaryVelocity ?? 0.0;
+    if (velocity > 0.0) {
+      // Fling down: dismiss, wherever the drag left the panel.
       _handleDismiss();
+    } else if (velocity < 0.0) {
+      _slideController.forward();
+    } else if (_slideController.value < 0.5) {
+      // Released below the halfway point: treat it as a dismissal.
+      _handleDismiss();
+    } else if (!_slideController.isCompleted) {
+      _slideController.forward();
     }
   }
 
   void _handleDismiss() {
-    if (_slideController.isCompleted) {
-      _slideController.reverse().then((_) {
-        if (!mounted) return;
-        setState(() {});
-        _reportVisibleHeight();
-      });
-    }
+    if (_slideController.isDismissed) return;
+    // Remember what was dismissed so rebuilds do not resurrect it until the
+    // underlying condition actually changes.
+    _dismissedMessageText = _currentMessageText;
+    _slideController.reverse().then((_) {
+      if (!mounted) return;
+      setState(() {});
+      _reportVisibleHeight();
+    });
   }
 
   void _measurePanelHeightAndReport() {
@@ -442,13 +360,13 @@ class _BriefingOverlayState extends State<BriefingOverlay>
           onTap: _handleDismiss,
           child: Builder(builder: (context) {
             final loc = AppLocalizations.of(context)!;
-            final bool usesPremiumUpgradeVisuals =
-                _isPremiumUpgradeMessage || _isDynamicPreditsUpgradeMessage;
+            final bool usesPremiumUpgradeVisuals = _isPremiumUpgradeMessage;
             final bool isPremiumMessage =
                 _currentMessageText == loc.videoPremiumWarning ||
                     _currentMessageText == loc.premiumTrialExhaustedMessage ||
                     _currentMessageText == loc.reachedLimit ||
-                    _currentMessageText == loc.dynamicPreditsUpgradeMessage;
+                    _currentMessageText ==
+                        loc.creditWarningFreeDecliningMessage;
             return _BriefingPanelContent(
               key: _panelKey,
               message: _currentMessageText ?? "",
@@ -463,7 +381,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   int _requiredCredits() {
     if (widget.isOfflineModel || widget.isDynamicChat) {
-      return 0; // Dynamic chat uses dredits
+      return 0;
     }
 
     // Wait, is it Fal.ai? Currently we only know via photoSelected = true?
@@ -499,6 +417,7 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
     with SingleTickerProviderStateMixin {
   late final AnimationController _shineController;
   late final Animation<double> _shineAnimation;
+  Timer? _shineStartTimer;
   Timer? _timer;
 
   @override
@@ -514,7 +433,7 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
       CurvedAnimation(parent: _shineController, curve: Curves.easeInOut),
     );
 
-    Future.delayed(const Duration(seconds: 1), () {
+    _shineStartTimer = Timer(const Duration(seconds: 1), () {
       if (mounted) _shineController.forward(from: 0.0);
     });
 
@@ -527,6 +446,7 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
 
   @override
   void dispose() {
+    _shineStartTimer?.cancel();
     _shineController.dispose();
     _timer?.cancel();
     super.dispose();
@@ -568,7 +488,8 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
     final double paddingVertical = isTablet ? screenWidth * 0.02 : 12.0;
     final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
 
-    // The user requested that if the user is NOT subscribed, the briefing ALWAYS gets premium styling and is clickable.
+    // The user requested that if the user is NOT subscribed, the briefing
+    // ALWAYS gets premium styling. Tapping anywhere dismisses the panel.
     final bool showPremiumStyling = widget.isPremiumStyling;
 
     final Color baseColor = AppColors.premium.withValues(alpha: 0.15);
@@ -631,65 +552,50 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
       ),
     );
 
+    // The whole panel is dismissible via the enclosing GestureDetector;
+    // tapping it never navigates, it fades the briefing away.
     Widget content;
 
     if (showPremiumStyling) {
-      content = Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            final userProvider = context.read<UserProvider>();
-            if (userProvider.isAnonymous) {
-              navigateToScreen(const UpgradeAccountScreen(showLoginFirst: true),
-                  direction: const Offset(0, 1));
-            } else {
-              navigateToScreen(const FundsScreen(),
-                  direction: const Offset(1.0, 0.0));
-            }
-            FocusScope.of(context).unfocus();
-          },
-          borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
-          splashColor: contentColor.withValues(alpha: 0.1),
-          highlightColor: contentColor.withValues(alpha: 0.05),
-          child: Stack(
-            children: [
-              Ink(
-                decoration: boxDecoration,
-                child: innerContent,
-              ),
-              Positioned.fill(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(borderRadius),
-                  child: AnimatedBuilder(
-                    animation: _shineAnimation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset:
-                            Offset(screenWidth * _shineAnimation.value, 0.0),
-                        child: child,
-                      );
-                    },
-                    child: Container(
-                      width: screenWidth * 0.2,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.0),
-                            Colors.white.withValues(alpha: 0.2),
-                            Colors.white.withValues(alpha: 0.0),
-                          ],
-                          stops: const [0.1, 0.5, 0.9],
-                        ),
+      content = Stack(
+        children: [
+          Container(
+            decoration: boxDecoration,
+            child: innerContent,
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(borderRadius),
+                child: AnimatedBuilder(
+                  animation: _shineAnimation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset:
+                          Offset(screenWidth * _shineAnimation.value, 0.0),
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    width: screenWidth * 0.2,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.0),
+                          Colors.white.withValues(alpha: 0.2),
+                          Colors.white.withValues(alpha: 0.0),
+                        ],
+                        stops: const [0.1, 0.5, 0.9],
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       );
     } else {
       content = Container(
