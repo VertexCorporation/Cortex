@@ -27,7 +27,7 @@ Future<void> main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
   final loc = await AppLocalizations.delegate.load(const Locale('en'));
   const renewal = Duration(hours: 23, minutes: 14);
-  final renewalText = formatRenewalRemaining(renewal);
+  final renewalText = formatRenewalRemainingLocalized(renewal, loc);
 
   group('creditRefusalRecoveryMessage — non-credit errors', () {
     test('passes through for untyped errors (null code)', () {
@@ -134,7 +134,7 @@ Future<void> main() async {
         localizations: loc,
       )!;
       expect(message, loc.creditWarningExhaustedMessage(renewalText));
-      expect(message, contains('23h 14m'));
+      expect(message, contains('23 hours 14 minutes'));
     });
 
     test('ultra tier gets no upgrade nudge', () {
@@ -246,11 +246,11 @@ Future<void> main() async {
         localizations: loc,
       )!;
       expect(message, loc.premiumTrialExhaustedMessage);
-      expect(message, isNot(contains('23h 14m')));
+      expect(message, isNot(contains('23 hours 14 minutes')));
     });
   });
 
-  group('formatRenewalRemaining', () {
+  group('formatRenewalRemaining — compact facts-payload form (never UI)', () {
     test('formats hours and minutes', () {
       expect(formatRenewalRemaining(const Duration(hours: 23, minutes: 14)),
           '23h 14m');
@@ -267,6 +267,132 @@ Future<void> main() async {
       expect(formatRenewalRemaining(Duration.zero), '1m');
       expect(formatRenewalRemaining(const Duration(seconds: 30)), '1m');
       expect(formatRenewalRemaining(const Duration(seconds: -90)), '1m');
+    });
+  });
+
+  group('formatRenewalRemainingLocalized — user-facing countdown words', () {
+    test('words hours and minutes with grammatical plurals', () {
+      expect(
+        formatRenewalRemainingLocalized(
+            const Duration(hours: 23, minutes: 14), loc),
+        '23 hours 14 minutes',
+      );
+      expect(
+        formatRenewalRemainingLocalized(
+            const Duration(hours: 2, minutes: 14), loc),
+        '2 hours 14 minutes',
+      );
+    });
+
+    test('words lone units', () {
+      expect(
+        formatRenewalRemainingLocalized(const Duration(hours: 1), loc),
+        '1 hour',
+      );
+      expect(
+        formatRenewalRemainingLocalized(const Duration(hours: 5), loc),
+        '5 hours',
+      );
+      expect(
+        formatRenewalRemainingLocalized(const Duration(minutes: 1), loc),
+        '1 minute',
+      );
+      expect(
+        formatRenewalRemainingLocalized(const Duration(minutes: 47), loc),
+        '47 minutes',
+      );
+    });
+
+    test('never counts below one minute', () {
+      expect(
+        formatRenewalRemainingLocalized(Duration.zero, loc),
+        '1 minute',
+      );
+      expect(
+        formatRenewalRemainingLocalized(const Duration(seconds: 30), loc),
+        '1 minute',
+      );
+      expect(
+        formatRenewalRemainingLocalized(const Duration(seconds: -90), loc),
+        '1 minute',
+      );
+    });
+
+    test('every supported locale words the countdown, never abbreviates',
+        () async {
+      // The user-facing contract holds in all 20 locales: fully worded,
+      // grammatically pluralized, never "4m"-style abbreviations.
+      final durations = [
+        const Duration(minutes: 4),
+        const Duration(hours: 1),
+        const Duration(hours: 2, minutes: 14),
+        const Duration(hours: 23, minutes: 59),
+      ];
+      for (final locale in AppLocalizations.supportedLocales) {
+        final localeLoc = await AppLocalizations.delegate.load(locale);
+        for (final remaining in durations) {
+          final text = formatRenewalRemainingLocalized(remaining, localeLoc);
+          expect(text, isNotEmpty,
+              reason: 'locale ${locale.languageCode} must word the countdown');
+          // No digit may trail into a bare h/m token in any locale (an
+          // h/m followed by more letters is a real word like "minutes"):
+          // that is exactly the abbreviation this feature replaces.
+          expect(RegExp(r'\d\s*[hHmM](?![a-zA-Z])').hasMatch(text), isFalse,
+              reason:
+                  "locale ${locale.languageCode} must not abbreviate: '$text'");
+        }
+      }
+    });
+  });
+
+  group('CreditsManager briefing dismissals — app-session-wide cooldown',
+      () {
+    final manager = CreditsManager.instance;
+
+    setUp(manager.debugResetCreditBriefingDismissals);
+
+    test('a dismissal suppresses the same kind for two hours', () {
+      expect(manager.isCreditBriefingSuppressed('freeDeclining'), isFalse);
+      manager.dismissCreditBriefing('freeDeclining');
+      expect(manager.isCreditBriefingSuppressed('freeDeclining'), isTrue);
+      // One hour in: still inside the window.
+      manager.debugAgeCreditBriefingDismissals(const Duration(hours: 1));
+      expect(manager.isCreditBriefingSuppressed('freeDeclining'), isTrue);
+      // Past two hours: eligible again on the next ordinary evaluation.
+      manager.debugAgeCreditBriefingDismissals(
+          const Duration(hours: 1, minutes: 1));
+      expect(manager.isCreditBriefingSuppressed('freeDeclining'), isFalse);
+    });
+
+    test("a different kind never inherits another kind's dismissal", () {
+      manager.dismissCreditBriefing('freeDeclining');
+      expect(manager.isCreditBriefingSuppressed('exhausted'), isFalse);
+    });
+
+    test('only a genuinely healthy observed balance clears the records', () {
+      manager.dismissCreditBriefing('exhausted');
+      // Snapshot gap (unknown balance): must never look like recovery.
+      manager.observeCreditBriefingState(
+          credits: null, debtFloor: _debtFloor);
+      expect(manager.isCreditBriefingSuppressed('exhausted'), isTrue);
+      // Declining band: a warning briefing would still resolve.
+      manager.observeCreditBriefingState(credits: 0, debtFloor: _debtFloor);
+      expect(manager.isCreditBriefingSuppressed('exhausted'), isTrue);
+      // At the debt floor: the exhausted briefing itself would resolve.
+      manager.observeCreditBriefingState(
+          credits: _debtFloor, debtFloor: _debtFloor);
+      expect(manager.isCreditBriefingSuppressed('exhausted'), isTrue);
+      // Known healthy balance: every warning band is left behind.
+      manager.observeCreditBriefingState(credits: 25, debtFloor: _debtFloor);
+      expect(manager.isCreditBriefingSuppressed('exhausted'), isFalse);
+    });
+
+    test('dispose ends the session: the next one starts with no records',
+        () {
+      manager.dismissCreditBriefing('freeDeclining');
+      expect(manager.isCreditBriefingSuppressed('freeDeclining'), isTrue);
+      manager.dispose();
+      expect(manager.isCreditBriefingSuppressed('freeDeclining'), isFalse);
     });
   });
 

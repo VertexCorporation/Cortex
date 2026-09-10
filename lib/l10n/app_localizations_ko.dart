@@ -2114,4 +2114,32 @@ class AppLocalizationsKo extends AppLocalizations {
   String creditWarningUltraExhaustedMessage(String renewalTime) {
     return '오늘의 사용 한도에 도달했어요. $renewalTime 후에 초기화돼요.';
   }
+
+  @override
+  String creditRenewalDurationHour(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString시간',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String creditRenewalDurationMinute(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString분',
+    );
+    return '$_temp0';
+  }
 }

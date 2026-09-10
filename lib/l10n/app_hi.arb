@@ -878,5 +878,7 @@
   "creditWarningPaidUpgradeMessage": "आपके क्रेडिट कम हो रहे हैं, जवाब आसान हो सकते हैं। ये {renewalTime} में नवीनीकृत होंगे। ज़्यादा उपयोग के लिए अपना प्लान अपग्रेड करें।",
   "creditWarningUltraMessage": "आप अपनी उपयोग सीमा के पास पहुँच रहे हैं, जवाब आसान हो सकते हैं। यह {renewalTime} में नवीनीकृत होगी।",
   "creditWarningExhaustedMessage": "आपने आज के सारे क्रेडिट इस्तेमाल कर लिए। ये {renewalTime} में नवीनीकृत होंगे। बिना सीमा जारी रखने के लिए अपग्रेड करें।",
-  "creditWarningUltraExhaustedMessage": "आप आज की उपयोग सीमा तक पहुँच गए हैं। यह {renewalTime} में नवीनीकृत होगी।"
+  "creditWarningUltraExhaustedMessage": "आप आज की उपयोग सीमा तक पहुँच गए हैं। यह {renewalTime} में नवीनीकृत होगी।",
+  "creditRenewalDurationHour": "{count, plural, one {{count} घंटा} other {{count} घंटे}}",
+  "creditRenewalDurationMinute": "{count, plural, one {{count} मिनट} other {{count} मिनट}}"
 }

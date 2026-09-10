@@ -2172,4 +2172,34 @@ class AppLocalizationsHu extends AppLocalizations {
   String creditWarningUltraExhaustedMessage(String renewalTime) {
     return 'Elérte a mai használati limitjét. $renewalTime múlva megújul.';
   }
+
+  @override
+  String creditRenewalDurationHour(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString óra',
+      one: '$countString óra',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String creditRenewalDurationMinute(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString perc',
+      one: '$countString perc',
+    );
+    return '$_temp0';
+  }
 }

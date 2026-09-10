@@ -661,5 +661,7 @@
   "creditWarningPaidUpgradeMessage": "Kredittene dine er i ferd med å ta slutt, svarene kan bli enklere. De fornyes om {renewalTime}. Oppgrader abonnementet ditt for mer bruk.",
   "creditWarningUltraMessage": "Du nærmer deg bruksgrensen din, svarene kan bli enklere. Den fornyes om {renewalTime}.",
   "creditWarningExhaustedMessage": "Du har brukt alle kredittene dine for i dag. De fornyes om {renewalTime}. Oppgrader for å fortsette uten grenser.",
-  "creditWarningUltraExhaustedMessage": "Du har nådd dagens bruksgrense. Den fornyes om {renewalTime}."
+  "creditWarningUltraExhaustedMessage": "Du har nådd dagens bruksgrense. Den fornyes om {renewalTime}.",
+  "creditRenewalDurationHour": "{count, plural, one {{count} time} other {{count} timer}}",
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minutt} other {{count} minutter}}"
 }

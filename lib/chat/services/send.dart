@@ -2357,7 +2357,8 @@ String? creditRefusalRecoveryMessage({
   // fall back to the plain limit message rather than inventing one.
   if (spendable == null) return null;
 
-  final String renewal = formatRenewalRemaining(renewalRemaining);
+  final String renewal =
+      formatRenewalRemainingLocalized(renewalRemaining, localizations);
 
   if (access == CreditAccess.blocked || spendable <= debtFloor) {
     // Nothing is sendable until the allowance renews. Ultra has no higher

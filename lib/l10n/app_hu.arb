@@ -631,5 +631,7 @@
   "creditWarningPaidUpgradeMessage": "A kreditei fogynak, a válaszok egyszerűbbek lehetnek. {renewalTime} múlva megújulnak. Több használatért frissítse csomagját.",
   "creditWarningUltraMessage": "Közeledik a használati limithez, a válaszok egyszerűbbek lehetnek. {renewalTime} múlva megújul.",
   "creditWarningExhaustedMessage": "Mára az összes kreditjét elhasználta. {renewalTime} múlva megújulnak. Korlátok nélküli folytatáshoz frissítsen.",
-  "creditWarningUltraExhaustedMessage": "Elérte a mai használati limitjét. {renewalTime} múlva megújul."
+  "creditWarningUltraExhaustedMessage": "Elérte a mai használati limitjét. {renewalTime} múlva megújul.",
+  "creditRenewalDurationHour": "{count, plural, one {{count} óra} other {{count} óra}}",
+  "creditRenewalDurationMinute": "{count, plural, one {{count} perc} other {{count} perc}}"
 }

@@ -2169,4 +2169,34 @@ class AppLocalizationsAz extends AppLocalizations {
   String creditWarningUltraExhaustedMessage(String renewalTime) {
     return 'Bu günlük istifadə həddinizə çatdınız. $renewalTime sonra yenilənir.';
   }
+
+  @override
+  String creditRenewalDurationHour(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString saat',
+      one: '$countString saat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String creditRenewalDurationMinute(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString dəqiqə',
+      one: '$countString dəqiqə',
+    );
+    return '$_temp0';
+  }
 }

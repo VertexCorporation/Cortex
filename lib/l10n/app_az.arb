@@ -912,5 +912,7 @@
   "creditWarningPaidUpgradeMessage": "Kreditləriniz azalır, cavablar daha sadə ola bilər. {renewalTime} sonra yenilənir. Daha çox istifadə üçün planınızı yüksəldin.",
   "creditWarningUltraMessage": "İstifadə həddinizə yaxınlaşırsınız, cavablar daha sadə ola bilər. {renewalTime} sonra yenilənir.",
   "creditWarningExhaustedMessage": "Bu günlük bütün kreditlərinizi istifadə etdiniz. {renewalTime} sonra yenilənir. Limitsiz davam etmək üçün hesabınızı yüksəldin.",
-  "creditWarningUltraExhaustedMessage": "Bu günlük istifadə həddinizə çatdınız. {renewalTime} sonra yenilənir."
+  "creditWarningUltraExhaustedMessage": "Bu günlük istifadə həddinizə çatdınız. {renewalTime} sonra yenilənir.",
+  "creditRenewalDurationHour": "{count, plural, one {{count} saat} other {{count} saat}}",
+  "creditRenewalDurationMinute": "{count, plural, one {{count} dəqiqə} other {{count} dəqiqə}}"
 }

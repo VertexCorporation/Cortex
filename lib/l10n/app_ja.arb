@@ -878,5 +878,7 @@
   "creditWarningPaidUpgradeMessage": "クレジットが少なくなっています。回答が簡易になる場合があります。{renewalTime}後に回復します。より多くの利用のためにプランをアップグレードしましょう。",
   "creditWarningUltraMessage": "利用上限に近づいています。回答が簡易になる場合があります。{renewalTime}後にリセットされます。",
   "creditWarningExhaustedMessage": "本日のクレジットをすべて使いました。{renewalTime}後に回復します。制限なく使い続けるにはアップグレードしてください。",
-  "creditWarningUltraExhaustedMessage": "本日の利用上限に達しました。{renewalTime}後にリセットされます。"
+  "creditWarningUltraExhaustedMessage": "本日の利用上限に達しました。{renewalTime}後にリセットされます。",
+  "creditRenewalDurationHour": "{count, plural, other {{count}時間}}",
+  "creditRenewalDurationMinute": "{count, plural, other {{count}分}}"
 }

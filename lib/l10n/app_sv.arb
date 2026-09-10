@@ -631,5 +631,7 @@
   "creditWarningPaidUpgradeMessage": "Dina krediter börjar ta slut, svaren kan bli enklare. De förnyas om {renewalTime}. Uppgradera ditt abonnemang för mer användning.",
   "creditWarningUltraMessage": "Du närmar dig din användningsgräns, svaren kan bli enklare. Den förnyas om {renewalTime}.",
   "creditWarningExhaustedMessage": "Du har använt alla dina krediter för idag. De förnyas om {renewalTime}. Uppgradera för att fortsätta utan gränser.",
-  "creditWarningUltraExhaustedMessage": "Du har nått din användningsgräns för idag. Den förnyas om {renewalTime}."
+  "creditWarningUltraExhaustedMessage": "Du har nått din användningsgräns för idag. Den förnyas om {renewalTime}.",
+  "creditRenewalDurationHour": "{count, plural, one {{count} timme} other {{count} timmar}}",
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minut} other {{count} minuter}}"
 }

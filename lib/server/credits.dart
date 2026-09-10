@@ -1,5 +1,6 @@
 // lib/server/credits.dart
 
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -15,6 +16,14 @@ abstract final class CreditAccess {
   static const String lowOnly = 'low_only';
   static const String blocked = 'blocked';
 }
+
+/// How long a dismissed credit briefing stays hidden before the same kind
+/// may appear again through the normal trigger flow (input focus, rebuild,
+/// chat switch, credit change…). Owned by [CreditsManager] — the
+/// app-session singleton — and re-derived from the recorded timestamp on
+/// every ordinary evaluation: no timer waits out this window, so a
+/// briefing never pops back open on its own once the window passes.
+const Duration creditBriefingDismissalCooldown = Duration(hours: 2);
 
 /// Central, singleton-style service that keeps the **current user’s**
 /// credit balance in memory for UI display purposes and provides a real-time
@@ -155,6 +164,76 @@ class CreditsManager {
   /// credit state — the server stays the single source of truth for that.
   String get subscriptionTier => _subscriptionTier;
 
+  // --- Credit briefing dismissal (app-session-wide) ---
+
+  /// App-session-wide record of dismissed credit briefings, keyed by the
+  /// briefing's logical kind name (the `_BriefingKind` enum name in the
+  /// briefing overlay). The engine owns this map — not any widget — so no
+  /// overlay lifecycle (State recreation on chat switches, rebuilds,
+  /// remounts, new-chat flows) can create, reset or outlive a cooldown.
+  /// Kept in memory only, never persisted.
+  ///
+  /// Records die in exactly three ways: their
+  /// [creditBriefingDismissalCooldown] window elapses (re-checked on every
+  /// ordinary evaluation), the credit state *genuinely recovers* (a known
+  /// balance outside every warning band, via [observeCreditBriefingState]),
+  /// or the user session itself ends (`listenToCredits` for a new session,
+  /// [dispose]). A transient unknown balance, a loading gap or a chat that
+  /// resolves no briefing never clears anything — that is what wiped
+  /// dismissals mid-session before this map moved into the engine.
+  final Map<String, DateTime> _dismissedCreditBriefings = {};
+
+  /// Records that the user just dismissed the credit briefing [kind] (tap
+  /// or downward swipe), starting its cooldown window right now.
+  void dismissCreditBriefing(String kind) {
+    _dismissedCreditBriefings[kind] = DateTime.now();
+  }
+
+  /// Whether the dismissed credit briefing [kind] is still inside its
+  /// cooldown window. Pure lookup: eligibility is re-derived from the
+  /// recorded timestamp, so every ordinary evaluation (rebuild, input
+  /// focus, chat switch, countdown tick) respects the window without
+  /// owning a timer for it.
+  bool isCreditBriefingSuppressed(String kind) {
+    final dismissed = _dismissedCreditBriefings[kind];
+    return dismissed != null &&
+        DateTime.now().difference(dismissed) < creditBriefingDismissalCooldown;
+  }
+
+  /// Reports the balance a surface currently observes, so the engine — the
+  /// owner of the cooldowns — can decide whether the credit state has
+  /// genuinely recovered. Only a *known healthy* balance — at least one
+  /// credit and above the debt floor, the exact complement of the credit
+  /// warning bands — clears the records, so a later dip into a band is a
+  /// fresh state transition. An unknown (`null`) balance or any
+  /// warning-band balance keeps them: transient snapshot gaps, loading
+  /// states and chat switches must never resurrect a dismissed briefing.
+  void observeCreditBriefingState({
+    required int? credits,
+    required int debtFloor,
+  }) {
+    if (credits != null && credits >= 1 && credits > debtFloor) {
+      _dismissedCreditBriefings.clear();
+    }
+  }
+
+  /// Test-only: clears every dismissal record, so each test starts with an
+  /// empty cooldown.
+  @visibleForTesting
+  void debugResetCreditBriefingDismissals() {
+    _dismissedCreditBriefings.clear();
+  }
+
+  /// Test-only: shifts every recorded dismissal [by] into the past, as if
+  /// the user had dismissed those briefings that much earlier. The
+  /// cooldown has no clock of its own, so this is the only way to cross
+  /// the window.
+  @visibleForTesting
+  void debugAgeCreditBriefingDismissals(Duration by) {
+    _dismissedCreditBriefings
+        .updateAll((kind, dismissed) => dismissed.subtract(by));
+  }
+
   // --- Internal State ---
   UserProvider? _userProvider;
   String? _activeUid;
@@ -212,6 +291,11 @@ class CreditsManager {
     _userProvider?.removeListener(_onUserDataChanged);
     _userProvider = userProvider;
 
+    // A listen cycle is the start of a user session (app start, sign-in,
+    // sign-out): dismissal records from any earlier session never carry
+    // over.
+    _dismissedCreditBriefings.clear();
+
     final user = FirebaseAuth.instance.currentUser;
     _activeUid = user?.uid;
     if (user == null) {
@@ -264,6 +348,11 @@ class CreditsManager {
     totalCreditsNotifier.value = credits;
     spendableNotifier.value = credits;
 
+    // The engine observes its own snapshots too: a genuinely recovered
+    // balance clears every briefing dismissal even if no overlay
+    // evaluation happens at this instant.
+    observeCreditBriefingState(credits: credits, debtFloor: debtFloor);
+
     debugPrint(
         "[CreditsManager] Unified balance: credits=$credits, tier=$_subscriptionTier, debtFloor=$debtFloor, access=${accessNotifier.value}");
   }
@@ -277,6 +366,7 @@ class CreditsManager {
     totalCreditsNotifier.value = null; // Reset to null on dispose
     spendableNotifier.value = null;
     _resetEngineFlags();
+    _dismissedCreditBriefings.clear();
   }
 }
 
@@ -284,8 +374,10 @@ class CreditsManager {
 /// already passed but the refreshed snapshot has not landed yet, the countdown
 /// holds at one minute instead of counting below zero.
 ///
-/// Shared by every surface that shows the time until the daily credit renewal
-/// (briefing overlay, send-failure recovery) so the format stays identical.
+/// Not user-facing: this compact form feeds only the structured facts
+/// payload the send-failure recovery model receives
+/// (`time_until_daily_renewal` in api.dart); every surface a human reads
+/// uses [formatRenewalRemainingLocalized] instead.
 String formatRenewalRemaining(Duration remaining) {
   if (remaining < const Duration(minutes: 1)) return '1m';
   final hours = remaining.inHours;
@@ -293,5 +385,30 @@ String formatRenewalRemaining(Duration remaining) {
   if (hours == 0) return '${minutes}m';
   if (minutes == 0) return '${hours}h';
   return '${hours}h ${minutes}m';
+}
+
+/// "23 hours 14 minutes" / "5 hours" / "47 minutes" — fully localized words,
+/// never "4m"-style abbreviations. Never negative either: if the renewal
+/// instant has already passed but the refreshed snapshot has not landed yet,
+/// the countdown holds at one minute instead of counting below zero.
+///
+/// Shared by every user-facing surface that shows the time until the daily
+/// credit renewal (briefing overlay, send-failure recovery) so the wording
+/// stays identical. The hour/minute words come from the locale's
+/// `creditRenewalDurationHour` / `creditRenewalDurationMinute` plural
+/// messages — grammatically correct in every language — and a mixed
+/// remainder is joined with a single space in every locale ("2 hours 14
+/// minutes").
+String formatRenewalRemainingLocalized(
+    Duration remaining, AppLocalizations localizations) {
+  if (remaining < const Duration(minutes: 1)) {
+    return localizations.creditRenewalDurationMinute(1);
+  }
+  final hours = remaining.inHours;
+  final minutes = remaining.inMinutes % 60;
+  if (hours == 0) return localizations.creditRenewalDurationMinute(minutes);
+  if (minutes == 0) return localizations.creditRenewalDurationHour(hours);
+  return '${localizations.creditRenewalDurationHour(hours)} '
+      '${localizations.creditRenewalDurationMinute(minutes)}';
 }
 

@@ -2164,4 +2164,34 @@ class AppLocalizationsSv extends AppLocalizations {
   String creditWarningUltraExhaustedMessage(String renewalTime) {
     return 'Du har nått din användningsgräns för idag. Den förnyas om $renewalTime.';
   }
+
+  @override
+  String creditRenewalDurationHour(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString timmar',
+      one: '$countString timme',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String creditRenewalDurationMinute(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString minuter',
+      one: '$countString minut',
+    );
+    return '$_temp0';
+  }
 }
