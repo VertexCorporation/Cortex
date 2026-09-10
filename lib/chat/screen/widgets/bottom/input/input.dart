@@ -31,7 +31,6 @@ part 'send.dart';
 
 class InputField extends StatefulWidget {
   final AppLocalizations localizations;
-  final bool isModelSelected;
   final bool isDynamicChatMode;
   final bool isLimitExceeded;
   final TextEditingController controller;
@@ -39,8 +38,6 @@ class InputField extends StatefulWidget {
   final Future<void> Function() onSend;
   final Future<void> Function() onApplyEditedMessage;
   final bool isPhotoLoading;
-  final Animation<Offset> slideAnimation;
-  final Animation<double> fadeAnimation;
   final bool isSending;
   final bool isPremiumModel;
   final bool isSubscribed;
@@ -61,7 +58,6 @@ class InputField extends StatefulWidget {
   const InputField({
     super.key,
     required this.localizations,
-    required this.isModelSelected,
     required this.isDynamicChatMode,
     required this.isLimitExceeded,
     required this.controller,
@@ -69,8 +65,6 @@ class InputField extends StatefulWidget {
     required this.onSend,
     required this.onApplyEditedMessage,
     required this.isPhotoLoading,
-    required this.slideAnimation,
-    required this.fadeAnimation,
     required this.isSending,
     required this.isPremiumModel,
     required this.isSubscribed,
@@ -156,15 +150,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       });
     }
 
-    final wasShowing = oldWidget.isModelSelected || oldWidget.isDynamicChatMode;
-    final isShowing = widget.isModelSelected || widget.isDynamicChatMode;
-
-    if (wasShowing && !isShowing) {
-      // Clear focus when the input field is hidden to prevent semantics crashes
-      if (widget.textFieldFocusNode.hasFocus) {
-        widget.textFieldFocusNode.unfocus();
-      }
-    }
   }
 
   @override
@@ -301,116 +286,115 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     // expansion trigger inside it depends on this rebuild.
     context.watch<InputProvider>();
 
-    final bool shouldShow = widget.isModelSelected || widget.isDynamicChatMode;
-
     final double radius = CortexDesign.cardRadius;
 
-    return Offstage(
-      offstage: !shouldShow,
-      child: AnimatedBuilder(
-        animation: _expandAnimation,
-        builder: (context, child) {
-          final double t = _expandAnimation.value;
-          // The capsule occupies a share of the available reading width:
-          // a compact pill while collapsed (every control inside), opening
-          // to a slightly wider share once expanded. The detachable bubbles
-          // float outside its border in the freed space on both sides.
-          // Collapsed share bumped from 0.6: the compact pill was starving
-          // the text field (the hint scaled to under half size), so the pill
-          // keeps a bit more width and the collapsed/expanded gap narrows.
-          const double collapsedCapsuleShare = 0.68;
-          const double expandedCapsuleShare = 0.7;
-          final double available =
-              viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
-          final double capsuleInset = lerpDouble(
-            available * (1.0 - collapsedCapsuleShare) / 2.0,
-            available * (1.0 - expandedCapsuleShare) / 2.0,
-            t,
-          )!;
-          // The capsule is a painted backdrop: the interactive row beneath
-          // it spans the full bar width so the detached "+" and action
-          // bubbles stay inside the hit-test bounds of every ancestor.
-          // (Painting outside a box is legal with Clip.none, but hit
-          // testing is bounds-checked at every level — a control that
-          // paints outside its parent simply cannot receive taps.)
-          return Padding(
-            padding: const EdgeInsets.only(
-              bottom: 12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Painted capsule border/background, inset exactly where the
-                // old container sat. The ±1 matches the 1px border that used
-                // to wrap this box around the 4px vertical padding.
-                Positioned(
-                  left: CortexDesign.readingInset(viewportWidth) + capsuleInset,
-                  right:
-                      CortexDesign.readingInset(viewportWidth) + capsuleInset,
-                  top: -1.0,
-                  bottom: -1.0,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(radius),
-                      border: Border.all(
-                        color: AppColors.border,
-                        width: 1,
-                      ),
+    // The composer is always on stage: exactly two visual states — the
+    // collapsed pill and the expanded capsule — driven by _expandAnimation.
+    // There is no third "absent" state, no offstage gate and no entrance
+    // animation to wait for, so a fresh load, async provider churn and
+    // navigation re-entry all land in the collapsed capsule immediately.
+    return AnimatedBuilder(
+      animation: _expandAnimation,
+      builder: (context, child) {
+        final double t = _expandAnimation.value;
+        // The capsule occupies a share of the available reading width:
+        // a compact pill while collapsed (every control inside), opening
+        // to a slightly wider share once expanded. The detachable bubbles
+        // float outside its border in the freed space on both sides.
+        // Collapsed share bumped from 0.6: the compact pill was starving
+        // the text field (the hint scaled to under half size), so the pill
+        // keeps a bit more width and the collapsed/expanded gap narrows.
+        const double collapsedCapsuleShare = 0.68;
+        const double expandedCapsuleShare = 0.7;
+        final double available =
+            viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
+        final double capsuleInset = lerpDouble(
+          available * (1.0 - collapsedCapsuleShare) / 2.0,
+          available * (1.0 - expandedCapsuleShare) / 2.0,
+          t,
+        )!;
+        // The capsule is a painted backdrop: the interactive row beneath
+        // it spans the full bar width so the detached "+" and action
+        // bubbles stay inside the hit-test bounds of every ancestor.
+        // (Painting outside a box is legal with Clip.none, but hit
+        // testing is bounds-checked at every level — a control that
+        // paints outside its parent simply cannot receive taps.)
+        return Padding(
+          padding: const EdgeInsets.only(
+            bottom: 12.0, // Daha az margin (1-2 cm aşağı çekilmiş hali)
+          ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Painted capsule border/background, inset exactly where the
+              // old container sat. The ±1 matches the 1px border that used
+              // to wrap this box around the 4px vertical padding.
+              Positioned(
+                left: CortexDesign.readingInset(viewportWidth) + capsuleInset,
+                right: CortexDesign.readingInset(viewportWidth) + capsuleInset,
+                top: -1.0,
+                bottom: -1.0,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(radius),
+                    border: Border.all(
+                      color: AppColors.border,
+                      width: 1,
                     ),
                   ),
                 ),
-                // Interactive content. Attachments and the RAG chip are
-                // pinned to the capsule interior; the composer row below
-                // is deliberately full bar width so its detached bubbles
-                // remain inside the hit-test region.
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: CortexDesign.readingInset(viewportWidth) +
-                              capsuleInset +
-                              1.0,
-                        ),
-                        child: child!,
+              ),
+              // Interactive content. Attachments and the RAG chip are
+              // pinned to the capsule interior; the composer row below
+              // is deliberately full bar width so its detached bubbles
+              // remain inside the hit-test region.
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: CortexDesign.readingInset(viewportWidth) +
+                            capsuleInset +
+                            1.0,
                       ),
-                      // The composer row is the only mode now. Dictation
-                      // keeps the row and the capsule expansion, dims the
-                      // "+" for the duration, turns the action button into
-                      // Stop, and overlays the field itself with the live
-                      // waveform (see [_DictationWave]) — the transcript
-                      // reappears once the session ends.
-                      _buildExpandingComposerRow(
-                        context,
-                        screenWidth,
-                        isTablet,
-                        isSendButtonEnabled,
-                        isActionPermitted,
-                        0.0,
-                        capsuleInset,
-                      ),
-                    ],
-                  ),
+                      child: child!,
+                    ),
+                    // The composer row is the only mode now. Dictation
+                    // keeps the row and the capsule expansion, dims the
+                    // "+" for the duration, turns the action button into
+                    // Stop, and overlays the field itself with the live
+                    // waveform (see [_DictationWave]) — the transcript
+                    // reappears once the session ends.
+                    _buildExpandingComposerRow(
+                      context,
+                      screenWidth,
+                      isTablet,
+                      isSendButtonEnabled,
+                      isActionPermitted,
+                      0.0,
+                      capsuleInset,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
-        // Attachments and the RAG chip stay off the animation's rebuild
-        // path; the composer row is built inside the builder because it
-        // needs the animated capsule inset to re-anchor its geometry.
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _AttachmentPreviewSection(
-                screenWidth: screenWidth, isTablet: isTablet),
+              ),
+            ],
+          ),
+        );
+      },
+      // Attachments and the RAG chip stay off the animation's rebuild
+      // path; the composer row is built inside the builder because it
+      // needs the animated capsule inset to re-anchor its geometry.
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _AttachmentPreviewSection(
+              screenWidth: screenWidth, isTablet: isTablet),
 
-            _RagStatusChip(screenWidth: screenWidth),
-          ],
-        ),
+          _RagStatusChip(screenWidth: screenWidth),
+        ],
       ),
     );
   }
@@ -531,6 +515,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                         screenWidth: screenWidth,
                         isTablet: isTablet,
                         showHintText: true,
+                        isComposerExpanded: isComposerExpanded,
+                        isDictating: isDictating,
                         onEnterPressed: () {
                           if (isSendButtonEnabled) {
                             widget.onSend();

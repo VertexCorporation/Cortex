@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "संदेश क्लिपबोर्ड पर कॉपी किया गया।",
   "messageHint": "कुछ भी पूछें",
+  "messageHintShort": "पूछें",
   "modality": "मोडैलिटी",
   "modelCreatedSuccess": "मॉडल सफलतापूर्वक बनाया गया!",
   "modelDescription": "{description}",

@@ -77,6 +77,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get messageHint => 'Vraag alles';
 
   @override
+  String get messageHintShort => 'Vraag';
+
+  @override
   String get messageCopied => 'Bericht gekopieerd naar klembord.';
 
   @override

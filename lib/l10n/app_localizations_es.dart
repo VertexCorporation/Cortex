@@ -77,6 +77,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get messageHint => 'Pregunta lo que sea';
 
   @override
+  String get messageHintShort => 'Pregunta';
+
+  @override
   String get messageCopied => 'Mensaje copiado al portapapeles.';
 
   @override

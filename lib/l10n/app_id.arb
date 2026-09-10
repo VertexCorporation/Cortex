@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "Pesan disalin ke papan klip.",
   "messageHint": "Tanyakan apa saja",
+  "messageHintShort": "Tanya",
   "modality": "Modalitas",
   "modelCreatedSuccess": "Model berhasil dibuat!",
   "modelDescription": "{description}",

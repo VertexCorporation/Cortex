@@ -467,6 +467,7 @@
   "memoryUpdated": "Hafıza güncellendi",
   "messageCopied": "Mesaj panoya kopyalandı.",
   "messageHint": "Herhangi bir şey sor",
+  "messageHintShort": "Sor",
   "modality": "Modalite",
   "modelCreatedSuccess": "Model başarıyla oluşturuldu!",
   "modelDescription": "{description}",

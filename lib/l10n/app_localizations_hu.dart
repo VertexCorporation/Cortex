@@ -77,6 +77,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get messageHint => 'Kérdezz bármit';
 
   @override
+  String get messageHintShort => 'Kérdezz';
+
+  @override
   String get messageCopied => 'Az üzenet a vágólapra másolva.';
 
   @override

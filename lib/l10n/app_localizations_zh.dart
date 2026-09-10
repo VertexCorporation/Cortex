@@ -77,6 +77,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get messageHint => '随便问点什么';
 
   @override
+  String get messageHintShort => '问';
+
+  @override
   String get messageCopied => '消息已复制到剪贴板。';
 
   @override

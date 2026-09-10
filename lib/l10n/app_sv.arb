@@ -20,6 +20,7 @@
   "descriptionSection": "Beskrivning",
   "searchHint": "Sök",
   "messageHint": "Fråga vad som helst",
+  "messageHintShort": "Fråga",
   "messageCopied": "Meddelandet har kopierats till urklipp.",
   "retry": "Försök igen",
   "systemInfo": "Systeminformation",

@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "Сообщение скопировано в буфер обмена.",
   "messageHint": "Ask anything",
+  "messageHintShort": "Спросите",
   "modality": "Modality",
   "modelCreatedSuccess": "Модель успешно создана!",
   "modelDescription": "{description}",

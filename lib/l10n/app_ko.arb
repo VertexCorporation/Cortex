@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "메시지가 클립보드에 복사되었습니다.",
   "messageHint": "무엇이든 물어보세요",
+  "messageHintShort": "물어보세요",
   "modality": "모달리티",
   "modelCreatedSuccess": "모델이 성공적으로 생성되었습니다!",
   "modelDescription": "{description}",

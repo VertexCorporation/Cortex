@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "Mesaj mübadilə buferinə kopyalandı.",
   "messageHint": "Hər şeyi soruş",
+  "messageHintShort": "Soruş",
   "modality": "Modallıq",
   "modelCreatedSuccess": "Model uğurla yaradıldı!",
   "modelDescription": "{description}",

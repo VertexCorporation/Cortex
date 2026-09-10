@@ -77,6 +77,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get messageHint => 'Pergunte qualquer coisa';
 
   @override
+  String get messageHintShort => 'Pergunte';
+
+  @override
   String get messageCopied => 'Mensagem copiada para a área de transferência.';
 
   @override

@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "Bericht gekopieerd naar klembord.",
   "messageHint": "Vraag alles",
+  "messageHintShort": "Vraag",
   "modality": "Modaliteit",
   "modelCreatedSuccess": "Model succesvol aangemaakt!",
   "modelDescription": "{description}",

@@ -20,6 +20,7 @@
   "descriptionSection": "Popis",
   "searchHint": "Hledat",
   "messageHint": "Zeptejte se na cokoli",
+  "messageHintShort": "Zeptejte se",
   "messageCopied": "Zpráva zkopírována do schránky.",
   "retry": "Opakovat",
   "systemInfo": "Systémové informace",

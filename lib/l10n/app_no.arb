@@ -20,6 +20,7 @@
   "descriptionSection": "Beskrivelse",
   "searchHint": "Søk",
   "messageHint": "Spør hva som helst",
+  "messageHintShort": "Spør",
   "messageCopied": "Meldingen er kopiert til utklippstavlen.",
   "retry": "Prøv på nytt",
   "systemInfo": "Systeminformasjon",

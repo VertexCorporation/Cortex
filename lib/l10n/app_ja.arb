@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "メッセージをクリップボードにコピーしました。",
   "messageHint": "何でも聞いてください",
+  "messageHintShort": "聞いてください",
   "modality": "モダリティ",
   "modelCreatedSuccess": "モデルが正常に作成されました！",
   "modelDescription": "{description}",

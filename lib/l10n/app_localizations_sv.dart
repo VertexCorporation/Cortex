@@ -77,6 +77,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get messageHint => 'Fråga vad som helst';
 
   @override
+  String get messageHintShort => 'Fråga';
+
+  @override
   String get messageCopied => 'Meddelandet har kopierats till urklipp.';
 
   @override

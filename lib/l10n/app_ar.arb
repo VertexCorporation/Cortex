@@ -435,6 +435,7 @@
   "memoryUpdated": "Memory updated",
   "messageCopied": "تم نسخ الرسالة إلى الحافظة.",
   "messageHint": "اسأل أي شيء",
+  "messageHintShort": "اسأل",
   "modality": "النمط",
   "modelCreatedSuccess": "تم إنشاء النموذج بنجاح!",
   "modelDescription": "{description}",

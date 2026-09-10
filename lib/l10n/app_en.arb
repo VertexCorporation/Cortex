@@ -31,6 +31,7 @@
   "descriptionSection": "Description",
   "searchHint": "Search",
   "messageHint": "Ask anything",
+  "messageHintShort": "Ask",
   "messageCopied": "Message copied to clipboard.",
   "retry": "Retry",
   "systemInfo": "System Information",

@@ -77,6 +77,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get messageHint => 'اسأل أي شيء';
 
   @override
+  String get messageHintShort => 'اسأل';
+
+  @override
   String get messageCopied => 'تم نسخ الرسالة إلى الحافظة.';
 
   @override

@@ -77,6 +77,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messageHint => 'Ask anything';
 
   @override
+  String get messageHintShort => 'Ask';
+
+  @override
   String get messageCopied => 'Message copied to clipboard.';
 
   @override

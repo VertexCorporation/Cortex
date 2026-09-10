@@ -77,6 +77,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get messageHint => 'Frag alles';
 
   @override
+  String get messageHintShort => 'Frag';
+
+  @override
   String get messageCopied => 'Nachricht in die Zwischenablage kopiert.';
 
   @override

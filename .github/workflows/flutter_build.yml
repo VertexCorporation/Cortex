@@ -83,8 +83,6 @@ jobs:
         run: |
           flutter clean
           flutter pub get
-          chmod +x scripts/download_llama.sh
-          ./scripts/download_llama.sh
           rm -rf ios/Pods ios/Podfile.lock
           cd ios
           pod install --repo-update
