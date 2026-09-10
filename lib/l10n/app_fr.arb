@@ -870,8 +870,8 @@
       }
     }
   },
-  "generationImageLabel": "Création de l’image",
-  "generationVideoLabel": "Création de la vidéo",
-  "generationAudioLabel": "Création de l’audio",
-  "generationDocumentLabel": "Création du document"
+  "generationImageLabel": "Création De L’Image",
+  "generationVideoLabel": "Création De La Vidéo",
+  "generationAudioLabel": "Création De L’Audio",
+  "generationDocumentLabel": "Création Du Document"
 }

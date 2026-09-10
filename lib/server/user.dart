@@ -123,6 +123,15 @@ class UserProvider with ChangeNotifier {
         isAnonymous: isAnonymous,
       );
 
+  /// Credit limits for the user's effective tier, published by the server on
+  /// the user document (`creditLimits` map) and cached here with the normal
+  /// user data — no extra reads. UI code reads these instead of hardcoding
+  /// tier limits; the server re-derives them from `TIER_LIMITS` on every
+  /// request, so a limit change on the backend propagates with the next
+  /// user-data snapshot.
+  CreditLimits get creditLimits =>
+      CreditLimits.fromData(_userData?['creditLimits']);
+
   /// The first initial of the user's name for use in avatars. Defaults to '?'.
   String get profileInitial {
     final name = username;

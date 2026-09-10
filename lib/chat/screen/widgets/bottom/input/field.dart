@@ -42,8 +42,21 @@ class _TextFieldSection extends StatelessWidget {
           isDense: true,
           contentPadding: EdgeInsets.symmetric(
               vertical: verticalPadding, horizontal: horizontalPadding),
-          hintText: showHintText ? localizations.messageHint : '',
-          hintStyle: TextStyle(color: Colors.grey[600], fontSize: fontSize),
+          // The localized hint scales itself down to whatever width the
+          // compact capsule gives the field instead of clipping or wrapping,
+          // and returns to its natural size once the field is wide enough.
+          hint: showHintText
+              ? FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    localizations.messageHint,
+                    maxLines: 1,
+                    style:
+                        TextStyle(color: Colors.grey[600], fontSize: fontSize),
+                  ),
+                )
+              : null,
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,

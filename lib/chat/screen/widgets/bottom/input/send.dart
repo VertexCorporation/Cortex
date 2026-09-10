@@ -8,6 +8,7 @@ class _SendButtonSection extends StatelessWidget {
   final bool isEnabled;
   final bool isActionPermitted;
   final TextEditingController controller;
+  final double bubbleScale;
   const _SendButtonSection({
     this.recordingProgress,
     required this.screenWidth,
@@ -16,6 +17,7 @@ class _SendButtonSection extends StatelessWidget {
     required this.isEnabled,
     required this.isActionPermitted,
     required this.controller,
+    this.bubbleScale = 1.0,
   });
 
   @override
@@ -40,21 +42,21 @@ class _SendButtonSection extends StatelessWidget {
       effectiveOnStop = widget.onStop;
     }
 
-    return Padding(
-      padding: EdgeInsetsDirectional.only(
-        end: 8.0,
-      ),
-      child: ActionButtonWidget(
-        isEnabled: effectiveEnabled,
-        isActionPermitted: isActionPermitted,
-        isSending: widget.isSending,
-        isRecording: inputProvider.isVoiceRecording,
-        recordingProgress: recordingProgress,
-        isTextEmpty: controller.text.trim().isEmpty,
-        onSend: widget.onSend,
-        onStop: effectiveOnStop,
-        controller: controller,
-      ),
+    // Only the detachable action bubble. The microphone is a separate,
+    // permanently-anchored control placed by the composer row itself and
+    // never merges with this button.
+    return ActionButtonWidget(
+      isEnabled: effectiveEnabled,
+      isActionPermitted: isActionPermitted,
+      isSending: widget.isSending,
+      isRecording: inputProvider.isVoiceRecording,
+      recordingProgress: recordingProgress,
+      isTextEmpty: controller.text.trim().isEmpty,
+      onSend: widget.onSend,
+      onStop: effectiveOnStop,
+      controller: controller,
+      includeMic: false,
+      bubbleScale: bubbleScale,
     );
   }
 }

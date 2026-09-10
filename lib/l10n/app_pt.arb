@@ -870,8 +870,8 @@
       }
     }
   },
-  "generationImageLabel": "Gerando imagem",
-  "generationVideoLabel": "Gerando vídeo",
-  "generationAudioLabel": "Gerando áudio",
-  "generationDocumentLabel": "Gerando documento"
+  "generationImageLabel": "Gerando Imagem",
+  "generationVideoLabel": "Gerando Vídeo",
+  "generationAudioLabel": "Gerando Áudio",
+  "generationDocumentLabel": "Gerando Documento"
 }

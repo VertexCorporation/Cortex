@@ -870,8 +870,8 @@
       }
     }
   },
-  "generationImageLabel": "Şəkil yaradılır",
-  "generationVideoLabel": "Video yaradılır",
-  "generationAudioLabel": "Səs yaradılır",
-  "generationDocumentLabel": "Sənəd yaradılır"
+  "generationImageLabel": "Şəkil Yaradılır",
+  "generationVideoLabel": "Video Yaradılır",
+  "generationAudioLabel": "Səs Yaradılır",
+  "generationDocumentLabel": "Sənəd Yaradılır"
 }

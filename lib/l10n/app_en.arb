@@ -942,8 +942,16 @@
       }
     }
   },
-  "generationImageLabel": "Generating image",
-  "generationVideoLabel": "Generating video",
-  "generationAudioLabel": "Generating audio",
-  "generationDocumentLabel": "Generating document"
+  "generationImageLabel": "Generating Image",
+  "generationVideoLabel": "Generating Video",
+  "generationAudioLabel": "Generating Audio",
+  "generationDocumentLabel": "Generating Document",
+  "creditWarningFreeDecliningTitle": "Credits Declining",
+  "creditWarningFreeDecliningMessage": "Your credits are declining. Intelligence performance may decrease.",
+  "creditWarningFreeExhaustedTitle": "Daily Limit Reached",
+  "creditWarningFreeExhaustedMessage": "Your chat allowance will renew with your daily limit. Subscribe for more access.",
+  "creditWarningPaidUpgradeTitle": "Upgrade Plan",
+  "creditWarningPaidUpgradeMessage": "Upgrade your plan for more credits.",
+  "creditWarningUltraTitle": "Credits Low",
+  "creditWarningUltraMessage": "Your credits are running low. Performance may decrease."
 }

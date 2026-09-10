@@ -314,8 +314,6 @@ class InputService {
     required bool isVideoModel,
     required SubscriptionTier userTier,
     required int? totalCredits,
-    required int? availablePredits,
-    required int? availableDredits,
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
@@ -334,33 +332,22 @@ class InputService {
 
     // 2. Credit gate
     //
-    // Billing v2 retired the premium lane and the Dynamic Chat currency: every
-    // model bills its real cost against one balance, so both cases collapse
-    // into "can they afford to start a text request". canUsePremiumModel and
-    // canSendDynamicChat keep the pre-migration behaviour for accounts the
-    // lazy migration has not touched yet.
+    // One unified balance. Past the debt floor nothing is sendable until the
+    // allowance renews; Dynamic Chat stays open below zero but also closes at
+    // the floor, and model choice needs the `full` band.
     final creditsManager = context.read<CreditsManager>();
 
-    // Past the debt floor nothing is sendable until the allowance renews, and
-    // that holds for every lane rather than the one the user happens to be in.
     if (!creditsManager.canSendAnything) {
       return false;
     }
 
-    // The lane-specific currencies below exist only outside the daily engine.
-    // Under it a model the user may not choose is rewritten to Dynamic Chat
-    // rather than refused, so it is not a reason to disable sending.
-    if (!creditsManager.creditsV3Notifier.value) {
-      if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
-        if (!creditsManager.canUsePremiumModel) {
-          return false;
-        }
+    if (isDynamicChatMode) {
+      if (!creditsManager.canSendText) {
+        return false;
       }
-
-      if (isDynamicChatMode) {
-        if (!creditsManager.canSendDynamicChat) {
-          return false;
-        }
+    } else if (isPremiumModel && !isSubscribed) {
+      if (!creditsManager.canChooseModel) {
+        return false;
       }
     }
 
@@ -402,8 +389,6 @@ class InputService {
     required bool isVideoModel,
     required SubscriptionTier userTier,
     required int? totalCredits,
-    required int? availablePredits,
-    required int? availableDredits,
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
@@ -422,33 +407,22 @@ class InputService {
 
     // 2. Credit gate
     //
-    // Billing v2 retired the premium lane and the Dynamic Chat currency: every
-    // model bills its real cost against one balance, so both cases collapse
-    // into "can they afford to start a text request". canUsePremiumModel and
-    // canSendDynamicChat keep the pre-migration behaviour for accounts the
-    // lazy migration has not touched yet.
+    // One unified balance. Past the debt floor nothing is sendable until the
+    // allowance renews; Dynamic Chat stays open below zero but also closes at
+    // the floor, and model choice needs the `full` band.
     final creditsManager = context.read<CreditsManager>();
 
-    // Past the debt floor nothing is sendable until the allowance renews, and
-    // that holds for every lane rather than the one the user happens to be in.
     if (!creditsManager.canSendAnything) {
       return false;
     }
 
-    // The lane-specific currencies below exist only outside the daily engine.
-    // Under it a model the user may not choose is rewritten to Dynamic Chat
-    // rather than refused, so it is not a reason to disable sending.
-    if (!creditsManager.creditsV3Notifier.value) {
-      if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
-        if (!creditsManager.canUsePremiumModel) {
-          return false;
-        }
+    if (isDynamicChatMode) {
+      if (!creditsManager.canSendText) {
+        return false;
       }
-
-      if (isDynamicChatMode) {
-        if (!creditsManager.canSendDynamicChat) {
-          return false;
-        }
+    } else if (isPremiumModel && !isSubscribed) {
+      if (!creditsManager.canChooseModel) {
+        return false;
       }
     }
 

@@ -2,7 +2,8 @@
 //
 // Unit tests for the nested `users/{uid}.subscription` entitlement model.
 // Covers the "missing = not applicable" rule, terminal states, anonymous
-// accounts and the cache-tolerant date parsing.
+// accounts, the cache-tolerant date parsing, and the server-published
+// `creditLimits` map (CreditLimits).
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/server/subscription.dart';
@@ -17,7 +18,6 @@ void main() {
       expect(entitlement.isPaid, false);
       expect(entitlement.effectiveTier, SubscriptionTier.free);
       expect(entitlement.chatCharacterLimit, 100000);
-      expect(entitlement.dailyGrant, 100);
     });
 
     test('explicit free map resolves to free', () {
@@ -286,7 +286,6 @@ void main() {
         },
       );
       expect(active.chatCharacterLimit, 1000000);
-      expect(active.dailyGrant, 10000);
 
       final lapsed = SubscriptionEntitlement.fromUserData(
         {
@@ -300,7 +299,6 @@ void main() {
         },
       );
       expect(lapsed.chatCharacterLimit, 100000);
-      expect(lapsed.dailyGrant, 100);
     });
 
     test('equality covers all entitlement fields', () {
@@ -334,6 +332,58 @@ void main() {
         SubscriptionTier.pro.planIndex > SubscriptionTier.plus.planIndex,
         true,
       );
+    });
+  });
+
+  group('CreditLimits.fromData', () {
+    test('absent map resolves to the free fallback', () {
+      final limits = CreditLimits.fromData(null);
+      expect(limits, CreditLimits.fallback);
+      expect(limits.dailyGrant, 50);
+      expect(limits.debtFloor, -50);
+    });
+
+    test('non-map values resolve to the free fallback', () {
+      expect(CreditLimits.fromData('free'), CreditLimits.fallback);
+      expect(CreditLimits.fromData(42), CreditLimits.fallback);
+    });
+
+    test('parses the server-published values', () {
+      final limits = CreditLimits.fromData(const {
+        'dailyGrant': 1250,
+        'debtFloor': -1250,
+      });
+      expect(limits.dailyGrant, 1250);
+      expect(limits.debtFloor, -1250);
+    });
+
+    test('num values are coerced to int', () {
+      final limits = CreditLimits.fromData(const {
+        'dailyGrant': 125.0,
+        'debtFloor': -125.0,
+      });
+      expect(limits.dailyGrant, 125);
+      expect(limits.debtFloor, -125);
+    });
+
+    test('partial maps resolve to the free fallback', () {
+      expect(
+        CreditLimits.fromData(const {'dailyGrant': 1250}),
+        CreditLimits.fallback,
+      );
+      expect(
+        CreditLimits.fromData(const {'debtFloor': -125}),
+        CreditLimits.fallback,
+      );
+    });
+
+    test('equality covers both fields', () {
+      const a = CreditLimits(dailyGrant: 125, debtFloor: -125);
+      const b = CreditLimits(dailyGrant: 125, debtFloor: -125);
+      const c = CreditLimits(dailyGrant: 1250, debtFloor: -1250);
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(a == c, false);
     });
   });
 }
