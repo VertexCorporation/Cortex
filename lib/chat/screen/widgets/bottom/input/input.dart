@@ -490,8 +490,15 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     // Dictation expands the capsule as well, so the speech transcript
     // lands in the roomy field instead of the compact pill.
     final bool isDictating = inputProvider.isVoiceRecording;
+    // So does content sitting in the field: words must never be dropped
+    // back into the compact pill — not even once the field loses focus.
+    // (initState listens to the controller and rebuilds exactly when the
+    // empty↔non-empty flip happens, so the capsule animates once here,
+    // not on every keystroke.)
+    final bool hasText = widget.controller.text.trim().isNotEmpty;
     final bool isComposerExpanded = widget.textFieldFocusNode.hasFocus ||
         isDictating ||
+        hasText ||
         inputProvider.featureMode != ChatInputMode.none;
     final bool hasSelectedFeature =
         inputProvider.featureMode != ChatInputMode.none;
