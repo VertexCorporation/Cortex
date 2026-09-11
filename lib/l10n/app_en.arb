@@ -641,7 +641,7 @@
   "featureCreateImageTitle": "Create Image",
   "featureCreateImageDescription": "Generate AI art from text.",
   "featureCreateAudioTitle": "Create Audio",
-  "featureCreateAudioDescription": "Generate sounds or voice from text.",
+  "featureCreateAudioDescription": "Generate sounds, voice, or music from text.",
   "featureCreateVideoTitle": "Create Video",
   "featureCreateVideoDescription": "Generate videos from text.",
   "featureStudyTitle": "Study & Learn",

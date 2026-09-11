@@ -1,8 +1,10 @@
 // lib/chat/services/send/media.dart
 
 import 'package:flutter/foundation.dart';
+
 import '../../../../library/backend/data/entity.dart';
 import '../../../../library/backend/data/service.dart';
+import '../generation.dart';
 
 enum MediaIntent {
   none,
@@ -13,6 +15,7 @@ enum MediaIntent {
   generateImage,
   generateVideo,
   generateAudio,
+  generateMusic,
 }
 
 class MediaRouter {
@@ -137,7 +140,7 @@ class MediaRouter {
       'gorsel',
       'resim',
       'fotograf',
-      'foto'
+      'foto',
     ];
     const videoTerms = [
       'video',
@@ -148,9 +151,17 @@ class MediaRouter {
       'animasyon',
       'hareket',
       'hareketlendir',
-      'canlandir'
+      'canlandir',
     ];
-    const audioTerms = ['audio', 'voice', 'sound', 'music', 'ses', 'muzik'];
+    const audioTerms = [
+      'audio',
+      'voice',
+      'sound',
+      'speech',
+      'ses',
+      'konusma',
+      'anlatim',
+    ];
     const generateTerms = [
       'generate',
       'create',
@@ -160,7 +171,7 @@ class MediaRouter {
       'olustur',
       'uret',
       'ciz',
-      'yap'
+      'yap',
     ];
     const understandTerms = [
       'what',
@@ -177,7 +188,7 @@ class MediaRouter {
       'analiz',
       'oku',
       'cevir',
-      'ozetle'
+      'ozetle',
     ];
 
     final edits = _containsAny(normalized, editTerms);
@@ -185,6 +196,7 @@ class MediaRouter {
     final mentionsImage = _containsAny(normalized, imageTerms);
     final mentionsVideo = _containsAny(normalized, videoTerms);
     final mentionsAudio = _containsAny(normalized, audioTerms);
+    final mentionsMusic = isMusicGenerationPrompt(text);
 
     if (hasImage && !hasVideo && mentionsVideo && (edits || generates)) {
       return MediaIntent.generateVideo;
@@ -192,7 +204,8 @@ class MediaRouter {
     if (hasImage &&
         (edits ||
             (generates &&
-                (mentionsImage || !mentionsVideo && !mentionsAudio)))) {
+                (mentionsImage ||
+                    !mentionsVideo && !mentionsAudio && !mentionsMusic)))) {
       return MediaIntent.editImage;
     }
     if (hasVideo && (edits || (generates && mentionsVideo))) {
@@ -202,6 +215,7 @@ class MediaRouter {
       return MediaIntent.editAudio;
     }
     if (generates && mentionsVideo) return MediaIntent.generateVideo;
+    if (generates && mentionsMusic) return MediaIntent.generateMusic;
     if (generates && mentionsAudio) return MediaIntent.generateAudio;
     if (generates) return MediaIntent.generateImage;
     if (_containsAny(normalized, understandTerms)) {
@@ -222,8 +236,10 @@ class MediaRouter {
       for (final entry in variants.entries) {
         final variantId = entry.key;
         if (seen.add(variantId)) {
-          yield _modelService.getPreciseModelData(variantId,
-              langCode: langCode);
+          yield _modelService.getPreciseModelData(
+            variantId,
+            langCode: langCode,
+          );
         }
       }
     }
@@ -263,22 +279,18 @@ class MediaRouter {
     String? requiredInputType,
     Set<String> excludeIds = const {},
   }) {
-    return pickModel(
-      langCode,
-      isUserSubscribed,
-      (model) {
-        if (excludeIds.contains(model.id)) return false;
-        if (model.source.toLowerCase() != 'fal') return false;
-        if (model.outputs[outputType] != true && model.category != outputType) {
-          return false;
-        }
-        if (requiredInputType != null &&
-            model.modalities[requiredInputType] != true) {
-          return false;
-        }
-        return true;
-      },
-    );
+    return pickModel(langCode, isUserSubscribed, (model) {
+      if (excludeIds.contains(model.id)) return false;
+      if (model.source.toLowerCase() != 'fal') return false;
+      if (model.outputs[outputType] != true && model.category != outputType) {
+        return false;
+      }
+      if (requiredInputType != null &&
+          model.modalities[requiredInputType] != true) {
+        return false;
+      }
+      return true;
+    });
   }
 
   ModelEntity? findAttachmentUnderstandingModel({
@@ -288,21 +300,17 @@ class MediaRouter {
     required bool hasVideo,
     required bool hasAudio,
   }) {
-    return pickModel(
-      langCode,
-      isUserSubscribed,
-      (model) {
-        final category = model.category.toLowerCase();
-        if (category == 'image' || category == 'video' || category == 'audio') {
-          return false;
-        }
-        if (model.source.toLowerCase() == 'fal') return false;
-        if (hasImage && model.modalities['image'] != true) return false;
-        if (hasVideo && model.modalities['video'] != true) return false;
-        if (hasAudio && model.modalities['audio'] != true) return false;
-        return model.outputs['text'] == true || model.outputs.isEmpty;
-      },
-    );
+    return pickModel(langCode, isUserSubscribed, (model) {
+      final category = model.category.toLowerCase();
+      if (category == 'image' || category == 'video' || category == 'audio') {
+        return false;
+      }
+      if (model.source.toLowerCase() == 'fal') return false;
+      if (hasImage && model.modalities['image'] != true) return false;
+      if (hasVideo && model.modalities['video'] != true) return false;
+      if (hasAudio && model.modalities['audio'] != true) return false;
+      return model.outputs['text'] == true || model.outputs.isEmpty;
+    });
   }
 
   String? resolveAttachmentIntentModelId({
@@ -376,8 +384,8 @@ class MediaRouter {
           requiredInputType: hasVideo
               ? 'video'
               : hasImage
-                  ? 'image'
-                  : null,
+              ? 'image'
+              : null,
         );
         break;
       case MediaIntent.generateAudio:
@@ -387,6 +395,12 @@ class MediaRouter {
           outputType: 'audio',
           requiredInputType: hasAudio ? 'audio' : null,
         );
+        break;
+      case MediaIntent.generateMusic:
+        // A generic audio model can be a speech/SFX model. Do not pin a
+        // musical request to the first audio-capable FAL model; leave it on
+        // Cortex Dynamic Chat so Fulcrum can select its dedicated music route.
+        routed = null;
         break;
       case MediaIntent.understand:
       case MediaIntent.none:
@@ -402,7 +416,8 @@ class MediaRouter {
 
     if (routed == null) return null;
     debugPrint(
-        "[MediaRouter] Attachment intent '$intent' routed dynamic chat to '${routed.id}'.");
+      "[MediaRouter] Attachment intent '$intent' routed dynamic chat to '${routed.id}'.",
+    );
     return routed.id;
   }
 

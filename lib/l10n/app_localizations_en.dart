@@ -1620,7 +1620,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get featureCreateAudioDescription =>
-      'Generate sounds or voice from text.';
+      'Generate sounds, voice, or music from text.';
 
   @override
   String get featureCreateVideoTitle => 'Create Video';
