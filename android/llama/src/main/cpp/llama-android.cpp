@@ -444,29 +444,47 @@ const auto text = env->GetStringUTFChars(jtext, 0);
 const auto context = reinterpret_cast<llama_context *>(context_pointer);
 const auto batch = reinterpret_cast<llama_batch *>(batch_pointer);
 
+// Clear the native KV cache before every generation — exact parity with
+// iOS (LibLlama.swift completion_init clears before tokenizing). The Dart
+// layer re-sends the FULL formatted conversation on every turn, so a dirty
+// cache would accumulate stale turns from OTHER conversations (the
+// cross-conversation context leak) on top of duplicated context, degraded
+// output, and eventual n_ctx overflow → llama_decode failures.
+llama_memory_clear(llama_get_memory(context), true);
+LOGi("KV memory cleared before generation (conversation isolation).");
+
 bool parse_special = (format_chat == JNI_TRUE);
 const auto tokens_list = common_tokenize(context, text, true, parse_special);
 
 if (!g_image_bytes.empty()) {
 LOGi("completion_init: %zu image bytes available for multimodal processing.",
      static_cast<size_t>(g_image_bytes.size()));
+// Hygiene: the image buffer belongs to THIS turn only. Without this, a
+// photo attached in conversation A would be retained (memory) and reused
+// by every subsequent generation until another image arrives.
+{
+    std::lock_guard<std::mutex> lock(g_image_mutex);
+    g_image_bytes.clear();
+    g_image_bytes.shrink_to_fit();
+    LOGi("completion_init: released per-turn image buffer.");
+}
 }
 
 auto n_ctx = llama_n_ctx(context);
 auto n_kv_req = tokens_list.size() + n_len;
 
-LOGi("n_len = %d, n_ctx = %d, n_kv_req = %zu",
+LOGi("n_len = %d, n_ctx = %d, n_kv_req = %zu, prompt_tokens = %zu",
      n_len,
      n_ctx,
-     (size_t) n_kv_req);
+     (size_t) n_kv_req,
+     (size_t) tokens_list.size());
 
 if (n_kv_req > n_ctx) {
 LOGe("error: n_kv_req > n_ctx, the required KV cache size is not big enough");
 }
 
-for (auto id : tokens_list) {
-LOGi("token: `%s`-> %d ", common_token_to_piece(context, id).c_str(), id);
-}
+// NOTE: prompt token pieces are intentionally NOT logged — message contents
+// must never reach logcat.
 
 common_batch_clear(*batch);
 
@@ -535,12 +553,17 @@ return nullptr;
 auto new_token_chars = common_token_to_piece(context, new_token_id);
 cached_token_chars += new_token_chars;
 
-// Check for common stop sequences in the accumulated output
+// Check for common stop sequences in the accumulated output.
+// Backstop for stop tokens whose GGUF may not mark them as end-of-generation;
+// it covers the union of every supported chat-template family (ChatML,
+// Llama 2/3, Gemma, Phi/GLM). The primary, per-architecture stop remains
+// llama_vocab_is_eog() above.
 const auto has_stop =
 cached_token_chars.find("<|im_end|>") != std::string::npos ||
 cached_token_chars.find("<end_of_turn>") != std::string::npos ||
 cached_token_chars.find("<|endoftext|>") != std::string::npos ||
 cached_token_chars.find("<|eot_id|>") != std::string::npos ||
+cached_token_chars.find("<|end|>") != std::string::npos ||
 cached_token_chars.find("</s>") != std::string::npos;
 if (has_stop) {
 cached_token_chars.clear();
@@ -549,8 +572,9 @@ return nullptr;
 
 jstring new_token = nullptr;
 if (is_valid_utf8(cached_token_chars.c_str())) {
+    // Generated content is intentionally NOT logged (privacy): the piece is
+    // still returned to the Kotlin flow for the UI.
     new_token = env->NewStringUTF(cached_token_chars.c_str());
-    LOGi("cached: %s, new_token_chars: `%s`, id: %d", cached_token_chars.c_str(), new_token_chars.c_str(), new_token_id);
     cached_token_chars.clear();
 } else {
     new_token = env->NewStringUTF("");

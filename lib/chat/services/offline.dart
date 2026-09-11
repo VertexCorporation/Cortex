@@ -105,6 +105,17 @@ SamplerPreset creativeSampler(ModelEntity model) {
   );
 }
 
+/// Classifies why a native model load attempt failed.
+///
+/// * [fileNotFound] — the GGUF is genuinely absent (stale download record).
+/// * [engineLoad]   — the native engine rejected the file while loading
+///   (e.g. `unknown model architecture` on a llama.cpp build that predates
+///   the model's release). The file itself can be perfectly valid.
+/// * [timeout]      — the attempt did not finish within the per-attempt
+///   budget (slow device, memory pressure, GPU init hang). Often transient.
+/// * [none]         — no failure recorded (attempt succeeded / not run yet).
+enum _LoadFailureKind { none, fileNotFound, engineLoad, timeout }
+
 class OfflineService {
   final ResponseService _responseService;
   final ChatSessionProvider _sessionProvider;
@@ -122,6 +133,27 @@ class OfflineService {
   int _lastVisibleChunkRepeatCount = 0;
   bool _forceAbortCurrentStream = false;
 
+  // ===========================================================================
+  // Native stream lifecycle — cross-conversation isolation
+  // ===========================================================================
+  //
+  // ONE llama context serves the whole app. When the user leaves a chat while
+  // its offline generation is still running, the native stream keeps decoding
+  // until it is stopped. `isWaitingForResponse` is a single, conversation-
+  // blind flag, so if a NEW conversation starts waiting while that stale
+  // stream is still alive, the stale stream's tokens — and its terminal
+  // `onMessageComplete` — are routed into the NEW conversation's message
+  // bubble (the "new chat B answers with chat A's language/content" leak).
+  //
+  // Every new offline generation therefore:
+  //   1. tears the previous native stream down first (stop + wait for its
+  //      terminal ack, bounded), and
+  //   2. accepts native events ONLY between its own `sendMessage` invoke and
+  //      its terminal `onMessageComplete`.
+  bool _isNativeStreamActive = false;
+  Completer<void>? _staleStreamTeardown;
+  bool _acceptingNativeEvents = false;
+
   // Repetition guard constants
   static const int _maxHistoryLength = 1024;
   static const int _chunkRepeatThreshold = 6; // More aggressive stop
@@ -135,6 +167,10 @@ class OfflineService {
   Completer<bool>? _modelLoadCompleter;
   Completer<bool>? _singleLoadAttemptCompleter;
   Timer? _retryTimer;
+
+  /// Why the most recent load attempt failed. Drives both the retry policy
+  /// and the (much stricter) auto-uninstall policy.
+  _LoadFailureKind _lastLoadFailureKind = _LoadFailureKind.none;
 
   OfflineService({
     required ResponseService responseService,
@@ -226,6 +262,7 @@ class OfflineService {
     if (!await File(path).exists()) {
       debugPrint(
           "[OfflineService] Critical Error: Model file not found at $path");
+      _lastLoadFailureKind = _LoadFailureKind.fileNotFound;
       await _autoRemoveSelectedOfflineModel();
       return false;
     }
@@ -261,6 +298,8 @@ class OfflineService {
     debugPrint(
         "[OfflineService] 🚀 Caching Model => ctx=$nCtx, gpu=$nGpu, threads=$nThreads (RAM: $ramMB MB)");
 
+    _lastLoadFailureKind = _LoadFailureKind.none;
+
     try {
       for (var attempt = 1; attempt <= _maxModelLoadRetries; attempt++) {
         // Fallback to CPU-only on retry if GPU fails (vital for Simulators/older devices)
@@ -278,14 +317,33 @@ class OfflineService {
         await _safeReleaseNativeModel();
         _sessionProvider.setLocalModelLoaded(false);
 
+        // Smart abort: deterministic failures never recover by retrying.
+        final kind = _lastLoadFailureKind;
+        if (kind == _LoadFailureKind.fileNotFound) {
+          // The file is gone — every retry would hit the same wall.
+          debugPrint(
+              "[OfflineService] File not found — aborting retries immediately.");
+          break;
+        }
+        if (kind == _LoadFailureKind.engineLoad && attempt >= 2) {
+          // The native engine rejected the file (e.g. an architecture this
+          // llama build doesn't know). We already tried the CPU-only
+          // fallback; do not burn attempts 3-5 (and 15s timeouts each).
+          debugPrint(
+              "[OfflineService] Deterministic engine load failure — stopping retries after GPU and CPU-only attempts.");
+          break;
+        }
+
         if (attempt < _maxModelLoadRetries) {
           _retryTimer?.cancel();
           await _retryDelay(const Duration(milliseconds: 350));
         }
       }
 
-      if (!loaded) {
-        await _autoRemoveSelectedOfflineModel();
+      if (loaded) {
+        _lastLoadFailureKind = _LoadFailureKind.none;
+      } else {
+        await _handleLoadFailureCleanup(path);
       }
     } catch (e) {
       debugPrint("[OfflineService] Model load retry loop failed: $e");
@@ -325,14 +383,19 @@ class OfflineService {
       return await _singleLoadAttemptCompleter!.future.timeout(
         const Duration(seconds: 15),
         onTimeout: () {
+          _lastLoadFailureKind = _LoadFailureKind.timeout;
           debugPrint(
               "[OfflineService] Timeout while waiting for model load (attempt $attempt).");
           return false;
         },
       );
     } on PlatformException catch (e) {
+      final String code = e.code;
+      _lastLoadFailureKind = code == 'FILE_NOT_FOUND'
+          ? _LoadFailureKind.fileNotFound
+          : _LoadFailureKind.engineLoad;
       debugPrint(
-          "[OfflineService] Failed to invoke 'cacheModel' (attempt $attempt): ${e.message}");
+          "[OfflineService] Failed to invoke 'cacheModel' (attempt $attempt, code: $code): ${e.message}");
       return false;
     } finally {
       _singleLoadAttemptCompleter = null;
@@ -345,6 +408,93 @@ class OfflineService {
     } catch (e) {
       debugPrint(
           "[OfflineService] releaseModel after failed load also failed: $e");
+    }
+  }
+
+  /// Decides what happens after the model failed to load.
+  ///
+  /// Auto-uninstall is ONLY justified when the file itself is unusable
+  /// (missing or structurally corrupt). A structurally valid GGUF is NEVER
+  /// deleted: the failure then belongs to the engine (stale llama build,
+  /// memory pressure, ...), and destroying a valid multi-hundred-MB download
+  /// — forcing the user to re-download it — is strictly worse than keeping
+  /// it and telling the user what happened.
+  Future<void> _handleLoadFailureCleanup(String path) async {
+    final bool plausible = await _isDownloadedGgufPlausible(path);
+    if (!plausible) {
+      debugPrint(
+          "[OfflineService] File missing/corrupt after load failure — auto-uninstalling model record.");
+      await _autoRemoveSelectedOfflineModel();
+      return;
+    }
+    debugPrint(
+        "[OfflineService] Load failed (kind: ${_lastLoadFailureKind.name}) but the GGUF file at '$path' is structurally valid. KEEPING the file — refusing destructive auto-uninstall.");
+  }
+
+  /// Cheap structural validation of a downloaded GGUF:
+  ///   1. Must exist and be non-trivially sized.
+  ///   2. Must start with the GGUF magic bytes and a plausible version.
+  ///   3. Actual file size must roughly match the catalog's expected size.
+  ///
+  /// Returns false only when the file is provably unusable. On any
+  /// unexpected I/O error it returns true — never delete on uncertainty.
+  Future<bool> _isDownloadedGgufPlausible(String path) async {
+    try {
+      final file = File(path);
+      if (!await file.exists()) {
+        return false;
+      }
+      final int length = await file.length();
+      if (length < 1024) {
+        return false;
+      }
+
+      final raf = await file.open(mode: FileMode.read);
+      try {
+        final magic = await raf.read(4);
+        if (magic.length < 4) {
+          return false;
+        }
+        // 'G', 'G', 'U', 'F'
+        const ggufMagic = [0x47, 0x47, 0x55, 0x46];
+        for (var i = 0; i < 4; i++) {
+          if (magic[i] != ggufMagic[i]) {
+            return false;
+          }
+        }
+
+        final versionBytes = await raf.read(4);
+        if (versionBytes.length == 4) {
+          final int version = versionBytes[0] |
+              (versionBytes[1] << 8) |
+              (versionBytes[2] << 16) |
+              (versionBytes[3] << 24);
+          // GGUF v1 (legacy), v2 and v3 are the known-good versions.
+          if (version < 1 || version > 3) {
+            return false;
+          }
+        }
+      } finally {
+        await raf.close();
+      }
+
+      // Expected size from the catalog (in MB). A tolerant 15% window
+      // covers decimal-MB vs MiB listing ambiguities.
+      final int? expectedMB = _sessionProvider.selectedModel?.size;
+      if (expectedMB != null && expectedMB > 0) {
+        final int expectedBytes = expectedMB * 1024 * 1024;
+        final double tolerance = expectedBytes * 0.15;
+        if ((length - expectedBytes).abs() > tolerance) {
+          debugPrint(
+              "[OfflineService] Size mismatch: expected ~$expectedBytes bytes (catalog $expectedMB MB), got $length bytes.");
+          return false;
+        }
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint("[OfflineService] GGUF validation error (keeping file): $e");
+      return true;
     }
   }
 
@@ -373,6 +523,9 @@ class OfflineService {
     debugPrint("[OfflineService] Invoking 'releaseModel'.");
     // Fix: Ensure any active generation is stopped before releasing memory/file handle.
     await stopGeneration();
+    // The native context is going away — no stream can be active afterwards.
+    _isNativeStreamActive = false;
+    _acceptingNativeEvents = false;
     await _llamaChannel.invokeMethod('releaseModel');
     _sessionProvider.setLocalModelLoaded(false);
     if (_modelLoadCompleter != null && !_modelLoadCompleter!.isCompleted) {
@@ -393,7 +546,19 @@ class OfflineService {
     List<String> attachmentPaths = const [],
     bool ragEnabled = false,
     List<String> ragDocumentIds = const [],
+    String? conversationId,
   ]) async {
+    // CROSS-CONVERSATION ISOLATION: the previous native generation (possibly
+    // still decoding for a conversation the user already left) must be dead
+    // before this conversation may wait on the same channel. The teardown
+    // also closes the token gate: from here on, only THIS generation's
+    // native events are accepted (see [_acceptingNativeEvents]).
+    await _teardownStaleNativeStream(
+      conversationId != null
+          ? "a new generation for conversation '$conversationId'"
+          : 'a new generation',
+    );
+
     final String? modelId = _sessionProvider.modelId;
     if (modelId == null) {
       _responseService.onMessageResponse("[Error: No model selected.]");
@@ -406,12 +571,28 @@ class OfflineService {
 
     final modelPath = _sessionProvider.modelPath;
     if (modelPath == null || modelPath.isEmpty) {
+      _responseService.onMessageResponse(
+          "[Error: The model file could not be found on this device. Please download the model again.]");
       _responseService.finalizeResponse();
       return;
     }
 
     final modelReady = await cacheModel(modelPath);
     if (!modelReady) {
+      // Never fail silently: without a visible error the user would just see
+      // an empty reply while the session quietly drifted back to Dynamic Chat.
+      switch (_lastLoadFailureKind) {
+        case _LoadFailureKind.fileNotFound:
+          _responseService.onMessageResponse(
+              "[Error: The model file was missing and has been removed from your library. Please download it again.]");
+        case _LoadFailureKind.engineLoad:
+          _responseService.onMessageResponse(
+              "[Error: The on-device model could not be started. The model file was kept — updating the app, freeing up memory, or choosing another model may help.]");
+        case _LoadFailureKind.timeout:
+        case _LoadFailureKind.none:
+          _responseService.onMessageResponse(
+              "[Error: The on-device model did not respond in time. The model file was kept — please try again, or free up memory.]");
+      }
       _responseService.finalizeResponse();
       return;
     }
@@ -491,11 +672,68 @@ class OfflineService {
         ...specArgs,
       },
     );
+
+    // The native stream for THIS conversation is now live: open the event
+    // gate. (Set after the invoke resolves so a failed invoke cannot leave
+    // the gate open for a stream that never started.)
+    _isNativeStreamActive = true;
+    _acceptingNativeEvents = true;
+    debugPrint(
+        "[OfflineService] Native generation started: conversation=${conversationId ?? 'unknown'}, model=${model.id}, promptChars=${finalPrompt.length}, ragInjected=${ragContext != null && ragContext.isNotEmpty}.");
+  }
+
+  /// Tears down any native generation that is still decoding so the NEXT
+  /// conversation's generation can own the channel exclusively.
+  ///
+  /// Stops the stale stream and waits (bounded) for its terminal
+  /// `onMessageComplete` ack. While tearing down, the event gate is closed:
+  /// the stale stream's remaining tokens are dropped and its completion is
+  /// never forwarded to [ResponseService] — otherwise the abandoned
+  /// conversation's completion would finalize the message of the NEW
+  /// conversation that is about to start waiting.
+  Future<void> _teardownStaleNativeStream(String reason) async {
+    // Close the gate FIRST: from this instant, no native event of the
+    // previous generation may reach the conversation provider.
+    _acceptingNativeEvents = false;
+
+    if (!_isNativeStreamActive) {
+      // No live native stream (idle, or the previous generation already
+      // completed normally) — nothing to stop or wait for.
+      return;
+    }
+
+    final Completer<void> ack = Completer<void>();
+    _staleStreamTeardown = ack;
+    debugPrint('[OfflineService] Tearing down stale native stream before $reason.');
+
+    try {
+      await _llamaChannel.invokeMethod('stopGeneration');
+    } catch (e) {
+      debugPrint('[OfflineService] stopGeneration during teardown failed: $e');
+    }
+
+    try {
+      await ack.future.timeout(const Duration(seconds: 2));
+      debugPrint('[OfflineService] Stale stream acknowledged stop.');
+    } on TimeoutException {
+      debugPrint(
+          '[OfflineService] WARNING: stale stream did not acknowledge stop within 2s; proceeding with the new generation anyway.');
+    }
+
+    _staleStreamTeardown = null;
+    _isNativeStreamActive = false;
   }
 
   Future<void> stopGeneration() async {
     debugPrint("[OfflineService] Invoking 'stopGeneration'.");
     _retryTimer?.cancel();
+    // The app is abandoning the current generation (stop button, chat
+    // switch, or the SendService pre-kill that precedes a new exchange).
+    // Close the event gate IMMEDIATELY: the dying stream's remaining tokens
+    // — and its terminal completion — must never be routed into a
+    // conversation that starts waiting afterwards (the cross-conversation
+    // leak). The gate reopens only when the next generation is accepted.
+    _acceptingNativeEvents = false;
     await _llamaChannel.invokeMethod('stopGeneration');
   }
 
@@ -514,6 +752,15 @@ class OfflineService {
     switch (call.method) {
       case 'onMessageResponse':
         final String rawToken = call.arguments as String? ?? '';
+        if (rawToken.isEmpty) return;
+        if (!_acceptingNativeEvents) {
+          // Token from a generation that was torn down (or never accepted):
+          // it belongs to a conversation that is no longer waiting — most
+          // commonly one the user left while it was still decoding.
+          debugPrint(
+              '[OfflineService] Dropped native token from a previous conversation (len=${rawToken.length}).');
+          return;
+        }
         if (_forceAbortCurrentStream) return;
 
         final processor = _currentProcessor;
@@ -538,6 +785,24 @@ class OfflineService {
         break;
 
       case 'onMessageComplete':
+        _isNativeStreamActive = false;
+        if (!_acceptingNativeEvents) {
+          // Terminal ack of a torn-down / unaccepted generation. Swallowing
+          // it prevents the ABANDONED conversation's completion from
+          // finalizing the thinking message of the conversation that is
+          // currently waiting (which would otherwise lock in its mixed or
+          // empty text and drop the real response).
+          final Completer<void>? pendingAck = _staleStreamTeardown;
+          if (pendingAck != null && !pendingAck.isCompleted) {
+            pendingAck.complete();
+          }
+          debugPrint(
+              '[OfflineService] Suppressed stale stream completion (previous conversation); nothing finalized.');
+          return;
+        }
+        // This generation is finished — close the gate against any trailing
+        // events before finalizing.
+        _acceptingNativeEvents = false;
         debugPrint("[OfflineService] Complete.");
 
         final tail = _currentProcessor?.finalize();
@@ -558,8 +823,23 @@ class OfflineService {
         break;
 
       case 'onModelLoadFailed':
-        final String error = call.arguments as String? ?? 'Unknown error';
-        debugPrint("[OfflineService] Load Failed: $error");
+        // The native side sends {"code": ..., "message": ...}; older builds
+        // sent a bare message string. Classify so the retry loop and the
+        // uninstall policy can act on the true cause.
+        String errorCode = 'LOAD_FAILED';
+        String errorMessage = 'Unknown error';
+        final args = call.arguments;
+        if (args is Map) {
+          errorCode = args['code'] as String? ?? 'LOAD_FAILED';
+          errorMessage = args['message'] as String? ?? 'Unknown error';
+        } else if (args is String) {
+          errorMessage = args;
+        }
+        _lastLoadFailureKind = errorCode == 'FILE_NOT_FOUND'
+            ? _LoadFailureKind.fileNotFound
+            : _LoadFailureKind.engineLoad;
+        debugPrint(
+            "[OfflineService] Load Failed (code: $errorCode): $errorMessage");
         _sessionProvider.setLocalModelLoaded(false);
         if (_singleLoadAttemptCompleter != null &&
             !_singleLoadAttemptCompleter!.isCompleted) {
@@ -575,6 +855,16 @@ class OfflineService {
   // ===========================================================================
   // Prompt & Repetition Check (Same as before but cleaner)
   // ===========================================================================
+
+  /// The single, neutral system prompt used for offline inference.
+  ///
+  /// Deliberately short: small on-device models (especially sub-1B) degrade
+  /// with long persona/behavior directives, and locale-forcing instructions
+  /// ("speak the device language") bias the reply language even when the user
+  /// writes in another language. The model follows the user's language
+  /// naturally from the conversation itself.
+  static const String _offlineSystemPrompt =
+      "You are a helpful AI assistant running inside Cortex, Türkiye's largest B2C AI platform.";
 
   Future<String> _buildFormattedPrompt({
     required ModelEntity model,
@@ -598,23 +888,13 @@ class OfflineService {
         ChatTokens.fromMap(ModelDefaults.getFallbackFormat(model.id));
 
     final sb = StringBuffer();
-    var systemPrompt = (model.role ?? "").trim();
-
-    // Short, direct instructions for better local model output
-    final langName = _languageName(langCode);
-    if (langCode == 'tr') {
-      systemPrompt +=
-          "\n\nSen Türkçe konuşan bir asistansın. Kısa ve doğal yanıt ver. Asla düşünce etiketi (<think>), işaretleme dili (markdown) veya biçimlendirme kullanma. Sadece düz metinle yanıtla. Konuşma geçmişini hatırla ve bağlamı koru.";
-    } else if (langCode == 'de') {
-      systemPrompt +=
-          "\n\nDu bist ein Assistent, der Deutsch spricht. Antworte kurz und natürlich. Verwende niemals Denk-Tags (<think>), Markdown oder Formatierungen. Antworte nur in Klartext. Behalte den Gesprächsverlauf im Gedächtnis.";
-    } else if (langCode == 'fr') {
-      systemPrompt +=
-          "\n\nTu es un assistant qui parle français. Réponds brièvement et naturellement. N'utilise jamais de balises de pensée (<think>), de markdown ou de formatage. Réponds uniquement en texte brut. Souviens-toi de l'historique de la conversation.";
-    } else {
-      systemPrompt +=
-          "\n\nYou are a $langName-speaking assistant. Keep responses short and natural. Never use think tags (<think>), markdown, or formatting. Respond in plain text only. Remember the conversation history.";
-    }
+    // ONE short, neutral system prompt for every offline model (see
+    // [_offlineSystemPrompt]). A curated `role` (a roleplay persona from the
+    // catalog) is the only exception: it is the model's identity, so it takes
+    // precedence when the catalog defines one. No locale-forcing directives —
+    // the model should follow the user's language from the conversation.
+    final String role = (model.role ?? '').trim();
+    final String systemPrompt = role.isNotEmpty ? role : _offlineSystemPrompt;
 
     // System Preamble
     if (systemPrompt.isNotEmpty &&
@@ -632,23 +912,37 @@ class OfflineService {
       langCode: langCode,
     );
 
+    // Composition log (counts only — never message contents) so cross-
+    // conversation leakage can be verified from logs: a brand-new chat MUST
+    // show historyMessages=0, a same-chat follow-up MUST show its own turns.
+    int historyUserCount = 0;
+    int historyAssistantCount = 0;
+
     for (final msg in history) {
       final role = msg['role'];
       final content = _extractVisibleText(msg['content']);
       if (content.isEmpty) continue;
 
       if (role == 'user') {
+        historyUserCount++;
         _appendTurn(sb,
             start: effectiveTokens.userStart ?? '',
             end: effectiveTokens.userEnd,
             content: content);
       } else if (role == 'assistant') {
+        historyAssistantCount++;
         _appendTurn(sb,
             start: effectiveTokens.assistantStart ?? '',
             end: effectiveTokens.assistantEnd,
             content: content);
       }
     }
+
+    debugPrint(
+        '[OfflineService] Prompt composition for model ${model.id}: system=${systemPrompt.isEmpty ? 0 : 1}, '
+        'historyMessages=${history.length} (user=$historyUserCount, assistant=$historyAssistantCount), '
+        'latestUser=1, ragInjected=${ragContext?.isNotEmpty ?? false}, '
+        'chatFormatProvided=${format != null}.');
 
     // Last User Message
     final String effectiveLatest = (ragContext != null && ragContext.isNotEmpty)
@@ -667,42 +961,9 @@ class OfflineService {
       }
     }
 
+    debugPrint(
+        '[OfflineService] Final offline prompt: promptChars=${sb.length}.');
     return sb.toString();
-  }
-
-  String _languageName(String langCode) {
-    switch (langCode) {
-      case 'tr':
-        return 'Turkish';
-      case 'de':
-        return 'German';
-      case 'fr':
-        return 'French';
-      case 'es':
-        return 'Spanish';
-      case 'it':
-        return 'Italian';
-      case 'pt':
-        return 'Portuguese';
-      case 'nl':
-        return 'Dutch';
-      case 'pl':
-        return 'Polish';
-      case 'ru':
-        return 'Russian';
-      case 'ja':
-        return 'Japanese';
-      case 'ko':
-        return 'Korean';
-      case 'zh':
-        return 'Chinese';
-      case 'ar':
-        return 'Arabic';
-      case 'hi':
-        return 'Hindi';
-      default:
-        return 'English';
-    }
   }
 
   String _extractVisibleText(dynamic content) {

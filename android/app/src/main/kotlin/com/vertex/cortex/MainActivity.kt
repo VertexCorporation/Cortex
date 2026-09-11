@@ -162,6 +162,17 @@ class MainActivity : FlutterFragmentActivity() {
                             putExtra("temp", temp)
                             putExtra("topP", topP)
                             putExtra("topK", topK)
+                            // The full sampler chain — parity with iOS. Without
+                            // these extras LlamaService would silently fall
+                            // back to the defaults (repeatPenalty=1.0, no
+                            // penalties, no mirostat), degrading generation
+                            // quality (repetition loops) on Android only.
+                            putExtra("repeatPenalty", call.argument<Double>("repeatPenalty")?.toFloat() ?: 1.0f)
+                            putExtra("frequencyPenalty", call.argument<Double>("frequencyPenalty")?.toFloat() ?: 0.0f)
+                            putExtra("presencePenalty", call.argument<Double>("presencePenalty")?.toFloat() ?: 0.0f)
+                            putExtra("mirostatMode", call.argument<Int>("mirostatMode") ?: 0)
+                            putExtra("mirostatTau", call.argument<Double>("mirostatTau")?.toFloat() ?: 5.0f)
+                            putExtra("mirostatEta", call.argument<Double>("mirostatEta")?.toFloat() ?: 0.1f)
                         }
                         startServiceSafe(intent)
                         

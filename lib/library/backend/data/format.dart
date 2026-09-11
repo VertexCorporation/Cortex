@@ -94,6 +94,10 @@ String formatName(String? name, {bool isOfflineVariant = false}) {
     if (source.contains('/')) {
       source = source.split('/').last.trim();
     }
+    // Hide the .gguf extension (e.g. "stories15m_moe.gguf" → "stories15m_moe").
+    if (source.toLowerCase().endsWith('.gguf')) {
+      source = source.substring(0, source.length - '.gguf'.length).trim();
+    }
 
     final words = source
         .replaceAll('_', ' ')
