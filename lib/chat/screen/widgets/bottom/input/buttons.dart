@@ -4,6 +4,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/library/backend/data/entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -466,6 +467,38 @@ class ActionButtonWidget extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
+// CANONICAL "+" FEATURE STATE
+// -----------------------------------------------------------------------------
+/// The canonical state of "the `+` bubble currently represents an actively
+/// selected feature, toggle or model-implied mode".
+///
+/// This ONE definition is the source of truth for BOTH:
+///  * the bubble's ACTIVE VISUALS (inverted border/background — the paint
+///    merely reflects this state, never the reverse), and
+///  * the composer capsule's EXPANSION: an active feature is meaningful input
+///    state, so the capsule must stay open even when the keyboard is closed,
+///    the field is unfocused, dictation is idle and the text is empty. The
+///    active `+` must never collapse out from under the user.
+///
+/// The capsule may collapse only when this state AND every other activity
+/// signal (focus, text, dictation) are all absent. Never branch on the
+/// painted colors — branch on this state.
+bool composerFeatureActive(
+  InputProvider inputProvider,
+  ModelEntity? currentModel,
+) =>
+    inputProvider.featureMode != ChatInputMode.none ||
+    inputProvider.enableWebSearch ||
+    inputProvider.ragEnabled ||
+    currentModel?.type == 'offline' ||
+    currentModel?.outputs['image'] == true ||
+    currentModel?.outputs['audio'] == true ||
+    currentModel?.outputs['video'] == true ||
+    currentModel?.category == 'image' ||
+    currentModel?.category == 'audio' ||
+    currentModel?.category == 'video';
+
+// -----------------------------------------------------------------------------
 // 2. ADD ATTACHMENT BUTTON (Refactored for Multi-file Support)
 // -----------------------------------------------------------------------------
 class AddPhotoButton extends StatefulWidget {
@@ -509,18 +542,12 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     final sessionProvider = context.watch<ChatSessionProvider>();
     final currentModel = sessionProvider.selectedModel;
 
-    final bool isFeatureActive =
-        widget.hasSelectedFeature ||
-            inputProvider.featureMode != ChatInputMode.none ||
-            inputProvider.enableWebSearch ||
-            inputProvider.ragEnabled ||
-            currentModel?.type == 'offline' ||
-            currentModel?.outputs['image'] == true ||
-            currentModel?.outputs['audio'] == true ||
-            currentModel?.outputs['video'] == true ||
-            currentModel?.category == 'image' ||
-            currentModel?.category == 'audio' ||
-            currentModel?.category == 'video';
+    // ONE canonical definition (see [composerFeatureActive]) drives both the
+    // bubble's active visuals here and the composer capsule's expansion in
+    // the input row — an active feature can never paint itself active and
+    // then have the capsule collapse the control away.
+    final bool isFeatureActive = widget.hasSelectedFeature ||
+        composerFeatureActive(inputProvider, currentModel);
 
     final double progress = widget.bubbleProgress.clamp(0.0, 1.0);
     final Color rawBackgroundColor = isFeatureActive

@@ -7,6 +7,8 @@ import 'package:shimmer/shimmer.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/messages/markdown/parser.dart';
+import 'package:cortex/chat/messages/tiles/ai/reveal_text.dart';
+import 'package:cortex/chat/messages/tiles/ai/reveal_timeline.dart';
 
 class ThinkingWidget extends StatefulWidget {
   final String content;
@@ -14,12 +16,27 @@ class ThinkingWidget extends StatefulWidget {
   final String? label;
   final bool autoFadeOut;
 
+  /// Typography/layout multiplier for hosts that scale their message tiles
+  /// (the AI message tile). Defaults to 1.0, which is what the in-markdown
+  /// usage (`processBlockMatch`) has always used.
+  final double scale;
+
+  /// The host message's shared reveal timeline. When provided, the reasoning
+  /// text is painted through the SAME [RevealText] glyph pipeline (same fade,
+  /// stagger, clock and generation state) as the assistant's main answer, so
+  /// a streamed reasoning block animates identically to streamed answer text
+  /// instead of appearing as plain typing. Static hosts (message viewer,
+  /// markdown blocks) omit it and keep the plain [RichText].
+  final RevealTimeline? reveal;
+
   const ThinkingWidget({
     super.key,
     required this.content,
     this.isFinished = false,
     this.label,
     this.autoFadeOut = false,
+    this.scale = 1.0,
+    this.reveal,
   });
 
   @override
@@ -110,7 +127,7 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
     }
     _cachedContentText = widget.content;
     _cachedParsedContent = parseText(context, widget.content,
-        fontSize: 12, isFinished: widget.isFinished);
+        fontSize: 12 * widget.scale, isFinished: widget.isFinished);
     return _cachedParsedContent!;
   }
 
@@ -120,6 +137,27 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
 
     if (widget.content != oldWidget.content) {
       _cachedParsedContent = null;
+    }
+
+    // The finished flag changes how the content is parsed (final markdown
+    // polish): a completed reasoning block must be re-parsed, not served
+    // from the streaming-phase cache.
+    if (widget.isFinished != oldWidget.isFinished) {
+      _cachedParsedContent = null;
+    }
+
+    // A NEW reasoning stream landed on this slot — a regeneration, or a
+    // different message recycled into the same list position. The label
+    // lifecycle must restart with it: a fresh, still-open stream shimmers
+    // "Thinking" again instead of inheriting the previous response's
+    // settled "Thought" state. (The finished flag flipping true→false and
+    // the content resetting to empty are the two observable stream
+    // restarts; neither is tied to expand/collapse.)
+    if ((!widget.isFinished && oldWidget.isFinished) ||
+        (widget.content.isEmpty && oldWidget.content.isNotEmpty)) {
+      _wasFinished = widget.isFinished;
+      _labelTransitionController.stop();
+      _labelTransitionController.value = widget.isFinished ? 1.0 : 0.0;
     }
 
     if (widget.isFinished && !_wasFinished) {
@@ -180,8 +218,9 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
               onTap: hasContent ? _toggleExpand : null,
               borderRadius: BorderRadius.circular(8),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                padding: EdgeInsets.symmetric(
+                    vertical: 8.0 * widget.scale,
+                    horizontal: 4.0 * widget.scale),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -199,8 +238,14 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                         final labelText =
                             showThinking ? thinkingLabel : thoughtLabel;
 
-                        // Show shimmer only when still in thinking state (not transitioning)
-                        final showShimmer = showThinking && !widget.isFinished;
+                        // Shimmer while the reasoning stream is open — and
+                        // keep it mounted while the label fades out so the
+                        // shimmer melts away with the fade instead of
+                        // snapping to a flat label. The settled "Thought"
+                        // state never shimmers.
+                        final showShimmer = showThinking &&
+                            (!widget.isFinished ||
+                                _labelTransitionController.isAnimating);
 
                         return Opacity(
                           opacity: opacity.clamp(0.0, 1.0),
@@ -213,7 +258,7 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                                   child: Text(
                                     labelText,
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 14 * widget.scale,
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w400,
                                       color: AppColors.tertiaryColor,
@@ -223,7 +268,7 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                               : Text(
                                   labelText,
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 14 * widget.scale,
                                     fontFamily: 'Inter',
                                     fontWeight: FontWeight.w400,
                                     color: AppColors.tertiaryColor,
@@ -267,28 +312,22 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
               child: SlideTransition(
                 position: _contentSlide,
                 child: Container(
-                  margin: const EdgeInsets.only(left: 4, bottom: 8),
-                  padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
+                  margin: EdgeInsets.only(
+                      left: 4 * widget.scale, bottom: 8 * widget.scale),
+                  padding: EdgeInsets.only(
+                      left: 12 * widget.scale,
+                      top: 4 * widget.scale,
+                      bottom: 4 * widget.scale),
                   decoration: BoxDecoration(
                     border: Border(
                       left: BorderSide(
                         color: AppColors.tertiaryColor.withValues(alpha: 0.3),
-                        width: 2,
+                        width: 2 * widget.scale,
                       ),
                     ),
                   ),
                   child: SelectionArea(
-                    child: RichText(
-                      text: TextSpan(
-                        children: _getParsedContent(context),
-                        style: TextStyle(
-                          color: AppColors.primaryColor.inverted
-                              .withValues(alpha: 0.8),
-                          fontSize: 12,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
+                    child: _buildContentText(context),
                   ),
                 ),
               ),
@@ -296,6 +335,31 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
           ),
         ],
       ),
+    );
+  }
+
+  /// The reasoning text. Without a [ThinkingWidget.reveal] timeline this is
+  /// the historical plain [RichText] (message viewer, markdown blocks). With
+  /// one — the AI message tile — the SAME [RevealText] component paints the
+  /// reasoning glyphs on the host message's shared reveal clock, so streamed
+  /// reasoning animates exactly like streamed main-answer text: identical
+  /// fade duration, stagger, catch-up pacing and generation resets.
+  Widget _buildContentText(BuildContext context) {
+    final style = TextStyle(
+      color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
+      fontSize: 12 * widget.scale,
+      height: 1.4,
+    );
+    final spans = _getParsedContent(context);
+    final reveal = widget.reveal;
+    if (reveal == null) {
+      return RichText(
+        text: TextSpan(children: spans, style: style),
+      );
+    }
+    return RevealText(
+      timeline: reveal,
+      text: TextSpan(style: style, children: spans),
     );
   }
 }

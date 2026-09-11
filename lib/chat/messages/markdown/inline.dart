@@ -79,6 +79,27 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
                 child: Text(content,
                     style: baseStyle.copyWith(
                         fontSize: fs * 0.9, fontFamily: 'monospace'))));
+      case 'displayMath':
+        // $$…$$ — the canonical block form, rendered as a standalone,
+        // horizontally scrollable (fog-edged) math widget.
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: SafeMathTex(
+            latex: matchText.substring(2, matchText.length - 2),
+            textStyle: baseStyle,
+            display: true,
+          ),
+        );
+      case 'inlineMath':
+        // $…$ — math flowing with the text. Malformed LaTeX degrades to the
+        // literal source text via SafeMathTex's fallback, never a crash.
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: SafeMathTex(
+            latex: matchText.substring(1, matchText.length - 1),
+            textStyle: baseStyle,
+          ),
+        );
       case 'link':
         final m = _linkPattern.firstMatch(matchText);
         if (m == null) return TextSpan(text: matchText, style: baseStyle);

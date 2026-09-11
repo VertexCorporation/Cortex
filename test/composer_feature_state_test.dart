@@ -52,12 +52,13 @@ class _Voice extends ChangeNotifier implements VoiceService {
 }
 
 class _Session extends ChangeNotifier implements ChatSessionProvider {
-  _Session({this.localModelLoaded = false});
+  _Session({this.localModelLoaded = false, this.model});
 
   final bool localModelLoaded;
+  final ModelEntity? model;
 
   @override
-  ModelEntity? get selectedModel => null;
+  ModelEntity? get selectedModel => model;
   @override
   bool get isLocalModelLoaded => localModelLoaded;
   @override
@@ -76,6 +77,7 @@ Future<void> _pumpComposer(
   required InputProvider input,
   required TextEditingController text,
   required FocusNode focus,
+  _Session? session,
   Future<void> Function()? onSend,
 }) async {
   final loc = await AppLocalizations.delegate.load(const Locale('en'));
@@ -85,11 +87,15 @@ Future<void> _pumpComposer(
       ChangeNotifierProvider<SpeechService>(create: (_) => _Speech()),
       ChangeNotifierProvider<VoiceService>(create: (_) => _Voice()),
       ChangeNotifierProvider<ChatSessionProvider>(
-          create: (_) => _Session(localModelLoaded: true)),
+          create: (_) => session ?? _Session(localModelLoaded: true)),
       ChangeNotifierProvider<InternetProvider>(create: (_) => _Internet()),
       Provider<CreditsManager>.value(value: CreditsManager.instance),
     ],
     child: MaterialApp(
+      // The RAG status chip (and other composer chrome) resolves localized
+      // strings through the delegates, so the test app must register them.
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: Align(
           alignment: Alignment.bottomCenter,
@@ -226,6 +232,137 @@ void main() {
     // storm: no teardown, no FocusNode/controller loss, no vanishing buttons.
     expect(tester.state(find.byType(TextField)), same(originalField));
     expect(find.byType(AddPhotoButton), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'web search active keeps the capsule open with no text, no focus and no dictation',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+
+    final field = find.byType(TextField);
+    final collapsedWidth = tester.getSize(field).width;
+
+    // Web search turns the "+" bubble active: the capsule must expand too,
+    // even though the field is empty, unfocused and dictation is idle.
+    input.toggleWebSearch();
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, greaterThan(collapsedWidth));
+    expect(find.byType(AddPhotoButton), findsOneWidget);
+
+    // Focus flips never collapse it while the active feature is on.
+    focus.requestFocus();
+    await tester.pumpAndSettle();
+    focus.unfocus();
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, greaterThan(collapsedWidth));
+
+    // Clearing the feature with everything else idle may collapse again.
+    input.clearWebSearch();
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, closeTo(collapsedWidth, 1.0));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'RAG (document chat) active keeps the capsule open until cleared',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+
+    final field = find.byType(TextField);
+    final collapsedWidth = tester.getSize(field).width;
+
+    input.toggleRag();
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, greaterThan(collapsedWidth));
+
+    // The empty, unfocused composer stays open while document chat is on.
+    expect(find.byType(AddPhotoButton), findsOneWidget);
+
+    input.setRagEnabled(false);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, closeTo(collapsedWidth, 1.0));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'a model-implied active "+" (offline/media model) never lets the capsule collapse',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final input = InputProvider();
+    final text = TextEditingController();
+    final focus = FocusNode();
+    addTearDown(input.dispose);
+    addTearDown(text.dispose);
+    addTearDown(focus.dispose);
+
+    // Baseline: a plain server-side text model, nothing selected — the
+    // capsule is collapsed with an empty, unfocused field.
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+    final field = find.byType(TextField);
+    final collapsedWidth = tester.getSize(field).width;
+
+    // Selecting an OFFLINE model paints the "+" active: the capsule must
+    // stay open with the keyboard closed and the field empty.
+    final offlineModel = ModelEntity.fromMap({
+      'id': 'qwen3-06b',
+      'title': 'Qwen 3 0.6B',
+      'type': 'offline',
+      'category': 'chat',
+    }, 'en');
+    await tester.pumpWidget(const SizedBox());
+    await _pumpComposer(
+      tester,
+      input: input,
+      text: text,
+      focus: focus,
+      session: _Session(localModelLoaded: true, model: offlineModel),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, greaterThan(collapsedWidth));
+    expect(find.byType(AddPhotoButton), findsOneWidget);
+
+    // Focus disappears entirely — the active "+" keeps the capsule open.
+    focus.unfocus();
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, greaterThan(collapsedWidth));
+    expect(tester.takeException(), isNull);
+
+    // Switching back to a plain text model (feature cleared) with nothing
+    // else active lets the capsule collapse again.
+    await tester.pumpWidget(const SizedBox());
+    await _pumpComposer(tester, input: input, text: text, focus: focus);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(field).width, closeTo(collapsedWidth, 1.0));
     expect(tester.takeException(), isNull);
   });
 }

@@ -14,10 +14,8 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/internet.dart';
 import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
-import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/select.dart';
 import 'package:cortex/chat/services/generation.dart';
-import 'package:cortex/main.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/user.dart';
@@ -353,15 +351,17 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   fontSize: fontSize,
                   borderRadius: borderRadius,
                   buttonSpacing: buttonSpacing,
-                  iconPath: 'assets/icons/world.svg',
+                  iconPath: 'assets/icons/context.svg',
                   title: l10n.offlineUse,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
                   isDisabled: false,
-                  onTap: () {
-                    final inputProvider = context.read<InputProvider>();
-                    inputProvider.toggleWebSearch();
-                  },
+                  // "Use Offline" must select a local offline model — never
+                  // arm Web Search (the accidental coupling this button used
+                  // to have). The canonical action picks the strongest
+                  // installed offline model, or routes to the Library's
+                  // Local Models section (pulse) when none is installed.
+                  onTap: () => handleUseOfflineAction(context),
                 ),
               ),
             ],
@@ -539,10 +539,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     final catalog = context.read<ModelCatalogProvider>();
     final l10n = AppLocalizations.of(context)!;
 
-    final hasOfflineModels = catalog.allModels.any((m) {
-      final path = local.getFilePathById(m.id);
-      return m.type == 'offline' && local.isModelOnDisk(path);
-    });
+    // One canonical definition of "an installed offline model exists" (see
+    // hasInstalledOfflineModel in chat/services/select.dart).
+    final hasOfflineModels =
+        hasInstalledOfflineModel(catalog.allModels, local);
 
     if (!hasOfflineModels) return;
 
@@ -559,35 +559,13 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              _handleOfflineAction(context);
+              handleUseOfflineAction(context);
             },
             child: Text(l10n.useOffline),
           ),
         ],
       ),
     );
-  }
-
-  void _handleOfflineAction(BuildContext context) {
-    final catalog = context.read<ModelCatalogProvider>();
-    final local = context.read<ModelLocalStateProvider>();
-    final selectionService = context.read<SelectionService>();
-    final inputProvider = context.read<InputProvider>();
-
-    final offlineModels = catalog.allModels.where((m) => m.type == 'offline');
-    final downloadedModels = offlineModels.where((m) {
-      final path = local.getFilePathById(m.id);
-      return local.isModelOnDisk(path);
-    }).toList();
-
-    if (downloadedModels.isNotEmpty) {
-      inputProvider.clearWebSearch();
-      inputProvider.setFeatureMode(ChatInputMode.offline);
-      selectionService.switchActiveModel(downloadedModels.first,
-          context: context);
-    } else {
-      mainScreenKey.currentState?.switchToLibrary(pulse: true);
-    }
   }
 
   @override

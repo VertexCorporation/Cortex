@@ -531,12 +531,23 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     // empty↔non-empty flip happens, so the capsule animates once here,
     // not on every keystroke.)
     final bool hasText = widget.controller.text.trim().isNotEmpty;
+    // The CANONICAL "+" active-feature state (see [composerFeatureActive] in
+    // buttons.dart) — the same state that turns the bubble's border/background
+    // inverted. An active feature selection (a `+` feature, web search, RAG,
+    // or a model-implied mode like offline/image/video/audio) is meaningful
+    // input state: the capsule stays open with the keyboard closed, the field
+    // unfocused and empty, and no dictation, so the active `+` control can
+    // never be collapsed away. Collapse is legal only when it AND every other
+    // activity signal are all absent.
+    final bool hasActiveFeature = composerFeatureActive(
+      inputProvider,
+      context.read<ChatSessionProvider>().selectedModel,
+    );
     final bool isComposerExpanded = widget.textFieldFocusNode.hasFocus ||
         isDictating ||
         hasText ||
-        inputProvider.featureMode != ChatInputMode.none;
-    final bool hasSelectedFeature =
-        inputProvider.featureMode != ChatInputMode.none;
+        hasActiveFeature;
+    final bool hasSelectedFeature = hasActiveFeature;
 
     _syncExpandAnimation(isComposerExpanded);
 

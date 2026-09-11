@@ -5,9 +5,6 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/select.dart';
 import 'package:cortex/chat/services/generation.dart';
 import 'package:cortex/library/backend/data/service.dart';
-import 'package:cortex/library/providers/catalog.dart';
-import 'package:cortex/library/providers/local.dart';
-import 'package:cortex/main.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/rag/screens/documents.dart';
 import 'package:cortex/theme.dart';
@@ -322,7 +319,11 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                             isOfflineModelSelected) {
                           _selectDynamicModel(context);
                         } else {
-                          _handleOfflineAction(context, l10n);
+                          // Canonical action (chat/services/select.dart):
+                          // picks the strongest installed offline model,
+                          // never arms Web Search, routes to the Library's
+                          // Local Models pulse when nothing is installed.
+                          handleUseOfflineAction(context);
                         }
                         Navigator.pop(context);
                       },
@@ -560,35 +561,6 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
 }
 
 // --- LOGIC HELPERS ---
-
-/// Logic for "Use Offline": Checks downloaded models, opens selector or library.
-void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
-  final catalog = context.read<ModelCatalogProvider>();
-  final local = context.read<ModelLocalStateProvider>();
-  final selectionService = context.read<SelectionService>();
-  final inputProvider = context.read<InputProvider>();
-
-  // Find all offline models
-  final offlineModels = catalog.allModels.where((m) => m.type == 'offline');
-
-  // Find which ones are actually downloaded
-  final downloadedModels = offlineModels.where((m) {
-    final path = local.getFilePathById(m.id);
-    return local.isModelOnDisk(path);
-  }).toList();
-
-  if (downloadedModels.isNotEmpty) {
-    // Offline focus must be singular.
-    inputProvider.clearWebSearch();
-    inputProvider.setFeatureMode(ChatInputMode.offline);
-
-    // Auto-select an available offline model.
-    final firstModel = downloadedModels.first;
-    selectionService.switchActiveModel(firstModel, context: context);
-  } else {
-    mainScreenKey.currentState?.switchToLibrary(pulse: true);
-  }
-}
 
 /// Logic for "Study" & "Quizzes": Formats input with prefix and sends.
 void _handleFeatureSelection(BuildContext context, ChatInputMode mode) {

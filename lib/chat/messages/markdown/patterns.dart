@@ -16,6 +16,21 @@ class RegexPatterns {
   static final bulletList = RegExp(r'^\s*[*\-+]\s+(.+)$', multiLine: true);
 
   static final inlineCode = RegExp(r'(?<!`)`([^`\r\n]+)`(?!`)');
+  // --- LATEX MATH ---
+  // Display math: $$...$$. The content is lazy and may span lines, so the
+  // canonical multi-line block form renders just like the single-line one.
+  // The closing delimiter is REQUIRED — a streamed, still-open "$$" stays
+  // literal text until its closing "$$" arrives (no flicker, no crash, no
+  // swallowing of the rest of the response). Escaped dollars (\$) and runs of
+  // three or more $ never open (or close) a math span.
+  static final displayMath =
+      RegExp(r'(?<![\\$])\$\$([\s\S]+?)(?<![\\$])\$\$(?!\$)');
+  // Inline math: $...$. One line, non-empty, no space just inside either
+  // delimiter (KaTeX/Pandoc rules), closing $ never followed by a digit —
+  // so currency prose like "costs $5, $10" can never pair up as math.
+  // Escaped dollars (\$) never open a span and stay literal text.
+  static final inlineMath = RegExp(
+      r'(?<![\\$])\$(?!\$)(?![ \t\n])((?:\\[^\n]|[^$\n])+?)(?<![ \t])\$(?!\d)(?!\$)');
   // One balanced parenthesised segment is accepted inside a URL. This covers
   // common links such as `/Function_(mathematics)` without swallowing prose.
   static final link =
@@ -54,6 +69,14 @@ class RegexPatterns {
     'bold': bold,
     'strikethrough': strikethrough,
     'italic': italic,
+    // Math must be listed display-first: at a "$$" the display alternative
+    // has to win the combined alternation (inlineMath can never match at a
+    // "$$" anyway — its lookarounds reject doubled dollars — but the order
+    // keeps the intent explicit). Appended after the text styles so bold and
+    // italic keep their existing behavior; no other pattern claims a "$"
+    // start position, so there are no same-start conflicts with them.
+    'displayMath': displayMath,
+    'inlineMath': inlineMath,
   };
 
   static final combinedInlinePattern = RegExp(
