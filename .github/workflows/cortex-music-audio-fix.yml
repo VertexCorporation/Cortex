@@ -1,0 +1,59 @@
+name: Apply music/audio generation fix
+
+on:
+  push:
+    branches:
+      - fix/music-audio-generation
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/music-audio-generation
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.4'
+          cache: true
+
+      - name: Apply routing fixes
+        run: |
+          python3 .github/scripts/apply_music_audio_fix.py
+          dart format \
+            lib/chat/services/generation.dart \
+            lib/chat/services/send.dart \
+            lib/chat/services/send/media.dart \
+            test/generation_test.dart
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run generation tests
+        run: flutter test test/generation_test.dart
+
+      - name: Commit tested fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/cortex-music-audio-fix.yml
+          git rm .github/scripts/apply_music_audio_fix.py
+          git add \
+            lib/chat/services/generation.dart \
+            lib/chat/services/send.dart \
+            lib/chat/services/send/media.dart \
+            lib/l10n/app_en.arb \
+            lib/l10n/app_localizations_en.dart \
+            test/generation_test.dart
+          git commit -m "fix: separate music from speech and sound generation"
+          git push origin HEAD:fix/music-audio-generation
