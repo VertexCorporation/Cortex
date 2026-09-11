@@ -10,6 +10,7 @@ import 'package:cortex/server/credits.dart' show formatRenewalRemaining;
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 class UserCancelledException implements Exception {
   final String message = "Request was cancelled by the user.";
@@ -79,6 +80,8 @@ class ApiService {
     FutureOr<void> Function(String audioUrl)? onAudioReceived,
     FutureOr<void> Function(String mediaType)? onMediaGenerating,
     Function(List<dynamic> toolCalls)? onToolCall,
+    Function(String toolName)? onToolActivity,
+    Function(bool truncated)? onStreamDone,
     Function(List<dynamic> citations)? onCitations,
     Function(bool active)? onWebSearchActive,
     Function(String title)? onTitleReceived,
@@ -95,6 +98,12 @@ class ApiService {
   }) async {
     _cancelToken = CancelToken();
 
+    // Correlation ID for this generation attempt chain: echoed by the
+    // client-side [ChatRequest] log and by the gateway's
+    // [REQ_START]/[MEDIA]/[ROUTE_DECISION]/[CREDIT_*] lines, so a production
+    // trace can follow one request end-to-end across services.
+    final String generationId = const Uuid().v4();
+
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw ApiException(localizations.errorUserNotAuthenticated,
@@ -109,6 +118,11 @@ class ApiService {
 
       // Buffers for accumulating streaming parts
       Map<int, Map<String, dynamic>> toolCallBuffer = {};
+
+      // Explicit completion contract: set by the terminal `done` event when
+      // the server reports the generation was cut short. Propagated through
+      // [onStreamDone] at stream end — never inferred from HTTP EOF.
+      bool streamTruncated = false;
 
       void trackCallback(FutureOr<void>? callbackResult) {
         if (callbackResult is Future) {
@@ -293,6 +307,32 @@ class ApiService {
       try {
         debugPrint("[ApiService] Sending request. Model: $targetModel");
 
+        // PAYLOAD-LEVEL attachment accounting: counts the media blocks that
+        // are actually serialized into the request body. Unlike the composer's
+        // MediaTrace (which reflects provider-side attachment classification),
+        // this line is authoritative for "did the attachment reach the wire?"
+        // and correlates with the server's [MEDIA] line via GenID.
+        int payloadImages = 0, payloadVideos = 0, payloadAudios = 0;
+        for (final msg in messages) {
+          final content = msg['content'];
+          if (content is List) {
+            for (final block in content) {
+              if (block is Map) {
+                final type = block['type'];
+                if (type == 'image_url') {
+                  payloadImages++;
+                } else if (type == 'video_url') {
+                  payloadVideos++;
+                } else if (type == 'input_audio' || type == 'audio_url') {
+                  payloadAudios++;
+                }
+              }
+            }
+          }
+        }
+        debugPrint(
+            "[ChatRequest] GenID: $generationId | Model: $targetModel | Attachments: image=$payloadImages video=$payloadVideos audio=$payloadAudios | Messages: ${messages.length} | Stream: true");
+
         // Set up options with connection reuse
         final options = Options(
           responseType: ResponseType.stream,
@@ -309,6 +349,7 @@ class ApiService {
         final response = await _dio.post<ResponseBody>(
           _proxyBaseUrl,
           data: jsonEncode({
+            "generationId": generationId,
             "model": targetModel,
             "messages": messages,
             "stream": true,
@@ -570,9 +611,16 @@ class ApiService {
                     if (containsWebSearchToolCall(data)) {
                       onWebSearchActive?.call(true);
                     }
-                    // Accumulate tool call deltas
-                    if (data is List) {
-                      for (var item in data) {
+                    // Accumulate tool call deltas. The server forwards the
+                    // array directly; tolerate an object-wrapped shape too.
+                    final toolCallDeltas = data is List
+                        ? data
+                        : (data is Map && data['tool_calls'] is List
+                            ? data['tool_calls'] as List
+                            : null);
+                    if (toolCallDeltas != null) {
+                      for (var item in toolCallDeltas) {
+                        if (item is! Map) continue;
                         final index = item['index'] as int? ?? 0;
                         if (!toolCallBuffer.containsKey(index)) {
                           toolCallBuffer[index] = {
@@ -587,14 +635,32 @@ class ApiService {
                         }
 
                         final func = item['function'];
-                        if (func != null) {
+                        if (func is Map) {
                           if (func['name'] != null) {
                             toolCallBuffer[index]!['function']['name'] +=
                                 func['name'];
                           }
                           if (func['arguments'] != null) {
+                            final hadArgs = (toolCallBuffer[index]!['function']
+                                    ['arguments'] as String)
+                                .isNotEmpty;
                             toolCallBuffer[index]!['function']['arguments'] +=
                                 func['arguments'];
+                            // LIVE TOOL ANNOUNCEMENT: arguments only start
+                            // streaming after the function name is complete,
+                            // so this is the first moment the tool is fully
+                            // identifiable. Announce it immediately so the UI
+                            // shows tool activity while the stream is still
+                            // running, not only after EOF.
+                            if (!hadArgs) {
+                              final toolName =
+                                  (toolCallBuffer[index]!['function']['name']
+                                          as String)
+                                      .trim();
+                              if (toolName.isNotEmpty) {
+                                trackCallback(onToolActivity?.call(toolName));
+                              }
+                            }
                           }
                         }
                       }
@@ -603,6 +669,16 @@ class ApiService {
 
                   case 'usage':
                     // Usage stats received - could be used for analytics
+                    break;
+
+                  case 'done':
+                    // Terminal completion event (explicit completion
+                    // contract). The server states whether the generation
+                    // actually finished; the client no longer has to guess
+                    // from HTTP EOF.
+                    if (data is Map && data['truncated'] == true) {
+                      streamTruncated = true;
+                    }
                     break;
 
                   default:
@@ -651,6 +727,10 @@ class ApiService {
                       toolCallBuffer.values.toList();
                   onToolCall(finalTools);
                 }
+                // Propagate the server's explicit completion status so the
+                // orchestrator can mark the response instead of treating a
+                // bare EOF as "complete".
+                onStreamDone?.call(streamTruncated);
                 completer.complete(finalContent.toString());
               }();
             }
@@ -1071,6 +1151,8 @@ class ApiService {
     Function(String)? onAudioReceived,
     Function(String)? onMediaGenerating,
     Function(List<dynamic>)? onToolCall,
+    Function(String)? onToolActivity,
+    Function(bool)? onStreamDone,
     Function(List<dynamic>)? onCitations,
     Function(bool)? onWebSearchActive,
     Function(String)? onTitleReceived,
@@ -1135,6 +1217,8 @@ class ApiService {
       onAudioReceived: onAudioReceived,
       onMediaGenerating: onMediaGenerating,
       onToolCall: onToolCall,
+      onToolActivity: onToolActivity,
+      onStreamDone: onStreamDone,
       onCitations: onCitations,
       onWebSearchActive: onWebSearchActive,
       onTitleReceived: onTitleReceived,

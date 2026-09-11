@@ -121,7 +121,7 @@ class Utils {
             lowerPath.startsWith('data:video/') ||
             lowerPath.startsWith('data:audio/') ||
             RegExp(
-              r'\.(jpg|jpeg|png|webp|gif|bmp|heic|mp4|webm|mov|mkv|m4v|mp3|wav|m4a|aac|ogg|flac|opus)(\?|$)',
+              r'\.(jpg|jpeg|png|webp|gif|bmp|heic|heif|mp4|webm|mov|mkv|m4v|mp3|wav|m4a|aac|ogg|flac|opus)(\?|$)',
             ).hasMatch(lowerPath);
         if (looksLikeMediaUrl) {
           final mediaType = lowerPath.startsWith('data:video/') ||

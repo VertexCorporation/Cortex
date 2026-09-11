@@ -26,7 +26,10 @@ class MediaRouter {
         lower.endsWith('.jpeg') ||
         lower.endsWith('.png') ||
         lower.endsWith('.webp') ||
-        lower.endsWith('.gif');
+        lower.endsWith('.gif') ||
+        lower.endsWith('.bmp') ||
+        lower.endsWith('.heic') ||
+        lower.endsWith('.heif');
   }
 
   bool isVideoFile(String path) {

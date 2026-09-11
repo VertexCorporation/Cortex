@@ -372,6 +372,6 @@ class InputProvider with ChangeNotifier {
 
   bool _isImageFile(String path) {
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic', 'heif'].contains(ext);
   }
 }
