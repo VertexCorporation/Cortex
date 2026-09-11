@@ -1,0 +1,43 @@
+name: Verify minimal music/audio diff
+
+on:
+  push:
+    branches:
+      - fix/music-audio-generation
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup-and-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/music-audio-generation
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.4'
+          cache: true
+
+      - name: Remove formatting-only churn
+        run: python3 .github/scripts/clean_music_audio_diff.py
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Test generation routing
+        run: flutter test test/generation_test.dart
+
+      - name: Commit minimal tested diff
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/chat/services/send.dart lib/chat/services/send/media.dart
+          git commit -m "chore: minimize music audio routing diff"
+          git push origin HEAD:fix/music-audio-generation
