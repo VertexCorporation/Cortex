@@ -242,6 +242,38 @@ void main() {
       }
     });
 
+    test(
+        'the exact final prompt for a fresh chat: one system turn + one user '
+        'turn + the assistant primer — nothing else',
+        () async {
+      // The reproduction case: a fresh English chat asking
+      // "hello how are you feeling today". The composition log showed
+      // system=1, historyMessages=0, latestUser=1, ragInjected=false,
+      // chatFormatProvided=true — this pins the resulting prompt EXACTLY.
+      // There is no language instruction of any kind: no device-locale
+      // forcing, no hidden Turkish directive, no stale system prompt and no
+      // RAG preamble. (A 600M model that then "decides" the reply must be in
+      // Turkish "as per the user's request" is hallucinating — nothing in
+      // this prompt asks for a language; the only Türkiye mention is the
+      // brand line below, which is NOT a language directive.)
+      const expectedPrompt = '<|im_start|>system\n'
+          "You are a helpful AI assistant running inside Cortex, Türkiye's "
+          'largest B2C AI platform.\n'
+          '<|im_end|>\n'
+          '<|im_start|>user\n'
+          'hello how are you feeling today\n'
+          '<|im_end|>\n'
+          '<|im_start|>assistant\n';
+
+      for (final locale in [const Locale('en'), const Locale('tr')]) {
+        final h = _Harness(locale: locale);
+        await h.send('hello how are you feeling today', 'convA');
+        expect(h.prompts.single, expectedPrompt,
+            reason: 'locale ${locale.languageCode} must compose the exact '
+                'same prompt');
+      }
+    });
+
     test('a curated roleplay role is the only persona override', () async {
       final h = _Harness(
         model: offlineModel(

@@ -1,5 +1,6 @@
 import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
+import 'package:cortex/fog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,26 +17,78 @@ double baseFs(BuildContext context) {
   return (physicalWidth / devicePixelRatio) * 0.044;
 }
 
-class SafeMathTex extends StatelessWidget {
+class SafeMathTex extends StatefulWidget {
   final String latex;
   final TextStyle textStyle;
 
-  const SafeMathTex({required this.latex, required this.textStyle, super.key});
+  /// `false` (default, `$…$`) — renders inline, flowing with the text.
+  /// `true` (`$$…$$`) — standalone block: vertical padding, full width,
+  /// and horizontal scroll behind fog edges when the equation overflows.
+  final bool display;
+
+  const SafeMathTex({
+    required this.latex,
+    required this.textStyle,
+    this.display = false,
+    super.key,
+  });
+
+  @override
+  State<SafeMathTex> createState() => _SafeMathTexState();
+}
+
+class _SafeMathTexState extends State<SafeMathTex> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // flutter_math_fork renders malformed input through onErrorFallback
+    // (literal source text) — the outer catch is belt and braces so a math
+    // span can never crash the whole message pipeline.
+    Widget content;
     try {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Math.tex(
-          latex,
-          textStyle: textStyle,
-          onErrorFallback: (_) => Text(latex, style: textStyle),
-        ),
+      content = Math.tex(
+        widget.latex,
+        textStyle: widget.textStyle,
+        onErrorFallback: (_) => Text(widget.latex, style: widget.textStyle),
       );
     } catch (_) {
-      return Text(latex, style: textStyle);
+      content = Text(widget.latex, style: widget.textStyle);
     }
+
+    if (!widget.display) {
+      // Inline math: sit in the text flow, no scrolling container (a
+      // horizontal ScrollView inside a WidgetSpan would greedily take the
+      // full line width and break the paragraph layout).
+      return content;
+    }
+
+    // Display math: wide equations scroll horizontally behind the shared
+    // fade-out fog edges (lib/fog.dart), exactly like code blocks. The
+    // LayoutBuilder guard keeps this safe even if some future host hands
+    // the span unbounded width (a bare SizedBox(infinity) would crash then).
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: LayoutBuilder(builder: (context, constraints) {
+        return SizedBox(
+          width: constraints.maxWidth.isFinite ? constraints.maxWidth : null,
+          child: ScrollFogHorizontal(
+            scrollController: _scrollController,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              child: content,
+            ),
+          ),
+        );
+      }),
+    );
   }
 }
 

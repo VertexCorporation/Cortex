@@ -1,10 +1,12 @@
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
+import '../../library/providers/catalog.dart';
 import '../../library/providers/local.dart';
 import '../../main.dart';
 import '../../variants.dart';
@@ -220,4 +222,100 @@ class SelectionService {
         "[SelectionService] No downloaded or non-premium variant found. Using first: '${variantsMap.keys.first}'");
     return variantsMap.keys.first;
   }
+}
+
+// --- CANONICAL "USE OFFLINE" ACTION ------------------------------------------
+//
+// Every "Use Offline" entry point (the empty-chat greeting card, the Features
+// sheet, the no-internet dialog) funnels into ONE implementation here. The
+// previous copies duplicated the installed-model scan and picked an arbitrary
+// `first` — and the greeting card even armed Web Search instead (see
+// default/view.dart). This section is the single audited path:
+//
+//   installed offline models
+//   → rank by capability proxy (RAM requirement, then file size)
+//   → select highest (deterministic id tie-breaker)
+//   → arm offline feature mode (never Web Search)
+//   → switch the active model — or route to the Library's Local Models
+//     section with the pulse animation when nothing is installed.
+
+/// Whether at least one offline model is actually installed (valid on disk).
+///
+/// This is the single definition of "an installed offline model" shared by the
+/// Use Offline action and the no-internet prompt's relevance check.
+bool hasInstalledOfflineModel(
+    Iterable<ModelEntity> models, ModelLocalStateProvider localState) {
+  return models.any((m) => _isInstalledOfflineModel(m, localState));
+}
+
+bool _isInstalledOfflineModel(
+    ModelEntity model, ModelLocalStateProvider localState) {
+  if (model.type != 'offline') return false;
+  return localState.isModelOnDisk(localState.getFilePathById(model.id));
+}
+
+/// Picks the strongest installed offline model from [models].
+///
+/// Ranking signal (canonical metadata already published by Synapse/Cortex):
+///   1. RAM requirement (`ModelEntity.ram`, MB) — higher is stronger.
+///   2. Model/file size (`ModelEntity.size`, MB) — higher is stronger.
+///   3. Model id, descending — deterministic tie-breaker.
+///
+/// Only models that are actually installed and valid on disk are considered;
+/// online models and non-downloaded offline models are ignored. Missing
+/// metadata counts as 0. Returns null when nothing is installed. No model id
+/// or family is hardcoded.
+ModelEntity? bestInstalledOfflineModel(
+    Iterable<ModelEntity> models, ModelLocalStateProvider localState) {
+  final installed =
+      models.where((m) => _isInstalledOfflineModel(m, localState)).toList();
+  if (installed.isEmpty) return null;
+
+  installed.sort((a, b) {
+    final int ram = (b.ram ?? 0).compareTo(a.ram ?? 0);
+    if (ram != 0) return ram;
+    final int size = (b.size ?? 0).compareTo(a.size ?? 0);
+    if (size != 0) return size;
+    return b.id.compareTo(a.id);
+  });
+  return installed.first;
+}
+
+/// The canonical "Use Offline" action.
+///
+/// * Pressing Use Offline NEVER enables Web Search. If Web Search happens to
+///   be armed it is cleared cleanly — offline execution is never routed
+///   online through it.
+/// * The strongest installed offline model is selected (see
+///   [bestInstalledOfflineModel]) and the offline feature mode is armed, so
+///   actual generation runs locally (`serverSide=false`, driven by the
+///   selected model's type — never credit-gated, model-load lifecycle and
+///   offline TitleGen behavior untouched).
+/// * When no offline model is installed, nothing is armed and the Library's
+///   Local Models section is opened with its existing pulse/highlight
+///   animation (`MainScreen.switchToLibrary(pulse: true)`).
+///
+/// Returns the selected model, or null when the Library route was taken.
+ModelEntity? handleUseOfflineAction(BuildContext context) {
+  final catalog = context.read<ModelCatalogProvider>();
+  final local = context.read<ModelLocalStateProvider>();
+  final inputProvider = context.read<InputProvider>();
+  final selectionService = context.read<SelectionService>();
+
+  final best = bestInstalledOfflineModel(catalog.allModels, local);
+  if (best == null) {
+    // Nothing usable on disk: drop any online search intent, then point the
+    // user at the Local Models section in the Library (existing pulse
+    // animation) instead of arming an offline mode with nothing to run.
+    inputProvider.clearWebSearch();
+    mainScreenKey.currentState?.switchToLibrary(pulse: true);
+    return null;
+  }
+
+  // Offline focus must be singular: drop any online search intent first,
+  // then arm the offline feature mode (which itself keeps web search off).
+  inputProvider.clearWebSearch();
+  inputProvider.setFeatureMode(ChatInputMode.offline);
+  selectionService.switchActiveModel(best, context: context);
+  return best;
 }

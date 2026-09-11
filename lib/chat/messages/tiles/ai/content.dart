@@ -30,6 +30,11 @@ class _AiBodyContent extends StatelessWidget {
 
     String mainText = fullText;
 
+    // Whether the reasoning stream has actually closed (the `</think>` tag
+    // has been revealed) — the true reasoning lifecycle, independent of the
+    // block's expand/collapse state below.
+    bool thinkClosed = false;
+
     final thinkStartMatch = _thinkStart.firstMatch(fullText);
     if (thinkStartMatch != null) {
       final contentStart = thinkStartMatch.end;
@@ -40,6 +45,7 @@ class _AiBodyContent extends StatelessWidget {
       final contentEnd = thinkEnd != -1 ? thinkEnd : fullText.length;
 
       thinkContent = fullText.substring(contentStart, contentEnd).trim();
+      thinkClosed = thinkEnd != -1;
 
       mainText =
           _withoutThinkingBlocks(fullText).replaceFirst(_leadingColons, '');
@@ -65,8 +71,20 @@ class _AiBodyContent extends StatelessWidget {
         ? Padding(
             padding: EdgeInsets.only(
                 top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
-            child:
-                ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
+            // The SAME presentation pipeline the markdown think blocks use
+            // (ThinkingWidget), driven here by the reasoning stream's real
+            // lifecycle: `isFinished` is true only once the `</think>` tag
+            // has been revealed (or the message itself finalized), so the
+            // label shimmers "Thinking" exactly while tokens are still
+            // arriving and then cross-fades to "Thought". Passing the tile's
+            // shared [reveal] timeline makes the reasoning text run through
+            // the same RevealText glyph animation as the main answer.
+            child: ThinkingWidget(
+              content: thinkContent,
+              isFinished: thinkClosed || !message.isThinking,
+              scale: scale,
+              reveal: reveal,
+            ),
           )
         : const SizedBox.shrink();
 
@@ -183,171 +201,6 @@ class _AiBodyContent extends StatelessWidget {
       parseCache.remove(key);
     }
     return spans;
-  }
-}
-
-class ThoughtProcessWidget extends StatefulWidget {
-  final String thinkContent;
-  final double scale;
-
-  const ThoughtProcessWidget({
-    super.key,
-    required this.thinkContent,
-    required this.scale,
-  });
-
-  @override
-  State<ThoughtProcessWidget> createState() => _ThoughtProcessWidgetState();
-}
-
-class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
-    with TickerProviderStateMixin {
-  bool _isExpanded = false;
-
-  late AnimationController _arrowController;
-  late Animation<double> _arrowTurns;
-
-  late AnimationController _contentController;
-  late Animation<double> _contentFade;
-  late Animation<Offset> _contentSlide;
-
-  @override
-  void initState() {
-    super.initState();
-    _arrowController = AnimationController(
-        duration: const Duration(milliseconds: 300), vsync: this);
-    _arrowTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
-      CurvedAnimation(parent: _arrowController, curve: Curves.easeInOut),
-    );
-
-    _contentController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _contentFade =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_contentController);
-    _contentSlide =
-        Tween<Offset>(begin: const Offset(0.0, -0.1), end: Offset.zero).animate(
-            CurvedAnimation(
-                parent: _contentController, curve: Curves.easeOutQuad));
-  }
-
-  @override
-  void dispose() {
-    _arrowController.dispose();
-    _contentController.dispose();
-    super.dispose();
-  }
-
-  void _toggleExpand() {
-    if (widget.thinkContent.trim().isEmpty) {
-      return;
-    }
-    setState(() {
-      _isExpanded = !_isExpanded;
-      if (_isExpanded) {
-        _arrowController.forward();
-        _contentController.forward();
-      } else {
-        _arrowController.reverse();
-        _contentController.reverse();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final content = widget.thinkContent.trim();
-    if (content.isEmpty) return const SizedBox.shrink();
-
-    final localizations = AppLocalizations.of(context);
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 12 * widget.scale),
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(
-            color: AppColors.primaryColor.inverted.withValues(alpha: 0.3),
-            width: 3 * widget.scale,
-          ),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _toggleExpand,
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: 12 * widget.scale,
-                    top: 4 * widget.scale,
-                    bottom: 2 * widget.scale,
-                    right: 4 * widget.scale),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      localizations?.thought ?? 'Thought',
-                      style: TextStyle(
-                        fontSize: 13 * widget.scale,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryColor.inverted
-                            .withValues(alpha: 0.5),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    RotationTransition(
-                      turns: _arrowTurns,
-                      child: Icon(
-                        Icons.keyboard_arrow_down,
-                        size: CortexDesign.icon,
-                        color: AppColors.primaryColor.inverted
-                            .withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SizeTransition(
-            sizeFactor: CurvedAnimation(
-              parent: _contentController,
-              curve: Curves.easeInOut,
-            ),
-            alignment: Alignment.topCenter,
-            child: FadeTransition(
-              opacity: _contentFade,
-              child: SlideTransition(
-                position: _contentSlide,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      left: 12 * widget.scale,
-                      right: 4 * widget.scale,
-                      bottom: 4 * widget.scale),
-                  child: SelectionArea(
-                    child: Text(
-                      content,
-                      style: TextStyle(
-                        fontSize: 14 * widget.scale,
-                        color: AppColors.primaryColor.inverted
-                            .withValues(alpha: 0.6),
-                        fontStyle: FontStyle.italic,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
