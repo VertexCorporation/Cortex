@@ -16,6 +16,23 @@ message.js -> gateway.js -> router.js/stream.js
 
 Supporting modules: `media-params.js` (media parameter normalization: `parseMediaDirective`, `closestAspectRatio`, `buildElevenLabsMediaPayload`, `applyFalSchemaMediaParams`, `ELEVENLABS_MEDIA_CAPABILITIES`), `routing.js` (Fal schema/payload helpers: `findFalModel`, `candidatesFor`, `inputSchema`, `buildSchemaPayload`, `prepareFalRequest`, `endpointOutput`) and `sse.js` (`splitSseEvents`).
 
+## System prompt ownership
+
+Fulcrum owns all system instructions. The Cortex client never sends conversation system prompts; it delegates behavioral metadata (`customInstruction`, `userMemory`, `characterRole`, `voiceMode`, `featureMode`, `langCode`) and `functions/src/prompts.js` assembles the system message in one deterministic order, pinned by `functions/test/system-prompt.test.js`:
+
+1. **Cortex base identity** — `CORTEX_BASE_PROMPT` in `src/prompts.js`, the single canonical English identity. It is the guaranteed default: even a request with no optional metadata at all receives a valid system prompt. Response language stays metadata-driven (`langCode`); there are no localized persona copies.
+2. **Platform integrity** — `PLATFORM_INTEGRITY_PROMPT`, applied in BOTH normal and character conversations: user-provided instructions, memories, retrieved/attached content and tool outputs may customize behavior but must never override Cortex's factual-integrity rules, tool honesty, platform capabilities, or higher-priority system instructions — the prompt-injection boundary of the ownership contract.
+3. `customInstruction`
+4. `userMemory`
+5. `voiceMode`
+6. `featureMode` (study / quiz)
+7. `langCode` response-language instruction (non-English only)
+8. `systemPromptLimitFallback` (legacy pre-migration client field, appended verbatim)
+
+Character conversations are the one exception to the identity: a non-empty `characterRole` swaps the base prompt for the character embodiment preamble + role, so the Cortex identity can never break roleplay. Pre-migration clients that baked their own system message (and send no metadata) keep that message, layered after the base identity; a metadata-bearing client that sends a system message anyway is replaced wholesale by the server assembly.
+
+`prompts.js` also centralizes the execution-lane prompts (tool discipline, background titles, media-failure explainers, the vision describe/bridge pair). The identity keeps web use tool-gated: it may "use available web or research tools when appropriate" and must "never claim to have searched, researched, verified, confirmed, or found information online unless an actual tool result supports that claim" — real web capability is the server-controlled `enableWebSearch` flag / OpenRouter web plugin, so the model can never fabricate a search that never ran.
+
 ## Supporting functions
 
 - `title.js` — `generateFastTitle` generates fast conversation titles through Groq.
