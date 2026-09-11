@@ -9,7 +9,8 @@ Catalog of the Fulcrum backend (`functions/`). `index.js` requires every family 
 ## Generation path
 
 - **`src/message.js`** (16) — backward-compatible re-export: `sendMessage`, `proxyOpenRouterRequest` (both delegate to gateway.js).
-- **`src/gateway.js`** (933) — `sendMessage`: the central chat gateway (validation, routing, context, credit rules, SSE).
+- **`src/gateway.js`** (1214) — `sendMessage`: the central chat gateway (validation, routing, context, credit rules, SSE).
+- **`src/prompts.js`** (198) — `CORTEX_BASE_PROMPT`, `PLATFORM_INTEGRITY_PROMPT`, `assembleCortexSystemPrompt` and every reusable system-prompt string (character embodiment, voice/study/quiz modes, tool discipline, titles, media-failure explainers, vision describe/bridge): the single source of truth for Fulcrum-owned system instructions (see "System prompt ownership" in `generation.md`).
 - **`src/router.js`** (612) — `getDynamicModels`, `pickBestModelList`, `analyzeIntent`, `analyzeMediaParams`, `resolveRoute`, `getProviderCatalog`, `workersAIModels`: provider/model policy engine.
 - **`src/media-params.js`** (558) — `parseMediaDirective`, `closestAspectRatio`, `buildElevenLabsMediaPayload`, `applyFalSchemaMediaParams`, `ELEVENLABS_MEDIA_CAPABILITIES`: media parameter normalization. Maps analyzed user directives (aspect ratio / duration / resolution) onto each provider's supported values with Cortex defaults (image 1:1, video closest-to-1:1, music 30s, sound 5s); research-backed ElevenLabs per-model enums.
 - **`src/stream.js`** (1709) — `executeApiStream`, `executeFalRequest`, `executeElevenLabsRequest`, `detectFalOutputType`, `deductDynamicCost`, `refundUserCredits`: provider execution, SSE parsing, retries, fallbacks, cost reconciliation.
@@ -46,4 +47,4 @@ Catalog of the Fulcrum backend (`functions/`). `index.js` requires every family 
 
 ## Tests
 
-`functions/test/`: `chat-regression.test.js`, `fal-routing.test.js`, `media-routing.test.js`, `sse.test.js`.
+`functions/test/`: `chat-regression.test.js`, `completion.test.js`, `credit-authorization.test.js`, `credit-lifecycle.test.js`, `credit-reconciliation.test.js`, `daily-credits.test.js`, `fal-routing.test.js`, `media-params.test.js`, `media-routing.test.js`, `sse.test.js`, `system-prompt.test.js` (the Fulcrum-owned prompt contract).
