@@ -88,7 +88,8 @@ class InputService {
 
           final File file = File(pickedFile.path);
           final String pathLower = file.path.toLowerCase();
-          final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+          final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif',
+              '.bmp', '.heic', '.heif']
               .any((ext) => pathLower.endsWith(ext));
 
           await _validateAndAddAttachment(inputProvider, file,
@@ -112,7 +113,8 @@ class InputService {
 
         final File file = File(pickedFile.path);
         final String pathLower = file.path.toLowerCase();
-        final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+        final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif',
+            '.bmp', '.heic', '.heif']
             .any((ext) => pathLower.endsWith(ext));
 
         await _validateAndAddAttachment(inputProvider, file, isImage: isImage);
@@ -160,7 +162,8 @@ class InputService {
 
         final File file = File(platformFile.path!);
         final String pathLower = file.path.toLowerCase();
-        final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+        final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif',
+            '.bmp', '.heic', '.heif']
             .any((ext) => pathLower.endsWith(ext));
         await _validateAndAddAttachment(inputProvider, file, isImage: isImage);
       }
@@ -362,24 +365,30 @@ class InputService {
       return false;
     }
 
-    // 2. Credit gate
+    // 2. Credit gate — SERVER-SIDE inference only.
     //
     // One unified balance. Past the debt floor nothing is sendable until the
     // allowance renews; Dynamic Chat stays open below zero but also closes at
     // the floor, and model choice needs the `full` band.
-    final creditsManager = context.read<CreditsManager>();
+    //
+    // Offline inference is exempt from every credit band: it runs on-device,
+    // consumes no Fulcrum credits, and must stay usable at ANY balance —
+    // including negative balances and the debt floor.
+    if (!isOfflineMode) {
+      final creditsManager = context.read<CreditsManager>();
 
-    if (!creditsManager.canSendAnything) {
-      return false;
-    }
-
-    if (isDynamicChatMode) {
-      if (!creditsManager.canSendText) {
+      if (!creditsManager.canSendAnything) {
         return false;
       }
-    } else if (isPremiumModel && !isSubscribed) {
-      if (!creditsManager.canChooseModel) {
-        return false;
+
+      if (isDynamicChatMode) {
+        if (!creditsManager.canSendText) {
+          return false;
+        }
+      } else if (isPremiumModel && !isSubscribed) {
+        if (!creditsManager.canChooseModel) {
+          return false;
+        }
       }
     }
 
@@ -437,24 +446,30 @@ class InputService {
       return false;
     }
 
-    // 2. Credit gate
+    // 2. Credit gate — SERVER-SIDE inference only.
     //
     // One unified balance. Past the debt floor nothing is sendable until the
     // allowance renews; Dynamic Chat stays open below zero but also closes at
     // the floor, and model choice needs the `full` band.
-    final creditsManager = context.read<CreditsManager>();
+    //
+    // Offline inference is exempt from every credit band: it runs on-device,
+    // consumes no Fulcrum credits, and must stay usable at ANY balance —
+    // including negative balances and the debt floor.
+    if (!isOfflineMode) {
+      final creditsManager = context.read<CreditsManager>();
 
-    if (!creditsManager.canSendAnything) {
-      return false;
-    }
-
-    if (isDynamicChatMode) {
-      if (!creditsManager.canSendText) {
+      if (!creditsManager.canSendAnything) {
         return false;
       }
-    } else if (isPremiumModel && !isSubscribed) {
-      if (!creditsManager.canChooseModel) {
-        return false;
+
+      if (isDynamicChatMode) {
+        if (!creditsManager.canSendText) {
+          return false;
+        }
+      } else if (isPremiumModel && !isSubscribed) {
+        if (!creditsManager.canChooseModel) {
+          return false;
+        }
       }
     }
 

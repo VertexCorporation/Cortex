@@ -179,7 +179,7 @@ class ContextService {
 
   bool _isImageFile(String path) {
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic', 'heif'].contains(ext);
   }
 
   bool _isVideoFile(String path) {
