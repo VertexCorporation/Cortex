@@ -1,7 +1,6 @@
 // lib/chat/services/send/media.dart
 
 import 'package:flutter/foundation.dart';
-
 import '../../../../library/backend/data/entity.dart';
 import '../../../../library/backend/data/service.dart';
 import '../generation.dart';
@@ -140,7 +139,7 @@ class MediaRouter {
       'gorsel',
       'resim',
       'fotograf',
-      'foto',
+      'foto'
     ];
     const videoTerms = [
       'video',
@@ -151,7 +150,7 @@ class MediaRouter {
       'animasyon',
       'hareket',
       'hareketlendir',
-      'canlandir',
+      'canlandir'
     ];
     const audioTerms = [
       'audio',
@@ -160,7 +159,7 @@ class MediaRouter {
       'speech',
       'ses',
       'konusma',
-      'anlatim',
+      'anlatim'
     ];
     const generateTerms = [
       'generate',
@@ -171,7 +170,7 @@ class MediaRouter {
       'olustur',
       'uret',
       'ciz',
-      'yap',
+      'yap'
     ];
     const understandTerms = [
       'what',
@@ -188,7 +187,7 @@ class MediaRouter {
       'analiz',
       'oku',
       'cevir',
-      'ozetle',
+      'ozetle'
     ];
 
     final edits = _containsAny(normalized, editTerms);
@@ -236,10 +235,8 @@ class MediaRouter {
       for (final entry in variants.entries) {
         final variantId = entry.key;
         if (seen.add(variantId)) {
-          yield _modelService.getPreciseModelData(
-            variantId,
-            langCode: langCode,
-          );
+          yield _modelService.getPreciseModelData(variantId,
+              langCode: langCode);
         }
       }
     }
@@ -279,18 +276,22 @@ class MediaRouter {
     String? requiredInputType,
     Set<String> excludeIds = const {},
   }) {
-    return pickModel(langCode, isUserSubscribed, (model) {
-      if (excludeIds.contains(model.id)) return false;
-      if (model.source.toLowerCase() != 'fal') return false;
-      if (model.outputs[outputType] != true && model.category != outputType) {
-        return false;
-      }
-      if (requiredInputType != null &&
-          model.modalities[requiredInputType] != true) {
-        return false;
-      }
-      return true;
-    });
+    return pickModel(
+      langCode,
+      isUserSubscribed,
+      (model) {
+        if (excludeIds.contains(model.id)) return false;
+        if (model.source.toLowerCase() != 'fal') return false;
+        if (model.outputs[outputType] != true && model.category != outputType) {
+          return false;
+        }
+        if (requiredInputType != null &&
+            model.modalities[requiredInputType] != true) {
+          return false;
+        }
+        return true;
+      },
+    );
   }
 
   ModelEntity? findAttachmentUnderstandingModel({
@@ -300,17 +301,21 @@ class MediaRouter {
     required bool hasVideo,
     required bool hasAudio,
   }) {
-    return pickModel(langCode, isUserSubscribed, (model) {
-      final category = model.category.toLowerCase();
-      if (category == 'image' || category == 'video' || category == 'audio') {
-        return false;
-      }
-      if (model.source.toLowerCase() == 'fal') return false;
-      if (hasImage && model.modalities['image'] != true) return false;
-      if (hasVideo && model.modalities['video'] != true) return false;
-      if (hasAudio && model.modalities['audio'] != true) return false;
-      return model.outputs['text'] == true || model.outputs.isEmpty;
-    });
+    return pickModel(
+      langCode,
+      isUserSubscribed,
+      (model) {
+        final category = model.category.toLowerCase();
+        if (category == 'image' || category == 'video' || category == 'audio') {
+          return false;
+        }
+        if (model.source.toLowerCase() == 'fal') return false;
+        if (hasImage && model.modalities['image'] != true) return false;
+        if (hasVideo && model.modalities['video'] != true) return false;
+        if (hasAudio && model.modalities['audio'] != true) return false;
+        return model.outputs['text'] == true || model.outputs.isEmpty;
+      },
+    );
   }
 
   String? resolveAttachmentIntentModelId({
@@ -384,8 +389,8 @@ class MediaRouter {
           requiredInputType: hasVideo
               ? 'video'
               : hasImage
-              ? 'image'
-              : null,
+                  ? 'image'
+                  : null,
         );
         break;
       case MediaIntent.generateAudio:
@@ -416,8 +421,7 @@ class MediaRouter {
 
     if (routed == null) return null;
     debugPrint(
-      "[MediaRouter] Attachment intent '$intent' routed dynamic chat to '${routed.id}'.",
-    );
+        "[MediaRouter] Attachment intent '$intent' routed dynamic chat to '${routed.id}'.");
     return routed.id;
   }
 
