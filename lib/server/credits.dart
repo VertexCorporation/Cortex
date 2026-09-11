@@ -127,7 +127,8 @@ class CreditsManager {
   /// Published default credit charge for a generation operation lane
   /// ('image' | 'video' | 'music' | 'speech'), from the `operationCosts`
   /// map Fulcrum publishes inside `creditLimits` (its DEFAULT_CREDIT_CHARGES
-  /// — image 100, video 1000, music 500, speech 100). The client's audio
+  /// — image 25, video 500, music 500, speech 25, document 25, easy 1,
+  /// medium 5, hard 10). The client's audio
   /// generation maps to the server's 'speech' lane (gateway.js routes
   /// audio_generation → speech). Null when the lane is unknown or the
   /// user document predates the publication; the server remains the
@@ -135,19 +136,25 @@ class CreditsManager {
   int? defaultCostFor(String operation) =>
       _creditLimits.operationCosts[operation];
 
-  /// Whether an [operation] lane can plausibly afford its default charge
-  /// right now. Mirrors the server's charging model: the request must keep
-  /// the balance at or above the debt floor after the lane's published
-  /// default cost. Fail-open by design — without a live balance snapshot or
-  /// a published cost for the lane the answer is yes and the server stays
-  /// the final gate; a blocked band still means no.
+  /// Whether an [operation] lane can afford its published default charge
+  /// right now. Mirrors the server's media policy in
+  /// `evaluateCreditPolicy`: media requires the `full` band (any negative
+  /// balance is refused with `negative_credits`/`media_blocked`, and the
+  /// debt floor blocks everything), and the balance must cover the lane's
+  /// published default cost at face value — a balance below the cost is
+  /// presented as disabled instead of arming a request the user cannot
+  /// pay for. Fail-open by design — without a live balance snapshot or a
+  /// published cost for the lane the answer is yes and the server stays
+  /// the final gate.
   bool canGenerate(String operation) {
-    if (accessNotifier.value == CreditAccess.blocked) return false;
+    // Media needs the full band: the server refuses media for any negative
+    // balance (State B) and everything at or below the floor (State C).
+    if (accessNotifier.value != CreditAccess.full) return false;
     final spendable = spendableNotifier.value;
-    if (spendable == null) return true;
+    if (spendable == null) return true; // fail-open before first snapshot
     final cost = defaultCostFor(operation);
-    if (cost == null) return true;
-    return spendable - cost >= _creditLimits.debtFloor;
+    if (cost == null) return true; // fail-open pre-publication
+    return spendable >= cost; // face-value affordability
   }
 
   /// Test seam: injects a limits snapshot without going through
