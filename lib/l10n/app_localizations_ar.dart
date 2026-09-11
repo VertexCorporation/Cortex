@@ -143,6 +143,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'النموذج';
+
+  @override
   String get editConversationTitle => 'إعادة تسمية';
 
   @override
@@ -882,6 +885,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'حدث خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'سيحدد النموذج الأساسي المختار قدرات الشخصية على التفكير والاستجابة.';
 
@@ -1096,7 +1106,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا الذكاء الاصطناعي هو ذكاء اصطناعي مميز، المستخدمون المجانيون لديهم وصول محدود إلى الذكاء الاصطناعي المميز؛ قم بالترقية لفتح وصول غير محدود!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'تشكيلة حصرية من نماذج الذكاء الاصطناعي';
 
   @override
   String get premiumTrialExhaustedMessage =>

@@ -4,6 +4,7 @@ import 'package:cortex/chat/screen/widgets/media.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +38,7 @@ void main() {
         expect(
             find.descendant(
                 of: find.byType(MediaShimmerPlaceholder),
-                matching: find.byType(Icon)),
+                matching: find.byType(SvgPicture)),
             findsOneWidget);
         await tester.pump(const Duration(milliseconds: 700));
         expect(tester.getCenter(label), original);

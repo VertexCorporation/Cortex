@@ -143,6 +143,9 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Model';
+
+  @override
   String get editConversationTitle => 'Přejmenovat';
 
   @override
@@ -885,6 +888,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Došlo k chybě sítě. Zkontrolujte připojení a zkuste to znovu.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Vybraný základní model určí vlastnosti uvažování a odezvy postavy.';
 
@@ -1104,7 +1114,7 @@ class AppLocalizationsCs extends AppLocalizations {
       'Tato AI je prémiová AI, bezplatní uživatelé mají omezený přístup k prémiovým AI; upgradujte a odemkněte neomezený přístup!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Exkluzivní výběr AI modelů';
 
   @override
   String get premiumTrialExhaustedMessage =>

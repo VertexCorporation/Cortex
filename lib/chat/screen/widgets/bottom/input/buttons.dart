@@ -630,7 +630,7 @@ class ModelSelectButton extends StatelessWidget {
     final bool isDynamic = sessionProvider.isDynamicChat;
     final String displayText = isDynamic
         ? localizations.dynamicChatTitle
-        : (sessionProvider.modelTitle ?? "Model");
+        : (sessionProvider.modelTitle ?? localizations.modelLabel);
     final double borderRadius = 30.0;
     final double fontSize = isTablet ? screenWidth * 0.02 : 13.0;
 

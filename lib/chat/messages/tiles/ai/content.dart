@@ -11,6 +11,7 @@ class _AiBodyContent extends StatelessWidget {
   final RevealTimeline reveal;
   final double scale;
   final Map<String, List<InlineSpan>> parseCache;
+  final VoidCallback? onContinue;
 
   const _AiBodyContent({
     required this.message,
@@ -19,6 +20,7 @@ class _AiBodyContent extends StatelessWidget {
     required this.reveal,
     required this.scale,
     required this.parseCache,
+    this.onContinue,
   });
 
   @override
@@ -48,8 +50,14 @@ class _AiBodyContent extends StatelessWidget {
     final bool hasMedia = embeddedMedia != null;
     final bool hasToolActivity =
         message.toolActivity.isNotEmpty || message.toolSteps.isNotEmpty;
+    final bool hasIncompleteNotice =
+        message.isIncomplete && !message.isThinking && !message.isError;
 
-    if (!hasMainText && !hasMedia && !hasThink && !hasToolActivity) {
+    if (!hasMainText &&
+        !hasMedia &&
+        !hasThink &&
+        !hasToolActivity &&
+        !hasIncompleteNotice) {
       return const SizedBox.shrink();
     }
 
@@ -108,6 +116,14 @@ class _AiBodyContent extends StatelessWidget {
         if (hasMedia && mediaAboveText) mediaBlock,
         if (hasMainText) textBlock,
         if (hasMedia && !mediaAboveText) mediaBlock,
+        if (hasIncompleteNotice)
+          Padding(
+            padding: EdgeInsets.only(top: 6 * scale, left: 2.0 * scale),
+            child: _TruncationNotice(
+              scale: scale,
+              onContinue: onContinue,
+            ),
+          ),
       ],
     );
   }
@@ -331,6 +347,85 @@ class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget>
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Compact inline notice shown when the server explicitly reported that the
+/// response was cut short (`finish_reason: "length"` / `"content_filter"` or
+/// a stream that ended without a finish chunk). Rendered from the persisted
+/// `isIncomplete` marker, so the truncation stays visible after the chat is
+/// reopened instead of a partial answer masquerading as a complete one.
+/// When [onContinue] is provided, the notice carries a "Continue generating"
+/// action that resumes the response exactly where the model stopped.
+class _TruncationNotice extends StatelessWidget {
+  final double scale;
+  final VoidCallback? onContinue;
+
+  const _TruncationNotice({required this.scale, this.onContinue});
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.content_cut,
+              size: 13 * scale,
+              color: AppColors.tertiaryColor,
+            ),
+            SizedBox(width: 5 * scale),
+            Flexible(
+              child: Text(
+                localizations.responseTruncatedNotice,
+                style: TextStyle(
+                  color: AppColors.tertiaryColor,
+                  fontSize: 13 * scale,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (onContinue != null)
+          Padding(
+            padding: EdgeInsets.only(top: 2 * scale, left: 2.0 * scale),
+            child: SizedBox(
+              height: 26 * scale,
+              child: TextButton.icon(
+                onPressed: onContinue,
+                icon: Icon(
+                  Icons.play_arrow,
+                  size: 14 * scale,
+                  color: AppColors.tertiaryColor,
+                ),
+                label: Text(
+                  localizations.continueGenerating,
+                  style: TextStyle(
+                    color: AppColors.tertiaryColor,
+                    fontSize: 13 * scale,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 6 * scale, vertical: 0),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

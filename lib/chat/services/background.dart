@@ -82,6 +82,37 @@ class BackgroundTaskService extends ChangeNotifier {
     return _activeTasks[conversationID]?.isWebSearchActive ?? false;
   }
 
+  /// Records a completed tool step for the conversation. Steps are durable
+  /// facts about the turn: they must survive the chat being backgrounded and
+  /// the in-memory message being replaced on re-entry (the buffer reset for
+  /// retries keeps them, like media attachments — only text is reset).
+  void addToolStep(String conversationID, String step) {
+    if (step.isEmpty) return;
+    final task = _ensureTask(conversationID);
+    if (!task.toolSteps.contains(step)) {
+      task.toolSteps.add(step);
+    }
+  }
+
+  /// Gets the completed tool steps recorded for the conversation.
+  List<String> getToolSteps(String conversationID) {
+    return _activeTasks[conversationID]?.toolSteps ?? const [];
+  }
+
+  /// Records the explicit completion status reported by the server's
+  /// terminal `done` SSE event. Set when the stream ends, read once at
+  /// finalization; cleared by [resetBuffer] for retries.
+  void setTruncated(String conversationID, bool truncated) {
+    _ensureTask(conversationID).isTruncated = truncated;
+  }
+
+  /// Whether the server explicitly reported the stream for this
+  /// conversation as truncated (cut short by `finish_reason: "length"`
+  /// / `"content_filter"` or ended without a finish chunk).
+  bool isTruncated(String conversationID) {
+    return _activeTasks[conversationID]?.isTruncated ?? false;
+  }
+
   /// Gets the accumulated text for a conversation.
   String consumeBuffer(String conversationID) {
     final task = _activeTasks[conversationID];
@@ -97,11 +128,24 @@ class BackgroundTaskService extends ChangeNotifier {
     return task.textBuffer.toString();
   }
 
+  /// Seeds the background text buffer with pre-existing turn content
+  /// ("Continue generating"): the kept partial is part of THIS turn's
+  /// final text, so a completion that finishes in the background
+  /// persists partial + continuation chunks. Replaces any stale text
+  /// left by a crashed previous turn; tool steps and media attachments
+  /// are durable facts and survive. Called once, before the retry loop.
+  void seedBuffer(String conversationID, String text) {
+    if (text.isEmpty) return;
+    final task = _ensureTask(conversationID);
+    task.textBuffer = StringBuffer(text);
+  }
+
   /// Clears the accumulated buffer for a conversation without marking it complete.
   void resetBuffer(String conversationID) {
     final task = _activeTasks[conversationID];
     if (task != null) {
       task.textBuffer = StringBuffer();
+      task.isTruncated = false;
       // Keep media attachments intact — only text gets reset for retries
     }
   }
@@ -130,4 +174,6 @@ class _BackgroundTaskState {
   List<String> mediaAttachments = [];
   MediaGenerationType pendingMediaType = MediaGenerationType.none;
   bool isWebSearchActive = false;
+  bool isTruncated = false;
+  final List<String> toolSteps = [];
 }

@@ -59,7 +59,7 @@
   "benefit7": "Daha çox istifadə limitləri",
   "benefit8": "Modellər əlavə edin",
   "benefit9": "Yeni mövzular",
-  "benefitPremiumModels": "Specific AI Selection",
+  "benefitPremiumModels": "Eksklüziv Süni İntellekt Seçkisi",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -446,6 +446,7 @@
   "modelCreatedSuccess": "Model uğurla yaradıldı!",
   "modelDescription": "{description}",
   "modelProducer": "İstehsalçı: {producer}",
+  "modelLabel": "Model",
   "modelRemovedSuccess": "“{modelName}” uğurla silindi.",
   "modelUploadDescription": "Yerli GGUF fayllarınızı birbaşa cihazınızdan seçin və yükləyin. Bu, modelinizi internet bağlantısı olmadan oflayn rejimdə işlətməyə imkan verir. Faylın etibarlı GGUF formatında və düzgün strukturda olduğundan əmin olun. Fayl səhv və ya zədələnmiş olarsa, Cortex gözlənildiyi kimi işləməyə bilər və xətalarla qarşılaşa bilərsiniz.",
   "modelUploadShortDescription": "Cihazınızdan bir .gguf faylı seçmək üçün bura toxunun",

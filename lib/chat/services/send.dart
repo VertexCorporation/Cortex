@@ -276,8 +276,34 @@ class SendService {
     String? overrideModelId,
     bool isHidden = false,
     bool flowMode = false,
+    // CONTINUATION MODE: resume a server-reported truncated response
+    // (`isIncomplete`). No new user text is sent; the response loop keeps
+    // the partial answer in context and appends a continuation instruction,
+    // and the streamed remainder appends to the SAME message.
+    bool isContinue = false,
   }) async {
     final sessionProvider = context.read<ChatSessionProvider>();
+
+    // -----------------------------------------------------------------------
+    // 0. CROSS-CONVERSATION ISOLATION (offline)
+    // -----------------------------------------------------------------------
+    // If an on-device generation is still decoding for a conversation the
+    // user has ALREADY LEFT (the native llama stream keeps running until it
+    // is stopped), its tokens would pass the single, conversation-blind
+    // `isWaitingForResponse` guard the moment THIS exchange starts waiting —
+    // i.e. the new chat would absorb another chat's tokens and its terminal
+    // completion. Stop any live native stream BEFORE this exchange exists so
+    // that can never happen. Harmless no-op when the stream is idle or the
+    // platform has no native handler (guarded by the loaded flag).
+    if (sessionProvider.isLocalModelLoaded) {
+      // The stop REQUEST is dispatched synchronously at invoke time (the
+      // platform message is out before the next line runs); awaiting its
+      // response is unnecessary — OfflineService tears any live stream
+      // down again, with a bounded ack wait, right before the actual
+      // native generation. `unawaited` keeps the BuildContext use below
+      // synchronous-only.
+      unawaited(_offlineService.stopGeneration());
+    }
 
     // -----------------------------------------------------------------------
     // 1. PREPARE CONTENT
@@ -293,7 +319,11 @@ class SendService {
         (m) => m.isUserMessage,
         orElse: () => Message(text: '', isUserMessage: true),
       );
-      currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
+      // Continuation re-uses the ORIGINAL turn's attachments already in
+      // history — re-attaching them to the continuation instruction would
+      // double-send the media blocks.
+      currentAttachmentPaths =
+          isContinue ? [] : List.from(lastUserMessage.attachmentPaths);
     } else {
       // Use the class member _inputProvider or the local one.
       // Since we injected it, _inputProvider is safe.
@@ -301,7 +331,9 @@ class SendService {
           _inputProvider.attachments.map((a) => a.file.path).toList();
     }
 
-    if (text.isEmpty && currentAttachmentPaths.isEmpty) {
+    // A continuation carries no new user text by design — the response loop
+    // appends the continuation instruction itself.
+    if (text.isEmpty && currentAttachmentPaths.isEmpty && !isContinue) {
       return false;
     }
 
@@ -367,6 +399,13 @@ class SendService {
       final bool enableThinkingMode =
           activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
+      if (isContinue) {
+        // CONTINUATION INSTRUCTION (model-facing, fixed English): the partial
+        // answer is already in context (appended manually by the response
+        // loop); this turn only instructs the resume.
+        textForApi =
+            "Continue your previous response exactly where it stopped. Resume mid-sentence without repeating any earlier text, and finish the response.";
+      }
 
       // Generation feature modes (Create Image/Video/Audio) do NOT modify
       // the text on the client. Only a generation key is sent to the server,
@@ -411,16 +450,35 @@ class SendService {
       }
 
       // Under the unified credit engine, model choice belongs to the `full`
-      // access band; below zero everyone is answered by Dynamic Chat. The
-      // gateway applies this regardless, so applying it here too keeps the
-      // message labelled with the model that actually answered it.
+      // access band — but ONLY for SERVER-SIDE selections. Credit
+      // restrictions ration paid cloud inference; they never apply to local
+      // inference. An installed OFFLINE model keeps executing on-device at
+      // ANY balance, even at the debt floor: it consumes no Fulcrum credits
+      // and — privacy critically — its prompt must stay completely local
+      // instead of silently shipping to Cortex through Dynamic Chat (remote
+      // TitleGen below is the single connectivity-gated exception, and it
+      // only ever shares the first message as a short title prompt). The
+      // gateway enforces the same rule for online models, so applying it
+      // here too keeps the message labelled with the model that actually
+      // answered it.
       //
       // The session's preferred model is left alone on purpose — when the
       // allowance renews tomorrow the user gets it back without having to pick
       // it again.
-      if (!creditsManager.canChooseModel) {
+      final bool selectedModelIsServerSide = Utils.isServerSideModel(
+        apiModelIdForSend,
+        langCode: langCode,
+        modelService: _modelService,
+      );
+      if (lowCreditsForcesDynamicChat(
+        canChooseModel: creditsManager.canChooseModel,
+        selectedModelIsServerSide: selectedModelIsServerSide,
+      )) {
         apiModelIdForSend = 'cortex/auto';
         originalUiModelId = 'cortex/auto';
+      } else if (!creditsManager.canChooseModel) {
+        debugPrint(
+            "[SendService] Credits below the full band; local model '$apiModelIdForSend' stays on-device — offline inference is never credit-gated and never falls back to cortex/auto.");
       }
 
       final intentResolvedModelId = _mediaRouter.resolveAttachmentIntentModelId(
@@ -601,8 +659,25 @@ class SendService {
             );
 
             // ASYNC AI CHAT TITLE GENERATION
-            if (isServerSide && text.isNotEmpty) {
-              debugPrint("[SendService] Triggering TitleGen for new chat...");
+            //
+            // TitleGen is the one product-defined exception to offline
+            // locality: for offline chats the message itself never leaves
+            // the device (only the offline branch can run below), but the
+            // tiny one-shot title prompt — built from the first user
+            // message only — goes through the same remote TitleGen flow
+            // online chats use, provided the device actually has internet.
+            // Offline chats with no connectivity keep the local fallback
+            // title instead of firing a request that cannot succeed, and
+            // any TitleGen failure (offline chats included) is non-fatal:
+            // catchError below keeps the conversation running with the
+            // fallback title.
+            if (text.isNotEmpty &&
+                shouldGenerateTitleRemotely(
+                  isServerSide: isServerSide,
+                  hasInternet: hasInternet,
+                )) {
+              debugPrint(
+                  "[SendService] Triggering TitleGen for new chat (${isServerSide ? 'online' : 'offline chat, remote title only'})...");
               _apiService
                   .generateChatTitle(
                       text,
@@ -739,6 +814,7 @@ class SendService {
             currentAttachmentPaths,
             _inputProvider.ragEnabled,
             _inputProvider.ragDocumentIds,
+            targetConvId,
           );
         } else {
           throw ApiException(localizations.errorPromptFlagged);
@@ -755,6 +831,17 @@ class SendService {
                 apiModelIdForSend == 'dynamic';
         final triedMediaFallbackIds = <String>{apiModelIdForSend};
 
+        // "Continue generating": the kept partial is part of THIS turn's
+        // final text. Seed the background buffer with it so a completion
+        // that finishes in the background persists partial + continuation
+        // (the buffer is the source of truth for background finalization).
+        if (isContinue) {
+          final keptPartial = _conversationProvider.messages[aiMessageIndex].text;
+          if (keptPartial.isNotEmpty) {
+            _backgroundTaskService.seedBuffer(convId, keptPartial);
+          }
+        }
+
         Future<void> switchToDynamicFallback({
           String? notice,
           Object? reason,
@@ -768,14 +855,26 @@ class SendService {
           attempt = 0;
           hasTriedDynamicServerFallback = true;
 
-          _backgroundTaskService.resetBuffer(convId);
           _clearPendingMediaState(convId, aiMessageIndex);
 
-          if (_isConversationActive(convId)) {
-            _conversationProvider.fadeOutMessage(aiMessageIndex);
-            await _delayed(const Duration(milliseconds: 300));
-            _conversationProvider.prepareForRegeneration(
-                aiMessageIndex, 'cortex/auto');
+          if (isContinue) {
+            // "Continue generating": keep the partial — the retry loop re-reads
+            // it as the assistant turn and the seeded background buffer keeps
+            // it in the finalization source. Only relabel the bubble so the
+            // model attribution matches the dynamic answer's source.
+            if (_isConversationActive(convId)) {
+              final currentMsg = _conversationProvider.messages[aiMessageIndex];
+              _conversationProvider.updateMessageAtIndex(
+                  aiMessageIndex, currentMsg.copyWith(model: 'cortex/auto'));
+            }
+          } else {
+            _backgroundTaskService.resetBuffer(convId);
+            if (_isConversationActive(convId)) {
+              _conversationProvider.fadeOutMessage(aiMessageIndex);
+              await _delayed(const Duration(milliseconds: 300));
+              _conversationProvider.prepareForRegeneration(
+                  aiMessageIndex, 'cortex/auto');
+            }
           }
           await _delayed(const Duration(milliseconds: 100));
         }
@@ -799,6 +898,10 @@ class SendService {
               onTitleReceived: handleServerTitle,
               activeMode: activeMode,
               flowMode: flowMode,
+              isContinue: isContinue,
+              continuationPartial: isContinue
+                  ? _conversationProvider.messages[aiMessageIndex].text
+                  : null,
             );
             success = true;
           } catch (e) {
@@ -815,12 +918,16 @@ class SendService {
                   "SendService: Empty response detected, retrying attempt $attempt...");
               // Reset every live copy before retrying. The background buffer is
               // the source of truth even while the chat is foregrounded.
-              _backgroundTaskService.resetBuffer(convId);
-              if (_isConversationActive(convId)) {
-                final currentMsg =
-                    _conversationProvider.messages[aiMessageIndex];
-                _conversationProvider.updateMessageAtIndex(
-                    aiMessageIndex, currentMsg.copyWith(text: ""));
+              // "Continue generating" retries keep the partial: the buffer is
+              // seeded with it and the loop re-reads it as the assistant turn.
+              if (!isContinue) {
+                _backgroundTaskService.resetBuffer(convId);
+                if (_isConversationActive(convId)) {
+                  final currentMsg =
+                      _conversationProvider.messages[aiMessageIndex];
+                  _conversationProvider.updateMessageAtIndex(
+                      aiMessageIndex, currentMsg.copyWith(text: ""));
+                }
               }
               await _delayed(const Duration(milliseconds: 500));
             } else if (e is ApiException && (e.code ?? '').startsWith('FAL_')) {
@@ -904,6 +1011,7 @@ class SendService {
         if (_isConversationActive(convId)) {
           _syncActiveMessageFromBackgroundBuffer(
               convId, aiMessageIndex, apiModelIdForSend!);
+          _applyStreamCompletionStatus(convId, aiMessageIndex);
           _conversationProvider.finishBotResponse(aiMessageIndex);
         } else {
           // Background: persist the final message to DB.
@@ -912,6 +1020,7 @@ class SendService {
           if (_isConversationActive(convId)) {
             _syncActiveMessageFromBackgroundBuffer(
                 convId, aiMessageIndex, apiModelIdForSend!);
+            _applyStreamCompletionStatus(convId, aiMessageIndex);
             _conversationProvider.finishBotResponse(aiMessageIndex);
           }
         }
@@ -1116,6 +1225,8 @@ class SendService {
     Function(String)? onTitleReceived,
     required ChatInputMode activeMode,
     bool flowMode = false,
+    bool isContinue = false,
+    String? continuationPartial,
   }) async {
     final ModelEntity modelData =
         _modelService.getPreciseModelData(modelId, langCode: langCode);
@@ -1129,7 +1240,11 @@ class SendService {
     // 1. Build Base Context (History)
     List<Map<String, dynamic>> contextMessages =
         await _contextService.buildContextMessages(
-      includeLastUser: false,
+      // CONTINUATION: the trigger user turn must STAY in history (the model
+      // resumes the answer it gave to it). The partial answer itself is
+      // appended manually below — it is marked `isThinking` for the UI and
+      // therefore excluded from the provider history.
+      includeLastUser: !isContinue,
       targetModelId: modelId,
       langCode: langCode,
       isCharacterModel: isCharacterModel,
@@ -1141,10 +1256,12 @@ class SendService {
 
     // RAG (Document Chat): retrieve relevant passages for this message and
     // prepend them as reference material. PII-safe before going online.
-    final String? ragContext = await _buildRagContext(
-      queryText: initialText,
-      attachmentPaths: attachments,
-    );
+    final String? ragContext = isContinue
+        ? null // Continuation: no new document query — the original turn's RAG material is already in history.
+        : await _buildRagContext(
+            queryText: initialText,
+            attachmentPaths: attachments,
+          );
     final bool ragActive = ragContext != null && ragContext.isNotEmpty;
 
     String combinedText = "";
@@ -1165,6 +1282,16 @@ class SendService {
     for (var path in attachments) {
       final block = await Utils.processAttachment(path);
       if (block != null) userContent.add(block);
+    }
+
+    // CONTINUATION: append the partial answer as the assistant turn the model
+    // must resume from, BEFORE the instruction turn. The provider history
+    // excludes it (it is marked `isThinking` for the streaming UI), so this
+    // manual append is what keeps the model's resume anchored mid-sentence.
+    // Continuation carries no attachment blocks — the original turn's media
+    // is already in history and re-processing it here would double-send it.
+    if (isContinue && continuationPartial != null) {
+      contextMessages.add({"role": "assistant", "content": continuationPartial});
     }
 
     // Extract documents for tool processing (PDF, XLSX, etc.)
@@ -1213,13 +1340,20 @@ class SendService {
     // context or the persisted assistant text.
     final toolSteps = <String>[];
     void setToolActivity(String toolName, {bool completed = false}) {
+      // Durable step recording happens BEFORE the active guard: completed
+      // steps are facts about the turn and must survive the chat being
+      // backgrounded and the in-memory message being replaced on re-entry.
+      // They are merged into the persisted message at finalization —
+      // in-memory-only tracking is what lost them on reopen (the DB write
+      // only happens when the response finalizes).
+      if (completed && toolName.isNotEmpty && !toolSteps.contains(toolName)) {
+        toolSteps.add(toolName);
+        _backgroundTaskService.addToolStep(targetConvId, toolName);
+      }
       if (!_isConversationActive(targetConvId)) return;
       final messages = _conversationProvider.messages;
       if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
 
-      if (completed && toolName.isNotEmpty && !toolSteps.contains(toolName)) {
-        toolSteps.add(toolName);
-      }
       final message = messages[aiMessageIndex];
       final active = completed ? '' : toolName;
       if (message.toolActivity == active &&
@@ -1609,6 +1743,17 @@ class SendService {
           // Capture Tools
           onToolCall: (tools) {
             turnToolCalls = tools;
+          },
+          // Live tool announcement: surface tool activity on the AI message
+          // while the stream is still running, not only after stream end.
+          onToolActivity: (name) {
+            setToolActivity(name);
+          },
+          // Explicit completion contract: record the server's truncation
+          // verdict for this conversation so finalization can mark the
+          // message instead of persisting a cut-short response as complete.
+          onStreamDone: (truncated) {
+            _backgroundTaskService.setTruncated(targetConvId, truncated);
           },
           onCitations: (citations) {
             setWebSearchActive(false);
@@ -2144,6 +2289,25 @@ class SendService {
     }
   }
 
+  /// Applies the server's explicit completion verdict (terminal `done` SSE
+  /// event, `truncated: true`) to the in-memory AI message. Called right
+  /// before `finishBotResponse` so the marker is part of the finalized
+  /// message and gets persisted with it.
+  void _applyStreamCompletionStatus(String convId, int aiMessageIndex) {
+    if (!_backgroundTaskService.isTruncated(convId)) return;
+    if (!_isConversationActive(convId)) return;
+    final messages = _conversationProvider.messages;
+    if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+    final message = messages[aiMessageIndex];
+    if (message.isUserMessage || message.isError || message.isIncomplete) {
+      return;
+    }
+    _conversationProvider.updateMessageAtIndex(
+      aiMessageIndex,
+      message.copyWith(isIncomplete: true),
+    );
+  }
+
   /// Checks the daily guest limit and returns true if the user can send a message.
   /// If the user is blocked, it shows the bottom sheet and returns false.
   Future<bool> checkGuestLimit(
@@ -2201,6 +2365,16 @@ class SendService {
         }
       }
 
+      // Merge the durable tool-step trace: the steps recorded in background
+      // task state (facts of this turn) union whatever the DB message
+      // already carried. Steps recorded only in memory were lost when the
+      // user left the chat mid-tool-flow — the DB write only happens at
+      // finalization.
+      final mergedToolSteps = <String>{
+        if (existingMsg != null) ...existingMsg.toolSteps,
+        ..._backgroundTaskService.getToolSteps(convId),
+      }.toList(growable: false);
+
       // Build a finalized AI message from the accumulated text + media.
       final rawFinalText = existingMsg != null && accumulatedText.isEmpty
           ? existingMsg.text
@@ -2216,6 +2390,10 @@ class SendService {
         attachmentPaths: mergedAttachments,
         model: existingMsg?.model ?? modelId,
         webSearchSources: existingMsg?.webSearchSources,
+        // Durable tool trace: steps recorded before the conversation went to
+        // the background, merged with whatever the DB message already had.
+        toolSteps: mergedToolSteps,
+        isIncomplete: _backgroundTaskService.isTruncated(convId),
       );
 
       await ChatStorageService.upsertMessage(
@@ -2316,6 +2494,53 @@ const Set<String> _creditRefusalCodes = {
   'QUOTA_EXCEEDED',
   'PAYMENT_REQUIRED',
 };
+
+/// Whether the unified credit engine forces this send onto Dynamic Chat.
+///
+/// The invariant this encodes — credit restrictions ration SERVER-SIDE
+/// inference only:
+///
+/// * credits below the `full` band + a server-side/manual selection →
+///   Dynamic Chat (`cortex/auto`) answers, mirroring the gateway's
+///   `manual_selection_disabled` policy for online models;
+/// * credits below the `full` band + an OFFLINE selection → NEVER. Local
+///   inference consumes no Fulcrum credits, so it must keep executing
+///   on-device at any balance — including negative balances and the debt
+///   floor — and its prompt must never be silently redirected to Cortex
+///   servers through Dynamic Chat.
+///
+/// [selectedModelIsServerSide] is the canonical model execution property
+/// (`ModelEntity.isServerSide`, i.e. `type != 'offline'`), not a fragile
+/// model-ID list. Pure and side-effect free so the routing matrix is unit
+/// tested directly (test/credit_routing_test.dart).
+bool lowCreditsForcesDynamicChat({
+  required bool canChooseModel,
+  required bool selectedModelIsServerSide,
+}) =>
+    !canChooseModel && selectedModelIsServerSide;
+
+
+/// Whether a new chat should ask the remote TitleGen flow for a title.
+///
+/// Online chats always try — their message path already required
+/// connectivity, and the server response may deliver a title of its own.
+/// OFFLINE chats also try whenever the device has internet: TitleGen is the
+/// single product-defined exception to offline locality, sharing only the
+/// first user message as a short title prompt while the conversation itself
+/// stays fully local. With no connectivity there is nothing to ask — the
+/// chat simply keeps its local fallback title. A failed TitleGen call never
+/// breaks the send: the caller treats errors as non-fatal and the fallback
+/// title survives. Credits are never consulted here, so the exception holds
+/// at any balance, including the debt floor.
+///
+/// Pure and side-effect free so the matrix is unit tested directly
+/// (test/credit_routing_test.dart).
+bool shouldGenerateTitleRemotely({
+  required bool isServerSide,
+  required bool hasInternet,
+}) =>
+    isServerSide || hasInternet;
+
 
 /// Composes the conversational recovery copy for a typed credit refusal, or
 /// null when the refusal is not a credit one or the client credit state is

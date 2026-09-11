@@ -144,6 +144,9 @@ class AppLocalizationsAz extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Model';
+
+  @override
   String get editConversationTitle => 'Adını dəyiş';
 
   @override
@@ -887,6 +890,13 @@ class AppLocalizationsAz extends AppLocalizations {
       'Şəbəkə xətası baş verdi. Zəhmət olmasa bağlantınızı yoxlayın və yenidən cəhd edin.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Seçilmiş əsas model xarakterin mühakimə və cavab vermə qabiliyyətlərini müəyyən edəcək.';
 
@@ -1106,7 +1116,7 @@ class AppLocalizationsAz extends AppLocalizations {
       'Bu süni zəka premium süni zəkadır, pulsuz istifadəçilərin premium süni zəkalara girişi məhduddur; limitsiz giriş üçün yüksəldin!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Eksklüziv Süni İntellekt Seçkisi';
 
   @override
   String get premiumTrialExhaustedMessage =>

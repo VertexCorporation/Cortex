@@ -143,6 +143,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => '모델';
+
+  @override
   String get editConversationTitle => '이름 변경';
 
   @override
@@ -870,6 +873,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get errorNetwork => '네트워크 오류가 발생했습니다. 연결을 확인하고 다시 시도해주세요.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       '선택된 기본 모델이 캐릭터의 추론 및 응답 능력을 결정합니다.';
 
@@ -1078,7 +1088,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 AI는 프리미엄 AI이며, 무료 사용자는 프리미엄 AI에 대한 접근이 제한됩니다. 업그레이드하여 무제한 접근을 해제하세요!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => '엄선된 AI 모델';
 
   @override
   String get premiumTrialExhaustedMessage =>

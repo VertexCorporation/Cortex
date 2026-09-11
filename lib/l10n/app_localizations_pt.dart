@@ -144,6 +144,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Modelo';
+
+  @override
   String get editConversationTitle => 'Renomear';
 
   @override
@@ -893,6 +896,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Ocorreu um erro de rede. Por favor, verifique a sua ligação e tente novamente.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'O modelo base selecionado determinará as capacidades de raciocínio e resposta do personagem.';
 
@@ -1112,7 +1122,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Esta IA é uma IA premium; usuários gratuitos têm acesso limitado às IAs premium; atualize para desbloquear o acesso ilimitado!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Seleção de IA exclusiva';
 
   @override
   String get premiumTrialExhaustedMessage =>

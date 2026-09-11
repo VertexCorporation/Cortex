@@ -143,6 +143,9 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'मॉडल';
+
+  @override
   String get editConversationTitle => 'नाम बदलें';
 
   @override
@@ -886,6 +889,13 @@ class AppLocalizationsHi extends AppLocalizations {
       'एक नेटवर्क त्रुटि हुई। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'चयनित आधार मॉडल चरित्र के तर्क और प्रतिक्रिया क्षमताओं को निर्धारित करेगा।';
 
@@ -1104,7 +1114,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'यह AI एक प्रीमियम AI है, मुफ्त उपयोगकर्ताओं के पास प्रीमियम AI तक सीमित पहुंच है; असीमित पहुंच के लिए अपग्रेड करें!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'विशेष एआई चयन';
 
   @override
   String get premiumTrialExhaustedMessage =>

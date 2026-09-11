@@ -43,7 +43,32 @@ class ChatFormatProcessor {
   List<String> _controlPatterns = const [];
 
   // Subset of _controlPatterns: tokens that should stop generation.
+  // NOTE: stop behavior is strictly architecture-aware — only the model's
+  // own `stop_generation` tokens (from the catalog) terminate the stream.
   Set<String> _stopPatterns = const {};
+
+  // Well-known control-token strings shared across ALL supported chat-template
+  // families. These are protocol markers and never legitimate visible text for
+  // any model, so they are stripped even when this model's own format does not
+  // list them (e.g. a fine-tune emitting a foreign family's marker mid-reply).
+  // They are NOT added to _stopPatterns: generation must only ever stop on the
+  // tokens this model's architecture actually defines.
+  static const List<String> _genericControlPatterns = [
+    '<|im_start|>',
+    '<|im_end|>',
+    '</s>',
+    '<|end_of_text|>',
+    '<|eot_id|>',
+    '<|start_header_id|>',
+    '<|end_header_id|>',
+    '<start_of_turn>',
+    '<end_of_turn>',
+    '<|end|>',
+    '<|start|>',
+    '<|message|>',
+    '<|channel|>',
+    '<|return|>',
+  ];
 
   bool _patternsInitialized = false;
 
@@ -220,6 +245,13 @@ class ChatFormatProcessor {
       _stopPatterns = list.whereType<String>().toSet();
     } else {
       _stopPatterns = const {};
+    }
+
+    // Cross-family protocol markers (strip-only — never stop on them).
+    for (final pattern in _genericControlPatterns) {
+      if (!patterns.contains(pattern)) {
+        patterns.add(pattern);
+      }
     }
 
     _controlPatterns = patterns.toList(growable: false);

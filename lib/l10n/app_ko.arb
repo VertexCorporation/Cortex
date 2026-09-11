@@ -53,7 +53,7 @@
   "benefit7": "추가 사용 제한",
   "benefit8": "모델 추가",
   "benefit9": "새로운 테마",
-  "benefitPremiumModels": "Specific AI Selection",
+  "benefitPremiumModels": "엄선된 AI 모델",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -440,6 +440,7 @@
   "modelCreatedSuccess": "모델이 성공적으로 생성되었습니다!",
   "modelDescription": "{description}",
   "modelProducer": "제작사: {producer}",
+  "modelLabel": "모델",
   "modelRemovedSuccess": "“{modelName}”이(가) 성공적으로 제거되었습니다.",
   "modelUploadDescription": "기기에서 직접 로컬 GGUF 파일을 선택하고 업로드하세요. 이를 통해 인터넷 연결 없이 오프라인으로 모델을 실행할 수 있습니다. 파일이 유효한 GGUF 형식이고 올바르게 구성되었는지 확인하세요. 파일이 잘못되었거나 손상된 경우 Cortex가 예상대로 작동하지 않을 수 있으며 오류가 발생할 수 있습니다.",
   "modelUploadShortDescription": "여기를 탭하여 기기에서 .gguf 파일을 선택하세요",

@@ -165,6 +165,9 @@ class Tiles {
     required double screenWidth,
     required double screenHeight,
     required ModelService modelService,
+    // "Continue generating" affordance for server-reported truncated
+    // responses (`isIncomplete`). Rendered inside the truncation notice.
+    VoidCallback? onContinue,
   }) {
     final langCode = Localizations.localeOf(context).languageCode;
     final preciseModelId = message.model ?? modelId;
@@ -278,6 +281,7 @@ class Tiles {
       },
       onStop: onStop,
       parsedSpans: message.parsedSpans,
+      onContinue: onContinue,
     );
 
     return Column(
@@ -687,6 +691,7 @@ class Tiles {
     required void Function({String? newModelId}) onRegenerate,
     required VoidCallback onStop,
     required ModelService modelService,
+    VoidCallback? onContinue,
   }) {
     if (message.isUserMessage) {
       return RepaintBoundary(
@@ -720,6 +725,7 @@ class Tiles {
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           modelService: modelService,
+          onContinue: onContinue,
         ),
       );
     }
@@ -737,6 +743,9 @@ class Tiles {
     ValueChanged<int>? onFadeOutComplete,
     required void Function(int index, {String? newModelId}) onRegenerate,
     required ValueChanged<int> onReport,
+    // "Continue generating" affordance for server-reported truncated
+    // responses (`isIncomplete`), forwarded to every AI tile.
+    void Function(int index)? onContinue,
     double bottomPadding = 0.0,
   }) {
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -806,6 +815,9 @@ class Tiles {
               },
               onStop: onStop,
               modelService: modelService,
+              onContinue: onContinue == null
+                  ? null
+                  : () => onContinue.call(realIndex),
             );
           },
         ),

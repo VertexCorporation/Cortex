@@ -148,6 +148,12 @@ class _ChatMessageListState extends State<ChatMessageList> {
           onReport: (index) {
             _handleReport(context, index, conversationProvider);
           },
+          onContinue: (int index) {
+            context.read<RegenerateService>().onContinue(
+                  index,
+                  context: context,
+                );
+          },
         ),
       ),
     );

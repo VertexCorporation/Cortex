@@ -377,7 +377,11 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       description: l10n.featureCreateImageDescription,
                       isSelected:
                           currentMode == ChatInputMode.imageGeneration,
-                      isDisabled: false,
+                      // Disabled while the balance cannot cover the
+                      // published image cost (or the band is not full);
+                      // re-evaluated on every sheet rebuild (UserProvider
+                      // watch) — the tap-gate below stays as a safety net.
+                      isDisabled: !creditsManager.canGenerate('image'),
                       onTap: () {
                         Navigator.pop(context);
                         // Band gate + per-operation affordability gate: the
@@ -407,7 +411,10 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       description: l10n.featureCreateAudioDescription,
                       isSelected:
                           currentMode == ChatInputMode.audioGeneration,
-                      isDisabled: false,
+                      // Disabled while the balance cannot cover the
+                      // published speech cost — the client's audio
+                      // generation maps to the server's 'speech' lane.
+                      isDisabled: !creditsManager.canGenerate('speech'),
                       onTap: () {
                         Navigator.pop(context);
                         // Same band gate, plus the per-operation
@@ -443,12 +450,18 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                           description: l10n.featureCreateVideoDescription,
                           isSelected:
                               currentMode == ChatInputMode.videoGeneration,
-                          isDisabled: false,
+                          // Ultra-only lane: a non-ultra user keeps the
+                          // tappable tier upsell; an ultra user with an
+                          // unaffordable balance gets the disabled
+                          // affordance instead of arming a request the
+                          // server will refuse.
+                          isDisabled:
+                              isUltra && !creditsManager.canGenerate('video'),
                           onTap: () {
                             Navigator.pop(context);
                             // Same band gate, plus the per-operation
                             // affordability gate: video's published default
-                            // (1000 credits) can exceed a thin full-band
+                            // (500 credits) can exceed a thin full-band
                             // balance, which would be refused server-side.
                             if (!mediaAvailable ||
                                 !creditsManager.canGenerate('video')) {

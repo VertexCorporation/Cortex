@@ -53,7 +53,7 @@
   "benefit7": "Daha fazla kullanım sınırı",
   "benefit8": "Model ekle",
   "benefit9": "Yeni temalar",
-  "benefitPremiumModels": "Specific AI Selection",
+  "benefitPremiumModels": "Özel Yapay Zekâ Seçkisi",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -228,6 +228,8 @@
     "description": "Model verileri getirilemediğinde hata ekranı başlığı."
   },
   "errorNetwork": "Bir ağ hatası oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
+  "responseTruncatedNotice": "Bu yanıt model tarafından kısa kesildi ve eksik olabilir.",
+  "continueGenerating": "Üretmeye devam et",
   "@errorNetwork": {},
   "errorNoModelsAvailable": "Şu anda hiçbir model mevcut değil. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.",
   "@errorNoModelsAvailable": {
@@ -472,6 +474,7 @@
   "modelCreatedSuccess": "Model başarıyla oluşturuldu!",
   "modelDescription": "{description}",
   "modelProducer": "Üretici: {producer}",
+  "modelLabel": "Model",
   "modelRemovedSuccess": "“{modelName}” başarıyla kaldırıldı.",
   "modelUploadDescription": "Yerel GGUF dosyalarınızı doğrudan cihazınızdan seçip yükleyin. Bu, modelinizi internet bağlantısı gerektirmeden lokal çalıştırmanızı sağlar. Dosyanın geçerli GGUF formatında ve düzgün yapılandırılmış olduğundan emin olun. Dosya yanlış veya bozuksa, Cortex beklendiği gibi çalışmayabilir ve hatalarla karşılaşabilirsiniz.",
   "modelUploadShortDescription": "Cihazınızdan bir .gguf dosyası seçmek için buraya dokunun",

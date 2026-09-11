@@ -143,6 +143,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Model';
+
+  @override
   String get editConversationTitle => 'Rename';
 
   @override
@@ -884,6 +887,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorNetwork =>
       'A network error occurred. Please check your connection and try again.';
+
+  @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
 
   @override
   String get baseModelForCharacterDescription =>

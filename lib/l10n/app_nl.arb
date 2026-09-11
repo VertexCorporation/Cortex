@@ -53,7 +53,7 @@
   "benefit7": "Meer gebruikslimieten",
   "benefit8": "Modellen toevoegen",
   "benefit9": "Nieuwe thema's",
-  "benefitPremiumModels": "Specific AI Selection",
+  "benefitPremiumModels": "Exclusieve AI-selectie",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -440,6 +440,7 @@
   "modelCreatedSuccess": "Model succesvol aangemaakt!",
   "modelDescription": "{description}",
   "modelProducer": "Producent: {producer}",
+  "modelLabel": "Model",
   "modelRemovedSuccess": "“{modelName}” is succesvol verwijderd.",
   "modelUploadDescription": "Selecteer en upload je lokale GGUF-bestanden rechtstreeks vanaf je apparaat. Hiermee kun je je model offline uitvoeren zonder internetverbinding. Zorg ervoor dat het bestand een geldig GGUF-formaat heeft en correct is gestructureerd. Als het bestand onjuist of beschadigd is, werkt Cortex mogelijk niet zoals verwacht en kun je fouten tegenkomen.",
   "modelUploadShortDescription": "Tik hier om een .gguf-bestand van je apparaat te kiezen",

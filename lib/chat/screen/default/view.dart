@@ -255,7 +255,17 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         (subscription.tier == SubscriptionTier.ultra ||
             subscription.mode == SubscriptionMode.lifetime);
 
-    return Padding(
+    // Affordability source: published lane costs + live balance/band
+    // notifiers (server-published `creditLimits.operationCosts`).
+    final credits = context.read<CreditsManager>();
+
+    // Affordability is live: the balance and the access band broadcast on
+    // ValueNotifiers, so the cards re-enable the moment a snapshot refills
+    // (or drains) the account without waiting for a parent rebuild.
+    return AnimatedBuilder(
+      animation:
+          Listenable.merge([credits.spendableNotifier, credits.accessNotifier]),
+      builder: (context, _) => Padding(
       padding: EdgeInsets.only(
         left: horizontalPadding,
         right: horizontalPadding,
@@ -279,7 +289,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   title: l10n.featureCreateImageTitle,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: false,
+                  // Disabled while the balance cannot cover the published
+                  // image cost (or the band is not full); re-enabled
+                  // reactively by the AnimatedBuilder above.
+                  isDisabled: !credits.canGenerate('image'),
                   onTap: () => _handleGeneration(context, 'image'),
                 ),
               ),
@@ -297,7 +310,11 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   title: l10n.featureCreateVideoTitle,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: false,
+                  // Ultra-only lane: a non-ultra user keeps the tappable
+                  // tier upsell; an ultra user with an unaffordable balance
+                  // gets the disabled affordance instead of arming a request
+                  // the server will refuse.
+                  isDisabled: isUltra && !credits.canGenerate('video'),
                   usePremiumStyle: !isUltra,
                   onTap: () => _handleGeneration(context, 'video'),
                 ),
@@ -320,7 +337,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   title: l10n.featureCreateAudioTitle,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
-                  isDisabled: false,
+                  // Disabled while the balance cannot cover the published
+                  // speech cost (audio maps to the server's 'speech' lane).
+                  isDisabled: !credits.canGenerate('speech'),
                   onTap: () => _handleGeneration(context, 'audio'),
                 ),
               ),
@@ -348,6 +367,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
             ],
           ),
         ],
+      ),
       ),
     );
   }
@@ -499,7 +519,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
     // Per-operation affordability gate: even the full band can be too thin
     // for a lane's published default charge (operationCosts — e.g. video's
-    // 1000-credit default against a small balance). Mirrors the
+    // 500-credit default against a small balance). Mirrors the
     // FeatureSheet gate; the server routes audio generation to its
     // 'speech' lane. Fail-open inside canGenerate keeps pre-publication
     // user documents working — the server stays the final gate.

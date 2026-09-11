@@ -380,6 +380,43 @@ class ConversationProvider with ChangeNotifier {
         "[ConversationProvider] Atomically prepared for regeneration. List truncated to index $aiMessageIndex and 'thinking' bubble added.");
   }
 
+  /// Marks a truncated AI message as the target of a continuation request.
+  ///
+  /// Unlike [prepareForRegeneration] the existing text is KEPT: the stream
+  /// buffer re-seeds from the message text ([appendToLastBotMessage] does
+  /// `??=` from the last message), so continuation chunks append to the
+  /// partial answer instead of replacing it. The stale `isIncomplete`
+  /// marker is cleared up front; the server's fresh terminal `done` event
+  /// re-applies it if the continuation is cut short again.
+  void prepareForContinuation(int aiMessageIndex) {
+    if (aiMessageIndex < 0 || aiMessageIndex >= _messages.length) {
+      debugPrint(
+          "[ConversationProvider] Invalid index $aiMessageIndex for continuation. Aborting.");
+      return;
+    }
+    final target = _messages[aiMessageIndex];
+    if (target.isUserMessage) {
+      debugPrint(
+          "[ConversationProvider] Continuation target is a user message. Aborting.");
+      return;
+    }
+
+    _messages[aiMessageIndex] = target.copyWith(
+      isThinking: true,
+      isIncomplete: false,
+      toolActivity: '',
+    );
+
+    _isWaitingForResponse = true;
+    _responseStopped = false;
+    _isLoadingMessages = false;
+    _streamBuffer = null; // Lazily re-seeded from the (kept) text on first chunk
+
+    notifyListeners();
+    debugPrint(
+        "[ConversationProvider] Prepared for continuation at index $aiMessageIndex (${target.text.length} chars kept).");
+  }
+
   /// Appends a chunk of text to the last AI message in the list (for streaming responses).
   /// Uses throttling to prevent excessive UI rebuilds during fast streaming.
   void appendToLastBotMessage(String chunk) {
