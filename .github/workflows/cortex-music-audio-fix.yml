@@ -195,7 +195,7 @@ jobs:
           replace_once(
               'lib/chat/services/send.dart',
               """      final creditsManager = context.read<CreditsManager>();\n      final hasInternet = await InternetConnection().hasInternetAccess;\n""",
-              """      final creditsManager = context.read<CreditsManager>();\n\n      // The Features sheet can only gate the generic Audio button against the\n      // cheap speech lane before a prompt exists. Once the prompt is known,\n      // enforce the actual resolved lane as well — especially music, which has\n      // its own published cost. The server still remains the final authority.\n      final generationCreditLane =\n          generationCreditLaneForTarget(generationTarget);\n      if (generationCreditLane != null &&\n          !creditsManager.canGenerate(generationCreditLane)) {\n        throw ApiException(\n          localizations.errorReachedLimit,\n          code: generationTarget == 'music'\n              ? 'LIMIT_MUSIC_INSUFFICIENT'\n              : 'LIMIT_MEDIA_INSUFFICIENT',\n        );\n      }\n\n      final hasInternet = await InternetConnection().hasInternetAccess;\n""",
+              """      final creditsManager = context.read<CreditsManager>();\n\n      // The Features sheet can only gate the generic Audio button against the\n      // cheap speech lane before a prompt exists. Once the prompt is known,\n      // enforce the actual resolved lane as well — especially music, which has\n      // its own published cost. The server still remains the final authority.\n      final generationCreditLane =\n          generationCreditLaneForTarget(generationTarget);\n      if (generationCreditLane != null &&\n          !creditsManager.canGenerate(generationCreditLane)) {\n        throw ApiException(\n          localizations.errorReachedLimit,\n          code: 'LIMIT_MEDIA_INSUFFICIENT',\n        );\n      }\n\n      final hasInternet = await InternetConnection().hasInternetAccess;\n""",
           )
 
           replace_once(
@@ -242,8 +242,8 @@ jobs:
           )
           replace_once(
               'lib/l10n/app_localizations_en.dart',
-              "String get featureCreateAudioDescription => 'Generate sounds or voice from text.';",
-              "String get featureCreateAudioDescription => 'Generate sounds, voice, or music from text.';",
+              "'Generate sounds or voice from text.'",
+              "'Generate sounds, voice, or music from text.'",
           )
 
           tests = r'''import 'package:cortex/chat/providers/input.dart';
