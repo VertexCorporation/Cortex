@@ -1,0 +1,413 @@
+name: Apply music/audio generation fix
+
+on:
+  push:
+    branches:
+      - fix/music-audio-generation
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/music-audio-generation
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.44.9'
+          cache: true
+
+      - name: Apply routing fixes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one match, found {count}: {old[:80]!r}')
+              p.write_text(text.replace(old, new, 1))
+
+          generation = r'''import 'package:flutter/material.dart';
+          import 'package:provider/provider.dart';
+          import 'package:cortex/chat/providers/input.dart';
+          import 'package:cortex/chat/providers/session.dart';
+
+          const List<String> _musicGenerationTerms = [
+            'music',
+            'muzik',
+            'song',
+            'sarki',
+            'melody',
+            'melodi',
+            'instrumental',
+            'beat',
+            'beste',
+            'jingle',
+            'soundtrack',
+            'lofi',
+            'lo fi',
+            'background music',
+            'arka plan muzigi',
+            'tema muzigi',
+            'parca',
+            'bpm',
+            'chord',
+            'akor',
+            'tempo',
+            'lyrics',
+            'vokal',
+          ];
+
+          String _normalizeGenerationIntent(String text) {
+            return text
+                .toLowerCase()
+                .replaceAll('ç', 'c')
+                .replaceAll('ğ', 'g')
+                .replaceAll('ı', 'i')
+                .replaceAll('ö', 'o')
+                .replaceAll('ş', 's')
+                .replaceAll('ü', 'u')
+                .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
+                .replaceAll(RegExp(r'\s+'), ' ')
+                .trim();
+          }
+
+          /// Returns true when an Audio-generation prompt is explicitly musical.
+          ///
+          /// Matching is token/phrase based rather than substring based so requests
+          /// such as "heartbeat sound effect" do not accidentally match `beat`.
+          bool isMusicGenerationPrompt(String text) {
+            final normalized = _normalizeGenerationIntent(text);
+            if (normalized.isEmpty) return false;
+            final padded = ' $normalized ';
+            return _musicGenerationTerms.any(
+              (term) => padded.contains(' $term '),
+            );
+          }
+
+          /// Resolves the explicit server generation target for a feature-mode send.
+          ///
+          /// Audio is intentionally split here: Fulcrum has separate music and
+          /// speech/sound routes, costs and media defaults. Musical prompts go to
+          /// `music`; voice, narration and sound effects keep using `audio`.
+          String? generationTargetForMode(
+            ChatInputMode mode,
+            String userText,
+          ) {
+            return switch (mode) {
+              ChatInputMode.imageGeneration => 'image',
+              ChatInputMode.videoGeneration => 'video',
+              ChatInputMode.audioGeneration =>
+                isMusicGenerationPrompt(userText) ? 'music' : 'audio',
+              _ => null,
+            };
+          }
+
+          /// Maps a transport target onto Fulcrum's published credit operation lane.
+          /// The `audio` generation target is billed through the `speech` lane.
+          String? generationCreditLaneForTarget(String? target) {
+            return switch (target) {
+              'image' => 'image',
+              'video' => 'video',
+              'music' => 'music',
+              'audio' => 'speech',
+              _ => null,
+            };
+          }
+
+          /// Maps a generation target type to its input feature mode.
+          ChatInputMode? generationModeForTarget(String targetType) {
+            return switch (targetType) {
+              'image' => ChatInputMode.imageGeneration,
+              'video' => ChatInputMode.videoGeneration,
+              'audio' => ChatInputMode.audioGeneration,
+              _ => null,
+            };
+          }
+
+          /// Logic for the "Create Image/Video/Audio" buttons: instead of sending
+          /// anything, this activates the matching input feature (exactly like
+          /// selecting a feature from the Features sheet), which highlights the "+"
+          /// button of the input field until the user sends their prompt.
+          ///
+          /// The client never prepends a hidden prompt. On send, the selected feature
+          /// is converted to an explicit `generationTarget`. Audio prompts are split
+          /// into `music` versus `audio` so Fulcrum can use its distinct music and
+          /// speech/sound routes, costs and duration defaults.
+          void setGenerationFeatureMode(
+            BuildContext context, {
+            required String targetType,
+          }) {
+            final mode = generationModeForTarget(targetType);
+            if (mode == null) return;
+
+            final inputProvider = context.read<InputProvider>();
+            final session = context.read<ChatSessionProvider>();
+
+            // Generation targets are mutually exclusive with web search.
+            inputProvider.clearWebSearch();
+
+            // Toggle off when tapped again, mirroring the Features sheet behaviour.
+            if (inputProvider.featureMode == mode) {
+              inputProvider.clearFeatureMode();
+            } else {
+              inputProvider.setFeatureMode(mode);
+            }
+
+            // Always hand off to dynamic chat; the server-side router picks the model
+            // from the resolved generation target, without a client-side model pin.
+            if (!session.isDynamicChat) {
+              session.startDynamicConversation(savePreference: true);
+            }
+          }
+          '''
+          Path('lib/chat/services/generation.dart').write_text(generation)
+
+          replace_once(
+              'lib/chat/services/send.dart',
+              "import 'package:cortex/chat/services/context.dart';\n",
+              "import 'package:cortex/chat/services/context.dart';\nimport 'package:cortex/chat/services/generation.dart';\n",
+          )
+          replace_once(
+              'lib/chat/services/send.dart',
+              """    // Generation lane ('image' | 'video' | 'audio') and conversation\n""",
+              """    // Generation lane ('image' | 'video' | 'audio' | 'music') and conversation\n""",
+          )
+          replace_once(
+              'lib/chat/services/send.dart',
+              """      // Generation feature modes (Create Image/Video/Audio) do NOT modify\n      // the text on the client. Only a generation key is sent to the server,\n      // which routes directly to the matching model group and prepends the\n      // canonical prefix itself (see Fulcrum's gateway/router).\n      // Hoisted above the try (see the target state block) so the catch can\n      // tell which operation the refused request was attempting.\n      generationTarget = switch (activeMode) {\n        ChatInputMode.imageGeneration => 'image',\n        ChatInputMode.videoGeneration => 'video',\n        ChatInputMode.audioGeneration => 'audio',\n        _ => null,\n      };\n""",
+              """      // Generation feature modes never rewrite the user's prompt. Resolve\n      // the explicit transport target here. Audio is split into music versus\n      // speech/sound so Fulcrum can use the correct model group, pricing lane\n      // and media-duration defaults.\n      generationTarget = generationTargetForMode(activeMode, text);\n""",
+          )
+          replace_once(
+              'lib/chat/services/send.dart',
+              """      final creditsManager = context.read<CreditsManager>();\n      final hasInternet = await InternetConnection().hasInternetAccess;\n""",
+              """      final creditsManager = context.read<CreditsManager>();\n\n      // The Features sheet can only gate the generic Audio button against the\n      // cheap speech lane before a prompt exists. Once the prompt is known,\n      // enforce the actual resolved lane as well — especially music, which has\n      // its own published cost. The server still remains the final authority.\n      final generationCreditLane =\n          generationCreditLaneForTarget(generationTarget);\n      if (generationCreditLane != null &&\n          !creditsManager.canGenerate(generationCreditLane)) {\n        throw ApiException(\n          localizations.errorReachedLimit,\n          code: generationTarget == 'music'\n              ? 'LIMIT_MUSIC_INSUFFICIENT'\n              : 'LIMIT_MEDIA_INSUFFICIENT',\n        );\n      }\n\n      final hasInternet = await InternetConnection().hasInternetAccess;\n""",
+          )
+
+          replace_once(
+              'lib/chat/services/send/media.dart',
+              "import '../../../../library/backend/data/service.dart';\n",
+              "import '../../../../library/backend/data/service.dart';\nimport '../generation.dart';\n",
+          )
+          replace_once(
+              'lib/chat/services/send/media.dart',
+              """  generateVideo,\n  generateAudio,\n}\n""",
+              """  generateVideo,\n  generateAudio,\n  generateMusic,\n}\n""",
+          )
+          replace_once(
+              'lib/chat/services/send/media.dart',
+              """    const audioTerms = ['audio', 'voice', 'sound', 'music', 'ses', 'muzik'];\n""",
+              """    const audioTerms = [\n      'audio',\n      'voice',\n      'sound',\n      'speech',\n      'ses',\n      'konusma',\n      'anlatim'\n    ];\n""",
+          )
+          replace_once(
+              'lib/chat/services/send/media.dart',
+              """    final mentionsAudio = _containsAny(normalized, audioTerms);\n\n    if (hasImage && !hasVideo && mentionsVideo && (edits || generates)) {\n""",
+              """    final mentionsAudio = _containsAny(normalized, audioTerms);\n    final mentionsMusic = isMusicGenerationPrompt(text);\n\n    if (hasImage && !hasVideo && mentionsVideo && (edits || generates)) {\n""",
+          )
+          replace_once(
+              'lib/chat/services/send/media.dart',
+              """                (mentionsImage || !mentionsVideo && !mentionsAudio)))) {\n""",
+              """                (mentionsImage ||\n                    !mentionsVideo && !mentionsAudio && !mentionsMusic)))) {\n""",
+          )
+          replace_once(
+              'lib/chat/services/send/media.dart',
+              """    if (generates && mentionsVideo) return MediaIntent.generateVideo;\n    if (generates && mentionsAudio) return MediaIntent.generateAudio;\n""",
+              """    if (generates && mentionsVideo) return MediaIntent.generateVideo;\n    if (generates && mentionsMusic) return MediaIntent.generateMusic;\n    if (generates && mentionsAudio) return MediaIntent.generateAudio;\n""",
+          )
+          replace_once(
+              'lib/chat/services/send/media.dart',
+              """      case MediaIntent.generateAudio:\n        routed = findFalMediaModel(\n          langCode: langCode,\n          isUserSubscribed: isUserSubscribed,\n          outputType: 'audio',\n          requiredInputType: hasAudio ? 'audio' : null,\n        );\n        break;\n      case MediaIntent.understand:\n""",
+              """      case MediaIntent.generateAudio:\n        routed = findFalMediaModel(\n          langCode: langCode,\n          isUserSubscribed: isUserSubscribed,\n          outputType: 'audio',\n          requiredInputType: hasAudio ? 'audio' : null,\n        );\n        break;\n      case MediaIntent.generateMusic:\n        // A generic audio model can be a speech/SFX model. Do not pin a\n        // musical request to the first audio-capable FAL model; leave it on\n        // Cortex Dynamic Chat so Fulcrum can select its dedicated music route.\n        routed = null;\n        break;\n      case MediaIntent.understand:\n""",
+          )
+
+          # English copy was the odd one out; Turkish already says audio or music.
+          replace_once(
+              'lib/l10n/app_en.arb',
+              '"featureCreateAudioDescription": "Generate sounds or voice from text."',
+              '"featureCreateAudioDescription": "Generate sounds, voice, or music from text."',
+          )
+          replace_once(
+              'lib/l10n/app_localizations_en.dart',
+              "String get featureCreateAudioDescription => 'Generate sounds or voice from text.';",
+              "String get featureCreateAudioDescription => 'Generate sounds, voice, or music from text.';",
+          )
+
+          tests = r'''import 'package:cortex/chat/providers/input.dart';
+          import 'package:cortex/chat/providers/session.dart';
+          import 'package:cortex/chat/services/generation.dart';
+          import 'package:cortex/l10n/app_localizations.dart';
+          import 'package:flutter/material.dart';
+          import 'package:flutter_test/flutter_test.dart';
+          import 'package:provider/provider.dart';
+
+          class GenerationSession extends ChangeNotifier implements ChatSessionProvider {
+            bool dynamicChat = false;
+            @override
+            bool get isDynamicChat => dynamicChat;
+            @override
+            void startDynamicConversation({bool savePreference = true}) {
+              dynamicChat = true;
+            }
+
+            @override
+            dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+          }
+
+          void main() {
+            test('generationModeForTarget maps generation keys to input modes', () {
+              expect(generationModeForTarget('image'), ChatInputMode.imageGeneration);
+              expect(generationModeForTarget('video'), ChatInputMode.videoGeneration);
+              expect(generationModeForTarget('audio'), ChatInputMode.audioGeneration);
+              expect(generationModeForTarget('unknown'), isNull);
+            });
+
+            test('audio feature routes explicit music prompts to music', () {
+              for (final prompt in [
+                'Create a 30 second lofi beat',
+                'Make cinematic background music',
+                '120 BPM instrumental with piano',
+                '30 saniyelik sakin müzik üret',
+                'Bir rap altyapısı için melodi ve akor oluştur',
+                'Kısa bir şarkı bestele',
+              ]) {
+                expect(
+                  generationTargetForMode(ChatInputMode.audioGeneration, prompt),
+                  'music',
+                  reason: prompt,
+                );
+              }
+            });
+
+            test('audio feature keeps voice and sound effects on audio', () {
+              for (final prompt in [
+                'Say hello with a calm female voice',
+                'Generate a thunder sound effect',
+                'Create a heartbeat sound effect',
+                'Türkçe bir anlatım sesi oluştur',
+                'Kapı kapanma sesi üret',
+              ]) {
+                expect(
+                  generationTargetForMode(ChatInputMode.audioGeneration, prompt),
+                  'audio',
+                  reason: prompt,
+                );
+              }
+            });
+
+            test('generation targets map to the correct credit lanes', () {
+              expect(generationCreditLaneForTarget('image'), 'image');
+              expect(generationCreditLaneForTarget('video'), 'video');
+              expect(generationCreditLaneForTarget('audio'), 'speech');
+              expect(generationCreditLaneForTarget('music'), 'music');
+              expect(generationCreditLaneForTarget(null), isNull);
+            });
+
+            test('non-audio generation targets ignore music-like words', () {
+              expect(
+                generationTargetForMode(
+                  ChatInputMode.imageGeneration,
+                  'album cover for my music',
+                ),
+                'image',
+              );
+              expect(
+                generationTargetForMode(
+                  ChatInputMode.videoGeneration,
+                  'music video clip',
+                ),
+                'video',
+              );
+            });
+
+            for (final type in ['image', 'video', 'audio']) {
+              testWidgets('$type button activates the input feature mode',
+                  (tester) async {
+                final input = InputProvider()..setFeatureMode(ChatInputMode.study);
+                final session = GenerationSession();
+                late BuildContext actionContext;
+                await tester.pumpWidget(MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider<InputProvider>.value(value: input),
+                    ChangeNotifierProvider<ChatSessionProvider>.value(value: session),
+                  ],
+                  child: MaterialApp(
+                    localizationsDelegates: AppLocalizations.localizationsDelegates,
+                    supportedLocales: AppLocalizations.supportedLocales,
+                    locale: const Locale('en'),
+                    home: Builder(builder: (context) {
+                      actionContext = context;
+                      return const SizedBox();
+                    }),
+                  ),
+                ));
+                await tester.pumpAndSettle();
+
+                final expectedMode = generationModeForTarget(type)!;
+
+                setGenerationFeatureMode(actionContext, targetType: type);
+                expect(input.featureMode, expectedMode);
+                expect(input.enableWebSearch, isFalse);
+                expect(session.isDynamicChat, isTrue);
+
+                setGenerationFeatureMode(actionContext, targetType: type);
+                expect(input.featureMode, ChatInputMode.none);
+
+                setGenerationFeatureMode(actionContext, targetType: type);
+                setGenerationFeatureMode(actionContext, targetType: 'image');
+                expect(
+                    input.featureMode,
+                    type == 'image'
+                        ? ChatInputMode.none
+                        : ChatInputMode.imageGeneration);
+
+                await tester.pumpWidget(const SizedBox());
+                input.dispose();
+                session.dispose();
+              });
+            }
+          }
+          '''
+          Path('test/generation_test.dart').write_text(tests)
+          PY
+
+          dart format \
+            lib/chat/services/generation.dart \
+            lib/chat/services/send.dart \
+            lib/chat/services/send/media.dart \
+            test/generation_test.dart
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run generation tests
+        run: flutter test test/generation_test.dart
+
+      - name: Commit tested fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/cortex-music-audio-fix.yml
+          git add \
+            lib/chat/services/generation.dart \
+            lib/chat/services/send.dart \
+            lib/chat/services/send/media.dart \
+            lib/l10n/app_en.arb \
+            lib/l10n/app_localizations_en.dart \
+            test/generation_test.dart
+          git commit -m "fix: separate music from speech and sound generation"
+          git push origin HEAD:fix/music-audio-generation
