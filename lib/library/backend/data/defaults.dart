@@ -575,6 +575,18 @@ class ModelDefaults {
     }
   };
 
+  static const Map<String, dynamic> _llama2Format = {
+    'template': 'llama2',
+    'tokens': {
+      'system_start': '<<SYS>>',
+      'system_end': '<</SYS>>',
+      'user_start': '[INST]',
+      'user_end': '[/INST]',
+      'assistant_end': '</s>',
+      'stop_generation': ['</s>', '[INST]', '[/INST]'],
+    }
+  };
+
   static const Map<String, dynamic> _phi3Format = {
     'template': 'phi3',
     'tokens': {
@@ -588,23 +600,41 @@ class ModelDefaults {
     }
   };
 
-  /// Returns a smart fallback format based on the model ID.
-  /// If the ID matches a known family (Llama 3, Gemma, etc.), returns that specific format.
-  /// Otherwise, returns ChatML as the safest general default.
+  /// Returns a smart fallback format based on the model ID, mirroring the
+  /// canonical chat-template metadata that Synapse publishes in the catalog
+  /// (`chatFormat.template`). This is only a LAST RESORT for models stored
+  /// before the catalog carried `chatFormat` (or unknown models) — whenever
+  /// the catalog provides a format, that metadata wins.
   static Map<String, dynamic> getFallbackFormat(String modelId) {
     final id = modelId.toLowerCase();
 
     if (id.contains('llama-3') || id.contains('llama3')) {
       return _llama3Format;
     }
-    if (id.contains('gemma') || id.contains('next')) {
+    if (id.contains('llama-2') || id.contains('llama2')) {
+      return _llama2Format;
+    }
+    if (id.contains('gemma')) {
       return _gemmaFormat;
     }
-    if (id.contains('phi-3') || id.contains('phi3')) {
+    if (id.contains('phi-3') || id.contains('phi3') ||
+        id.contains('phi-4') || id.contains('phi4') ||
+        id.contains('glm')) {
       return _phi3Format;
     }
+    // Hermes, Qwen, Next and friends are ChatML-trained; check BEFORE the
+    // generic Mistral rule so "Hermes-2-Pro-Mistral" is not mis-detected.
+    if (id.contains('hermes') || id.contains('qwen') || id.contains('next')) {
+      return _chatmlFormat;
+    }
+    if (id.contains('mistral') || id.contains('ministral') ||
+        id.contains('magistral') || id.contains('codestral') ||
+        id.contains('pixtral') || id.contains('devstral')) {
+      return _llama2Format;
+    }
 
-    // Default to ChatML for Qwen, Mistral, and others as they often support it or are fine-tuned on it.
+    // Default to ChatML: the safest general template (Qwen, Next, LFM, DeepSeek
+    // fine-tunes and most modern small models are trained on it or tolerate it).
     return _chatmlFormat;
   }
 

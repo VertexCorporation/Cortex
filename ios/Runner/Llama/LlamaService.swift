@@ -42,9 +42,23 @@ class LlamaService: NSObject, FlutterPlugin {
                         result(nil)
                     }
                 } catch {
+                    // Surface a stable, machine-readable code so the Dart layer can
+                    // decide whether the GGUF should ever be deleted:
+                    //   FILE_NOT_FOUND -> record is stale, uninstall is justified.
+                    //   LOAD_FAILED    -> engine rejected a (possibly perfectly valid)
+                    //                     file — must NOT trigger destructive cleanup.
+                    let code: String
+                    let message: String
+                    if let llamaError = error as? LlamaError {
+                        code = llamaError.platformChannelCode
+                        message = llamaError.errorDescription ?? "Failed to load model"
+                    } else {
+                        code = "LOAD_FAILED"
+                        message = error.localizedDescription
+                    }
                     DispatchQueue.main.async {
-                        self.resultChannel?.invokeMethod("onModelLoadFailed", arguments: error.localizedDescription)
-                        result(FlutterError(code: "LOAD_FAILED", message: "Failed to load model", details: nil))
+                        self.resultChannel?.invokeMethod("onModelLoadFailed", arguments: ["code": code, "message": message])
+                        result(FlutterError(code: code, message: message, details: nil))
                     }
                 }
             }

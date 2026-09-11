@@ -32,7 +32,36 @@ func llama_batch_add(_ batch: inout llama_batch, _ id: llama_token, _ pos: llama
 enum LlamaError: Error {
     case couldNotInitializeContext
     case modelNotFound(String)
+    case modelLoadFailed(String)
     case decodeFailed
+}
+
+extension LlamaError: LocalizedError {
+    /// Human-readable descriptions so failures are diagnosable in logs
+    /// instead of the opaque "Runner.LlamaError error 0" bridging artifact.
+    var errorDescription: String? {
+        switch self {
+        case .couldNotInitializeContext:
+            return "llama_init_from_model returned NULL (context creation failed)"
+        case .modelNotFound(let path):
+            return "Model file not found at \(path)"
+        case .modelLoadFailed(let path):
+            return "llama_model_load_from_file returned NULL (unsupported or corrupted model): \(path)"
+        case .decodeFailed:
+            return "llama_decode failed"
+        }
+    }
+
+    /// Stable code surfaced to Dart over the platform channel so the Dart
+    /// pipeline can distinguish "file missing" from "engine rejected file".
+    var platformChannelCode: String {
+        switch self {
+        case .modelNotFound:
+            return "FILE_NOT_FOUND"
+        default:
+            return "LOAD_FAILED"
+        }
+    }
 }
 
 struct SamplerParams {
@@ -134,8 +163,16 @@ actor LlamaContext {
         print("[LlamaContext] Device detected: GPU (Metal) enabled with \(nGpu) layers.")
         #endif
 
-        guard let model = llama_model_load_from_file(path, model_params) else {
+        // Distinguish a genuinely missing file from an engine-level load
+        // failure (e.g. "unknown model architecture: 'qwen3'" on a llama.cpp
+        // build that predates the model) so Dart can decide whether deleting
+        // the file is ever justified.
+        guard FileManager.default.fileExists(atPath: path) else {
             throw LlamaError.modelNotFound(path)
+        }
+
+        guard let model = llama_model_load_from_file(path, model_params) else {
+            throw LlamaError.modelLoadFailed(path)
         }
 
         // Use provided thread count or auto-detect
@@ -201,8 +238,8 @@ actor LlamaContext {
         
         // CRITICAL FIX: Clear native KV cache to match Android behavior
         // Without this, old context bleeds into new generations causing gibberish
-        // New llama.cpp API: llama_kv_self_clear(ctx)
-        llama_kv_self_clear(context)
+        // New llama.cpp API: llama_memory_clear(mem, data)
+        llama_memory_clear(llama_get_memory(context), true)
         
         print("[LlamaContext] Context and KV cache cleared.")
     }
@@ -215,7 +252,8 @@ actor LlamaContext {
              // TODO: implement llava_eval_image_embed if bindings available
         }
 
-        print("[LlamaContext] Processing prompt: \(text.prefix(100))...")
+        // Metadata only — message contents must never reach the console.
+        print("[LlamaContext] completion_init: prompt=\(text.count) chars, image=\(imageData?.count ?? 0) bytes")
 
         // Reset state
         is_interrupted = false
@@ -225,8 +263,9 @@ actor LlamaContext {
         n_decode = 0
         
         // CRITICAL: Clear KV cache before new generation (matching Android behavior)
-        // New llama.cpp API: llama_kv_self_clear(ctx)
-        llama_kv_self_clear(context)
+        // New llama.cpp API: llama_memory_clear(mem, data)
+        llama_memory_clear(llama_get_memory(context), true)
+        print("[LlamaContext] KV cache cleared before generation (conversation isolation).")
 
         // Tokenize with special token parsing enabled (CRITICAL for chat formats!)
         // This ensures tokens like <|im_start|>, <|im_end|>, <|eot_id|> are parsed correctly
