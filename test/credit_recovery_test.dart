@@ -398,23 +398,33 @@ Future<void> main() async {
 
   group('CreditLimits.operationCosts — server-published pricing', () {
     test('parses the operationCosts map from a creditLimits document', () {
+      // The fixture mirrors the live server table (DEFAULT_CREDIT_CHARGES in
+      // Fulcrum's subscription.js) so a server price change that forgets the
+      // published contract shows up here as a stale mirror.
       final limits = CreditLimits.fromData({
         'dailyGrant': 100,
         'debtFloor': -100,
         'operationCosts': {
-          'image': 100,
-          'video': 1000,
+          'easy': 1,
+          'medium': 5,
+          'hard': 10,
+          'image': 25,
+          'speech': 25,
+          'document': 25,
+          'video': 500,
           'music': 500,
-          'speech': 100,
-          'easy': 10,
         },
       });
       expect(limits.dailyGrant, 100);
       expect(limits.debtFloor, -100);
-      expect(limits.operationCosts['image'], 100);
-      expect(limits.operationCosts['video'], 1000);
-      expect(limits.operationCosts['speech'], 100);
-      expect(limits.operationCosts['easy'], 10);
+      expect(limits.operationCosts['easy'], 1);
+      expect(limits.operationCosts['medium'], 5);
+      expect(limits.operationCosts['hard'], 10);
+      expect(limits.operationCosts['image'], 25);
+      expect(limits.operationCosts['speech'], 25);
+      expect(limits.operationCosts['document'], 25);
+      expect(limits.operationCosts['video'], 500);
+      expect(limits.operationCosts['music'], 500);
     });
 
     test('missing or malformed operationCosts resolve to an empty map', () {
@@ -424,6 +434,15 @@ Future<void> main() async {
         isEmpty,
       );
       expect(CreditLimits.fromData(null).operationCosts, isEmpty);
+      // An explicit null publication is as good as an absent one.
+      expect(
+        CreditLimits.fromData({
+          'dailyGrant': 100,
+          'debtFloor': -100,
+          'operationCosts': null,
+        }).operationCosts,
+        isEmpty,
+      );
       expect(CreditLimits.fallback.operationCosts, isEmpty);
       // Non-integer costs are dropped rather than crashing the parse.
       expect(
@@ -434,6 +453,26 @@ Future<void> main() async {
         }).operationCosts,
         isEmpty,
       );
+    });
+
+    test('null and fractional entries cannot resurface the Map<String,int> '
+        'subtype crash', () {
+      // Regression pin for the historic
+      // "type 'Null' is not a subtype of type 'Map<String, int>'" crash:
+      // every entry passes the `is Map` / `is int` narrowing before it may
+      // enter the typed slot, so a hostile snapshot degrades to a partial
+      // map instead of throwing.
+      final limits = CreditLimits.fromData({
+        'dailyGrant': 100,
+        'debtFloor': -100,
+        'operationCosts': {
+          'image': null, // null value inside the map → dropped
+          'video': 500.7, // fractional num → truncated to int
+          'music': true, // non-numeric → dropped
+          'speech': 25,
+        },
+      });
+      expect(limits.operationCosts, {'video': 500, 'speech': 25});
     });
   });
 
@@ -463,18 +502,50 @@ Future<void> main() async {
       expect(manager.canGenerate('video'), isTrue);
     });
 
-    test('affordability keeps the balance at or above the debt floor', () {
+    test('face-value affordability: the balance must cover the cost', () {
       manager.spendableNotifier.value = 150;
-      // 150 - 100 = 50, well above the -100 floor.
+      // 150 >= 100: comfortably affordable.
       expect(manager.canGenerate('image'), isTrue);
-      // 150 - 1000 = -850, below the floor: the server would refuse or
-      // overdraw, so the sheet/greeting routes to Funds instead.
+      // 150 < 1000: the server would accept the charge (the balance stays
+      // above the -100 floor), but the UI must not arm a request the user
+      // cannot pay for at face value — the action is presented as
+      // disabled / routes to Funds instead.
       expect(manager.canGenerate('video'), isFalse);
+    });
+
+    test('a balance below the published cost is refused even above the floor',
+        () {
+      // The user's scenario: 20 credits against a lane that costs more
+      // (e.g. 25). The old debt-floor arithmetic (20 - 25 = -5 >= -50)
+      // armed the request and let the balance dip negative; the new
+      // contract requires the full face value up front.
+      manager.spendableNotifier.value = 20;
+      expect(manager.canGenerate('image'), isFalse);
+      // Exactly enough is affordable (inclusive boundary).
+      manager.spendableNotifier.value = 100;
+      expect(manager.canGenerate('image'), isTrue);
+    });
+
+    test('negative balances never arm a media lane (full band required)', () {
+      // Above the floor, so the old blocked-only check passed and the
+      // charge arithmetic could still succeed — but evaluateCreditPolicy
+      // refuses media for ANY negative balance (media_blocked), so the
+      // client must present the lane as unavailable.
+      manager.spendableNotifier.value = -10;
+      expect(manager.canGenerate('image'), isFalse);
+      expect(manager.canGenerate('video'), isFalse);
+      expect(manager.canGenerate('speech'), isFalse);
     });
 
     test('blocked band refuses regardless of the balance', () {
       manager.spendableNotifier.value = 5000;
       manager.accessNotifier.value = CreditAccess.blocked;
+      expect(manager.canGenerate('image'), isFalse);
+    });
+
+    test('low_only band refuses media even with a comfortable balance', () {
+      manager.spendableNotifier.value = 5000;
+      manager.accessNotifier.value = CreditAccess.lowOnly;
       expect(manager.canGenerate('image'), isFalse);
     });
 
@@ -555,6 +626,35 @@ Future<void> main() async {
       expect(provider.messages.last.isError, isTrue);
       expect(provider.messages.last.includeInContext, isFalse);
       expect(provider.messages.last.text, 'generic failure');
+    });
+  });
+
+  group('CreditsManager.canSendText - the debt floor closes text input '
+      '(mirrors evaluateCreditPolicy State B/C)', () {
+    final manager = CreditsManager.instance;
+
+    tearDown(() {
+      manager.spendableNotifier.value = null;
+      manager.debugSetCreditLimits(CreditLimits.fallback);
+    });
+
+    test('text input stays open anywhere above the floor, even deep in debt', () {
+      manager.debugSetCreditLimits(
+          const CreditLimits(dailyGrant: 50, debtFloor: -50));
+      manager.spendableNotifier.value = -49;
+      expect(manager.canSendText, isTrue);
+      manager.spendableNotifier.value = -1;
+      expect(manager.canSendText, isTrue);
+    });
+
+    test('exactly at the floor text input becomes unavailable', () {
+      manager.debugSetCreditLimits(
+          const CreditLimits(dailyGrant: 50, debtFloor: -50));
+      manager.spendableNotifier.value = -50;
+      expect(manager.canSendText, isFalse);
+      // One credit above the floor reopens it:
+      manager.spendableNotifier.value = -49;
+      expect(manager.canSendText, isTrue);
     });
   });
 }
