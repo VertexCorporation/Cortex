@@ -53,7 +53,7 @@
   "benefit7": "使用制限の拡大",
   "benefit8": "モデルを追加",
   "benefit9": "新しいテーマ",
-  "benefitPremiumModels": "Specific AI Selection",
+  "benefitPremiumModels": "厳選AIセレクション",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -440,6 +440,7 @@
   "modelCreatedSuccess": "モデルが正常に作成されました！",
   "modelDescription": "{description}",
   "modelProducer": "プロデューサー: {producer}",
+  "modelLabel": "モデル",
   "modelRemovedSuccess": "「{modelName}」は正常に削除されました。",
   "modelUploadDescription": "デバイスから直接ローカルのGGUFファイルを選択してアップロードします。これにより、インターネット接続なしでモデルをオフラインで実行できます。ファイルが有効なGGUF形式であり、適切に構造化されていることを確認してください。ファイルが正しくないか破損している場合、Cortexは期待どおりに機能しない可能性があり、エラーが発生する可能性があります。",
   "modelUploadShortDescription": "ここをタップしてデバイスから.ggufファイルを選択",

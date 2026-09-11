@@ -343,6 +343,8 @@ class ChatStorageService {
           'model': m.model,
           'includeInContext': m.includeInContext ? 1 : 0,
           'ts': DateTime.now().millisecondsSinceEpoch,
+          'toolSteps': m.toolSteps.isNotEmpty ? jsonEncode(m.toolSteps) : null,
+          'isIncomplete': m.isIncomplete ? 1 : 0,
         },
         where: 'conversationId = ? AND idx = ?',
         whereArgs: [convId, idx],
@@ -388,6 +390,8 @@ class ChatStorageService {
           'model': m.model,
           'includeInContext': m.includeInContext ? 1 : 0,
           'ts': DateTime.now().millisecondsSinceEpoch,
+          'toolSteps': m.toolSteps.isNotEmpty ? jsonEncode(m.toolSteps) : null,
+          'isIncomplete': m.isIncomplete ? 1 : 0,
         });
       }
       await batch.commit(noResult: true);
@@ -491,6 +495,8 @@ class ChatStorageService {
         'model': m.model,
         'includeInContext': m.includeInContext ? 1 : 0,
         'ts': DateTime.now().millisecondsSinceEpoch,
+        'toolSteps': m.toolSteps.isNotEmpty ? jsonEncode(m.toolSteps) : null,
+        'isIncomplete': m.isIncomplete ? 1 : 0,
       };
 
       await db.insert(
@@ -761,8 +767,13 @@ class ChatStorageService {
       debugPrint(
           "[ChatStorage] Web platform ignored unsupported database write for: '$operationName'.");
     } else {
-      debugPrint("[ChatStorage] Unexpected error in '$operationName': $e");
-      throw e;
+      // Best-effort persistence: these writes are fire-and-forget from the
+      // conversation provider (upsertMessage is intentionally unawaited), so
+      // rethrowing here would surface as an UNHANDLED async exception for
+      // any transient DB error (locked DB, missing path, plugin missing in
+      // tests) even though nothing upstream can recover from it.
+      debugPrint(
+          "[ChatStorage] Unexpected error in '$operationName': $e — write skipped (best-effort persistence).");
     }
   }
 

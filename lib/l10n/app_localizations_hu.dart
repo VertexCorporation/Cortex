@@ -143,6 +143,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Modell';
+
+  @override
   String get editConversationTitle => 'Átnevezés';
 
   @override
@@ -889,6 +892,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Hálózati hiba történt. Kérjük, ellenőrizze a kapcsolatot, és próbálja újra.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'A kiválasztott alapmodell határozza meg a karakter jellemzőit, érvelési és válaszadási képességeit.';
 
@@ -1108,7 +1118,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez a mesterséges intelligencia egy prémium AI, az ingyenes felhasználók korlátozott hozzáféréssel rendelkeznek a prémium AI-khoz; frissítse a korlátlan hozzáférés feloldásához!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Exkluzív MI-választék';
 
   @override
   String get premiumTrialExhaustedMessage =>

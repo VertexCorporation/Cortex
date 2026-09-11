@@ -143,6 +143,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => '模型';
+
+  @override
   String get editConversationTitle => '重命名';
 
   @override
@@ -859,6 +862,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorNetwork => '发生网络错误。请检查您的连接并重试。';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription => '所选的基础模型将决定角色的推理和响应能力。';
 
   @override
@@ -1052,7 +1062,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '这是一个高级AI，免费用户对高级AI的访问受限；升级以解锁无限访问！';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => '专属 AI 精选';
 
   @override
   String get premiumTrialExhaustedMessage => '您已使用高级模型的所有免费每日消息，请升级以获得无限制访问权限。';

@@ -57,6 +57,26 @@ class ApiService {
     _cancelToken?.cancel("Request was cancelled by the user.");
   }
 
+  /// Explicit completion contract — the terminal classification for a
+  /// generation stream.
+  ///
+  ///  * `serverReportedTruncation` — the gateway's terminal `done` event
+  ///    carried `truncated: true` (provider `finish_reason` "length" /
+  ///    "content_filter", or a text stream that ended without a finish
+  ///    chunk).
+  ///  * `sawDoneEvent` — whether the terminal `done` event arrived at all.
+  ///    The gateway sends it for every non-terminated request; an EOF
+  ///    without it means the transport died mid-generation (connection drop,
+  ///    gateway process timeout). An interrupted transport is classified as
+  ///    an incomplete response — never as a complete one, and never as a
+  ///    model token limit — so the UI offers to continue from the partial
+  ///    text instead of presenting it as finished.
+  static bool streamInterrupted({
+    required bool serverReportedTruncation,
+    required bool sawDoneEvent,
+  }) =>
+      serverReportedTruncation || !sawDoneEvent;
+
   /// Internal request handler.
   Future<String> _getResponse({
     required List<Map<String, dynamic>> messages,
@@ -123,6 +143,12 @@ class ApiService {
       // the server reports the generation was cut short. Propagated through
       // [onStreamDone] at stream end — never inferred from HTTP EOF.
       bool streamTruncated = false;
+      // Whether the gateway's terminal `done` event arrived at all. The
+      // gateway ALWAYS sends one for a non-terminated request (text and
+      // media lanes alike); an EOF without it means the transport died
+      // (connection drop, gateway process timeout) — an INTERRUPTED
+      // generation, which must not masquerade as a complete response.
+      bool sawDoneEvent = false;
 
       void trackCallback(FutureOr<void>? callbackResult) {
         if (callbackResult is Future) {
@@ -676,6 +702,7 @@ class ApiService {
                     // contract). The server states whether the generation
                     // actually finished; the client no longer has to guess
                     // from HTTP EOF.
+                    sawDoneEvent = true;
                     if (data is Map && data['truncated'] == true) {
                       streamTruncated = true;
                     }
@@ -729,8 +756,13 @@ class ApiService {
                 }
                 // Propagate the server's explicit completion status so the
                 // orchestrator can mark the response instead of treating a
-                // bare EOF as "complete".
-                onStreamDone?.call(streamTruncated);
+                // bare EOF as "complete". An EOF without the terminal done
+                // event is an interrupted transport, not a completion —
+                // [ApiService.streamInterrupted] owns that classification.
+                onStreamDone?.call(ApiService.streamInterrupted(
+                  serverReportedTruncation: streamTruncated,
+                  sawDoneEvent: sawDoneEvent,
+                ));
                 completer.complete(finalContent.toString());
               }();
             }

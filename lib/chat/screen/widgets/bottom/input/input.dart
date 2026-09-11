@@ -233,11 +233,24 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   void dispose() {
     _expandController.dispose();
     _speechService?.removeListener(_onSpeechStatusChange);
+    _featureProvider?.removeListener(_onFeatureModeChanged);
     widget.textFieldFocusNode.removeListener(_onFocusChange);
     super.dispose();
   }
 
   SpeechService? _speechService;
+
+  // The composer capsule reacts to the SELECTED FEATURE state too: a feature
+  // (image/video/audio/offline/reasoning) keeps the composer visually ACTIVE
+  // even with an empty field and no focus. Feature mode can change WITHOUT a
+  // route transition (model-change rewrites in ChatView, the offline chip in
+  // the + button, post-send clears), so the composer must re-evaluate on the
+  // provider's notification itself — never only when a sheet/route rebuild
+  // happens to pass by. Without this listener the capsule's expanded state
+  // went stale (stuck expanded after a clear, stuck collapsed after a
+  // selection made outside the sheet).
+  InputProvider? _featureProvider;
+  ChatInputMode? _lastFeatureMode;
 
   @override
   void didChangeDependencies() {
@@ -248,6 +261,21 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       _speechService = newService;
       _speechService?.addListener(_onSpeechStatusChange);
     }
+    final newProvider = context.read<InputProvider>();
+    if (_featureProvider != newProvider) {
+      _featureProvider?.removeListener(_onFeatureModeChanged);
+      _featureProvider = newProvider;
+      _lastFeatureMode = newProvider.featureMode;
+      _featureProvider?.addListener(_onFeatureModeChanged);
+    }
+  }
+
+  void _onFeatureModeChanged() {
+    final provider = _featureProvider;
+    if (provider == null) return;
+    if (provider.featureMode == _lastFeatureMode) return;
+    _lastFeatureMode = provider.featureMode;
+    _rebuildComposerState();
   }
 
   void _onSpeechStatusChange() {
@@ -262,7 +290,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     }
   }
 
-  void _onFocusChange() {
+  /// Scheduler-safe re-evaluation of the composer state (focus changes,
+  /// feature-mode changes): setState during layout/paint is deferred to the
+  /// next frame instead of asserting.
+  void _rebuildComposerState() {
     if (!mounted) return;
     if (SchedulerBinding.instance.schedulerPhase ==
         SchedulerPhase.persistentCallbacks) {
@@ -272,6 +303,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     } else {
       setState(() {});
     }
+  }
+
+  void _onFocusChange() {
+    _rebuildComposerState();
   }
 
   void _syncExpandAnimation(bool shouldExpand) {

@@ -143,6 +143,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Modell';
+
+  @override
   String get editConversationTitle => 'Umbenennen';
 
   @override
@@ -895,6 +898,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ein Netzwerkfehler ist aufgetreten. Bitte überprüfe deine Verbindung und versuche es erneut.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Das ausgewählte Basismodell bestimmt die Denk- und Antwortfähigkeiten des Charakters.';
 
@@ -1115,7 +1125,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese KI ist eine Premium-KI, kostenlose Nutzer haben nur eingeschränkten Zugriff auf Premium-KIs; upgraden Sie für unbegrenzten Zugriff!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Exklusive KI-Auswahl';
 
   @override
   String get premiumTrialExhaustedMessage =>

@@ -143,6 +143,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'モデル';
+
+  @override
   String get editConversationTitle => '名前を変更';
 
   @override
@@ -871,6 +874,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get errorNetwork => 'ネットワークエラーが発生しました。接続を確認してもう一度お試しください。';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       '選択されたベースモデルが、キャラクターの推論および応答能力を決定します。';
 
@@ -1076,7 +1086,7 @@ class AppLocalizationsJa extends AppLocalizations {
       'このAIはプレミアムAIです。無料ユーザーはプレミアムAIへのアクセスが制限されています。アップグレードして無制限アクセスを解除しましょう！';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => '厳選AIセレクション';
 
   @override
   String get premiumTrialExhaustedMessage =>

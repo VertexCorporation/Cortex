@@ -143,6 +143,9 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Model';
+
+  @override
   String get editConversationTitle => 'Ganti Nama';
 
   @override
@@ -889,6 +892,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Terjadi kesalahan jaringan. Harap periksa koneksi Anda dan coba lagi.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Model dasar yang dipilih akan menentukan kemampuan penalaran dan respons karakter.';
 
@@ -1109,7 +1119,7 @@ class AppLocalizationsId extends AppLocalizations {
       'AI ini adalah AI premium, pengguna gratis memiliki akses terbatas ke AI premium; tingkatkan untuk membuka akses tak terbatas!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Pilihan AI Eksklusif';
 
   @override
   String get premiumTrialExhaustedMessage =>

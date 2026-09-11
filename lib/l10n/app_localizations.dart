@@ -386,6 +386,12 @@ abstract class AppLocalizations {
   /// **'{description}'**
   String modelDescription(Object description);
 
+  /// Generic fallback label shown in the model selector button when no specific model is chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get modelLabel;
+
   /// No description provided for @editConversationTitle.
   ///
   /// In en, this message translates to:
@@ -1777,6 +1783,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A network error occurred. Please check your connection and try again.'**
   String get errorNetwork;
+
+  /// No description provided for @responseTruncatedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This response was cut short by the model and may be incomplete.'**
+  String get responseTruncatedNotice;
+
+  /// No description provided for @continueGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue generating'**
+  String get continueGenerating;
 
   /// No description provided for @baseModelForCharacterDescription.
   ///

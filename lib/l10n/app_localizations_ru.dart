@@ -143,6 +143,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Модель';
+
+  @override
   String get editConversationTitle => 'Переименовать';
 
   @override
@@ -891,6 +894,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Произошла сетевая ошибка. Пожалуйста, проверьте подключение и повторите попытку.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Выбранная базовая модель будет определять особенности мышления и способности персонажа реагировать.';
 
@@ -1112,7 +1122,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Этот ИИ является ИИ премиум-класса, бесплатные пользователи имеют ограниченный доступ к ИИ премиум-класса; обновите, чтобы разблокировать неограниченный доступ!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Эксклюзивный выбор ИИ';
 
   @override
   String get premiumTrialExhaustedMessage =>

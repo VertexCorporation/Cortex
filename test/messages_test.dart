@@ -75,5 +75,103 @@ void main() {
       final msgFilled = Message.user(text: 'Filled', attachmentPaths: ['/a']);
       expect(msgFilled.hasAttachments, true);
     });
+
+    test('Serialization: toolSteps round-trip through toMap/fromMap', () {
+      final msg = Message(
+        id: 'rt-1',
+        text: 'Checked the weather.',
+        isUserMessage: false,
+        toolSteps: const ['get_weather', 'render_chart'],
+      );
+
+      final map = msg.toMap();
+      // The storage layer persists toolSteps as a JSON string array.
+      expect(map['toolSteps'], isNotNull);
+
+      final restored = Message.fromMap({
+        ...map,
+        'isUser': 0,
+      });
+      expect(restored.toolSteps, ['get_weather', 'render_chart']);
+    });
+
+    test('Serialization: isIncomplete round-trip through toMap/fromMap', () {
+      final truncated = Message(
+        id: 'rt-2',
+        text: 'Cut short mid-sentence...',
+        isUserMessage: false,
+        isIncomplete: true,
+      );
+      final restored = Message.fromMap({...truncated.toMap(), 'isUser': 0});
+      expect(restored.isIncomplete, true);
+
+      final complete = Message(
+        id: 'rt-3',
+        text: 'Full answer.',
+        isUserMessage: false,
+      );
+      final restoredComplete =
+          Message.fromMap({...complete.toMap(), 'isUser': 0});
+      expect(restoredComplete.isIncomplete, false);
+    });
+
+    test('Serialization: legacy rows without toolSteps/isIncomplete columns',
+        () {
+      final msg = Message.fromMap({
+        'uuid': 'legacy-1',
+        'text': 'Old row',
+        'isUser': 0,
+      });
+      expect(msg.toolSteps, isEmpty);
+      expect(msg.isIncomplete, false);
+    });
+
+    test('Serialization: corrupt toolSteps JSON does not crash the chat', () {
+      final msg = Message.fromMap({
+        'uuid': 'corrupt-1',
+        'text': 'Row with bad JSON',
+        'isUser': 0,
+        'toolSteps': '{"broken":',
+      });
+      expect(msg.toolSteps, isEmpty);
+    });
+
+    test('copyWith preserves toolSteps and isIncomplete (finalize path)', () {
+      // finishBotResponse finalizes with copyWith(toolActivity: '') — the
+      // durable tool trace and the truncation marker must survive it.
+      final msg = Message(
+        text: 'Partial',
+        isUserMessage: false,
+        isThinking: true,
+        toolActivity: 'get_weather',
+        toolSteps: const ['get_weather'],
+        isIncomplete: true,
+      );
+
+      final finalized = msg.copyWith(
+        isThinking: false,
+        includeInContext: true,
+        toolActivity: '',
+      );
+      expect(finalized.toolSteps, ['get_weather']);
+      expect(finalized.isIncomplete, true);
+      expect(finalized.toolActivity, isEmpty);
+    });
+
+    test('copyWithText preserves toolSteps and isIncomplete (stream path)', () {
+      // appendToLastBotMessage rebuilds the message with copyWithText on
+      // every chunk — steps and marker must ride along.
+      final msg = Message(
+        text: 'Partial',
+        isUserMessage: false,
+        toolSteps: const ['calculate'],
+        isIncomplete: true,
+      );
+
+      final streamed = msg.copyWithText('Partial text grows');
+      expect(streamed.toolSteps, ['calculate']);
+      expect(streamed.isIncomplete, true);
+      expect(streamed.text, 'Partial text grows');
+    });
   });
 }

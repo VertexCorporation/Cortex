@@ -11,7 +11,7 @@ class DbHelper {
   DbHelper._internal();
 
   Database? _db;
-  static const int _latestVersion = 11; // Define the latest version here
+  static const int _latestVersion = 12; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -56,7 +56,9 @@ class DbHelper {
         model             TEXT,
         includeInContext  INTEGER,
         ts                INTEGER,
-        webSearchSources  TEXT
+        webSearchSources  TEXT,
+        toolSteps         TEXT,
+        isIncomplete      INTEGER DEFAULT 0
       );
     ''');
     await d.execute('''
@@ -198,6 +200,16 @@ class DbHelper {
             CREATE INDEX IF NOT EXISTS idx_rag_chunks_doc
             ON rag_chunks(documentId);
           ''');
+          break;
+        case 12:
+          // Explicit completion contract + durable tool-step trace:
+          // - toolSteps: JSON string array of executed tool names so the
+          //   tile can render the tool trace after a chat is reopened.
+          // - isIncomplete: the server-reported truncation marker so a
+          //   cut-short response is never mistaken for a complete one.
+          batch.execute('ALTER TABLE messages ADD COLUMN toolSteps TEXT;');
+          batch.execute(
+              'ALTER TABLE messages ADD COLUMN isIncomplete INTEGER DEFAULT 0;');
           break;
       }
     }

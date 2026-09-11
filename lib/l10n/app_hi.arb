@@ -53,7 +53,7 @@
   "benefit7": "अधिक उपयोग सीमाएँ",
   "benefit8": "मॉडल जोड़ें",
   "benefit9": "नई थीम",
-  "benefitPremiumModels": "Specific AI Selection",
+  "benefitPremiumModels": "विशेष एआई चयन",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -440,6 +440,7 @@
   "modelCreatedSuccess": "मॉडल सफलतापूर्वक बनाया गया!",
   "modelDescription": "{description}",
   "modelProducer": "निर्माता: {producer}",
+  "modelLabel": "मॉडल",
   "modelRemovedSuccess": "“{modelName}” सफलतापूर्वक हटा दिया गया था।",
   "modelUploadDescription": "अपने डिवाइस से सीधे अपनी स्थानीय GGUF फ़ाइलों का चयन और अपलोड करें। यह आपको इंटरनेट कनेक्शन की आवश्यकता के बिना अपने मॉडल को ऑफ़लाइन चलाने देता है। सुनिश्चित करें कि फ़ाइल मान्य GGUF प्रारूप में है और ठीक से संरचित है। यदि फ़ाइल गलत या दूषित है, तो Cortex अपेक्षा के अनुरूप काम नहीं कर सकता है, और आपको त्रुटियों का सामना करना पड़ सकता है।",
   "modelUploadShortDescription": "अपने डिवाइस से .gguf फ़ाइल चुनने के लिए यहां टैप करें",

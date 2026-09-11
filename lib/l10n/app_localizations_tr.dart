@@ -143,6 +143,9 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Model';
+
+  @override
   String get editConversationTitle => 'Yeniden Adlandır';
 
   @override
@@ -886,6 +889,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bir ağ hatası oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.';
 
   @override
+  String get responseTruncatedNotice =>
+      'Bu yanıt model tarafından kısa kesildi ve eksik olabilir.';
+
+  @override
+  String get continueGenerating => 'Üretmeye devam et';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Seçilen temel model, karakterin akıl yürütme ve yanıt verme yeteneklerini belirleyecektir.';
 
@@ -1105,7 +1115,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu zekâ, üst düzey bir zekâdır; ücretsiz kullanıcıların üst düzey zekâlara erişimi sınırlıdır; sınırsız erişim için yükseltin!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Özel Yapay Zekâ Seçkisi';
 
   @override
   String get premiumTrialExhaustedMessage =>

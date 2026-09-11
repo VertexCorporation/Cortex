@@ -1,3 +1,4 @@
+import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/design.dart';
 // lib/chat/widgets/options/change.dart
 
@@ -56,10 +57,17 @@ Future<void> showModelSelectionDialog({
 
   final creditsManager = context.read<CreditsManager>();
 
-  // The unified credit engine hands model choice to the `full` access band.
-  // Below that the gateway answers with Dynamic Chat whatever is picked here,
-  // so a dialog would only offer a choice that gets overridden on send.
-  if (!creditsManager.canChooseModel) return;
+  // The unified credit engine hands SERVER-SIDE model choice to the `full`
+  // access band. Below that the gateway answers with Dynamic Chat whatever is
+  // picked here, so a dialog would only offer a choice that gets overridden
+  // on send. OFFLINE chats are exempt — a local model keeps executing
+  // on-device at any balance, so its variant dialog stays available.
+  final bool currentModelIsOffline = !Utils.isServerSideModel(
+    currentModelId,
+    langCode: langCode,
+    modelService: modelService,
+  );
+  if (!creditsManager.canChooseModel && !currentModelIsOffline) return;
 
   // Premium access is a balance question under the unified engine: any model
   // may be picked while manual model selection is allowed.

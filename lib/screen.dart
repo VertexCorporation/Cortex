@@ -817,14 +817,25 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
 
     return Builder(builder: (context) {
-      if (isCurrentRoute) {
-        return _buildMainContent(context, screenWidth, screenHeight,
-            standardAxonWidth, isRtl, directionMultiplier, gradientColors);
-      }
-
-      final baseMediaQuery = MediaQuery.of(context);
+      // The subtree root must keep the same widget type whether or not a
+      // route/dialog is pushed on top of MainScreen. Swapping between a bare
+      // subtree and a MediaQuery-wrapped one (as this used to do) tears the
+      // entire main content down and rebuilds it on every route push/pop:
+      // the Axon list lost its state (blank while renaming), the chat
+      // composer lost its FocusNode/controller/expansion (controls vanished
+      // around feature toggles) and GlobalKeyed subtrees were reparented
+      // through the fresh tree (tripping semantics/render reparenting
+      // assertions). Keeping a permanent MediaQuery wrapper and varying only
+      // its data preserves the original isolation: while another route owns
+      // the keyboard, viewInsets are zeroed so the background tabs do not
+      // relayout. Because the zeroed data is otherwise identical to the
+      // previous frame's, dependents are not even notified while the top
+      // route's keyboard animates.
+      final MediaQueryData mediaQueryData = isCurrentRoute
+          ? MediaQuery.of(context)
+          : MediaQuery.of(context).copyWith(viewInsets: EdgeInsets.zero);
       return MediaQuery(
-        data: baseMediaQuery.copyWith(viewInsets: EdgeInsets.zero),
+        data: mediaQueryData,
         child: _buildMainContent(context, screenWidth, screenHeight,
             standardAxonWidth, isRtl, directionMultiplier, gradientColors),
       );

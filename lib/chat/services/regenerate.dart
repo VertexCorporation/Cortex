@@ -7,6 +7,7 @@ import 'package:cortex/chat/services/send.dart';
 import 'package:cortex/chat/services/stop.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ScaffoldMessenger, SnackBar;
 import 'package:cortex/chat/messages/messages.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -26,6 +27,86 @@ class RegenerateService {
         _stopService = stopService,
         _sendService = sendService,
         _scrollService = scrollService;
+
+  /// Continues a truncated AI response: keeps the partial text, re-enters
+  /// the response loop with a continuation instruction, and streams the
+  /// remainder into the SAME message. Only applies to persisted `isIncomplete`
+  /// AI messages — the marker is produced by the server's terminal `done`
+  /// event, so local/offline answers never need it.
+  Future<void> onContinue(
+    int aiMessageIndex, {
+    required BuildContext context,
+  }) async {
+    const String logPrefix = "[RegenerateService]";
+    debugPrint(
+        "$logPrefix: onContinue called for index: $aiMessageIndex.");
+    final localizations = AppLocalizations.of(context)!;
+    if (_conversationProvider.isWaitingForResponse) {
+      debugPrint("$logPrefix: Operation already in progress. Aborting.");
+      return;
+    }
+    _scrollService.hideButtonImmediately();
+    try {
+      final messages = _conversationProvider.messages;
+      if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) {
+        debugPrint("$logPrefix: Invalid index ($aiMessageIndex). Aborting.");
+        return;
+      }
+      final Message partial = messages[aiMessageIndex];
+      if (partial.isUserMessage || !partial.isIncomplete) {
+        debugPrint(
+            "$logPrefix: Target is not a truncated AI message. Aborting.");
+        return;
+      }
+
+      _conversationProvider.prepareForContinuation(aiMessageIndex);
+
+      // Persist the marked state so a continuation that runs in the
+      // background still starts from the kept text.
+      final conversationID = _conversationProvider.conversationID;
+      if (conversationID != null) {
+        await ChatStorageService.upsertMessage(
+            conversationID, aiMessageIndex,
+            _conversationProvider.messages[aiMessageIndex]);
+      }
+      if (!context.mounted) {
+        debugPrint(
+            "$logPrefix: Context is no longer mounted. Aborting.");
+        return;
+      }
+
+      debugPrint("$logPrefix: Delegating to SendService (continue mode).");
+      await _sendService.sendMessage(
+        context: context,
+        localizations: localizations,
+        // No new user text: the response loop appends the continuation
+        // instruction itself, and the partial answer is already in context.
+        messageText: '',
+        isRegenerate: true,
+        regenerateAiIndex: aiMessageIndex,
+        // Continue with the model that produced the partial answer — even if
+        // the user has since switched models — so the continuation matches
+        // the voice and context of what is already on screen.
+        overrideModelId: partial.model,
+        isContinue: true,
+      );
+      debugPrint("$logPrefix: sendMessage (continue) call completed.");
+    } catch (e, s) {
+      debugPrint("$logPrefix: ERROR in onContinue: $e\nStack Trace: $s");
+      if (_conversationProvider.isWaitingForResponse) {
+        final thinkingIndex =
+            _conversationProvider.messages.lastIndexWhere((m) => m.isThinking);
+        if (thinkingIndex != -1) {
+          _conversationProvider.finishBotResponse(thinkingIndex);
+        }
+      }
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(localizations.anErrorOccurred)),
+        );
+      }
+    }
+  }
 
   Future<void> onRegenerate(
     int messageIndex, {

@@ -144,6 +144,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Model';
+
+  @override
   String get editConversationTitle => 'Hernoemen';
 
   @override
@@ -892,6 +895,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Er is een netwerkfout opgetreden. Controleer je verbinding en probeer het opnieuw.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Het geselecteerde basismodel bepaalt de redeneer- en antwoordcapaciteiten van het personage.';
 
@@ -1112,7 +1122,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze AI is een premium AI, gratis gebruikers hebben beperkte toegang tot premium AI\'s; upgrade om onbeperkte toegang te ontgrendelen!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Exclusieve AI-selectie';
 
   @override
   String get premiumTrialExhaustedMessage =>

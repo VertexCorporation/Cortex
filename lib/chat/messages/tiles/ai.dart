@@ -58,6 +58,9 @@ class AIMessageTile extends StatefulWidget {
   final void Function({String? newModelId})? onRegenerate;
   final VoidCallback? onStop;
   final List<InlineSpan>? parsedSpans;
+  // "Continue generating" affordance for server-reported truncated responses
+  // (`isIncomplete`). Rendered inside the truncation notice when provided.
+  final VoidCallback? onContinue;
 
   const AIMessageTile({
     super.key,
@@ -70,6 +73,7 @@ class AIMessageTile extends StatefulWidget {
     this.onRegenerate,
     this.onStop,
     this.parsedSpans,
+    this.onContinue,
   });
 
   @override
@@ -585,6 +589,7 @@ class _AIMessageTileState extends State<AIMessageTile>
                               reveal: _reveal,
                               scale: scale,
                               parseCache: _parseCache,
+                              onContinue: widget.onContinue,
                             ),
                           ),
                         ),

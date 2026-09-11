@@ -61,6 +61,16 @@ class _MediaShimmerPlaceholderState extends State<MediaShimmerPlaceholder>
     };
     final width = math.min(MediaQuery.sizeOf(context).width * 0.65, 340.0);
     final foreground = AppColors.primaryColor.inverted;
+    // Reduced-motion users get a static card: no pulsing dots, no shimmer —
+    // the label stays readable without any looping animation.
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final Widget labelWidget = Text(label,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: foreground.withValues(alpha: 0.55)));
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Semantics(
@@ -89,18 +99,15 @@ class _MediaShimmerPlaceholderState extends State<MediaShimmerPlaceholder>
                         colorFilter: ColorFilter.mode(foreground, BlendMode.srcIn),
                       ),
                       const SizedBox(height: 12),
-                      Shimmer.fromColors(
-                        baseColor: foreground.withValues(alpha: 0.38),
-                        highlightColor: foreground.withValues(alpha: 0.90),
-                        period: const Duration(milliseconds: 1250),
-                        child: Text(label,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: foreground.withValues(alpha: 0.55))),
-                      ),
+                      if (reduceMotion)
+                        labelWidget
+                      else
+                        Shimmer.fromColors(
+                          baseColor: foreground.withValues(alpha: 0.38),
+                          highlightColor: foreground.withValues(alpha: 0.90),
+                          period: const Duration(milliseconds: 1250),
+                          child: labelWidget,
+                        ),
                     ]))),
           ]),
         )),

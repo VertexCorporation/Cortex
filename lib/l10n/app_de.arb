@@ -53,7 +53,7 @@
   "benefit7": "Höheres Nutzungslimit",
   "benefit8": "Modelle hinzufügen",
   "benefit9": "Neue Themes",
-  "benefitPremiumModels": "Specific AI Selection",
+  "benefitPremiumModels": "Exklusive KI-Auswahl",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
@@ -440,6 +440,7 @@
   "modelCreatedSuccess": "Modell erfolgreich erstellt!",
   "modelDescription": "{description}",
   "modelProducer": "Hersteller: {producer}",
+  "modelLabel": "Modell",
   "modelRemovedSuccess": "„{modelName}“ wurde erfolgreich entfernt.",
   "modelUploadDescription": "Wähle und lade deine lokalen GGUF-Dateien direkt von deinem Gerät hoch. So kannst du dein Modell offline ausführen, ohne eine Internetverbindung zu benötigen. Stelle sicher, dass die Datei im gültigen GGUF-Format vorliegt und ordnungsgemäß strukturiert ist. Wenn die Datei fehlerhaft oder beschädigt ist, funktioniert Cortex möglicherweise nicht wie erwartet, und es können Fehler auftreten.",
   "modelUploadShortDescription": "Tippe hier, um eine .gguf-Datei von deinem Gerät auszuwählen",

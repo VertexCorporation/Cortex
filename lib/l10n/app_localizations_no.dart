@@ -143,6 +143,9 @@ class AppLocalizationsNo extends AppLocalizations {
   }
 
   @override
+  String get modelLabel => 'Modell';
+
+  @override
   String get editConversationTitle => 'Gi nytt navn';
 
   @override
@@ -885,6 +888,13 @@ class AppLocalizationsNo extends AppLocalizations {
       'Det oppstod en nettverksfeil. Kontroller tilkoblingen og prøv igjen.';
 
   @override
+  String get responseTruncatedNotice =>
+      'This response was cut short by the model and may be incomplete.';
+
+  @override
+  String get continueGenerating => 'Continue generating';
+
+  @override
   String get baseModelForCharacterDescription =>
       'Den valgte basismodellen vil bestemme karakterens funksjon Begrunnelse og responsevner.';
 
@@ -1104,7 +1114,7 @@ class AppLocalizationsNo extends AppLocalizations {
       'Denne AI er en premium AI, gratis brukere har begrenset tilgang til premium AIer; oppgrader for å låse opp ubegrenset tilgang!';
 
   @override
-  String get benefitPremiumModels => 'Specific AI Selection';
+  String get benefitPremiumModels => 'Eksklusivt AI-utvalg';
 
   @override
   String get premiumTrialExhaustedMessage =>

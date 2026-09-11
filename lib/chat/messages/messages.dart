@@ -89,6 +89,13 @@ class Message {
   /// without leaking implementation markers into the assistant text.
   final List<String> toolSteps;
 
+  /// True when the server explicitly reported that this response was cut
+  /// short (`finish_reason: "length"` / `"content_filter"`, or a text stream
+  /// that ended without any finish chunk). Persisted so the truncation is
+  /// still visible after the chat is reopened — a truncated response must
+  /// never masquerade as a complete one.
+  final bool isIncomplete;
+
   Message({
     this.id,
     required this.text,
@@ -109,6 +116,7 @@ class Message {
     this.isServerFallback = false,
     this.toolActivity = '',
     this.toolSteps = const [],
+    this.isIncomplete = false,
   }) : notifier = ValueNotifier(text);
 
   /// Private constructor used by `copyWith` and `fromMap`.
@@ -133,6 +141,7 @@ class Message {
     required this.isServerFallback,
     required this.toolActivity,
     required this.toolSteps,
+    required this.isIncomplete,
   });
 
   /// Helper getter to check if the message has any attachments.
@@ -174,6 +183,7 @@ class Message {
     bool? isServerFallback,
     String? toolActivity,
     List<String>? toolSteps,
+    bool? isIncomplete,
   }) {
     final String? newText = text;
     final newNotifier = (newText != null && newText != this.text)
@@ -204,6 +214,7 @@ class Message {
       isServerFallback: isServerFallback ?? this.isServerFallback,
       toolActivity: toolActivity ?? this.toolActivity,
       toolSteps: toolSteps ?? this.toolSteps,
+      isIncomplete: isIncomplete ?? this.isIncomplete,
     );
   }
 
@@ -232,6 +243,7 @@ class Message {
       isServerFallback: isServerFallback,
       toolActivity: currentToolActivity,
       toolSteps: currentToolSteps,
+      isIncomplete: isIncomplete,
     );
   }
 
@@ -305,8 +317,29 @@ class Message {
       pendingMediaType: MediaGenerationType.none,
       isServerFallback: (map['isServerFallback'] as int? ?? 0) == 1,
       toolActivity: '',
-      toolSteps: const [],
+      toolSteps: decodeToolSteps(map['toolSteps']),
+      isIncomplete: (map['isIncomplete'] as int? ?? 0) == 1,
     );
+  }
+
+  /// Decodes persisted tool steps. The storage layer keeps them as a JSON
+  /// string array; in-memory maps may carry the raw list. Tolerates legacy
+  /// rows where the column is missing entirely.
+  static List<String> decodeToolSteps(dynamic value) {
+    if (value is List) {
+      return value.map((e) => e.toString()).toList(growable: false);
+    }
+    if (value is String && value.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is List) {
+          return decoded.map((e) => e.toString()).toList(growable: false);
+        }
+      } catch (_) {
+        // Corrupt JSON — treat as no steps rather than crashing the chat.
+      }
+    }
+    return const [];
   }
 
   Map<String, dynamic> toMap() {
@@ -327,6 +360,8 @@ class Message {
       'webSearchSources':
           webSearchSources != null ? jsonEncode(webSearchSources) : null,
       'isServerFallback': isServerFallback ? 1 : 0,
+      'toolSteps': toolSteps.isNotEmpty ? jsonEncode(toolSteps) : null,
+      'isIncomplete': isIncomplete ? 1 : 0,
     };
   }
 }
