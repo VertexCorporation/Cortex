@@ -213,7 +213,10 @@ class Tiles {
         message.isThinking ||
         message.hasAttachments ||
         hasShimmer ||
-        !message.isError;
+        message.isError ||
+        message.toolActivity.isNotEmpty ||
+        message.toolSteps.isNotEmpty ||
+        message.isIncomplete;
 
     // Media Widget - Shimmer placeholder OR real attachments with crossfade
     Widget mediaWidget;

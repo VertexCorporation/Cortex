@@ -148,6 +148,14 @@ class _Harness {
       if (call.method == 'sendMessage') {
         final args = call.arguments as Map;
         prompts.add(args['message'] as String);
+        final earlyToken = synchronousTokenOnSend;
+        if (earlyToken != null) {
+          await offline.methodCallHandler(
+              MethodCall('onMessageResponse', earlyToken));
+        }
+        if (synchronousCompleteOnSend) {
+          await offline.methodCallHandler(const MethodCall('onMessageComplete'));
+        }
       } else if (call.method == 'stopGeneration') {
         // Mirror native semantics: the abandoned stream is halted, but not
         // before emitting one in-flight token and its terminal completion.
@@ -164,6 +172,8 @@ class _Harness {
   late OfflineService offline;
   final List<String> calls = [];
   final List<String> prompts = [];
+  String? synchronousTokenOnSend;
+  bool synchronousCompleteOnSend = false;
 
   Future<void> deliverToken(String token) async {
     await offline.methodCallHandler(MethodCall('onMessageResponse', token));
@@ -288,6 +298,70 @@ void main() {
       await h.deliverToken('Paris.');
       await h.deliverComplete();
       expect(h.conversation.messages.last.text, 'Paris.');
+      expect(h.conversation.isWaitingForResponse, isFalse);
+    });
+  });
+
+  group('offline launch window and empty response recovery', () {
+    test('token and completion emitted before invokeMethod returns are replayed',
+        () async {
+      final h = _Harness()
+        ..synchronousTokenOnSend = 'Hello from Qwen.'
+        ..synchronousCompleteOnSend = true;
+
+      await h.conversation.startNewConversationSession(
+        'convFast',
+        'Fast local model',
+        'qwen3-06b',
+        Message(text: 'Hello', isUserMessage: true),
+      );
+      await h.offline.sendMessage(
+        'Hello',
+        null,
+        null,
+        [],
+        false,
+        [],
+        'convFast',
+        'Please try again.',
+      );
+
+      final answer = h.conversation.messages.last;
+      expect(answer.text, 'Hello from Qwen.');
+      expect(answer.isThinking, isFalse);
+      expect(answer.isError, isFalse);
+      expect(h.conversation.isWaitingForResponse, isFalse);
+    });
+
+    test('zero-token completion becomes an error, never a ghost assistant row',
+        () async {
+      final h = _Harness()..synchronousCompleteOnSend = true;
+
+      await h.conversation.startNewConversationSession(
+        'convEmpty',
+        'Empty local response',
+        'qwen3-06b',
+        Message(text: 'alo', isUserMessage: true),
+      );
+      await h.offline.sendMessage(
+        'alo',
+        null,
+        null,
+        [],
+        false,
+        [],
+        'convEmpty',
+        'The model did not generate a response. Please try again.',
+      );
+
+      final answer = h.conversation.messages.last;
+      expect(
+        answer.text,
+        'The model did not generate a response. Please try again.',
+      );
+      expect(answer.isThinking, isFalse);
+      expect(answer.isError, isTrue);
+      expect(answer.includeInContext, isFalse);
       expect(h.conversation.isWaitingForResponse, isFalse);
     });
   });

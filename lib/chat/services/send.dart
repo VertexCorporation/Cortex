@@ -815,6 +815,7 @@ class SendService {
             _inputProvider.ragEnabled,
             _inputProvider.ragDocumentIds,
             targetConvId,
+            localizations.requestFailed,
           );
         } else {
           throw ApiException(localizations.errorPromptFlagged);

@@ -54,7 +54,7 @@ class ResponseService {
   ///
   /// This method is the single source of truth for transitioning the conversation
   /// from a "waiting" state to an "idle" state and persisting the final message.
-  void finalizeResponse() {
+  void finalizeResponse({String? emptyResponseError}) {
     MetricsTracker().stopTracking();
     // Guard clause: If we're not expecting a response, there's nothing to finalize.
     if (!_conversationProvider.isWaitingForResponse) {
@@ -73,6 +73,22 @@ class ResponseService {
         messages.lastIndexWhere((m) => m.isThinking && !m.isUserMessage);
 
     if (targetIndex != -1) {
+      final targetMessage = messages[targetIndex];
+      final emptyResponse = targetMessage.displayableText.trim().isEmpty &&
+          !targetMessage.hasAttachments;
+      if (emptyResponse &&
+          emptyResponseError != null &&
+          emptyResponseError.trim().isNotEmpty) {
+        debugPrint(
+            "[ResponseService] Native stream completed without visible output. Converting placeholder to an error instead of persisting a ghost reply.");
+        _conversationProvider.setErrorMessage(
+          targetIndex,
+          emptyResponseError,
+          false,
+        );
+        return;
+      }
+
       // The `finishBotResponse` method within the provider handles all necessary state changes:
       // 1. Sets `isThinking` to `false`.
       // 2. Sets `includeInContext` to `true`.
