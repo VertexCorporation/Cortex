@@ -151,7 +151,7 @@ class ChatStorageService {
           m.photoPath as lastMessagePhoto,
           m.ts as realLastMessageTs
         FROM conversations c
-        LEFT JOIN messages m ON m.idx = (
+        LEFT JOIN messages m ON m.conversationId = c.id AND m.idx = (
             SELECT idx FROM messages 
             WHERE conversationId = c.id 
               AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))

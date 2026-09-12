@@ -45,6 +45,17 @@ class ModelService with ChangeNotifier {
   List<ModelEntity>? _cachedEntities;
   String? _cachedEntitiesLangCode;
   Future<List<ModelEntity>?>? _pendingFetch;
+  String? _pendingFetchLanguage;
+  final Map<String, bool> _imageFileChecks = {};
+
+  bool _imageFileExists(String path) {
+    if (_imageFileChecks.isEmpty) {
+      // Coalesce repeated lookups within this synchronous render/build only.
+      // Do not keep stale existence results across later event-loop turns.
+      scheduleMicrotask(_imageFileChecks.clear);
+    }
+    return _imageFileChecks.putIfAbsent(path, () => File(path).existsSync());
+  }
 
   // --- Public API ---
 
@@ -63,9 +74,21 @@ class ModelService with ChangeNotifier {
   ///
   /// Returns a list of [ModelEntity] objects, or null on a critical failure.
   Future<List<ModelEntity>?> getModels({required String langCode}) {
-    if (_pendingFetch != null) return _pendingFetch!;
+    final language = _normalizeLangCode(langCode);
+    if (_pendingFetch != null) {
+      if (_pendingFetchLanguage == language) return _pendingFetch!;
+      // A request in another language must not receive the first caller's
+      // localized list. Serialize it, then re-use/rebuild the proper cache.
+      return _pendingFetch!.then((_) => getModels(langCode: langCode));
+    }
+    if (!_hasError && _cachedEntities?.isNotEmpty == true &&
+        _cachedEntitiesLangCode == language) {
+      return Future.value(_cachedEntities);
+    }
+    _pendingFetchLanguage = language;
     _pendingFetch = _getModelsInternal(langCode: langCode).whenComplete(() {
       _pendingFetch = null;
+      _pendingFetchLanguage = null;
     });
     return _pendingFetch!;
   }
@@ -574,7 +597,7 @@ class ModelService with ChangeNotifier {
 
     if (cachedImagePaths.containsKey(model.id)) {
       final localPath = cachedImagePaths[model.id]!;
-      if (File(localPath).existsSync()) {
+      if (_imageFileExists(localPath)) {
         return localPath;
       }
     }
@@ -607,7 +630,7 @@ class ModelService with ChangeNotifier {
       return model.imagePath!;
     }
 
-    if (model.imagePath != null && File(model.imagePath!).existsSync()) {
+    if (model.imagePath != null && _imageFileExists(model.imagePath!)) {
       return model.imagePath!;
     }
 
