@@ -158,7 +158,10 @@ class SelectTextScreenState extends State<SelectTextScreen> {
       child: SelectableText.rich(
         TextSpan(
           // Ensure the parser knows the base font size for relative scaling of markdown elements.
-          children: parseText(context, rawText, fontSize: style.fontSize),
+          // The sheet always renders finalized message text, so the
+          // provisional streaming delimiter completion must never apply here.
+          children: parseText(context, rawText,
+              fontSize: style.fontSize, isFinished: true),
           style: style,
         ),
       ),

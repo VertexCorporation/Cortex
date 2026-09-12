@@ -100,6 +100,16 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
             textStyle: baseStyle,
           ),
         );
+      case 'inlineMathParen':
+        // \(…\) — TeX's inline delimiter, flowing with the text exactly like
+        // $…$ above. Both delimiters are two characters wide at each end.
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: SafeMathTex(
+            latex: matchText.substring(2, matchText.length - 2),
+            textStyle: baseStyle,
+          ),
+        );
       case 'link':
         final m = _linkPattern.firstMatch(matchText);
         if (m == null) return TextSpan(text: matchText, style: baseStyle);

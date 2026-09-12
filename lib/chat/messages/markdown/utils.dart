@@ -17,6 +17,44 @@ double baseFs(BuildContext context) {
   return (physicalWidth / devicePixelRatio) * 0.044;
 }
 
+final RegExp _multlineOpen = RegExp(r'\\begin\{multline');
+final RegExp _multlinePair =
+    RegExp(r'\\begin\{(multline\*?)\}([\s\S]*?)(?:\\end\{\1\}|$)');
+// A row break immediately before \end{multline} would render an empty last
+// row once converted (models often emit one, and it is very common while the
+// equation is still streaming). \s* tolerates the trailing newline too.
+final RegExp _trailingRowBreak = RegExp(r'(?:\s*\\\\)+\s*$');
+
+/// Normalizes the amsmath `multline` environment (and its starred form) to
+/// something flutter_math_fork 0.7.4 can actually render.
+///
+/// flutter_math_fork knows the matrix family, `cases`, `aligned`,
+/// `alignedat`, `array`/`darray` and `subarray` — but NOT `multline`
+/// (`gathered` is literally commented out in its environment table), so a
+/// `$$\begin{multline}…\end{multline}$$` block would hit SafeMathTex's
+/// literal-source fallback and dump raw LaTeX into the chat.
+///
+/// `aligned` is the safe approximation: it shares `multline`'s `\\` row
+/// semantics and is already exercised by this pipeline, so the body is
+/// preserved verbatim. A still-OPEN `multline` (the stream has not sent
+/// `\end{multline}` yet, or the response was truncated) is auto-closed at
+/// the end of its body so the rows rendered so far appear as math
+/// immediately; if the partial body is still unparseable (an unfinished
+/// `\frac` etc.) flutter_math's own error handling degrades to the literal
+/// source — never a crash.
+///
+/// Input without `\begin{multline` is returned untouched (same instance on
+/// the fast path), so `aligned`, `cases`, matrices and every other
+/// environment keep rendering byte-identically.
+String normalizeMultiline(String latex) {
+  if (!_multlineOpen.hasMatch(latex)) return latex;
+  return latex.replaceAllMapped(_multlinePair, (m) {
+    var body = m.group(2) ?? '';
+    body = body.replaceFirst(_trailingRowBreak, '');
+    return '\\begin{aligned}$body\\end{aligned}';
+  });
+}
+
 class SafeMathTex extends StatefulWidget {
   final String latex;
   final TextStyle textStyle;
@@ -53,8 +91,12 @@ class _SafeMathTexState extends State<SafeMathTex> {
     // span can never crash the whole message pipeline.
     Widget content;
     try {
+      // multline is normalized (to aligned) before parsing — see
+      // [normalizeMultiline]. The fallback keeps showing the ORIGINAL latex
+      // the model emitted, so a malformed span degrades to the honest
+      // literal source, never a crash.
       content = Math.tex(
-        widget.latex,
+        normalizeMultiline(widget.latex),
         textStyle: widget.textStyle,
         onErrorFallback: (_) => Text(widget.latex, style: widget.textStyle),
       );

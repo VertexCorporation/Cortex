@@ -8,6 +8,18 @@ class RegexPatterns {
   static final codeBlock = RegExp(
       r'^[ \t]*(```+)([^\r\n]*)\r?\n([\s\S]*?)\r?\n^[ \t]*\1[ \t]*$',
       multiLine: true);
+  // Display math: \[…\] — the TeX/LaTeX standard delimiter many models emit
+  // alongside (or instead of) $$…$$. The opening \[ must start a line
+  // (indentation allowed) and the closing \] must end one, matching how
+  // display equations are actually emitted. As a BLOCK pattern the whole
+  // equation is carved out before bullets/tables/headings run, so markdown
+  // markup inside the body ("- " rows, "|" columns, "#" lines) stays inert,
+  // and fenced code blocks still win because they start earlier. The closing
+  // delimiter is REQUIRED — a still-streaming "\[ …" stays plain text and
+  // snaps into math the moment its "\]" arrives.
+  static final displayMathBracket = RegExp(
+      r'^[ \t]*\\\[([\s\S]+?)\\\][ \t]*(?=\r?\n|$)',
+      multiLine: true);
   static final blockquote = RegExp(r'^(?:\s*>\s?.+(?:\n|$))+', multiLine: true);
   static final table = RegExp(
       r'(^[ \t]*\|[^\r\n]+\|[ \t]*\r?\n[ \t]*\|(?:[ \t]*:?-+:?[ \t]*\|)+[ \t]*(?:\r?\n|$)(?:[ \t]*\|[^\r\n]*\|[ \t]*(?:\r?\n|$))*)',
@@ -31,6 +43,13 @@ class RegexPatterns {
   // Escaped dollars (\$) never open a span and stay literal text.
   static final inlineMath = RegExp(
       r'(?<![\\$])\$(?!\$)(?![ \t\n])((?:\\[^\n]|[^$\n])+?)(?<![ \t])\$(?!\d)(?!\$)');
+  // Inline math: \(…\) — the TeX/LaTeX standard inline delimiter many models
+  // emit alongside (or instead of) $…$. Same policy as inlineMath: one line,
+  // non-empty body without a backtick (inline code keeps priority), and the
+  // closing \) REQUIRED so a still-streaming "\( …" stays plain text until it
+  // closes. (?<!\\) keeps an escaped \\( from ever opening a span.
+  static final inlineMathParen =
+      RegExp(r'(?<!\\)\\\(([^`\r\n]+?)\\\)');
   // One balanced parenthesised segment is accepted inside a URL. This covers
   // common links such as `/Function_(mathematics)` without swallowing prose.
   static final link =
@@ -54,6 +73,7 @@ class RegexPatterns {
     'thinking': thinking,
     'horizontalRule': horizontalRule,
     'codeBlock': codeBlock,
+    'displayMathBracket': displayMathBracket,
     'blockquote': blockquote,
     'table': table,
     'heading': heading,
@@ -77,6 +97,7 @@ class RegexPatterns {
     // start position, so there are no same-start conflicts with them.
     'displayMath': displayMath,
     'inlineMath': inlineMath,
+    'inlineMathParen': inlineMathParen,
   };
 
   static final combinedInlinePattern = RegExp(

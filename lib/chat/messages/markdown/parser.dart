@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/theme.dart';
 import 'patterns.dart';
+import 'streaming.dart';
 import 'utils.dart';
 import 'inline.dart';
 import 'blocks.dart';
@@ -111,6 +112,23 @@ List<InlineSpan> parseText(BuildContext context, String text,
     }
 
     text = text.trim();
+
+    // Streaming provisional layer: while tokens are still arriving
+    // (isFinished == false) a dangling paired delimiter would otherwise
+    // show as raw syntax (`**bold`, `\(...`, `\[…`, an open ``` fence)
+    // until its closer arrives. closeStreamingDelimiters only ever appends
+    // the missing closer — bounded per construct, masked against code, and
+    // validated against the finalized patterns — so the finalized rules
+    // themselves are untouched and a closed message parses byte-identically
+    // to before this layer existed.
+    if (!isFinished) {
+      try {
+        text = closeStreamingDelimiters(text);
+      } catch (_) {
+        // Best effort only: on any unexpected failure the raw text renders
+        // exactly as it did before this layer existed.
+      }
+    }
 
     List<dynamic>? activeCitations = citations;
     if ((activeCitations == null || activeCitations.isEmpty) &&

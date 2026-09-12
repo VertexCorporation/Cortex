@@ -140,6 +140,22 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
             text: matchText,
             style: TextStyle(
                 color: AppColors.primaryColor.inverted, fontSize: fs));
+      case 'displayMathBracket':
+        // \[…\] — the TeX display-equation block. Re-match to pull the
+        // captured body between the delimiters; malformed LaTeX degrades to
+        // literal source text via SafeMathTex's fallback, never a crash.
+        final mathMatch =
+            RegexPatterns.displayMathBracket.firstMatch(matchText);
+        final latex = mathMatch?.group(1)?.trim() ?? matchText;
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: SafeMathTex(
+            latex: latex,
+            textStyle: TextStyle(
+                color: AppColors.primaryColor.inverted, fontSize: fs),
+            display: true,
+          ),
+        );
       case 'table':
         final lines = matchText.trim().split('\n');
         if (lines.length < 2) {
