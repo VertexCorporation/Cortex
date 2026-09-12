@@ -14,6 +14,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import '../../cache.dart';
+import 'transaction_guard.dart';
 import '../../internet.dart';
 import '../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
@@ -50,6 +51,7 @@ class FundsBackend with ChangeNotifier {
 
   bool _isLoading = true;
   bool _isPurchasePending = false;
+  final TransactionGuard _verificationGuard = TransactionGuard();
   String? _errorMessage;
   List<ProductDetails> _products = [];
   SubscriptionEntitlement _subscription = SubscriptionEntitlement.none;
@@ -63,7 +65,8 @@ class FundsBackend with ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  bool get isPurchasePending => _isPurchasePending;
+  bool get isPurchasePending =>
+      _isPurchasePending || _verificationGuard.isBusy;
 
   String? get errorMessage => _errorMessage;
 

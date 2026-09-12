@@ -2,7 +2,7 @@ part of 'service.dart';
 
 extension FundsPurchase on FundsBackend {
   Future<void> purchase(ProductDetails product) async {
-    if (_isPurchasePending) {
+    if (isPurchasePending) {
       log('Purchase attempt ignored: Another purchase is already pending.',
           name: FundsBackend._logName);
       return;
@@ -88,53 +88,46 @@ extension FundsPurchase on FundsBackend {
 
         ChangeSubscriptionParam? changeParam;
 
-        if (_subscription.productId != null &&
-            _subscription.productId!.isNotEmpty) {
-          log('Detected active subscription: ${_subscription.productId}. Attempting upgrade flow.',
-              name: FundsBackend._logName);
-
-          GooglePlayPurchaseDetails? oldPurchase;
-
-          try {
-            final androidAddition = _inAppPurchase
-                .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
-            final QueryPurchaseDetailsResponse pastPurchasesResponse =
-                await androidAddition.queryPastPurchases();
-
-            if (pastPurchasesResponse.error == null) {
-              try {
-                oldPurchase = pastPurchasesResponse.pastPurchases
-                    .map((e) => e)
-                    .firstWhere((p) =>
-                        p.productID == _subscription.productId &&
-                        p.status == PurchaseStatus.purchased);
-              } catch (_) {}
-            }
-          } catch (e) {
-            log('Failed to query past purchases for upgrade flow: $e',
-                name: FundsBackend._logName);
+        // Always consult the store, even before the user document has loaded.
+        // Do not start a second subscription while ownership is uncertain.
+        try {
+          final android = _inAppPurchase
+              .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+          final owned = await android.queryPastPurchases();
+          if (owned.error != null) {
+            throw StateError('Store ownership query failed');
           }
-
-          if (oldPurchase != null) {
-            log('Found old purchase token. Configuring replacement mode (Upgrade).',
-                name: FundsBackend._logName);
+          final subscriptions = owned.pastPurchases
+              .where((p) => FundsBackend._subscriptionIds.contains(p.productID))
+              .toList();
+          if (subscriptions.length > 1 ||
+              subscriptions.any((p) => p.status != PurchaseStatus.purchased)) {
+            throw StateError('Subscription ownership needs reconciliation');
+          }
+          if (subscriptions.isEmpty) {
+            if (activeSubscriptionProductId?.isNotEmpty == true) {
+              throw StateError('Store and account subscription disagree');
+            }
+          } else {
+            final oldPurchase = subscriptions.single;
+            if (oldPurchase.productID == googlePlayProductDetails.id) {
+              throw StateError('Subscription already owned');
+            }
             changeParam = ChangeSubscriptionParam(
               oldPurchaseDetails: oldPurchase,
               replacementMode: ReplacementMode.withTimeProration,
             );
-          } else {
-            log('CRITICAL: Sync mismatch. DB says active sub, but local store has no token. Blocking to prevent double billing.',
-                name: FundsBackend._logName);
-
-            _notificationService?.showNotification(
-              message:
-                  "Please tap 'Restore Purchases' first to sync your account.",
-              type: NotificationType.error,
-              oneLine: false,
-            );
-            _setPurchasePending(false);
-            return;
           }
+        } catch (e) {
+          log('Subscription purchase requires restore: $e',
+              name: FundsBackend._logName);
+          _notificationService?.showNotification(
+            message: 'Please tap "Restore Purchases" first to sync your account.',
+            type: NotificationType.error,
+            oneLine: false,
+          );
+          _setPurchasePending(false);
+          return;
         }
 
         purchaseParam = GooglePlayPurchaseParam(
@@ -157,11 +150,20 @@ extension FundsPurchase on FundsBackend {
     }
 
     try {
-      if (FundsBackend._subscriptionIds.contains(product.id)) {
-        await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
-      } else {
-        await _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
+      if (_auth.currentUser?.uid != user.uid) {
+        _setPurchasePending(false);
+        return;
       }
+      final bool started;
+      if (FundsBackend._subscriptionIds.contains(product.id)) {
+        started = await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+      } else {
+        started = await _inAppPurchase.buyConsumable(
+          purchaseParam: purchaseParam,
+          autoConsume: defaultTargetPlatform != TargetPlatform.android,
+        );
+      }
+      if (!started) _setPurchasePending(false);
     } catch (e, stack) {
       log('Error initiating purchase flow: $e',
           name: FundsBackend._logName, error: e);
@@ -204,7 +206,7 @@ extension FundsPurchase on FundsBackend {
   }
 
   Future<void> restorePurchases() async {
-    if (_isPurchasePending) return;
+    if (isPurchasePending) return;
     _setPurchasePending(true);
 
     try {
@@ -212,7 +214,7 @@ extension FundsPurchase on FundsBackend {
       await _inAppPurchase.restorePurchases();
 
       Future.delayed(const Duration(seconds: 4), () {
-        if (_isPurchasePending) {
+        if (isPurchasePending) {
           log('Restore timeout. Resetting UI.', name: FundsBackend._logName);
           _setPurchasePending(false);
         }
@@ -273,10 +275,8 @@ extension FundsPurchase on FundsBackend {
       oneLine: false,
     );
 
-    if (purchaseDetails.pendingCompletePurchase) {
-      _inAppPurchase.completePurchase(purchaseDetails);
-    }
-
+    // Never finalize an error update as delivered. Only purchased/restored
+    // transactions are eligible for server verification and completion.
     _setPurchasePending(false);
   }
 
@@ -292,7 +292,9 @@ extension FundsPurchase on FundsBackend {
   }
 
   void _handleCanceledPurchase(PurchaseDetails d) {
-    if (d.pendingCompletePurchase) _inAppPurchase.completePurchase(d);
+    // A canceled store flow is not a delivered purchase. In particular, do
+    // not call completePurchase here even if a platform wrapper reports a
+    // pending completion flag.
     _setPurchasePending(false);
   }
 }

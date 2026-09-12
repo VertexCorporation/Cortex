@@ -37,13 +37,15 @@ class ApiService {
 
   final Dio _dio;
   CancelToken? _cancelToken;
-  String? _cachedToken;
+  final FirebaseAuth _auth;
 
-  ApiService()
-      : _dio = Dio(BaseOptions(
-          connectTimeout: const Duration(seconds: 20),
-          receiveTimeout: const Duration(minutes: 5),
-        ));
+  ApiService({FirebaseAuth? auth, Dio? dio})
+      : _auth = auth ?? FirebaseAuth.instance,
+        _dio = dio ??
+            Dio(BaseOptions(
+              connectTimeout: const Duration(seconds: 20),
+              receiveTimeout: const Duration(minutes: 5),
+            ));
 
   // PERF: Reuse a single Dio instance for title generation to avoid
   // creating a new HTTP connection pool on every new conversation.
@@ -124,13 +126,33 @@ class ApiService {
     // trace can follow one request end-to-end across services.
     final String generationId = const Uuid().v4();
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
     if (user == null) {
       throw ApiException(localizations.errorUserNotAuthenticated,
           statusCode: 401, code: 'NO_USER');
     }
 
+    void ensureCurrentUser() {
+      if (_auth.currentUser?.uid != user.uid) {
+        throw ApiException(localizations.errorUserNotAuthenticated,
+            statusCode: 401, code: 'USER_CHANGED');
+      }
+    }
+
+    Future<String> requestToken({bool forceRefresh = false}) async {
+      ensureCurrentUser();
+      // Firebase owns token caching and expiry; never share a token across users.
+      final token = await user.getIdToken(forceRefresh);
+      ensureCurrentUser();
+      if (token == null || token.isEmpty) {
+        throw ApiException(localizations.errorUserNotAuthenticated,
+            statusCode: 401, code: 'NO_TOKEN');
+      }
+      return token;
+    }
+
     Future<String> attemptRequest(String token, String targetModel) async {
+      ensureCurrentUser();
       final completer = Completer<String>();
       final finalContent = StringBuffer();
       String currentEvent = '';
@@ -819,12 +841,12 @@ class ApiService {
     }
 
     try {
-      _cachedToken ??= await user.getIdToken(false);
-      return await attemptRequestWithFailover(_cachedToken!);
+      final token = await requestToken();
+      return await attemptRequestWithFailover(token);
     } on DioException catch (e) {
       if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
-        _cachedToken = await user.getIdToken(true);
-        return await attemptRequestWithFailover(_cachedToken!);
+        final token = await requestToken(forceRefresh: true);
+        return await attemptRequestWithFailover(token);
       }
       if (e.type == DioExceptionType.cancel) throw UserCancelledException();
       throw ApiException(localizations.errorNetwork, code: 'CONNECTION_ERROR');
@@ -894,7 +916,7 @@ class ApiService {
   /// Silently generates a title for a new conversation using the backend's fast new title endpoint.
   Future<String?> optimizeImagePrompt(String userInput) async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = _auth.currentUser;
       if (user == null) return null;
       final String? token = await user.getIdToken();
 
@@ -947,7 +969,7 @@ class ApiService {
     try {
       debugPrint(
           '[TitleGen] Starting title generation for: "${userInput.length > 20 ? userInput.substring(0, 20) : userInput}..."');
-      final user = FirebaseAuth.instance.currentUser;
+      final user = _auth.currentUser;
       if (user == null) {
         debugPrint('[TitleGen] Error: User is null');
         return null;
@@ -1107,7 +1129,7 @@ class ApiService {
   Future<List<String>?> extractUserMemory(
       String userInput, String langCode) async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = _auth.currentUser;
       if (user == null) return null;
 
       final String? token = await user.getIdToken();

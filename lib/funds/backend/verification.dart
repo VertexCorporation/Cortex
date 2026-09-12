@@ -3,7 +3,39 @@ part of 'service.dart';
 extension FundsVerification on FundsBackend {
   Future<void> _verifyAndCompletePurchase(
       PurchaseDetails purchaseDetails) async {
+    final expectedUid = _auth.currentUser?.uid;
+    if (expectedUid == null) return;
+
+    // A store may replay the same purchase while verification is still pending.
+    // Scope the guard to the account that started verification so an auth switch
+    // cannot make a callback look like it belongs to the newly signed-in user.
+    final receipt = purchaseDetails.verificationData.serverVerificationData;
+    final key = '$expectedUid:${purchaseDetails.productID}:'
+        '${purchaseDetails.purchaseID ?? receipt}';
+    try {
+      await _verificationGuard.run(key, () async {
+        if (_disposed || _auth.currentUser?.uid != expectedUid) return;
+        _notify();
+        await _processPurchase(purchaseDetails, expectedUid);
+      });
+    } catch (e, stack) {
+      await _crashlytics.recordError(e, stack,
+          reason: 'Purchase processing failed', fatal: false);
+    } finally {
+      if (!_disposed) _notify();
+    }
+  }
+
+  Future<void> _processPurchase(
+      PurchaseDetails purchaseDetails, String expectedUid) async {
     String? verificationData;
+
+    if (_auth.currentUser?.uid != expectedUid) {
+      log('Purchase verification skipped because the signed-in account changed.',
+          name: FundsBackend._logName);
+      _setPurchasePending(false);
+      return;
+    }
 
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       verificationData = await _resolveIosReceiptBase64(purchaseDetails);
@@ -52,8 +84,16 @@ extension FundsVerification on FundsBackend {
     }
 
     try {
+      // Re-check immediately before the callable so a queued purchase callback
+      // cannot be verified against a different Firebase account.
+      if (_auth.currentUser?.uid != expectedUid) {
+        log('Purchase verification aborted after an account switch.',
+            name: FundsBackend._logName);
+        return;
+      }
+
       final callable = _functions.httpsCallable('verifyPurchase');
-      await callable.call<dynamic>({
+      final result = await callable.call<dynamic>({
         'receiptData': verificationData,
         'productId': purchaseDetails.productID,
         'platform':
@@ -62,11 +102,35 @@ extension FundsVerification on FundsBackend {
         'transactionId': purchaseDetails.purchaseID,
       });
 
-      if (purchaseDetails.pendingCompletePurchase) {
+      // A resolved callable is not automatically a successful purchase. Require
+      // the backend's explicit success contract before store finalization or UI.
+      final data = result.data;
+      if (data is! Map || data['success'] != true) {
+        throw StateError('verifyPurchase returned no explicit success result');
+      }
+
+      final isAndroidConsumable =
+          defaultTargetPlatform == TargetPlatform.android &&
+              !FundsBackend._subscriptionIds.contains(purchaseDetails.productID);
+
+      if (!isAndroidConsumable && purchaseDetails.pendingCompletePurchase) {
+        // Android consumables are consumed by Fulcrum after verification. Do not
+        // race the secure backend with a second client-side consume/ack request.
+        // Subscriptions and Apple purchases still need normal store completion.
         await _inAppPurchase.completePurchase(purchaseDetails);
       }
 
       AppDataState().markUserDataAsChanged();
+
+      // If the account changed while the server call was in flight, the server
+      // still delivered to the account whose auth token made the request. Store
+      // finalization above is therefore valid, but success UI must not leak into
+      // the newly signed-in account.
+      if (_auth.currentUser?.uid != expectedUid) {
+        log('Purchase verified for the previous account; suppressing success UI.',
+            name: FundsBackend._logName);
+        return;
+      }
 
       // Only fire the purchase-completed event for genuinely fresh
       // transactions (within the last 5 minutes).  Google Play's
@@ -101,25 +165,13 @@ extension FundsVerification on FundsBackend {
       log('Verification failed: ${e.message} (Code: ${e.code})',
           name: FundsBackend._logName);
 
-      if (e.code == 'invalid-argument' ||
-          e.code == 'not-found' ||
-          e.code == 'already-exists') {
-        log('Fatal error. Clearing from queue.', name: FundsBackend._logName);
-        if (purchaseDetails.pendingCompletePurchase) {
-          await _inAppPurchase.completePurchase(purchaseDetails);
-        }
-        _notificationService?.showNotification(
-          message: _localizations?.purchaseError ?? 'purchaseError',
-          type: NotificationType.error,
-          oneLine: false,
-        );
-      } else {
-        _notificationService?.showNotification(
-          message: _localizations?.verificationDelayed ?? 'verificationDelayed',
-          type: NotificationType.error,
-          oneLine: false,
-        );
-      }
+      // A generic error code does not prove that entitlement was delivered.
+      // Keep the transaction recoverable until the server confirms success.
+      _notificationService?.showNotification(
+        message: _localizations?.verificationDelayed ?? 'verificationDelayed',
+        type: NotificationType.error,
+        oneLine: false,
+      );
 
       await _crashlytics.recordError(e, stack,
           reason: 'Server returned HttpsError for ${purchaseDetails.productID}',
