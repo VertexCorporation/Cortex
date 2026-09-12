@@ -85,7 +85,6 @@ class Utils {
         final mimeType = lookupMimeType(mediaPath, headerBytes: mediaBytes) ??
             'application/octet-stream';
 
-        // Ensure it's media (we optionally could restrict down to mp4, wav, etc.)
         if (!mimeType.startsWith('image/') &&
             !mimeType.startsWith('video/') &&
             !mimeType.startsWith('audio/')) {
@@ -100,6 +99,22 @@ class Utils {
       debugPrint("Error reading or encoding media file: $e");
     }
     return null;
+  }
+
+  /// Reads only enough bytes for MIME sniffing. Some Android/iOS picker cache
+  /// files have generic or missing extensions even though they contain a valid
+  /// image. Relying only on the path can therefore make a visible attachment
+  /// disappear from the API payload.
+  static Future<List<int>> _readMimeProbe(File file) async {
+    RandomAccessFile? handle;
+    try {
+      handle = await file.open();
+      return await handle.read(512);
+    } catch (_) {
+      return const <int>[];
+    } finally {
+      await handle?.close();
+    }
   }
 
   /// Processes an attachment path and returns the correct OpenAI-compatible content block.
@@ -140,13 +155,28 @@ class Utils {
       }
 
       final file = File(path);
-      if (!await file.exists()) return null;
+      if (!await file.exists()) {
+        debugPrint("[Utils] Attachment no longer exists: $path");
+        return null;
+      }
 
-      final mimeType = lookupMimeType(path) ?? 'application/octet-stream';
-      final String fileName = path.split('/').last;
-      final String extension = fileName.split('.').last.toLowerCase();
+      final mimeProbe = await _readMimeProbe(file);
+      final mimeType = lookupMimeType(
+            path,
+            headerBytes: mimeProbe.isEmpty ? null : mimeProbe,
+          ) ??
+          'application/octet-stream';
+      final String fileName = file.uri.pathSegments.isNotEmpty
+          ? file.uri.pathSegments.last
+          : path.split('/').last;
+      final int dotIndex = fileName.lastIndexOf('.');
+      final String extension = dotIndex >= 0 && dotIndex < fileName.length - 1
+          ? fileName.substring(dotIndex + 1).toLowerCase()
+          : '';
 
-      // 1. Handle Media (Images, Video, Audio) - send as base64 data URL
+      // 1. Handle Media (Images, Video, Audio) - send as base64 data URL.
+      // MIME is sniffed from file bytes so picker-cache paths without a useful
+      // extension still reach vision-capable models.
       if (mimeType.startsWith('image/') ||
           mimeType.startsWith('video/') ||
           mimeType.startsWith('audio/')) {
@@ -164,6 +194,8 @@ class Utils {
             mediaType: {"url": base64Url}
           };
         }
+        debugPrint("[Utils] Failed to encode media attachment: $path");
+        return null;
       }
 
       // 2. Text-based files - read directly (no tool needed)

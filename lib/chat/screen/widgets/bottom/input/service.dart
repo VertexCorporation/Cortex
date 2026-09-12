@@ -70,12 +70,14 @@ class InputService {
     try {
       if (source == ImageSource.gallery) {
         List<XFile> pickedFiles = [];
+        bool pickedImages = false;
         if (supportImage) {
           pickedFiles = await _imagePicker.pickMultiImage(
             imageQuality: 80,
             maxWidth: 1920,
             maxHeight: 1920,
           );
+          pickedImages = true;
         } else if (supportVideo) {
           final XFile? file = await _imagePicker.pickVideo(source: source);
           if (file != null) pickedFiles.add(file);
@@ -87,17 +89,19 @@ class InputService {
           if (!_canAddMoreAttachments(inputProvider)) break;
 
           final File file = File(pickedFile.path);
-          final String pathLower = file.path.toLowerCase();
-          final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif',
-              '.bmp', '.heic', '.heif']
-              .any((ext) => pathLower.endsWith(ext));
-
+          // ImagePicker already tells us which picker was used. Do not infer
+          // this again from a temporary cache filename, which may have a
+          // generic or missing extension on some Android/iOS devices.
           await _validateAndAddAttachment(inputProvider, file,
-              isImage: isImage);
+              isImage: pickedImages);
+        }
+
+        if (pickedImages) {
+          _promoteSelectedSeriesForImage(context);
         }
       } else {
         XFile? pickedFile;
-        // For camera, usually we separate pickImage and pickVideo, but here we just keep pickImage for now unless video is specifically supported (camera video recording).
+        bool pickedImage = false;
         if (supportImage) {
           pickedFile = await _imagePicker.pickImage(
             source: source,
@@ -105,6 +109,7 @@ class InputService {
             maxWidth: 1920,
             maxHeight: 1920,
           );
+          pickedImage = true;
         } else if (supportVideo) {
           pickedFile = await _imagePicker.pickVideo(source: source);
         }
@@ -112,12 +117,11 @@ class InputService {
         if (pickedFile == null) return;
 
         final File file = File(pickedFile.path);
-        final String pathLower = file.path.toLowerCase();
-        final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif',
-            '.bmp', '.heic', '.heif']
-            .any((ext) => pathLower.endsWith(ext));
-
-        await _validateAndAddAttachment(inputProvider, file, isImage: isImage);
+        await _validateAndAddAttachment(inputProvider, file,
+            isImage: pickedImage);
+        if (pickedImage) {
+          _promoteSelectedSeriesForImage(context);
+        }
       }
 
       onSelectionComplete();
@@ -147,17 +151,14 @@ class InputService {
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: dynamicExtensions,
-        allowMultiple: true, // Allow selecting multiple files at once
+        allowMultiple: true,
       );
 
       if (result == null || result.files.isEmpty) return;
 
       // 3. Process each selected file
-      // We loop through them to validate limits individually.
       for (final platformFile in result.files) {
         if (platformFile.path == null) continue;
-
-        // Stop if user tries to add more than the limit in a batch
         if (!_canAddMoreAttachments(inputProvider)) break;
 
         final File file = File(platformFile.path!);
@@ -174,10 +175,8 @@ class InputService {
 
   // --- Helper: Validation & State Update ---
 
-  /// Checks if the user has reached the maximum number of attachments (4).
   bool _canAddMoreAttachments(InputProvider inputProvider) {
     if (inputProvider.attachments.length >= _maxAttachmentCount) {
-      // Optional: Show a toast/snackbar here telling the user "Max 4 files".
       debugPrint("Attachment limit reached ($_maxAttachmentCount).");
       return false;
     }
@@ -188,16 +187,11 @@ class InputService {
   Future<void> _validateAndAddAttachment(InputProvider inputProvider, File file,
       {required bool isImage}) async {
     try {
-      // Async operation: Get file size
       final int sizeInBytes = await file.length();
 
-      // Security Check:
-      // Even if a user renames 'game.exe' (500MB) to 'game.txt',
-      // this check prevents it from entering our system.
       if (sizeInBytes > _maxFileSizeInBytes) {
         debugPrint(
             "File rejected: Size (${sizeInBytes / 1024 / 1024} MB) exceeds limit.");
-        // Optional: Trigger a UI notification via a helper service
         return;
       }
 
@@ -238,6 +232,57 @@ class InputService {
       debugPrint("InputService: Durable copy failed, keeping original: $e");
       return source;
     }
+  }
+
+  /// If a server-side series contains a dedicated vision variant, select that
+  /// concrete variant as soon as an image is attached. This keeps the visible
+  /// series choice while preventing SendService from ever silently falling
+  /// back to the first text-only variant for the image request.
+  void _promoteSelectedSeriesForImage(BuildContext context) {
+    final sessionProvider = context.read<ChatSessionProvider>();
+    if (sessionProvider.isDynamicChat) return;
+
+    final selected = sessionProvider.selectedModel;
+    final variants = selected?.variants;
+    if (selected == null ||
+        !selected.isServerSide ||
+        variants == null ||
+        variants.isEmpty) {
+      return;
+    }
+
+    String? fallbackVisionId;
+    String? preferredVisionId;
+
+    for (final entry in variants.entries) {
+      final raw = entry.value;
+      if (raw is! Map) continue;
+      final variant = Map<String, dynamic>.from(raw);
+      final modalities = variant['modalities'];
+      if (modalities is! Map || modalities['image'] != true) continue;
+
+      final id = variant['id']?.toString().trim() ?? entry.key.trim();
+      if (id.isEmpty || id.toLowerCase().contains('guard')) continue;
+
+      fallbackVisionId ??= id;
+      final tier = variant['tier']?.toString().toLowerCase() ?? 'free';
+      final needsPaidAccess = tier == 'premium' ||
+          tier == 'plus' ||
+          tier == 'pro' ||
+          tier == 'ultra';
+      if (!needsPaidAccess || sessionProvider.isUserSubscribed) {
+        preferredVisionId = id;
+        break;
+      }
+    }
+
+    final targetId = preferredVisionId ??
+        (sessionProvider.isUserSubscribed ? fallbackVisionId : null);
+    if (targetId == null || targetId == sessionProvider.modelId) return;
+
+    debugPrint(
+        "[InputService] Image attached. Promoting series '${selected.id}' to vision variant '$targetId'.");
+    sessionProvider.updateActiveModelVariant(targetId);
   }
 
   // --- Model Selection Logic (Existing) ---
@@ -292,6 +337,14 @@ class InputService {
       } else {
         sessionProvider.updateActiveModelVariant(newModelId);
       }
+
+      // If an image was attached before switching models, re-resolve the newly
+      // selected series to its vision variant immediately.
+      final inputProvider = context.read<InputProvider>();
+      if (inputProvider.attachments
+          .any((attachment) => attachment.type == AttachmentType.image)) {
+        _promoteSelectedSeriesForImage(context);
+      }
     } catch (e) {
       debugPrint("Error switching model: $e");
       sessionProvider.updateActiveModelVariant(newModelId);
@@ -305,21 +358,19 @@ class InputService {
     required bool isServerSide,
     required bool isDynamicChat,
     required bool isPremium,
-    required int attachmentCount, // New Parameter: Number of files
-    required bool isSearchEnabled, // Included web search cost
-    bool isRagEnabled = false, // Included document-chat (RAG) cost
+    required int attachmentCount,
+    required bool isSearchEnabled,
+    bool isRagEnabled = false,
   }) {
     if (!isServerSide) return 0;
 
-    // Define Costs
     const int attachmentCostPerUnit = 30;
     const int searchCost = 5;
     const int ragCost = 5;
 
-    // Determine Base Cost
-    int baseCost = 5; // Standard
+    int baseCost = 5;
     if (isDynamicChat || isPremium) {
-      baseCost = 20; // Premium / Auto
+      baseCost = 20;
     }
 
     if (isSearchEnabled) {
@@ -330,9 +381,7 @@ class InputService {
       baseCost += ragCost;
     }
 
-    // Formula: Base + (N * 30)
     final int totalAttachmentCost = attachmentCount * attachmentCostPerUnit;
-
     return baseCost + totalAttachmentCost;
   }
 
@@ -350,7 +399,6 @@ class InputService {
     required SubscriptionTier userTier,
     required int? totalCredits,
   }) {
-    // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
       return false;
     }
@@ -359,9 +407,9 @@ class InputService {
       return false;
     }
 
+    final sessionProvider = context.read<ChatSessionProvider>();
     final isOfflineMode = !isDynamicChatMode && !isServerSideModel;
-    if (isOfflineMode &&
-        !context.read<ChatSessionProvider>().isLocalModelLoaded) {
+    if (isOfflineMode && !sessionProvider.isLocalModelLoaded) {
       return false;
     }
 
@@ -393,10 +441,19 @@ class InputService {
     }
 
     final inputProvider = context.read<InputProvider>();
+    final bool hasImageAttachment = inputProvider.attachments
+        .any((attachment) => attachment.type == AttachmentType.image);
+
+    // Never allow an image to be silently sent through a model that cannot
+    // consume images. Dynamic Chat is exempt because SendService routes it to a
+    // vision-capable model for the request.
+    if (!isDynamicChatMode &&
+        hasImageAttachment &&
+        !sessionProvider.canHandleImage) {
+      return false;
+    }
 
     final int attachmentCount = inputProvider.attachments.length;
-
-    // 4. Overall Credit Check
     final needed = calculateRequiredCredits(
       isServerSide: isServerSideModel,
       isDynamicChat: isDynamicChatMode,
@@ -431,7 +488,6 @@ class InputService {
     required SubscriptionTier userTier,
     required int? totalCredits,
   }) {
-    // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
       return false;
     }
@@ -440,9 +496,9 @@ class InputService {
       return false;
     }
 
+    final sessionProvider = context.read<ChatSessionProvider>();
     final isOfflineMode = !isDynamicChatMode && !isServerSideModel;
-    if (isOfflineMode &&
-        !context.read<ChatSessionProvider>().isLocalModelLoaded) {
+    if (isOfflineMode && !sessionProvider.isLocalModelLoaded) {
       return false;
     }
 
@@ -476,11 +532,17 @@ class InputService {
     final inputProvider = context.read<InputProvider>();
     final String currentText = controller.text.trim();
 
-    // UPDATED: Check list length instead of single photo
     final int attachmentCount = inputProvider.attachments.length;
     final bool hasAttachments = attachmentCount > 0;
+    final bool hasImageAttachment = inputProvider.attachments
+        .any((attachment) => attachment.type == AttachmentType.image);
 
-    // 4. Overall Credit Check
+    if (!isDynamicChatMode &&
+        hasImageAttachment &&
+        !sessionProvider.canHandleImage) {
+      return false;
+    }
+
     final needed = calculateRequiredCredits(
       isServerSide: isServerSideModel,
       isDynamicChat: isDynamicChatMode,
@@ -497,12 +559,10 @@ class InputService {
       return false;
     }
 
-    // 5. Content Validation
     if (inputProvider.isEditingMode) {
       return currentText.isNotEmpty || hasAttachments;
     }
 
-    // Standard Mode: Must have text OR attachments
     return currentText.isNotEmpty || hasAttachments;
   }
 }

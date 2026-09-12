@@ -28,6 +28,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:sqflite/sqflite.dart';
+import '../security.dart';
 
 /// The [ModelRepository] class is responsible for all low-level data operations
 /// related to AI models. It abstracts the data sources from the rest of the application.
@@ -259,6 +260,12 @@ class ModelRepository {
     debugPrint("[ModelRepository] Starting full model sync with server...");
     try {
       final validPublicIds = await _fetchAndStorePublicModels(langCode);
+      if (validPublicIds == null) {
+        debugPrint(
+            "[ModelRepository] Server sync was rejected or incomplete. Preserving local catalog and last-sync state.");
+        return;
+      }
+
       debugPrint(
           "[ModelRepository] Public model sync complete. Found ${validPublicIds.length} valid IDs.");
 
@@ -275,16 +282,10 @@ class ModelRepository {
 
   /// Fetches the public model list from the remote server.
   ///
-  /// OPTIMIZATION NOTES FOR LOW-END DEVICES (ANR Prevention):
-  /// 1. **Isolate Parsing**: JSON parsing is moved to a background isolate via `compute`.
-  ///    This prevents the CPU from blocking the main thread during data processing.
-  /// 2. **Chunked Inserts**: Database writes are split into batches of 50.
-  /// 3. **UI Yielding**: After each batch commit, we `await Future.delayed(Duration.zero)`.
-  ///    This gives the UI thread a chance to render frames and handle events, preventing
-  ///    "Application Not Responding" errors on slow storage devices.
-  /// 4. **Deferred Vacuum**: Database optimization is performed only after all writes are done
-  ///    and after a brief cooling period.
-  Future<Set<String>> _fetchAndStorePublicModels(String langCode) async {
+  /// Returns null when the remote response cannot be trusted as a complete,
+  /// successful catalog. Null prevents stale cleanup and prevents the client from
+  /// advancing its last-successful-sync timestamp.
+  Future<Set<String>?> _fetchAndStorePublicModels(String langCode) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         _serverUrl,
@@ -298,23 +299,28 @@ class ModelRepository {
       if (response.statusCode != 200) {
         debugPrint(
             "[ModelRepository] Server returned status ${response.statusCode}. Skipping sync.");
-        return <String>{};
+        return null;
       }
 
       if (response.data == null) {
         debugPrint("[ModelRepository] Server returned empty data.");
-        return <String>{};
+        return null;
       }
 
       final rawServerData = response.data!;
 
-      // 1. Offload heavy JSON parsing to a background isolate.
       debugPrint(
           "[ModelRepository] Parsing server data in background isolate...");
       final parsedServerModels = await compute(
         _parseServerDataIsolate,
         {'data': rawServerData, 'langCode': langCode},
       );
+
+      if (parsedServerModels.isEmpty) {
+        debugPrint(
+            "[ModelRepository] Parsed catalog is empty. Treating response as incomplete.");
+        return null;
+      }
 
       final parsedFallbackModels = await compute(
         _parseServerDataIsolate,
@@ -327,64 +333,90 @@ class ModelRepository {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('fallback', json.encode(parsedFallbackModels));
 
-      final validServerIds =
-          parsedServerModels.map((m) => m['id']?.toString() ?? '').toSet();
-
-      // Filter out local/custom models just in case the server sent something weird.
+      // Filter out local/custom IDs and malformed entries. A remote catalog must
+      // never impersonate user-created/local model namespaces.
       final modelsToInsert = parsedServerModels.where((modelData) {
-        return !modelData['id'].startsWith('self_') &&
-            !modelData['id'].startsWith('local_');
+        final id = modelData['id']?.toString().trim() ?? '';
+        return id.isNotEmpty &&
+            !id.startsWith('self_') &&
+            !id.startsWith('local_');
       }).toList();
 
-      if (modelsToInsert.isNotEmpty) {
-        final db = await _dbHelper.database;
-        if (db != null) {
-          const int batchSize = 50; // Optimal chunk size to prevent locking
+      if (modelsToInsert.isEmpty) {
+        debugPrint(
+            "[ModelRepository] No valid public models remained after validation.");
+        return null;
+      }
 
-          for (var i = 0; i < modelsToInsert.length; i += batchSize) {
-            final end = (i + batchSize < modelsToInsert.length)
-                ? i + batchSize
-                : modelsToInsert.length;
-            final currentBatch = modelsToInsert.sublist(i, end);
+      final currentModels =
+          await _dbHelper.getAllModels(userId: _auth.currentUser?.uid);
+      final existingPublicCount = currentModels.where((model) {
+        final id = model['id']?.toString() ?? '';
+        return id.isNotEmpty &&
+            !id.startsWith('self_') &&
+            !id.startsWith('local_');
+      }).length;
 
-            final batch = db.batch();
+      if (!ModelSecurity.isPlausibleCatalogReplacement(
+        existingCount: existingPublicCount,
+        incomingCount: modelsToInsert.length,
+      )) {
+        debugPrint(
+            "[ModelRepository] Catalog shrink guard rejected ${modelsToInsert.length} incoming models against $existingPublicCount existing public models.");
+        return null;
+      }
 
-            for (var modelData in currentBatch) {
-              batch.insert(
-                  'models',
-                  {
-                    'id': modelData['id'],
-                    'producer': modelData['producer'] ?? 'Unknown',
-                    'title': modelData['title'] ?? modelData['id'],
-                    'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
-                    'type': modelData['type'] ?? 'online',
-                    'raw_json': json.encode(modelData),
-                  },
-                  conflictAlgorithm: ConflictAlgorithm.replace);
-            }
+      final validServerIds = modelsToInsert
+          .map((model) => model['id']?.toString().trim() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toSet();
 
-            try {
-              await batch.commit(noResult: true);
+      var writeFailed = false;
+      final db = await _dbHelper.database;
+      if (db != null) {
+        const int batchSize = 50; // Optimal chunk size to prevent locking
 
-              // 2. Yield to the UI thread to prevent ANRs on slow devices.
-              await Future.delayed(Duration.zero);
-            } catch (e) {
-              if (e.toString().contains("SQLITE_FULL")) {
-                debugPrint(
-                    "[ModelRepository] DISK FULL. Aborting model sync save.");
-                break;
-              } else {
-                rethrow;
-              }
+        for (var i = 0; i < modelsToInsert.length; i += batchSize) {
+          final end = (i + batchSize < modelsToInsert.length)
+              ? i + batchSize
+              : modelsToInsert.length;
+          final currentBatch = modelsToInsert.sublist(i, end);
+
+          final batch = db.batch();
+
+          for (var modelData in currentBatch) {
+            batch.insert(
+                'models',
+                {
+                  'id': modelData['id'],
+                  'producer': modelData['producer'] ?? 'Unknown',
+                  'title': modelData['title'] ?? modelData['id'],
+                  'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
+                  'type': modelData['type'] ?? 'online',
+                  'raw_json': json.encode(modelData),
+                },
+                conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+
+          try {
+            await batch.commit(noResult: true);
+            await Future.delayed(Duration.zero);
+          } catch (e) {
+            if (e.toString().contains("SQLITE_FULL")) {
+              debugPrint(
+                  "[ModelRepository] DISK FULL. Aborting model sync save without advancing sync state.");
+              writeFailed = true;
+              break;
+            } else {
+              rethrow;
             }
           }
         }
       }
 
-      // 3. Allow UI to breathe before the heavy VACUUM operation.
-      await Future.delayed(const Duration(milliseconds: 100));
+      if (writeFailed) return null;
 
-      // 4. Perform database optimization.
+      await Future.delayed(const Duration(milliseconds: 100));
       await _dbHelper.optimizeDatabase();
 
       return validServerIds;
@@ -394,7 +426,7 @@ class ModelRepository {
             "[ModelRepository] Server Error (500). Using local cache instead.");
         FirebaseCrashlytics.instance
             .log("Server 500 error on model sync. Skipping.");
-        return <String>{};
+        return null;
       }
 
       final errorString = e.toString();
@@ -402,7 +434,7 @@ class ModelRepository {
           errorString.contains("HandshakeException")) {
         debugPrint(
             "[ModelRepository] SSL/Certificate Error detected (Likely user network issue). Using local cache.");
-        return <String>{};
+        return null;
       }
 
       if (e.type == DioExceptionType.connectionTimeout ||
@@ -412,18 +444,18 @@ class ModelRepository {
           e.error is SocketException) {
         debugPrint(
             "[ModelRepository] Network timeout or connection error (${e.type}). Using local cache.");
-        return <String>{};
+        return null;
       }
 
       debugPrint("[ModelRepository] Unexpected DioException: $e");
       FirebaseCrashlytics.instance
           .recordError(e, s, reason: 'Failed to sync public models');
-      return <String>{};
+      return null;
     } catch (e, s) {
       debugPrint("[ModelRepository] Generic error: $e");
       FirebaseCrashlytics.instance
           .recordError(e, s, reason: 'Unexpected failure in public model sync');
-      return <String>{};
+      return null;
     }
   }
 
@@ -732,9 +764,13 @@ class ModelRepository {
         if (model != null) finalList.add(model);
       }
     }
-    // Normalize before persistence so duplicate legacy series IDs from
-    // different producers cannot overwrite each other in the model table.
-    return ModelDefaults.normalizeModelFamilies(finalList);
+    // Normalize into family groups first (legacy series IDs from different
+    // producers cannot overwrite each other in the model table), then make
+    // any remaining duplicate model IDs unique per producer so persistence
+    // can never upsert one model over another.
+    return ModelSecurity.disambiguateDuplicateModelIds(
+      ModelDefaults.normalizeModelFamilies(finalList),
+    );
   }
 
   static Map<String, dynamic>? _staticParseSingleVariantModel(String seriesName,
@@ -824,6 +860,8 @@ class ModelRepository {
       if (variantData is! Map<String, dynamic>) continue;
 
       final cleanVariantData = _staticSanitizeRawData(variantData);
+      final variantId = cleanVariantData['id']?.toString().trim() ?? '';
+      if (variantId.isEmpty) continue;
 
       final descriptionMap = _safeStringKeyMap(cleanVariantData['description']);
 
@@ -833,9 +871,9 @@ class ModelRepository {
       final bool isVariantLocalized = (_normalizedLangCode(langCode) == 'en') ||
           _hasLocalizedString(descriptionMap, langCode);
 
-      variants[cleanVariantData['id'] as String] = {
+      variants[variantId] = {
         ...cleanVariantData,
-        'id': cleanVariantData['id'],
+        'id': variantId,
         'title': cleanVariantData['title'] ?? variantKey,
         'summary': localizedSeriesSummary,
         'description': localizedVariantDescription,

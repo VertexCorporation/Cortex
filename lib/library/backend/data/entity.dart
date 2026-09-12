@@ -183,6 +183,30 @@ class ModelEntity {
       return null;
     }
 
+    /// A top-level catalog entry can represent a series rather than one exact
+    /// backend model. Synapse keeps capabilities on individual variants, while
+    /// the UI asks the parent ModelEntity whether it can accept an image/audio
+    /// input. Aggregate true capabilities from every variant so those two views
+    /// cannot disagree. Explicit parent values are preserved.
+    Map<String, dynamic> aggregateModalities() {
+      final result = _safeStringKeyMap(map['modalities']);
+      final rawVariants = map['variants'];
+      if (rawVariants is! Map) return result;
+
+      for (final rawVariant in rawVariants.values) {
+        if (rawVariant is! Map) continue;
+        final variantModalities = _safeStringKeyMap(rawVariant['modalities']);
+        for (final entry in variantModalities.entries) {
+          if (entry.value == true) {
+            result[entry.key] = true;
+          } else {
+            result.putIfAbsent(entry.key, () => entry.value);
+          }
+        }
+      }
+      return result;
+    }
+
     final id = map['id']?.toString() ?? 'unknown';
     final seriesSource = getStringOrLocalized(map['series']);
     final rawTitleCandidate = getLocalizedFieldFromDetails('title') ??
@@ -230,7 +254,7 @@ class ModelEntity {
       tier: getStringOrLocalized(map['tier']) ?? 'free',
       size: int.tryParse(map['size']?.toString() ?? ''),
       ram: int.tryParse(map['ram']?.toString() ?? ''),
-      modalities: _safeStringKeyMap(map['modalities']),
+      modalities: aggregateModalities(),
       outputs: _safeStringKeyMap(map['outputs']),
       toolUse: map['toolUse'] == true,
       variants: map['variants'] is Map

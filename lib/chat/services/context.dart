@@ -113,13 +113,13 @@ class ContextService {
     List<Map<String, dynamic>> textParts = [];
     List<Map<String, dynamic>> mediaParts = [];
 
-    // 1. Text Content
+    // 1. Text Content. `message.model` is UI/storage metadata, not dialogue.
+    // Prefixing it into assistant text causes cross-model identity contamination
+    // when the user switches from e.g. Cortex to Llama or Claude.
     if (message.text.isNotEmpty) {
       final String processedText = message.isUserMessage
           ? LocalPiiRedactionFilter.redact(message.text)
-          : (message.model != null && message.model!.isNotEmpty
-              ? "[Model: ${message.model}] ${message.text}"
-              : message.text);
+          : message.text;
       final contextText = message.isUserMessage
           ? processedText
           : processedText.replaceAll(_toolWidgetMarker, '').trim();

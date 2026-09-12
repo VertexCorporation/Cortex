@@ -20,6 +20,7 @@ import 'package:cortex/library/backend/system.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'data/user.dart';
+import 'security.dart';
 
 /// Describes the compatibility of a model with the current device's hardware.
 enum CompatibilityStatus {
@@ -106,7 +107,10 @@ class ModelsBackendUtils {
     assert(filesDir.isNotEmpty, 'filesDir must not be empty');
     assert(modelId.isNotEmpty, 'modelId must not be empty');
 
-    final fullPath = p.join(filesDir, '$modelId.gguf');
+    final fullPath = ModelSecurity.resolveModelFilePath(
+      filesDir: filesDir,
+      modelId: modelId,
+    );
 
     dev.log(
       '[CANONICAL_PATH] getFilePathById(id: $modelId) → $fullPath',
