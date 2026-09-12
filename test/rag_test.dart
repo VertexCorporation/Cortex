@@ -24,6 +24,21 @@ class FakeRagStorage extends RagStorageService {
   }
 
   @override
+  Future<RagDocument?> getDocumentByPath(String filePath) async {
+    for (final doc in docs) {
+      if (doc.filePath == filePath) return doc;
+    }
+    return null;
+  }
+
+  @override
+  Future<List<RagDocument>> getDocumentsByIds(
+    Iterable<String> documentIds,
+  ) async {
+    return [for (final doc in docs) if (documentIds.contains(doc.id)) doc];
+  }
+
+  @override
   Future<Map<String, List<RagChunk>>> getChunksByDocument(
     List<String> documentIds,
   ) async {

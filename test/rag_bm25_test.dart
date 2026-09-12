@@ -31,6 +31,21 @@ class FakeRagStorage extends RagStorageService {
     }
     return null;
   }
+
+  @override
+  Future<List<RagDocument>> getIndexedDocuments() async {
+    return [
+      for (final doc in docs)
+        if (doc.status == RagDocumentStatus.indexed) doc
+    ];
+  }
+
+  @override
+  Future<List<RagDocument>> getDocumentsByIds(
+    Iterable<String> documentIds,
+  ) async {
+    return [for (final doc in docs) if (documentIds.contains(doc.id)) doc];
+  }
 }
 
 RagDocument _doc(String id, String title,

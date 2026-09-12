@@ -4,17 +4,27 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cortex/cache.dart';
+import 'package:cortex/performance/stable_fingerprint.dart';
+import 'package:cortex/performance/write_behind.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cortex/cache.dart';
+
 import 'subscription.dart';
 
-/// A provider class to manage the authenticated user's state and data.
+class _UserCacheWrite {
+  const _UserCacheWrite({required this.uid, required this.json});
+  final String uid;
+  final String json;
+}
+
+/// Single source of truth for authenticated user data.
 ///
-/// This class is the single source of truth for user information. It handles
-/// fetching data from Firestore, caching it locally to allow offline usage,
-/// and providing reactive updates to the UI.
+/// Firestore can replay semantically identical snapshots (cache -> server,
+/// metadata changes, listener reattachment). A stable fingerprint suppresses
+/// redundant provider rebuilds and persistence. Cache writes are replaceable,
+/// so a short write-behind queue folds bursts into one SharedPreferences write.
 class UserProvider with ChangeNotifier {
   final FirebaseAuth? _authOverride;
   final FirebaseFirestore? _firestoreOverride;
@@ -29,12 +39,29 @@ class UserProvider with ChangeNotifier {
     Map<String, dynamic>? initialData,
   })  : _authOverride = auth,
         _firestoreOverride = firestore,
-        _userData = initialData;
+        _userData = initialData {
+    if (initialData != null) _dataFingerprint.changed(initialData);
+  }
 
   Map<String, dynamic>? _userData;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
   String? _activeUid;
   int _listenerGeneration = 0;
+  bool _disposed = false;
+
+  final FingerprintGuard _dataFingerprint = FingerprintGuard();
+
+  late final LatestWriteQueue<_UserCacheWrite> _cacheWrites =
+      LatestWriteQueue<_UserCacheWrite>(
+    delay: const Duration(milliseconds: 250),
+    writer: (write) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_cacheKeyForUid(write.uid), write.json);
+    },
+    onError: (error, stack) {
+      debugPrint('[UserProvider] deferred cache write failed: $error');
+    },
+  );
 
   String _cacheKeyForUid(String uid) => 'cached_user_data_$uid';
 
@@ -70,22 +97,17 @@ class UserProvider with ChangeNotifier {
         _safeCurrentUser?.uid == user.uid;
   }
 
-  // --- Public Getters ---
-
-  /// The current user's data as a map. Returns null if not logged in.
   Map<String, dynamic>? get userData => _userData;
 
   @visibleForTesting
   set userData(Map<String, dynamic>? data) {
+    if (!_dataFingerprint.changed(data)) return;
     _userData = data;
-    notifyListeners();
+    if (!_disposed) notifyListeners();
   }
 
-  /// Returns true if a user is authenticated and their data has been loaded.
   bool get isLoggedIn => _safeCurrentUser != null && _userData != null;
 
-  /// Returns true only when the app has user data that can safely drive
-  /// entitlement-sensitive UI.
   bool get isUserStateReady {
     final user = _safeCurrentUser;
     final data = _userData;
@@ -94,31 +116,18 @@ class UserProvider with ChangeNotifier {
     return _activeUid == user.uid;
   }
 
-  /// The user's display name. Defaults to 'Guest' if unavailable.
   String get username => _userData?['username'] as String? ?? 'Guest';
-
-  /// Whether the server has flagged this account as an internal Vertex test
-  /// account. Gates debug-only simulated purchase flows (server re-checks it
-  /// on every call — never a client-side security boundary).
   bool get isVertex => _userData?['isVertex'] == true;
 
-  /// Checks if the current user is in 'Guest/Anonymous' mode.
-  /// First checks the auth provider, then falls back to accountType.
   bool get isAnonymous {
     final user = _safeCurrentUser;
     if (user != null && user.isAnonymous) return true;
-
     if (_userData == null) return false;
     return _userData!['accountType'] == 'anonymous';
   }
 
-  /// The user's subscription entitlement, resolved from the nested
-  /// `users/{uid}.subscription` map.
-  ///
-  /// Anonymous users and missing maps resolve to the free entitlement. This
-  /// is the getter UI code should use instead of reading the raw document —
-  /// it tolerates both Firestore timestamps and cached ISO strings.
-  SubscriptionEntitlement get subscription => SubscriptionEntitlement.fromUserData(
+  SubscriptionEntitlement get subscription =>
+      SubscriptionEntitlement.fromUserData(
         _userData,
         isAnonymous: isAnonymous,
       );
@@ -135,25 +144,23 @@ class UserProvider with ChangeNotifier {
   /// The first initial of the user's name for use in avatars. Defaults to '?'.
   String get profileInitial {
     final name = username;
-    if (name.trim().isEmpty || name == 'Guest') {
-      return '?';
-    }
+    if (name.trim().isEmpty || name == 'Guest') return '?';
     return name.trim()[0].toUpperCase();
   }
 
-  /// Listens for real-time updates to the user's document in Firestore.
-  ///
-  /// This method should be called when a user signs in. It sets up a stream
-  /// that automatically updates the provider's state when data changes.
   void listenToUserData(User user) {
-    // Cancel any existing subscription to avoid memory leaks.
     _listenerGeneration++;
     final generation = _listenerGeneration;
+    final accountChanged = _activeUid != user.uid;
     _activeUid = user.uid;
     _userSubscription?.cancel();
+
+    if (accountChanged) _dataFingerprint.reset();
+
     if (_userData != null && !_dataBelongsToUser(_userData!, user)) {
       _userData = null;
-      notifyListeners();
+      _dataFingerprint.changed(null);
+      if (!_disposed) notifyListeners();
     }
 
     _userSubscription = _firestore
@@ -161,135 +168,117 @@ class UserProvider with ChangeNotifier {
         .doc(user.uid)
         .snapshots()
         .listen((snapshot) {
-      if (!_isCurrentUser(user, generation)) {
+      if (!_isCurrentUser(user, generation) || _disposed) {
         debugPrint(
-            "[UserProvider] Ignored stale user snapshot for: ${user.uid}");
+          '[UserProvider] Ignored stale user snapshot for: ${user.uid}',
+        );
         return;
       }
 
-      if (snapshot.exists) {
-        final data = snapshot.data();
+      if (!snapshot.exists) return;
+      final data = snapshot.data();
+      if (data == null) return;
 
-        // Safety: Only update if data is not null.
-        if (data != null) {
-          _userData = data;
-          _cacheUserData(data); // Persist updated data to local cache.
+      // Skip identical cache/server replays before JSON encoding, disk writes
+      // and ChangeNotifier fan-out.
+      if (!_dataFingerprint.changed(data)) return;
 
-          debugPrint(
-              "[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
-          notifyListeners();
-          debugPrint("[UserProvider] User data updated for: ${user.uid}");
-        }
-      }
+      _userData = data;
+      unawaited(_cacheUserData(data, uid: user.uid));
+      notifyListeners();
+      debugPrint('[UserProvider] User data updated for: ${user.uid}');
     }, onError: (error) {
-      if (!_isCurrentUser(user, generation)) {
-        debugPrint("[UserProvider] Ignored stale user error for: ${user.uid}");
+      if (!_isCurrentUser(user, generation) || _disposed) {
+        debugPrint('[UserProvider] Ignored stale user error for: ${user.uid}');
         return;
       }
 
-      debugPrint("[UserProvider] Error listening to user data: $error");
-
-      // UPDATED LOGIC: Do not clear data on transient network errors.
-      // We only force a sign-out state if the permission is explicitly denied,
-      // which usually means the user was banned or deleted server-side.
-      // For network errors, we keep the stale data (Fault Tolerance).
+      debugPrint('[UserProvider] Error listening to user data: $error');
       if (error is FirebaseException && error.code == 'permission-denied') {
-        clearDataOnSignOut();
+        unawaited(clearDataOnSignOut());
       }
     });
   }
 
-  /// Fetches the initial user data for a responsive UI on app launch or sign-in.
-  ///
-  /// It prioritizes loading from the cache for immediate UI feedback,
-  /// then fetches the latest data from the server to ensure freshness.
   Future<void> fetchInitialData(User user) async {
+    final accountChanged = _activeUid != user.uid;
     _activeUid = user.uid;
+    if (accountChanged) _dataFingerprint.reset();
     final generation = _listenerGeneration;
 
     try {
       if (_userData != null && !_dataBelongsToUser(_userData!, user)) {
         _userData = null;
-        notifyListeners();
+        _dataFingerprint.changed(null);
+        if (!_disposed) notifyListeners();
       }
 
-      // 1. Load from cache so the UI isn't blocked/blank.
       await loadFromCache(user: user);
-      if (!_isCurrentUser(user, generation)) {
-        debugPrint(
-            "[UserProvider] Ignored stale cached fetch for: ${user.uid}");
+      if (!_isCurrentUser(user, generation) || _disposed) {
+        debugPrint('[UserProvider] Ignored stale cached fetch for: ${user.uid}');
         return;
       }
 
-      // If we found cached data, notify immediately to show the UI.
-      if (_userData != null) notifyListeners();
-
-      // 2. Fetch the authoritative data from the server.
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      if (!_isCurrentUser(user, generation)) {
-        debugPrint(
-            "[UserProvider] Ignored stale server fetch for: ${user.uid}");
+      if (!_isCurrentUser(user, generation) || _disposed) {
+        debugPrint('[UserProvider] Ignored stale server fetch for: ${user.uid}');
         return;
       }
 
       if (doc.exists) {
         final data = doc.data();
-        if (data != null) {
+        if (data != null && _dataFingerprint.changed(data)) {
           _userData = data;
-          await _cacheUserData(data);
-          notifyListeners(); // Rebuild with fresh data.
+          await _cacheUserData(data, uid: user.uid);
+          if (!_disposed) notifyListeners();
           debugPrint(
-              "[UserProvider] Initial user data fetched for: ${user.uid}");
+            '[UserProvider] Initial user data fetched for: ${user.uid}',
+          );
         }
       }
     } catch (e) {
-      debugPrint("[UserProvider] Error fetching initial data: $e");
-      // Note: We don't throw here. If fetching fails, we stay with cached data
-      // (or null data), preventing a crash.
+      debugPrint('[UserProvider] Error fetching initial data: $e');
     }
   }
 
-  /// Clears all user data and cancels the Firestore stream subscription.
-  ///
-  /// This should be called when the user signs out to clean up resources
-  /// and reset the application's state.
   Future<void> clearDataOnSignOut() async {
     _listenerGeneration++;
     _activeUid = null;
     await _userSubscription?.cancel();
     _userSubscription = null;
+
+    // Ensure a deferred write from the previous account cannot race after the
+    // cache deletion and recreate signed-out state on disk.
+    await _cacheWrites.flush();
+
     _userData = null;
+    _dataFingerprint.reset();
     await _clearCachedUserData();
     CacheService.clearAll();
-    notifyListeners();
-    debugPrint("[UserProvider] All user data and listeners cleared.");
+    if (!_disposed) notifyListeners();
+    debugPrint('[UserProvider] All user data and listeners cleared.');
   }
 
-  // --- Private Helper Methods ---
-
-  /// Caches the user data to SharedPreferences as a JSON string.
-  /// Handles Firestore [Timestamp] conversion to String for JSON compatibility.
-  Future<void> _cacheUserData(Map<String, dynamic> data) async {
+  Future<void> _cacheUserData(
+    Map<String, dynamic> data, {
+    required String uid,
+  }) async {
     try {
-      final uid = _auth.currentUser?.uid;
-      if (uid == null || uid.isEmpty) return;
-
-      final prefs = await SharedPreferences.getInstance();
+      if (uid.isEmpty) return;
       final jsonString = jsonEncode(
         data,
         toEncodable: (object) =>
             object is Timestamp ? object.toDate().toIso8601String() : object,
       );
-      await prefs.setString(_cacheKeyForUid(uid), jsonString);
+      _cacheWrites.add(_UserCacheWrite(uid: uid, json: jsonString));
     } catch (e) {
-      debugPrint("[UserProvider] Cache write error: $e");
+      debugPrint('[UserProvider] Cache encode error: $e');
     }
   }
 
-  /// Loads user data from the SharedPreferences cache, if it exists.
   Future<void> loadFromCache({User? user}) async {
-    final currentUser = user ?? _auth.currentUser;
-    if (currentUser == null) return;
+    final currentUser = user ?? _safeCurrentUser;
+    if (currentUser == null || _disposed) return;
 
     final prefs = await SharedPreferences.getInstance();
     final cacheKey = _cacheKeyForUid(currentUser.uid);
@@ -297,45 +286,55 @@ class UserProvider with ChangeNotifier {
     final isLegacyCache = jsonString == null;
     jsonString ??= prefs.getString('cached_user_data');
 
-    if (jsonString != null) {
-      try {
-        final decoded = jsonDecode(jsonString);
-        if (decoded is! Map<String, dynamic> ||
-            !_dataBelongsToUser(decoded, currentUser)) {
-          if (isLegacyCache) {
-            await prefs.remove('cached_user_data');
-          }
-          if (_userData != null &&
-              !_dataBelongsToUser(_userData!, currentUser)) {
-            _userData = null;
-          }
-          debugPrint(
-              "[UserProvider] Cached data ignored because it belongs to another user.");
-          return;
-        }
+    if (jsonString == null) return;
 
-        _userData = decoded;
-        if (isLegacyCache) {
-          await prefs.setString(cacheKey, jsonString);
-          await prefs.remove('cached_user_data');
+    try {
+      final decoded = jsonDecode(jsonString);
+      if (decoded is! Map<String, dynamic> ||
+          !_dataBelongsToUser(decoded, currentUser)) {
+        if (isLegacyCache) await prefs.remove('cached_user_data');
+        if (_userData != null &&
+            !_dataBelongsToUser(_userData!, currentUser)) {
+          _userData = null;
+          _dataFingerprint.changed(null);
         }
-        debugPrint("[UserProvider] Cached data loaded successfully.");
-        // Notify listeners so the UI (AppBar, etc.) picks up the cached data immediately.
-        notifyListeners();
-      } catch (e) {
-        debugPrint("[UserProvider] Failed to parse cached user data: $e");
+        debugPrint(
+          '[UserProvider] Cached data ignored because it belongs to another user.',
+        );
+        return;
       }
+
+      final changed = _dataFingerprint.changed(decoded);
+      _userData = decoded;
+      if (isLegacyCache) {
+        await prefs.setString(cacheKey, jsonString);
+        await prefs.remove('cached_user_data');
+      }
+      debugPrint('[UserProvider] Cached data loaded successfully.');
+      if (changed && !_disposed) notifyListeners();
+    } catch (e) {
+      debugPrint('[UserProvider] Failed to parse cached user data: $e');
     }
   }
 
-  /// Removes the user data from the SharedPreferences cache.
   Future<void> _clearCachedUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    for (final key in prefs.getKeys()) {
-      if (key.startsWith('cached_user_data_')) {
-        await prefs.remove(key);
-      }
+    final keys = prefs
+        .getKeys()
+        .where((key) => key.startsWith('cached_user_data_'))
+        .toList(growable: false);
+    for (final key in keys) {
+      await prefs.remove(key);
     }
     await prefs.remove('cached_user_data');
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _listenerGeneration++;
+    _userSubscription?.cancel();
+    unawaited(_cacheWrites.flush());
+    super.dispose();
   }
 }

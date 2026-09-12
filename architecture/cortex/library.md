@@ -10,6 +10,14 @@ Chain: repository -> typed ModelEntity -> ModelService cache/business rules -> p
 - `ModelService` (service.dart) — ChangeNotifier business layer: `getModels(langCode)` with per-language caching (`_ensureCachedLanguage`, `clearAllCache`), base-model validation (`_validateAndAssignDefaultBaseModels`), cache mutations for custom-model changes (`addModelToEntityCache`, `removeModelFromEntityCache`, `updateCachedEntity`), and `updateBaseModel`.
 - Support: `DatabaseHelper` (database.dart), `ModelDefaults` (defaults.dart), `ChatFormat`/`ChatTokens` (format.dart), `ModelImageCache` (image.dart), `CryptoHelper` (crypto.dart), `UserModels` (user.dart).
 
+### Image path cache
+
+`ModelImageCache` holds the newest model-cover path map in memory and persists it in SharedPreferences. Individual cover downloads are replaceable cache mutations, so path writes use a short write-behind window: a burst of additions serializes the newest map rather than rewriting the entire JSON map for every intermediate state. `savePaths` and destructive `remove` operations still flush durably. A pending newest snapshot remains readable even if the normal in-memory map is invalidated while persistence is in flight.
+
+Frequently rebuilt image widgets should not issue a storage syscall on every build. `FileProbeCache` (`performance/file_probe_cache.dart`) provides a short-lived synchronous file existence/stat fast path with explicit invalidation hooks. This is a presentation optimization only; missing/expired probes fall back to the filesystem and image widgets retain their normal error fallbacks.
+
+The repository's network image synchronization policy itself remains in `ModelRepository._syncModelImages`; this runtime change does not make image downloads unbounded or move I/O into widgets.
+
 ## Downloads and offline runtime
 
 `ModelDownloadController` (download/controller.dart) and `DownloadManager`/`DownloadedModelsManager`/`DownloadedModel`/`FileDownloadHelper` (download/download.dart) manage GGUF downloads. `ModelRemoveService` (backend/remove.dart) removes models. `SystemInfoProvider`/`SystemInfoData` (system.dart) expose device capabilities. `ModelsBackendUtils`/`CompatibilityStatus` (utils.dart) hold compatibility rules; `ModelDataUtils` (library/utils.dart) formats model data.
