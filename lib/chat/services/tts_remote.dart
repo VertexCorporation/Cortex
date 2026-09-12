@@ -39,6 +39,8 @@ class RemoteTtsService {
 
   AudioPlayer? _player;
   bool _contextConfigured = false;
+  final Set<CancelToken> _requests = {};
+  int _generation = 0;
 
   /// The voice the user picked, kept here so voice mode does not have to reach
   /// for a provider on every sentence. VoiceCatalogProvider writes it; null
@@ -91,15 +93,20 @@ class RemoteTtsService {
     // An explicit id wins so the settings preview can audition a voice the
     // user has not committed to yet.
     final voice = voiceId ?? activeVoiceId;
+    final generation = _generation;
+    final cancelToken = CancelToken();
+    _requests.add(cancelToken);
 
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return null;
       final token = await user.getIdToken();
-      if (token == null) return null;
+      if (token == null || cancelToken.isCancelled ||
+          FirebaseAuth.instance.currentUser?.uid != user.uid) return null;
 
       final response = await _dio.post<List<int>>(
         _endpoint,
+        cancelToken: cancelToken,
         data: {
           'text': trimmed,
           if (voice != null && voice.isNotEmpty) 'voiceId': voice,
@@ -115,6 +122,8 @@ class RemoteTtsService {
         ),
       );
 
+      if (generation != _generation ||
+          FirebaseAuth.instance.currentUser?.uid != user.uid) return null;
       if (response.statusCode != 200 || response.data == null) {
         debugPrint("[RemoteTts] Declined: HTTP ${response.statusCode}");
         return null;
@@ -122,8 +131,10 @@ class RemoteTtsService {
       final bytes = Uint8List.fromList(response.data!);
       return bytes.isEmpty ? null : bytes;
     } catch (e) {
-      debugPrint("[RemoteTts] synthesize failed: $e");
+      if (kDebugMode) debugPrint('[RemoteTts] Synthesis unavailable.');
       return null;
+    } finally {
+      _requests.remove(cancelToken);
     }
   }
 
@@ -132,16 +143,18 @@ class RemoteTtsService {
   /// Returns false if playback could not start, so the caller can speak the
   /// same sentence on-device instead of skipping it.
   Future<bool> play(Uint8List bytes) async {
+    StreamSubscription<void>? onComplete;
+    StreamSubscription<PlayerState>? onState;
+    final generation = _generation;
     try {
       final player = await _ensurePlayer();
+      if (generation != _generation) return true;
       await player.stop();
-      await player.play(BytesSource(bytes));
+      if (generation != _generation) return true;
 
       // onPlayerComplete does not fire if playback is stopped from elsewhere,
       // so the state stream is watched as well.
       final completer = Completer<void>();
-      late final StreamSubscription<void> onComplete;
-      late final StreamSubscription<PlayerState> onState;
 
       void finish() {
         if (!completer.isCompleted) completer.complete();
@@ -154,18 +167,25 @@ class RemoteTtsService {
         }
       });
 
+      // Subscribe before play: short clips can finish before play() returns.
+      await player.play(BytesSource(bytes));
       await completer.future;
-      await onComplete.cancel();
-      await onState.cancel();
       return true;
     } catch (e) {
       debugPrint("[RemoteTts] play failed: $e");
       return false;
+    } finally {
+      await onComplete?.cancel();
+      await onState?.cancel();
     }
   }
 
   /// Cuts playback short — used when the user interrupts.
   Future<void> stop() async {
+    _generation++;
+    for (final request in _requests) {
+      request.cancel('Voice interrupted');
+    }
     try {
       await _player?.stop();
     } catch (e) {
@@ -174,6 +194,7 @@ class RemoteTtsService {
   }
 
   Future<void> dispose() async {
+    await stop();
     try {
       await _player?.dispose();
     } catch (_) {}
