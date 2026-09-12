@@ -154,6 +154,16 @@ class OfflineService {
   Completer<void>? _staleStreamTeardown;
   bool _acceptingNativeEvents = false;
 
+  // Very fast sub-1B models can emit their first token (or even complete)
+  // while MethodChannel.sendMessage is still returning to Dart. Buffer only
+  // that launch window. Teardown events remain rejected because the launch
+  // flag is enabled only immediately around the new send invocation.
+  bool _isLaunchingNativeStream = false;
+  final List<String> _launchBufferedTokens = <String>[];
+  bool _launchBufferedCompletion = false;
+  bool _didEmitVisibleOutput = false;
+  String? _emptyResponseError;
+
   // Repetition guard constants
   static const int _maxHistoryLength = 1024;
   static const int _chunkRepeatThreshold = 6; // More aggressive stop
@@ -547,6 +557,7 @@ class OfflineService {
     bool ragEnabled = false,
     List<String> ragDocumentIds = const [],
     String? conversationId,
+    String? emptyResponseError,
   ]) async {
     // CROSS-CONVERSATION ISOLATION: the previous native generation (possibly
     // still decoding for a conversation the user already left) must be dead
@@ -558,6 +569,8 @@ class OfflineService {
           ? "a new generation for conversation '$conversationId'"
           : 'a new generation',
     );
+    _didEmitVisibleOutput = false;
+    _emptyResponseError = emptyResponseError;
 
     final String? modelId = _sessionProvider.modelId;
     if (modelId == null) {
@@ -600,7 +613,12 @@ class OfflineService {
     // Setup Processor (Stops formatting tokens)
     _currentProcessor = ChatFormatProcessor(
       model.chatFormat,
-      onStopTokenDetected: stopGeneration,
+      // A model-emitted stop marker belongs to the current generation. Ask
+      // native code to stop without closing the event gate: its terminal
+      // completion still needs to finalize this exact response.
+      onStopTokenDetected: () {
+        unawaited(_requestNativeStopForControlToken());
+      },
     );
     _resetRepetitionGuardState();
 
@@ -655,29 +673,57 @@ class OfflineService {
         ? _speculativeConfig.toNativeArgs()
         : <String, dynamic>{};
 
-    await _llamaChannel.invokeMethod<void>(
-      'sendMessage',
-      {
-        'message': finalPrompt,
-        'photoPath': photoPath,
-        'temp': sampler.temperature,
-        'topP': sampler.topP,
-        'topK': sampler.topK,
-        'repeatPenalty': sampler.repeatPenalty,
-        'frequencyPenalty': sampler.frequencyPenalty,
-        'presencePenalty': sampler.presencePenalty,
-        'mirostatMode': sampler.mirostatMode,
-        'mirostatTau': sampler.mirostatTau,
-        'mirostatEta': sampler.mirostatEta,
-        ...specArgs,
-      },
-    );
+    final nativeArgs = <String, dynamic>{
+      'message': finalPrompt,
+      'photoPath': photoPath,
+      'temp': sampler.temperature,
+      'topP': sampler.topP,
+      'topK': sampler.topK,
+      'repeatPenalty': sampler.repeatPenalty,
+      'frequencyPenalty': sampler.frequencyPenalty,
+      'presencePenalty': sampler.presencePenalty,
+      'mirostatMode': sampler.mirostatMode,
+      'mirostatTau': sampler.mirostatTau,
+      'mirostatEta': sampler.mirostatEta,
+      ...specArgs,
+    };
 
-    // The native stream for THIS conversation is now live: open the event
-    // gate. (Set after the invoke resolves so a failed invoke cannot leave
-    // the gate open for a stream that never started.)
-    _isNativeStreamActive = true;
-    _acceptingNativeEvents = true;
+    _isLaunchingNativeStream = true;
+    _launchBufferedTokens.clear();
+    _launchBufferedCompletion = false;
+    try {
+      await _llamaChannel.invokeMethod<void>('sendMessage', nativeArgs);
+
+      // A user stop can cancel while invokeMethod is still in flight. Never
+      // reopen the event gate after such a cancellation.
+      if (!_isLaunchingNativeStream) {
+        return;
+      }
+
+      _isNativeStreamActive = true;
+      _acceptingNativeEvents = true;
+      _isLaunchingNativeStream = false;
+
+      final earlyTokens = List<String>.from(_launchBufferedTokens);
+      final earlyCompletion = _launchBufferedCompletion;
+      _launchBufferedTokens.clear();
+      _launchBufferedCompletion = false;
+
+      for (final token in earlyTokens) {
+        _handleAcceptedNativeToken(token);
+      }
+      if (earlyCompletion) {
+        await _handleAcceptedNativeCompletion();
+      }
+    } catch (_) {
+      _isLaunchingNativeStream = false;
+      _launchBufferedTokens.clear();
+      _launchBufferedCompletion = false;
+      _acceptingNativeEvents = false;
+      _isNativeStreamActive = false;
+      rethrow;
+    }
+
     debugPrint(
         "[OfflineService] Native generation started: conversation=${conversationId ?? 'unknown'}, model=${model.id}, promptChars=${finalPrompt.length}, ragInjected=${ragContext != null && ragContext.isNotEmpty}.");
   }
@@ -724,9 +770,21 @@ class OfflineService {
     _isNativeStreamActive = false;
   }
 
+  Future<void> _requestNativeStopForControlToken() async {
+    try {
+      await _llamaChannel.invokeMethod('stopGeneration');
+    } catch (e) {
+      debugPrint(
+          "[OfflineService] Native stop after model control token failed: $e");
+    }
+  }
+
   Future<void> stopGeneration() async {
     debugPrint("[OfflineService] Invoking 'stopGeneration'.");
     _retryTimer?.cancel();
+    _isLaunchingNativeStream = false;
+    _launchBufferedTokens.clear();
+    _launchBufferedCompletion = false;
     // The app is abandoning the current generation (stop button, chat
     // switch, or the SendService pre-kill that precedes a new exchange).
     // Close the event gate IMMEDIATELY: the dying stream's remaining tokens
@@ -743,6 +801,50 @@ class OfflineService {
     return completer.future;
   }
 
+  void _handleAcceptedNativeToken(String rawToken) {
+    if (_forceAbortCurrentStream || rawToken.isEmpty) return;
+
+    final processor = _currentProcessor;
+    if (processor == null) {
+      if (_shouldAbortForRepetition(rawToken)) {
+        _handleRepetitionAbort();
+      } else {
+        _didEmitVisibleOutput = true;
+        _responseService.onMessageResponse(rawToken);
+      }
+      return;
+    }
+
+    final String? processedToken = processor.processToken(rawToken);
+    if (processedToken == null || processedToken.isEmpty) return;
+    if (_shouldAbortForRepetition(processedToken)) {
+      _handleRepetitionAbort();
+      return;
+    }
+
+    _didEmitVisibleOutput = true;
+    _responseService.onMessageResponse(processedToken);
+  }
+
+  Future<void> _handleAcceptedNativeCompletion() async {
+    _isNativeStreamActive = false;
+    _acceptingNativeEvents = false;
+    debugPrint("[OfflineService] Complete.");
+
+    final tail = _currentProcessor?.finalize();
+    if (tail != null && tail.isNotEmpty) {
+      _didEmitVisibleOutput = true;
+      _responseService.onMessageResponse(tail);
+    }
+
+    _responseService.finalizeResponse(
+      emptyResponseError: _didEmitVisibleOutput ? null : _emptyResponseError,
+    );
+    _currentProcessor = null;
+    _emptyResponseError = null;
+    _didEmitVisibleOutput = false;
+  }
+
   // ===========================================================================
   // Native Handler
   // ===========================================================================
@@ -753,6 +855,12 @@ class OfflineService {
       case 'onMessageResponse':
         final String rawToken = call.arguments as String? ?? '';
         if (rawToken.isEmpty) return;
+        if (!_acceptingNativeEvents && _isLaunchingNativeStream) {
+          _launchBufferedTokens.add(rawToken);
+          debugPrint(
+              '[OfflineService] Buffered token that arrived during native launch (len=${rawToken.length}).');
+          return;
+        }
         if (!_acceptingNativeEvents) {
           // Token from a generation that was torn down (or never accepted):
           // it belongs to a conversation that is no longer waiting — most
@@ -761,30 +869,16 @@ class OfflineService {
               '[OfflineService] Dropped native token from a previous conversation (len=${rawToken.length}).');
           return;
         }
-        if (_forceAbortCurrentStream) return;
-
-        final processor = _currentProcessor;
-        if (processor == null) {
-          if (rawToken.isEmpty) return;
-          if (_shouldAbortForRepetition(rawToken)) {
-            _handleRepetitionAbort();
-          } else {
-            _responseService.onMessageResponse(rawToken);
-          }
-          return;
-        }
-
-        final String? processedToken = processor.processToken(rawToken);
-        if (processedToken != null && processedToken.isNotEmpty) {
-          if (_shouldAbortForRepetition(processedToken)) {
-            _handleRepetitionAbort();
-          } else {
-            _responseService.onMessageResponse(processedToken);
-          }
-        }
+        _handleAcceptedNativeToken(rawToken);
         break;
 
       case 'onMessageComplete':
+        if (!_acceptingNativeEvents && _isLaunchingNativeStream) {
+          _launchBufferedCompletion = true;
+          debugPrint(
+              '[OfflineService] Buffered completion that arrived during native launch.');
+          return;
+        }
         _isNativeStreamActive = false;
         if (!_acceptingNativeEvents) {
           // Terminal ack of a torn-down / unaccepted generation. Swallowing
@@ -800,17 +894,7 @@ class OfflineService {
               '[OfflineService] Suppressed stale stream completion (previous conversation); nothing finalized.');
           return;
         }
-        // This generation is finished — close the gate against any trailing
-        // events before finalizing.
-        _acceptingNativeEvents = false;
-        debugPrint("[OfflineService] Complete.");
-
-        final tail = _currentProcessor?.finalize();
-        if (tail != null && tail.isNotEmpty) {
-          _responseService.onMessageResponse(tail);
-        }
-        _responseService.finalizeResponse();
-        _currentProcessor = null;
+        await _handleAcceptedNativeCompletion();
         break;
 
       case 'onModelLoaded':
