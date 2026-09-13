@@ -331,7 +331,7 @@ class _ArtTile extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
             cacheHeight: 300,
-            errorBuilder: (_, __, ___) =>
+            errorBuilder: (_, _, _) =>
                 _buildFallbackIcon(Icons.broken_image_rounded),
           ),
         );

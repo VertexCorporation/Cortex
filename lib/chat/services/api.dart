@@ -401,13 +401,13 @@ class ApiService {
             "model": targetModel,
             "messages": messages,
             "stream": true,
-            if (source != null) "source": source,
-            if (tools != null) "tools": tools,
+            "source": ?source,
+            "tools": ?tools,
             if (tools != null) "tool_choice": "auto",
             "enableReasoning": enablefeatureReasoning,
             "enableWebSearch": enableWebSearch,
             "isCharacterModel": isCharacterModel,
-            if (generationTarget != null) "generationTarget": generationTarget,
+            "generationTarget": ?generationTarget,
             if (customInstruction != null && customInstruction.isNotEmpty)
               "customInstruction": customInstruction,
             if (userMemory != null && userMemory.isNotEmpty)

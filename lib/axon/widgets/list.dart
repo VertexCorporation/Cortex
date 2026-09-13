@@ -156,7 +156,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
           alignment: Alignment.topCenter,
           children: <Widget>[
             ...previousChildren,
-            if (currentChild != null) currentChild,
+            ?currentChild,
           ],
         );
       },

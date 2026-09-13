@@ -42,7 +42,7 @@ class PhotoViewer extends StatefulWidget {
       reverseTransitionDuration: const Duration(milliseconds: 150),
       opaque: false,
       barrierDismissible: false,
-      pageBuilder: (_, __, ___) => PhotoViewer(
+      pageBuilder: (_, _, _) => PhotoViewer(
         imageFile: imageFile,
         onEditImage: onEditImage,
       ),
@@ -408,7 +408,7 @@ class VideoViewer extends StatefulWidget {
       reverseTransitionDuration: const Duration(milliseconds: 150),
       opaque: false,
       barrierDismissible: false,
-      pageBuilder: (_, __, ___) =>
+      pageBuilder: (_, _, _) =>
           VideoViewer(videoPath: videoPath, onEditVideo: onEditVideo),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(animation);
@@ -942,7 +942,7 @@ class AudioViewer extends StatefulWidget {
       reverseTransitionDuration: const Duration(milliseconds: 150),
       opaque: false,
       barrierDismissible: false,
-      pageBuilder: (_, __, ___) =>
+      pageBuilder: (_, _, _) =>
           AudioViewer(audioPath: audioPath, onEditAudio: onEditAudio),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(animation);

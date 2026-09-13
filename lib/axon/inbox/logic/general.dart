@@ -145,10 +145,9 @@ class InboxViewModel extends ChangeNotifier {
       _conversationManagers;
 
   InboxViewModel({
-    required ModelService modelService,
-    required IntrovertNotificationService notificationService,
-  })  : _modelService = modelService,
-        _notificationService = notificationService;
+    required this._modelService,
+    required this._notificationService,
+  });
 
   Future<void> initialize(String langCode) async {
     _currentLangCode = langCode;
@@ -223,7 +222,16 @@ class InboxViewModel extends ChangeNotifier {
     }
 
     // 2. Then sort by Date (Newest first)
-    return b.lastMessageDate.compareTo(a.lastMessageDate);
+    final dateComparison = b.lastMessageDate.compareTo(a.lastMessageDate);
+    if (dateComparison != 0) return dateComparison;
+
+    // 3. Deterministic tiebreaker. Dart's List.sort is NOT stable, and
+    // conversations without visible messages all share lastMessageDate == 0
+    // (conversations.lastMessageDate defaults to 0 in the schema and its
+    // migration). Without a total order, that tie group reshuffles on every
+    // sort — the reported "conversations randomly reordering" bug. IDs are
+    // unique and stable, so this makes the sort a pure function of state.
+    return a.conversationID.compareTo(b.conversationID);
   }
 
   void _sortConversations() {
@@ -457,6 +465,15 @@ class InboxViewModel extends ChangeNotifier {
               lastMsgTextExisting ?? '',
               lastMsgPhotoExisting ?? '',
               DateTime.fromMillisecondsSinceEpoch(realLastMsgTsExisting),
+            );
+          } else {
+            // ORDER FIX: no visible message — reconcile the sort key with the
+            // conversation-row timestamp. Previously this branch never
+            // updated anything, so a stale in-memory date survived every
+            // reload and the sort kept disagreeing with fresh DB state.
+            existing.updateLastMessageDate(
+              DateTime.fromMillisecondsSinceEpoch(
+                  row['lastMessageDate'] as int? ?? 0),
             );
           }
           continue;

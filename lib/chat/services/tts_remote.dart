@@ -102,7 +102,9 @@ class RemoteTtsService {
       if (user == null) return null;
       final token = await user.getIdToken();
       if (token == null || cancelToken.isCancelled ||
-          FirebaseAuth.instance.currentUser?.uid != user.uid) return null;
+          FirebaseAuth.instance.currentUser?.uid != user.uid) {
+        return null;
+      }
 
       final response = await _dio.post<List<int>>(
         _endpoint,
@@ -123,7 +125,9 @@ class RemoteTtsService {
       );
 
       if (generation != _generation ||
-          FirebaseAuth.instance.currentUser?.uid != user.uid) return null;
+          FirebaseAuth.instance.currentUser?.uid != user.uid) {
+        return null;
+      }
       if (response.statusCode != 200 || response.data == null) {
         debugPrint("[RemoteTts] Declined: HTTP ${response.statusCode}");
         return null;

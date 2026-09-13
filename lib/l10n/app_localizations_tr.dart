@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -1385,7 +1386,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String notificationUpsellFeatureBody(
-      Object currentTier, Object featureName, Object targetTier) {
+    Object currentTier,
+    Object featureName,
+    Object targetTier,
+  ) {
     return 'Merhaba $currentTier abonesi! $targetTier planına, Cortex\'ini bir sonraki seviyeye taşıyacak $featureName özelliği geldi. Yükseltmeye ne dersin?';
   }
 
@@ -2202,4 +2206,13 @@ class AppLocalizationsTr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String voiceTimeRemaining(String time) {
+    return 'Kalan ses süresi: $time';
+  }
+
+  @override
+  String get voiceDailyLimitReached =>
+      'Bugünün ses süresini kullandınız. Gece yarısından sonra yenilenir.';
 }

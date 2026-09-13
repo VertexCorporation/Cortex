@@ -106,7 +106,7 @@ ModelEntity offlineModel({
       'category': 'chat',
       'tier': 'free',
       'role': role,
-      if (chatFormat != null) 'chatFormat': chatFormat,
+      'chatFormat': ?chatFormat,
     }, 'en');
 
 class _FakeSession extends ChangeNotifier implements ChatSessionProvider {

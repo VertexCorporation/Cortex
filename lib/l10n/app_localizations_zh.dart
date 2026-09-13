@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -1309,7 +1310,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String notificationUpsellFeatureBody(
-      Object currentTier, Object featureName, Object targetTier) {
+    Object currentTier,
+    Object featureName,
+    Object targetTier,
+  ) {
     return '您好，$currentTier 订阅用户！$targetTier 套餐刚刚添加了 $featureName 功能，这将使您的 Cortex 体验更上一层楼。想升级一下吗？';
   }
 
@@ -2093,4 +2097,13 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String voiceTimeRemaining(String time) {
+    return 'Voice time left: $time';
+  }
+
+  @override
+  String get voiceDailyLimitReached =>
+      'You\'ve used today\'s voice time. It renews after midnight.';
 }

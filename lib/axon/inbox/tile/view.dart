@@ -416,7 +416,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                           alignment: Alignment.centerLeft,
                           children: <Widget>[
                             ...previousChildren,
-                            if (currentChild != null) currentChild,
+                            ?currentChild,
                           ],
                         );
                       },

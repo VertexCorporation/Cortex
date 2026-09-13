@@ -28,7 +28,15 @@
 
 ## Scheduled work (scheduled.js)
 
-`initiateVerificationChecks` + `handleVerificationCheck` (Pub/Sub), `handleSubscriptionExpiry`, `backupSubscriptionSweeper`, `awardDailyBonusCredits`, `cleanupOrphanAndIncompleteUsers`, `detectAndActionRefundAbuse`, `processPendingDeletions`, `cleanupAbandonedAnonymousAccounts`.
+`initiateVerificationChecks` + `handleVerificationCheck` (Pub/Sub), `handleSubscriptionExpiry`, `backupSubscriptionSweeper`, `awardDailyBonusCredits`, `cleanupExpiredUsageSessions`, `cleanupOrphanAndIncompleteUsers`, `detectAndActionRefundAbuse`, `processPendingDeletions`, `cleanupAbandonedAnonymousAccounts`.
+
+## Realtime voice allowance (voice.js)
+
+A product/safety daily cap, deliberately SEPARATE from the credit engine: one shared pool per user per Istanbul day for Voice Mode and Flow Mode, sized by `TIER_LIMITS.dailyVoiceSeconds` (free 120 / plus 300 / pro 720 / ultra 3600 seconds) and published to clients via `creditLimitsForTier` (`voiceDailySeconds`), stored on the user document as `voiceUsage: { day, seconds }`.
+
+Enforcement is RESERVATION AT MINT + RECONCILIATION AT SETTLEMENT, each in one Firestore transaction: concurrent devices serialize on the user document and can never double-spend the pool; the pool resets LAZILY at the first mint of a new Istanbul day (`renewalDayKey` from credits.js — the same boundary as the credit renewal), so no scheduled voice job exists that could be missed. Each mint reserves `min(remaining, VOICE_WINDOW_SECONDS=300)` and creates the `usage_sessions` document in the same transaction, answers with the authoritative `voice` block (`allowanceSeconds`/`remainingSeconds`/`reservedSeconds`), and refuses with 403 `voice_daily_limit` once the pool is empty; a failed provider mint releases the reservation. Honest clients recycle the provider connection at the window boundary; the server re-checks the pool at every mint, and AssemblyAI sessions are additionally provider-capped at the user's remaining allowance via `max_session_duration_seconds`. Settlement replaces the reservation with the provider-reported actual session duration (clamped to one hour, same-day only). `reportOnly` failure telemetry is logged without minting, reserving or charging. `cleanupExpiredUsageSessions` (hourly) deletes usage-session documents 24h after their settlement window.
+
+Credits continue to settle provider cost exactly as before — the LLM turn is charged by `sendMessage`, realtime STT by `settleSpeechUsage` (Deepgram exact-cost lookup when available, else duration×rate; AssemblyAI session-hour), TTS by the ElevenLabs character-cost path — so the allowance never double-charges anything.
 
 ## Credit engine
 

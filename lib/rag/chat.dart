@@ -22,14 +22,11 @@ const Set<String> kRagDocumentExtensions = {
 
 class RagChatService {
   RagChatService({
-    required RetrievalEngine retrievalEngine,
-    required RagIngestionService ingestion,
-    required RagStorageService storage,
+    required this._retrievalEngine,
+    required this._ingestion,
+    required this._storage,
     RagContextInjector? injector,
-  })  : _retrievalEngine = retrievalEngine,
-        _ingestion = ingestion,
-        _storage = storage,
-        _injector = injector ?? const RagContextInjector();
+  }) : _injector = injector ?? const RagContextInjector();
 
   final RetrievalEngine _retrievalEngine;
   final RagIngestionService _ingestion;

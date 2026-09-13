@@ -72,19 +72,15 @@ class ConversationManager extends ChangeNotifier {
     required String initialModelId,
     required this.isStarred,
     this.starredDate, // Add param
-    required DateTime lastMessageDate,
+    required this._lastMessageDate,
     required String langCode,
     String? persistedModelTitle,
     String? persistedModelImagePath,
-    String lastMessageText = '',
-    String lastMessagePhotoPath = '',
-    required ModelService modelService,
-  })  : _lastMessageText = lastMessageText,
-        _lastMessageDate = lastMessageDate,
-        _lastMessagePhotoPath = lastMessagePhotoPath,
-        _persistedModelTitle = persistedModelTitle,
-        _persistedModelImagePath = persistedModelImagePath,
-        _modelService = modelService {
+    this._lastMessageText = '',
+    this._lastMessagePhotoPath = '',
+    required this._modelService,
+  })  : _persistedModelTitle = persistedModelTitle,
+        _persistedModelImagePath = persistedModelImagePath {
     if (initialModelId == 'dynamic') {
       _model = ModelEntity.fromMap({
         'id': 'dynamic',

@@ -170,8 +170,8 @@ class PerfSpan {
     required this.name,
     required this.metadata,
     required this.startedAtMicros,
-    required Stopwatch stopwatch,
-  }) : _stopwatch = stopwatch;
+    required this._stopwatch,
+  });
 
   final String name;
   final Map<String, Object?> metadata;

@@ -21,10 +21,9 @@ class ResponseService {
   /// - [conversationProvider] to update the central message list and state.
   /// - [scrollService] to trigger UI side-effects like auto-scrolling.
   ResponseService({
-    required ConversationProvider conversationProvider,
-    required ScrollService scrollService,
-  })  : _conversationProvider = conversationProvider,
-        _scrollService = scrollService;
+    required this._conversationProvider,
+    required this._scrollService,
+  });
 
   /// Called for each token received from a streaming source (API or native Llama).
   ///

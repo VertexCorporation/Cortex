@@ -19,16 +19,12 @@ class SettingsActionProvider with ChangeNotifier {
   final AppInitializer _appInitializer;
 
   SettingsActionProvider({
-    required AuthService authService,
-    required ProfileService profileService,
-    required IntrovertNotificationService notificationService,
-    required InternetProvider internetProvider,
-    required AppInitializer appInitializer,
-  })  : _authService = authService,
-        _profileService = profileService,
-        _notificationService = notificationService,
-        _internetProvider = internetProvider,
-        _appInitializer = appInitializer;
+    required this._authService,
+    required this._profileService,
+    required this._notificationService,
+    required this._internetProvider,
+    required this._appInitializer,
+  });
 
   // --- UI State Variables ---
   bool _isUpdatingUsername = false;

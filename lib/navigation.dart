@@ -38,7 +38,7 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
 
   final route = PageRouteBuilder<T>(
     // The new screen widget itself.
-    pageBuilder: (_, __, ___) => screen,
+    pageBuilder: (_, _, _) => screen,
 
     // Use the runtime type of the screen widget as the route name for Analytics
     settings: RouteSettings(name: screen.runtimeType.toString()),

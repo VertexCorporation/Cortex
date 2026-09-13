@@ -23,7 +23,7 @@ class PurchaseSyncQueue {
       _completed.add(key);
     });
     // A failed receipt must not poison subsequent events, and is retryable.
-    _tail = task.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    _tail = task.then<void>((_) {}, onError: (Object _, StackTrace _) {});
     return task;
   }
 }

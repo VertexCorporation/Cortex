@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:cortex/purchase_sync_queue.dart';
+import 'package:cortex/sync.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

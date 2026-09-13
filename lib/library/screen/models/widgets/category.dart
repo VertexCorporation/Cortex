@@ -128,10 +128,20 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
       columns.add(
         Padding(
           padding: EdgeInsetsDirectional.only(end: screenWidth * 0.001),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: columnModels.map((model) {
+          child: ClipRect(
+            child: OverflowBox(
+              alignment: AlignmentDirectional.topStart,
+              // Safety net: the page box height comes from
+              // ModelsBackendUtils.calculateCategoryHeight, an estimate.
+              // If tile content ever outgrows it (exotic OEM fonts, future
+              // tile edits), clip the bleed instead of throwing a RenderFlex
+              // overflow; when content fits this is a no-op.
+              minHeight: 0,
+              maxHeight: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: columnModels.map((model) {
               bool isDownloaded = widget.downloadedStates[model.id] ?? false;
               DownloadManager? manager =
                   model.isServerSide ? null : widget.downloadManagers[model.id];
@@ -224,6 +234,8 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                 },
               );
             }).toList(),
+              ),
+            ),
           ),
         ),
       );

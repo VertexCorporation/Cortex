@@ -23,10 +23,9 @@ class RagProvider extends ChangeNotifier {
   bool _disposed = false;
 
   RagProvider({
-    required RagStorageService storage,
-    required RagIngestionService ingestion,
-  })  : _storage = storage,
-        _ingestion = ingestion;
+    required this._storage,
+    required this._ingestion,
+  });
 
   List<RagDocument> get documents => List.unmodifiable(_documents);
   Set<String> get selectedDocumentIds => Set.unmodifiable(_selectedDocumentIds);

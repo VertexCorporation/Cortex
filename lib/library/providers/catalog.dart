@@ -105,7 +105,10 @@ class ModelCatalogProvider extends ChangeNotifier {
     _loadError = false;
     notifyListeners(); // Let the UI know we are starting a refresh.
 
-    _modelService.clearAllCache();
+    // Explicit user action (Retry button / manual refresh): bypass the
+    // repository's transient-failure backoff so a real catalog fetch is
+    // attempted immediately instead of being suppressed by recent failures.
+    _modelService.clearAllCache(forceSync: true);
 
     // Now, trigger the data loading process.
     _loadCatalogData();
@@ -368,7 +371,7 @@ class ModelCatalogProvider extends ChangeNotifier {
       barrierDismissible: true,
       barrierLabel: 'RemoveModelConfirmation',
       transitionDuration: const Duration(milliseconds: 150),
-      pageBuilder: (ctx, _, __) {
+      pageBuilder: (ctx, _, _) {
         return Center(
           child: Material(
             color: Colors.transparent,

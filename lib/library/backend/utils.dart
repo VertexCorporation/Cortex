@@ -63,7 +63,18 @@ class ModelsBackendUtils {
   ) {
     const modelsPerColumn = 3;
     const verticalSpacingFactor = 0.01;
-    final cardHeight = screenWidth * 0.17;
+    // ModelTile's tallest intrinsic region is its right-hand action column:
+    // a status line (0.04w) + a gap (0.005w) + a fixed-height control button
+    // (CortexDesign.control == 48 px), plus 0.016w of vertical tile padding.
+    // Those fixed pixels do not shrink with the screen, so a purely
+    // width-proportional card height underestimates the real tile below
+    // ~399 px of logical width (Poco F7 is ~394 px) and the column overflows
+    // the page box. Give the per-card slot a fixed-pixel floor.
+    final proportionalCardHeight = screenWidth * 0.17;
+    final narrowScreenFloor = screenWidth * 0.061 + 50.0;
+    final cardHeight = proportionalCardHeight > narrowScreenFloor
+        ? proportionalCardHeight
+        : narrowScreenFloor;
     final spacing = screenWidth * verticalSpacingFactor;
 
     final totalColumns = (models.length / modelsPerColumn).ceil();

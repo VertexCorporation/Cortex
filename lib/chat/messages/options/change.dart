@@ -126,7 +126,7 @@ Future<void> showModelSelectionDialog({
     barrierDismissible: true,
     barrierLabel: modalBarrierLabel,
     transitionDuration: const Duration(milliseconds: 150),
-    pageBuilder: (dialogContext, _, __) {
+    pageBuilder: (dialogContext, _, _) {
       return _ModelSelectionDialogContent(
         title: l10n.changeModel,
         items: filteredItems,
@@ -134,7 +134,7 @@ Future<void> showModelSelectionDialog({
         onSelectionChanged: (newCode) => tempSelectedCode = newCode,
       );
     },
-    transitionBuilder: (_, animation, __, child) =>
+    transitionBuilder: (_, animation, _, child) =>
         FadeTransition(opacity: animation, child: child),
   ).whenComplete(() {
     restoreNavBar();

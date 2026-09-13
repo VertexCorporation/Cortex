@@ -170,12 +170,10 @@ class ModelDetailProvider extends ChangeNotifier {
   //================================================================================
 
   ModelDetailProvider({
-    required String modelId,
+    required this._modelId,
     required BuildContext context,
-    required DownloadManager? downloadManager,
-  })  : _modelId = modelId,
-        _downloadManager = downloadManager,
-        _modelService = context.read<ModelService>(),
+    required this._downloadManager,
+  })  : _modelService = context.read<ModelService>(),
         _localStateProvider = context.read<ModelLocalStateProvider>(),
         _userProvider = context.read<UserProvider>(),
         _localeProvider = context.read<LocaleProvider>(),

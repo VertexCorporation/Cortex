@@ -27,8 +27,7 @@ class ModelService with ChangeNotifier {
   final ModelRepository _repository;
 
   // --- Constructor
-  ModelService({required ModelRepository repository})
-      : _repository = repository;
+  ModelService({required this._repository});
 
   // --- Private State ---
 
@@ -458,8 +457,16 @@ class ModelService with ChangeNotifier {
 
   /// Clears all in-memory caches for both raw data (in repository) and processed entities.
   /// This will force a full network/database reload on the next call to [getModels].
-  void clearAllCache() {
+  ///
+  /// When [forceSync] is true the repository's transient-failure backoff is
+  /// bypassed for the next load — used by the explicit user Retry action so
+  /// pressing Retry always produces a real catalog fetch attempt instead of
+  /// one suppressed by recent automatic failures.
+  void clearAllCache({bool forceSync = false}) {
     _repository.clearRawCache();
+    if (forceSync) {
+      _repository.forceSyncOnNextLoad();
+    }
     _cachedEntities = null;
     _cachedEntitiesLangCode = null;
 

@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'library/backend/data/database.dart';
-import 'purchase_sync_queue.dart';
+import 'sync.dart';
 
 Future<void>? _purchaseSync;
 

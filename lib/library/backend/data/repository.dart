@@ -22,7 +22,6 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,6 +49,32 @@ class ModelRepository {
       'model_data_preserved_stale_model_ids';
   static const String _serverUrl = 'https://cortexishere.com/models';
 
+  // Transient-failure backoff for automatic catalog sync attempts.
+  //
+  // The catalog GET itself is the only authoritative reachability signal, so
+  // when the host is unreachable every warranted sync must actually try the
+  // fetch. To keep an empty database (or a stale cache) from hammering the
+  // endpoint on every pipeline run, automatic attempts back off
+  // exponentially starting at [_syncRetryBackoffBase] and capped at
+  // [_syncRetryBackoffCap]. The explicit user Retry action bypasses the
+  // backoff entirely (see [forceSyncOnNextLoad]). The state is deliberately
+  // session-scoped: a fresh app session always gets one immediate attempt,
+  // and any success resets it, so a temporary failure can never permanently
+  // prevent future synchronization.
+  static const Duration _syncRetryBackoffBase = Duration(seconds: 30);
+  static const Duration _syncRetryBackoffCap = Duration(minutes: 10);
+
+  /// Timestamp of the last failed catalog fetch attempt, if any.
+  DateTime? _lastSyncFailureAt;
+
+  /// Consecutive failed catalog fetches since the last success.
+  int _consecutiveSyncFailures = 0;
+
+  /// Set by the explicit user Retry action so the next initialization pass
+  /// bypasses the transient backoff and attempts the real catalog fetch
+  /// immediately.
+  bool _forceNextSyncAttempt = false;
+
   /// Singleton instances for database and authentication helpers.
   final Dio _dio;
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
@@ -62,7 +87,7 @@ class ModelRepository {
   Completer<void>? _syncCompleter;
 
   /// Constructor
-  ModelRepository({required Dio dio}) : _dio = dio;
+  ModelRepository({required this._dio});
 
   // --- Public API ---
 
@@ -204,6 +229,16 @@ class ModelRepository {
     debugPrint("[ModelRepository] In-memory raw model cache cleared.");
   }
 
+  /// Marks the next initialization pass to bypass the transient-failure
+  /// backoff. Used by the explicit user Retry action on the library error
+  /// screen: a user pressing Retry should always get a real catalog fetch
+  /// attempt, regardless of how recently an automatic attempt failed.
+  void forceSyncOnNextLoad() {
+    _forceNextSyncAttempt = true;
+    debugPrint(
+        "[ModelRepository] Next sync attempt will bypass the transient backoff (explicit retry).");
+  }
+
   // --- Private Core Logic ---
 
   /// Orchestrates the entire data initialization and synchronization pipeline.
@@ -225,25 +260,93 @@ class ModelRepository {
     final isDbEmpty = initialDbMaps.isEmpty;
     final isCacheStale = lastSyncTime == null ||
         DateTime.now().difference(lastSyncTime) > _cacheStaleDuration;
-    final hasInternet = await InternetConnection().hasInternetAccess;
     final isLangChanged =
         lastSyncLangCode != null && lastSyncLangCode != langCode;
 
-    if (hasInternet && (isDbEmpty || isCacheStale || isLangChanged)) {
-      debugPrint(
-          "[ModelRepository] Sync required. DB Empty: $isDbEmpty, Stale: $isCacheStale, Lang Changed: $isLangChanged");
-      await _syncWithServer(langCode);
+    // The catalog GET itself is the only authoritative reachability signal.
+    // HEAD probes and generic third-party host checks (one.one.one.one,
+    // icanhazip.com...) can both succeed while the real fetch fails — WAFs,
+    // proxies and carrier networks frequently treat HEAD and GET
+    // differently — and a passing probe proves nothing about the subsequent
+    // fetch. So when a sync is warranted we simply attempt the real fetch
+    // directly and classify its actual failure (DNS, timeout, TLS, HTTP
+    // status, parsing). A transient backoff keeps an unreachable endpoint
+    // from being hammered by repeated pipeline runs; the explicit user Retry
+    // action bypasses it (see [forceSyncOnNextLoad]).
+    final syncRequired = isSyncRequired(
+      isDbEmpty: isDbEmpty,
+      isCacheStale: isCacheStale,
+      isLangChanged: isLangChanged,
+    );
+
+    final bool forced = _forceNextSyncAttempt;
+    _forceNextSyncAttempt = false;
+
+    bool syncSucceeded = false;
+    bool attemptedSync = false;
+    if (syncRequired) {
+      final bool backoffElapsed = isBackoffElapsed(
+        lastFailureAt: _lastSyncFailureAt,
+        consecutiveFailures: _consecutiveSyncFailures,
+        now: DateTime.now(),
+      );
+
+      if (forced || backoffElapsed) {
+        if (forced) {
+          debugPrint(
+              "[ModelRepository] Explicit retry: bypassing transient backoff after $_consecutiveSyncFailures consecutive failure(s).");
+        }
+        attemptedSync = true;
+        debugPrint(
+            "[ModelRepository] Sync required (DB empty: $isDbEmpty, stale: $isCacheStale, lang changed: $isLangChanged). Attempting the real catalog fetch.");
+        syncSucceeded = await _syncWithServer(langCode, isCritical: isDbEmpty);
+
+        if (syncSucceeded) {
+          _lastSyncFailureAt = null;
+          _consecutiveSyncFailures = 0;
+        } else {
+          _lastSyncFailureAt = DateTime.now();
+          _consecutiveSyncFailures++;
+          final backoff =
+              syncRetryBackoff(consecutiveFailures: _consecutiveSyncFailures);
+          debugPrint(
+              "[ModelRepository] Catalog fetch failed ($_consecutiveSyncFailures consecutive failure(s)). Backing off for $backoff before the next automatic attempt.");
+        }
+      } else {
+        debugPrint(
+            "[ModelRepository] Sync required, but the catalog host failed recently ($_consecutiveSyncFailures consecutive failure(s)) and the transient backoff has not elapsed. Serving local data; the next automatic attempt retries after the backoff window.");
+      }
     } else {
       debugPrint("[ModelRepository] Sync not required. Loading from local DB.");
     }
 
     final mapsFromDb =
         await _dbHelper.getAllModels(userId: _auth.currentUser?.uid);
-    _rawModelsCache = mapsFromDb;
-    debugPrint(
-        "[ModelRepository] Raw cache initialized with ${_rawModelsCache?.length ?? 0} models from database.");
 
-    if (hasInternet && _rawModelsCache != null) {
+    // A failed sync with an empty database must NOT be memoized as an empty
+    // raw cache: `[]` would make every subsequent [getAllModels] call return
+    // the empty list instantly without any network attempt, leaving the
+    // library stuck on the error screen until a call path that happens to
+    // clear the cache runs. Keeping the cache unset lets the next call
+    // (retry button, tab revisit, language change, chat flow) re-run the
+    // pipeline and recover as soon as the catalog is reachable.
+    if (shouldMemoizeRawCache(dbHasModels: mapsFromDb.isNotEmpty)) {
+      _rawModelsCache = mapsFromDb;
+      debugPrint(
+          "[ModelRepository] Raw cache initialized with ${_rawModelsCache?.length ?? 0} models from database.");
+    } else {
+      _rawModelsCache = null;
+      debugPrint(
+          "[ModelRepository] Database is empty (sync completed: $syncSucceeded). Raw cache left unset so the next attempt can retry.");
+    }
+
+    // Image sync only does meaningful network work when it is likely to
+    // succeed: right after a successful catalog fetch (network proven) or
+    // when no fetch was attempted at all (fresh local data; missing images
+    // are rare and each download is individually guarded). Directly after a
+    // failed fetch the network is probably unavailable, so the extra image
+    // requests are skipped instead of stalling the pipeline.
+    if (_rawModelsCache != null && (syncSucceeded || !attemptedSync)) {
       await _syncModelImages(_rawModelsCache!, localAssetMap);
 
       // After image sync is complete, invalidate the in-memory cache of image paths.
@@ -255,15 +358,80 @@ class ModelRepository {
     }
   }
 
+  /// Pure decision rule for whether a network sync is warranted.
+  ///
+  /// Deliberately free of any connectivity-probe input: reachability is
+  /// determined by attempting the real catalog fetch — probe results (HEAD
+  /// requests or third-party hosts) do not predict whether the GET will
+  /// succeed. A sync is warranted when the catalog is absent (empty DB),
+  /// stale, or the display language changed; whether the warranted attempt
+  /// actually reaches the network is then a matter of the transient backoff
+  /// (see [isBackoffElapsed]).
+  @visibleForTesting
+  static bool isSyncRequired({
+    required bool isDbEmpty,
+    required bool isCacheStale,
+    required bool isLangChanged,
+  }) =>
+      isDbEmpty || isCacheStale || isLangChanged;
+
+  /// Exponential backoff applied to automatic catalog fetch attempts after
+  /// [consecutiveFailures] consecutive failures. Starts at 30 seconds,
+  /// doubles per failure and is capped at 10 minutes, so an unreachable
+  /// catalog host is retried at a bounded rate while recovery stays fast.
+  /// The explicit user Retry action bypasses this schedule entirely.
+  @visibleForTesting
+  static Duration syncRetryBackoff({required int consecutiveFailures}) {
+    if (consecutiveFailures <= 0) return Duration.zero;
+    // base * 2^(n-1): 30s, 1m, 2m, 4m, 8m, then capped at 10m. The shift is
+    // clamped so a large failure counter can never overflow.
+    final int exp = consecutiveFailures - 1;
+    if (exp > 4) return _syncRetryBackoffCap;
+    final Duration backoff = _syncRetryBackoffBase * (1 << exp);
+    return backoff > _syncRetryBackoffCap ? _syncRetryBackoffCap : backoff;
+  }
+
+  /// Pure decision rule for whether the transient backoff still blocks a
+  /// new automatic fetch attempt. True (attempt allowed) when no failure is
+  /// recorded or the backoff window has fully elapsed.
+  @visibleForTesting
+  static bool isBackoffElapsed({
+    required DateTime? lastFailureAt,
+    required int consecutiveFailures,
+    required DateTime now,
+  }) {
+    if (lastFailureAt == null || consecutiveFailures <= 0) return true;
+    return now.difference(lastFailureAt) >=
+        syncRetryBackoff(consecutiveFailures: consecutiveFailures);
+  }
+
+  /// Pure decision rule preventing an empty database result from being
+  /// memoized as the session's raw cache. Memoizing `[]` (after a failed or
+  /// pathologically empty sync) makes every subsequent [getAllModels] call
+  /// return the empty list instantly without any network attempt, leaving
+  /// the library dead-ended on the error screen. Only a populated database
+  /// may be memoized.
+  @visibleForTesting
+  static bool shouldMemoizeRawCache({required bool dbHasModels}) =>
+      dbHasModels;
+
   /// Manages the full server synchronization flow.
-  Future<void> _syncWithServer(String langCode) async {
+  ///
+  /// Returns true only when the catalog was fetched, validated and stored
+  /// completely. Returns false when the fetch was rejected or failed, letting
+  /// the caller decide how to treat a possibly-empty database. Never throws:
+  /// an orchestration failure must not turn a usable local catalog into a
+  /// dead-end error screen.
+  Future<bool> _syncWithServer(String langCode,
+      {required bool isCritical}) async {
     debugPrint("[ModelRepository] Starting full model sync with server...");
     try {
-      final validPublicIds = await _fetchAndStorePublicModels(langCode);
+      final validPublicIds = await _fetchAndStorePublicModels(langCode,
+          isCritical: isCritical);
       if (validPublicIds == null) {
         debugPrint(
             "[ModelRepository] Server sync was rejected or incomplete. Preserving local catalog and last-sync state.");
-        return;
+        return false;
       }
 
       debugPrint(
@@ -273,10 +441,40 @@ class ModelRepository {
 
       await _updateLastSyncState(langCode);
       debugPrint("[ModelRepository] Sync process fully complete.");
+      return true;
     } catch (e, s) {
       debugPrint(
           "[ModelRepository] CRITICAL ERROR during sync orchestration: $e\n$s");
-      throw Exception("Sync with server failed.");
+      FirebaseCrashlytics.instance.recordError(e, s,
+          reason: 'ModelRepository sync orchestration failure');
+      return false;
+    }
+  }
+
+  /// Central diagnostics for catalog sync failures.
+  ///
+  /// Every failure mode leaves a Crashlytics breadcrumb, and when the failure
+  /// is critical (the local database is empty, so the user is stuck on the
+  /// "could not load" screen) a non-fatal error is recorded with a precise,
+  /// machine-readable mode. This makes device/network-specific catalog
+  /// failures (carrier filtering, DNS quirks, TLS interception, WAF
+  /// challenges, captive portals...) visible in production instead of only
+  /// in debugPrint.
+  void _reportSyncFailure(String mode,
+      {Object? error,
+      StackTrace? stack,
+      required bool critical,
+      bool alwaysRecord = false}) {
+    final description = error == null ? mode : '$mode ($error)';
+    debugPrint("[ModelRepository] Model sync failure: $description");
+    FirebaseCrashlytics.instance.log('ModelCatalogSync failed: $description');
+    if (critical || alwaysRecord) {
+      FirebaseCrashlytics.instance.recordError(
+        error ?? Exception('ModelCatalogSyncFailed:$mode'),
+        stack ?? StackTrace.current,
+        reason: 'ModelCatalogSyncFailed:$mode',
+        fatal: false,
+      );
     }
   }
 
@@ -285,7 +483,12 @@ class ModelRepository {
   /// Returns null when the remote response cannot be trusted as a complete,
   /// successful catalog. Null prevents stale cleanup and prevents the client from
   /// advancing its last-successful-sync timestamp.
-  Future<Set<String>?> _fetchAndStorePublicModels(String langCode) async {
+  ///
+  /// [isCritical] marks that the local database is empty, meaning the caller
+  /// has nothing to fall back on and the user would see the library error
+  /// screen; such failures are reported to Crashlytics with their exact mode.
+  Future<Set<String>?> _fetchAndStorePublicModels(String langCode,
+      {required bool isCritical}) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         _serverUrl,
@@ -299,30 +502,33 @@ class ModelRepository {
       if (response.statusCode != 200) {
         debugPrint(
             "[ModelRepository] Server returned status ${response.statusCode}. Skipping sync.");
+        _reportSyncFailure('http_${response.statusCode}', critical: isCritical);
         return null;
       }
 
       if (response.data == null) {
         debugPrint("[ModelRepository] Server returned empty data.");
+        _reportSyncFailure('empty_body', critical: isCritical);
         return null;
       }
 
       final rawServerData = response.data!;
 
       debugPrint(
-          "[ModelRepository] Parsing server data in background isolate...");
-      final parsedServerModels = await compute(
+          "[ModelRepository] Parsing server data into per-variant rows in background isolate...");
+      final parsedServerRows = await compute(
         _parseServerDataIsolate,
         {'data': rawServerData, 'langCode': langCode},
       );
 
-      if (parsedServerModels.isEmpty) {
+      if (parsedServerRows.isEmpty) {
         debugPrint(
             "[ModelRepository] Parsed catalog is empty. Treating response as incomplete.");
+        _reportSyncFailure('empty_catalog', critical: isCritical);
         return null;
       }
 
-      final parsedFallbackModels = await compute(
+      final parsedFallbackRows = await compute(
         _parseServerDataIsolate,
         {
           'data': {'producers': rawServerData['fallback'] ?? {}},
@@ -331,11 +537,11 @@ class ModelRepository {
       );
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('fallback', json.encode(parsedFallbackModels));
+      await prefs.setString('fallback', json.encode(parsedFallbackRows));
 
       // Filter out local/custom IDs and malformed entries. A remote catalog must
       // never impersonate user-created/local model namespaces.
-      final modelsToInsert = parsedServerModels.where((modelData) {
+      final modelsToInsert = parsedServerRows.where((modelData) {
         final id = modelData['id']?.toString().trim() ?? '';
         return id.isNotEmpty &&
             !id.startsWith('self_') &&
@@ -345,6 +551,7 @@ class ModelRepository {
       if (modelsToInsert.isEmpty) {
         debugPrint(
             "[ModelRepository] No valid public models remained after validation.");
+        _reportSyncFailure('no_valid_public_models', critical: isCritical);
         return null;
       }
 
@@ -363,6 +570,7 @@ class ModelRepository {
       )) {
         debugPrint(
             "[ModelRepository] Catalog shrink guard rejected ${modelsToInsert.length} incoming models against $existingPublicCount existing public models.");
+        _reportSyncFailure('catalog_shrink_guard', critical: isCritical);
         return null;
       }
 
@@ -414,18 +622,30 @@ class ModelRepository {
         }
       }
 
-      if (writeFailed) return null;
+      if (writeFailed) {
+        _reportSyncFailure('disk_full', critical: isCritical);
+        return null;
+      }
 
       await Future.delayed(const Duration(milliseconds: 100));
       await _dbHelper.optimizeDatabase();
 
       return validServerIds;
     } on DioException catch (e, s) {
-      if (e.response?.statusCode == 500) {
-        debugPrint(
-            "[ModelRepository] Server Error (500). Using local cache instead.");
-        FirebaseCrashlytics.instance
-            .log("Server 500 error on model sync. Skipping.");
+      // Server-side failures (5xx). validateStatus lets these throw while
+      // non-5xx responses pass through to the status check above, so every
+      // rejected-by-server outcome lands here or in the 200-only check.
+      final status = e.response?.statusCode;
+      if (status != null && status >= 500) {
+        if (status == 500) {
+          debugPrint(
+              "[ModelRepository] Server Error (500). Using local cache instead.");
+          _reportSyncFailure('server_500', error: e, critical: isCritical);
+        } else {
+          debugPrint(
+              "[ModelRepository] Server Error ($status). Using local cache instead.");
+          _reportSyncFailure('http_$status', error: e, critical: isCritical);
+        }
         return null;
       }
 
@@ -434,27 +654,59 @@ class ModelRepository {
           errorString.contains("HandshakeException")) {
         debugPrint(
             "[ModelRepository] SSL/Certificate Error detected (Likely user network issue). Using local cache.");
+        _reportSyncFailure('tls_certificate',
+            error: e.error ?? e.message, stack: s, critical: isCritical);
         return null;
       }
 
+      // Fine-grained network classification so production Crashlytics
+      // records pinpoint the exact layer that failed on device-specific
+      // networks: timeouts, DNS resolution, low-level socket errors, and
+      // generic connection failures.
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.sendTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.connectionError ||
-          e.error is SocketException) {
+          e.type == DioExceptionType.receiveTimeout) {
         debugPrint(
-            "[ModelRepository] Network timeout or connection error (${e.type}). Using local cache.");
+            "[ModelRepository] Network timeout (${e.type}). Using local cache.");
+        _reportSyncFailure('network_timeout',
+            error: e.error ?? e.message, stack: s, critical: isCritical);
+        return null;
+      }
+
+      if (e.error is SocketException) {
+        final socketMessage = (e.error as SocketException).toString();
+        if (socketMessage.contains('Failed host lookup')) {
+          debugPrint(
+              "[ModelRepository] DNS lookup for the catalog host failed. Using local cache.");
+          _reportSyncFailure('dns_lookup_failed',
+              error: e.error, stack: s, critical: isCritical);
+        } else {
+          debugPrint(
+              "[ModelRepository] Socket error during catalog fetch. Using local cache.");
+          _reportSyncFailure('network_socket_error',
+              error: e.error, stack: s, critical: isCritical);
+        }
+        return null;
+      }
+
+      if (e.type == DioExceptionType.connectionError) {
+        debugPrint(
+            "[ModelRepository] Connection error during catalog fetch. Using local cache.");
+        _reportSyncFailure('network_connection_error',
+            error: e.error ?? e.message, stack: s, critical: isCritical);
         return null;
       }
 
       debugPrint("[ModelRepository] Unexpected DioException: $e");
-      FirebaseCrashlytics.instance
-          .recordError(e, s, reason: 'Failed to sync public models');
+      _reportSyncFailure('unexpected_dio_${e.type.name}',
+          error: e, stack: s, critical: isCritical, alwaysRecord: true);
       return null;
     } catch (e, s) {
       debugPrint("[ModelRepository] Generic error: $e");
-      FirebaseCrashlytics.instance
-          .recordError(e, s, reason: 'Unexpected failure in public model sync');
+      // Captures malformed responses (e.g. a captive portal answering with
+      // an HTML page), type errors and any other non-network failure.
+      _reportSyncFailure('parse_or_unexpected',
+          error: e, stack: s, critical: isCritical, alwaysRecord: true);
       return null;
     }
   }
@@ -469,51 +721,97 @@ class ModelRepository {
 
       final downloadedModelIds =
           (await UserModels.loadDownloadedModelPaths()).keys.toSet();
-      final placeholders = List.filled(validPublicIds.length, '?').join(',');
 
-      final allStaleModels = await db.query(
-        'models',
-        columns: ['id', 'raw_json'],
-        where:
-            "id NOT IN ($placeholders) AND id NOT LIKE 'self_%' AND id NOT LIKE 'local_%'",
-        whereArgs: validPublicIds.toList(),
-      );
+      // SQLite host implementations cap bind-variable counts (999 on the
+      // system SQLite shipped with older Android releases), so the valid-ID
+      // list is applied in chunks.
+      const int idChunkSize = 500;
+      final validIds = validPublicIds.toList();
 
-      if (allStaleModels.isNotEmpty) {
-        final staleModelsToDelete = <Map<String, dynamic>>[];
-        final preservedStaleIds = <String>{};
+      final candidateIds = <String>{};
+      for (var i = 0; i < validIds.length; i += idChunkSize) {
+        final end = (i + idChunkSize < validIds.length)
+            ? i + idChunkSize
+            : validIds.length;
+        final chunk = validIds.sublist(i, end);
+        final placeholders = List.filled(chunk.length, '?').join(',');
 
-        for (final model in allStaleModels) {
-          final id = model['id'] as String;
-          if (downloadedModelIds.contains(id)) {
-            preservedStaleIds.add(id);
-          } else {
-            staleModelsToDelete.add(model);
-          }
-        }
-
-        await _savePreservedStaleModelIds(preservedStaleIds);
-
-        if (staleModelsToDelete.isEmpty) {
-          return;
-        }
-
-        debugPrint(
-            "[ModelRepository] Found ${staleModelsToDelete.length} stale public models to clean up.");
-        final staleModelIds =
-            staleModelsToDelete.map((m) => m['id'] as String).toList();
-
-        // Concurrently delete associated images from cache.
-        await _deleteStaleImages(staleModelsToDelete);
-
-        final count = await db.delete(
+        final chunkRows = await db.query(
           'models',
-          where: "id IN (${List.filled(staleModelIds.length, '?').join(',')})",
-          whereArgs: staleModelIds,
+          columns: ['id'],
+          where:
+              "id NOT IN ($placeholders) AND id NOT LIKE 'self_%' AND id NOT LIKE 'local_%'",
+          whereArgs: chunk,
         );
-        debugPrint(
-            "[ModelRepository] Cleaned up $count stale models from database.");
+        for (final row in chunkRows) {
+          candidateIds.add(row['id'] as String);
+        }
       }
+
+      // A row that is part of a later chunk's valid-ID list is not stale;
+      // the per-chunk NOT IN query cannot know that by itself.
+      final staleIds =
+          candidateIds.where((id) => !validPublicIds.contains(id)).toList();
+      if (staleIds.isEmpty) return;
+
+      final allStaleModels = <Map<String, dynamic>>[];
+      for (var i = 0; i < staleIds.length; i += idChunkSize) {
+        final end = (i + idChunkSize < staleIds.length)
+            ? i + idChunkSize
+            : staleIds.length;
+        final chunk = staleIds.sublist(i, end);
+        final placeholders = List.filled(chunk.length, '?').join(',');
+        allStaleModels.addAll(await db.query(
+          'models',
+          columns: ['id', 'raw_json'],
+          where: "id IN ($placeholders)",
+          whereArgs: chunk,
+        ));
+      }
+
+      if (allStaleModels.isEmpty) return;
+
+      final staleModelsToDelete = <Map<String, dynamic>>[];
+      final preservedStaleIds = <String>{};
+
+      for (final model in allStaleModels) {
+        final id = model['id'] as String;
+        if (downloadedModelIds.contains(id)) {
+          preservedStaleIds.add(id);
+        } else {
+          staleModelsToDelete.add(model);
+        }
+      }
+
+      await _savePreservedStaleModelIds(preservedStaleIds);
+
+      if (staleModelsToDelete.isEmpty) {
+        return;
+      }
+
+      debugPrint(
+          "[ModelRepository] Found ${staleModelsToDelete.length} stale public models to clean up.");
+      final staleModelIds =
+          staleModelsToDelete.map((m) => m['id'] as String).toList();
+
+      // Concurrently delete associated images from cache.
+      await _deleteStaleImages(staleModelsToDelete);
+
+      var deletedCount = 0;
+      for (var i = 0; i < staleModelIds.length; i += idChunkSize) {
+        final end = (i + idChunkSize < staleModelIds.length)
+            ? i + idChunkSize
+            : staleModelIds.length;
+        final chunk = staleModelIds.sublist(i, end);
+        final placeholders = List.filled(chunk.length, '?').join(',');
+        deletedCount += await db.delete(
+          'models',
+          where: "id IN ($placeholders)",
+          whereArgs: chunk,
+        );
+      }
+      debugPrint(
+          "[ModelRepository] Cleaned up $deletedCount stale models from database.");
     } catch (e) {
       if (e.toString().contains("SQLITE_FULL")) {
         debugPrint(
@@ -722,17 +1020,48 @@ class ModelRepository {
   // --- STATIC PARSING HELPERS (ISOLATE-READY) ---
 
   /// Static entry point for the isolate to parse server data.
+  ///
+  /// Returns the flat per-variant records that are persisted. Family
+  /// presentation containers are rebuilt at read time by
+  /// [ModelDefaults.normalizeModelFamilies]; persisting the containers
+  /// themselves produced rows far larger than Android's 2 MB CursorWindow.
   static List<Map<String, dynamic>> _parseServerDataIsolate(
       Map<String, dynamic> params) {
     final rawData = params['data'] as Map<String, dynamic>;
     final langCode = params['langCode'] as String;
-    return parseServerModels(rawData, langCode);
+    return parseServerModelRows(rawData, langCode);
   }
 
+  /// Parses the wire catalog into the family containers the UI consumes.
+  ///
+  /// Composition of [parseServerModelRows] plus the two presentation-only
+  /// steps: family grouping and duplicate-ID disambiguation. This is the
+  /// wire-contract surface used by tests; persistence stores the rows.
   @visibleForTesting
   static List<Map<String, dynamic>> parseServerModels(
+          Map<String, dynamic> rawData, String langCode) =>
+      ModelSecurity.disambiguateDuplicateModelIds(
+        ModelDefaults.normalizeModelFamilies(
+          parseServerModelRows(rawData, langCode),
+        ),
+      );
+
+  /// Parses the wire catalog into flat records, one per variant entry.
+  ///
+  /// The wire format nests variant entries under
+  /// `producers -> producer -> series -> variant`, and each series carries
+  /// shared presentation metadata. A record merges that series-level
+  /// metadata (scalars only — sibling variant maps are never duplicated
+  /// into records) with one parsed variant entry.
+  ///
+  /// Records are what gets persisted: each stays a few KB no matter how
+  /// many variants a family spans, so a query can never return a row too
+  /// big for Android's 2 MB CursorWindow, while read-time normalization
+  /// rebuilds exactly the same family containers the UI expects.
+  @visibleForTesting
+  static List<Map<String, dynamic>> parseServerModelRows(
       Map<String, dynamic> rawData, String langCode) {
-    final List<Map<String, dynamic>> finalList = [];
+    final rows = <Map<String, dynamic>>[];
     final producers = rawData['producers'] != null
         ? Map<String, dynamic>.from(rawData['producers'] as Map)
         : <String, dynamic>{};
@@ -754,23 +1083,17 @@ class ModelRepository {
           ..remove('series_description');
         if (variantsMap.isEmpty) continue;
 
-        final model =
-            (variantsMap.length == 1 && variantsMap.containsKey('Default'))
-                ? _staticParseSingleVariantModel(
-                    seriesName, producerName, variantsMap['Default'], langCode)
-                : _staticParseMultiVariantSeries(
-                    seriesName, producerName, cleanSeriesValue, langCode);
-
-        if (model != null) finalList.add(model);
+        if (variantsMap.length == 1 && variantsMap.containsKey('Default')) {
+          final model = _staticParseSingleVariantModel(
+              seriesName, producerName, variantsMap['Default'], langCode);
+          if (model != null) rows.add(model);
+        } else {
+          rows.addAll(_staticParseSeriesVariantRows(
+              seriesName, producerName, cleanSeriesValue, langCode));
+        }
       }
     }
-    // Normalize into family groups first (legacy series IDs from different
-    // producers cannot overwrite each other in the model table), then make
-    // any remaining duplicate model IDs unique per producer so persistence
-    // can never upsert one model over another.
-    return ModelSecurity.disambiguateDuplicateModelIds(
-      ModelDefaults.normalizeModelFamilies(finalList),
-    );
+    return rows;
   }
 
   static Map<String, dynamic>? _staticParseSingleVariantModel(String seriesName,
@@ -835,25 +1158,29 @@ class ModelRepository {
     };
   }
 
-  static Map<String, dynamic>? _staticParseMultiVariantSeries(String seriesName,
-      String producerName, Map<String, dynamic> seriesValue, String langCode) {
-    final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
-
-    final seriesDetails =
-        _safeStringKeyMap(cleanSeriesValue['series_description']);
-
-    final localizedSeriesSummary =
-        _localizedString(seriesDetails, langCode) ?? '';
-
-    final bool isSeriesLocalized = (_normalizedLangCode(langCode) == 'en') ||
-        _hasLocalizedString(seriesDetails, langCode);
-
+  /// Builds one record per variant of a multi-variant series.
+  ///
+  /// Every record shares the series' scalar metadata (so read-time family
+  /// grouping still sees `series`, `producer`, `url`, ...) and carries one
+  /// fully parsed variant. Map-valued series keys are sibling variant
+  /// entries (or series descriptions) and are deliberately excluded —
+  /// duplicating them into every record is what made legacy family rows
+  /// grow quadratically with the variant count.
+  static List<Map<String, dynamic>> _staticParseSeriesVariantRows(
+      String seriesName,
+      String producerName,
+      Map<String, dynamic> cleanSeriesValue,
+      String langCode) {
     final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
       ..remove('series_description')
       ..remove('featureReasoning');
-    if (variantsMap.isEmpty) return null;
 
-    final variants = <String, dynamic>{};
+    final seriesDetails =
+        _safeStringKeyMap(cleanSeriesValue['series_description']);
+    final localizedSeriesSummary =
+        _localizedString(seriesDetails, langCode) ?? '';
+
+    final parsedVariants = <Map<String, dynamic>>[];
     for (final variantEntry in variantsMap.entries) {
       final variantKey = variantEntry.key;
       final variantData = variantEntry.value;
@@ -864,67 +1191,39 @@ class ModelRepository {
       if (variantId.isEmpty) continue;
 
       final descriptionMap = _safeStringKeyMap(cleanVariantData['description']);
-
       final localizedVariantDescription =
           _localizedString(descriptionMap, langCode) ?? '';
-
       final bool isVariantLocalized = (_normalizedLangCode(langCode) == 'en') ||
           _hasLocalizedString(descriptionMap, langCode);
 
-      variants[variantId] = {
+      parsedVariants.add({
         ...cleanVariantData,
         'id': variantId,
         'title': cleanVariantData['title'] ?? variantKey,
         'summary': localizedSeriesSummary,
         'description': localizedVariantDescription,
         'isFullyLocalized': isVariantLocalized,
-      };
+      });
     }
 
-    if (variants.isEmpty) return null;
+    if (parsedVariants.isEmpty) return const [];
 
     // Check if any variant indicates this is actually the Lyria series
     // instead of the general Google series.
-    String finalSeriesName = seriesName;
-    String finalTitle = cleanSeriesValue['title'] ?? seriesName;
+    final isLyriaSeries =
+        parsedVariants.any((v) => '${v['id']}'.toLowerCase().contains('lyria'));
 
-    if (variants.keys.any((id) => id.toLowerCase().contains('lyria'))) {
-      finalSeriesName = 'Lyria';
-      finalTitle = 'Lyria';
-    }
-
-    final firstVariant = variants.values.first as Map<String, dynamic>;
-    final inferredType =
-        cleanSeriesValue['type'] ?? firstVariant['type'] ?? 'online';
-
-    String inferredCategory = cleanSeriesValue['category'] ??
-        firstVariant['category'] ??
-        inferredType;
-    final outputs = firstVariant['outputs'] as Map<String, dynamic>? ?? {};
-
-    if (outputs['video'] == true) {
-      inferredCategory = 'video';
-    } else if (outputs['image'] == true) {
-      inferredCategory = 'image';
-    } else if (outputs['audio'] == true) {
-      inferredCategory = 'audio';
-    }
-
-    return {
-      ...cleanSeriesValue,
-      'id': finalSeriesName.toLowerCase().replaceAll(' ', '-'),
-      'series': finalSeriesName,
-      'title': finalTitle,
+    final seriesMeta = <String, dynamic>{
+      for (final entry in cleanSeriesValue.entries)
+        if (entry.value is! Map) entry.key: entry.value,
+      'series': isLyriaSeries ? 'Lyria' : seriesName,
       'producer': producerName,
-      'type': inferredType,
-      'size': firstVariant['size'],
-      'ram': firstVariant['ram'],
-      'category': inferredCategory,
-      'summary': localizedSeriesSummary,
-      'description': localizedSeriesSummary,
-      'variants': variants,
-      'isFullyLocalized': isSeriesLocalized,
     };
+
+    return [
+      for (final variant in parsedVariants)
+        {...seriesMeta, ...variant}..remove('variants'),
+    ];
   }
 
   static Map<String, dynamic> _staticSanitizeRawData(

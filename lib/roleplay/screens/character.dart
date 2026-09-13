@@ -138,7 +138,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
       ),
       child: AnimatedBuilder(
         animation: _stepController,
-        builder: (_, __) {
+        builder: (_, _) {
           final step = _stepController.index;
           return Row(
             children: [
@@ -210,7 +210,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
       child: AnimatedBuilder(
         animation: _stepController,
-        builder: (_, __) {
+        builder: (_, _) {
           return Row(
             children: List.generate(4, (index) {
               final isActive = _stepController.index == index;
@@ -312,7 +312,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _presetGradients.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final grad = _presetGradients[index];
                   final isSelected = _gradientColors[0] == grad[0];
@@ -710,7 +710,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
                       const Spacer(),
                       AnimatedBuilder(
                         animation: _systemPromptCtrl,
-                        builder: (_, __) {
+                        builder: (_, _) {
                           final remaining =
                               3000 - _systemPromptCtrl.text.length;
                           final isWarning = remaining < 200;
@@ -964,7 +964,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen>
       ),
       child: AnimatedBuilder(
         animation: _stepController,
-        builder: (_, __) {
+        builder: (_, _) {
           final step = _stepController.index;
           return Row(
             children: [
@@ -1609,7 +1609,7 @@ class _TraitAddSheetState extends State<_TraitAddSheet> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _emojis.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final e = _emojis[index];
                 final isSelected = e == _selectedEmoji;

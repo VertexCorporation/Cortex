@@ -140,7 +140,7 @@ class AppThemeSection extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'ThemeSelection',
       transitionDuration: const Duration(milliseconds: 150),
-      pageBuilder: (ctx, _, __) {
+      pageBuilder: (ctx, _, _) {
         return Center(
           child: Material(
             color: Colors.transparent,

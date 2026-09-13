@@ -32,7 +32,7 @@ class UserSection extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'UserActionDialog',
-      pageBuilder: (ctx, _, __) {
+      pageBuilder: (ctx, _, _) {
         final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
         return AnimatedPadding(
           padding: EdgeInsets.only(bottom: keyboardPadding),

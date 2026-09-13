@@ -33,7 +33,16 @@ Around it: `ContextService` (context construction), `SemanticMemoryService` (mem
 
 ## Voice, TTS and STT
 
-`SpeechService`, `VoiceService`/`VoiceState`, `TtsService`/`TtsState` + `RemoteTtsService`, `RemoteSttService` (stt_remote.dart), `VoiceCatalogProvider`/`CortexVoice` (voice_catalog.dart). Provider secrets (Deepgram, AssemblyAI, ElevenLabs) stay server-side behind Fulcrum `voice.js` endpoints.
+Two deliberately separate speech experiences behind `SpeechService` (speech.dart) — the app's single microphone gateway; there is exactly one logical mic owner at any moment, and a new owner always stops the previous capture first:
+
+- **Ordinary dictation** (composer mic button, `SpeechOwner.dictation`): native recognizer ONLY — the app language is mapped to an installed recognizer locale with an English fallback, and no remote speech credits are ever spent.
+- **Voice Mode / Flow Mode** (`SpeechOwner.voice`/`flow`): remote-first — `RemoteSttService` (stt_remote.dart) streams the microphone straight to Deepgram nova-3 (multilingual) with AssemblyAI universal-3-5-pro as the live fallback, both behind Fulcrum-minted short-lived tokens; the native recognizer is the final resilience fallback. Start/stop are serialized and epoch-guarded inside `RemoteSttService`, so no ghost recorder or socket can survive a superseded session.
+
+`VoiceService` (voice.dart) owns the realtime session lifecycle: an explicit `VoiceState` machine (idle/connecting/listening/processing/speaking/failed), session generations (every STT result, timer, TTS completion, flow turn and reconnect is generation-guarded; stale artifacts of a stopped session can never mutate its successor), one CONTINUOUS provider session per voice session recycled at the server's reserved-window boundary (the daily pool is re-checked at every mint), amplitude+transcript barge-in while the assistant speaks, bounded reconnects (3/session), a 90s inactivity timeout, and app-background session teardown. Voice and Flow share this one core — Flow is a mode flag plus agent cycling on top of the same session.
+
+`TtsService`/`TtsState` + `RemoteTtsService` (tts_remote.dart — ElevenLabs, proxied per sentence through Fulcrum with native flutter_tts fallback; also serves read-aloud), `VoiceCatalogProvider`/`CortexVoice` (voice_catalog.dart). Provider secrets (Deepgram, AssemblyAI, ElevenLabs) stay server-side behind Fulcrum `voice.js` endpoints.
+
+The daily realtime Voice/Flow allowance (seconds; one shared pool for both modes) is SERVER-authoritative: Fulcrum reserves a window at every speech-token mint and reconciles at settlement; the client only mirrors `creditLimits.voiceDailySeconds` + `voiceUsage` from the user snapshot and the mint response (`SttLease`) for the countdown and early-out.
 
 ## Tools
 

@@ -20,6 +20,7 @@ import 'package:cortex/initialization.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
+import 'package:cortex/funds/routing.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
 import '../messages/skeleton.dart';
@@ -309,6 +310,21 @@ class ChatViewState extends State<ChatView>
     final isVoiceModeActive =
         context.select<InputProvider, bool>((p) => p.isVoiceModeActive);
 
+    // Voice Mode unmounts the briefing overlay entirely (see mainStack): a
+    // slide by the panel's own height could never clear the composer zone,
+    // so a premium banner used to linger over the voice panel's controls.
+    // An unmounted panel can no longer report its own height, so the layout
+    // reserve is cleared here the moment voice mode opens — otherwise the
+    // scroll-down button keeps dodging a phantom briefing until the overlay
+    // remounts and re-measures.
+    if (isVoiceModeActive && briefingVisibleHeightNotifier.value != 0.0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && briefingVisibleHeightNotifier.value != 0.0) {
+          briefingVisibleHeightNotifier.value = 0.0;
+        }
+      });
+    }
+
     // PERFORMANCE: Use granular MediaQuery accessors that do NOT subscribe
     // to viewInsets changes (keyboard). This prevents the entire ChatView
     // from rebuilding ~60 times during keyboard open/close animation.
@@ -330,7 +346,7 @@ class ChatViewState extends State<ChatView>
                 isLoadingMessages, isMessagesEmpty, isVoiceModeActive)),
         if (!isVoiceModeActive) _buildBottomFog(screenHeight),
         _buildBottomPanel(isVoiceModeActive, bottomSafe),
-        _buildBriefingOverlay(bottomSafe, isVoiceModeActive),
+        if (!isVoiceModeActive) _buildBriefingOverlay(bottomSafe),
         _buildScrollDownButton(
             isVoiceModeActive, bottomSafe, screenWidth, screenHeight),
         const Positioned(top: 0, left: 0, right: 0, child: TtsPlayerOverlay()),
@@ -455,7 +471,7 @@ class ChatViewState extends State<ChatView>
     );
   }
 
-  Widget _buildBriefingOverlay(double bottomSafe, bool isVoiceMode) {
+  Widget _buildBriefingOverlay(double bottomSafe) {
     // The briefing must track the panel's live height: opening edit mode
     // grows the panel over 300ms and SizeChangedLayoutNotifier reports every
     // frame, so this AnimatedBuilder keeps the briefing gliding up in
@@ -463,6 +479,10 @@ class ChatViewState extends State<ChatView>
     // bottom offset at the last full rebuild and let the newly opened edit
     // banner slide straight under the briefing. Only the briefing moves:
     // the chat content keeps its own padding rule (see _buildMainContent).
+    //
+    // Voice Mode hides the briefing by unmounting it (see mainStack), not by
+    // sliding it down, and the shared premium funnel is wired once here for
+    // every briefing the composer can show.
     return AnimatedBuilder(
       animation: bottomPanelHeightNotifier,
       builder: (context, _) {
@@ -472,17 +492,13 @@ class ChatViewState extends State<ChatView>
           bottom: bottomPanelHeightNotifier.value +
               bottomSafe +
               _briefingBottomOffset,
-          child: AnimatedSlide(
-            offset: isVoiceMode ? const Offset(0, 1.5) : Offset.zero,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: _BriefingOverlayWrapper(
-              onVisibleHeightChanged: (h) {
-                if (briefingVisibleHeightNotifier.value != h) {
-                  briefingVisibleHeightNotifier.value = h;
-                }
-              },
-            ),
+          child: _BriefingOverlayWrapper(
+            onPremiumTap: () => openNextSubscriptionStep(context),
+            onVisibleHeightChanged: (h) {
+              if (briefingVisibleHeightNotifier.value != h) {
+                briefingVisibleHeightNotifier.value = h;
+              }
+            },
           ),
         );
       },
@@ -514,8 +530,10 @@ class ChatViewState extends State<ChatView>
 
 class _BriefingOverlayWrapper extends StatelessWidget {
   final ValueChanged<double>? onVisibleHeightChanged;
+  final VoidCallback? onPremiumTap;
 
-  const _BriefingOverlayWrapper({this.onVisibleHeightChanged});
+  const _BriefingOverlayWrapper(
+      {this.onVisibleHeightChanged, this.onPremiumTap});
 
   bool _usesDynamicChatAllowance(ModelEntity? model, bool isDynamicChat) {
     if (isDynamicChat || model == null) return true;
@@ -592,6 +610,7 @@ class _BriefingOverlayWrapper extends StatelessWidget {
           conversationId: conv.conversationID,
           inappropriate: false,
           onVisibleHeightChanged: onVisibleHeightChanged,
+          onPremiumTap: onPremiumTap,
         );
       },
     );

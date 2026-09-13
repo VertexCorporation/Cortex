@@ -20,16 +20,12 @@ class StopService {
   Timer? _stopTimer;
 
   StopService({
-    required ConversationProvider conversationProvider,
-    required ChatSessionProvider sessionProvider,
-    required ApiService apiService,
-    required OfflineService offlineService,
-    required ModelService modelService,
-  })  : _conversationProvider = conversationProvider,
-        _sessionProvider = sessionProvider,
-        _apiService = apiService,
-        _offlineService = offlineService,
-        _modelService = modelService;
+    required this._conversationProvider,
+    required this._sessionProvider,
+    required this._apiService,
+    required this._offlineService,
+    required this._modelService,
+  });
 
   /// Initiates the process to stop the AI's response generation.
   Future<void> stopResponse() async {

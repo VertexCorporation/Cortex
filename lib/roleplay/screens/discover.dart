@@ -271,7 +271,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               horizontal: CortexDesign.gutter(screenWidth)),
           scrollDirection: Axis.horizontal,
           itemCount: _categories.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          separatorBuilder: (_, _) => const SizedBox(width: 8),
           itemBuilder: (context, index) {
             final cat = _categories[index];
             final isSelected = index == _tabController.index;
@@ -367,7 +367,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         childAspectRatio: 0.75,
       ),
       itemCount: 6,
-      itemBuilder: (_, __) => _ShimmerCard(),
+      itemBuilder: (_, _) => _ShimmerCard(),
     );
   }
 
@@ -627,7 +627,7 @@ class _ShimmerCardState extends State<_ShimmerCard>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, __) => Container(
+      builder: (_, _) => Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           color: AppColors.secondaryColor.withValues(alpha: _anim.value),
@@ -749,7 +749,7 @@ class _MyBotsSheet extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: rp.userCharacters.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final char = rp.userCharacters[index];
                     return _UserBotTile(character: char);

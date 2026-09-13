@@ -6,9 +6,7 @@ import '../messages/messages.dart';
 class ChatLimitManager {
   final SubscriptionEntitlement _subscription;
 
-  const ChatLimitManager({
-    required SubscriptionEntitlement subscription,
-  }) : _subscription = subscription;
+  const ChatLimitManager({required this._subscription});
 
   /// Returns the maximum allowed characters in a chat context based on the
   /// user's effective subscription tier.

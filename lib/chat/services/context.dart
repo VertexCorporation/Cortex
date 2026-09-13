@@ -20,10 +20,9 @@ class ContextService {
   final ModelService _modelService;
 
   ContextService({
-    required ConversationProvider conversationProvider,
-    required ModelService modelService,
-  })  : _conversationProvider = conversationProvider,
-        _modelService = modelService;
+    required this._conversationProvider,
+    required this._modelService,
+  });
 
   /// Builds the list of messages for the API context.
   Future<List<Map<String, dynamic>>> buildContextMessages({

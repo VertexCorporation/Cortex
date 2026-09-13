@@ -96,7 +96,7 @@ class InputService {
               isImage: pickedImages);
         }
 
-        if (pickedImages) {
+        if (pickedImages && context.mounted) {
           _promoteSelectedSeriesForImage(context);
         }
       } else {
@@ -119,7 +119,7 @@ class InputService {
         final File file = File(pickedFile.path);
         await _validateAndAddAttachment(inputProvider, file,
             isImage: pickedImage);
-        if (pickedImage) {
+        if (pickedImage && context.mounted) {
           _promoteSelectedSeriesForImage(context);
         }
       }

@@ -157,7 +157,15 @@ class ChatStorageService {
               AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))
             ORDER BY idx DESC LIMIT 1
         )
-        ORDER BY c.lastMessageDate DESC
+        -- ORDER FIX: The Dart inbox re-sorts by (last visible message ts,
+        -- else conversations.lastMessageDate, else 0) — see
+        -- compareConversationManagers. The SQL must feed rows in that same
+        -- order, or the (unstable) Dart sort receives a differently-ordered
+        -- input on every reload and tie groups permute "randomly".
+        -- conversations.lastMessageDate defaults to 0 (schema + migration),
+        -- so message-less legacy rows all tie at 0: break ties by id for a
+        -- fully deterministic result order.
+        ORDER BY COALESCE(m.ts, c.lastMessageDate, 0) DESC, c.id ASC
       ''');
       return results;
     } catch (e) {

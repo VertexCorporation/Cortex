@@ -38,8 +38,8 @@ class CreationProfileHeader extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'RemovePhoto',
       transitionDuration: const Duration(milliseconds: 150),
-      pageBuilder: (ctx, _, __) => _buildConfirmationDialog(ctx, localizations),
-      transitionBuilder: (_, anim, __, child) =>
+      pageBuilder: (ctx, _, _) => _buildConfirmationDialog(ctx, localizations),
+      transitionBuilder: (_, anim, _, child) =>
           FadeTransition(opacity: anim, child: child),
     );
 

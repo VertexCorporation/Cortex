@@ -212,7 +212,7 @@ class FundsBackend with ChangeNotifier {
 
   static VoidCallback? onPreloadComplete;
 
-  FundsBackend({UserProvider? userProvider}) : _userProvider = userProvider {
+  FundsBackend({this._userProvider}) {
     // Pre-populate state from cache so synchronous UI renders correctly before fetch
     loadFromCache();
     // Re-load if a background preload finishes after the instance is created

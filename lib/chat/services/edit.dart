@@ -24,20 +24,14 @@ class EditService {
   List<Message>? _messagesBeforeEdit;
 
   EditService({
-    required InputProvider inputProvider,
-    required ConversationProvider conversationProvider,
-    required RegenerateService regenerateService,
-    required ScrollService scrollService,
-    required TextEditingController controller,
-    required FocusNode focusNode,
-    required AnimationController panelController,
-  })  : _inputProvider = inputProvider,
-        _conversationProvider = conversationProvider,
-        _regenerateService = regenerateService,
-        _scrollService = scrollService,
-        _controller = controller,
-        _focusNode = focusNode,
-        _panelController = panelController;
+    required this._inputProvider,
+    required this._conversationProvider,
+    required this._regenerateService,
+    required this._scrollService,
+    required this._controller,
+    required this._focusNode,
+    required this._panelController,
+  });
 
   void updateControllers({
     required TextEditingController controller,

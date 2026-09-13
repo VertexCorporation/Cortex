@@ -19,14 +19,11 @@ class RegenerateService {
   final ScrollService _scrollService;
 
   RegenerateService({
-    required ConversationProvider conversationProvider,
-    required StopService stopService,
-    required SendService sendService,
-    required ScrollService scrollService,
-  })  : _conversationProvider = conversationProvider,
-        _stopService = stopService,
-        _sendService = sendService,
-        _scrollService = scrollService;
+    required this._conversationProvider,
+    required this._stopService,
+    required this._sendService,
+    required this._scrollService,
+  });
 
   /// Continues a truncated AI response: keeps the partial text, re-enters
   /// the response loop with a continuation instruction, and streams the

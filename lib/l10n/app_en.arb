@@ -1024,5 +1024,19 @@
           "description": "Number of minutes."
         }
       }
+    },
+  "voiceTimeRemaining": "Voice time left: {time}",
+  "@voiceTimeRemaining": {
+    "description": "Realtime Voice/Flow daily allowance countdown, shown in the voice overlay while a session is active. Fills the {time} placeholder with an m:ss countdown.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "description": "The remaining time, formatted as m:ss (e.g. 4:53)."
+      }
     }
+  },
+  "voiceDailyLimitReached": "You've used today's voice time. It renews after midnight.",
+  "@voiceDailyLimitReached": {
+    "description": "Shown when the daily realtime Voice/Flow allowance is exhausted and the server refused to start a new session."
+  }
 }

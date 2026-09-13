@@ -77,7 +77,7 @@ class _SettingsSectionState extends State<SettingsSection>
       context: context,
       barrierDismissible: true,
       barrierLabel: 'RedeemCodeDialog',
-      pageBuilder: (ctx, _, __) {
+      pageBuilder: (ctx, _, _) {
         final screenWidth = MediaQuery.of(ctx).size.width;
         final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
 
@@ -376,11 +376,11 @@ class _SettingsSectionState extends State<SettingsSection>
         'action': () {
           Navigator.of(context).push(
             PageRouteBuilder(
-              pageBuilder: (_, __, ___) =>
+              pageBuilder: (_, _, _) =>
                   const OnboardingScreen(isStoryMode: true),
               transitionDuration: const Duration(milliseconds: 500),
               reverseTransitionDuration: const Duration(milliseconds: 500),
-              transitionsBuilder: (_, animation, __, child) {
+              transitionsBuilder: (_, animation, _, child) {
                 return FadeTransition(opacity: animation, child: child);
               },
             ),

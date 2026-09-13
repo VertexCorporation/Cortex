@@ -171,7 +171,7 @@ class ModelHeader extends StatelessWidget {
     return Image(
       image: imageProvider,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => fallbackImage,
+      errorBuilder: (_, _, _) => fallbackImage,
     );
   }
 }

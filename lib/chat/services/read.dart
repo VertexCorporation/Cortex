@@ -26,14 +26,11 @@ class ReadService {
   int _loadGeneration = 0;
 
   ReadService({
-    required ConversationProvider conversationProvider,
-    required ChatSessionProvider sessionProvider,
-    required ModelService modelService,
-    required BackgroundTaskService backgroundTaskService,
-  })  : _conversationProvider = conversationProvider,
-        _sessionProvider = sessionProvider,
-        _modelService = modelService,
-        _backgroundTaskService = backgroundTaskService;
+    required this._conversationProvider,
+    required this._sessionProvider,
+    required this._modelService,
+    required this._backgroundTaskService,
+  });
 
   /// Loads a conversation using the provided manager.
   Future<void> loadConversation(ConversationManager manager,

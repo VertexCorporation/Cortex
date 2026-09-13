@@ -21,14 +21,11 @@ class SelectionService {
   final ModelLocalStateProvider _localStateProvider;
 
   SelectionService({
-    required ChatSessionProvider sessionProvider,
-    required ConversationProvider conversationProvider,
-    required ModelService modelService,
-    required ModelLocalStateProvider localStateProvider,
-  })  : _sessionProvider = sessionProvider,
-        _conversationProvider = conversationProvider,
-        _modelService = modelService,
-        _localStateProvider = localStateProvider;
+    required this._sessionProvider,
+    required this._conversationProvider,
+    required this._modelService,
+    required this._localStateProvider,
+  });
 
   /// Selects a model to start a new chat session using a ModelEntity.
   ///

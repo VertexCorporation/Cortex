@@ -40,14 +40,11 @@ class SettingsGeneralProvider with ChangeNotifier {
 
   /// Constructor: Injects services and starts the initialization process.
   SettingsGeneralProvider({
-    required AuthService authService,
-    required ProfileService profileService,
-    required IntrovertNotificationService notificationService,
-    required UserProvider userProvider,
-  })  : _authService = authService,
-        _profileService = profileService,
-        _notificationService = notificationService,
-        _userProvider = userProvider;
+    required this._authService,
+    required this._profileService,
+    required this._notificationService,
+    required this._userProvider,
+  });
 
   // --- Public Getters for UI State ---
 

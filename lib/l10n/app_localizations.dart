@@ -81,7 +81,7 @@ import 'app_localizations_zh.dart';
 /// property.
 abstract class AppLocalizations {
   AppLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -104,11 +104,11 @@ abstract class AppLocalizations {
   /// of delegates is preferred or required.
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
@@ -131,7 +131,7 @@ abstract class AppLocalizations {
     Locale('pt'),
     Locale('ru'),
     Locale('sv'),
-    Locale('zh')
+    Locale('zh'),
   ];
 
   /// Localized time context injected into all model system prompts.
@@ -2623,7 +2623,10 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hello {currentTier} subscriber! The {targetTier} plan just got the {featureName} feature, which will take your Cortex to the next level. How about an upgrade?'**
   String notificationUpsellFeatureBody(
-      Object currentTier, Object featureName, Object targetTier);
+    Object currentTier,
+    Object featureName,
+    Object targetTier,
+  );
 
   /// No description provided for @notificationOriginStoryTitle.
   ///
@@ -3998,6 +4001,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one {{count} minute} other {{count} minutes}}'**
   String creditRenewalDurationMinute(int count);
+
+  /// Realtime Voice/Flow daily allowance countdown, shown in the voice overlay while a session is active. Fills the {time} placeholder with an m:ss countdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice time left: {time}'**
+  String voiceTimeRemaining(String time);
+
+  /// Shown when the daily realtime Voice/Flow allowance is exhausted and the server refused to start a new session.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used today\'s voice time. It renews after midnight.'**
+  String get voiceDailyLimitReached;
 }
 
 class _AppLocalizationsDelegate
@@ -4011,27 +4026,27 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) => <String>[
-        'ar',
-        'az',
-        'cs',
-        'de',
-        'en',
-        'es',
-        'fr',
-        'hi',
-        'hu',
-        'id',
-        'it',
-        'ja',
-        'ko',
-        'nl',
-        'no',
-        'pt',
-        'ru',
-        'sv',
-        'tr',
-        'zh'
-      ].contains(locale.languageCode);
+    'ar',
+    'az',
+    'cs',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'hi',
+    'hu',
+    'id',
+    'it',
+    'ja',
+    'ko',
+    'nl',
+    'no',
+    'pt',
+    'ru',
+    'sv',
+    'tr',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -4083,8 +4098,9 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   }
 
   throw FlutterError(
-      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
 }

@@ -39,7 +39,7 @@ class RagStorageService {
       _docTable,
       {
         'status': status.name,
-        if (chunkCount != null) 'chunkCount': chunkCount,
+        'chunkCount': ?chunkCount,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       },
       where: 'id = ?',

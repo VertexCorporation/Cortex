@@ -35,12 +35,16 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "az": [
     "responseTruncatedNotice",
-    "continueGenerating"
+    "continueGenerating",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "cs": [
@@ -79,7 +83,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "de": [
@@ -118,7 +124,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "es": [
@@ -157,7 +165,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "fr": [
@@ -196,7 +206,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "hi": [
@@ -235,7 +247,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "hu": [
@@ -274,7 +288,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "id": [
@@ -313,7 +329,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "it": [
@@ -352,7 +370,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "ja": [
@@ -391,7 +411,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "ko": [
@@ -430,7 +452,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "nl": [
@@ -469,7 +493,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "no": [
@@ -508,7 +534,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "pt": [
@@ -547,7 +575,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "ru": [
@@ -586,7 +616,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "sv": [
@@ -625,7 +657,9 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ],
 
   "tr": [
@@ -669,6 +703,8 @@
     "voicePreviewText",
     "voicePreviewFailed",
     "voiceMale",
-    "voiceFemale"
+    "voiceFemale",
+    "voiceTimeRemaining",
+    "voiceDailyLimitReached"
   ]
 }

@@ -135,18 +135,13 @@ class AppInitializer with ChangeNotifier {
 
   AppInitializer({
     required AppStatus initialStatus,
-    required AuthService authService,
-    required ModelService modelService,
-    required ExtrovertNotificationService extrovertNotificationService,
+    required this._authService,
+    required this._modelService,
+    required this._extrovertNotificationService,
     required IntrovertNotificationService introvertNotificationService,
-    required InternetProvider internetProvider,
-    required UserProvider userProvider,
-  })  : _status = initialStatus,
-        _authService = authService,
-        _modelService = modelService,
-        _extrovertNotificationService = extrovertNotificationService,
-        _internetProvider = internetProvider,
-        _userProvider = userProvider {
+    required this._internetProvider,
+    required this._userProvider,
+  }) : _status = initialStatus {
     debugPrint("AppInitializer: Instantiated with initial status: $_status");
   }
 

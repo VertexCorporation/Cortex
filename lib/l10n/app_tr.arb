@@ -929,5 +929,7 @@
   "creditWarningExhaustedMessage": "Bugünlük kredilerinizin tamamını kullandınız. {renewalTime} içinde yenilenir. Sınırsız devam etmek için hesabınızı yükseltin.",
   "creditWarningUltraExhaustedMessage": "Bugünlük kullanım sınırınıza ulaştınız. {renewalTime} içinde yenilenir.",
   "creditRenewalDurationHour": "{count, plural, one {{count} saat} other {{count} saat}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} dakika} other {{count} dakika}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} dakika} other {{count} dakika}}",
+  "voiceTimeRemaining": "Kalan ses süresi: {time}",
+  "voiceDailyLimitReached": "Bugünün ses süresini kullandınız. Gece yarısından sonra yenilenir."
 }

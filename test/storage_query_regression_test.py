@@ -62,6 +62,32 @@ class InboxQueryTest(unittest.TestCase):
         row = self.db.execute(self.query).fetchone()
         self.assertEqual(row['lastMessagePhoto'], '["image.jpg"]')
 
+    def test_order_uses_message_ts_before_conversation_timestamp(self):
+        # The Dart sort key is realLastMessageTs ?? conversations.lastMessageDate
+        # ?? 0; the SQL ORDER BY must agree or the inbox's unstable sort gets a
+        # differently-ordered input on every reload.
+        self.conversation('fresh-empty')  # no message -> row timestamp (2000)
+        self.db.execute(
+            "UPDATE conversations SET lastMessageDate = 2000 WHERE id = 'fresh-empty'")
+        self.conversation('stale-row-new-message')  # message ts (0) must win
+        self.db.execute(
+            "UPDATE conversations SET lastMessageDate = 9000 WHERE id = 'stale-row-new-message'")
+        self.message('stale-row-new-message', 0, 'hello')  # helper writes ts = idx = 0
+        rows = self.db.execute(self.query).fetchall()
+        self.assertEqual([r['id'] for r in rows],
+                         ['fresh-empty', 'stale-row-new-message'])
+
+    def test_order_ties_break_deterministically_by_conversation_id(self):
+        # Conversations that predate the lastMessageDate column all sit at the
+        # schema/migration default 0 with no messages: a tie group. The query
+        # must return them in a fixed order (id ASC) so the inbox sort is a
+        # pure function of row state instead of "random".
+        for name in ['delta', 'bravo', 'charlie', 'alpha']:
+            self.conversation(name)
+        rows = self.db.execute(self.query).fetchall()
+        self.assertEqual([r['id'] for r in rows],
+                         ['alpha', 'bravo', 'charlie', 'delta'])
+
     def test_result_count_does_not_grow_quadratically(self):
         for number in range(100):
             identifier = str(number)

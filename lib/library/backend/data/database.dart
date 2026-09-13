@@ -28,13 +28,51 @@ class DatabaseHelper {
     });
   }
 
+  /// Set when a schema migration dropped legacy rows; the file is vacuumed
+  /// right after the upgrade transaction commits so the space is reclaimed.
+  static bool _vacuumAfterUpgrade = false;
+
   Future<Database> _initDatabase() async {
     String path = p.join(await getDatabasesPath(), 'cortex_models_v2.db');
-    return await openDatabase(
+    final db = await openDatabase(
       path,
-      version: 1,
+      version: _schemaVersion,
       onCreate: _createDb,
+      onUpgrade: _upgradeDb,
     );
+    if (_vacuumAfterUpgrade) {
+      _vacuumAfterUpgrade = false;
+      try {
+        await db.execute('VACUUM');
+        debugPrint(
+            "[DatabaseHelper] Vacuumed after catalog schema migration (legacy catalog rows dropped).");
+      } catch (e) {
+        debugPrint(
+            "[DatabaseHelper] Post-migration vacuum failed (non-fatal): $e");
+      }
+    }
+    return db;
+  }
+
+  /// v2 — one row per wire variant entry (or per user-created model) instead
+  /// of one row per family container. The raw JSON of a family container
+  /// embedded every variant of the family and grew past Android's 2 MB
+  /// CursorWindow, crashing every catalog read. Per-variant rows stay a few
+  /// KB; family containers are rebuilt at read time by
+  /// `ModelDefaults.normalizeModelFamilies`.
+  static const int _schemaVersion = 2;
+
+  /// Upgrades legacy databases. The catalog is server-derived and fully
+  /// reconstructable, so legacy catalog rows are simply dropped and the next
+  /// sync repopulates the table; user-created models are preserved.
+  Future<void> _upgradeDb(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      final dropped = await db.delete('models',
+          where: "id NOT LIKE 'self_%' AND id NOT LIKE 'local_%'");
+      debugPrint(
+          "[DatabaseHelper] v2 schema migration: dropped $dropped legacy catalog row(s); user-created models preserved.");
+      _vacuumAfterUpgrade = true;
+    }
   }
 
   /// Creates the database table.

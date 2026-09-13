@@ -366,7 +366,7 @@ class AnalyticsService {
         parameters: {
           'error_type': errorType,
           'error_message': errorMessage,
-          if (screen != null) 'screen': screen,
+          'screen': ?screen,
         },
       );
 

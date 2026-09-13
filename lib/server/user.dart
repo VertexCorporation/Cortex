@@ -141,6 +141,11 @@ class UserProvider with ChangeNotifier {
   CreditLimits get creditLimits =>
       CreditLimits.fromData(_userData?['creditLimits']);
 
+  /// The user's daily realtime Voice/Flow pool (see [VoiceUsage]). Mirrored
+  /// from the server's reservation/settlement writes — the server stays
+  /// authoritative at every speech-token mint.
+  VoiceUsage get voiceUsage => VoiceUsage.fromData(_userData?['voiceUsage']);
+
   /// The first initial of the user's name for use in avatars. Defaults to '?'.
   String get profileInitial {
     final name = username;

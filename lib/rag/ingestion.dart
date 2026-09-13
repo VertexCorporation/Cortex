@@ -43,11 +43,10 @@ class RagIngestionService {
   );
 
   RagIngestionService({
-    required RagStorageService storage,
+    required this._storage,
     DocTextExtractor? extractor,
     DocumentChunker? chunker,
-  })  : _storage = storage,
-        _extractor = extractor ?? DocTextExtractor(),
+  })  : _extractor = extractor ?? DocTextExtractor(),
         _chunker = chunker ?? const DocumentChunker();
 
   Future<bool> isIndexable(String path) async {

@@ -98,10 +98,10 @@ class ModelCreationProvider extends ChangeNotifier {
   ModelCreationProvider(
     TickerProvider vsync,
     List<ModelEntity> baseModels, {
-    required ModelService modelService,
+    required this._modelService,
     required String localeName,
     required AppLocalizations localizations,
-  }) : _modelService = modelService {
+  }) {
     // Initialize Animation Controllers
     nameShakeController = AnimationController(
         vsync: vsync, duration: const Duration(milliseconds: 500));
@@ -266,7 +266,7 @@ class ModelCreationProvider extends ChangeNotifier {
       'description': description,
       'prompt': prompt,
       'base64Image': base64Image,
-      if (clientModelId != null) 'clientModelId': clientModelId,
+      'clientModelId': ?clientModelId,
     });
   }
 

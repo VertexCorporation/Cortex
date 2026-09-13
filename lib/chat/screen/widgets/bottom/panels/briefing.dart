@@ -82,6 +82,15 @@ class BriefingOverlay extends StatefulWidget {
 
   final ValueChanged<double>? onVisibleHeightChanged;
 
+  /// Fires when the user taps a briefing that carries conversion intent —
+  /// the premium/credit kinds. Production wires this to the shared
+  /// conversion funnel (`openNextSubscriptionStep` in `funds/routing.dart`)
+  /// so every premium briefing routes through one ladder: anonymous users
+  /// open the account-upgrade flow, and each tier lands on its next plan.
+  /// The panel itself never navigates, which keeps widget tests pure;
+  /// `null` keeps the tap dismiss-only.
+  final VoidCallback? onPremiumTap;
+
   final bool isVideoModel;
   final SubscriptionTier userTier;
 
@@ -106,6 +115,7 @@ class BriefingOverlay extends StatefulWidget {
     required this.isUserStateReady,
     required this.conversationId,
     this.onVisibleHeightChanged,
+    this.onPremiumTap,
   });
 
   // Credit briefing dismissal cooldowns live in `CreditsManager` (the
@@ -456,6 +466,32 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     }
   }
 
+  /// The briefings that carry conversion intent (plan/credit upsells).
+  /// Tapping one of them routes through the shared premium funnel (see
+  /// [BriefingOverlay.onPremiumTap]); every other kind keeps the classic
+  /// dismiss-only tap.
+  static bool _isPremiumKind(_BriefingKind? kind) => switch (kind) {
+        _BriefingKind.videoPremium ||
+        _BriefingKind.premiumTrial ||
+        _BriefingKind.usageLimitReached ||
+        _BriefingKind.freeDeclining ||
+        _BriefingKind.paidUpgrade ||
+        _BriefingKind.ultraLow ||
+        _BriefingKind.exhausted ||
+        _BriefingKind.ultraExhausted =>
+          true,
+        _ => false,
+      };
+
+  void _handleTap() {
+    if (_isPremiumKind(_currentKind)) {
+      widget.onPremiumTap?.call();
+    }
+    // Navigation (when routed) and dismissal are not mutually exclusive:
+    // the briefing leaves the screen either way, exactly as before.
+    _handleDismiss();
+  }
+
   void _handleDismiss() {
     if (_slideController.isDismissed) return;
     final kind = _currentKind;
@@ -557,22 +593,10 @@ class _BriefingOverlayState extends State<BriefingOverlay>
             }
           },
           onVerticalDragEnd: _handlePanEnd,
-          onTap: _handleDismiss,
+          onTap: _handleTap,
           child: Builder(builder: (context) {
             final bool usesPremiumUpgradeVisuals = _isPremiumUpgradeMessage;
-            final bool isPremiumMessage = _currentKind != null &&
-                switch (_currentKind!) {
-                  _BriefingKind.videoPremium ||
-                  _BriefingKind.premiumTrial ||
-                  _BriefingKind.usageLimitReached ||
-                  _BriefingKind.freeDeclining ||
-                  _BriefingKind.paidUpgrade ||
-                  _BriefingKind.ultraLow ||
-                  _BriefingKind.exhausted ||
-                  _BriefingKind.ultraExhausted =>
-                    true,
-                  _ => false,
-                };
+            final bool isPremiumMessage = _isPremiumKind(_currentKind);
             return _BriefingPanelContent(
               key: _panelKey,
               message: _currentMessageText ?? "",

@@ -30,7 +30,7 @@ class Bm25DocumentIndex {
     required this.document,
     required this.chunks,
     required this.tokenLengths,
-    required this.postings,
+    required this._postings,
     required this.documentFrequency,
     required this.totalTokens,
   });
@@ -78,7 +78,7 @@ class Bm25DocumentIndex {
   final RagDocument document;
   final List<RagChunk> chunks;
   final List<int> tokenLengths;
-  final Map<String, List<_Posting>> postings;
+  final Map<String, List<_Posting>> _postings;
   final Map<String, int> documentFrequency;
   final int totalTokens;
 
@@ -191,7 +191,7 @@ class Bm25Scorer {
       );
 
       for (final document in usable) {
-        final termPostings = document.postings[term];
+        final termPostings = document._postings[term];
         if (termPostings == null) continue;
         for (final posting in termPostings) {
           final dl = document.tokenLengths[posting.chunkOffset].toDouble();

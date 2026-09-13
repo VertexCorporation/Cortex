@@ -14,6 +14,14 @@ import 'package:provider/provider.dart';
 
 import '../../../l10n/app_localizations.dart';
 
+/// '4:53' / '0:12' — compact m:ss for the realtime voice allowance countdown.
+String _formatVoiceSeconds(int seconds) {
+  if (seconds < 0) seconds = 0;
+  final m = seconds ~/ 60;
+  final s = seconds % 60;
+  return '$m:${s.toString().padLeft(2, '0')}';
+}
+
 class VoiceSessionOverlay extends StatefulWidget {
   const VoiceSessionOverlay({super.key});
 
@@ -72,6 +80,12 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
     // Determine visual state
     bool isUserSpeaking = voiceService.state == VoiceState.listening;
     bool isAiSpeaking = voiceService.state == VoiceState.speaking;
+
+    // New lifecycle states: thinking (distinct internal motion on the orb),
+    // connecting/failed (subdued — the mic button is shown to retry).
+    bool isThinking = voiceService.state == VoiceState.processing;
+    bool isSubdued = voiceService.state == VoiceState.connecting ||
+        voiceService.state == VoiceState.failed;
 
     // Sound Level (0.0 to 1.0) for Dot Animation
     double level = speechService.soundLevel;
@@ -138,6 +152,8 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                       child: _MorphingVisualizer(
                         isUserSpeaking: isUserSpeaking,
                         isAiSpeaking: isAiSpeaking,
+                        isThinking: isThinking,
+                        isSubdued: isSubdued,
                         level: level,
                         isFluxMode: sessionProvider.isFluxMode,
                       ),
@@ -287,6 +303,40 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                         ),
                       ),
                     ),
+                    // Daily realtime allowance: server-authoritative numbers
+                    // published with the subscription tier, mirrored here for
+                    // the countdown; near-limit turns the label amber, and a
+                    // refused session explains itself instead of going dark.
+                    if (voiceService.lastEndReason == VoiceEndReason.limit &&
+                        !voiceService.isSessionActive) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        AppLocalizations.of(context)!.voiceDailyLimitReached,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.premium,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ] else if (voiceService.isSessionActive &&
+                        voiceService.remainingVoiceSeconds != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        AppLocalizations.of(context)!.voiceTimeRemaining(
+                          _formatVoiceSeconds(
+                              voiceService.remainingVoiceSeconds!),
+                        ),
+                        key: ValueKey<int>(voiceService.remainingVoiceSeconds!),
+                        style: TextStyle(
+                          color: (voiceService.remainingVoiceSeconds ?? 0) <= 30
+                              ? AppColors.premium
+                              : AppColors.tertiaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -500,11 +550,21 @@ class _MorphingVisualizer extends StatefulWidget {
   final double level;
   final bool isFluxMode;
 
+  /// Thinking (AI turn in flight): a slow, organic internal pulse — visually
+  /// distinct from mic-driven listening and the speaking wave.
+  final bool isThinking;
+
+  /// Connecting or failed: the orb is subdued until the session is live
+  /// again (the center button shows the mic to retry).
+  final bool isSubdued;
+
   const _MorphingVisualizer({
     required this.isUserSpeaking,
     required this.isAiSpeaking,
     required this.level,
     required this.isFluxMode,
+    this.isThinking = false,
+    this.isSubdued = false,
   });
 
   @override
@@ -596,6 +656,12 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
           // Using power function makes it spike more naturally like speech headers
           effectiveLevel =
               0.2 + (0.5 * (val * val * val)); // cubic curve for organic spikes
+        } else if (widget.isThinking) {
+          // Thinking: a slow, organic internal pulse — visually distinct from
+          // mic-driven listening and the speaking wave. Reuses the already
+          // running simulator controller, so no extra animation load.
+          double val = _aiSpeechSimulator.value;
+          effectiveLevel = 0.12 + 0.10 * (val * val);
         } else {
           _smoothLevel = _levelSmoother.value;
           effectiveLevel = _smoothLevel;
@@ -637,6 +703,11 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
           }
         } else if (widget.isFluxMode) {
           baseContainerColor = AppColors.secondaryColor;
+        } else if (widget.isSubdued) {
+          // Connecting or failed: the orb waits quietly instead of pretending
+          // to listen. The mic button restarts the session.
+          baseContainerColor =
+              AppColors.primaryColor.inverted.withValues(alpha: 0.45);
         } else {
           baseContainerColor = AppColors.primaryColor.inverted;
         }

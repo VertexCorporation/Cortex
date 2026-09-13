@@ -66,29 +66,19 @@ class SendService {
   Timer? _retryTimer;
 
   SendService({
-    required ConversationProvider conversationProvider,
     required ChatSessionProvider sessionProvider,
-    required InputProvider inputProvider,
-    required ApiService apiService,
-    required ContextService contextService,
-    required ScrollService scrollService,
-    required OfflineService offlineService,
-    required ModelService modelService,
-    required VoiceService voiceService,
-    required UserMemoryProvider userMemoryProvider,
-    required BackgroundTaskService backgroundTaskService,
-    required RagChatService ragChat,
-  })  : _conversationProvider = conversationProvider,
-        _inputProvider = inputProvider,
-        _apiService = apiService,
-        _contextService = contextService,
-        _scrollService = scrollService,
-        _offlineService = offlineService,
-        _modelService = modelService,
-        _voiceService = voiceService,
-        _userMemoryProvider = userMemoryProvider,
-        _backgroundTaskService = backgroundTaskService,
-        _ragChat = ragChat {
+    required this._conversationProvider,
+    required this._inputProvider,
+    required this._apiService,
+    required this._contextService,
+    required this._scrollService,
+    required this._offlineService,
+    required this._modelService,
+    required this._voiceService,
+    required this._userMemoryProvider,
+    required this._backgroundTaskService,
+    required this._ragChat,
+  }) {
     _mediaRouter = MediaRouter(_modelService);
   }
 

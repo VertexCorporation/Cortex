@@ -47,7 +47,7 @@ class TtlLruCache<K, V> {
     int Function()? clockMicros,
   })  : assert(maxEntries > 0),
         assert(maxWeight == null || maxWeight > 0),
-        _weigh = weigh ?? ((_, __) => 1),
+        _weigh = weigh ?? ((_, _) => 1),
         _clockMicros = clockMicros ?? _systemMicros;
 
   final Duration defaultTtl;

@@ -183,16 +183,12 @@ class OfflineService {
   _LoadFailureKind _lastLoadFailureKind = _LoadFailureKind.none;
 
   OfflineService({
-    required ResponseService responseService,
-    required ChatSessionProvider sessionProvider,
-    required ModelService modelService,
-    required ContextService contextService,
-    required RagChatService ragChat,
-  })  : _responseService = responseService,
-        _sessionProvider = sessionProvider,
-        _modelService = modelService,
-        _contextService = contextService,
-        _ragChat = ragChat {
+    required this._responseService,
+    required this._sessionProvider,
+    required this._modelService,
+    required this._contextService,
+    required this._ragChat,
+  }) {
     _llamaChannel.setMethodCallHandler(methodCallHandler);
   }
 

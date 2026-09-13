@@ -108,8 +108,14 @@ class MicButton extends StatelessWidget {
 
         inputProvider.setVoiceRecording(true);
 
-        await speechService.startListening(
+        // Ordinary prompt dictation runs on the device's NATIVE recognizer
+        // only (SpeechOwner.dictation): effectively unlimited, inexpensive,
+        // never a paid remote speech session, and locale-mapped from the
+        // application language with an English fallback. The remote
+        // providers are reserved for Voice Mode and Flow Mode.
+        final started = await speechService.startListening(
           locale: localeCode,
+          owner: SpeechOwner.dictation,
           onResult: (String text) {
             String spacer =
                 (currentText.isNotEmpty && !currentText.endsWith(' '))
@@ -122,6 +128,9 @@ class MicButton extends StatelessWidget {
             );
           },
         );
+        if (!started) {
+          inputProvider.setVoiceRecording(false);
+        }
       },
       child: SvgPicture.asset(
         'assets/icons/microphone.svg',

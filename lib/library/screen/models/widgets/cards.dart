@@ -154,13 +154,20 @@ class _ModelTileState extends State<ModelTile> {
       child: _content(context, w, loc, finalImageWidget),
     );
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: w * .008, horizontal: w * .005),
-      child: Column(
-        children: [
-          gestureDetector,
-          if (!widget.isLastInColumn) SizedBox(height: w * .01)
-        ],
+    // The tile lives in a fixed per-card height slot (see
+    // ModelsBackendUtils.calculateCategoryHeight). Clamp text scaling so
+    // enlarged system fonts cannot push the tile past that slot; titles
+    // already fade on a single line, and detail screens keep scaling freely.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.3,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: w * .008, horizontal: w * .005),
+        child: Column(
+          children: [
+            gestureDetector,
+            if (!widget.isLastInColumn) SizedBox(height: w * .01)
+          ],
+        ),
       ),
     );
   }
@@ -338,7 +345,9 @@ class _ModelTileState extends State<ModelTile> {
     Widget imageContent;
 
     if (resolvedImagePath.endsWith('self.svg')) {
-      imageContent = fallbackImage;
+      // The framed container below adds w * .012 padding per side; keep the
+      // fallback inside the padded frame instead of bleeding past it.
+      imageContent = _fallback(imgW - w * .024, imgH - w * .024);
     } else {
       if (variant == '.svg') {
         imageContent = SvgPicture.asset(
@@ -363,7 +372,7 @@ class _ModelTileState extends State<ModelTile> {
         imageContent = Image(
             image: provider,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => fallbackImage);
+            errorBuilder: (_, _, _) => fallbackImage);
       }
     }
 
@@ -371,7 +380,10 @@ class _ModelTileState extends State<ModelTile> {
       imageContent = Container(
           width: imgW,
           height: imgH,
-          padding: const EdgeInsets.all(6.0),
+          // Width-relative: keeps the framed image inside the per-card height
+          // slot (calculateCategoryHeight) on narrow screens, where a fixed
+          // 6 px pad made the tile taller than its budget.
+          padding: EdgeInsets.all(w * .012),
           decoration: BoxDecoration(
               color: AppColors.secondaryColor,
               borderRadius: BorderRadius.circular(w * .03)),

@@ -54,7 +54,7 @@ class ReportDialog extends StatefulWidget {
         barrierDismissible: true,
         barrierLabel: 'ReportDialog',
         transitionDuration: const Duration(milliseconds: 200),
-        pageBuilder: (dialogContext, _, __) {
+        pageBuilder: (dialogContext, _, _) {
           return ReportDialog(
             aiMessage: aiMessage,
             modelId: modelId,

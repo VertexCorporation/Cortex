@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 /// Tier of a Cortex subscription entitlement.
 enum SubscriptionTier {
@@ -306,6 +307,7 @@ class CreditLimits {
     required this.dailyGrant,
     required this.debtFloor,
     this.operationCosts = const {},
+    this.voiceDailySeconds,
   });
 
   /// Daily credit grant for the tier (`TIER_LIMITS.dailyCredits`).
@@ -314,6 +316,12 @@ class CreditLimits {
   /// Debt floor for the tier (`TIER_LIMITS.negativeCreditLimit`): at or
   /// below this balance nothing is sendable until the allowance renews.
   final int debtFloor;
+
+  /// Daily realtime Voice/Flow allowance in seconds
+  /// (`TIER_LIMITS.dailyVoiceSeconds`). Null when the document predates the
+  /// server's publication — the client then hides the countdown and the
+  /// server still enforces at every speech-token mint.
+  final int? voiceDailySeconds;
 
   /// Server-published default credit cost per generation operation
   /// (`DEFAULT_CREDIT_CHARGES` in Fulcrum's subscription.js): image, video,
@@ -342,6 +350,7 @@ class CreditLimits {
       dailyGrant: grant,
       debtFloor: floor,
       operationCosts: _readOperationCosts(raw['operationCosts']),
+      voiceDailySeconds: _readInt(raw['voiceDailySeconds']),
     );
   }
 
@@ -364,14 +373,80 @@ class CreditLimits {
       other is CreditLimits &&
           other.dailyGrant == dailyGrant &&
           other.debtFloor == debtFloor &&
+          other.voiceDailySeconds == voiceDailySeconds &&
           const MapEquality().equals(other.operationCosts, operationCosts);
 
   @override
   int get hashCode => Object.hash(
-      dailyGrant, debtFloor, const MapEquality().hash(operationCosts));
+      dailyGrant, debtFloor, voiceDailySeconds, const MapEquality().hash(operationCosts));
 
   @override
   String toString() =>
       'CreditLimits(dailyGrant: $dailyGrant, debtFloor: $debtFloor, '
+      'voiceDailySeconds: $voiceDailySeconds, '
       'operationCosts: $operationCosts)';
+}
+
+/// The user's daily realtime Voice/Flow pool, written by Fulcrum's voice
+/// endpoints (`functions/src/voice.js`): every speech-token mint RESERVES a
+/// window from the pool and every settlement reconciles it to the actual
+/// provider-reported session duration, all in one Firestore transaction per
+/// mint — so two devices can never double-spend the pool.
+///
+/// `day` is an Istanbul calendar-day key ('YYYY-MM-DD'), exactly the boundary
+/// the daily credit renewal uses (functions/src/credits.js): the pool resets
+/// LAZILY at the first mint of a new day, with no scheduled voice job to
+/// miss. The client mirrors this map for display; the server stays
+/// authoritative at every mint.
+class VoiceUsage {
+  const VoiceUsage({this.day, this.consumedSeconds = 0});
+
+  /// Istanbul day key the pool belongs to ('YYYY-MM-DD'), null when the user
+  /// has never used Voice/Flow (or the document predates the feature).
+  final String? day;
+
+  /// Seconds consumed today — reservations plus settled actuals.
+  final int consumedSeconds;
+
+  /// Seconds left in the pool for the current Istanbul day. A stored pool
+  /// from a previous day no longer applies (the server resets it lazily at
+  /// the first mint of the new day).
+  int remainingToday(int allowanceSeconds) {
+    if (allowanceSeconds <= 0) return 0;
+    final key = day;
+    if (key == null || key != todayIstanbulKey()) return allowanceSeconds;
+    final remaining = allowanceSeconds - consumedSeconds;
+    return remaining < 0 ? 0 : remaining;
+  }
+
+  /// Istanbul calendar-day key, matching `renewalDayKey` in
+  /// functions/src/credits.js ('en-CA' format yields YYYY-MM-DD). Requires
+  /// the timezone database to be initialized (initialization.dart does this
+  /// at startup, the same initialization `nextDailyRenewal` relies on).
+  static String todayIstanbulKey() {
+    final now = tz.TZDateTime.now(tz.getLocation('Europe/Istanbul'));
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    return '${now.year}-$month-$day';
+  }
+
+  /// Parses the `voiceUsage` map from a user document. Absent or malformed
+  /// maps simply mean "nothing consumed yet".
+  static VoiceUsage fromData(dynamic raw) {
+    if (raw is! Map) return const VoiceUsage();
+    final day = raw['day'];
+    final seconds = raw['seconds'];
+    return VoiceUsage(
+      day: day is String && day.trim().isNotEmpty ? day.trim() : null,
+      consumedSeconds: seconds is int
+          ? (seconds < 0 ? 0 : seconds)
+          : seconds is num
+              ? (seconds < 0 ? 0 : seconds.toInt())
+              : 0,
+    );
+  }
+
+  @override
+  String toString() =>
+      'VoiceUsage(day: $day, consumedSeconds: $consumedSeconds)';
 }

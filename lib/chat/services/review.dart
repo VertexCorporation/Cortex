@@ -177,7 +177,7 @@ class ReviewService {
       context: context, // This use is now safe.
       barrierLabel: 'ReviewPrompt',
       barrierDismissible: true,
-      pageBuilder: (dialogCtx, _, __) {
+      pageBuilder: (dialogCtx, _, _) {
         // `dialogCtx` is a new, valid context for the duration of this builder.
         return Center(
           child: Material(

@@ -57,10 +57,9 @@ abstract class RetrievalEngine {
 
 class Bm25RetrievalEngine implements RetrievalEngine {
   Bm25RetrievalEngine({
-    required RagStorageService storage,
+    required this._storage,
     RagTokenizer? tokenizer,
-  })  : _storage = storage,
-        _tokenizer = tokenizer ?? RagTokenizer();
+  }) : _tokenizer = tokenizer ?? RagTokenizer();
 
   final RagStorageService _storage;
   final RagTokenizer _tokenizer;

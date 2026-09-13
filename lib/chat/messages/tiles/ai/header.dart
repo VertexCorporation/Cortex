@@ -254,7 +254,7 @@ class _AiHeader extends StatelessWidget {
             width: containerSize,
             height: containerSize,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => fallbackWidget);
+            errorBuilder: (_, _, _) => fallbackWidget);
       }
     }
     return Container(

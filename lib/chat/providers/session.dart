@@ -247,11 +247,11 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   ChatSessionProvider({
-    required ModelService modelService,
+    required this._modelService,
     String initialModelId = 'cortex/auto',
     String initialModelTitle = '', // [NEW] Cached title
     Locale initialLocale = const Locale('en'),
-  }) : _modelService = modelService {
+  }) {
     try {
       _authSub = FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {

@@ -198,7 +198,7 @@ class _ComposerHintState extends State<_ComposerHint> {
           alignment: AlignmentDirectional.centerStart,
           children: <Widget>[
             ...previousChildren,
-            if (currentChild != null) currentChild,
+            ?currentChild,
           ],
         );
       },
