@@ -17,6 +17,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
+import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
@@ -32,7 +33,7 @@ class RemoteTtsService {
   /// spending a request to find that out.
   static const int maxChars = 800;
 
-  final Dio _dio = Dio(BaseOptions(
+  final Dio _dio = createFulcrumHttp(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 30),
   ));

@@ -21,7 +21,9 @@ import 'package:cortex/settings/providers/general.dart';
 import 'package:cortex/settings/services/auth.dart';
 import 'package:cortex/settings/services/profile.dart';
 import 'package:dio/dio.dart';
+import 'package:cortex/network/fulcrum_http.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -148,6 +150,28 @@ class AppBootstrap {
     try {
       await Future.wait([
         Firebase.initializeApp().then((_) async {
+          // Install providers before Firestore, auth, or callable traffic starts.
+          // Activation configures the SDK; it does not wait for attestation.
+          // Web/desktop do not have production Firebase configuration here.
+          if (!kIsWeb &&
+              (defaultTargetPlatform == TargetPlatform.android ||
+                  defaultTargetPlatform == TargetPlatform.iOS)) {
+            try {
+              await FirebaseAppCheck.instance.activate(
+                providerAndroid: kDebugMode
+                    ? const AndroidDebugProvider()
+                    : const AndroidPlayIntegrityProvider(),
+                providerApple: kDebugMode
+                    ? const AppleDebugProvider()
+                    : const AppleAppAttestWithDeviceCheckFallbackProvider(),
+              );
+            } catch (_) {
+              // Enforcement is a separate rollout. Keep startup usable if
+              // provider installation fails; never log tokens or use debug
+              // attestation as a production fallback.
+              debugPrint('[AppBootstrap] App Check activation failed.');
+            }
+          }
           try {
             FirebaseFirestore.instance.settings = const Settings(
               persistenceEnabled: true,
@@ -373,7 +397,7 @@ List<SingleChildWidget> _buildCoreProviders(
     // Global Dio instance with Smart Retry.
     Provider<Dio>(
       create: (_) {
-        final dio = Dio(
+        final dio = createFulcrumHttp(
           BaseOptions(
             connectTimeout: const Duration(seconds: 30),
             receiveTimeout: const Duration(seconds: 30),

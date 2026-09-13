@@ -8,6 +8,7 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/server/credits.dart' show formatRenewalRemaining;
 import 'package:dio/dio.dart';
+import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
@@ -41,15 +42,15 @@ class ApiService {
 
   ApiService({FirebaseAuth? auth, Dio? dio})
       : _auth = auth ?? FirebaseAuth.instance,
-        _dio = dio ??
-            Dio(BaseOptions(
+        _dio = dio != null ? configureFulcrumHttp(dio) :
+            createFulcrumHttp(BaseOptions(
               connectTimeout: const Duration(seconds: 20),
               receiveTimeout: const Duration(minutes: 5),
             ));
 
   // PERF: Reuse a single Dio instance for title generation to avoid
   // creating a new HTTP connection pool on every new conversation.
-  late final Dio _titleDio = Dio(BaseOptions(
+  late final Dio _titleDio = createFulcrumHttp(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 15),
   ));

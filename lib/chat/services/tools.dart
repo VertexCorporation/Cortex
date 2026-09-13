@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
@@ -201,7 +202,7 @@ class ToolRegistry {
       if (user == null) return "Error: User not authenticated.";
 
       final token = await user.getIdToken();
-      final dio = Dio();
+      final dio = createFulcrumHttp();
 
       // Include documents if this is a read_document call
       final Map<String, dynamic> requestData = {

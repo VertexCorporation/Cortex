@@ -14,6 +14,7 @@ import 'package:cortex/rag/extractors.dart';
 import 'package:cortex/rag/models.dart';
 import 'package:cortex/rag/storage.dart';
 import 'package:dio/dio.dart';
+import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mime/mime.dart';
@@ -35,7 +36,7 @@ class RagIngestionService {
     maxBatchSize: 256,
   );
 
-  static final Dio _fallbackDio = Dio(
+  static final Dio _fallbackDio = createFulcrumHttp(
     BaseOptions(
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(minutes: 2),

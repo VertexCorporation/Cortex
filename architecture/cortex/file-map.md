@@ -401,3 +401,7 @@ Use this document to locate code: when you know a symbol but not its file, searc
 ### `webview.dart/`
 
 - **`lib/webview.dart`** — Feature implementation for the  area. Declarations: `_WebViewModalContent, _WebViewModalContentState, _TriangleLoadingIndicator, _ErrorDisplay, _TrianglePainter`.
+
+### `network/`
+
+- **`lib/network/fulcrum_http.dart`** — Shared Fulcrum HTTP factory, exact-origin App Check interceptor and redirect credential boundary. Declarations: `createFulcrumHttp`, `configureFulcrumHttp`, `isFulcrumUri`, `FulcrumAppCheckInterceptor`, `FulcrumRedirectAdapter`.

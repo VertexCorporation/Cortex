@@ -23,6 +23,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
+import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -107,7 +108,7 @@ class RemoteSttService {
       "&sample_rate=$_sampleRate&channels=1"
       "&interim_results=true&smart_format=true";
 
-  final Dio _dio = Dio(BaseOptions(
+  final Dio _dio = createFulcrumHttp(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 15),
   ));
