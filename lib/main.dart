@@ -11,6 +11,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/screen.dart';
@@ -32,11 +33,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:cortex/startup/splash.dart';
 
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'axon/inbox/logic/general.dart';
 import 'arts/provider.dart';
 import 'roleplay/provider.dart';
@@ -47,6 +49,7 @@ import 'package:cortex/rag/retrieval.dart';
 import 'package:cortex/rag/injector.dart';
 import 'package:cortex/rag/chat.dart';
 import 'package:cortex/rag/provider.dart';
+
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
 import 'chat/providers/session.dart';
@@ -96,8 +99,9 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 /// This must be a top-level function and annotated with `@pragma('vm:entry-point')`.
 @pragma('vm:entry-point')
 void downloadCallback(String id, int status, int progress) {
-  final SendPort? sendPort =
-      IsolateNameServer.lookupPortByName('downloader_send_port');
+  final SendPort? sendPort = IsolateNameServer.lookupPortByName(
+    'downloader_send_port',
+  );
   sendPort?.send(<dynamic>[id, status, progress]);
 }
 
@@ -143,6 +147,10 @@ class BootstrapResult {
 class AppBootstrap {
   static Future<BootstrapResult> init() async {
     final stopwatch = Stopwatch()..start();
+
+    // Register AI tools here (moved out of the gatekeeper's post-frame path)
+    // so the splash's first animated frames start with an uncontended frame.
+    ToolRegistry.initialize();
 
     // 1. Initialize Firebase, FlutterDownloader, and SharedPreferences concurrently.
     // This significantly reduces cold start time by not waiting sequentially.
@@ -306,17 +314,11 @@ class AppBootstrap {
 ///
 /// Keeps the main setup ultra-light:
 /// - Ensures widgets binding
-/// - Preserves the native splash
-/// - Initializes time zones
+/// - Lets the OS release its static launch screen on the first Flutter frame
+/// - Defers bootstrap until after the first animated splash frames are due
 /// - Boots the [AppGatekeeper], which does the heavy lifting via a FutureBuilder.
-void main() async {
-  final WidgetsBinding widgetsBinding =
-      WidgetsFlutterBinding.ensureInitialized();
-
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-  // Initialize Tools
-  ToolRegistry.initialize();
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
 
   // PERFORMANCE: Highly restrictive image caching for 1GB RAM devices.
   // We limit the cache to 50 images or 30MB, whichever comes first, to prevent OOM errors.
@@ -330,57 +332,144 @@ void main() async {
 /// - Running the bootstrap once
 /// - Building the provider tree
 /// - Injecting [AppLifecycleManager] into [Cortex].
-class AppGatekeeper extends StatelessWidget {
+class AppGatekeeper extends StatefulWidget {
   const AppGatekeeper({super.key});
 
-  /// Cached bootstrap future to avoid re-running initialization on hot reload
-  /// or rebuilds of [FutureBuilder].
-  static final Future<BootstrapResult> _bootstrapFuture = AppBootstrap.init();
+  @override
+  State<AppGatekeeper> createState() => _AppGatekeeperState();
+}
+
+class _AppGatekeeperState extends State<AppGatekeeper> {
+  Future<BootstrapResult>? _bootstrapFuture;
+  bool _animationComplete = false;
+  bool _startupReady = false;
+  bool _bootstrapFailed = false;
+  bool _splashGone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // The splash starts animating on the first post-frame callback. Bootstrap
+    // work (Firebase, App Check, storage) competes for the platform main
+    // thread, so it starts one frame later: the first animated splash frames
+    // get a clean runway and visible motion begins sooner.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() {
+          _bootstrapFuture = AppBootstrap.init();
+          _bootstrapFuture!.then(
+            (_) {},
+            onError: (Object error, StackTrace stack) {
+              if (mounted) setState(() => _bootstrapFailed = true);
+            },
+          );
+        });
+      });
+    });
+  }
+
+  void _ready() {
+    if (mounted && !_startupReady) setState(() => _startupReady = true);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<BootstrapResult>(
-      future: _bootstrapFuture,
-      builder: (BuildContext context, AsyncSnapshot<BootstrapResult> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            // A minimal, non-crashing UI for bootstrap errors.
-            return MaterialApp(
-              home: Scaffold(
-                body: Center(
-                  child: Text('Bootstrap error: ${snapshot.error}'),
+    // Reduce-motion users skip the crossfade, matching the instant handoff
+    // the splash itself uses for them.
+    final bool reduceMotion = WidgetsBinding
+        .instance.platformDispatcher.accessibilityFeatures.disableAnimations;
+    final Duration fadeDuration = reduceMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 420);
+    return MediaQuery.fromView(
+      view: View.of(context),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // The real application UI fades in underneath while the splash
+            // fades out: a true crossfade between two Flutter layers, with no
+            // blank or intermediate frame in between.
+            AnimatedOpacity(
+              opacity: _animationComplete ? 1 : 0,
+              duration: fadeDuration,
+              curve: Curves.ease,
+              child: FutureBuilder<BootstrapResult>(
+                future: _bootstrapFuture,
+                builder:
+                    (
+                      BuildContext context,
+                      AsyncSnapshot<BootstrapResult> snapshot,
+                    ) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasError) {
+                          // A minimal, non-crashing UI for bootstrap errors.
+                          return MaterialApp(
+                            home: Scaffold(
+                              body: Center(
+                                child: Text(
+                                  'Bootstrap error: ${snapshot.error}',
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        final bootstrap = snapshot.data!;
+
+                        return MultiProvider(
+                          providers: <SingleChildWidget>[
+                            ..._buildCoreProviders(
+                              bootstrap.initialStatus,
+                              bootstrap.initialTheme,
+                              bootstrap.initialLanguageCode,
+                              bootstrap.initialUserDataJson,
+                            ),
+                            ..._buildSettingsProviders(),
+                            ..._buildChatAndLibraryProviders(
+                              bootstrap.initialModelId,
+                              bootstrap.initialModelTitle,
+                              bootstrap.initialLanguageCode,
+                            ),
+                          ],
+                          child: Cortex(
+                            navigatorKey: navigatorKey,
+                            startupScreen: AppLifecycleManager(
+                              onStartupReady: _ready,
+                              startupVisible:
+                                  !_splashGone || !_startupReady,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+              ),
+            ),
+            if (!_splashGone)
+              AnimatedOpacity(
+                opacity: _animationComplete ? 0 : 1,
+                duration: fadeDuration,
+                curve: Curves.ease,
+                onEnd: () {
+                  if (_animationComplete && !_splashGone && mounted) {
+                    setState(() => _splashGone = true);
+                  }
+                },
+                child: CortexStartupSplash(
+                  ready: _startupReady || _bootstrapFailed,
+                  onComplete: () {
+                    if (mounted) setState(() => _animationComplete = true);
+                  },
                 ),
               ),
-            );
-          }
-
-          final bootstrap = snapshot.data!;
-
-          return MultiProvider(
-            providers: <SingleChildWidget>[
-              ..._buildCoreProviders(
-                bootstrap.initialStatus,
-                bootstrap.initialTheme,
-                bootstrap.initialLanguageCode,
-                bootstrap.initialUserDataJson,
-              ),
-              ..._buildSettingsProviders(),
-              ..._buildChatAndLibraryProviders(
-                bootstrap.initialModelId,
-                bootstrap.initialModelTitle,
-                bootstrap.initialLanguageCode,
-              ),
-            ],
-            child: Cortex(
-              navigatorKey: navigatorKey,
-              startupScreen: const AppLifecycleManager(),
-            ),
-          );
-        }
-
-        // While bootstrapping we keep the native splash visible and render nothing.
-        return const SizedBox.shrink();
-      },
+          ],
+        ),
+      ),
     );
   }
 }

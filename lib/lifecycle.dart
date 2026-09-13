@@ -18,8 +18,8 @@ import 'package:cortex/notifications/extrovert.dart';
 import 'package:cortex/screen.dart';
 import 'package:cortex/update.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
+
 import 'meet.dart';
 
 /// Routes the user to the correct screen depending on [AppInitializer.status].
@@ -29,7 +29,14 @@ import 'meet.dart';
 /// - Maintenance & forced-update screens
 /// - Main app shell when ready
 class AppLifecycleManager extends StatefulWidget {
-  const AppLifecycleManager({super.key});
+  const AppLifecycleManager({
+    super.key,
+    this.onStartupReady,
+    this.startupVisible = false,
+  });
+
+  final VoidCallback? onStartupReady;
+  final bool startupVisible;
 
   @override
   State<AppLifecycleManager> createState() => _AppLifecycleManagerState();
@@ -38,7 +45,7 @@ class AppLifecycleManager extends StatefulWidget {
 class _AppLifecycleManagerState extends State<AppLifecycleManager>
     with WidgetsBindingObserver {
   AppStatus? _previousStatus;
-  bool _splashRemoved = false;
+  bool _startupReported = false;
   bool _firstLaunchConversationStarted = false;
   AppInitializer? _lastInitializer;
 
@@ -63,9 +70,9 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
     super.didChangeAppLifecycleState(state);
     if (!mounted) return;
 
-    context
-        .read<ExtrovertNotificationService>()
-        .handleAppLifecycleStateChange(state);
+    context.read<ExtrovertNotificationService>().handleAppLifecycleStateChange(
+      state,
+    );
     debugPrint('AppLifecycleManager: App lifecycle state changed: $state');
   }
 
@@ -93,18 +100,10 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
       builder: (BuildContext context, AppInitializer initializer, Widget? _) {
         final AppStatus currentStatus = initializer.status;
 
-        // Remove native splash exactly once once we are past the initializing state.
-        if (!_splashRemoved && currentStatus != AppStatus.initializing) {
-          _splashRemoved = true;
+        if (!_startupReported && currentStatus != AppStatus.initializing) {
+          _startupReported = true;
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            debugPrint(
-              'AppLifecycleManager: First real frame is ready. Removing native splash...',
-            );
-            try {
-              FlutterNativeSplash.remove();
-            } catch (e) {
-              debugPrint("Warning: Failed to remove splash screen: $e");
-            }
+            if (mounted) widget.onStartupReady?.call();
           });
         }
 
@@ -128,7 +127,8 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
         _previousStatus = currentStatus;
 
-        if (!_firstLaunchConversationStarted &&
+        if (!widget.startupVisible &&
+            !_firstLaunchConversationStarted &&
             currentStatus == AppStatus.ready) {
           _firstLaunchConversationStarted = true;
 
@@ -145,10 +145,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 500),
           transitionBuilder: (Widget child, Animation<double> animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
+            return FadeTransition(opacity: animation, child: child);
           },
           child: _buildScreenForStatus(initializer),
         );
@@ -194,7 +191,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
         return const UpdateRequiredScreen(key: ValueKey('UpdateScreen'));
 
       case AppStatus.initializing:
-        // While initializing, let the native splash stay visible.
+        // The root Flutter splash remains visible until startup is ready.
         return const SizedBox.shrink(key: ValueKey('Initializing'));
 
       case AppStatus.ready:

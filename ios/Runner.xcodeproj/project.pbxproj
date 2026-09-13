@@ -472,6 +472,7 @@
 				ADFAF2D3E7ABEC7835807012 /* [CP] Embed Pods Frameworks */,
 				A9FBB9F5645787E4C0B6D925 /* [CP] Copy Pods Resources */,
 				05CA17CC2EE048EA00FCE005 /* ShellScript */,
+				A177A5A10000000000000001 /* Verify llama signature */,
 			);
 			buildRules = (
 			);
@@ -489,7 +490,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 2660;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					331C8080294A63A400263BE5 = {
@@ -691,6 +692,23 @@
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
 		};
+		A177A5A10000000000000001 /* Verify llama signature */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(PROJECT_DIR)/verify-llama-signature.sh",
+				"$(TARGET_BUILD_DIR)/$(FRAMEWORKS_FOLDER_PATH)/llama.framework",
+			);
+			name = "Verify llama signature";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "if [ \"${CODE_SIGNING_ALLOWED:-YES}\" = NO ]; then\n  \"${PROJECT_DIR}/verify-llama-signature.sh\" --identifier-only \"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/llama.framework\"\nelse\n  \"${PROJECT_DIR}/verify-llama-signature.sh\" \"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/llama.framework\"\nfi\n";
+		};
 		A9FBB9F5645787E4C0B6D925 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -699,9 +717,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -716,9 +738,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

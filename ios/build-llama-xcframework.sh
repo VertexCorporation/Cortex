@@ -138,7 +138,6 @@ package_framework() {
         -framework Accelerate -framework Metal -framework Foundation \
         -framework CoreFoundation -lobjc \
         -o "$fw/llama"
-    codesign --force --sign - "$fw/llama"
 
     # Headers (the set the modulemap exposes; ggml-opt.h is required since
     # recent llama.h versions include it)
@@ -209,6 +208,11 @@ PLIST
 
     # Debug symbols
     dsymutil "$fw/llama" -o "$BUILD_ROOT/$name/dSYMs/llama.dSYM"
+    # Sign the completed bundle, not the bare dylib before Info.plist exists.
+    # Xcode CodeSignOnCopy preserves the dependency's signing identifier.
+    # Explicitly override any identifier left by the linker/previous signature.
+    codesign --force --sign - --identifier org.ggml.llama "$fw"
+    "$REPO_ROOT/ios/verify-llama-signature.sh" "$fw"
     echo "==> [$name] packaged: $fw"
 }
 
@@ -237,6 +241,8 @@ xcodebuild -create-xcframework \
     -framework "$BUILD_ROOT/ios-arm64_x86_64-simulator/llama.framework" \
     -debug-symbols "$BUILD_ROOT/ios-arm64_x86_64-simulator/dSYMs/llama.dSYM" \
     -output "$OUT"
+
+"$REPO_ROOT/ios/verify-llama-signature.sh" "$OUT"
 
 echo "==> Done: $OUT"
 echo "    Quick sanity checks:"
