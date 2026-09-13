@@ -10,6 +10,9 @@ class AppLocalizationsId extends AppLocalizations {
   AppLocalizationsId([String locale = 'id']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Lebih banyak obrolan suara';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nTanggal dan waktu saat ini: $formattedTime.';
   }

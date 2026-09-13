@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import 'stt_remote.dart';
+import 'voice_turns.dart';
 
 /// Who owns the microphone right now. There is exactly one logical owner at
 /// any moment; a new owner always terminates the previous one's capture
@@ -40,6 +41,30 @@ class SpeechService with ChangeNotifier {
   bool _isListening = false;
   double _soundLevel = 0.0;
   String _localeId = "en_US";
+
+  /// The committed text of the previous VOICE user turn, in the exact raw
+  /// cumulative form the engines emit (armed by [beginNewUserTurn]).
+  ///
+  /// Why this exists: the capture deliberately outlives a user turn (the
+  /// continuous-session model), and BOTH engines emit text cumulative since
+  /// the capture started — Deepgram/AssemblyAI append every utterance final
+  /// to [_finalizedText], and the native plugin's `recognizedWords` covers
+  /// its whole listen session. Without a boundary, turn 2's text arrives as
+  /// "turn-1 words + turn-2 words" and the outgoing user message grows
+  /// every turn.
+  ///
+  /// While armed, the committed span is stripped from the FRONT of every
+  /// emission (normalized match — see
+  /// [VoiceTurnTracker.stripCommittedPrefix]) and the accumulator is kept
+  /// in sync, so a late final of the committed utterance can never leak
+  /// into the next turn either. The guard disarms on the first fragment
+  /// that does not extend the committed text (fresh speech).
+  String _turnPrefix = "";
+
+  /// The most recent RAW cumulative text handed to an onResult callback
+  /// (pre-strip, pre-capitalization) — what [beginNewUserTurn] arms when
+  /// the caller does not know the exact committed span.
+  String _lastRawCumulative = "";
 
   /// Bumped on every stop: callbacks handed to a capture that has since been
   /// superseded are dropped instead of mutating the new session.
@@ -198,6 +223,8 @@ class SpeechService with ChangeNotifier {
 
     _owner = owner;
     _finalizedText = "";
+    _turnPrefix = "";
+    _lastRawCumulative = "";
 
     final mode = owner == SpeechOwner.flow ? 'flow' : 'voice';
 
@@ -210,10 +237,11 @@ class SpeechService with ChangeNotifier {
           // Voice Mode's barge-in gating reads it. Dictation callers pass
           // no handler and pay nothing for it.
           onSttResult?.call(result);
-          final spoken = result.isFinal
+          final rawCumulative = result.isFinal
               ? _appendFinal(result.text)
               : _withInterim(result.text);
-          onResult(_capitalize(spoken));
+          _lastRawCumulative = rawCumulative;
+          onResult(_capitalize(_stripStale(rawCumulative)));
         },
         onClosed: (info) {
           if (_disposed || generation != _generation) return;
@@ -288,7 +316,9 @@ class SpeechService with ChangeNotifier {
       localeId: _localeId,
       onResult: (result) {
         if (_disposed || generation != _generation) return;
-        onResult(_capitalize(result.recognizedWords));
+        final rawCumulative = result.recognizedWords;
+        _lastRawCumulative = rawCumulative;
+        onResult(_capitalize(_stripStale(rawCumulative)));
       },
       onSoundLevelChange: (level) {
         if (_disposed || !_isListening || generation != _generation) return;
@@ -345,6 +375,8 @@ class SpeechService with ChangeNotifier {
     _isListening = false;
     _soundLevel = 0.0;
     _finalizedText = "";
+    _turnPrefix = "";
+    _lastRawCumulative = "";
     _notifyNow();
   }
 
@@ -361,6 +393,19 @@ class SpeechService with ChangeNotifier {
   Future<bool> reconnectRemoteSocket() async {
     if (_disposed || !_usingRemote) return false;
     return _remote.reconnectSocket();
+  }
+
+  /// Rotates the provider socket of the active remote capture at the
+  /// reserved-window boundary: the current socket is settled, closed and
+  /// replaced by a freshly minted one — the microphone capture is NEVER
+  /// touched, so chunks keep flowing through the rotation and the user's
+  /// next word lands on the new socket instead of in a teardown gap. No
+  /// generation changes; every callback handed out stays valid. Returns
+  /// false when rotation failed — the caller decides between a full engine
+  /// restart and ending the session.
+  Future<bool> rotateRemoteSocket() async {
+    if (_disposed || !_usingRemote) return false;
+    return _remote.rotateSocket();
   }
 
   /// One line of live remote-capture health (socket state, mic state, frame /
@@ -381,6 +426,39 @@ class SpeechService with ChangeNotifier {
 
   String _withInterim(String span) =>
       _finalizedText.isEmpty ? span : "$_finalizedText $span";
+
+  /// Marks the end of a VOICE user turn: everything captured so far belongs
+  /// to the committed turn and must never appear in the text handed to the
+  /// next one. The capture itself keeps running (continuous session) — this
+  /// only moves the cumulative-text boundary.
+  ///
+  /// [committedText] is the raw cumulative text as it was last emitted when
+  /// the turn committed; when omitted, the last emission is used (correct
+  /// for both engines since their emissions are cumulative).
+  void beginNewUserTurn({String? committedText}) {
+    _turnPrefix = committedText ?? _lastRawCumulative;
+    _finalizedText = "";
+  }
+
+  /// Applies the committed-turn guard to one raw cumulative emission,
+  /// keeping [_finalizedText] in sync so a stripped span cannot re-leak
+  /// through later emissions of the same turn.
+  String _stripStale(String spoken) {
+    final stale = _turnPrefix;
+    if (stale.trim().isEmpty || spoken.isEmpty) return spoken;
+    final remainder = VoiceTurnTracker.stripCommittedPrefix(spoken, stale);
+    if (identical(remainder, spoken)) {
+      // The fragment does not extend the committed turn's words: fresh
+      // speech. Disarm so a repeated opening word can never be stripped
+      // later in this turn. (The native plugin's cumulative text always
+      // extends the committed span, so there the guard stays armed for as
+      // long as its listen session lives.)
+      _turnPrefix = "";
+      return spoken;
+    }
+    _finalizedText = remainder;
+    return remainder;
+  }
 
   String _capitalize(String text) {
     final trimmed = text.trim();

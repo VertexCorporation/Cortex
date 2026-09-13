@@ -148,20 +148,16 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     final conversationProvider = context.read<ConversationProvider>();
 
     final (
-      isVoiceMode,
       isAttachmentLoading,
       isEditingMode,
       originalMessageText,
       preselectedPhoto,
-    ) = context.select<InputProvider, (bool, bool, bool, String?, String?)>((
-      p,
-    ) {
+    ) = context.select<InputProvider, (bool, bool, String?, String?)>((p) {
       final atts = p.attachments;
       final photoPath = atts.isNotEmpty && atts.first.file.path.isNotEmpty
           ? atts.first.file.path
           : null;
       return (
-        p.isVoiceModeActive,
         p.isAttachmentLoading,
         p.isEditingMode,
         p.originalMessageText,
@@ -213,115 +209,109 @@ class _ChatInputPanelState extends State<ChatInputPanel>
           height: 300,
           child: const IgnorePointer(child: AmbientGlow()),
         ),
-        // Standard Input Panel (Slides Down)
-        AnimatedSlide(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          // Slide down (hide) when voice mode is active
-          offset: isVoiceMode ? const Offset(0, 1.2) : Offset.zero,
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            opacity: isVoiceMode ? 0.0 : 1.0,
-            child: SizeChangedLayoutNotifier(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 1. Edit Panel (Slides down when editing)
-                  SizeTransition(
-                    sizeFactor: _editPanelSizeFactor,
-                    axis: Axis.vertical,
-                    child: EditPanelWidget(
-                      slideAnimation: widget.slideAnimation,
-                      fadeAnimation: widget.fadeAnimation,
-                      onCancel: () {
-                        widget.editService.cancelEditingMode();
-                        widget.scrollService.updateButtonVisibility();
-                      },
-                    ),
-                  ),
-
-                  // 2. Main Input Field
-                  // Wrapped in a ValueListenableBuilder so that credit changes
-                  // (e.g. after account switch) reactively rebuild the input.
-                  ValueListenableBuilder<int?>(
-                    valueListenable: creditsManager.totalCreditsNotifier,
-                    builder: (context, totalCredits, _) {
-                      return InputField(
-                        key: _inputFieldKey,
-                        localizations: localizations,
-                        isDynamicChatMode: isDynamicChat,
-                        isLimitExceeded: isLimitExceeded,
-                        isPhotoLoading: isAttachmentLoading,
-                        isSending: isWaitingForResponse,
-                        canHandleImage: isDynamicChat ? true : canHandleImage,
-                        isEditingMode: isEditingMode,
-                        originalMessageText: originalMessageText,
-                        // Legacy photo support for UI
-                        preselectedPhoto: preselectedPhoto != null
-                            ? File(preselectedPhoto)
-                            : null,
-                        isStorageSufficient: isStorageSufficient,
-                        modelMissing: modelMissing,
-                        role: role,
-                        isPremiumModel: isDynamicChat
-                            ? false
-                            : isCurrentModelPremium,
-                        isSubscribed: isUserSubscribed,
-                        userTier: userTier,
-                        isServerSideModel: Utils.isServerSideModel(
-                          modelId,
-                          langCode: langCode,
-                          modelService: modelService,
-                        ),
-                        totalCredits: totalCredits,
-                        controller: _textController,
-                        textFieldFocusNode: _focusNode,
-
-                        // --- Actions ---
-                        onSend: () async => _handleSend(
-                          localizations,
-                          isLimitExceeded,
-                          langCode,
-                          modelService,
-                          context.read<InputProvider>(),
-                          conversationProvider,
-                        ),
-                        onApplyEditedMessage: () async => await widget
-                            .editService
-                            .applyEditedMessage(context),
-                        onStop: () {
-                          final voiceService = context.read<VoiceService>();
-                          if (voiceService.isFlowActive) {
-                            // [NEW] Flow Mode: Pause & Listen (Interruption)
-                            voiceService.interruptFlowAndListen();
-                            // Stop any text generation but keep session alive
-                            context
-                                .read<ConversationProvider>()
-                                .stopGenerating();
-                          } else {
-                            // Standard Mode: Stop Everything
-                            context.read<StopService>().stopResponse();
-                          }
-                        },
-                        // Logic Update: Null check before adding
-                        onPhotoSelected: (photo) {
-                          if (photo != null) {
-                            context.read<InputProvider>().addAttachment(
-                              photo,
-                              isImage: true,
-                            );
-                          }
-                        },
-                        onCancelEditing: () {
-                          widget.editService.cancelEditingMode();
-                          widget.scrollService.updateButtonVisibility();
-                        },
-                      );
-                    },
-                  ),
-                ],
+        // Standard Input Panel — Voice Mode V2 is a LAYER over the normal
+        // composer, never a takeover: the panel stays mounted and fully
+        // visible in voice mode, and the composer's own widgets (input.dart)
+        // drive the 3-channel morph — center capsule shrink, left "+" ->
+        // Flow, right send -> X. The legacy whole-panel slide/fade is GONE
+        // on purpose: hiding the panel here would orphan the compact orb's
+        // anchor (view.dart tracks this panel's live height) and make the
+        // fullscreen Flow/X controls unreachable.
+        SizeChangedLayoutNotifier(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 1. Edit Panel (Slides down when editing)
+              SizeTransition(
+                sizeFactor: _editPanelSizeFactor,
+                axis: Axis.vertical,
+                child: EditPanelWidget(
+                  slideAnimation: widget.slideAnimation,
+                  fadeAnimation: widget.fadeAnimation,
+                  onCancel: () {
+                    widget.editService.cancelEditingMode();
+                    widget.scrollService.updateButtonVisibility();
+                  },
+                ),
               ),
-            ),
+
+              // 2. Main Input Field
+              // Wrapped in a ValueListenableBuilder so that credit changes
+              // (e.g. after account switch) reactively rebuild the input.
+              ValueListenableBuilder<int?>(
+                valueListenable: creditsManager.totalCreditsNotifier,
+                builder: (context, totalCredits, _) {
+                  return InputField(
+                    key: _inputFieldKey,
+                    localizations: localizations,
+                    isDynamicChatMode: isDynamicChat,
+                    isLimitExceeded: isLimitExceeded,
+                    isPhotoLoading: isAttachmentLoading,
+                    isSending: isWaitingForResponse,
+                    canHandleImage: isDynamicChat ? true : canHandleImage,
+                    isEditingMode: isEditingMode,
+                    originalMessageText: originalMessageText,
+                    // Legacy photo support for UI
+                    preselectedPhoto: preselectedPhoto != null
+                        ? File(preselectedPhoto)
+                        : null,
+                    isStorageSufficient: isStorageSufficient,
+                    modelMissing: modelMissing,
+                    role: role,
+                    isPremiumModel: isDynamicChat
+                        ? false
+                        : isCurrentModelPremium,
+                    isSubscribed: isUserSubscribed,
+                    userTier: userTier,
+                    isServerSideModel: Utils.isServerSideModel(
+                      modelId,
+                      langCode: langCode,
+                      modelService: modelService,
+                    ),
+                    totalCredits: totalCredits,
+                    controller: _textController,
+                    textFieldFocusNode: _focusNode,
+
+                    // --- Actions ---
+                    onSend: () async => _handleSend(
+                      localizations,
+                      isLimitExceeded,
+                      langCode,
+                      modelService,
+                      context.read<InputProvider>(),
+                      conversationProvider,
+                    ),
+                    onApplyEditedMessage: () async =>
+                        await widget.editService.applyEditedMessage(context),
+                    onStop: () {
+                      final voiceService = context.read<VoiceService>();
+                      if (voiceService.isFlowActive) {
+                        // [NEW] Flow Mode: Pause & Listen (Interruption)
+                        voiceService.interruptFlowAndListen();
+                        // Stop any text generation but keep session alive
+                        context.read<ConversationProvider>().stopGenerating();
+                      } else {
+                        // Standard Mode: Stop Everything
+                        context.read<StopService>().stopResponse();
+                      }
+                    },
+                    // Logic Update: Null check before adding
+                    onPhotoSelected: (photo) {
+                      if (photo != null) {
+                        context.read<InputProvider>().addAttachment(
+                          photo,
+                          isImage: true,
+                        );
+                      }
+                    },
+                    onCancelEditing: () {
+                      widget.editService.cancelEditingMode();
+                      widget.scrollService.updateButtonVisibility();
+                    },
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ],

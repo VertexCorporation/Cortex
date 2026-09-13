@@ -10,6 +10,9 @@ class AppLocalizationsNo extends AppLocalizations {
   AppLocalizationsNo([String locale = 'no']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Mer talechat';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return 'Gjeldende dato og klokkeslett: $formattedTime.';
   }

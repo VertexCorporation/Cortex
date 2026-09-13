@@ -13,7 +13,9 @@ import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/stt_remote.dart';
 import 'package:cortex/chat/services/tts_remote.dart';
 import 'package:cortex/chat/services/voice_barge_in.dart';
+import 'package:cortex/chat/services/voice_echo.dart';
 import 'package:cortex/chat/services/voice_health.dart';
+import 'package:cortex/chat/services/voice_turns.dart';
 
 /// The realtime Voice/Flow lifecycle. One enum, one truth: no combination of
 /// booleans can put the session in two states at once. UI-compat: the four
@@ -128,6 +130,29 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// started talking. See [BargeInDetector] for the exact gates.
   late final BargeInDetector _bargeIn = BargeInDetector(clock: _clock);
 
+  // --- ECHO SUPPRESSION (transcript path) --------------------------------
+  /// The same fingerprints the barge-in gate uses to reject echo, applied to
+  /// the text that becomes the committed user turn: assistant speaker-bleed
+  /// spans are stripped at ingest (see [AssistantEchoFilter]) while genuine
+  /// user words before/after the span survive.
+  late final AssistantEchoFilter _echoFilter = AssistantEchoFilter(
+    clock: _clock,
+  );
+
+  // --- PER-TURN TRANSCRIPT LIFECYCLE --------------------------------------
+  /// Session/turn identities and the CURRENT turn's buffer. The engine
+  /// emissions are cumulative since the capture started (the capture
+  /// deliberately outlives a turn); this tracker is what keeps every
+  /// committed turn's words out of the next turn's outgoing message.
+  late final VoiceTurnTracker _turns = VoiceTurnTracker(
+    clock: _clock,
+    echoFilter: _echoFilter,
+  );
+
+  /// The active user turn's transcript ('' when no live turn) — the live
+  /// transcript card reads this.
+  String get userTurnText => _turns.buffer;
+
   // --- RECONNECT ----------------------------------------------------------
   /// Provider sockets can die mid-session (idle closes, network drops). The
   /// session is still alive: reconnect up to this many times per session,
@@ -166,8 +191,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _speechGeneration++;
     _sentenceQueue.clear();
     // Playback is over from the barge-in detector's point of view too: the
-    // post-TTS echo discard window starts here.
+    // post-TTS echo discard window starts here. The transcript echo filter
+    // opens its strong window from the same instant.
     _bargeIn.onAssistantSpeechStopped();
+    _echoFilter.onAssistantSpeechStopped();
     unawaited(_remoteTts.stop());
   }
 
@@ -449,16 +476,21 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Barge-in: the user started talking over the assistant. Stops the
   /// currently playing audio, invalidates every queued/in-flight TTS chunk of
-  /// this generation, discards any partial transcript picked up during
-  /// playback (so echo-transcribed assistant words never leak into the
-  /// user's turn), and returns to listening immediately.
+  /// this generation, and returns to listening immediately — on a NEW user
+  /// turn.
+  ///
+  /// The user's own words that were spoken DURING playback are already in
+  /// the engine's cumulative text; they survive into the new turn through
+  /// the tracker's echo filtering (assistant-bleed spans are stripped,
+  /// genuine user words are not), while the previously COMMITTED turn can
+  /// never be appended to — the tracker minted a fresh turn identity here.
   void _interruptForBargeIn(int gen) {
     if (gen != _activeGeneration || _state != VoiceState.speaking) return;
     debugPrint("[VoiceService] Barge-in (session $gen): cutting audio.");
     unawaited(
       _haltAssistantSpeech(gen).then((_) {
         if (gen != _activeGeneration) return;
-        _lastRecognizedText = "";
+        _turns.beginTurn();
         _liveTranscript = "";
         _isLiveUserMessage = true;
         // Fresh evidence cycle for the next time the assistant speaks.
@@ -566,7 +598,6 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
     _isSpeaking = false;
     _liveTranscript = "";
-    _lastRecognizedText = "";
     _cancelPendingSpeech();
     _incomingTextBuffer.clear();
     _fullAiResponseBuffer.clear();
@@ -665,6 +696,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _isSpeaking = false;
     _reconnecting = false;
     _bargeIn.reset();
+    _echoFilter.reset();
+    _turns.reset();
 
     // Microphone, native TTS and the remote audio player all released.
     await _speechService.stopListening();
@@ -709,7 +742,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     unawaited(_beginListening(gen));
   }
 
-  bool get hasRecognizedText => _lastRecognizedText.trim().isNotEmpty;
+  /// True when the CURRENT user turn has recognisable text. Turn-scoped by
+  /// definition: a committed turn's words never count here again.
+  bool get hasRecognizedText => _turns.hasText;
 
   void manualSubmit(BuildContext context) async {
     final gen = _activeGeneration;
@@ -731,19 +766,26 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  String _lastRecognizedText = "";
   BuildContext? _lastContext;
 
-  void _resetSilenceTimer(String recognizedText, int gen) {
+  /// One STT emission arrived for the ACTIVE user turn. The engine text is
+  /// cumulative since the turn boundary; the tracker owns the turn's buffer
+  /// (echo-stripped, stale-guarded) and the silence timer is keyed to the
+  /// turn it captured, so a timer from an already-committed turn can never
+  /// finalize its successor.
+  void _resetSilenceTimer(int gen) {
     if (gen != _activeGeneration) return;
-    _lastRecognizedText = recognizedText;
-    _liveTranscript = recognizedText;
+    final turnId = _turns.currentTurnId;
+    if (turnId == null) return;
+    _liveTranscript = _turns.buffer;
     _isLiveUserMessage = true;
     notifyListeners();
     _armInactivityTimer(gen);
     _silenceTimer?.cancel();
     _silenceTimer = Timer(const Duration(seconds: 2), () {
-      unawaited(_finalizeUserSpeech(gen));
+      if (gen != _activeGeneration) return;
+      if (turnId != _turns.currentTurnId) return; // this turn already ended
+      unawaited(_finalizeUserSpeech(gen, turnId: turnId));
     });
   }
 
@@ -751,8 +793,13 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// Generation-guarded. The provider connection STAYS OPEN across turns —
   /// the continuous-session model (lower latency, barge-in support, one
   /// reserved window per provider session) — only the turn state changes.
-  Future<void> _finalizeUserSpeech(int gen) async {
+  ///
+  /// [turnId] keys this finalize to ONE user turn when driven by the silence
+  /// timer; a timer that outlived its turn must never commit its successor's
+  /// text (or an empty buffer) by accident.
+  Future<void> _finalizeUserSpeech(int gen, {int? turnId}) async {
     if (gen != _activeGeneration) return;
+    if (turnId != null && turnId != _turns.currentTurnId) return;
 
     // Check limits again before sending
     final context = _lastContext;
@@ -787,7 +834,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
-    if (_lastRecognizedText.trim().isEmpty) {
+    if (_turns.buffer.trim().isEmpty) {
       // Silence during a Flow pause (interrupted but nothing said): the
       // AI-to-AI loop resumes automatically instead of hanging.
       if (isFlowActive && _state == VoiceState.listening) {
@@ -806,20 +853,29 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _updateState(VoiceState.processing);
     _firstAiChunkSeen = false;
 
-    String textToSend = _lastRecognizedText;
+    // Commit the turn: exactly THIS turn's speech — the tracker guarantees
+    // the buffer never contains words of previously committed turns.
+    final String textToSend = _turns.commit();
     VoiceTelemetry.mark('STT final → chat request: "$textToSend"');
 
     // User speech is visible (breaks the flow loop temporarily; the user can
     // always intervene).
     _shouldNextMessageBeHidden = false;
 
-    _lastRecognizedText = "";
+    // THE TURN BOUNDARY: the conversation keeps the committed message
+    // through the normal chat history; the voice accumulator starts empty
+    // for the NEXT turn, and the engine's cumulative-text boundary moves
+    // with it so "hello" can never grow into "hello how are you?".
+    _turns.beginTurn();
+    _speechService.beginNewUserTurn();
+
     _aiGenerationComplete = false;
     _isFlowInterrupted = false; // Reset flag on successful speech
     _emptyNativeRestarts = 0;
 
     if (_onFinalSentence != null) {
       // Pass only user text to callback - voice system prompt is handled separately
+      debugPrint('[VoiceService] sending committed voice turn');
       _onFinalSentence!(textToSend);
     }
   }
@@ -959,8 +1015,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
       // The sentence being spoken becomes the barge-in detector's echo
       // fingerprint: transcripts of these words arriving during playback are
-      // speaker bounce, not the user.
+      // speaker bounce, not the user. The transcript echo filter keeps the
+      // same fingerprint so the words can never commit as user text either.
       _bargeIn.onAssistantSpeechStarted(next);
+      _echoFilter.onAssistantSpeechStarted(next);
 
       debugPrint("[VoiceService] Speaking: $next");
 
@@ -1007,6 +1065,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     // the autonomous-resume path below returns the session to listening
     // without the user doing anything.
     _bargeIn.onAssistantSpeechStopped();
+    _echoFilter.onAssistantSpeechStopped();
 
     // Trigger Completion Logic (replaces the Handler callback logic)
     if (_aiGenerationComplete) {
@@ -1094,6 +1153,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _emptyNativeRestarts = 0;
     _recyclePending = false;
     _bargeIn.reset();
+    _echoFilter.reset();
+    // A fresh session starts a fresh turn lifecycle: no fragment of any
+    // earlier session/turn can survive into this one's buffers.
+    _turns.beginSession(gen);
     lastEndReason = null;
     return gen;
   }
@@ -1160,7 +1223,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   /// Routes one STT result by session state:
-  ///  * listening — feeds the transcript and the silence timer (turn taking);
+  ///  * listening — ingested into the ACTIVE user turn (echo-stripped,
+  ///    stale-guarded by the tracker) and re-arms the silence timer keyed to
+  ///    that turn;
   ///  * speaking — ignored here: the text evidence that matters during
   ///    playback is the STRUCTURED frame (with the provider confidence),
   ///    which arrives via [_onSttStructuredResult] and feeds the barge-in
@@ -1175,7 +1240,14 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     }
     switch (_state) {
       case VoiceState.listening:
-        _resetSilenceTimer(text, gen);
+        final turnId = _turns.currentTurnId;
+        if (turnId == null) break;
+        // The engine emission is cumulative since the turn boundary; the
+        // tracker owns per-turn accumulation, echo stripping and the
+        // stale-fragment guard.
+        _turns.ingest(turnId: turnId, raw: text);
+        _resetSilenceTimer(gen);
+        break;
       default:
         break;
     }
@@ -1316,9 +1388,14 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Applies the server's mint response for the CURRENT window: the
   /// authoritative allowance numbers, and the reserved window that schedules
-  /// the next provider recycle (the server re-checks the pool at each mint —
-  /// that is what keeps the server authoritative even though the client holds
-  /// the connection).
+  /// the next provider socket rotation (the server re-checks the pool at each
+  /// mint — that is what keeps the server authoritative even though the client
+  /// holds the connection).
+  ///
+  /// `remainingVoiceSeconds` is the DAILY POOL after this window's
+  /// reservation (the server reserves min(remaining, 300s) at mint), so 0 is
+  /// its normal state right after the first mint of the day on free tier —
+  /// not a leak and not an error.
   void _applyLease(int gen, SttLease lease) {
     if (gen != _activeGeneration) return;
     debugPrint(
@@ -1334,20 +1411,39 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     if (window != null && window > 0) {
       _voiceWindowSeconds = window;
       _windowTimer?.cancel();
-      _windowTimer = Timer(Duration(seconds: window - 10), () {
-        if (gen != _activeGeneration) return;
-        _recyclePending = true;
-        _maybeRecycle(gen);
-      });
+      _windowTimer = Timer(
+        Duration(seconds: windowRecycleDelaySeconds(window)),
+        () {
+          if (gen != _activeGeneration) return;
+          _recyclePending = true;
+          _maybeRecycle(gen);
+        },
+      );
     }
     _startBudgetTicker(gen);
     notifyListeners();
   }
 
-  /// Recycles the provider connection at a TURN BOUNDARY once the reserved
-  /// window is nearly exhausted — never mid-utterance (the user's first word
-  /// must not land in a reconnect gap). Deferred while the user is speaking;
-  /// the next boundary picks it up. The native fallback has no window.
+  /// Seconds after a lease lands at which the window-boundary rotation may
+  /// fire. Long windows rotate 10 s BEFORE the reservation expires so the
+  /// re-mint lands in time; SHORT windows — the daily pool's final seconds —
+  /// run their full length instead. The old `window - 10` went NEGATIVE for
+  /// any window <= 10 s (window=3 scheduled a recycle at -7 s) and fired the
+  /// recycle the instant the lease arrived, tearing the session down before
+  /// the user's first word — the immediate-recycle failure seen on device.
+  @visibleForTesting
+  static int windowRecycleDelaySeconds(int window) {
+    assert(window > 0, 'a lease never reserves a non-positive window');
+    return window > 10 ? window - 10 : window;
+  }
+
+  /// Rotates the provider SOCKET at a TURN BOUNDARY once the reserved window
+  /// is nearly exhausted — never mid-utterance (the user's first word must
+  /// not land in a reconnect gap). Deferred while the user is speaking; the
+  /// next boundary picks it up. The microphone capture is NEVER touched: the
+  /// recorder keeps streaming while a freshly minted socket replaces the old
+  /// one underneath it (the server re-checks the pool at every mint — that is
+  /// the whole point of recycling). The native fallback has no window.
   void _maybeRecycle(int gen) {
     if (gen != _activeGeneration || !_recyclePending) return;
     if (_state != VoiceState.listening || hasRecognizedText) return;
@@ -1357,12 +1453,29 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       "[VoiceService] Recycling STT connection at window boundary (session $gen).",
     );
     unawaited(
-      _restartEngine(gen).then((started) {
+      _speechService.rotateRemoteSocket().then((rotated) async {
+        if (gen != _activeGeneration || rotated) return;
+        if (_speechService.remoteVoiceLimitReached) {
+          // The server refused the re-mint: the daily pool is genuinely
+          // empty. End with the limit reason — the honest, explained exit.
+          // A full engine restart is deliberately NOT tried: it would tear
+          // the healthy capture down only to bypass the server's allowance
+          // contract on the native engine.
+          debugPrint(
+            "[VoiceService] Window rotation refused: daily allowance "
+            "exhausted (session $gen).",
+          );
+          await _endSession(gen, VoiceEndReason.limit);
+          return;
+        }
+        // Rotation failed for a non-limit reason (network): the socket is
+        // gone and only a full engine restart can recover the line — the
+        // microphone re-opens with it, which is acceptable exactly because
+        // nothing less can recover a failed rotation. If that fails too the
+        // session ends with the generic error.
+        final started = await _restartEngine(gen);
         if (gen != _activeGeneration || started) return;
-        final reason = _speechService.remoteVoiceLimitReached
-            ? VoiceEndReason.limit
-            : VoiceEndReason.error;
-        unawaited(_endSession(gen, reason));
+        await _endSession(gen, VoiceEndReason.error);
       }),
     );
   }
@@ -1401,8 +1514,17 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// Turn boundary back into listening. On the remote engine the capture is
   /// continuous — nothing to reopen; the native fallback stopped itself after
   /// its last final, so it is restarted here.
+  ///
+  /// A NEW user turn starts here: the tracker mints its identity (the
+  /// buffer starts empty — nothing of the committed turn can carry over)
+  /// and the engine's cumulative-text boundary moves with it, flushing any
+  /// echo finals the speaker dropped into the accumulator during playback.
   void _resumeListeningAfterTurn(int gen) {
     if (gen != _activeGeneration) return;
+    _turns.beginTurn();
+    _speechService.beginNewUserTurn();
+    _liveTranscript = "";
+    _isLiveUserMessage = true;
     _updateState(VoiceState.listening);
     if (!_speechService.isListening) {
       unawaited(_beginListening(gen, quiet: true));

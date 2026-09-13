@@ -8,7 +8,10 @@
 //   * the continuous-session model never re-mints between turns;
 //   * interrupted speech never resumes;
 //   * reconnects are bounded;
-//   * the server's allowance numbers are the ones the UI shows.
+//   * the server's allowance numbers are the ones the UI shows;
+//   * only the exact 403 + voice_daily_limit refusal is a spent allowance
+//     — an outage (401, non-JSON 5xx crash page) is never a spent one, and
+//     a mint that never opened a socket never keeps its reservation.
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cortex/chat/services/voice.dart';
@@ -28,6 +31,9 @@ class MockSpeechService extends SpeechService {
   bool micLive = false;
   bool shouldSucceedReconnect = true;
   int reconnectSocketCount = 0;
+  bool shouldSucceedRotate = true;
+  int rotateSocketCount = 0;
+  bool remoteLimitReached = false;
 
   Function(String text)? onResultCallback;
   void Function(SttCloseInfo info)? onClosedCallback;
@@ -72,9 +78,19 @@ class MockSpeechService extends SpeechService {
   }
 
   @override
+  bool get remoteVoiceLimitReached => remoteLimitReached;
+
+  @override
   Future<bool> reconnectRemoteSocket() async {
     reconnectSocketCount++;
     if (!shouldSucceedReconnect) return false;
+    return remoteActive && micLive;
+  }
+
+  @override
+  Future<bool> rotateRemoteSocket() async {
+    rotateSocketCount++;
+    if (!shouldSucceedRotate) return false;
     return remoteActive && micLive;
   }
 
@@ -604,6 +620,131 @@ void main() {
     },
   );
 
+  test('window recycle scheduling never fires in the past', () {
+    // The device failure: window=3 scheduled a recycle at 3-10 = -7s, which
+    // fired the instant the lease arrived and killed the session.
+    expect(VoiceService.windowRecycleDelaySeconds(1), 1);
+    expect(VoiceService.windowRecycleDelaySeconds(3), 3);
+    expect(VoiceService.windowRecycleDelaySeconds(10), 10);
+    expect(VoiceService.windowRecycleDelaySeconds(11), 1);
+    expect(VoiceService.windowRecycleDelaySeconds(120), 110);
+    expect(VoiceService.windowRecycleDelaySeconds(300), 290);
+    for (var window = 1; window <= 300; window++) {
+      final delay = VoiceService.windowRecycleDelaySeconds(window);
+      expect(delay, greaterThan(0), reason: 'window=$window fired in the past');
+      expect(delay, lessThanOrEqualTo(window), reason: 'window=$window');
+    }
+  });
+
+  test('a tiny end-of-pool window is never recycled before it opens (device regression: window=3)', () async {
+    await startTestSession();
+    mockSpeechService.remoteActive = true;
+    mockSpeechService.micLive = true;
+
+    // The pool's literal last seconds, exactly as the failing device log:
+    // allowance=120 remaining=0 window=3. The old `window - 10` timer
+    // scheduled the recycle at -7s and tore the session down instantly.
+    mockSpeechService.onLeaseCallback?.call(
+      const SttLease(
+        provider: 'deepgram',
+        allowanceVoiceSeconds: 120,
+        remainingVoiceSeconds: 0,
+        reservedVoiceSeconds: 3,
+      ),
+    );
+
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    expect(
+      mockSpeechService.rotateSocketCount,
+      0,
+      reason: 'a small window runs its full length — no instant recycle',
+    );
+    expect(
+      mockSpeechService.startCount,
+      1,
+      reason: 'no engine restart either — the capture was never touched',
+    );
+  });
+
+  test('the window-boundary recycle rotates the SOCKET and never re-opens the microphone', () async {
+    await startTestSession();
+    mockSpeechService.remoteActive = true;
+    mockSpeechService.micLive = true;
+    mockSpeechService.onLeaseCallback?.call(
+      const SttLease(
+        provider: 'deepgram',
+        allowanceVoiceSeconds: 120,
+        remainingVoiceSeconds: 0,
+        reservedVoiceSeconds: 1,
+      ),
+    );
+
+    // window=1 recycles at its END (never before): one real second.
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
+    expect(mockSpeechService.rotateSocketCount, 1);
+    expect(
+      mockSpeechService.startCount,
+      1,
+      reason: 'rotation must never re-open the microphone',
+    );
+    expect(mockSpeechService.stopCount, 0);
+    expect(voiceService.isSessionActive, true);
+    expect(voiceService.state, VoiceState.listening);
+  });
+
+  test('a rotation refused by the daily limit ends the session without touching the capture', () async {
+    await startTestSession();
+    mockSpeechService.remoteActive = true;
+    mockSpeechService.micLive = true;
+    mockSpeechService.shouldSucceedRotate = false;
+    mockSpeechService.remoteLimitReached = true;
+    mockSpeechService.onLeaseCallback?.call(
+      const SttLease(
+        provider: 'deepgram',
+        allowanceVoiceSeconds: 120,
+        remainingVoiceSeconds: 0,
+        reservedVoiceSeconds: 1,
+      ),
+    );
+
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
+    expect(mockSpeechService.rotateSocketCount, 1);
+    expect(
+      mockSpeechService.startCount,
+      1,
+      reason:
+          'the limit ends the session; the healthy capture is never re-opened',
+    );
+    expect(voiceService.isSessionActive, false);
+    expect(voiceService.lastEndReason, VoiceEndReason.limit);
+  });
+
+  test('a rotation that fails for a non-limit reason falls back to a full engine restart', () async {
+    await startTestSession();
+    mockSpeechService.remoteActive = true;
+    mockSpeechService.micLive = true;
+    mockSpeechService.shouldSucceedRotate = false;
+    mockSpeechService.remoteLimitReached = false;
+    mockSpeechService.onLeaseCallback?.call(
+      const SttLease(
+        provider: 'deepgram',
+        allowanceVoiceSeconds: 120,
+        remainingVoiceSeconds: 0,
+        reservedVoiceSeconds: 1,
+      ),
+    );
+
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
+    expect(mockSpeechService.rotateSocketCount, 1);
+    expect(
+      mockSpeechService.startCount,
+      2,
+      reason: 'last resort: only a full engine restart can recover the socket',
+    );
+    expect(voiceService.isSessionActive, true);
+    expect(voiceService.state, VoiceState.listening);
+  });
+
   test(
     'Flow Mode submits its hidden prompt under the same session identity',
     () async {
@@ -916,6 +1057,138 @@ void main() {
         VoiceService.reconnectDelayFor(info(SttCloseClass.fatal), 1),
         Duration.zero,
       );
+    });
+  });
+
+  group('token mint refusals (non-JSON 5xx, 403 limit, 401 auth)', () {
+    test(
+      'ONLY the exact 403 + voice_daily_limit pair is a spent allowance',
+      () {
+        // The exact pair — the one case that means the daily pool is empty.
+        expect(
+          RemoteSttService.isDailyVoiceLimitRefusal(403, {
+            'error': 'voice_daily_limit',
+          }),
+          isTrue,
+        );
+
+        // A 403 for any other reason (blocked key, quota) is not the pool.
+        expect(
+          RemoteSttService.isDailyVoiceLimitRefusal(403, {
+            'error': 'forbidden',
+          }),
+          isFalse,
+        );
+
+        // An outage that happens to carry the limit body is not the pool: the
+        // flag it would wrongly set disables the takeover AND drives the
+        // user-facing limit sheet.
+        expect(
+          RemoteSttService.isDailyVoiceLimitRefusal(500, {
+            'error': 'voice_daily_limit',
+          }),
+          isFalse,
+        );
+
+        // A refusal whose body did not parse (non-JSON crash page) can never
+        // confirm the exact error code, so it is never the pool.
+        expect(RemoteSttService.isDailyVoiceLimitRefusal(403, null), isFalse);
+
+        // A success-shaped response is not a refusal at all.
+        expect(
+          RemoteSttService.isDailyVoiceLimitRefusal(200, {
+            'error': 'voice_daily_limit',
+          }),
+          isFalse,
+        );
+      },
+    );
+
+    test('mintRefusalCode names 401/403 and collapses the 5xx family', () {
+      expect(
+        RemoteSttService.mintRefusalCode('deepgram', 500),
+        'DEEPGRAM_MINT_HTTP_5XX',
+      );
+      // One code for the whole family: a cold-start OOM page and a gateway
+      // timeout get the same response from us and stay greppable together.
+      expect(
+        RemoteSttService.mintRefusalCode('deepgram', 502),
+        'DEEPGRAM_MINT_HTTP_5XX',
+      );
+      expect(
+        RemoteSttService.mintRefusalCode('deepgram', 403),
+        'DEEPGRAM_MINT_HTTP_403',
+      );
+      expect(
+        RemoteSttService.mintRefusalCode('assemblyai', 401),
+        'ASSEMBLYAI_MINT_HTTP_401',
+      );
+      // Unusual codes stay exact; no status at all is named as 0.
+      expect(
+        RemoteSttService.mintRefusalCode('deepgram', 402),
+        'DEEPGRAM_MINT_HTTP_402',
+      );
+      expect(
+        RemoteSttService.mintRefusalCode('deepgram', null),
+        'DEEPGRAM_MINT_HTTP_0',
+      );
+    });
+
+    test('refusalBodyPreview carries a crash page without crashing or bloating', () {
+      // A cold-start 5xx is an HTML crash page: the preview must keep its
+      // diagnosis (leading text) while collapsing it to one short line.
+      const crashPage =
+          '<!DOCTYPE html>\n<html>\n  <head>\n    <title>Server Error'
+          '</title>\n  </head>\n  <body>\n    Function failed to load.\n  </body>\n</html>';
+      final preview = RemoteSttService.refusalBodyPreview(crashPage);
+      expect(preview, startsWith('<!DOCTYPE html>'));
+      // Whitespace-collapsed to a single line, bounded so the piggybacked
+      // failure report can never be inflated by a crash page.
+      expect(preview, isNot(contains('\n')));
+      expect(preview.length, lessThanOrEqualTo(160));
+
+      // A JSON error body contributes its error string, nothing else.
+      expect(
+        RemoteSttService.refusalBodyPreview({
+          'error': 'voice_daily_limit',
+          'details': 'ignored',
+        }),
+        'voice_daily_limit',
+      );
+
+      // A non-string error falls through to the raw body rather than
+      // casting anything.
+      expect(RemoteSttService.refusalBodyPreview({'error': 7}), '{error: 7}');
+
+      // No body at all is an empty preview, not a crash.
+      expect(RemoteSttService.refusalBodyPreview(null), '');
+
+      // A long error is truncated to the bound.
+      final long = 'x' * 400;
+      expect(RemoteSttService.refusalBodyPreview({'error': long}).length, 160);
+    });
+
+    test('decodeSpeechTokenResponse never throws or casts a crash page', () {
+      // An HTML 5xx page decodes to null — the controlled-failure path, not
+      // a type error mid-session.
+      expect(
+        decodeSpeechTokenResponse('<html><body>Function OOM</body></html>'),
+        isNull,
+      );
+
+      // A JSON string body still decodes to its map.
+      expect(
+        decodeSpeechTokenResponse('{"token":"t","error":"e"}'),
+        isA<Map<String, dynamic>>(),
+      );
+
+      // Structurally-JSON-but-not-an-object is not a token response.
+      expect(decodeSpeechTokenResponse('[1,2,3]'), isNull);
+
+      // Arbitrary non-string bodies (already-decoded maps pass through).
+      expect(decodeSpeechTokenResponse(500), isNull);
+      const map = {'token': 't'};
+      expect(decodeSpeechTokenResponse(map), same(map));
     });
   });
 }

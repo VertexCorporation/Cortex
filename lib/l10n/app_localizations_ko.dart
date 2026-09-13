@@ -10,6 +10,9 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => '더 많은 음성 채팅';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\n현재 날짜 및 시간: $formattedTime.';
   }

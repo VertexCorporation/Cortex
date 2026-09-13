@@ -1,4 +1,5 @@
 {
+  "benefitMoreVoiceChat": "音声チャットの利用枠を拡大",
   "@@locale": "ja",
   "accessSettingsDescription": "ヘルプへのアクセス、コードの引き換え、Cortexの共有、および当社のポリシーの表示。",
   "accountDeletionRequested": "アカウントの削除リクエストが受信され、アカウントは現在無効になっています。",

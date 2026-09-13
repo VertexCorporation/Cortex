@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/chat/messages/messages.dart';
@@ -24,20 +25,14 @@ enum ChatInputMode {
   audioGeneration,
 }
 
-enum AttachmentType {
-  image,
-  document,
-}
+enum AttachmentType { image, document }
 
 /// A simple wrapper class to categorize attachments for the UI.
 class InputAttachment {
   final File file;
   final AttachmentType type;
 
-  const InputAttachment({
-    required this.file,
-    required this.type,
-  });
+  const InputAttachment({required this.file, required this.type});
 
   String get fileName => p.basename(file.path);
 
@@ -62,6 +57,7 @@ class InputProvider with ChangeNotifier {
   // --- Voice & Features ---
   bool _isVoiceRecording = false;
   bool _isVoiceModeActive = false;
+  bool _isVoiceOverlayExpanded = false;
   StreamSubscription? _authSub;
   ChatInputMode _featureMode = ChatInputMode.none;
 
@@ -126,6 +122,10 @@ class InputProvider with ChangeNotifier {
 
   bool get isVoiceModeActive => _isVoiceModeActive;
 
+  /// Presentation only: compact and expanded both keep Flow/X and hide input.
+  /// Voice activation owns the composer morph; only exit restores text input.
+  bool get isVoiceOverlayExpanded => _isVoiceOverlayExpanded;
+
   // Web Search
   bool get enableWebSearch => _enableWebSearch;
 
@@ -172,6 +172,26 @@ class InputProvider with ChangeNotifier {
   void setVoiceModeActive(bool isActive) {
     if (_isVoiceModeActive == isActive) return;
     _isVoiceModeActive = isActive;
+    if (!isActive) {
+      // Leaving Voice Mode always collapses the orb state: the composer must
+      // never come back with a phantom "expanded" morph applied.
+      _isVoiceOverlayExpanded = false;
+    }
+    notifyListeners();
+  }
+
+  /// Expands/collapses the Voice Mode orb overlay. Only meaningful while
+  /// Voice Mode is active; the overlay owns the actual transition animation.
+  void setVoiceOverlayExpanded(bool expanded) {
+    if (_isVoiceOverlayExpanded == expanded) return;
+    if (_isVoiceModeActive && !expanded) {
+      // Stays consistent only inside an active voice mode.
+      _isVoiceOverlayExpanded = false;
+      notifyListeners();
+      return;
+    }
+    if (!_isVoiceModeActive) return;
+    _isVoiceOverlayExpanded = expanded;
     notifyListeners();
   }
 
@@ -226,18 +246,22 @@ class InputProvider with ChangeNotifier {
 
   void addAttachment(File file, {required bool isImage}) {
     debugPrint(
-        "InputProvider: addAttachment called. Current count: ${_attachments.length}. New file: ${file.path}");
+      "InputProvider: addAttachment called. Current count: ${_attachments.length}. New file: ${file.path}",
+    );
     if (_attachments.length >= 9) {
       debugPrint("InputProvider: Attachment limit reached. Ignoring.");
       return;
     }
 
-    _attachments.add(InputAttachment(
-      file: file,
-      type: isImage ? AttachmentType.image : AttachmentType.document,
-    ));
+    _attachments.add(
+      InputAttachment(
+        file: file,
+        type: isImage ? AttachmentType.image : AttachmentType.document,
+      ),
+    );
     debugPrint(
-        "InputProvider: Attachment added. New count: ${_attachments.length}. Notifying listeners.");
+      "InputProvider: Attachment added. New count: ${_attachments.length}. Notifying listeners.",
+    );
     notifyListeners();
   }
 
@@ -284,10 +308,12 @@ class InputProvider with ChangeNotifier {
         // Only add if the file still exists on the device
         if (file.existsSync()) {
           final isImage = _isImageFile(path);
-          _attachments.add(InputAttachment(
-            file: file,
-            type: isImage ? AttachmentType.image : AttachmentType.document,
-          ));
+          _attachments.add(
+            InputAttachment(
+              file: file,
+              type: isImage ? AttachmentType.image : AttachmentType.document,
+            ),
+          );
         }
       }
     }
@@ -372,6 +398,15 @@ class InputProvider with ChangeNotifier {
 
   bool _isImageFile(String path) {
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic', 'heif'].contains(ext);
+    return [
+      'jpg',
+      'jpeg',
+      'png',
+      'webp',
+      'gif',
+      'bmp',
+      'heic',
+      'heif',
+    ].contains(ext);
   }
 }

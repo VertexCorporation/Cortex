@@ -19,6 +19,11 @@ class _TextFieldSection extends StatelessWidget {
   /// placeholder — and therefore its overflow fog — is not on stage then.
   final bool isDictating;
 
+  /// Voice Mode owns the input path: the field is read-only and cannot take
+  /// focus for the whole voice session, so the keyboard can never open over
+  /// the orb.
+  final bool isVoiceLocked;
+
   const _TextFieldSection({
     super.key,
     required this.controller,
@@ -30,6 +35,7 @@ class _TextFieldSection extends StatelessWidget {
     this.showHintText = true,
     this.isComposerExpanded = false,
     this.isDictating = false,
+    this.isVoiceLocked = false,
   });
 
   @override
@@ -43,96 +49,110 @@ class _TextFieldSection extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: LayoutBuilder(builder: (context, constraints) {
-        // Boolean does-the-label-fit probe: the placeholder's own text
-        // metrics against the decorator's content box. It never sizes or
-        // positions anything (the decorator owns all hint geometry) — it
-        // only decides whether the seam-covering fog strip below is needed
-        // for locales whose label outgrows the pill.
-        final TextPainter probe = TextPainter(
-          text: TextSpan(
-            text: hintLabel,
-            style: TextStyle(color: Colors.grey[600], fontSize: fontSize),
-          ),
-          textDirection: Directionality.of(context),
-          textScaler: MediaQuery.textScalerOf(context),
-        )..layout();
-        final bool labelOverflows =
-            probe.width > constraints.maxWidth - 2 * horizontalPadding + 2.0;
-        probe.dispose();
-
-        // The fog belongs to the placeholder state alone: it lifts as soon
-        // as the user types (the decorator swaps the hint out) and stands
-        // down while dictation covers the slot with the waveform. Its
-        // strips are painted, pointer-transparent and hard-clipped to the
-        // field's box, so hit-testing, the caret and the composer geometry
-        // are untouched.
-        final bool showFog = labelOverflows &&
-            showHintText &&
-            controller.text.isEmpty &&
-            !isDictating;
-
-        return EdgeFog(
-          showStart: false,
-          showEnd: showFog,
-          endFogWidth: fontSize * 0.75,
-          endStripKey: const ValueKey('hint_fog_end'),
-          child: TextField(
-            key: const ValueKey('chat_input_field'),
-            focusNode: focusNode,
-            cursorColor: AppColors.primaryColor.inverted,
-            controller: controller,
-            // The caret stroke is a dynamic fraction of the field's responsive
-            // font size — never a fixed pixel width. The hairline, plus the
-            // framework's own caret anchoring, stays inside the first glyph's
-            // natural left side bearing, so the blinking bar reads as sitting
-            // immediately before the hint/typed glyph instead of painting over
-            // its ink.
-            cursorWidth: fontSize * 0.04,
-            cursorRadius: Radius.circular(fontSize * 0.02),
-            maxLength: 4000,
-            minLines: 1,
-            maxLines: 6,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                  vertical: verticalPadding, horizontal: horizontalPadding),
-              // One layout system for hint, caret and typed text: the
-              // placeholder lives in the decorator's own hint slot with the
-              // field's exact responsive style, so it shares the editable's
-              // origin, line metrics and caret geometry instead of drawing a
-              // separately scaled twin over the field. The placeholder has
-              // two semantic labels — the short collapsed one and the full
-              // expanded one — cross-faded by [_ComposerHint] on a shared
-              // start edge: no FittedBox, no scaling, no ellipsis (a label
-              // wider than the slot clips at the slot edge and dissolves
-              // into the fog strip above).
-              hint: showHintText
-                  ? _ComposerHint(
-                      short: localizations.messageHintShort,
-                      full: localizations.messageHint,
-                      expanded: isComposerExpanded,
-                      fontSize: fontSize,
-                      color: Colors.grey[600]!,
-                    )
-                  : null,
-              hintStyle:
-                  TextStyle(color: Colors.grey[600], fontSize: fontSize),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              counterText: '',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Boolean does-the-label-fit probe: the placeholder's own text
+          // metrics against the decorator's content box. It never sizes or
+          // positions anything (the decorator owns all hint geometry) — it
+          // only decides whether the seam-covering fog strip below is needed
+          // for locales whose label outgrows the pill.
+          final TextPainter probe = TextPainter(
+            text: TextSpan(
+              text: hintLabel,
+              style: TextStyle(color: Colors.grey[600], fontSize: fontSize),
             ),
-            style: TextStyle(
-                color: AppColors.primaryColor.inverted, fontSize: fontSize),
-            onSubmitted: (_) => onEnterPressed(),
-          ),
-        );
-      }),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+          )..layout();
+          final bool labelOverflows =
+              probe.width > constraints.maxWidth - 2 * horizontalPadding + 2.0;
+          probe.dispose();
+
+          // The fog belongs to the placeholder state alone: it lifts as soon
+          // as the user types (the decorator swaps the hint out) and stands
+          // down while dictation covers the slot with the waveform. Its
+          // strips are painted, pointer-transparent and hard-clipped to the
+          // field's box, so hit-testing, the caret and the composer geometry
+          // are untouched.
+          final bool showFog =
+              labelOverflows &&
+              showHintText &&
+              controller.text.isEmpty &&
+              !isDictating;
+
+          return EdgeFog(
+            showStart: false,
+            showEnd: showFog,
+            endFogWidth: fontSize * 0.75,
+            endStripKey: const ValueKey('hint_fog_end'),
+            child: TextField(
+              key: const ValueKey('chat_input_field'),
+              focusNode: focusNode,
+              cursorColor: AppColors.primaryColor.inverted,
+              controller: controller,
+              // The caret stroke is a dynamic fraction of the field's responsive
+              // font size — never a fixed pixel width. The hairline, plus the
+              // framework's own caret anchoring, stays inside the first glyph's
+              // natural left side bearing, so the blinking bar reads as sitting
+              // immediately before the hint/typed glyph instead of painting over
+              // its ink.
+              cursorWidth: fontSize * 0.04,
+              cursorRadius: Radius.circular(fontSize * 0.02),
+              maxLength: 4000,
+              minLines: 1,
+              maxLines: 6,
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
+              // Voice Mode: the session owns the input path — read-only and
+              // focus-immune for the whole voice session so the IME can never
+              // reopen over the orb experience.
+              readOnly: isVoiceLocked,
+              canRequestFocus: !isVoiceLocked,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: verticalPadding,
+                  horizontal: horizontalPadding,
+                ),
+                // One layout system for hint, caret and typed text: the
+                // placeholder lives in the decorator's own hint slot with the
+                // field's exact responsive style, so it shares the editable's
+                // origin, line metrics and caret geometry instead of drawing a
+                // separately scaled twin over the field. The placeholder has
+                // two semantic labels — the short collapsed one and the full
+                // expanded one — cross-faded by [_ComposerHint] on a shared
+                // start edge: no FittedBox, no scaling, no ellipsis (a label
+                // wider than the slot clips at the slot edge and dissolves
+                // into the fog strip above).
+                hint: showHintText
+                    ? _ComposerHint(
+                        short: localizations.messageHintShort,
+                        full: localizations.messageHint,
+                        expanded: isComposerExpanded,
+                        fontSize: fontSize,
+                        color: Colors.grey[600]!,
+                      )
+                    : null,
+                hintStyle: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: fontSize,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                counterText: '',
+              ),
+              style: TextStyle(
+                color: AppColors.primaryColor.inverted,
+                fontSize: fontSize,
+              ),
+              onSubmitted: (_) => onEnterPressed(),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -179,14 +199,18 @@ class _ComposerHintState extends State<_ComposerHint> {
   @override
   void didUpdateWidget(_ComposerHint oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final String oldLabel = oldWidget.expanded ? oldWidget.full : oldWidget.short;
+    final String oldLabel = oldWidget.expanded
+        ? oldWidget.full
+        : oldWidget.short;
     if (_label != oldLabel) _generation++;
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style =
-        TextStyle(color: widget.color, fontSize: widget.fontSize);
+    final TextStyle style = TextStyle(
+      color: widget.color,
+      fontSize: widget.fontSize,
+    );
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
       switchInCurve: Curves.easeOut,
@@ -196,10 +220,7 @@ class _ComposerHintState extends State<_ComposerHint> {
       layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
         return Stack(
           alignment: AlignmentDirectional.centerStart,
-          children: <Widget>[
-            ...previousChildren,
-            ?currentChild,
-          ],
+          children: <Widget>[...previousChildren, ?currentChild],
         );
       },
       child: Text(

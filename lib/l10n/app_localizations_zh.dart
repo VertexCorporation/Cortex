@@ -10,6 +10,9 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => '更多语音聊天';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\n当前日期和时间：$formattedTime。';
   }

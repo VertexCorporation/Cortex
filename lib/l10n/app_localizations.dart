@@ -134,6 +134,12 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @benefitMoreVoiceChat.
+  ///
+  /// In en, this message translates to:
+  /// **'More voice chat'**
+  String get benefitMoreVoiceChat;
+
   /// Localized time context injected into all model system prompts.
   ///
   /// In en, this message translates to:

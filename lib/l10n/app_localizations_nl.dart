@@ -10,6 +10,9 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Meer spraakchats';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nHuidige datum en tijd: $formattedTime.';
   }

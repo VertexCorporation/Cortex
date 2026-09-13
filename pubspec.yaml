@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 8.6.0+860
+version: 8.7.0+870
 
 environment:
   sdk: '>=3.13.0 <4.0.0'
@@ -132,27 +132,27 @@ flutter_launcher_icons:
 flutter_native_splash:
   # —─────────── Global light-mode splash (required) ───────────—
   color: "#FFFFFF"              # Light-mode background
-  image: assets/cortex/black.png
+  image: assets/startup/black.png
 
   # —────────────── Dark-mode splash overrides ───────────────—
   color_dark: "#000000"         # Dark-mode background
-  image_dark: assets/cortex/white.png
+  image_dark: assets/startup/white.png
 
   # —────────── Android 12+ specific settings ─────────—
   android_12:
     # Light-mode icon & window color
-    image: assets/cortex/black.png
-    icon_background_color: "#FFFFFF"
+    image: assets/startup/android12-black.png
 
     # Dark-mode overrides for Android 12+
-    image_dark: assets/cortex/white.png
-    icon_background_color_dark: "#000000"
+    image_dark: assets/startup/android12-white.png
 
 flutter:
   config:
     enable-swift-package-manager: false
   uses-material-design: true
   generate: true
+  shaders:
+    - shaders/voice_orb.frag
   fonts:
     - family: Inter
       fonts:

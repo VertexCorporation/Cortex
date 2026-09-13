@@ -10,6 +10,9 @@ class AppLocalizationsCs extends AppLocalizations {
   AppLocalizationsCs([String locale = 'cs']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Více hlasového chatu';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return 'Aktuální datum a čas: $formattedTime.';
   }

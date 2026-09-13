@@ -1,4 +1,5 @@
 {
+  "benefitMoreVoiceChat": "Mer röstchatt",
   "@@locale": "sv",
   "systemTimeInfo": "Aktuellt datum och tid: {formattedTime}.",
   "cancel": "Avbryt",

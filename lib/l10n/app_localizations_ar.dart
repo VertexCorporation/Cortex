@@ -10,6 +10,9 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'المزيد من الدردشة الصوتية';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nالتاريخ والوقت الحالي: $formattedTime.';
   }

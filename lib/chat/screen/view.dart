@@ -23,6 +23,7 @@ import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/funds/routing.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
+import 'package:flutter/foundation.dart';
 
 import '../messages/skeleton.dart';
 import 'default/view.dart';
@@ -341,13 +342,12 @@ class ChatViewState extends State<ChatView>
       (p) => p.isVoiceModeActive,
     );
 
-    // Voice Mode unmounts the briefing overlay entirely (see mainStack): a
-    // slide by the panel's own height could never clear the composer zone,
-    // so a premium banner used to linger over the voice panel's controls.
-    // An unmounted panel can no longer report its own height, so the layout
-    // reserve is cleared here the moment voice mode opens — otherwise the
-    // scroll-down button keeps dodging a phantom briefing until the overlay
-    // remounts and re-measures.
+    // Voice Mode slides the briefing slightly DOWN and fades it out quickly
+    // (see _buildBriefingOverlay — the entry choreography: keyboard closes
+    // first, the briefing yields, the orb scales in above the composer,
+    // and the composer itself stays). The layout reserve is still cleared
+    // instantly while voice mode is open — otherwise the scroll-down button
+    // keeps dodging a phantom briefing.
     if (isVoiceModeActive && briefingVisibleHeightNotifier.value != 0.0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && briefingVisibleHeightNotifier.value != 0.0) {
@@ -370,6 +370,14 @@ class ChatViewState extends State<ChatView>
     // PERFORMANCE: To prevent the ENTIRE ChatView from rebuilding 60fps
     // during the keyboard animation, we ONLY read viewInsets inside a Builder.
 
+    // Voice Mode's fullscreen expansion is watched granularly: the chat
+    // content dims behind the orb stage, but in COMPACT mode the
+    // conversation stays fully visible — Voice Mode V2 is an overlay over
+    // the chat, not a takeover of it.
+    final isVoiceOverlayExpanded = context.select<InputProvider, bool>(
+      (p) => p.isVoiceOverlayExpanded,
+    );
+
     final mainStack = Stack(
       children: [
         Positioned.fill(
@@ -377,11 +385,12 @@ class ChatViewState extends State<ChatView>
             isLoadingMessages,
             isMessagesEmpty,
             isVoiceModeActive,
+            isVoiceOverlayExpanded,
           ),
         ),
-        if (!isVoiceModeActive) _buildBottomFog(screenHeight),
-        _buildBottomPanel(isVoiceModeActive, bottomSafe),
-        if (!isVoiceModeActive) _buildBriefingOverlay(bottomSafe),
+        _buildBottomFog(screenHeight),
+        _buildBottomPanel(bottomSafe),
+        _buildBriefingOverlay(bottomSafe, isVoiceModeActive),
         _buildScrollDownButton(
           isVoiceModeActive,
           bottomSafe,
@@ -389,7 +398,11 @@ class ChatViewState extends State<ChatView>
           screenHeight,
         ),
         const Positioned(top: 0, left: 0, right: 0, child: TtsPlayerOverlay()),
-        if (isVoiceModeActive) const VoiceSessionOverlay(),
+        _VoiceOverlayHost(
+          active: isVoiceModeActive,
+          panelHeight: bottomPanelHeightNotifier,
+          bottomSafe: bottomSafe,
+        ),
       ],
     );
 
@@ -416,13 +429,23 @@ class ChatViewState extends State<ChatView>
     );
   }
 
-  Widget _buildMainContent(bool isLoading, bool isEmpty, bool isVoiceMode) {
+  Widget _buildMainContent(
+    bool isLoading,
+    bool isEmpty,
+    bool isVoiceMode,
+    bool isVoiceExpanded,
+  ) {
+    // Voice Mode V2: the conversation STAYS visible in compact mode — the
+    // orb floats above the composer over live chat. Only the fullscreen
+    // expansion recedes it slightly, and the orb's own backdrop dims it.
+    final targetScale = isVoiceMode && isVoiceExpanded ? 0.96 : 1.0;
+    final targetOpacity = isVoiceMode && isVoiceExpanded ? 0.35 : 1.0;
     return AnimatedScale(
-      scale: isVoiceMode ? 0.5 : 1.0,
+      scale: targetScale,
       duration: const Duration(milliseconds: 300),
-      curve: isVoiceMode ? Curves.easeInBack : Curves.easeOutCubic,
+      curve: isVoiceExpanded ? Curves.easeInBack : Curves.easeOutCubic,
       child: AnimatedOpacity(
-        opacity: isVoiceMode ? 0.0 : 1.0,
+        opacity: targetOpacity,
         duration: const Duration(milliseconds: 300),
         child: AnimatedBuilder(
           animation: _combinedLayoutNotifier,
@@ -480,34 +503,33 @@ class ChatViewState extends State<ChatView>
     );
   }
 
-  Widget _buildBottomPanel(bool isVoiceMode, double bottomSafe) {
+  Widget _buildBottomPanel(double bottomSafe) {
+    // The composer STAYS MOUNTED in Voice Mode — the compact orb anchors to
+    // its top edge (VoiceSessionOverlay tracks the live panel height), so it
+    // must never slide away. The fullscreen expansion morphs the capsule
+    // from inside the composer widgets themselves.
     return Align(
       alignment: Alignment.bottomCenter,
-      child: AnimatedSlide(
-        offset: isVoiceMode ? const Offset(0, 1) : Offset.zero,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        child: SafeArea(
-          top: false,
-          bottom: true,
-          child: NotificationListener<SizeChangedLayoutNotification>(
-            onNotification: (_) {
-              WidgetsBinding.instance.addPostFrameCallback(
-                (_) => _updateBottomPanelHeight(),
-              );
-              return true;
-            },
-            child: SizeChangedLayoutNotifier(
-              child: SizedBox(
-                key: _bottomPanelKey,
-                width: double.infinity,
-                child: ChatInputPanel(
-                  editService: editService,
-                  scrollService: _scrollService,
-                  editPanelController: editPanelController,
-                  slideAnimation: slideAnimation,
-                  fadeAnimation: fadeAnimation,
-                ),
+      child: SafeArea(
+        top: false,
+        bottom: true,
+        child: NotificationListener<SizeChangedLayoutNotification>(
+          onNotification: (_) {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _updateBottomPanelHeight(),
+            );
+            return true;
+          },
+          child: SizeChangedLayoutNotifier(
+            child: SizedBox(
+              key: _bottomPanelKey,
+              width: double.infinity,
+              child: ChatInputPanel(
+                editService: editService,
+                scrollService: _scrollService,
+                editPanelController: editPanelController,
+                slideAnimation: slideAnimation,
+                fadeAnimation: fadeAnimation,
               ),
             ),
           ),
@@ -516,7 +538,7 @@ class ChatViewState extends State<ChatView>
     );
   }
 
-  Widget _buildBriefingOverlay(double bottomSafe) {
+  Widget _buildBriefingOverlay(double bottomSafe, bool isVoiceMode) {
     // The briefing must track the panel's live height: opening edit mode
     // grows the panel over 300ms and SizeChangedLayoutNotifier reports every
     // frame, so this AnimatedBuilder keeps the briefing gliding up in
@@ -525,9 +547,13 @@ class ChatViewState extends State<ChatView>
     // banner slide straight under the briefing. Only the briefing moves:
     // the chat content keeps its own padding rule (see _buildMainContent).
     //
-    // Voice Mode hides the briefing by unmounting it (see mainStack), not by
-    // sliding it down, and the shared premium funnel is wired once here for
-    // every briefing the composer can show.
+    // Voice Mode moves the briefing slightly DOWN and fades it out quickly
+    // (instead of unmounting it cold): the panel slides under the composer
+    // zone without ever colliding with it, and restores with the reverse
+    // animation on exit. The shared premium funnel is wired once here for
+    // every briefing the composer can show. The layout reserve is still
+    // cleared instantly while voice mode is open (see build), so the
+    // scroll-down button never dodges a phantom briefing.
     return AnimatedBuilder(
       animation: bottomPanelHeightNotifier,
       builder: (context, _) {
@@ -538,13 +564,28 @@ class ChatViewState extends State<ChatView>
               bottomPanelHeightNotifier.value +
               bottomSafe +
               _briefingBottomOffset,
-          child: _BriefingOverlayWrapper(
-            onPremiumTap: () => openNextSubscriptionStep(context),
-            onVisibleHeightChanged: (h) {
-              if (briefingVisibleHeightNotifier.value != h) {
-                briefingVisibleHeightNotifier.value = h;
-              }
-            },
+          child: IgnorePointer(
+            ignoring: isVoiceMode,
+            child: AnimatedSlide(
+              offset: isVoiceMode ? const Offset(0, 0.22) : Offset.zero,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeIn,
+              child: AnimatedOpacity(
+                opacity: isVoiceMode ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 180),
+                child: _BriefingOverlayWrapper(
+                  onPremiumTap: () => openNextSubscriptionStep(context),
+                  onVisibleHeightChanged: (h) {
+                    // A briefing that is fading out under Voice Mode must not
+                    // reserve layout space for its dying height.
+                    if (isVoiceMode) return;
+                    if (briefingVisibleHeightNotifier.value != h) {
+                      briefingVisibleHeightNotifier.value = h;
+                    }
+                  },
+                ),
+              ),
+            ),
           ),
         );
       },
@@ -574,6 +615,58 @@ class ChatViewState extends State<ChatView>
           keyboardHeight: 0.0,
           slideOffset: isVoiceMode ? const Offset(0, 2) : Offset.zero,
         );
+      },
+    );
+  }
+}
+
+/// Mounts the Voice Mode overlay for its whole life INCLUDING the exit
+/// animation: `InputProvider.isVoiceModeActive` flips off the moment the
+/// user exits, and the overlay still needs a few hundred milliseconds to
+/// fade/scale away before being unmounted.
+class _VoiceOverlayHost extends StatefulWidget {
+  const _VoiceOverlayHost({
+    required this.active,
+    required this.panelHeight,
+    required this.bottomSafe,
+  });
+
+  final bool active;
+  final ValueListenable<double> panelHeight;
+  final double bottomSafe;
+
+  @override
+  State<_VoiceOverlayHost> createState() => _VoiceOverlayHostState();
+}
+
+class _VoiceOverlayHostState extends State<_VoiceOverlayHost> {
+  bool _shown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _shown = widget.active;
+  }
+
+  @override
+  void didUpdateWidget(_VoiceOverlayHost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.active && !_shown) {
+      setState(() => _shown = true);
+    }
+    // Deactivation does NOT hide the host: the overlay animates itself out
+    // and calls back here through [VoiceSessionOverlay.onExited].
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_shown) return const SizedBox.shrink();
+    return VoiceSessionOverlay(
+      active: widget.active,
+      panelHeight: widget.panelHeight,
+      bottomSafe: widget.bottomSafe,
+      onExited: () {
+        if (mounted) setState(() => _shown = false);
       },
     );
   }

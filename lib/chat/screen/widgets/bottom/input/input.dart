@@ -1,7 +1,9 @@
 import 'package:cortex/design.dart';
+
 import 'dart:async';
 import 'dart:ui' show lerpDouble;
 import 'dart:io';
+
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,9 @@ import 'package:cortex/internet.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/services/speech.dart';
+
 import '../../wave.dart';
+
 import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/service.dart';
 import 'package:cortex/server/subscription.dart';
@@ -34,8 +38,10 @@ part 'send.dart';
 /// two morph states. Shared with the edit-mode banner so the banner hugs
 /// the capsule instead of spanning the full bar.
 double composerCapsuleInset(double viewportWidth, {required bool expanded}) {
-  final double screenWidth =
-      viewportWidth.clamp(0.0, CortexDesign.readingWidth);
+  final double screenWidth = viewportWidth.clamp(
+    0.0,
+    CortexDesign.readingWidth,
+  );
   final double available =
       viewportWidth - 2 * CortexDesign.readingInset(viewportWidth);
   if (available <= 0) return 0;
@@ -56,12 +62,13 @@ double composerCapsuleInset(double viewportWidth, {required bool expanded}) {
     final double buttonSize = InputFieldState.buttonSizeFor(screenWidth);
     final double collapsedControlInsets =
         (InputFieldState.edgeGap + buttonSize + InputFieldState.inputGap) +
-            (InputFieldState.edgeGap +
-                buttonSize * 2 +
-                InputFieldState.buttonGap +
-                InputFieldState.inputGap);
-    final double responsiveFont =
-        screenWidth >= 600 ? screenWidth * 0.025 : screenWidth * 0.04;
+        (InputFieldState.edgeGap +
+            buttonSize * 2 +
+            InputFieldState.buttonGap +
+            InputFieldState.inputGap);
+    final double responsiveFont = screenWidth >= 600
+        ? screenWidth * 0.025
+        : screenWidth * 0.04;
     // A livable collapsed field: 1.2em of glyph room plus the field's
     // own horizontal paddings (2x4 content + 2x2 section). A hint that
     // outgrows it clips into the section's fog strip by design.
@@ -70,9 +77,10 @@ double composerCapsuleInset(double viewportWidth, {required bool expanded}) {
     // horizontal padding, per side.
     final double minCollapsedShare =
         (collapsedControlInsets + 6.0 + minCollapsedField) / available;
-    share = (InputFieldState.collapsedCapsuleShare *
-            InputFieldState.collapsedCapsuleShrink)
-        .clamp(minCollapsedShare, 1.0);
+    share =
+        (InputFieldState.collapsedCapsuleShare *
+                InputFieldState.collapsedCapsuleShrink)
+            .clamp(minCollapsedShare, 1.0);
   }
   return available * (1.0 - share) / 2.0;
 }
@@ -99,7 +107,7 @@ class InputField extends StatefulWidget {
   final bool canHandleImage; // Maintained for legacy check logic
   final bool isEditingMode;
   final File?
-      preselectedPhoto; // Deprecated but kept for signature compatibility
+  preselectedPhoto; // Deprecated but kept for signature compatibility
   final bool modelMissing;
   final VoidCallback onCancelEditing;
 
@@ -162,7 +170,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   static const double edgeGap = 8.0; // control -> capsule interior edge
   static const double buttonGap = 4.0; // mic -> action while both are inside
   static const double inputGap = 14.0; // breathing room around the text field
-  static const double inputEdgeGap = 14.0; // text field -> capsule border (expanded)
+  static const double inputEdgeGap =
+      14.0; // text field -> capsule border (expanded)
   static const double screenEdgeGap = 8.0; // detached bubble -> screen edge
   static const double detachedScreenShare = 0.75;
   static const double expandedButtonGrow = 1.25;
@@ -173,6 +182,11 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   // Morphing composer expand/collapse animation
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
+
+  /// Voice entry shrinks/fades the capsule while Flow/X move outward.
+  /// This clock is independent of compact/expanded orb presentation.
+  late AnimationController _voiceMorphController;
+  late Animation<double> _voiceMorphAnimation;
 
   @override
   void initState() {
@@ -187,6 +201,15 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       parent: _expandController,
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
+    );
+
+    _voiceMorphController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 380),
+    );
+    _voiceMorphAnimation = CurvedAnimation(
+      parent: _voiceMorphController,
+      curve: Curves.easeInOutCubic,
     );
 
     widget.textFieldFocusNode.addListener(_onFocusChange);
@@ -206,7 +229,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         setState(() {});
       }
     });
-
   }
 
   @override
@@ -226,12 +248,12 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         if (mounted) setState(() {});
       });
     }
-
   }
 
   @override
   void dispose() {
     _expandController.dispose();
+    _voiceMorphController.dispose();
     _speechService?.removeListener(_onSpeechStatusChange);
     _featureProvider?.removeListener(_onFeatureModeChanged);
     widget.textFieldFocusNode.removeListener(_onFocusChange);
@@ -309,6 +331,34 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     _rebuildComposerState();
   }
 
+  /// Drives the Voice Mode entry morph from the provider flag. Guarded
+  /// like [_syncExpandAnimation]: never starts an animation from inside a
+  /// layout/paint phase.
+  void _syncVoiceMorphAnimation(bool expanded) {
+    void animate() {
+      if (expanded) {
+        if (_voiceMorphController.status != AnimationStatus.forward &&
+            _voiceMorphController.status != AnimationStatus.completed) {
+          _voiceMorphController.forward();
+        }
+      } else {
+        if (_voiceMorphController.status != AnimationStatus.reverse &&
+            _voiceMorphController.status != AnimationStatus.dismissed) {
+          _voiceMorphController.reverse();
+        }
+      }
+    }
+
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) animate();
+      });
+    } else {
+      animate();
+    }
+  }
+
   void _syncExpandAnimation(bool shouldExpand) {
     void animate() {
       if (shouldExpand) {
@@ -341,7 +391,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   bool get isActionPermitted {
     final sessionProvider = context.read<ChatSessionProvider>();
     final currentModel = sessionProvider.selectedModel;
-    final isVideoModel = !widget.isDynamicChatMode &&
+    final isVideoModel =
+        !widget.isDynamicChatMode &&
         currentModel != null &&
         (currentModel.outputs['video'] == true ||
             currentModel.category == 'video');
@@ -365,7 +416,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   bool get isSendButtonEnabled {
     final sessionProvider = context.read<ChatSessionProvider>();
     final currentModel = sessionProvider.selectedModel;
-    final isVideoModel = !widget.isDynamicChatMode &&
+    final isVideoModel =
+        !widget.isDynamicChatMode &&
         currentModel != null &&
         (currentModel.outputs['video'] == true ||
             currentModel.category == 'video');
@@ -393,22 +445,24 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     final screenWidth = viewportWidth.clamp(0.0, CortexDesign.readingWidth);
     final bool isTablet = screenWidth >= 600;
 
-    // Watched so provider flips (dictation, feature modes) rebuild this
-    // subtree: the row reads the provider directly, but the capsule
-    // expansion trigger inside it depends on this rebuild.
-    context.watch<InputProvider>();
+    // Watched so provider flips (dictation, feature modes, VOICE MODE and
+    // its activation) rebuild this subtree: the row reads the
+    // provider directly, but the capsule expansion trigger inside it and
+    // the voice morphs below depend on this rebuild.
+    final inputProvider = context.watch<InputProvider>();
+    final bool isVoiceMode = inputProvider.isVoiceModeActive;
+    // Voice activation owns this clock; orb expansion cannot reverse it.
+    _syncVoiceMorphAnimation(isVoiceMode);
 
     final double radius = CortexDesign.cardRadius;
 
-    // The composer is always on stage: exactly two visual states — the
-    // collapsed pill and the expanded capsule — driven by _expandAnimation.
-    // There is no third "absent" state, no offstage gate and no entrance
-    // animation to wait for, so a fresh load, async provider churn and
-    // navigation re-entry all land in the collapsed capsule immediately.
+    // Keep layout and side-control hit regions mounted as the capsule fades.
     return AnimatedBuilder(
-      animation: _expandAnimation,
+      animation: Listenable.merge([_expandAnimation, _voiceMorphAnimation]),
       builder: (context, child) {
         final double t = _expandAnimation.value;
+        // Voice Mode entry morph progress (0 = normal chat, 1 = voice).
+        final double voiceT = _voiceMorphAnimation.value;
         // The collapsed pill is drawn at the share composerCapsuleInset()
         // computes (85% of the old share, floored on narrow phones); the
         // expanded share is untouched, so the morph visibly grows the
@@ -435,19 +489,28 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
               // Painted capsule border/background, inset exactly where the
               // old container sat. The ±1 matches the 1px border that used
               // to wrap this box around the 4px vertical padding.
+              //
+              // Voice Mode entry: the capsule shrinks inward and fades
+              // — the composer keeps its geometry (the compact orb anchors
+              // to the panel's top edge) while its visual dissolves to make
+              // room for the expanded orb stage.
               Positioned(
                 left: CortexDesign.readingInset(viewportWidth) + capsuleInset,
                 right: CortexDesign.readingInset(viewportWidth) + capsuleInset,
                 top: -1.0,
                 bottom: -1.0,
-                child: DecoratedBox(
-                  key: const ValueKey('composer_capsule'),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(radius),
-                    border: Border.all(
-                      color: AppColors.border,
-                      width: 1,
+                child: Transform.scale(
+                  scaleX: 1.0 - 0.45 * voiceT,
+                  scaleY: 1.0 - 0.06 * voiceT,
+                  child: Opacity(
+                    opacity: 1.0 - voiceT,
+                    child: DecoratedBox(
+                      key: const ValueKey('composer_capsule'),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(radius),
+                        border: Border.all(color: AppColors.border, width: 1),
+                      ),
                     ),
                   ),
                 ),
@@ -463,11 +526,20 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: CortexDesign.readingInset(viewportWidth) +
+                        horizontal:
+                            CortexDesign.readingInset(viewportWidth) +
                             capsuleInset +
                             1.0,
                       ),
-                      child: child!,
+                      // Attachments and the RAG chip dissolve with the
+                      // capsule in the fullscreen voice stage.
+                      child: Opacity(
+                        opacity: 1.0 - voiceT,
+                        child: IgnorePointer(
+                          ignoring: voiceT > 0.05,
+                          child: child!,
+                        ),
+                      ),
                     ),
                     // The composer row is the only mode now. Dictation
                     // keeps the row and the capsule expansion, dims the
@@ -483,6 +555,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                       isActionPermitted,
                       0.0,
                       capsuleInset,
+                      isVoiceMode: isVoiceMode,
                     ),
                   ],
                 ),
@@ -498,7 +571,9 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         mainAxisSize: MainAxisSize.min,
         children: [
           _AttachmentPreviewSection(
-              screenWidth: screenWidth, isTablet: isTablet),
+            screenWidth: screenWidth,
+            isTablet: isTablet,
+          ),
 
           _RagStatusChip(screenWidth: screenWidth),
         ],
@@ -519,8 +594,11 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
     // Animated inset between the bar edge and the capsule border. The row
     // is wider than the capsule, so it re-anchors every interior-relative
     // control back to the capsule with this.
-    double capsuleInset,
-  ) {
+    double capsuleInset, {
+    // Voice Mode V2: locks the text field (the voice session owns the
+    // input path) and drives the fullscreen outward control shift.
+    required bool isVoiceMode,
+  }) {
     final inputProvider = context.read<InputProvider>();
     // Dictation expands the capsule as well, so the speech transcript
     // lands in the roomy field instead of the compact pill.
@@ -543,7 +621,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       inputProvider,
       context.read<ChatSessionProvider>().selectedModel,
     );
-    final bool isComposerExpanded = widget.textFieldFocusNode.hasFocus ||
+    final bool isComposerExpanded =
+        widget.textFieldFocusNode.hasFocus ||
         isDictating ||
         hasText ||
         hasActiveFeature;
@@ -568,16 +647,18 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         // also the horizontal room between the capsule border and the
         // screen edge, per side. Every interior-relative control below is
         // re-anchored to the capsule border with it.
-        final double base = CortexDesign.readingInset(
-                MediaQuery.sizeOf(context).width) +
+        final double base =
+            CortexDesign.readingInset(MediaQuery.sizeOf(context).width) +
             capsuleInset +
             1.0;
         final double outerMargin = base;
 
         return AnimatedBuilder(
-          animation: _expandAnimation,
+          animation: Listenable.merge([_expandAnimation, _voiceMorphAnimation]),
           builder: (context, child) {
             final double t = _expandAnimation.value;
+            // Voice Mode entry morph progress (0 = normal chat, 1 = voice).
+            final double voiceT = _voiceMorphAnimation.value;
 
             // The detachable bubbles swell slowly along with the expansion.
             final double buttonScale = lerpDouble(1.0, expandedButtonGrow, t)!;
@@ -589,76 +670,105 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
             // keeps them inside the screen on narrow viewports.
             final double freeSpace = outerMargin - 1 - grownButtonSize;
             final double screenSideGap = freeSpace * detachedScreenShare;
-            final double detach = outerMargin -
-                (screenSideGap > screenEdgeGap
-                    ? screenSideGap
-                    : screenEdgeGap);
+            final double detach =
+                outerMargin -
+                (screenSideGap > screenEdgeGap ? screenSideGap : screenEdgeGap);
 
-            // Left "+" control: inside while collapsed, floats out left.
-            final double plusLeft = lerpDouble(edgeGap, -detach, t)!;
-            // Right action button: inside while collapsed, floats out right.
-            final double actionRight = lerpDouble(edgeGap, -detach, t)!;
+            // Reuse the normal composer's detached control destination.
+            // Voice entry owns this movement independently of orb expansion.
+            final double controlOffset = lerpDouble(
+              lerpDouble(edgeGap, -detach, t)!,
+              -detach,
+              voiceT,
+            )!;
+            final double plusLeft = controlOffset;
+            final double actionRight = controlOffset;
             // The microphone never detaches; it slides to the interior right
             // edge once the action button vacates its collapsed slot.
-            final double micRight =
-                lerpDouble(edgeGap + buttonSize + buttonGap, edgeGap, t)!;
+            final double micRight = lerpDouble(
+              edgeGap + buttonSize + buttonGap,
+              edgeGap,
+              t,
+            )!;
 
             // The text field fills the space left between the controls; the
             // compact capsule itself provides the small overall footprint.
-            final double inputLeft =
-                lerpDouble(edgeGap + buttonSize + inputGap, inputEdgeGap, t)!;
+            final double inputLeft = lerpDouble(
+              edgeGap + buttonSize + inputGap,
+              inputEdgeGap,
+              t,
+            )!;
             final double inputRight = lerpDouble(
-                edgeGap + buttonSize * 2 + buttonGap + inputGap,
-                edgeGap + buttonSize + inputGap,
-                t)!;
+              edgeGap + buttonSize * 2 + buttonGap + inputGap,
+              edgeGap + buttonSize + inputGap,
+              t,
+            )!;
 
             return Stack(
               clipBehavior: Clip.none,
               children: [
                 Padding(
                   padding: EdgeInsets.only(
-                      left: base + inputLeft, right: base + inputRight),
-                  child: Stack(
-                    children: [
-                      _TextFieldSection(
-                        key: const ValueKey('textfield'),
-                        controller: widget.controller,
-                        focusNode: widget.textFieldFocusNode,
-                        localizations: widget.localizations,
-                        screenWidth: screenWidth,
-                        isTablet: isTablet,
-                        showHintText: true,
-                        isComposerExpanded: isComposerExpanded,
-                        isDictating: isDictating,
-                        onEnterPressed: () {
-                          if (isSendButtonEnabled) {
-                            widget.onSend();
-                          }
-                        },
+                    left: base + inputLeft,
+                    right: base + inputRight,
+                  ),
+                  // The text field dissolves with the capsule in the
+                  // fullscreen voice stage (the orb owns the interaction),
+                  // and in compact voice mode it is read-only: the voice
+                  // session owns the input path and the keyboard may never
+                  // reopen over it.
+                  child: Opacity(
+                    opacity: 1.0 - voiceT,
+                    child: IgnorePointer(
+                      ignoring: isVoiceMode,
+                      child: Stack(
+                        children: [
+                          _TextFieldSection(
+                            key: const ValueKey('textfield'),
+                            controller: widget.controller,
+                            focusNode: widget.textFieldFocusNode,
+                            localizations: widget.localizations,
+                            screenWidth: screenWidth,
+                            isTablet: isTablet,
+                            showHintText: true,
+                            isComposerExpanded: isComposerExpanded,
+                            isDictating: isDictating,
+                            isVoiceLocked: isVoiceMode,
+                            onEnterPressed: () {
+                              if (isSendButtonEnabled) {
+                                widget.onSend();
+                              }
+                            },
+                          ),
+                          // While dictation runs the field is covered by the
+                          // animated waveform — the takeover the retired
+                          // recording layout used to perform, now confined to
+                          // the field slot so the capsule, the dimmed "+" and
+                          // Stop all stay where they were. The switcher gives
+                          // the sheet its fade in/out; the wave itself
+                          // undulates with the detected sound level.
+                          Positioned.fill(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 250),
+                              switchInCurve: Curves.easeOutQuad,
+                              switchOutCurve: Curves.easeInQuad,
+                              transitionBuilder: (child, animation) =>
+                                  FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                              child: isDictating
+                                  ? const _DictationWave(
+                                      key: ValueKey('dictation_wave'),
+                                    )
+                                  : const SizedBox.shrink(
+                                      key: ValueKey('dictation_idle'),
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
-                      // While dictation runs the field is covered by the
-                      // animated waveform — the takeover the retired
-                      // recording layout used to perform, now confined to
-                      // the field slot so the capsule, the dimmed "+" and
-                      // Stop all stay where they were. The switcher gives
-                      // the sheet its fade in/out; the wave itself
-                      // undulates with the detected sound level.
-                      Positioned.fill(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          switchInCurve: Curves.easeOutQuad,
-                          switchOutCurve: Curves.easeInQuad,
-                          transitionBuilder: (child, animation) =>
-                              FadeTransition(
-                                  opacity: animation, child: child),
-                          child: isDictating
-                              ? const _DictationWave(
-                                  key: ValueKey('dictation_wave'))
-                              : const SizedBox.shrink(
-                                  key: ValueKey('dictation_idle')),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 Positioned(

@@ -1,4 +1,5 @@
 {
+  "benefitMoreVoiceChat": "더 많은 음성 채팅",
   "@@locale": "ko",
   "accessSettingsDescription": "도움말에 액세스하고, 코드를 사용하고, Cortex를 공유하고, 정책을 확인하세요.",
   "accountDeletionRequested": "계정 삭제 요청이 접수되었으며 계정이 비활성화되었습니다.",

@@ -10,6 +10,9 @@ class AppLocalizationsAz extends AppLocalizations {
   AppLocalizationsAz([String locale = 'az']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Daha çox səsli söhbət';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nHazırkı tarix və vaxt: $formattedTime.';
   }

@@ -70,7 +70,19 @@ class RemoteTtsService {
       isSpeakerphoneOn: true,
       stayAwake: true,
       contentType: AndroidContentType.speech,
-      usageType: AndroidUsageType.assistant,
+      // VOICE_COMMUNICATION, not ASSISTANT. Echo suppression (the platform
+      // AEC that cancels the app's own speaker output inside the mic signal)
+      // applies between streams of the SAME audio domain: the capture side
+      // already runs in the voice-communication domain (record's
+      // AndroidRecordConfig uses the voiceCommunication source with AEC/NS
+      // enabled and AudioManagerMode.modeInCommunication), but playback used
+      // to sit in the assistant domain, so the HAL had no reference signal
+      // and the assistant's own spoken words transcribed back as user
+      // speech — verified on device as finals containing the assistant's
+      // exact sentences. Routing playback into the communication domain gives
+      // platform AEC its reference; the software fingerprint layer
+      // (AssistantEchoFilter) remains as the second line of defense.
+      usageType: AndroidUsageType.voiceCommunication,
       // NO audio focus, deliberately. record_android's AudioRecorder
       // registers an audio-focus listener for the microphone by default and
       // PAUSES the recording forever on any focus loss (its resume path only
@@ -79,7 +91,7 @@ class RemoteTtsService {
       // verified on device: the socket stayed alive and only KeepAlive frames
       // flowed, so the user's next utterance never reached STT. Voice Mode's
       // own playback is short-form speech; ducking others is not worth the
-      // microphone. The recorder side is also hardened (its config now uses
+      // microphone. The recorder side is also hardened (its config uses
       // AudioInterruptionMode.none), so neither component does focus games
       // while the mic should be live.
       audioFocus: AndroidAudioFocus.none,

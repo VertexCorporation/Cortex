@@ -623,6 +623,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     bool closeSidebar = true,
     bool autoFocus = false,
     bool restoreDefaultModel = true,
+    bool preserveVoiceMode = false,
   }) {
     // Skip keyboard close on first launch so auto-focus can open it
     if (!autoFocus) {
@@ -639,8 +640,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       final input = context.read<InputProvider>();
       final voiceService = context.read<VoiceService>();
 
-      // Force Voice Mode OFF
-      if (input.isVoiceModeActive) {
+      // Voice entry keeps its immediate composer state during chat reset.
+      // Ordinary new-chat actions still tear down the voice session.
+      if (input.isVoiceModeActive && !preserveVoiceMode) {
         await voiceService.stopSession();
         input.setVoiceModeActive(false);
       }

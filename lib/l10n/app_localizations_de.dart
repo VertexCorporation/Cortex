@@ -10,6 +10,9 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Mehr Sprachchats';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nAktuelles Datum und Uhrzeit: $formattedTime.';
   }

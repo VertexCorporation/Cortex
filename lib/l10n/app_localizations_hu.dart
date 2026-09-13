@@ -10,6 +10,9 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Több hangalapú csevegés';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return 'Jelenlegi dátum és idő: $formattedTime.';
   }

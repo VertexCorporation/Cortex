@@ -10,6 +10,9 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Daha fazla sesli sohbet';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\nŞu anki tarih ve saat: $formattedTime.';
   }

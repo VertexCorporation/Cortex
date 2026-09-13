@@ -1,5 +1,8 @@
 import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
+
+import 'dart:async';
+
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/providers/conversation.dart';
@@ -9,6 +12,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import '../../voice_orb.dart';
+import '../../voice.dart' show voiceAllowanceExhausted, openVoiceUpgrade;
+
+import 'package:cortex/server/subscription.dart';
+import 'package:cortex/server/user.dart';
 
 import '../../../../../internet.dart';
 import '../../../../../library/backend/data/service.dart';
@@ -84,6 +93,13 @@ class MicButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final speechService = context.watch<SpeechService>();
     final inputProvider = context.watch<InputProvider>();
+
+    // Voice Mode owns the microphone — the dictation mic disappears from the
+    // composer while a voice session is live (its slot is right where the
+    // compact orb's composer controls live).
+    if (inputProvider.isVoiceModeActive) {
+      return const SizedBox.shrink(key: ValueKey('mic_voice_mode_hidden'));
+    }
 
     final bool isDeviceSupported = speechService.isDeviceSupported;
     final bool isRecording = inputProvider.isVoiceRecording;
@@ -253,7 +269,11 @@ class ActionButtonWidget extends StatelessWidget {
 
     final bool hasContent = !isTextEmpty || inputProvider.hasAttachments;
 
-    if (isSending || isRecording) {
+    if (inputProvider.isVoiceModeActive) {
+      // X exits both compact and expanded Voice Mode.
+      rightButtonKey = const ValueKey('voice_exit');
+      rightButton = _buildVoiceExitButton(context, buttonSize);
+    } else if (isSending || isRecording) {
       // STATE: STOP (Used for both AI gen and Voice Recording)
       rightButtonKey = const ValueKey('stop');
       rightButton = _buildStopButton(buttonSize);
@@ -326,6 +346,53 @@ class ActionButtonWidget extends StatelessWidget {
         // Main Action Button (Send/Stop/Voice)
         rightAction,
       ],
+    );
+  }
+
+  /// X — exits Voice Mode entirely (session stop + UI teardown). Replaces
+  /// the send/voice control for the whole voice session; the existing
+  /// AnimatedSwitcher crossfades between them. The container GROWS in from
+  /// 75% on entry (the right control assembling onto the voice stage next
+  /// to Flow) while the glyph holds its fixed [CortexDesign.icon] size the
+  /// whole way: the container is the affordance and may move; the glyph is
+  /// the meaning and must not pulse.
+  Widget _buildVoiceExitButton(BuildContext context, double size) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.75, end: 1.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutBack,
+      child: SvgPicture.asset(
+        'assets/icons/x.svg',
+        width: CortexDesign.icon,
+        height: CortexDesign.icon,
+        colorFilter: ColorFilter.mode(
+          AppColors.primaryColor.inverted,
+          BlendMode.srcIn,
+        ),
+      ),
+      builder: (context, grow, glyph) {
+        final double grown = size * grow;
+        return GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            final voiceService = context.read<VoiceService>();
+            final inputProvider = context.read<InputProvider>();
+            voiceService.stopSession();
+            inputProvider.setVoiceOverlayExpanded(false);
+            inputProvider.setVoiceModeActive(false);
+          },
+          child: Container(
+            width: grown,
+            height: grown,
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(grown / 2),
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            child: Center(child: glyph),
+          ),
+        );
+      },
     );
   }
 
@@ -414,6 +481,11 @@ class ActionButtonWidget extends StatelessWidget {
               FocusScope.of(context).unfocus();
               SystemChannels.textInput.invokeMethod('TextInput.hide');
 
+              // Prewarm the orb's fragment shader NOW, before the first
+              // visible transition: the program compiles once per process,
+              // off the entry animation's critical path.
+              unawaited(VoiceOrbController.prewarm());
+
               final voiceService = context.read<VoiceService>();
 
               // [FIX] Ensure we always start in Standard Voice Mode, not Flow Mode
@@ -421,6 +493,13 @@ class ActionButtonWidget extends StatelessWidget {
 
               final session = context.read<ChatSessionProvider>();
               final inputProvider = context.read<InputProvider>();
+              inputProvider.setVoiceModeActive(true);
+              if (voiceAllowanceExhausted(
+                voiceService,
+                context.read<UserProvider?>(),
+              )) {
+                return;
+              }
               final sendService = context.read<SendService>();
               final localizations = AppLocalizations.of(context)!;
               final localeCode = session.getLocale().languageCode;
@@ -431,6 +510,7 @@ class ActionButtonWidget extends StatelessWidget {
               if (conversationProvider.messages.isNotEmpty) {
                 mainScreenKey.currentState?.startNewConversation(
                   closeSidebar: false,
+                  preserveVoiceMode: true,
                 );
                 // Wait a brief moment for state to reset?
                 // startNewConversation is async-ish but returns void.
@@ -448,8 +528,8 @@ class ActionButtonWidget extends StatelessWidget {
 
               if (!context.mounted) return;
 
-              // Activate UI mode (triggers Overlay)
-              inputProvider.setVoiceModeActive(true);
+              // X may have been pressed while audio teardown was pending.
+              if (!inputProvider.isVoiceModeActive) return;
 
               // Start Voice Session
               await voiceService.startSession(
@@ -568,6 +648,12 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     final inputProvider = context.watch<InputProvider>();
     final screenWidth = MediaQuery.sizeOf(context).width;
 
+    // Voice entry owns Flow/X; orb expansion only changes presentation.
+    final bool flowStage = inputProvider.isVoiceModeActive;
+    final voiceService = context.watch<VoiceService>();
+    final bool flowOn =
+        flowStage && (voiceService.isFlowMode || voiceService.isFlowActive);
+
     final sessionProvider = context.watch<ChatSessionProvider>();
     final currentModel = sessionProvider.selectedModel;
 
@@ -607,9 +693,24 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         (screenWidth * 0.086).clamp(32.0, 38.0) * widget.bubbleScale;
 
     final Widget bubble = GestureDetector(
-      onTap: buttonDisabled || widget.isPhotoLoading
+      onTap: !flowStage && (buttonDisabled || widget.isPhotoLoading)
           ? () {
               HapticFeedback.heavyImpact();
+            }
+          : flowStage
+          ? () {
+              HapticFeedback.lightImpact();
+              final user = context.read<UserProvider?>();
+              if (voiceAllowanceExhausted(voiceService, user)) {
+                // Tier-correct routing (Free → Plus, Plus → Pro, Pro →
+                // Ultra; Ultra opens nothing — see voice.dart).
+                openVoiceUpgrade(
+                  tier:
+                      user?.subscription.effectiveTier ?? SubscriptionTier.free,
+                );
+                return;
+              }
+              voiceService.toggleFlowMode();
             }
           : () async {
               HapticFeedback.lightImpact();
@@ -627,7 +728,10 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
           color: backgroundColor,
           border: Border.all(
             color: borderColor,
-            width: isFeatureActive ? 2 : 1,
+            // The Flow button's frame must READ on the voice stage: the
+            // same 2px weight the active-feature bubble uses, so the orb's
+            // left control never dissolves into the background.
+            width: (isFeatureActive || flowStage) ? 2 : 1,
           ),
           shape: BoxShape.circle,
         ),
@@ -636,23 +740,45 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
             turns: _isOpened ? 1.375 : 0.0,
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeInOutCubic,
-            child: TweenAnimationBuilder<Color?>(
+            child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              tween: ColorTween(end: iconColor),
-              builder: (context, color, child) {
-                return SvgPicture.asset(
-                  'assets/icons/add.svg',
-                  // The "+" glyph fills more of its circle so the hollow
-                  // bubble reads the same size as the filled action button.
-                  width: size * 0.75,
-                  height: size * 0.75,
-                  colorFilter: ColorFilter.mode(
-                    color ?? iconColor,
-                    BlendMode.srcIn,
-                  ),
-                );
-              },
+              switchInCurve: Curves.easeOutQuad,
+              switchOutCurve: Curves.easeInQuad,
+              transitionBuilder: (child, animation) =>
+                  FadeTransition(opacity: animation, child: child),
+              child: flowStage
+                  ? SvgPicture.asset(
+                      'assets/icons/flow.svg',
+                      key: const ValueKey('flow_icon'),
+                      width: size * 0.62,
+                      height: size * 0.62,
+                      colorFilter: ColorFilter.mode(
+                        flowOn
+                            ? AppColors.primaryColor
+                            : AppColors.primaryColor.inverted,
+                        BlendMode.srcIn,
+                      ),
+                    )
+                  : TweenAnimationBuilder<Color?>(
+                      key: const ValueKey('plus_icon'),
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                      tween: ColorTween(end: iconColor),
+                      builder: (context, color, child) {
+                        return SvgPicture.asset(
+                          'assets/icons/add.svg',
+                          // The "+" glyph fills more of its circle so the
+                          // hollow bubble reads the same size as the filled
+                          // action button.
+                          width: size * 0.75,
+                          height: size * 0.75,
+                          colorFilter: ColorFilter.mode(
+                            color ?? iconColor,
+                            BlendMode.srcIn,
+                          ),
+                        );
+                      },
+                    ),
             ),
           ),
         ),
@@ -663,7 +789,23 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     // (its semantics included) twice per session. Keeping the shape
     // constant and animating only the opacity value leaves the element and
     // semantics trees untouched while dimming exactly as before.
-    return Opacity(opacity: widget.isDimmed ? 0.4 : 1.0, child: bubble);
+    // VOICE ENTRY GROWTH: when the composer flips into the voice stage, the
+    // Flow container grows in from 75% — the left control assembling onto
+    // the stage next to the X. Transform (not width) keeps the row layout
+    // stable during the grow; the flow glyph is size-relative by design, so
+    // it rides along (unlike the X, whose glyph stays fixed).
+    final Widget stageBubble = TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: flowStage ? 0.75 : 1.0, end: 1.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutBack,
+      builder: (context, grow, child) =>
+          Transform.scale(scale: grow, child: child),
+      child: bubble,
+    );
+    return Opacity(
+      opacity: widget.isDimmed && !flowStage ? 0.4 : 1.0,
+      child: stageBubble,
+    );
   }
 }
 

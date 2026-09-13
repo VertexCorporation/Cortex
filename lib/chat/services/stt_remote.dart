@@ -32,6 +32,21 @@ import 'package:record/record.dart';
 
 import 'voice_health.dart';
 
+/// Proxies may return JSON as text or HTML/plain-text errors on 5xx.
+/// Decode only objects; never cast an infrastructure error body to a map.
+Map<String, dynamic>? decodeSpeechTokenResponse(dynamic body) {
+  if (body is Map<String, dynamic>) return body;
+  if (body is String) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) return decoded;
+    } on FormatException {
+      return null;
+    }
+  }
+  return null;
+}
+
 /// One transcript update. Deepgram sends a running best guess and then a
 /// settled version of the same span; [isFinal] separates them so the caller
 /// can replace rather than append.
@@ -339,6 +354,15 @@ class RemoteSttService {
   /// replaced it.
   int _epoch = 0;
 
+  /// Socket generation, bumped every time a socket is intentionally retired
+  /// or replaced. The epoch alone cannot make an INTENTIONALLY closed
+  /// socket's handlers go inert: a window-boundary rotation closes a socket
+  /// that is still OPEN — its onDone would otherwise classify our own
+  /// deliberate close as an unexpected death and stack a second reconnect
+  /// on top of the rotation. Handlers capture their socket's generation;
+  /// events from a superseded socket are dropped.
+  int _socketGen = 0;
+
   /// Serializes start/stop through one queue: a second rapid start waits for
   /// the first to settle instead of opening a second microphone on top of
   /// the first recorder (the ghost-microphone race), and stop can never
@@ -366,6 +390,22 @@ class RemoteSttService {
   // trace, so "it did nothing" and "it worked" looked identical from here.
   int _chunksSent = 0;
   int _transcriptsSeen = 0;
+
+  /// Whether PCM has been forwarded to the CURRENT socket yet. Startup
+  /// telemetry separates "frames received from the recorder" (the mic probe)
+  /// from "frames actually on the wire" — a socket gap between the two is
+  /// the difference between a capture problem and a connect problem.
+  bool _pcmForwarded = false;
+
+  /// Peak absolute PCM sample (0..1) since the last [healthLine] read — a
+  /// read-and-reset gauge. Vendor HAL logs (`AudioRecordImpl:
+  /// [audioRecordData][mute]` on Xiaomi/HyperOS) report the platform record
+  /// track's mute STATE, not whether the bytes we receive are silent; frames
+  /// flowing prove the capture is alive, and this proves the audio itself
+  /// has energy. ~0% while frames flow means genuinely silent PCM (a real
+  /// platform mute); a noise floor of a few % or speech peaks means the
+  /// vendor label is cosmetic.
+  double _peakSinceHealth = 0.0;
 
   bool get isActive => _socket != null;
 
@@ -448,7 +488,7 @@ class RemoteSttService {
       final idToken = await user.getIdToken();
       if (idToken == null) return;
 
-      await _dio.post<Map<String, dynamic>>(
+      await _dio.post<dynamic>(
         _tokenEndpoint,
         data: <String, dynamic>{
           'lastFailure': failure,
@@ -474,13 +514,15 @@ class RemoteSttService {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return null;
+      VoiceTelemetry.mark('STT lease auth start');
       final idToken = await user.getIdToken();
       if (idToken == null) return null;
 
       final previousFailure = _lastFailure;
       _lastFailure = null;
 
-      final response = await _dio.post<Map<String, dynamic>>(
+      VoiceTelemetry.mark('STT lease request start');
+      final response = await _dio.post<dynamic>(
         _tokenEndpoint,
         data: <String, dynamic>{
           if (previousFailure != null) ...{
@@ -498,28 +540,52 @@ class RemoteSttService {
         ),
       );
 
+      final data = decodeSpeechTokenResponse(response.data);
       if (response.statusCode != 200) {
-        dailyVoiceLimitReached =
-            response.statusCode == 403 &&
-            response.data?['error'] == 'voice_daily_limit';
+        // Only the exact 403 + voice_daily_limit pair raises the limit flag
+        // (see isDailyVoiceLimitRefusal): a plain outage must never look
+        // like a spent allowance, because the takeover and the UI both
+        // branch on it.
+        dailyVoiceLimitReached = isDailyVoiceLimitRefusal(
+          response.statusCode,
+          data,
+        );
+        // A non-JSON 5xx (a platform cold-start crash page) degrades to a
+        // named failure code instead of a crash or a silent null; the code
+        // and the body preview ride to the server with the next token
+        // request, which is how an OOM at the endpoint becomes visible
+        // without a device log.
+        _fail(
+          mintRefusalCode('deepgram', response.statusCode),
+          refusalBodyPreview(response.data),
+        );
+        VoiceTelemetry.mark('STT lease refused (HTTP ${response.statusCode})');
         debugPrint("[RemoteStt] Token declined: HTTP ${response.statusCode}");
         return null;
       }
-      final token = response.data?['token'];
-      if (token is! String || token.isEmpty) return null;
-      final sessionId = response.data?['sessionId'];
-      final voice = _readVoiceFields(response.data);
+      final token = data?['token'];
+      if (token is! String || token.isEmpty) {
+        // HTTP 200 without a usable token is a server-side defect; without
+        // saying so it is indistinguishable from a mint that never happened.
+        _fail("DEEPGRAM_MINT_MALFORMED", "200 without a usable token");
+        return null;
+      }
+      final sessionId = data?['sessionId'];
+      final voice = _readVoiceFields(data);
+      final provider = data?['provider'] == 'assemblyai'
+          ? 'assemblyai'
+          : 'deepgram';
+      VoiceTelemetry.mark('STT lease granted ($provider)');
       return _SpeechLease(
         token: token,
         sessionId: sessionId is String ? sessionId : null,
-        provider: response.data?['provider'] == 'assemblyai'
-            ? 'assemblyai'
-            : 'deepgram',
+        provider: provider,
         allowanceVoiceSeconds: voice?['allowanceSeconds'],
         remainingVoiceSeconds: voice?['remainingSeconds'],
         reservedVoiceSeconds: voice?['reservedSeconds'],
       );
     } catch (e) {
+      _fail("DEEPGRAM_MINT_REQUEST_FAILED", e);
       debugPrint("[RemoteStt] Token request failed: $e");
       return null;
     }
@@ -542,6 +608,63 @@ class RemoteSttService {
     };
   }
 
+  /// Whether a refused mint is specifically the daily-voice-allowance
+  /// refusal the UI must explain distinctly from every other failure (401
+  /// auth, 5xx outage, a non-JSON platform crash page). ONLY this exact
+  /// pair — HTTP 403 plus the server's `voice_daily_limit` error code —
+  /// may ever raise the limit flag: a plain outage with a coincidental 403
+  /// must never look like a spent allowance, because both the AssemblyAI
+  /// takeover and the user-facing limit sheet branch on it.
+  @visibleForTesting
+  static bool isDailyVoiceLimitRefusal(
+    int? statusCode,
+    Map<String, dynamic>? body,
+  ) {
+    return statusCode == 403 && body?['error'] == 'voice_daily_limit';
+  }
+
+  /// The telemetry code for a refused mint. 401 and 403 are named, the whole
+  /// 5xx family collapses into one code (a cold-start OOM page and a gateway
+  /// timeout need the same response from us, and one code stays greppable in
+  /// the piggybacked failure report).
+  @visibleForTesting
+  static String mintRefusalCode(String provider, int? statusCode) {
+    final status = statusCode ?? 0;
+    final String suffix;
+    switch (status) {
+      case 401:
+        suffix = '401';
+      case 403:
+        suffix = '403';
+      case >= 500 && <= 599:
+        suffix = '5XX';
+      default:
+        suffix = '$status';
+    }
+    return '${provider.toUpperCase()}_MINT_HTTP_$suffix';
+  }
+
+  /// One short, single-line preview of a refusal body for the piggybacked
+  /// failure report: the JSON `error` string when the body parsed, otherwise
+  /// the RAW body — a cold-start 500 is an HTML crash page, not JSON, and
+  /// that page is the diagnosis. Whitespace-collapsed and length-bounded so
+  /// a crash page can never bloat the report (or crash anything on the way
+  /// through — nothing here casts or parses the body).
+  @visibleForTesting
+  static String refusalBodyPreview(dynamic rawBody, [int limit = 160]) {
+    if (rawBody is Map) {
+      final error = rawBody['error'];
+      if (error is String) return _collapseForReport(error, limit);
+    }
+    return _collapseForReport(rawBody?.toString() ?? '', limit);
+  }
+
+  static String _collapseForReport(String text, int limit) {
+    final collapsed = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (collapsed.length <= limit) return collapsed;
+    return collapsed.substring(0, limit);
+  }
+
   Future<_SpeechLease?> _fetchAssemblyToken({String? mode}) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -549,7 +672,7 @@ class RemoteSttService {
       final idToken = await user.getIdToken();
       if (idToken == null) return null;
 
-      final response = await _dio.post<Map<String, dynamic>>(
+      final response = await _dio.post<dynamic>(
         _assemblyTokenEndpoint,
         data: mode == null
             ? const <String, dynamic>{}
@@ -562,16 +685,32 @@ class RemoteSttService {
           validateStatus: (_) => true,
         ),
       );
+      final data = decodeSpeechTokenResponse(response.data);
       if (response.statusCode != 200) {
-        dailyVoiceLimitReached =
-            response.statusCode == 403 &&
-            response.data?['error'] == 'voice_daily_limit';
+        // Same exact-pair rule as the Deepgram mint: only 403 +
+        // voice_daily_limit means the pool is spent; a 401 or a non-JSON
+        // 5xx crash page is an outage, never a spent allowance.
+        dailyVoiceLimitReached = isDailyVoiceLimitRefusal(
+          response.statusCode,
+          data,
+        );
+        _fail(
+          mintRefusalCode('assemblyai', response.statusCode),
+          refusalBodyPreview(response.data),
+        );
+        VoiceTelemetry.mark(
+          'STT assembly lease refused (HTTP ${response.statusCode})',
+        );
         return null;
       }
-      final token = response.data?['token'];
-      if (token is! String || token.isEmpty) return null;
-      final sessionId = response.data?['sessionId'];
-      final voice = _readVoiceFields(response.data);
+      final token = data?['token'];
+      if (token is! String || token.isEmpty) {
+        _fail("ASSEMBLY_MINT_MALFORMED", "200 without a usable token");
+        return null;
+      }
+      final sessionId = data?['sessionId'];
+      final voice = _readVoiceFields(data);
+      VoiceTelemetry.mark('STT assembly lease granted');
       return _SpeechLease(
         token: token,
         sessionId: sessionId is String ? sessionId : null,
@@ -581,6 +720,7 @@ class RemoteSttService {
         reservedVoiceSeconds: voice?['reservedSeconds'],
       );
     } catch (e) {
+      _fail("ASSEMBLY_MINT_REQUEST_FAILED", e);
       debugPrint("[RemoteStt] AssemblyAI token request failed: $e");
       return null;
     }
@@ -594,6 +734,10 @@ class RemoteSttService {
     required void Function(SttResult result) onResult,
     void Function(SttCloseInfo info)? onClosed,
   }) async {
+    // Every socket open retires the previous socket's handlers (see
+    // [_socketGen]); rotation relies on this to close a live socket without
+    // its close event being misread as an unexpected death.
+    final socketGen = ++_socketGen;
     try {
       // Temporary tokens must be redeemed via the `token` query parameter —
       // the documented interface for one-time streaming tokens — and the
@@ -607,6 +751,7 @@ class RemoteSttService {
               'token': token,
             },
           );
+      VoiceTelemetry.mark('STT socket connect start (assemblyai)');
       _socket = await WebSocket.connect(assemblyUrl.toString())
           .timeout(const Duration(seconds: 10));
     } catch (e) {
@@ -620,16 +765,17 @@ class RemoteSttService {
     _sessionId = sessionId;
     _sessionStartedAt = DateTime.now();
     _lastErrorMsgCode = null;
+    _pcmForwarded = false;
     _socket!.listen(
       (dynamic message) {
-        if (epoch != _epoch) return;
+        if (epoch != _epoch || socketGen != _socketGen) return;
         if (message is! String) return;
         _captureAssemblyUsage(message);
         final result = _parseAssemblyTranscript(message);
         if (result != null) onResult(result);
       },
       onError: (Object e) {
-        if (epoch != _epoch) return;
+        if (epoch != _epoch || socketGen != _socketGen) return;
         debugPrint("[RemoteStt] AssemblyAI socket error: $e");
         final socket = _socket;
         _handleUnexpectedSocketDeath(
@@ -649,7 +795,7 @@ class RemoteSttService {
         );
       },
       onDone: () {
-        if (epoch != _epoch) return;
+        if (epoch != _epoch || socketGen != _socketGen) return;
         if (!_closing) {
           final socket = _socket;
           final info = SttCloseInfo(
@@ -743,6 +889,8 @@ class RemoteSttService {
     _lastTranscriptAt = null;
     _recorderState = null;
     _recoveringCapture = false;
+    _pcmForwarded = false;
+    _peakSinceHealth = 0.0;
     // Defense in depth: a previous session that somehow survived is torn
     // down before anything new opens — exactly one recorder and one socket
     // may exist at any moment.
@@ -788,6 +936,10 @@ class RemoteSttService {
     // ── 2. Now that there is audio to send, buy a token ──
     final lease = await _fetchToken(mode: mode);
     if (lease == null) {
+      if (dailyVoiceLimitReached) {
+        await _stopInternal();
+        return false;
+      }
       // Deepgram is out of tokens; AssemblyAI takes over the same live
       // microphone before the session is torn down.
       final assemblyLease = await _fetchAssemblyToken(mode: mode);
@@ -804,6 +956,10 @@ class RemoteSttService {
           _announceLease(assemblyLease, onLease);
           return true;
         }
+        // The minted takeover lease died with the failed connect: settle it
+        // now, or its reserved window strands against the daily pool for the
+        // rest of the day.
+        await _abandonLease(assemblyLease);
       }
       _fail("NO_TOKEN");
       await _stopInternal();
@@ -822,8 +978,12 @@ class RemoteSttService {
       _announceLease(lease, onLease);
       return true;
     }
-    // Deepgram's door did not open; AssemblyAI takes over the same live
-    // microphone before the session is torn down.
+    // Deepgram's door did not open. The dead lease is settled FIRST and the
+    // settle is AWAITED: the takeover below mints from the same daily pool,
+    // and a still-standing reservation makes that pool look exhausted to the
+    // server — the reservation stack that burned a tester's entire daily
+    // allowance without a single real session.
+    await _abandonLease(lease);
     final assemblyLease = await _fetchAssemblyToken(mode: mode);
     if (assemblyLease != null) {
       final startedAssembly = await _startAssemblyAi(
@@ -838,6 +998,7 @@ class RemoteSttService {
         _announceLease(assemblyLease, onLease);
         return true;
       }
+      await _abandonLease(assemblyLease);
     }
     await _stopInternal();
     return false;
@@ -852,7 +1013,12 @@ class RemoteSttService {
     required void Function(SttResult result) onResult,
     void Function(SttCloseInfo info)? onClosed,
   }) async {
+    // Retire the previous socket's handlers FIRST: a socket replaced by a
+    // rotation or takeover must not be able to report its own close as an
+    // unexpected death once a successor exists (see [_socketGen]).
+    final socketGen = ++_socketGen;
     try {
+      VoiceTelemetry.mark('STT socket connect start (deepgram)');
       _socket = await WebSocket.connect(
         _listenUrl,
         headers: {'Authorization': 'Bearer ${lease.token}'},
@@ -867,8 +1033,14 @@ class RemoteSttService {
     _sessionId = lease.sessionId;
     _sessionStartedAt = DateTime.now();
     _lastErrorMsgCode = null;
+    _pcmForwarded = false;
 
-    _attachDeepgramListeners(epoch, onResult: onResult, onClosed: onClosed);
+    _attachDeepgramListeners(
+      epoch,
+      socketGen: socketGen,
+      onResult: onResult,
+      onClosed: onClosed,
+    );
     _startKeepAlive(epoch);
     _startCaptureWatchdog(epoch);
     VoiceTelemetry.mark('STT socket open (deepgram)');
@@ -884,12 +1056,13 @@ class RemoteSttService {
   /// keeps buffering into [_pending] until it lands.
   void _attachDeepgramListeners(
     int epoch, {
+    required int socketGen,
     required void Function(SttResult result) onResult,
     void Function(SttCloseInfo info)? onClosed,
   }) {
     _socket!.listen(
       (dynamic message) {
-        if (epoch != _epoch) return;
+        if (epoch != _epoch || socketGen != _socketGen) return;
         if (message is! String) return;
         _captureDeepgramUsage(message);
         final result = _parseTranscript(message);
@@ -899,7 +1072,7 @@ class RemoteSttService {
         }
       },
       onError: (Object e) {
-        if (epoch != _epoch) return;
+        if (epoch != _epoch || socketGen != _socketGen) return;
         _fail("SOCKET_ERROR", e);
         final socket = _socket;
         final info = SttCloseInfo(
@@ -917,7 +1090,7 @@ class RemoteSttService {
         _handleUnexpectedSocketDeath(epoch, info, onClosed);
       },
       onDone: () {
-        if (epoch != _epoch) return;
+        if (epoch != _epoch || socketGen != _socketGen) return;
         // A close we did not ask for carries Deepgram's reason for it.
         if (!_closing) {
           final socket = _socket;
@@ -1197,6 +1370,10 @@ class RemoteSttService {
     final now = DateTime.now();
     String ago(DateTime? at) =>
         at == null ? 'never' : '${now.difference(at).inMilliseconds}ms ago';
+    // Read-and-reset: the peak covers the window since the previous health
+    // line, so it answers "was the PCM itself alive", not "ever".
+    final peakPct = (_peakSinceHealth * 100).round();
+    _peakSinceHealth = 0.0;
     final socket = _socket;
     final socketState = switch (socket?.readyState) {
       WebSocket.open => 'open',
@@ -1209,7 +1386,7 @@ class RemoteSttService {
         'mic=${isMicLive ? 'live' : 'down'} recorder=${_recorderState ?? 'unknown'} '
         'lastFrame=${ago(_lastMicFrameAt)} lastForwarded=${ago(_lastAudioSentAt)} '
         'lastTranscript=${ago(_lastTranscriptAt)} frames=$_chunksSent '
-        'pendingBuffer=${_pending.length}';
+        'pendingBuffer=${_pending.length} pcmPeak=$peakPct%';
   }
 
   /// Reconnects ONLY the provider socket of the current session, keeping
@@ -1271,27 +1448,136 @@ class RemoteSttService {
         _announceLease(lease, onLease);
         return true;
       }
+      // The re-minted lease died with the failed connect: settle it before
+      // any further mint, or its reserved window strands against the pool.
+      await _abandonLease(lease);
     }
-    final assemblyLease = await _fetchAssemblyToken(mode: _activeMode);
-    final recorder = _recorder;
-    if (assemblyLease != null && recorder != null) {
-      final started = await _startAssemblyAi(
-        recorder: recorder,
-        token: assemblyLease.token,
-        sessionId: assemblyLease.sessionId,
-        epoch: epoch,
-        onResult: onResult,
-        onClosed: onClosed,
-      );
-      if (started) {
-        _announceLease(assemblyLease, onLease);
-        return true;
+    // When the daily pool is exhausted the takeover mint draws from the
+    // same empty pool: a pointless request that would also report the limit
+    // state as if it were new.
+    if (!dailyVoiceLimitReached) {
+      final assemblyLease = await _fetchAssemblyToken(mode: _activeMode);
+      final recorder = _recorder;
+      if (assemblyLease != null && recorder != null) {
+        final started = await _startAssemblyAi(
+          recorder: recorder,
+          token: assemblyLease.token,
+          sessionId: assemblyLease.sessionId,
+          epoch: epoch,
+          onResult: onResult,
+          onClosed: onClosed,
+        );
+        if (started) {
+          _announceLease(assemblyLease, onLease);
+          return true;
+        }
+        await _abandonLease(assemblyLease);
       }
     }
 
     // The socket could not be re-established; the caller falls back to a
     // full engine restart (which also settles the surviving capture).
     _fail("RECONNECT_FAILED", "socket-only reconnect could not mint/open");
+    return false;
+  }
+
+  /// Rotates the provider socket at the reserved-window boundary: the
+  /// outgoing socket is settled, closed and replaced by a freshly minted
+  /// one — WITHOUT touching the microphone capture. The recorder keeps
+  /// streaming through the rotation, chunks buffer in [_pending] while no
+  /// socket is open, and the first live frame flushes them to the new
+  /// socket, so a rotation costs a provider token, never the user's words.
+  ///
+  /// Different from [reconnectSocket] (which runs after a socket died on
+  /// its own): rotation deliberately closes a STILL-OPEN socket, so its
+  /// close/done events must not be classified as an unexpected death and
+  /// stack a second reconnect — [_socketGen] retires the outgoing handlers
+  /// BEFORE the close.
+  ///
+  /// Returns true when a new socket is open and its lease announced.
+  /// Returns false when rotation failed (no live capture, mint refused,
+  /// connect failed) — the caller decides between a full engine restart
+  /// and ending the session.
+  Future<bool> rotateSocket() => _exclusive(_rotateSocketInternal);
+
+  Future<bool> _rotateSocketInternal() async {
+    final onResult = _activeOnResult;
+    final onClosed = _activeOnClosed;
+    final onLease = _activeOnLease;
+    if (onResult == null || !isMicLive) return false;
+    if (_closing) return false;
+
+    // Settle the outgoing socket's provider session BEFORE the mint below
+    // replaces its identity, or its usage is never booked (mirrors the
+    // reconnect path).
+    final startedAt = _sessionStartedAt;
+    await _settleUsage(
+      provider: _provider,
+      sessionId: _sessionId,
+      fallbackDurationSeconds: startedAt == null
+          ? 0
+          : DateTime.now().difference(startedAt).inMilliseconds / 1000.0,
+    );
+    _providerDurationSeconds = null;
+    _providerSessionDurationSeconds = null;
+    _providerRequestId = null;
+
+    // Retire the outgoing socket's handlers FIRST — otherwise its onDone
+    // classifies this deliberate close as an unexpected death and fires a
+    // second reconnect on top of the rotation.
+    _socketGen++;
+    final outgoing = _socket;
+    _socket = null;
+    try {
+      await outgoing?.close();
+    } catch (_) {}
+
+    // A fresh lease for the new socket. When the daily pool is exhausted
+    // the mint is refused and the AssemblyAI takeover is pointless — its
+    // mint draws from the same empty pool — so the rotation fails and the
+    // caller ends the session with the limit reason.
+    final lease = await _fetchToken(mode: _activeMode);
+    if (lease != null) {
+      final epoch = _epoch;
+      final opened = await _openDeepgramSocket(
+        lease: lease,
+        epoch: epoch,
+        onResult: onResult,
+        onClosed: onClosed,
+      );
+      if (opened) {
+        _announceLease(lease, onLease);
+        VoiceTelemetry.mark('STT socket rotated (deepgram)');
+        return true;
+      }
+      // The rotation's fresh lease died with the failed connect: settle it
+      // before the takeover mint reads the same daily pool.
+      await _abandonLease(lease);
+      if (!dailyVoiceLimitReached) {
+        final assemblyLease = await _fetchAssemblyToken(mode: _activeMode);
+        final recorder = _recorder;
+        if (assemblyLease != null && recorder != null) {
+          final started = await _startAssemblyAi(
+            recorder: recorder,
+            token: assemblyLease.token,
+            sessionId: assemblyLease.sessionId,
+            epoch: epoch,
+            onResult: onResult,
+            onClosed: onClosed,
+          );
+          if (started) {
+            _announceLease(assemblyLease, onLease);
+            VoiceTelemetry.mark('STT socket rotated (assemblyai)');
+            return true;
+          }
+          await _abandonLease(assemblyLease);
+        }
+      }
+    }
+
+    // No socket could replace the outgoing one; the caller falls back to a
+    // full engine restart (which also settles the surviving capture).
+    _fail("ROTATE_FAILED", "socket rotation could not mint/open");
     return false;
   }
 
@@ -1328,7 +1614,7 @@ class RemoteSttService {
     required int epoch,
     void Function(SttCloseInfo info)? onClosed,
   }) async {
-    // The capture is configured with two deliberate additions, both born on
+    // The capture is configured with three deliberate additions, all born on
     // a real-device failure:
     //
     //  * `device` — record_android otherwise probes the default input device
@@ -1347,6 +1633,18 @@ class RemoteSttService {
     //    never reached the server. Voice Mode needs the mic immune to focus
     //    churn; the watchdog below recovers the capture if anything else
     //    ever stops it. AEC/NS stay enabled in the withEffects config.
+    //
+    //  * `androidConfig` — the VOICE_COMMUNICATION audio source plus
+    //    AudioManagerMode.modeInCommunication put the capture in the same
+    //    audio domain Voice Mode's playback now runs in (see
+    //    RemoteTtsService._voiceContext), which is the configuration Android
+    //    needs to reference-cancel the app's own speaker output inside the
+    //    mic signal. Without it the HAL AEC has no reference for our playback
+    //    and the assistant's spoken words transcribed back as user speech.
+    //    The microphone itself keeps all the guarantees above: it is never
+    //    paused, muted or re-opened by this, and AEC/NS stay on. The `plain`
+    //    fallback keeps the stock config so a device that rejects the
+    //    communication routing still gets a working capture.
     final InputDevice? device = await _resolveInputDevice(recorder);
     final withEffects = RecordConfig(
       encoder: AudioEncoder.pcm16bits,
@@ -1356,6 +1654,10 @@ class RemoteSttService {
       noiseSuppress: true,
       device: device,
       audioInterruption: AudioInterruptionMode.none,
+      androidConfig: const AndroidRecordConfig(
+        audioSource: AndroidAudioSource.voiceCommunication,
+        audioManagerMode: AudioManagerMode.modeInCommunication,
+      ),
     );
     final plain = RecordConfig(
       encoder: AudioEncoder.pcm16bits,
@@ -1371,6 +1673,7 @@ class RemoteSttService {
     ]) {
       final Stream<Uint8List> stream;
       try {
+        VoiceTelemetry.mark('STT recorder start ($attempt.label)');
         stream = await recorder.startStream(attempt.config);
       } catch (e) {
         _fail("MIC_START_FAILED_${attempt.label}", e);
@@ -1395,6 +1698,8 @@ class RemoteSttService {
           }
           _chunksSent++;
           soundLevel.value = _levelOf(chunk);
+          final chunkPeak = _peakOf(chunk);
+          if (chunkPeak > _peakSinceHealth) _peakSinceHealth = chunkPeak;
 
           final socket = _socket;
           if (socket != null && socket.readyState == WebSocket.open) {
@@ -1405,6 +1710,10 @@ class RemoteSttService {
               _pending.clear();
             }
             socket.add(chunk);
+            if (!_pcmForwarded) {
+              _pcmForwarded = true;
+              VoiceTelemetry.mark('first PCM forwarded to socket');
+            }
             // Active streaming: mark the line as flowing so the keep-alive
             // tick stays suppressed while audio frames move.
             _lastAudioSentAt = DateTime.now();
@@ -1503,6 +1812,8 @@ class RemoteSttService {
     _recorderState = null;
     _recoveringCapture = false;
     _lastErrorMsgCode = null;
+    _pcmForwarded = false;
+    _peakSinceHealth = 0.0;
     _activeOnResult = null;
     _activeOnClosed = null;
     _activeOnLease = null;
@@ -1559,17 +1870,21 @@ class RemoteSttService {
     _sessionStartedAt = null;
   }
 
-  Future<void> _settleUsage({
+  /// Settles one usage session. Returns whether the server accepted the
+  /// settlement — callers that must not lose a reservation (a minted lease
+  /// whose socket never opened) retry on false; the ordinary end-of-session
+  /// path treats a lost report as acceptable noise.
+  Future<bool> _settleUsage({
     required String? provider,
     required String? sessionId,
     required double fallbackDurationSeconds,
   }) async {
-    if (provider == null || sessionId == null) return;
+    if (provider == null || sessionId == null) return false;
     try {
       final user = FirebaseAuth.instance.currentUser;
       final idToken = await user?.getIdToken();
-      if (idToken == null) return;
-      await _dio.post<void>(
+      if (idToken == null) return false;
+      final response = await _dio.post<void>(
         _settleUsageEndpoint,
         data: <String, dynamic>{
           'provider': provider,
@@ -1588,8 +1903,61 @@ class RemoteSttService {
           validateStatus: (_) => true,
         ),
       );
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint('[RemoteStt] Usage settlement failed: $e');
+      return false;
+    }
+  }
+
+  /// Settles a minted lease whose socket never opened, releasing its
+  /// reserved window (up to VOICE_WINDOW_SECONDS) back into the daily pool
+  /// immediately. The settle is AWAITED on every path that is about to mint
+  /// another lease from that same pool: a still-standing reservation makes
+  /// the pool look exhausted to the server, so without this a failed connect
+  /// stacked a fresh 300-second reservation onto the previous one and a few
+  /// retries could burn the entire daily allowance with no real session ever
+  /// having run (observed live: 720/720 seconds gone, every one stranded).
+  ///
+  /// A lease without a session id (a server predating the usage contract)
+  /// reserved nothing, so there is nothing to release.
+  Future<void> _abandonLease(_SpeechLease lease) async {
+    final sessionId = lease.sessionId;
+    if (sessionId == null) return;
+
+    // An abandoned lease never produced provider usage: clear the trackers
+    // so the settle books exactly zero (defense in depth — every caller
+    // reaches here with them already null).
+    _providerDurationSeconds = null;
+    _providerSessionDurationSeconds = null;
+    _providerRequestId = null;
+
+    var settled = await _settleUsage(
+      provider: lease.provider,
+      sessionId: sessionId,
+      fallbackDurationSeconds: 0,
+    );
+    if (!settled) {
+      // One retry: whatever killed the connect often kills the first settle
+      // too, and the reservation this must release is worth a second
+      // attempt before it strands until the daily window rolls over.
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      settled = await _settleUsage(
+        provider: lease.provider,
+        sessionId: sessionId,
+        fallbackDurationSeconds: 0,
+      );
+    }
+    VoiceTelemetry.mark(
+      settled
+          ? 'STT lease abandoned (${lease.provider}) — reservation released'
+          : 'STT lease abandoned (${lease.provider}) — settlement failed',
+    );
+    if (!settled) {
+      debugPrint(
+        "[RemoteStt] Abandoned ${lease.provider} lease could not be "
+        "settled; its reservation strands until the daily window rolls over",
+      );
     }
   }
 
@@ -1700,6 +2068,22 @@ class RemoteSttService {
       debugPrint("[RemoteStt] Could not parse AssemblyAI message: $e");
       return null;
     }
+  }
+
+  /// Peak absolute sample of a little-endian 16-bit PCM chunk, subsampled
+  /// (every 4th sample) — a silence witness does not need every sample.
+  /// Feeds [_peakSinceHealth]; see the field docs for why the PCM itself is
+  /// the only trustworthy witness against vendor `[mute]` log labels.
+  double _peakOf(Uint8List chunk) {
+    final byteCount = chunk.lengthInBytes;
+    if (byteCount < 2) return 0.0;
+    final bytes = ByteData.view(chunk.buffer, chunk.offsetInBytes, byteCount);
+    var peak = 0.0;
+    for (var i = 0; i + 1 < byteCount; i += 8) {
+      final normalised = (bytes.getInt16(i, Endian.little) / 32768.0).abs();
+      if (normalised > peak) peak = normalised;
+    }
+    return peak;
   }
 
   /// RMS of a little-endian 16-bit PCM chunk, normalised to 0..1 and eased so

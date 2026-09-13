@@ -1,4 +1,5 @@
 {
+  "benefitMoreVoiceChat": "Více hlasového chatu",
   "@@locale": "cs",
   "systemTimeInfo": "Aktuální datum a čas: {formattedTime}.",
   "cancel": "Zrušit",

@@ -1,4 +1,5 @@
 {
+  "benefitMoreVoiceChat": "Több hangalapú csevegés",
   "@@locale": "hu",
   "systemTimeInfo": "Jelenlegi dátum és idő: {formattedTime}.",
   "cancel": "Mégse",

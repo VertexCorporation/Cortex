@@ -10,6 +10,9 @@ class AppLocalizationsSv extends AppLocalizations {
   AppLocalizationsSv([String locale = 'sv']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Mer röstchatt';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return 'Aktuellt datum och tid: $formattedTime.';
   }

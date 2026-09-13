@@ -1,4 +1,5 @@
 {
+  "benefitMoreVoiceChat": "Mer talechat",
   "@@locale": "no",
   "systemTimeInfo": "Gjeldende dato og klokkeslett: {formattedTime}.",
   "cancel": "Avbryt",

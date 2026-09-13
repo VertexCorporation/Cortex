@@ -10,6 +10,9 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => 'Больше голосового общения';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return 'Текущая дата и время: $formattedTime.';
   }

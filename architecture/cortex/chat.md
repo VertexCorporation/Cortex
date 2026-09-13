@@ -44,6 +44,26 @@ Two deliberately separate speech experiences behind `SpeechService` (speech.dart
 
 The daily realtime Voice/Flow allowance (seconds; one shared pool for both modes) is SERVER-authoritative: Fulcrum reserves a window at every speech-token mint and reconciles at settlement; the client only mirrors `creditLimits.voiceDailySeconds` + `voiceUsage` from the user snapshot and the mint response (`SttLease`) for the countdown and early-out.
 
+## Voice Mode presentation
+
+`InputProvider.isVoiceModeActive` owns the composer transition: entry hides
+only the center capsule and changes the visible side controls to Flow/X.
+`isVoiceOverlayExpanded` controls only orb geometry and conversation presentation.
+Compact and expanded Voice Mode both keep Flow/X; only X restores text input.
+There is no separate transcript or rectangular dim surface above the controls.
+
+`VoiceOrbController` keeps one continuous ticker across phases and sizes. It
+integrates smoothed liquid speed, slowly interpolates internal palettes, and
+paints a bounded six-second breath without changing layout or border thickness.
+Remote TTS exposes no amplitude meter; speaking uses the existing synthesized
+speech envelope. Microphone amplitude remains smoothed from `SpeechService`.
+
+The overlay uses the published allowance and terminal server limit response to
+show an internal purple palette. A live reserved window is not treated as
+exhausted merely because the unreserved pool is empty. Exhausted orb/Flow taps
+open the existing `FundsScreen(initialPlanType: 'plus')`; they cannot retry audio.
+Plus, Pro and Ultra share the localized `benefitMoreVoiceChat` benefit.
+
 ## Tools
 
 `CortexTool`/`ToolRegistry` (tools.dart) define and render tools; `ToolWidgetFactory` renders weather/crypto/chart cards (screen/widgets/tools.dart); `CodeExecutionWidget` (execution.dart) renders hosted execution results; `ToolStatusWidget`/`ToolActivityWidget` show live tool status; `Utils` (utils.dart) holds shared helpers.

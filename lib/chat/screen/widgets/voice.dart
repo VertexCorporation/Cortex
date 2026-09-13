@@ -1,897 +1,438 @@
-import 'package:cortex/design.dart';
-import 'package:cortex/app.dart';
+// lib/chat/screen/widgets/voice.dart
+//
+// VOICE MODE V2 — the orb experience.
+//
+// Compact mode: a small shader orb floats just ABOVE the composer, anchored
+// to its top edge (attachments/edit growing the panel push the orb up;
+// briefing visibility does not affect it). Voice is autonomous — there is no
+// center microphone button; the user simply speaks, and genuine speech can
+// interrupt the assistant (the barge-in detector).
+//
+// Voice entry transforms the composer into Flow/X immediately. Compact and
+// expanded presentations share those controls; only X restores text input.
+// Orb taps change geometry without affecting composer state.
+//
+// NO TEXT anywhere on the stage: no transcript panel, no status or
+// countdown line. Voice Mode V2 rides the NORMAL chat pipeline — STT
+// commits a real user bubble, the AI reply lands as a normal message
+// and TTS speaks it — so the conversation behind the dim IS the
+// transcript. Fullscreen keeps only the orb; tapping the orb again
+// collapses back to compact; X exits Voice Mode entirely.
+//
+// The old center-microphone / waveform overlay is intentionally GONE — the
+// GPU orb (see voice_orb.dart + shaders/voice_orb.frag) is the primary
+// experience now.
+
+import 'dart:ui' show lerpDouble;
+
 import 'package:cortex/chat/providers/input.dart';
-import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/voice.dart';
-import 'package:cortex/chat/providers/conversation.dart';
-import 'package:cortex/chat/screen/widgets/wave.dart';
-import 'package:cortex/theme.dart';
+import 'package:cortex/chat/screen/widgets/voice_orb.dart';
+import 'package:cortex/funds/funds.dart';
+import 'package:cortex/navigation.dart';
+import 'package:cortex/server/subscription.dart';
+import 'package:cortex/server/user.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../../../l10n/app_localizations.dart';
+/// Palette per Flow participant. The product's four model identities —
+/// red, blue, green, yellow — as SOFT pastel base palettes: the same sealed
+/// liquid-sphere style stays, never a flat identity disc. The flow loop
+/// cycles `currentFlowAgentIndex` (see VoiceService's
+/// `setAiGenerationComplete`); the clamp + %-friendly length keep the
+/// mapping stable as the participant set grows, and active-model changes
+/// glide through the controller's palette interpolation.
+List<Color> flowAgentPalettes() {
+  return const [
+    Color(0xFFEFA8A6), // identity red — soft coral
+    Color(0xFFA6B9F2), // identity blue — powder blue
+    Color(0xFFA8D9B4), // identity green — soft sage
+    Color(0xFFF2DDA0), // identity yellow — soft butter
+  ];
+}
 
-/// '4:53' / '0:12' — compact m:ss for the realtime voice allowance countdown.
-String _formatVoiceSeconds(int seconds) {
-  if (seconds < 0) seconds = 0;
-  final m = seconds ~/ 60;
-  final s = seconds % 60;
-  return '$m:${s.toString().padLeft(2, '0')}';
+/// The normal Voice Mode orb interior — the product reference palette: a
+/// sealed soft pastel liquid sphere. Lavender, powder blue and blush pink
+/// blend as the base fields; the pale-cyan vein and the warm cream breath
+/// live inside the shader itself.
+const Color voicePastelLavender = Color(0xFFC9B6F2);
+const Color voicePastelPowderBlue = Color(0xFFAEC8F5);
+const Color voicePastelBlushPink = Color(0xFFF3C3D9);
+
+/// The server's terminal response wins. A healthy reserved window may keep
+/// running even when the user snapshot shows no unreserved seconds left.
+bool voiceAllowanceExhausted(VoiceService voice, UserProvider? user) {
+  final allowance = user?.creditLimits.voiceDailySeconds;
+  return voice.voiceLimitReached ||
+      (!voice.isSessionActive &&
+          allowance != null &&
+          user!.voiceUsage.remainingToday(allowance) <= 0);
+}
+
+/// The plan the exhausted-allowance sheet pre-selects for this tier —
+/// always the NEXT one up: Free → Plus, Plus → Pro, Pro → Ultra. Ultra has
+/// nothing above it: null means the sheet must not open at all; the
+/// exhausted orb's purple visual IS the affordance, and redirecting an
+/// Ultra user to the funds screen would only re-sell the plan they
+/// already hold.
+String? voiceUpgradePlanType(SubscriptionTier tier) {
+  switch (tier) {
+    case SubscriptionTier.free:
+      return 'plus';
+    case SubscriptionTier.plus:
+      return 'pro';
+    case SubscriptionTier.pro:
+      return 'ultra';
+    case SubscriptionTier.ultra:
+      return null;
+  }
+}
+
+/// Opens the funds sheet on the plan the exhausted user should upgrade to
+/// (see [voiceUpgradePlanType]). A null plan type — Ultra, which has
+/// nothing above it — opens nothing at all.
+void openVoiceUpgrade({required SubscriptionTier tier}) {
+  final planType = voiceUpgradePlanType(tier);
+  if (planType == null) return;
+  navigateToScreen(
+    FundsScreen(initialPlanType: planType),
+    direction: const Offset(0, 1),
+  );
 }
 
 class VoiceSessionOverlay extends StatefulWidget {
-  const VoiceSessionOverlay({super.key});
+  const VoiceSessionOverlay({
+    super.key,
+    required this.active,
+    required this.panelHeight,
+    required this.bottomSafe,
+    required this.onExited,
+  });
+
+  /// Whether Voice Mode is currently active (false while the exit
+  /// animation is still playing).
+  final bool active;
+
+  /// The composer panel's live height — the orb anchors to the panel's top
+  /// edge so attachments/edit growth pushes it up in real time.
+  final ValueListenable<double> panelHeight;
+
+  /// Bottom safe-area inset (the panel height excludes it).
+  final double bottomSafe;
+
+  /// Fired when the exit animation has fully faded the overlay away — the
+  /// host then unmounts it.
+  final VoidCallback onExited;
 
   @override
   State<VoiceSessionOverlay> createState() => _VoiceSessionOverlayState();
 }
 
 class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _entranceController;
-  late Animation<double> _scaleAnimation;
-  late Animation<Offset> _slideAnimation;
+    with TickerProviderStateMixin {
+  /// Compact -> fullscreen expansion. Drives the orb geometry AND the
+  /// shader's internal energy (uExpand) — one clock for both.
+  late final AnimationController _expandController;
+
+  /// Entry/exit presence: the orb scales up + fades in above the composer,
+  /// and reverses on exit.
+  late final AnimationController _presenceController;
+
+  late final VoiceOrbController _orb;
+
+  /// Mic-level feed: raw SoundService notifications are pushed straight
+  /// into the controller (no setState, no widget rebuilds at frame rate).
+  SpeechService? _speechService;
+  bool _disposed = false;
+
+  static const double _compactOrbSize = 64.0;
+  static const double _orbGapAboveComposer = 10.0;
 
   @override
   void initState() {
     super.initState();
-    _entranceController = AnimationController(
+    _expandController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 420),
+    )..addListener(_syncExpandToShader);
+    _presenceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
     );
+    _orb = VoiceOrbController(vsync: this);
+    _orb.load();
+    if (widget.active) {
+      _presenceController.forward();
+    } else {
+      _presenceController.value = 1;
+    }
+  }
 
-    _scaleAnimation = CurvedAnimation(
-      parent: _entranceController,
-      curve: Curves.easeOutBack,
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final speech = _speechService;
+    if (speech != null) return;
+    final attached = Provider.of<SpeechService>(context, listen: false);
+    _speechService = attached;
+    attached.addListener(_onSpeechLevel);
+  }
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entranceController,
-      curve: Curves.easeOutBack,
-    ));
+  void _onSpeechLevel() {
+    if (_disposed) return;
+    final speech = _speechService;
+    if (speech == null) return;
+    // Only the user's microphone drives the mic uniform; while the
+    // assistant speaks the level is dominated by speaker bleed and the
+    // shader's speaking envelope is the signal instead.
+    if (_orb.phase == VoiceOrbPhase.listening) {
+      _orb.setMicLevel(speech.soundLevel);
+    } else {
+      _orb.setMicLevel(0);
+    }
+  }
 
-    // Ensure keyboard is dismissed
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).unfocus();
-    });
-
-    _entranceController.forward();
+  @override
+  void didUpdateWidget(VoiceSessionOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.active == oldWidget.active) return;
+    if (widget.active) {
+      _presenceController.forward();
+    } else {
+      _presenceController.reverse().whenCompleteOrCancel(() {
+        if (mounted) widget.onExited();
+      });
+    }
   }
 
   @override
   void dispose() {
-    _entranceController.dispose();
+    _disposed = true;
+    _speechService?.removeListener(_onSpeechLevel);
+    _expandController.dispose();
+    _presenceController.dispose();
+    _orb.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final voiceService = context.watch<VoiceService>();
-    final speechService = context.watch<SpeechService>();
-    final inputProvider = context.read<InputProvider>();
-    final sessionProvider = context.watch<ChatSessionProvider>();
-
-    // Determine visual state
-    bool isUserSpeaking = voiceService.state == VoiceState.listening;
-    bool isAiSpeaking = voiceService.state == VoiceState.speaking;
-
-    // New lifecycle states: thinking (distinct internal motion on the orb),
-    // connecting/failed (subdued — the mic button is shown to retry).
-    bool isThinking = voiceService.state == VoiceState.processing;
-    bool isSubdued = voiceService.state == VoiceState.connecting ||
-        voiceService.state == VoiceState.failed;
-
-    // Sound Level (0.0 to 1.0) for Dot Animation
-    double level = speechService.soundLevel;
-
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SlideTransition(
-        position: _slideAnimation,
-        child: Stack(
-          children: [
-            // 0. Top Live Speech Text (Smooth text only, no box/icon)
-            if (voiceService.liveTranscript.isNotEmpty)
-              Positioned(
-                top: MediaQuery.paddingOf(context).top + 72,
-                left: 32,
-                right: 32,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.2),
-                          end: Offset.zero,
-                        ).animate(animation),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Text(
-                    voiceService.liveTranscript,
-                    key: ValueKey<String>(voiceService.liveTranscript),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.primaryColor.inverted
-                          .withValues(alpha: 0.9),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.2,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ),
-
-            // 1. Central Visualizer (The Core Experience)
-            // Animated from small to full size on entrance
-            Center(
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // MORPHING VISUALIZER
-                    // Wave (AI) <-> Dot (User)
-                    SizedBox(
-                      height: 150, // Increased height for larger visual
-                      width: double.infinity,
-                      child: _MorphingVisualizer(
-                        isUserSpeaking: isUserSpeaking,
-                        isAiSpeaking: isAiSpeaking,
-                        isThinking: isThinking,
-                        isSubdued: isSubdued,
-                        level: level,
-                        isFluxMode: sessionProvider.isFluxMode,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // 2. Bottom Controls (3 Buttons)
-            Positioned(
-              bottom: MediaQuery.paddingOf(context).bottom +
-                  16, // Reduced padding to move 1x height
-              left: 24,
-              right: 24,
-              child: FadeTransition(
-                opacity: _entranceController,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // LEFT BUTTON: Flow Mode Toggle
-                        // Logic:
-                        // If Flow OFF: Show Flow Icon. Tap -> Enable Flow.
-                        // If Flow ON: Show Voice Icon. Tap -> Disable Flow (Start New Chat if needed).
-                        Builder(builder: (context) {
-                          final isFlow = voiceService.isFlowMode;
-                          return _buildCircleButton(
-                            iconPath: isFlow
-                                ? 'assets/icons/voice.svg'
-                                : 'assets/icons/flow.svg',
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-
-                              if (!isFlow) {
-                                // Enable Flow
-
-                                // [NEW] If chat is not empty, start fresh before entering Flow Mode
-                                final conversationProvider =
-                                    context.read<ConversationProvider>();
-                                if (conversationProvider.messages.isNotEmpty) {
-                                  conversationProvider.clearConversation();
-                                  // Ensure we are in a fresh state
-                                  context
-                                      .read<ChatSessionProvider>()
-                                      .startDynamicConversation();
-                                }
-
-                                // Service sets visual to Line (Processing) + Stops Listening
-                                voiceService.toggleFlowMode();
-                              } else {
-                                // Disable Flow -> Return to Voice
-                                // First toggle mode (sets visual to listening/idle)
-                                voiceService.toggleFlowMode();
-
-                                // [NEW] Stop any ongoing generation/speech immediately
-                                // This ensures we don't have lingering TTS or generation when switching modes
-                                final conversationProvider =
-                                    context.read<ConversationProvider>();
-                                conversationProvider.stopGenerating();
-                                voiceService.stopSpeaking(context: context);
-                                final sessionProvider =
-                                    context.read<ChatSessionProvider>();
-
-                                // If current chat has content, start fresh
-                                if (conversationProvider.messages.isNotEmpty) {
-                                  // Clear conversation to start fresh "background" chat
-                                  conversationProvider.clearConversation();
-                                  // Reset session state (standard dynamic)
-                                  sessionProvider.startDynamicConversation();
-
-                                  // Re-start listening in new context
-                                  voiceService.startListening(context: context);
-                                } else {
-                                  // Empty chat, just start listening
-                                  voiceService.startListening(context: context);
-                                }
-                              }
-                            },
-                            isSecondary:
-                                true, // Always "Secondary" style (White/Outline) per user request
-                          );
-                        }),
-
-                        // CENTER BUTTON: Mic / Stop / Flow Start
-                        _buildCenterButton(
-                          isUserSpeaking: isUserSpeaking,
-                          isAiSpeaking: isAiSpeaking,
-                          isFlowMode: voiceService.isFlowMode,
-                          isFlowActive: voiceService.isFlowActive,
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-
-                            if (voiceService.isFlowMode) {
-                              if (!voiceService.isFlowActive) {
-                                // Start Flow Mode
-                                voiceService.startFlowWithPrompt(
-                                    "Let's start a multi-agent discussion. What topic would you like to explore with the Cortex Flow agents?");
-                              } else {
-                                // Interrupt Flow (Stop speaking)
-                                voiceService.stopSpeaking(context: context);
-                              }
-                              return;
-                            }
-
-                            if (isUserSpeaking) {
-                              voiceService.manualSubmit(context);
-                            } else if (isAiSpeaking) {
-                              voiceService.stopSpeaking(context: context);
-                            } else {
-                              debugPrint(
-                                  "Restarting voice session from idle...");
-                              voiceService.startListening(context: context);
-                            }
-                          },
-                        ),
-
-                        // RIGHT BUTTON: Exit (Arrow)
-                        _buildCircleButton(
-                          iconPath:
-                              'assets/icons/arrov.svg', // Assuming arrov.svg is correct as used before
-                          onTap: () {
-                            HapticFeedback.mediumImpact();
-                            voiceService.stopSession();
-                            inputProvider.setVoiceModeActive(false);
-                          },
-                          isSecondary: true,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: Text(
-                        voiceService.isFlowMode
-                            ? AppLocalizations.of(context)!.flowModeDescription
-                            : AppLocalizations.of(context)!
-                                .voiceModeInformation,
-                        key: ValueKey<bool>(voiceService.isFlowMode),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.tertiaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    // Daily realtime allowance: server-authoritative numbers
-                    // published with the subscription tier, mirrored here for
-                    // the countdown; near-limit turns the label amber, and a
-                    // refused session explains itself instead of going dark.
-                    if (voiceService.lastEndReason == VoiceEndReason.limit &&
-                        !voiceService.isSessionActive) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        AppLocalizations.of(context)!.voiceDailyLimitReached,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.premium,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ] else if (voiceService.isSessionActive &&
-                        voiceService.remainingVoiceSeconds != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        AppLocalizations.of(context)!.voiceTimeRemaining(
-                          _formatVoiceSeconds(
-                              voiceService.remainingVoiceSeconds!),
-                        ),
-                        key: ValueKey<int>(voiceService.remainingVoiceSeconds!),
-                        style: TextStyle(
-                          color: (voiceService.remainingVoiceSeconds ?? 0) <= 30
-                              ? AppColors.premium
-                              : AppColors.tertiaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
+  void _syncExpandToShader() {
+    _orb.setExpandProgress(
+      Curves.easeInOutCubic.transform(_expandController.value),
     );
   }
 
-  Widget _buildCircleButton({
-    required String iconPath,
-    required VoidCallback onTap,
-    bool isSecondary = false,
-  }) {
-    return _ScaleButton(
-      onTap: onTap,
-      styleColor: isSecondary ? AppColors.background : AppColors.primaryColor,
-      shape: BoxShape.circle,
-      border:
-          isSecondary ? Border.all(color: AppColors.border, width: 1.5) : null,
-      child: SizedBox(
-        width: 56,
-        height: 56,
-        child: SizedBox(
-          width: 56,
-          height: 56,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(scale: animation, child: child));
-              },
-              child: SvgPicture.asset(
-                height: CortexDesign.icon,
-                width: CortexDesign.icon,
-                iconPath,
-                key: ValueKey<String>(iconPath),
-                colorFilter: ColorFilter.mode(
-                  isSecondary ? AppColors.primaryColor.inverted : Colors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+  void _toggleFullscreen() {
+    HapticFeedback.lightImpact();
+    final voice = context.read<VoiceService>();
+    final user = context.read<UserProvider?>();
+    if (voiceAllowanceExhausted(voice, user)) {
+      // Tier-correct routing: Free → Plus, Plus → Pro, Pro → Ultra. An
+      // Ultra user is already at the top — openVoiceUpgrade no-ops and the
+      // tap stays on the exhausted orb instead of re-selling their own
+      // plan.
+      openVoiceUpgrade(
+        tier: user?.subscription.effectiveTier ?? SubscriptionTier.free,
+      );
+      return;
+    }
+    if (voice.state == VoiceState.failed) {
+      // The failed orb is the retry affordance: tapping it reopens the
+      // session (no separate center microphone button exists in V2).
+      voice.startListening(context: context);
+      return;
+    }
+    final input = context.read<InputProvider>();
+    final goingFullscreen = !input.isVoiceOverlayExpanded;
+    if (goingFullscreen) {
+      _expandController.forward();
+      input.setVoiceOverlayExpanded(true);
+    } else {
+      _expandController.reverse();
+      input.setVoiceOverlayExpanded(false);
+    }
   }
 
-  // Center button is larger and changes appearance
-  Widget _buildCenterButton({
-    required bool isUserSpeaking,
-    required bool isAiSpeaking,
-    required bool isFlowMode,
-    required bool isFlowActive,
-    required VoidCallback onTap,
-  }) {
-    // Icon logic:
-    // Flow Mode & Not Active -> Arrow Up (Start)
-    // Flow Mode & Active -> Stop (Interrupt)
-    // User Speaking -> STOP
-    // Model Speaking -> STOP
-    // Idle -> MIC
+  /// Maps the voice session state onto the orb's visual phase + palette.
+  /// Controller setters are idempotent and do not notify, so calling them
+  /// from build is cheap; the palette glide happens on the controller's
+  /// own ticker.
+  void _syncOrbInputs(VoiceService voiceService) {
+    final state = voiceService.state;
+    final isFlow = voiceService.isFlowActive;
 
-    final bool showStop = isUserSpeaking || isAiSpeaking || isFlowActive;
+    VoiceOrbPhase phase;
+    var intensity = 1.0;
+    var multicolor = 0.0;
 
-    return _ScaleButton(
-      onTap: onTap,
-      styleColor: AppColors.primaryColor.inverted,
-      shape: BoxShape.circle,
-      child: SizedBox(
-        width: 80,
-        height: 80,
-        child: Padding(
-          padding: EdgeInsets.zero, // Padding handled by Center/Child inside
-          // Use AnimatedSwitcher for smooth fade transition
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                  opacity: animation,
-                  child: ScaleTransition(scale: animation, child: child));
-            },
-            child: (isFlowMode && !isFlowActive)
-                ? Padding(
-                    key: const ValueKey('start_flow_icon'),
-                    padding: const EdgeInsets.all(80 * 0.22),
-                    child: SvgPicture.asset(
-                      height: CortexDesign.icon,
-                      width: CortexDesign.icon,
-                      'assets/icons/arrow.svg',
-                      colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor, BlendMode.srcIn),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(22),
-                    child: SvgPicture.asset(
-                      height: CortexDesign.icon,
-                      width: CortexDesign.icon,
-                      showStop
-                          ? 'assets/icons/stop.svg'
-                          : 'assets/icons/microphone.svg',
-                      key: ValueKey<String>(showStop ? 'stop' : 'mic'),
-                      colorFilter: ColorFilter.mode(
-                        AppColors.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ScaleButton extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onTap;
-  final Color styleColor;
-  final BoxShape
-      shape; // Using BoxShape as we are manually building decoration in Material
-  final BoxBorder? border;
-
-  const _ScaleButton({
-    required this.child,
-    required this.onTap,
-    required this.styleColor,
-    this.shape = BoxShape.circle,
-    this.border,
-  });
-
-  @override
-  State<_ScaleButton> createState() => _ScaleButtonState();
-}
-
-class _ScaleButtonState extends State<_ScaleButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 100));
-    _scale = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Material needs a ShapeBorder for shape, but Container used BoxShape.
-    // We'll map BoxShape to valid Material shapes roughly or use Container inside Material?
-    // Actually, best to use Material with InkWell.
-    // If shape is circle, we use CircleBorder.
-
-    ShapeBorder? materialShape;
-    if (widget.shape == BoxShape.circle) {
-      if (widget.border != null && widget.border is Border) {
-        // Assuming uniform border for circle
-        materialShape = CircleBorder(side: (widget.border as Border).top);
-      } else {
-        materialShape = const CircleBorder();
+    if (isFlow) {
+      // Flow: the AI-to-AI loop. The active model identity recolors the
+      // BASE INTERNAL palette — the soft liquid-sphere style itself never
+      // changes, so the orb is never a flat red/blue/green/yellow disc
+      // (see flowAgentPalettes; active-model transitions glide through
+      // the controller's interpolation).
+      final palettes = flowAgentPalettes();
+      final agent = voiceService.currentFlowAgentIndex.clamp(
+        0,
+        palettes.length - 1,
+      );
+      _orb.setPalette(
+        primary: palettes[agent],
+        secondary: voicePastelLavender,
+        accent: voicePastelBlushPink,
+      );
+      switch (state) {
+        case VoiceState.listening:
+          // Flow's listening window is the interruption slot: translucent,
+          // multicolor, alive — but never a plain "listening" look.
+          phase = VoiceOrbPhase.flow;
+          multicolor = 1.0;
+          intensity = 0.9;
+        case VoiceState.processing:
+          phase = VoiceOrbPhase.flow;
+          intensity = 0.85;
+        case VoiceState.speaking:
+          phase = VoiceOrbPhase.speaking;
+        case VoiceState.connecting:
+          phase = VoiceOrbPhase.subdued;
+          intensity = 0.45;
+        case VoiceState.failed:
+          phase = VoiceOrbPhase.subdued;
+          intensity = 0.35;
+        case VoiceState.idle:
+          phase = VoiceOrbPhase.subdued;
+          intensity = 0.5;
       }
     } else {
-      // Rounded rect?
-      materialShape = const RoundedRectangleBorder();
+      // The reference look: a soft pastel liquid sphere — lavender, powder
+      // blue and blush pink fields blending inside the sealed circle.
+      _orb.setPalette(
+        primary: voicePastelLavender,
+        secondary: voicePastelPowderBlue,
+        accent: voicePastelBlushPink,
+      );
+      switch (state) {
+        case VoiceState.listening:
+          phase = VoiceOrbPhase.listening;
+        case VoiceState.processing:
+          phase = VoiceOrbPhase.thinking;
+          intensity = 0.85;
+        case VoiceState.speaking:
+          phase = VoiceOrbPhase.speaking;
+        case VoiceState.connecting:
+          phase = VoiceOrbPhase.subdued;
+          intensity = 0.45;
+        case VoiceState.failed:
+          phase = VoiceOrbPhase.subdued;
+          intensity = 0.35;
+        case VoiceState.idle:
+          phase = VoiceOrbPhase.subdued;
+          intensity = 0.5;
+      }
     }
 
-    return ScaleTransition(
-      scale: _scale,
-      child: Material(
-        color: widget.styleColor,
-        shape: materialShape,
-        clipBehavior: Clip.hardEdge,
-        child: InkWell(
-          onTap: () {
-            HapticFeedback.lightImpact(); // Ensure haptic on tap
-            widget.onTap();
-          },
-          onHighlightChanged: (isPressed) {
-            if (isPressed) {
-              _controller.forward();
-            } else {
-              _controller.reverse();
-            }
-          },
-          child: widget.child, // Child is the content padding + icon
-        ),
-      ),
-    );
-  }
-}
-
-class _MorphingVisualizer extends StatefulWidget {
-  final bool isUserSpeaking;
-  final bool isAiSpeaking;
-  final double level;
-  final bool isFluxMode;
-
-  /// Thinking (AI turn in flight): a slow, organic internal pulse — visually
-  /// distinct from mic-driven listening and the speaking wave.
-  final bool isThinking;
-
-  /// Connecting or failed: the orb is subdued until the session is live
-  /// again (the center button shows the mic to retry).
-  final bool isSubdued;
-
-  const _MorphingVisualizer({
-    required this.isUserSpeaking,
-    required this.isAiSpeaking,
-    required this.level,
-    required this.isFluxMode,
-    this.isThinking = false,
-    this.isSubdued = false,
-  });
-
-  @override
-  State<_MorphingVisualizer> createState() => _MorphingVisualizerState();
-}
-
-class _MorphingVisualizerState extends State<_MorphingVisualizer>
-    with TickerProviderStateMixin {
-  late AnimationController _morphController;
-
-  late AnimationController _levelSmoother;
-  double _smoothLevel = 0.0;
-
-  // AI Speaking Simulation
-  late AnimationController _aiSpeechSimulator;
-
-  @override
-  void initState() {
-    super.initState();
-    _morphController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    // No duration here, we drive it manually or with animateTo
-    _levelSmoother = AnimationController(
-      vsync: this,
-      lowerBound: 0.0,
-      upperBound: 1.0,
-      value: 0.0,
-      duration: const Duration(milliseconds: 100),
-    );
-
-    // Simulate a breathing/talking rhythm
-    _aiSpeechSimulator = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-
-    if (widget.isAiSpeaking) {
-      _morphController.value = 1.0;
+    if (voiceAllowanceExhausted(voiceService, context.read<UserProvider?>())) {
+      _orb.setPalette(
+        primary: const Color(0xFFAB7BE3),
+        secondary: const Color(0xFFC3A0ED),
+        accent: const Color(0xFFD8B5F2),
+      );
+      phase = VoiceOrbPhase.subdued;
+      intensity = 1.0;
+      multicolor = 0.0;
     }
-  }
-
-  @override
-  void didUpdateWidget(covariant _MorphingVisualizer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isAiSpeaking && !oldWidget.isAiSpeaking) {
-      // User -> AI: Animate to Wave
-      _morphController.forward();
-    } else if (!widget.isAiSpeaking && oldWidget.isAiSpeaking) {
-      // AI -> User: Animate back to Dot
-      _morphController.reverse();
-    }
-
-    if (widget.level != oldWidget.level) {
-      // Animate to new level smoothly over 100ms
-      _levelSmoother.animateTo(widget.level, curve: Curves.easeOut);
-    }
-  }
-
-  @override
-  void dispose() {
-    _morphController.dispose();
-    _levelSmoother.dispose();
-    _aiSpeechSimulator.dispose();
-    super.dispose();
+    _orb.setPhase(phase);
+    _orb.setIntensity(intensity);
+    _orb.setMulticolor(multicolor);
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<UserProvider?>();
+    final voiceService = context.watch<VoiceService>();
+    _syncOrbInputs(voiceService);
+
+    // MediaQuery size accessors that do not subscribe to viewInsets: the
+    // orb never rebuilds from keyboard changes.
+    final size = MediaQuery.sizeOf(context);
+    final safeTop = MediaQuery.paddingOf(context).top;
+    // A SMALLER expanded orb: 70% of width capped at 288 — the fullscreen
+    // stage reads as a jewel, not a moon.
+    final fullOrbSize = size.width * 0.70 > 288.0 ? 288.0 : size.width * 0.70;
+
     return AnimatedBuilder(
-      animation: Listenable.merge(
-          [_morphController, _levelSmoother, _aiSpeechSimulator]),
-      builder: (context, child) {
-        final voiceService =
-            context.watch<VoiceService>(); // Use watch to rebuild on updates
-        double t = _morphController.value;
+      animation: Listenable.merge([
+        _presenceController,
+        _expandController,
+        widget.panelHeight,
+      ]),
+      builder: (context, _) {
+        // SCALE keeps the playful easeOutBack overshoot (~1.05x near the
+        // end of the animation). Every OPACITY must use a monotonic 0..1
+        // curve instead: easeOutBack overshoots past 1.0 and `Opacity`
+        // asserts [0.0, 1.0], which crashed the overlay mid-entry AND
+        // mid-exit on device (entry and exit both pass through the
+        // overshoot region). Fullscreen's `expandT * presence` product
+        // stays <= 1.0 for the same reason — both factors monotonic.
+        final presenceScale = Curves.easeOutBack.transform(
+          _presenceController.value,
+        );
+        final presence = Curves.easeOutCubic.transform(
+          _presenceController.value,
+        );
+        final expandT = Curves.easeInOutCubic.transform(
+          _expandController.value,
+        );
+        final orbSize = lerpDouble(_compactOrbSize, fullOrbSize, expandT)!;
 
-        // Determine the effective level to visualise
-        double effectiveLevel = 0.0;
+        // COMPACT anchor: the composer panel's top edge. Live height means
+        // attachments/edit growth pushes the orb upward frame-accurately;
+        // briefing visibility is not part of the equation at all.
+        final composerTop =
+            size.height - widget.bottomSafe - widget.panelHeight.value;
+        final compactCenter = Offset(
+          size.width / 2,
+          composerTop - _orbGapAboveComposer - orbSize / 2,
+        );
+        // FULLSCREEN anchor: the true vertical center of the SafeArea —
+        // notch-aware via MediaQuery top, home-indicator-aware via the
+        // same bottomSafe inset that anchors compact mode — so the orb
+        // never rides high under the notch the way the old raw
+        // 0.40·height fraction did.
+        final fullCenter = Offset(
+          size.width / 2,
+          safeTop + (size.height - safeTop - widget.bottomSafe) / 2,
+        );
+        final center = Offset.lerp(compactCenter, fullCenter, expandT)!;
 
-        if (widget.isAiSpeaking) {
-          // Simulate complex speech pattern using combined sine waves from the simulator controller
-          // We map the 0.0-1.0 controller value to a dynamic "talking" wave
-          // Combines sine wave values non-linearly to create a more organic "speech" effect
-          // rather than a mechanical breathing animation.
-          double val = _aiSpeechSimulator.value;
-          // Using power function makes it spike more naturally like speech headers
-          effectiveLevel =
-              0.2 + (0.5 * (val * val * val)); // cubic curve for organic spikes
-        } else if (widget.isThinking) {
-          // Thinking: a slow, organic internal pulse — visually distinct from
-          // mic-driven listening and the speaking wave. Reuses the already
-          // running simulator controller, so no extra animation load.
-          double val = _aiSpeechSimulator.value;
-          effectiveLevel = 0.12 + 0.10 * (val * val);
-        } else {
-          _smoothLevel = _levelSmoother.value;
-          effectiveLevel = _smoothLevel;
-        }
-
-        if (effectiveLevel < 0.0) effectiveLevel = 0.0;
-
-        double baseSize = 96.0;
-        double maxExtra = 48.0;
-
-        double dotSize = baseSize + (effectiveLevel * maxExtra);
-        // Cap just in case
-        if (dotSize > (baseSize + maxExtra)) dotSize = baseSize + maxExtra;
-
-        // Freeze dot size during morph to avoid jitter
-        // if (t > 0.1) dotSize = baseSize; // Removed to allow pulsing during initial morph phase
-
-        double currentWidth;
-        double currentHeight;
-        double borderRadius;
-
-        // Define base color for the container
-        Color baseContainerColor;
-
-        if (voiceService.isFlowActive) {
-          // Multi-Agent Colors
-          switch (voiceService.currentFlowAgentIndex) {
-            case 0:
-              baseContainerColor = AppColors.senaryColor;
-              break;
-            case 1:
-              baseContainerColor = AppColors.septenaryColor;
-              break;
-            case 2:
-              baseContainerColor = AppColors.premium;
-              break;
-            default:
-              baseContainerColor = AppColors.senaryColor;
-          }
-        } else if (widget.isFluxMode) {
-          baseContainerColor = AppColors.secondaryColor;
-        } else if (widget.isSubdued) {
-          // Connecting or failed: the orb waits quietly instead of pretending
-          // to listen. The mic button restarts the session.
-          baseContainerColor =
-              AppColors.primaryColor.inverted.withValues(alpha: 0.45);
-        } else {
-          baseContainerColor = AppColors.primaryColor.inverted;
-        }
-
-        Color containerColor =
-            baseContainerColor; // Initialize with solid color
-
-        double opacityWave = 0.0;
-
-        if (t < 0.3) {
-          // PHASE 1: SQUASH
-          double localT = t / 0.3;
-          currentWidth = dotSize;
-          currentHeight = dotSize + (2.0 - dotSize) * localT;
-          borderRadius = currentHeight / 2;
-        } else if (t < 0.7) {
-          // PHASE 2: STRETCH
-          double localT = (t - 0.3) / 0.4;
-          currentHeight = 2.0;
-          double screenWidth = MediaQuery.sizeOf(context).width;
-          currentWidth = dotSize + (screenWidth - dotSize) * localT;
-          borderRadius = 1.0;
-        } else {
-          // PHASE 3: FADE OUT & GROW
-          // To fix the "Huge Bar" glitch:
-          // 1. First fraction of time (e.g. 0.0->0.2 of Phase 3): Fade color to transparent. Height stays small (2.0).
-          // 2. Remaining fraction (0.2->1.0): Grow height to 150.0. Width expands to full.
-
-          double localT = (t - 0.7) / 0.3;
-          double fadeEnd = 0.2; // 20% of phase for fade
-
-          // Color Opacity Logic: 1.0 -> 0.0 in first 20%
-          double opacity = 1.0;
-          if (localT <= fadeEnd) {
-            opacity = 1.0 - (localT / fadeEnd);
-          } else {
-            opacity = 0.0;
-          }
-          opacity = opacity.clamp(0.0, 1.0);
-
-          // Apply opacity to container color
-          containerColor = baseContainerColor.withValues(alpha: opacity);
-
-          // Height Logic: Starts growing AFTER fade is mostly done to avoid huge black bar
-          // Or grow linearly but since opacity drops fast, it won't look like a block.
-          // Let's grow height linearly but keep opacity logic aggressive.
-          // Actually, let's delay height growth slightly.
-
-          double heightT = (localT - fadeEnd) / (1.0 - fadeEnd);
-          if (heightT < 0) heightT = 0;
-
-          currentHeight = 2.0 + (150.0 - 2.0) * heightT;
-          currentWidth = MediaQuery.sizeOf(context).width;
-          borderRadius = 0.0;
-          opacityWave =
-              heightT.clamp(0.0, 1.0); // Wave fades in as height grows
-        }
-
-        // VISIBILITY LOGIC:
-        // User Request: "Flow modunda ortada nokta olmayacak" (No dot in Flow Mode)
-        // Dot represents "Mic Listening".
-        // In Flow Mode, we are passive unless interrupting.
-        // So hide the Dot when:
-        // 1. Flow Active
-        // 2. Not User Speaking (Interruption)
-        // 3. Not AI Speaking (Wave)
-        // Note: When AI Speaking, we show Wave (so opacity 1.0).
-
-        // User Request: "Flow modunda ortada nokta olmayacak... düz çizgiye dönüşecek"
-        // (No dot in Flow Mode -> turns into flat line)
-        // This applies when Flow is Active AND NO ONE is speaking (Processing state).
-        // Since toggleFlowMode sets state to Processing, this logic catches it.
-        // HOWEVER, voiceService.isFlowActive might be false if just Toggled but not Started?
-        // Ah, toggleFlowMode sets flowActive=false.
-        // We need to check if we are in Flow Mode (Setup) OR Flow Active.
-        // If VoiceState is 'processing', we should show the line?
-        // Or should we trust isFlowMode?
-
-        // Wait, "Flow Mode'a geçildiğinde... direkt çizgiye dönüşsün".
-        // VoiceState.processing triggers visualizer to do what?
-        // Currently visualizer depends on isUserSpeaking/isAiSpeaking.
-        // If processing, both are false.
-        // So checking isFlowMode (or FlowActive which is irrelevant for "setup")
-        // AND state == Processing?
-
-        bool isFlowProcessing =
-            (voiceService.isFlowMode || voiceService.isFlowActive) &&
-                !widget.isUserSpeaking &&
-                !widget.isAiSpeaking;
-
-        if (isFlowProcessing) {
-          // Enforce Flat Line State for Flow Mode Processing
-          // "Flat line" means width is wide, height is very thin
-          currentWidth = MediaQuery.sizeOf(context).width * 0.6;
-          currentHeight = 4.0;
-          borderRadius = 2.0;
-
-          // Ensure it's opaque and visible
-          containerColor = baseContainerColor;
-
-          // Flux Desaturation Check
-          if (widget.isFluxMode) {
-            // "Flux Mode'a basıldığında Flow Mode'da renkler biraz solsun"
-            // Desaturate by mixing with white/grey or reducing opacity?
-            // Or changing to a paler version.
-            containerColor = Color.alphaBlend(
-                Colors.white.withValues(alpha: 0.4), containerColor);
-          }
-
-          // Also set morph controller to 0 to avoid wave interference?
-          // No, just override dimensions.
-        } else if (widget.isFluxMode) {
-          // Keep Flux mode styling if not flat line
-          baseContainerColor = AppColors.secondaryColor;
-        }
-
-        return Center(
-          child: GestureDetector(
-            onTapDown: (_) {
-              // Behave like a button press - visual feedback
-              _levelSmoother.animateTo(1.0,
-                  duration: const Duration(milliseconds: 150),
-                  curve: Curves.easeOutQuad);
-            },
-            onTapUp: (_) {
-              _levelSmoother.animateTo(widget.level,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutBack);
-            },
-            onTapCancel: () {
-              _levelSmoother.animateTo(widget.level,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutBack);
-            },
-            // [CHANGED] Use AnimatedContainer for dimensions/color, remove AnimatedOpacity logic from previous try
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-              width: currentWidth,
-              height: currentHeight,
-              decoration: BoxDecoration(
-                color: containerColor,
-                borderRadius: BorderRadius.circular(borderRadius),
-                border: widget.isFluxMode
-                    ? Border.all(
-                        color: AppColors.border.withValues(
-                            alpha: t >= 0.7
-                                ? (1.0 - (t - 0.7) / 0.3).clamp(0.0, 1.0)
-                                : 1.0),
-                        width: 2)
-                    : null,
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  if (opacityWave > 0.01)
-                    Opacity(
-                      opacity: opacityWave.clamp(0.0, 1.0),
-                      child: WaveformVisualizer(
-                        origin: WaveOrigin.right,
-                        color:
-                            baseContainerColor, // Correctly pass dynamic color
-                        // Pass effectiveLevel to WaveformVisualizer if it supported it.
-                        // Assuming WaveformVisualizer might handle internal animation or we need to pass level?
-                        // Checking file `voice.dart` doesn't show `WaveformVisualizer` internals (imported).
-                        // But previous code didn't pass level to it. It likely uses internal or random.
-                        // Wait, user said "dalgalar nasıl sese göre şekil değiştiriyorsa...".
-                        // If `WaveformVisualizer` is static or random, we might not be affecting it directly via `level`.
-                        // However, the `_MorphingVisualizer` itself (the dot) pulses with `dotSize`.
-                        // The user said "dalgalar...".
-                        // If `WaveformVisualizer` is the thing inside (the squiggly lines), we might need to modify THAT.
-                        // But looking at existing code:
-                        // `_MorphingVisualizer` controls `dotSize` via `effectiveLevel`.
-                        // The `WaveformVisualizer` is just a child.
-                        // The "Dalga" logic usually refers to the visualizer itself morphing.
-                        // The `dotSize` determines the size of the BLOB.
-                        // If the user means the blob pulsing, my change covers it.
-                        // If they mean the lines inside, I can't see that code here.
-                        // Assuming "Dalga" = The visual blob pulsing.
-                      ),
+        return IgnorePointer(
+          // The overlay owns no interaction while it has fully faded out.
+          ignoring: _presenceController.isDismissed,
+          child: Stack(
+            children: [
+              // The orb: one widget instance from compact through fullscreen
+              // — the controller keeps shader phase/state continuity while
+              // only its geometry lerps.
+              Positioned(
+                left: center.dx - orbSize / 2,
+                top: center.dy - orbSize / 2,
+                child: Transform.scale(
+                  // Scale is the one place the easeOutBack overshoot is
+                  // welcome (a slight 1.05x pop as the orb settles in).
+                  scale: 0.65 + 0.35 * presenceScale,
+                  child: Opacity(
+                    opacity: presence,
+                    child: VoiceOrb(
+                      controller: _orb,
+                      size: orbSize,
+                      onTap: _toggleFullscreen,
                     ),
-                ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         );
       },

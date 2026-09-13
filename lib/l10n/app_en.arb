@@ -1,4 +1,5 @@
 {
+  "benefitMoreVoiceChat": "More voice chat",
   "systemTimeInfo": "\n\nCurrent date and time: {formattedTime}.",
   "@systemTimeInfo": {
     "description": "Localized time context injected into all model system prompts.",

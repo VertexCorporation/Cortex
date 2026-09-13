@@ -10,6 +10,9 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
+  String get benefitMoreVoiceChat => '音声チャットの利用枠を拡大';
+
+  @override
   String systemTimeInfo(String formattedTime) {
     return '\n\n現在の日時: $formattedTime。';
   }
