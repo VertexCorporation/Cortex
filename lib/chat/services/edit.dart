@@ -1,6 +1,7 @@
 // lib/chat/services/edit.dart
 
 import 'dart:async';
+
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/regenerate.dart';
@@ -8,6 +9,7 @@ import 'package:cortex/chat/services/scroll.dart';
 import 'package:flutter/foundation.dart'; // for listEquals
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/session.dart';
 import '../messages/messages.dart';
 
@@ -54,26 +56,32 @@ class EditService {
     final String newText = _controller.text.trim();
 
     // Get new list of attachment paths from InputProvider
-    final List<String> newAttachmentPaths =
-        _inputProvider.attachments.map((a) => a.file.path).toList();
+    final List<String> newAttachmentPaths = _inputProvider.attachments
+        .map((a) => a.file.path)
+        .toList();
 
     final originalMessage = originalMessages[editingIndex];
 
     // Determine changes
     final bool textChanged = newText != originalMessage.text;
-    final bool attachmentsChanged =
-        !listEquals(newAttachmentPaths, originalMessage.attachmentPaths);
+    final bool attachmentsChanged = !listEquals(
+      newAttachmentPaths,
+      originalMessage.attachmentPaths,
+    );
 
     debugPrint(
-        "[EditService] textChanged=$textChanged, attachmentsChanged=$attachmentsChanged");
+      "[EditService] textChanged=$textChanged, attachmentsChanged=$attachmentsChanged",
+    );
 
     if (!textChanged && !attachmentsChanged) {
       debugPrint(
-          "[EditService] Nothing changed. Regenerating from the same user message.");
+        "[EditService] Nothing changed. Regenerating from the same user message.",
+      );
     }
 
-    List<Message> updatedList =
-        List<Message>.from(originalMessages.sublist(0, editingIndex));
+    List<Message> updatedList = List<Message>.from(
+      originalMessages.sublist(0, editingIndex),
+    );
 
     final updatedMessage = originalMessage.copyWith(
       text: newText,
@@ -177,7 +185,12 @@ class EditService {
   /// exactly the "app fights me" experience we removed. Requesting focus on
   /// an already-focused node is a no-op, so the keyboard only ever opens
   /// when the node is genuinely unfocused.
+  ///
+  /// Voice Mode suppresses composer keyboard focus entirely while it is
+  /// active: a focus chain that lands mid-session must not reopen the
+  /// keyboard over the voice overlay.
   void requestFocus() {
+    if (_inputProvider.isVoiceModeActive) return;
     if (!_focusNode.hasFocus) {
       _focusNode.requestFocus();
     }

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
 import '../../../../../internet.dart';
 import '../../../../../library/backend/data/service.dart';
 import '../../../../../theme.dart';
@@ -49,9 +50,7 @@ class _ToolCircleButton extends StatelessWidget {
               : BorderSide.none,
         ),
         child: Ink(
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-          ),
+          decoration: const BoxDecoration(shape: BoxShape.circle),
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: () {
@@ -89,7 +88,8 @@ class MicButton extends StatelessWidget {
     final bool isDeviceSupported = speechService.isDeviceSupported;
     final bool isRecording = inputProvider.isVoiceRecording;
 
-    bool showMic = isDeviceSupported &&
+    bool showMic =
+        isDeviceSupported &&
         !isSending &&
         (recordingProgress != null || !isRecording);
 
@@ -102,8 +102,10 @@ class MicButton extends StatelessWidget {
       showBorder: false,
       size: buttonSize,
       onTap: () async {
-        final localeCode =
-            context.read<ChatSessionProvider>().getLocale().languageCode;
+        final localeCode = context
+            .read<ChatSessionProvider>()
+            .getLocale()
+            .languageCode;
         final currentText = controller.text;
 
         inputProvider.setVoiceRecording(true);
@@ -119,8 +121,8 @@ class MicButton extends StatelessWidget {
           onResult: (String text) {
             String spacer =
                 (currentText.isNotEmpty && !currentText.endsWith(' '))
-                    ? ' '
-                    : '';
+                ? ' '
+                : '';
             if (currentText.isEmpty) spacer = '';
             controller.text = "$currentText$spacer$text";
             controller.selection = TextSelection.fromPosition(
@@ -137,17 +139,22 @@ class MicButton extends StatelessWidget {
         width: CortexDesign.icon,
         height: CortexDesign.icon,
         colorFilter: ColorFilter.mode(
-            AppColors.primaryColor.inverted, BlendMode.srcIn),
+          AppColors.primaryColor.inverted,
+          BlendMode.srcIn,
+        ),
       ),
     );
 
-    final micVisibility = 1 -
-        const Interval(0, 0.4, curve: Curves.easeOut)
-            .transform(recordingProgress ?? 0);
+    final micVisibility =
+        1 -
+        const Interval(
+          0,
+          0.4,
+          curve: Curves.easeOut,
+        ).transform(recordingProgress ?? 0);
     // While dictation runs the mic stays visible but is locked and dimmed
     // like the "+", leaving Stop as the only exit from the session.
-    final double micOpacity =
-        isRecording ? micVisibility * 0.4 : micVisibility;
+    final double micOpacity = isRecording ? micVisibility * 0.4 : micVisibility;
 
     if (recordingProgress != null) {
       return IgnorePointer(
@@ -185,9 +192,7 @@ class MicButton extends StatelessWidget {
           ),
         );
       },
-      child: showMic
-          ? mic
-          : const SizedBox.shrink(key: ValueKey('mic_hidden')),
+      child: showMic ? mic : const SizedBox.shrink(key: ValueKey('mic_hidden')),
     );
   }
 }
@@ -260,8 +265,11 @@ class ActionButtonWidget extends StatelessWidget {
       // STATE: IDLE
       if (isDeviceSupported) {
         rightButtonKey = const ValueKey('voice_chat');
-        rightButton =
-            _buildVoiceChatButton(context, buttonSize, isActionPermitted);
+        rightButton = _buildVoiceChatButton(
+          context,
+          buttonSize,
+          isActionPermitted,
+        );
       } else {
         rightButtonKey = const ValueKey('send_disabled');
         rightButton = _buildSendButton(buttonSize, false, isConnected);
@@ -274,10 +282,7 @@ class ActionButtonWidget extends StatelessWidget {
       switchOutCurve: Curves.easeInQuad,
       transitionBuilder: (child, animation) =>
           FadeTransition(opacity: animation, child: child),
-      child: KeyedSubtree(
-        key: rightButtonKey,
-        child: rightButton,
-      ),
+      child: KeyedSubtree(key: rightButtonKey, child: rightButton),
     );
 
     if (!includeMic) {
@@ -290,9 +295,13 @@ class ActionButtonWidget extends StatelessWidget {
       recordingProgress: recordingProgress,
     );
 
-    final micVisibility = 1 -
-        const Interval(0, 0.4, curve: Curves.easeOut)
-            .transform(recordingProgress ?? 0);
+    final micVisibility =
+        1 -
+        const Interval(
+          0,
+          0.4,
+          curve: Curves.easeOut,
+        ).transform(recordingProgress ?? 0);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -332,10 +341,7 @@ class ActionButtonWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.circular(size / 2),
-          border: Border.all(
-            color: AppColors.border,
-            width: 1.0,
-          ),
+          border: Border.all(color: AppColors.border, width: 1.0),
         ),
         child: Center(
           child: SvgPicture.asset(
@@ -343,7 +349,9 @@ class ActionButtonWidget extends StatelessWidget {
             width: CortexDesign.icon,
             height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.inverted, BlendMode.srcIn),
+              AppColors.primaryColor.inverted,
+              BlendMode.srcIn,
+            ),
           ),
         ),
       ),
@@ -353,7 +361,8 @@ class ActionButtonWidget extends StatelessWidget {
   Widget _buildSendButton(double size, bool enabled, bool isConnected) {
     final backgroundColor = AppColors.primaryColor.inverted;
     final iconColor = AppColors.primaryColor.withValues(
-        alpha: enabled ? 1 : 0.45);
+      alpha: enabled ? 1 : 0.45,
+    );
 
     return GestureDetector(
       onTap: enabled
@@ -367,8 +376,7 @@ class ActionButtonWidget extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: backgroundColor,
-          border: Border.all(
-              color: AppColors.primaryColor.inverted),
+          border: Border.all(color: AppColors.primaryColor.inverted),
           shape: BoxShape.circle,
         ),
         child: Padding(
@@ -385,7 +393,10 @@ class ActionButtonWidget extends StatelessWidget {
   }
 
   Widget _buildVoiceChatButton(
-      BuildContext context, double size, bool isEnabled) {
+    BuildContext context,
+    double size,
+    bool isEnabled,
+  ) {
     return GestureDetector(
       onTap: !isEnabled
           ? () {
@@ -393,6 +404,15 @@ class ActionButtonWidget extends StatelessWidget {
             }
           : () async {
               HapticFeedback.lightImpact();
+
+              // Voice Mode takes the screen — kill the keyboard
+              // SYNCHRONOUSLY, before any async session work runs: the
+              // overlay must never start under an open keyboard. Pending
+              // focus chains are aborted by the voice-mode guards in
+              // screen.dart/view.dart/EditService (a state check, not a
+              // timing hack), so nothing re-opens it after this either.
+              FocusScope.of(context).unfocus();
+              SystemChannels.textInput.invokeMethod('TextInput.hide');
 
               final voiceService = context.read<VoiceService>();
 
@@ -404,13 +424,14 @@ class ActionButtonWidget extends StatelessWidget {
               final sendService = context.read<SendService>();
               final localizations = AppLocalizations.of(context)!;
               final localeCode = session.getLocale().languageCode;
-              final conversationProvider =
-                  context.read<ConversationProvider>(); // Restore variable
+              final conversationProvider = context
+                  .read<ConversationProvider>(); // Restore variable
 
               // [NEW] LOGIC: If chat is not empty, start a new conversation automatically
               if (conversationProvider.messages.isNotEmpty) {
-                mainScreenKey.currentState
-                    ?.startNewConversation(closeSidebar: false);
+                mainScreenKey.currentState?.startNewConversation(
+                  closeSidebar: false,
+                );
                 // Wait a brief moment for state to reset?
                 // startNewConversation is async-ish but returns void.
                 // It resets providers. We should yield to event loop.
@@ -455,8 +476,7 @@ class ActionButtonWidget extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: AppColors.primaryColor.inverted,
-          border: Border.all(
-              color: AppColors.primaryColor.inverted),
+          border: Border.all(color: AppColors.primaryColor.inverted),
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -465,9 +485,9 @@ class ActionButtonWidget extends StatelessWidget {
             width: CortexDesign.icon,
             height: CortexDesign.icon,
             colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.withValues(
-                    alpha: isEnabled ? 1.0 : 0.3),
-                BlendMode.srcIn),
+              AppColors.primaryColor.withValues(alpha: isEnabled ? 1.0 : 0.3),
+              BlendMode.srcIn,
+            ),
           ),
         ),
       ),
@@ -555,7 +575,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     // bubble's active visuals here and the composer capsule's expansion in
     // the input row — an active feature can never paint itself active and
     // then have the capsule collapse the control away.
-    final bool isFeatureActive = widget.hasSelectedFeature ||
+    final bool isFeatureActive =
+        widget.hasSelectedFeature ||
         composerFeatureActive(inputProvider, currentModel);
 
     final double progress = widget.bubbleProgress.clamp(0.0, 1.0);
@@ -563,18 +584,21 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         ? AppColors.primaryColor.inverted
         : AppColors.background;
     final Color backgroundColor = rawBackgroundColor.withValues(
-        alpha: rawBackgroundColor.a * progress);
+      alpha: rawBackgroundColor.a * progress,
+    );
     final Color rawBorderColor = isFeatureActive
         ? AppColors.primaryColor.inverted
         : AppColors.border;
-    final Color borderColor =
-        rawBorderColor.withValues(alpha: rawBorderColor.a * progress);
+    final Color borderColor = rawBorderColor.withValues(
+      alpha: rawBorderColor.a * progress,
+    );
     final Color iconColor = isFeatureActive
         ? AppColors.primaryColor
         : AppColors.primaryColor.inverted;
 
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
-    final bool buttonDisabled = widget.isLimitExceeded ||
+    final bool buttonDisabled =
+        widget.isLimitExceeded ||
         (widget.isPhotoLoading && isMaxAttachments) ||
         widget.isDimmed;
     // The whole bubble grows with the capsule expansion (bubbleScale); the
@@ -591,7 +615,9 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
               HapticFeedback.lightImpact();
               if (mounted) setState(() => _isOpened = true);
               await showFeaturesSheet(
-                  context: context, controller: widget.controller);
+                context: context,
+                controller: widget.controller,
+              );
               if (mounted) setState(() => _isOpened = false);
             },
       child: Container(
@@ -621,8 +647,10 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
                   // bubble reads the same size as the filled action button.
                   width: size * 0.75,
                   height: size * 0.75,
-                  colorFilter:
-                      ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                    color ?? iconColor,
+                    BlendMode.srcIn,
+                  ),
                 );
               },
             ),
@@ -635,10 +663,7 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     // (its semantics included) twice per session. Keeping the shape
     // constant and animating only the opacity value leaves the element and
     // semantics trees untouched while dimming exactly as before.
-    return Opacity(
-      opacity: widget.isDimmed ? 0.4 : 1.0,
-      child: bubble,
-    );
+    return Opacity(opacity: widget.isDimmed ? 0.4 : 1.0, child: bubble);
   }
 }
 
@@ -699,8 +724,10 @@ class ModelSelectButton extends StatelessWidget {
                   initialModels: sessionProvider.allModels,
                   onModelSelected: (String id) {
                     // 2. Fetch Model Data
-                    final model = modelService.getPreciseModelData(id,
-                        langCode: langCode);
+                    final model = modelService.getPreciseModelData(
+                      id,
+                      langCode: langCode,
+                    );
 
                     // 3. Select the Model
                     selectionService.switchActiveModel(model);
@@ -728,7 +755,9 @@ class ModelSelectButton extends StatelessWidget {
               child: Container(
                 constraints: BoxConstraints(maxWidth: screenWidth * 0.55),
                 padding: EdgeInsets.symmetric(
-                    horizontal: isTablet ? 16.0 : 14.0, vertical: 8.0),
+                  horizontal: isTablet ? 16.0 : 14.0,
+                  vertical: 8.0,
+                ),
                 child: AnimatedSize(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOutCubic,
@@ -741,27 +770,33 @@ class ModelSelectButton extends StatelessWidget {
                           duration: const Duration(milliseconds: 250),
                           transitionBuilder:
                               (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                                opacity: animation, child: child);
-                          },
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
                           child: Text(
                             displayText,
                             key: ValueKey<String>(displayText),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                                color: AppColors.primaryColor.inverted,
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.w500),
+                              color: AppColors.primaryColor.inverted,
+                              fontSize: fontSize,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 4),
                       Transform.rotate(
-                          angle: -1.5708,
-                          child: Icon(Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primaryColor.inverted,
-                              size: CortexDesign.icon)),
+                        angle: -1.5708,
+                        child: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: AppColors.primaryColor.inverted,
+                          size: CortexDesign.icon,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -778,7 +813,7 @@ class ModelSelectButton extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       AppColors.senaryColor.withValues(alpha: 0.1),
-                      Colors.transparent
+                      Colors.transparent,
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,

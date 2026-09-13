@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+
 import 'package:cortex/chat/screen/widgets/glow.dart';
 import 'package:cortex/chat/screen/widgets/bottom/panels/edit.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
+
 import 'input/input.dart';
 
 class ChatInputPanel extends StatefulWidget {
@@ -87,8 +89,22 @@ class _ChatInputPanelState extends State<ChatInputPanel>
   /// Public method to request keyboard focus on the chat input field.
   /// Called by ChatController after the initial setup pipeline completes.
   void requestKeyboardFocus() {
-    if (mounted && !_focusNode.hasFocus) {
+    if (!mounted) return;
+    // Voice Mode owns the screen; opening the composer keyboard over the
+    // voice overlay would fight the session the user just started.
+    if (_voiceModeActive) return;
+    if (!_focusNode.hasFocus) {
       _focusNode.requestFocus();
+    }
+  }
+
+  /// Whether Voice Mode currently owns the chat screen. Tolerates a missing
+  /// provider scope (unit tests) by behaving as if it were inactive.
+  bool get _voiceModeActive {
+    try {
+      return context.read<InputProvider>().isVoiceModeActive;
+    } catch (_) {
+      return false;
     }
   }
 
@@ -112,27 +128,22 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       isCurrentModelPremium,
       isUserSubscribed,
       chatLimitManager,
-    ) = context.select<
-        ChatSessionProvider,
-        (
-          String?,
-          bool,
-          bool,
-          bool,
-          String?,
-          bool,
-          bool,
-          dynamic,
-        )>((s) => (
-          s.modelId,
-          s.isDynamicChat,
-          s.canHandleImage,
-          s.isStorageSufficient,
-          s.role,
-          s.isCurrentModelPremium,
-          s.isUserSubscribed,
-          s.chatLimitManager,
-        ));
+    ) = context
+        .select<
+          ChatSessionProvider,
+          (String?, bool, bool, bool, String?, bool, bool, dynamic)
+        >(
+          (s) => (
+            s.modelId,
+            s.isDynamicChat,
+            s.canHandleImage,
+            s.isStorageSufficient,
+            s.role,
+            s.isCurrentModelPremium,
+            s.isUserSubscribed,
+            s.chatLimitManager,
+          ),
+        );
 
     final conversationProvider = context.read<ConversationProvider>();
 
@@ -142,15 +153,9 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       isEditingMode,
       originalMessageText,
       preselectedPhoto,
-    ) = context.select<
-        InputProvider,
-        (
-          bool,
-          bool,
-          bool,
-          String?,
-          String?,
-        )>((p) {
+    ) = context.select<InputProvider, (bool, bool, bool, String?, String?)>((
+      p,
+    ) {
       final atts = p.attachments;
       final photoPath = atts.isNotEmpty && atts.first.file.path.isNotEmpty
           ? atts.first.file.path
@@ -188,8 +193,9 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     // Check if model is missing (Only for offline non-dynamic models)
     final modelMissing = !isDynamicChat && isOffline && !isDownloaded;
 
-    final bool isLimitExceeded =
-        context.select<ConversationProvider, bool>((c) {
+    final bool isLimitExceeded = context.select<ConversationProvider, bool>((
+      c,
+    ) {
       return chatLimitManager?.isLimitExceeded(c.messages) ?? false;
     });
 
@@ -247,8 +253,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                         isLimitExceeded: isLimitExceeded,
                         isPhotoLoading: isAttachmentLoading,
                         isSending: isWaitingForResponse,
-                        canHandleImage:
-                            isDynamicChat ? true : canHandleImage,
+                        canHandleImage: isDynamicChat ? true : canHandleImage,
                         isEditingMode: isEditingMode,
                         originalMessageText: originalMessageText,
                         // Legacy photo support for UI
@@ -274,18 +279,18 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
                         // --- Actions ---
                         onSend: () async => _handleSend(
-                            localizations,
-                            isLimitExceeded,
-                            langCode,
-                            modelService,
-                            context.read<InputProvider>(),
-                            conversationProvider),
+                          localizations,
+                          isLimitExceeded,
+                          langCode,
+                          modelService,
+                          context.read<InputProvider>(),
+                          conversationProvider,
+                        ),
                         onApplyEditedMessage: () async => await widget
                             .editService
                             .applyEditedMessage(context),
                         onStop: () {
-                          final voiceService =
-                              context.read<VoiceService>();
+                          final voiceService = context.read<VoiceService>();
                           if (voiceService.isFlowActive) {
                             // [NEW] Flow Mode: Pause & Listen (Interruption)
                             voiceService.interruptFlowAndListen();
@@ -301,9 +306,10 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                         // Logic Update: Null check before adding
                         onPhotoSelected: (photo) {
                           if (photo != null) {
-                            context
-                                .read<InputProvider>()
-                                .addAttachment(photo, isImage: true);
+                            context.read<InputProvider>().addAttachment(
+                              photo,
+                              isImage: true,
+                            );
                           }
                         },
                         onCancelEditing: () {
@@ -366,7 +372,8 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     FocusScope.of(context).unfocus();
     // Send Logic
     debugPrint(
-        "ChatInputPanel: Sending message. Text length: ${messageText.length}. Attachments: ${inputProvider.attachments.length}");
+      "ChatInputPanel: Sending message. Text length: ${messageText.length}. Attachments: ${inputProvider.attachments.length}",
+    );
     final sendFuture = sendService.sendMessage(
       context: context,
       localizations: localizations,

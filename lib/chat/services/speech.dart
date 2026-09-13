@@ -147,8 +147,9 @@ class SpeechService with ChangeNotifier {
     if (_nativeLocaleIds == null) {
       try {
         final available = await _speech.locales();
-        _nativeLocaleIds =
-            available.map((locale) => locale.localeId).toList(growable: false);
+        _nativeLocaleIds = available
+            .map((locale) => locale.localeId)
+            .toList(growable: false);
       } catch (_) {
         _nativeLocaleIds = const <String>[];
       }
@@ -182,8 +183,9 @@ class SpeechService with ChangeNotifier {
     required String locale,
     required Function(String text) onResult,
     SpeechOwner owner = SpeechOwner.dictation,
-    void Function()? onClosed,
+    void Function(SttCloseInfo info)? onClosed,
     void Function(SttLease lease)? onLease,
+    void Function(SttResult result)? onSttResult,
   }) async {
     if (_disposed) return false;
 
@@ -204,18 +206,30 @@ class SpeechService with ChangeNotifier {
       final startedRemote = await _remote.start(
         onResult: (result) {
           if (_disposed || generation != _generation || !_usingRemote) return;
+          // The structured frame behind the text (confidence included) —
+          // Voice Mode's barge-in gating reads it. Dictation callers pass
+          // no handler and pay nothing for it.
+          onSttResult?.call(result);
           final spoken = result.isFinal
               ? _appendFinal(result.text)
               : _withInterim(result.text);
           onResult(_capitalize(spoken));
         },
-        onClosed: () {
+        onClosed: (info) {
           if (_disposed || generation != _generation) return;
-          _usingRemote = false;
-          _isListening = false;
-          _detachRemoteLevel();
+          // A socket that died on top of a LIVE microphone is recoverable:
+          // the capture keeps streaming (chunks buffer in the remote
+          // service) and the session reconnects the socket alone, so the
+          // logical capture — and everything keyed on it, like barge-in
+          // level sampling — stays alive. Only a capture with no
+          // microphone left is actually dead.
+          if (!_remote.isMicLive) {
+            _usingRemote = false;
+            _isListening = false;
+            _detachRemoteLevel();
+          }
           _notifyNow();
-          onClosed?.call();
+          onClosed?.call(info);
         },
         onLease: onLease,
         mode: mode,
@@ -333,6 +347,27 @@ class SpeechService with ChangeNotifier {
     _finalizedText = "";
     _notifyNow();
   }
+
+  /// True when the remote capture's microphone is still live after a socket
+  /// death — the socket can be reconnected without re-opening the mic, so
+  /// the user's first words after the gap are buffered, never lost.
+  bool get isRemoteSocketReconnectable => _usingRemote && _remote.isMicLive;
+
+  /// Reconnects ONLY the provider socket of the active remote capture,
+  /// keeping the microphone untouched. The capture never stopped, so no
+  /// generation changes and every callback handed out stays valid. Returns
+  /// false when the remote service could not re-establish the socket — the
+  /// caller then falls back to a full engine restart.
+  Future<bool> reconnectRemoteSocket() async {
+    if (_disposed || !_usingRemote) return false;
+    return _remote.reconnectSocket();
+  }
+
+  /// One line of live remote-capture health (socket state, mic state, frame /
+  /// forward / transcript ages). The voice session prints this periodically
+  /// so a session can never claim "listening" while audio frames have
+  /// actually stopped flowing.
+  String remoteHealthLine() => _remote.healthLine();
 
   void _onRemoteLevel() {
     if (!_usingRemote || _disposed) return;

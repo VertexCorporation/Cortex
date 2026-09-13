@@ -21,6 +21,8 @@ import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import 'voice_health.dart';
+
 class RemoteTtsService {
   RemoteTtsService._();
   static final RemoteTtsService instance = RemoteTtsService._();
@@ -33,10 +35,12 @@ class RemoteTtsService {
   /// spending a request to find that out.
   static const int maxChars = 800;
 
-  final Dio _dio = createFulcrumHttp(BaseOptions(
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 30),
-  ));
+  final Dio _dio = createFulcrumHttp(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 30),
+    ),
+  );
 
   AudioPlayer? _player;
   bool _contextConfigured = false;
@@ -67,7 +71,18 @@ class RemoteTtsService {
       stayAwake: true,
       contentType: AndroidContentType.speech,
       usageType: AndroidUsageType.assistant,
-      audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+      // NO audio focus, deliberately. record_android's AudioRecorder
+      // registers an audio-focus listener for the microphone by default and
+      // PAUSES the recording forever on any focus loss (its resume path only
+      // exists in pauseResume mode). Requesting focus per sentence here used
+      // to make every sentence's playback silently kill the microphone —
+      // verified on device: the socket stayed alive and only KeepAlive frames
+      // flowed, so the user's next utterance never reached STT. Voice Mode's
+      // own playback is short-form speech; ducking others is not worth the
+      // microphone. The recorder side is also hardened (its config now uses
+      // AudioInterruptionMode.none), so neither component does focus games
+      // while the mic should be live.
+      audioFocus: AndroidAudioFocus.none,
     ),
   );
 
@@ -81,6 +96,46 @@ class RemoteTtsService {
       }
     }
     return _player ??= AudioPlayer();
+  }
+
+  /// Fire-and-forget request sent when a voice session OPENS. The synthesis
+  /// endpoint runs on a scale-to-zero container, and the device log showed
+  /// the FIRST real sentence paying an ~8-second cold boot before playback
+  /// could begin — every later sentence on the warm instance took ~1–3s.
+  /// This request is rejected by the server (empty text) within
+  /// milliseconds, but it still boots the container while the user is still
+  /// talking, so the first sentence's synthesis hits a warm instance.
+  ///
+  /// Never throws, never blocks the caller, and does not spend speech
+  /// credits: the server rejects empty text before any synthesis.
+  Future<void> warmup() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final token = await user.getIdToken();
+      if (token == null) return;
+      final started = DateTime.now();
+      await _dio.post<List<int>>(
+        _endpoint,
+        data: const {'text': ''},
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          validateStatus: (_) => true,
+        ),
+      );
+      VoiceTelemetry.mark(
+        'TTS warmup done '
+        '(${DateTime.now().difference(started).inMilliseconds}ms)',
+      );
+    } catch (e) {
+      // Warmup is best-effort by definition: the network being cold now does
+      // not stop the session, it just leaves the container cold.
+      debugPrint('[RemoteTts] Warmup unavailable: $e');
+    }
   }
 
   /// Fetches spoken audio for one sentence.
@@ -97,12 +152,18 @@ class RemoteTtsService {
     final generation = _generation;
     final cancelToken = CancelToken();
     _requests.add(cancelToken);
+    final synthStartedAt = DateTime.now();
+    final preview = trimmed.length > 18
+        ? '${trimmed.substring(0, 18)}…'
+        : trimmed;
+    VoiceTelemetry.mark('TTS synth request start: "$preview"');
 
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return null;
       final token = await user.getIdToken();
-      if (token == null || cancelToken.isCancelled ||
+      if (token == null ||
+          cancelToken.isCancelled ||
           FirebaseAuth.instance.currentUser?.uid != user.uid) {
         return null;
       }
@@ -134,7 +195,12 @@ class RemoteTtsService {
         return null;
       }
       final bytes = Uint8List.fromList(response.data!);
-      return bytes.isEmpty ? null : bytes;
+      if (bytes.isEmpty) return null;
+      VoiceTelemetry.mark(
+        'TTS bytes ready (${DateTime.now().difference(synthStartedAt).inMilliseconds}ms, '
+        '${(bytes.length / 1024).round()}KB)',
+      );
+      return bytes;
     } catch (e) {
       if (kDebugMode) debugPrint('[RemoteTts] Synthesis unavailable.');
       return null;
@@ -173,8 +239,10 @@ class RemoteTtsService {
       });
 
       // Subscribe before play: short clips can finish before play() returns.
+      VoiceTelemetry.mark('TTS playback start');
       await player.play(BytesSource(bytes));
       await completer.future;
+      VoiceTelemetry.mark('TTS playback complete');
       return true;
     } catch (e) {
       debugPrint("[RemoteTts] play failed: $e");

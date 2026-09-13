@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -11,6 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/stt_remote.dart';
 import 'package:cortex/chat/services/tts_remote.dart';
+import 'package:cortex/chat/services/voice_barge_in.dart';
+import 'package:cortex/chat/services/voice_health.dart';
 
 /// The realtime Voice/Flow lifecycle. One enum, one truth: no combination of
 /// booleans can put the session in two states at once. UI-compat: the four
@@ -38,6 +41,21 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   Timer? _silenceTimer;
   Timer? _voiceTimer;
   Function(String)? _onFinalSentence; // Callback to send text to AI
+
+  /// Prints the remote capture health line every few seconds while a
+  /// session is live — last mic frame, last forwarded chunk, last
+  /// transcript, socket state — so a stalled capture is visible in the
+  /// device log instead of masquerading as "listening" (it once did: audio
+  /// focus paused the recorder mid-session with zero other symptoms).
+  Timer? _healthTimer;
+
+  /// Turn-scoped telemetry flags: the first streamed AI chunk of a turn and
+  /// the first transcript after playback both produce one [VoiceTelemetry]
+  /// mark each, which is exactly the pair of timings real-device testing
+  /// cares about (STT final → first AI token; TTS complete → next user
+  /// audio).
+  bool _firstAiChunkSeen = false;
+  bool _awaitingPostTtsTranscript = false;
 
   bool isFlowMode = false; // "Setup" mode (Flow selected but not started)
   bool isFlowActive = false; // "Active" mode (Flow loop running)
@@ -102,13 +120,13 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   bool get sttEngineIsRemote => _speechService.isRemoteActive;
 
   // --- BARGE-IN (user interrupts assistant speech by talking) ------------
-  /// While the assistant speaks and the remote mic stays open, sustained
-  /// microphone level above this for [_bargeInSamples] consecutive samples
-  /// PLUS at least one transcript frame counts as the user starting to talk.
-  static const double _bargeInLevel = 0.45;
-  static const int _bargeInSamples = 3;
-  int _bargeInHits = 0;
-  bool _heardSpeechWhileSpeaking = false;
+  /// Confidence-gated detector replacing the old "one transcript frame +
+  /// three loud samples" heuristic: echo bleeds through that gate far too
+  /// easily, and echo was solved at the cost of nothing being solved. The
+  /// microphone stays OPEN while the assistant speaks (continuous capture,
+  /// AEC untouched); the DETECTOR decides which evidence means the user
+  /// started talking. See [BargeInDetector] for the exact gates.
+  late final BargeInDetector _bargeIn = BargeInDetector(clock: _clock);
 
   // --- RECONNECT ----------------------------------------------------------
   /// Provider sockets can die mid-session (idle closes, network drops). The
@@ -147,6 +165,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _cancelPendingSpeech() {
     _speechGeneration++;
     _sentenceQueue.clear();
+    // Playback is over from the barge-in detector's point of view too: the
+    // post-TTS echo discard window starts here.
+    _bargeIn.onAssistantSpeechStopped();
     unawaited(_remoteTts.stop());
   }
 
@@ -160,7 +181,11 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   VoiceService({
     required this._speechService,
     FlutterTts? flutterTts,
-  }) : _flutterTts = flutterTts ?? FlutterTts() {
+    DateTime Function()? clock,
+    Duration Function(SttCloseInfo info, int attempt)? reconnectBackoff,
+  }) : _clock = clock ?? DateTime.now,
+       _reconnectBackoffOverride = reconnectBackoff,
+       _flutterTts = flutterTts ?? FlutterTts() {
     _initTts();
     _speechService.addListener(_onSpeechStatusChange);
     // App-lifecycle policy: backgrounding the app ends the realtime session
@@ -169,6 +194,15 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
   }
 
+  /// Time source, injectable so tests can drive the barge-in windows
+  /// deterministically instead of sleeping real milliseconds.
+  final DateTime Function() _clock;
+
+  /// Reconnect backoff policy, injectable for tests (the default is the
+  /// classification-driven jittered policy in [_reconnectDelayFor]).
+  final Duration Function(SttCloseInfo info, int attempt)?
+  _reconnectBackoffOverride;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
@@ -176,7 +210,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       final gen = _activeGeneration;
       if (gen != null) {
         debugPrint(
-            "[VoiceService] Session $gen ended: app backgrounded ($state).");
+          "[VoiceService] Session $gen ended: app backgrounded ($state).",
+        );
         unawaited(_endSession(gen, VoiceEndReason.background));
       }
     }
@@ -193,6 +228,23 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     super.dispose();
   }
 
+  /// Prints the remote capture's health line every few seconds while the
+  /// session is live: socket state, mic state, recorder state, and the ages
+  /// of the last received frame / forwarded chunk / transcript. With this
+  /// line in the log a "listening" session with a dead capture path is
+  /// impossible to miss — the exact failure real-device testing caught.
+  void _startHealthTimer(int gen) {
+    _healthTimer?.cancel();
+    _healthTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (gen != _activeGeneration) {
+        _healthTimer?.cancel();
+        _healthTimer = null;
+        return;
+      }
+      debugPrint("[VoiceHealth] ${_speechService.remoteHealthLine()}");
+    });
+  }
+
   void _cancelAllTimers() {
     _silenceTimer?.cancel();
     _silenceTimer = null;
@@ -206,6 +258,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _windowTimer = null;
     _budgetTicker?.cancel();
     _budgetTicker = null;
+    _healthTimer?.cancel();
+    _healthTimer = null;
   }
 
   void _onSpeechStatusChange() {
@@ -213,23 +267,18 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     if (gen == null) return;
 
     // 1. Barge-in sampling: the remote mic stays open while the assistant
-    //    speaks, and level updates flow through here. Loudness alone is not
-    //    enough (speaker echo can look loud without AEC): require sustained
-    //    level AND at least one transcript frame, then cut the audio.
+    //    speaks, and level updates flow through here into the detector.
+    //    The microphone is never muted during playback; the detector's
+    //    gates (sustained amplitude + confident, non-echo transcript)
+    //    decide what counts as the user talking over the audio.
     if (_state == VoiceState.speaking && _speechService.isRemoteActive) {
-      final level = _speechService.soundLevel;
-      if (level >= _bargeInLevel) {
-        _bargeInHits++;
-        if (_bargeInHits >= _bargeInSamples && _heardSpeechWhileSpeaking) {
-          _bargeInHits = 0;
-          _interruptForBargeIn(gen);
-          return;
-        }
-      } else {
-        _bargeInHits = 0;
+      _bargeIn.onLevel(_speechService.soundLevel);
+      if (_bargeIn.shouldBargeIn) {
+        _interruptForBargeIn(gen);
+        return;
       }
     } else {
-      _bargeInHits = 0;
+      _bargeIn.onLevel(0.0);
     }
 
     // 2. Native-fallback auto-stop (speech_to_text stops itself after
@@ -240,7 +289,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
         !_speechService.isRemoteActive &&
         _state == VoiceState.listening) {
       debugPrint(
-          "[VoiceService] Native listener stopped (session $gen). hasText: $hasRecognizedText");
+        "[VoiceService] Native listener stopped (session $gen). hasText: $hasRecognizedText",
+      );
       if (hasRecognizedText) {
         _emptyNativeRestarts = 0;
         unawaited(_finalizeUserSpeech(gen));
@@ -259,14 +309,15 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     await _flutterTts.setVolume(1.0); // Maximum volume
     await _flutterTts.setSharedInstance(true);
     await _flutterTts.setIosAudioCategory(
-        IosTextToSpeechAudioCategory.playAndRecord,
-        [
-          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
-          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
-          IosTextToSpeechAudioCategoryOptions.mixWithOthers,
-          IosTextToSpeechAudioCategoryOptions.defaultToSpeaker
-        ],
-        IosTextToSpeechAudioMode.voiceChat);
+      IosTextToSpeechAudioCategory.playAndRecord,
+      [
+        IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+        IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+        IosTextToSpeechAudioCategoryOptions.mixWithOthers,
+        IosTextToSpeechAudioCategoryOptions.defaultToSpeaker,
+      ],
+      IosTextToSpeechAudioMode.voiceChat,
+    );
 
     await _flutterTts.awaitSpeakCompletion(true);
 
@@ -308,7 +359,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       // Voice -> Flow: "Stop listening instantly and morph to line".
       _updateState(VoiceState.processing);
       debugPrint(
-          "[VoiceService] Switched to Flow Mode: Stopped Listening, Visual=Line");
+        "[VoiceService] Switched to Flow Mode: Stopped Listening, Visual=Line",
+      );
     } else {
       // Flow -> Voice: "Start listening instantly and morph to dot". A fresh
       // session generation is created by startListening — no stale artifacts.
@@ -362,7 +414,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void interruptFlowAndListen() async {
     final gen = _activeGeneration;
     debugPrint(
-        "[VoiceService] Interrupting Flow. Transitioning to Listen Mode.");
+      "[VoiceService] Interrupting Flow. Transitioning to Listen Mode.",
+    );
     _isFlowInterrupted = true;
     _isSpeaking = false;
     _cancelPendingSpeech();
@@ -402,16 +455,19 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _interruptForBargeIn(int gen) {
     if (gen != _activeGeneration || _state != VoiceState.speaking) return;
     debugPrint("[VoiceService] Barge-in (session $gen): cutting audio.");
-    unawaited(_haltAssistantSpeech(gen).then((_) {
-      if (gen != _activeGeneration) return;
-      _lastRecognizedText = "";
-      _liveTranscript = "";
-      _isLiveUserMessage = true;
-      _heardSpeechWhileSpeaking = false;
-      _updateState(VoiceState.listening);
-      _armInactivityTimer(gen);
-      notifyListeners();
-    }));
+    unawaited(
+      _haltAssistantSpeech(gen).then((_) {
+        if (gen != _activeGeneration) return;
+        _lastRecognizedText = "";
+        _liveTranscript = "";
+        _isLiveUserMessage = true;
+        // Fresh evidence cycle for the next time the assistant speaks.
+        _bargeIn.reset();
+        _updateState(VoiceState.listening);
+        _armInactivityTimer(gen);
+        notifyListeners();
+      }),
+    );
   }
 
   void stopSpeaking({BuildContext? context}) async {
@@ -483,7 +539,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   }) async {
     if (_activeGeneration != null) {
       debugPrint(
-          "[VoiceService] startSession ignored: a session is already active.");
+        "[VoiceService] startSession ignored: a session is already active.",
+      );
       return;
     }
 
@@ -495,6 +552,18 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _lastContext = context;
     _currentLocale = locale;
     _onFinalSentence = onFinalSentence;
+
+    // Timing window for the whole session: every hop (mic frames, socket,
+    // STT final, first AI token, sentence queue, TTS, playback) logs its
+    // delta from this instant. Also warm the speech-synthesis endpoint
+    // now: the container is scale-to-zero and its cold boot (~8s, measured)
+    // used to sit on the critical path of the FIRST sentence. The warmup
+    // request is rejected by the server within milliseconds — it boots the
+    // container while the user is still speaking.
+    VoiceTelemetry.begin();
+    VoiceTelemetry.mark('voice session opening');
+    unawaited(_remoteTts.warmup());
+
     _isSpeaking = false;
     _liveTranscript = "";
     _lastRecognizedText = "";
@@ -529,7 +598,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
     final gen = _ensureSession();
     debugPrint(
-        "[VoiceService] Session $gen starting (${isFlowMode ? "flow" : "voice"}).");
+      "[VoiceService] Session $gen starting (${isFlowMode ? "flow" : "voice"}).",
+    );
     await _beginListening(gen);
   }
 
@@ -537,8 +607,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     final session = context.read<ChatSessionProvider>();
 
     // Check Chat Limits (e.g. free user max messages)
-    if (session.chatLimitManager
-            ?.isLimitExceeded(context.read<ConversationProvider>().messages) ==
+    if (session.chatLimitManager?.isLimitExceeded(
+          context.read<ConversationProvider>().messages,
+        ) ==
         true) {
       debugPrint("[VoiceService] Chat limit exceeded. Stopping.");
       stopSession();
@@ -593,6 +664,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _liveTranscript = "";
     _isSpeaking = false;
     _reconnecting = false;
+    _bargeIn.reset();
 
     // Microphone, native TTS and the remote audio player all released.
     await _speechService.stopListening();
@@ -705,7 +777,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
             if (gen != _activeGeneration) return;
             if (_state == VoiceState.speaking) {
               debugPrint(
-                  "[VoiceService] Test Mode: Simulated AI speaking done. Restarting loop.");
+                "[VoiceService] Test Mode: Simulated AI speaking done. Restarting loop.",
+              );
               startListening(context: context);
             }
           });
@@ -731,8 +804,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     }
 
     _updateState(VoiceState.processing);
+    _firstAiChunkSeen = false;
 
     String textToSend = _lastRecognizedText;
+    VoiceTelemetry.mark('STT final → chat request: "$textToSend"');
 
     // User speech is visible (breaks the flow loop temporarily; the user can
     // always intervene).
@@ -754,13 +829,19 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// Helper to clean raw streaming response for UI and TTS
   String _cleanResponseText(String text) {
     String cleaned = text;
-    cleaned =
-        cleaned.replaceAll(RegExp(r'<function[\s\S]*?</function>[\s:]*'), '');
+    cleaned = cleaned.replaceAll(
+      RegExp(r'<function[\s\S]*?</function>[\s:]*'),
+      '',
+    );
     cleaned = cleaned.replaceAll(RegExp(r'<function[\s\S]*?>[\s:]*'), '');
     cleaned = cleaned.replaceAll(
-        RegExp(r'<tool_call>[\s\S]*?</tool_call>[\s:]*'), '');
-    cleaned =
-        cleaned.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
+      RegExp(r'<tool_call>[\s\S]*?</tool_call>[\s:]*'),
+      '',
+    );
+    cleaned = cleaned.replaceAll(
+      RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'),
+      '',
+    );
     cleaned = cleaned.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
     return cleaned;
   }
@@ -769,6 +850,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void onAiStreamCallback(String chunk) {
     final gen = _activeGeneration;
     if (gen == null) return; // No live session: nothing to speak into.
+    if (!_firstAiChunkSeen) {
+      _firstAiChunkSeen = true;
+      VoiceTelemetry.mark('first AI token received');
+    }
     _incomingTextBuffer.write(chunk);
     _fullAiResponseBuffer.write(chunk);
     _liveTranscript = _cleanResponseText(_fullAiResponseBuffer.toString());
@@ -839,7 +924,11 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     if (speechText.trim().isEmpty) return;
 
     debugPrint(
-        "[VoiceService] Enqueuing Sentence: ${speechText.substring(0, speechText.length > 20 ? 20 : speechText.length)}...");
+      "[VoiceService] Enqueuing Sentence: ${speechText.substring(0, speechText.length > 20 ? 20 : speechText.length)}...",
+    );
+    VoiceTelemetry.mark(
+      'sentence queued (${_sentenceQueue.length + 1}): "${speechText.length > 18 ? '${speechText.substring(0, 18)}…' : speechText}"',
+    );
     _sentenceQueue.add(speechText);
     _processQueue();
   }
@@ -867,6 +956,11 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       _updateState(VoiceState.speaking);
       final int generation = _speechGeneration;
       final String next = _sentenceQueue.removeAt(0);
+
+      // The sentence being spoken becomes the barge-in detector's echo
+      // fingerprint: transcripts of these words arriving during playback are
+      // speaker bounce, not the user.
+      _bargeIn.onAssistantSpeechStarted(next);
 
       debugPrint("[VoiceService] Speaking: $next");
 
@@ -903,7 +997,16 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
     // Loop Finished
     debugPrint("[VoiceService] Queue Finished.");
+    VoiceTelemetry.mark('TTS queue finished — returning to listening');
+    // The next transcript that arrives proves the post-TTS capture path is
+    // alive end to end (mic frames → STT): it closes the "TTS completion →
+    // next user audio forwarded" timing.
+    _awaitingPostTtsTranscript = true;
     _isSpeaking = false;
+    // Natural end of playback: the post-TTS echo discard window starts, and
+    // the autonomous-resume path below returns the session to listening
+    // without the user doing anything.
+    _bargeIn.onAssistantSpeechStopped();
 
     // Trigger Completion Logic (replaces the Handler callback logic)
     if (_aiGenerationComplete) {
@@ -923,7 +1026,11 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     if (complete && !_isSpeaking && _sentenceQueue.isEmpty) {
       // Flow Mode Logic: Cycle to next agent
       if (isFlowActive) {
-        // Wait a bit before next turn
+        // Wait a bit before next turn. Cancel any pending timer FIRST —
+        // a second completion must never orphan the first timer: an
+        // orphaned rotation timer still fires (it is only
+        // generation-guarded) and would double-advance the agents.
+        _voiceTimer?.cancel();
         _voiceTimer = Timer(const Duration(milliseconds: 800), () {
           if (gen != _activeGeneration) return;
           if (!isFlowActive) return; // check if cancelled
@@ -947,11 +1054,13 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
           _shouldNextMessageBeHidden = true;
           if (_onFinalSentence != null) {
             debugPrint(
-                "[VoiceService] Triggering verified next Flow turn: Agent $currentFlowAgentIndex");
+              "[VoiceService] Triggering verified next Flow turn: Agent $currentFlowAgentIndex",
+            );
             _onFinalSentence!(prompt);
           } else {
             debugPrint(
-                "[VoiceService] CRITICAL ERROR: _onFinalSentence is null!");
+              "[VoiceService] CRITICAL ERROR: _onFinalSentence is null!",
+            );
           }
         });
         return;
@@ -959,6 +1068,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
       // Edge case: generation finished but nothing was spoken (e.g. very
       // short answer or bug), or generation finished while we were idle.
+      _voiceTimer?.cancel();
       _voiceTimer = Timer(const Duration(milliseconds: 500), () {
         if (gen != _activeGeneration) return;
         if (_state != VoiceState.idle && !isFlowActive) {
@@ -983,8 +1093,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _reconnectAttempts = 0;
     _emptyNativeRestarts = 0;
     _recyclePending = false;
-    _bargeInHits = 0;
-    _heardSpeechWhileSpeaking = false;
+    _bargeIn.reset();
     lastEndReason = null;
     return gen;
   }
@@ -1005,7 +1114,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
         if (gen != _activeGeneration) return;
         if (_state == VoiceState.listening) {
           debugPrint(
-              "[VoiceService] Test Mode: Simulated user speech finished.");
+            "[VoiceService] Test Mode: Simulated user speech finished.",
+          );
           unawaited(_finalizeUserSpeech(gen));
         }
       });
@@ -1019,7 +1129,11 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       _reconnecting = false;
       if (!quiet || _state == VoiceState.connecting) {
         _updateState(VoiceState.listening);
+        VoiceTelemetry.mark(
+          quiet ? 're-listening (reconnect)' : 'listening ready',
+        );
       }
+      _startHealthTimer(gen);
       _armInactivityTimer(gen);
       notifyListeners();
     } else {
@@ -1039,43 +1153,114 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       locale: _currentLocale,
       owner: isFlowMode ? SpeechOwner.flow : SpeechOwner.voice,
       onResult: (text) => _onSttResult(gen, text),
-      onClosed: () => _handleSttClosed(gen),
+      onClosed: (info) => _handleSttClosed(gen, info),
       onLease: (lease) => _applyLease(gen, lease),
+      onSttResult: (result) => _onSttStructuredResult(gen, result),
     );
   }
 
   /// Routes one STT result by session state:
   ///  * listening — feeds the transcript and the silence timer (turn taking);
-  ///  * speaking — marks evidence of the user talking over the assistant
-  ///    (barge-in); the text itself is discarded so echo-transcribed
-  ///    assistant words can never leak into the user's next turn;
+  ///  * speaking — ignored here: the text evidence that matters during
+  ///    playback is the STRUCTURED frame (with the provider confidence),
+  ///    which arrives via [_onSttStructuredResult] and feeds the barge-in
+  ///    detector; echo-transcribed assistant words never leak into the
+  ///    user's turn either way;
   ///  * processing/connecting — ignored (the turn is already in flight).
   void _onSttResult(int gen, String text) {
     if (gen != _activeGeneration || text.isEmpty) return;
+    if (_awaitingPostTtsTranscript && _state == VoiceState.listening) {
+      _awaitingPostTtsTranscript = false;
+      VoiceTelemetry.mark('post-TTS user audio reached STT');
+    }
     switch (_state) {
       case VoiceState.listening:
         _resetSilenceTimer(text, gen);
-      case VoiceState.speaking:
-        _heardSpeechWhileSpeaking = true;
       default:
         break;
     }
   }
 
-  /// The remote socket closed on its own (idle close, network drop, provider
-  /// session cap): the session is still alive — reconnect under the SAME
-  /// generation, bounded per session.
-  void _handleSttClosed(int gen) {
-    if (gen != _activeGeneration || _reconnecting) return;
-    if (_state == VoiceState.listening ||
-        _state == VoiceState.connecting ||
-        _state == VoiceState.speaking) {
-      debugPrint("[VoiceService] STT closed (session $gen) — reconnecting.");
-      unawaited(_reconnect(gen));
+  /// The structured remote frame behind every text result. While the
+  /// assistant speaks it feeds the barge-in detector (confidence gate,
+  /// word-count gate, echo fingerprint, post-TTS discard window — see
+  /// [BargeInDetector]). In the other states the text path alone is enough.
+  void _onSttStructuredResult(int gen, SttResult result) {
+    if (gen != _activeGeneration || result.text.isEmpty) return;
+    if (_state == VoiceState.speaking) {
+      _bargeIn.onUserTranscript(
+        text: result.text,
+        confidence: result.confidence,
+      );
     }
   }
 
-  Future<void> _reconnect(int gen) async {
+  /// The remote socket closed on its own. The classification (see
+  /// [SttCloseInfo]) decides the policy: fatal closes end the session —
+  /// retrying a protocol error or undecodable audio stream cannot succeed —
+  /// and every other close reconnects under the SAME generation, bounded per
+  /// session, with the microphone preserved whenever it is still live.
+  void _handleSttClosed(int gen, SttCloseInfo info) {
+    if (gen != _activeGeneration || _reconnecting) return;
+
+    if (info.isFatal) {
+      debugPrint(
+        "[VoiceService] STT closed fatally (session $gen): code=${info.closeCode} msg=${info.msgCode ?? info.closeReason ?? 'n/a'}.",
+      );
+      unawaited(_endSession(gen, VoiceEndReason.error));
+      return;
+    }
+    if (_state == VoiceState.listening ||
+        _state == VoiceState.connecting ||
+        _state == VoiceState.speaking) {
+      debugPrint(
+        "[VoiceService] STT closed (session $gen, ${info.closeClass}) — reconnecting.",
+      );
+      unawaited(_reconnect(gen, info));
+    }
+  }
+
+  /// Jittered backoff for a reconnect attempt, driven by the close
+  /// classification. Pure and exposed for tests.
+  ///
+  ///  * reconnectImmediate (Deepgram NET-0001, the client went silent):
+  ///    retry fast and keep the line warm — the microphone is supposedly
+  ///    streaming, so this is a blip, and the socket-only reconnect makes
+  ///    the gap a few hundred milliseconds.
+  ///  * reconnect (NET-0000 / unknown abnormal close): exponential from
+  ///    0.5s, capped at 3s so a user never waits longer than that for a
+  ///    provider hiccup.
+  ///  * reconnectExtended (NET-0002 no-audio idle timeout): the
+  ///    connection was idle long enough to time out — take the retry slower
+  ///    and let the keep-alive supervision own the steady state.
+  ///
+  /// The jitter keeps a fleet of clients from thundering a provider blip
+  /// in lockstep.
+  @visibleForTesting
+  static Duration reconnectDelayFor(SttCloseInfo info, int attempt) {
+    final jitter = DateTime.now().microsecondsSinceEpoch % 250;
+    switch (info.closeClass) {
+      case SttCloseClass.reconnectImmediate:
+        return Duration(milliseconds: 250 + jitter);
+      case SttCloseClass.reconnectExtended:
+        final total = 2000 + jitter * 4 + (attempt - 1) * 1000;
+        return Duration(milliseconds: total > 6000 ? 6000 : total);
+      case SttCloseClass.reconnect:
+        final base = 500 * (1 << (attempt - 1));
+        final total = base + jitter;
+        return Duration(milliseconds: total > 3000 ? 3000 : total);
+      case SttCloseClass.fatal:
+        return Duration.zero; // callers never reconnect on fatal
+    }
+  }
+
+  Duration _backoffFor(SttCloseInfo info, int attempt) {
+    final override = _reconnectBackoffOverride;
+    if (override != null) return override(info, attempt);
+    return reconnectDelayFor(info, attempt);
+  }
+
+  Future<void> _reconnect(int gen, SttCloseInfo info) async {
     if (gen != _activeGeneration || _reconnecting) return;
     if (_reconnectAttempts >= _maxReconnectsPerSession) {
       debugPrint("[VoiceService] Reconnect budget exhausted (session $gen).");
@@ -1086,10 +1271,38 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     }
     _reconnecting = true;
     _reconnectAttempts++;
-    // If the daily pool was exhausted, the server refuses this mint and the
-    // restart falls back to native; if that fails too the session ends below.
-    final started = await _restartEngine(gen);
-    if (gen != _activeGeneration) return;
+
+    final delay = _backoffFor(info, _reconnectAttempts);
+    if (delay > Duration.zero) {
+      await Future<void>.delayed(delay);
+    }
+    if (gen != _activeGeneration) {
+      _reconnecting = false;
+      return;
+    }
+
+    // 1. Socket-only reconnect: the microphone never stopped — its chunks
+    //    kept buffering through the gap, so the user's first word after it
+    //    flows to the fresh socket instead of being lost to a re-open.
+    bool started = false;
+    if (_speechService.isRemoteSocketReconnectable) {
+      started = await _speechService.reconnectRemoteSocket();
+    }
+    // 2. Full engine restart: native capture, dead microphone, or a socket
+    //    that could not be re-established. If the daily pool was exhausted,
+    //    the server refuses this mint and the restart falls back to native;
+    //    if that fails too the session ends below.
+    if (gen != _activeGeneration) {
+      _reconnecting = false;
+      return;
+    }
+    if (!started) {
+      started = await _restartEngine(gen);
+    }
+    if (gen != _activeGeneration) {
+      _reconnecting = false;
+      return;
+    }
     _reconnecting = false;
     if (!started) {
       final reason = _speechService.remoteVoiceLimitReached
@@ -1109,7 +1322,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _applyLease(int gen, SttLease lease) {
     if (gen != _activeGeneration) return;
     debugPrint(
-        "[VoiceService] Lease (session $gen): provider=${lease.provider} allowance=${lease.allowanceVoiceSeconds} remaining=${lease.remainingVoiceSeconds} window=${lease.reservedVoiceSeconds}");
+      "[VoiceService] Lease (session $gen): provider=${lease.provider} allowance=${lease.allowanceVoiceSeconds} remaining=${lease.remainingVoiceSeconds} window=${lease.reservedVoiceSeconds}",
+    );
     if (lease.allowanceVoiceSeconds != null) {
       voiceAllowanceSeconds = lease.allowanceVoiceSeconds;
     }
@@ -1140,14 +1354,17 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     if (!_speechService.isRemoteActive) return;
     _recyclePending = false;
     debugPrint(
-        "[VoiceService] Recycling STT connection at window boundary (session $gen).");
-    unawaited(_restartEngine(gen).then((started) {
-      if (gen != _activeGeneration || started) return;
-      final reason = _speechService.remoteVoiceLimitReached
-          ? VoiceEndReason.limit
-          : VoiceEndReason.error;
-      unawaited(_endSession(gen, reason));
-    }));
+      "[VoiceService] Recycling STT connection at window boundary (session $gen).",
+    );
+    unawaited(
+      _restartEngine(gen).then((started) {
+        if (gen != _activeGeneration || started) return;
+        final reason = _speechService.remoteVoiceLimitReached
+            ? VoiceEndReason.limit
+            : VoiceEndReason.error;
+        unawaited(_endSession(gen, reason));
+      }),
+    );
   }
 
   /// Inactivity timeout: a session that produces nothing (no speech, no

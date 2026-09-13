@@ -7,9 +7,12 @@ import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
 
 import 'package:flutter/material.dart';
+
 import 'main.dart';
+
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import 'axon/view.dart';
 import 'chat/controller.dart';
 import 'chat/providers/conversation.dart';
@@ -36,15 +39,7 @@ import 'rag/screens/documents.dart';
 import 'stack.dart';
 import 'boundary.dart';
 
-enum MainScreenView {
-  chat,
-  library,
-  news,
-  create,
-  arts,
-  roleplay,
-  documents,
-}
+enum MainScreenView { chat, library, news, create, arts, roleplay, documents }
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -197,9 +192,26 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           return;
         }
 
+        // Voice Mode owns the chat screen while it is active: abort the
+        // chain — no keyboard may be opened over the voice overlay, and no
+        // retry may outlive the session the user just started. Checked on
+        // EVERY attempt so chains scheduled before the overlay appeared
+        // die the moment voice mode activates (state check, not timing).
+        bool voiceModeActive = false;
+        try {
+          voiceModeActive = context.read<InputProvider>().isVoiceModeActive;
+        } catch (_) {}
+        if (voiceModeActive) {
+          debugPrint(
+            "[KeyboardFocus] Aborted for $source: voice mode is active.",
+          );
+          return;
+        }
+
         if (_isDialogOpen || _isSearchFocused) {
           debugPrint(
-              "[KeyboardFocus] Deferred by overlay/search for $source. Retrying $attemptNumber/$controllerRetries.");
+            "[KeyboardFocus] Deferred by overlay/search for $source. Retrying $attemptNumber/$controllerRetries.",
+          );
           if (attemptNumber < controllerRetries) {
             Future.delayed(Duration(milliseconds: retryDelayMs), () {
               attempt(attemptNumber + 1);
@@ -211,7 +223,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         final chatState = chatScreenKey.currentState;
         if (chatState == null) {
           debugPrint(
-              "[KeyboardFocus] ChatController not ready for $source. Retrying $attemptNumber/$controllerRetries.");
+            "[KeyboardFocus] ChatController not ready for $source. Retrying $attemptNumber/$controllerRetries.",
+          );
           if (attemptNumber < controllerRetries) {
             Future.delayed(Duration(milliseconds: retryDelayMs), () {
               attempt(attemptNumber + 1);
@@ -221,7 +234,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         }
 
         debugPrint(
-            "[KeyboardFocus] Dispatching focus request from $source. controllerAttempt=$attemptNumber");
+          "[KeyboardFocus] Dispatching focus request from $source. controllerAttempt=$attemptNumber",
+        );
         chatState.requestKeyboardFocus(
           delayMs: 0,
           maxRetries: focusRetries,
@@ -572,8 +586,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     final ReadService readService = context.read<ReadService>();
     final LocaleProvider localeProvider = context.read<LocaleProvider>();
-    await readService.loadConversation(manager,
-        languageCode: localeProvider.locale.languageCode);
+    await readService.loadConversation(
+      manager,
+      languageCode: localeProvider.locale.languageCode,
+    );
 
     if (mounted) {
       final session = context.read<ChatSessionProvider>();
@@ -758,18 +774,12 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       children: [
         // Index 0: Chat
         RepaintBoundary(
-          child: ErrorBoundary(
-            child: ChatController(key: chatScreenKey),
-          ),
+          child: ErrorBoundary(child: ChatController(key: chatScreenKey)),
         ),
         // Index 1: Library
-        RepaintBoundary(
-          child: LibraryScreen(key: libraryScreenKey),
-        ),
+        RepaintBoundary(child: LibraryScreen(key: libraryScreenKey)),
         // Index 2: News
-        const RepaintBoundary(
-          child: NewsScreen(),
-        ),
+        const RepaintBoundary(child: NewsScreen()),
         // Index 3: Create AI
         // PERF: Selector guards rebuilds — only fires when model list length
         // changes, not on every ModelCatalogProvider notification.
@@ -782,17 +792,11 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
         ),
         // Index 4: Arts
-        const RepaintBoundary(
-          child: ArtsScreen(),
-        ),
+        const RepaintBoundary(child: ArtsScreen()),
         // Index 5: Roleplay / Discover
-        const RepaintBoundary(
-          child: DiscoverScreen(),
-        ),
+        const RepaintBoundary(child: DiscoverScreen()),
         // Index 6: Documents
-        const RepaintBoundary(
-          child: DocumentLibraryScreen(),
-        ),
+        const RepaintBoundary(child: DocumentLibraryScreen()),
       ],
     );
   }
@@ -816,40 +820,50 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     // simultaneously in the background when the keyboard opens on the top screen!
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
 
-    return Builder(builder: (context) {
-      // The subtree root must keep the same widget type whether or not a
-      // route/dialog is pushed on top of MainScreen. Swapping between a bare
-      // subtree and a MediaQuery-wrapped one (as this used to do) tears the
-      // entire main content down and rebuilds it on every route push/pop:
-      // the Axon list lost its state (blank while renaming), the chat
-      // composer lost its FocusNode/controller/expansion (controls vanished
-      // around feature toggles) and GlobalKeyed subtrees were reparented
-      // through the fresh tree (tripping semantics/render reparenting
-      // assertions). Keeping a permanent MediaQuery wrapper and varying only
-      // its data preserves the original isolation: while another route owns
-      // the keyboard, viewInsets are zeroed so the background tabs do not
-      // relayout. Because the zeroed data is otherwise identical to the
-      // previous frame's, dependents are not even notified while the top
-      // route's keyboard animates.
-      final MediaQueryData mediaQueryData = isCurrentRoute
-          ? MediaQuery.of(context)
-          : MediaQuery.of(context).copyWith(viewInsets: EdgeInsets.zero);
-      return MediaQuery(
-        data: mediaQueryData,
-        child: _buildMainContent(context, screenWidth, screenHeight,
-            standardAxonWidth, isRtl, directionMultiplier, gradientColors),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        // The subtree root must keep the same widget type whether or not a
+        // route/dialog is pushed on top of MainScreen. Swapping between a bare
+        // subtree and a MediaQuery-wrapped one (as this used to do) tears the
+        // entire main content down and rebuilds it on every route push/pop:
+        // the Axon list lost its state (blank while renaming), the chat
+        // composer lost its FocusNode/controller/expansion (controls vanished
+        // around feature toggles) and GlobalKeyed subtrees were reparented
+        // through the fresh tree (tripping semantics/render reparenting
+        // assertions). Keeping a permanent MediaQuery wrapper and varying only
+        // its data preserves the original isolation: while another route owns
+        // the keyboard, viewInsets are zeroed so the background tabs do not
+        // relayout. Because the zeroed data is otherwise identical to the
+        // previous frame's, dependents are not even notified while the top
+        // route's keyboard animates.
+        final MediaQueryData mediaQueryData = isCurrentRoute
+            ? MediaQuery.of(context)
+            : MediaQuery.of(context).copyWith(viewInsets: EdgeInsets.zero);
+        return MediaQuery(
+          data: mediaQueryData,
+          child: _buildMainContent(
+            context,
+            screenWidth,
+            screenHeight,
+            standardAxonWidth,
+            isRtl,
+            directionMultiplier,
+            gradientColors,
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildMainContent(
-      BuildContext context,
-      double screenWidth,
-      double screenHeight,
-      double standardAxonWidth,
-      bool isRtl,
-      double directionMultiplier,
-      List<Color> gradientColors) {
+    BuildContext context,
+    double screenWidth,
+    double screenHeight,
+    double standardAxonWidth,
+    bool isRtl,
+    double directionMultiplier,
+    List<Color> gradientColors,
+  ) {
     return Title(
       title: 'Cortex',
       color: AppColors.background,
@@ -911,17 +925,19 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 animation: Listenable.merge([
                   _axonController,
                   _elasticController,
-                  _searchModeController
+                  _searchModeController,
                 ]),
                 child: _buildCurrentScreenWidget(),
                 builder: (context, child) {
                   final double rawValue = _axonController.value;
-                  final double searchValue = Curves.easeInOutCubic
-                      .transform(_searchModeController.value);
+                  final double searchValue = Curves.easeInOutCubic.transform(
+                    _searchModeController.value,
+                  );
 
                   final double visibleAxonWidth =
                       standardAxonWidth + _elasticWidth;
-                  final double currentAxonWidth = visibleAxonWidth +
+                  final double currentAxonWidth =
+                      visibleAxonWidth +
                       ((screenWidth - visibleAxonWidth) * searchValue);
 
                   final double axonOpenOffset =
@@ -981,12 +997,13 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                             boxShadow: [
                               if (rawValue > 0)
                                 BoxShadow(
-                                  color: Colors.black
-                                      .withValues(alpha: 0.2 * rawValue),
+                                  color: Colors.black.withValues(
+                                    alpha: 0.2 * rawValue,
+                                  ),
                                   blurRadius: 30,
                                   spreadRadius: -5,
                                   offset: Offset(-15 * directionMultiplier, 0),
-                                )
+                                ),
                             ],
                           ),
                           // PERFORMANCE: Removed MediaQuery wrapper that caused
