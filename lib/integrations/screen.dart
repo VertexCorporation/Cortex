@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
@@ -7,12 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'logo.dart';
 import 'model.dart';
+import 'permission_store.dart';
 import 'service.dart';
 import 'strings.dart';
 
 class IntegrationsScreen extends StatefulWidget {
-  const IntegrationsScreen({super.key});
+  final String initialSearch;
+
+  const IntegrationsScreen({
+    super.key,
+    this.initialSearch = '',
+  });
 
   @override
   State<IntegrationsScreen> createState() => _IntegrationsScreenState();
@@ -20,7 +26,7 @@ class IntegrationsScreen extends StatefulWidget {
 
 class _IntegrationsScreenState extends State<IntegrationsScreen>
     with WidgetsBindingObserver {
-  final _searchController = TextEditingController();
+  late final TextEditingController _searchController;
   final _service = IntegrationService.instance;
 
   IntegrationCatalogPage? _catalog;
@@ -45,6 +51,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _searchController = TextEditingController(text: widget.initialSearch);
     _load();
   }
 
@@ -96,6 +103,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
   }
 
   void _onSearchChanged(String _) {
+    setState(() {});
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 320), _load);
   }
@@ -122,11 +130,35 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
     setState(() => _busySlug = item.slug);
     try {
       await _service.disconnect(id);
+      await IntegrationPermissionStore.instance.clearToolkit(item.slug);
       await _load(silent: true);
     } catch (_) {
       if (mounted) _showMessage(IntegrationStrings.of(context).error);
     } finally {
       if (mounted) setState(() => _busySlug = null);
+    }
+  }
+
+  Future<void> _manageInstalled(IntegrationItem item) async {
+    if (!item.connected) {
+      await _connect(item);
+      return;
+    }
+
+    final removed = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: AppColors.secondaryColor,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (_) => _IntegrationManagementSheet(
+        item: item,
+        onDisconnect: () async {
+          Navigator.of(context).pop(true);
+        },
+      ),
+    );
+    if (removed == true && mounted) {
+      await _disconnect(item);
     }
   }
 
@@ -146,7 +178,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
       context: context,
       backgroundColor: AppColors.secondaryColor,
       showDragHandle: true,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
           child: Row(
@@ -164,7 +196,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
               ),
               TextButton.icon(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(sheetContext);
                   _load(silent: true);
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -222,7 +254,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 10, 24, 12),
+              padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
               child: TextField(
                 controller: _searchController,
                 onChanged: _onSearchChanged,
@@ -247,6 +279,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
                       : IconButton(
                           onPressed: () {
                             _searchController.clear();
+                            setState(() {});
                             _load();
                           },
                           icon: Icon(
@@ -286,7 +319,6 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
     if (_loading && _catalog == null) {
       return const Center(child: CircularProgressIndicator(strokeWidth: 2));
     }
-
     if (_error != null && _catalog == null) {
       return Center(
         child: Padding(
@@ -320,41 +352,30 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
-          if (query.isEmpty) ...[
-            _SectionTitle(strings.installed),
-            const SizedBox(height: 12),
-            _InstalledStrip(
-              items: catalog.installed,
-              strings: strings,
-              busySlug: _busySlug,
-              onTap: _handleItemTap,
-            ),
-            const SizedBox(height: 28),
-            _SectionTitle(strings.popular),
-            const SizedBox(height: 8),
-            ...catalog.items.take(12).map(
-                  (item) => _IntegrationRow(
-                    item: item,
-                    strings: strings,
-                    busy: _busySlug == item.slug,
-                    onConnect: () => _connect(item),
-                    onDisconnect: () => _disconnect(item),
-                  ),
-                ),
-            ..._buildCategorySections(catalog.items, strings),
-          ] else ...[
+          // Installed plugins are deliberately ALWAYS first, directly under
+          // search, even while the user is searching the catalog.
+          _SectionTitle(strings.installed),
+          const SizedBox(height: 11),
+          _InstalledStrip(
+            items: catalog.installed,
+            strings: strings,
+            busySlug: _busySlug,
+            onTap: _manageInstalled,
+          ),
+          const SizedBox(height: 26),
+          if (query.isNotEmpty) ...[
             ...catalog.items.map(
               (item) => _IntegrationRow(
                 item: item,
                 strings: strings,
                 busy: _busySlug == item.slug,
                 onConnect: () => _connect(item),
-                onDisconnect: () => _disconnect(item),
+                onManage: () => _manageInstalled(item),
               ),
             ),
             if (catalog.items.isEmpty)
               Padding(
-                padding: const EdgeInsets.only(top: 80),
+                padding: const EdgeInsets.only(top: 54),
                 child: Center(
                   child: Text(
                     strings.search,
@@ -365,6 +386,19 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
                   ),
                 ),
               ),
+          ] else ...[
+            _SectionTitle(strings.popular),
+            const SizedBox(height: 8),
+            ...catalog.items.take(12).map(
+              (item) => _IntegrationRow(
+                item: item,
+                strings: strings,
+                busy: _busySlug == item.slug,
+                onConnect: () => _connect(item),
+                onManage: () => _manageInstalled(item),
+              ),
+            ),
+            ..._buildCategorySections(catalog.items, strings),
           ],
         ],
       ),
@@ -377,7 +411,6 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
   ) {
     final byCategory = <String, List<IntegrationItem>>{};
     final names = <String, String>{};
-
     for (final item in items) {
       for (final category in item.categories) {
         if (category.id.isEmpty) continue;
@@ -401,25 +434,17 @@ class _IntegrationsScreenState extends State<IntegrationsScreen>
         ..add(const SizedBox(height: 8))
         ..addAll(
           sectionItems.take(10).map(
-                (item) => _IntegrationRow(
-                  item: item,
-                  strings: strings,
-                  busy: _busySlug == item.slug,
-                  onConnect: () => _connect(item),
-                  onDisconnect: () => _disconnect(item),
-                ),
-              ),
+            (item) => _IntegrationRow(
+              item: item,
+              strings: strings,
+              busy: _busySlug == item.slug,
+              onConnect: () => _connect(item),
+              onManage: () => _manageInstalled(item),
+            ),
+          ),
         );
     }
     return widgets;
-  }
-
-  void _handleItemTap(IntegrationItem item) {
-    if (item.connected) {
-      _disconnect(item);
-    } else {
-      _connect(item);
-    }
   }
 }
 
@@ -495,7 +520,7 @@ class _InstalledStrip extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 54,
+      height: 56,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
@@ -504,7 +529,25 @@ class _InstalledStrip extends StatelessWidget {
           final item = items[index];
           return GestureDetector(
             onTap: busySlug == null ? () => onTap(item) : null,
-            child: _IntegrationLogo(item: item, size: 48),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IntegrationLogo(name: item.name, logoUrl: item.logo, size: 48),
+                PositionedDirectional(
+                  end: -2,
+                  bottom: -2,
+                  child: Container(
+                    width: 13,
+                    height: 13,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2FBF71),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.background, width: 2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -517,14 +560,14 @@ class _IntegrationRow extends StatelessWidget {
   final IntegrationStrings strings;
   final bool busy;
   final VoidCallback onConnect;
-  final VoidCallback onDisconnect;
+  final VoidCallback onManage;
 
   const _IntegrationRow({
     required this.item,
     required this.strings,
     required this.busy,
     required this.onConnect,
-    required this.onDisconnect,
+    required this.onManage,
   });
 
   @override
@@ -534,7 +577,7 @@ class _IntegrationRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         children: [
-          _IntegrationLogo(item: item, size: 46),
+          IntegrationLogo(name: item.name, logoUrl: item.logo, size: 46),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -553,13 +596,11 @@ class _IntegrationRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  item.connected
-                      ? strings.connected
-                      : strings.description(item.name),
+                  item.connected ? strings.connected : strings.description(item.name),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: foreground.withValues(alpha: 0.48),
+                    color: foreground.withValues(alpha: 0.52),
                     fontFamily: 'Inter',
                     fontSize: 12.5,
                   ),
@@ -567,36 +608,23 @@ class _IntegrationRow extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
           if (busy)
             const SizedBox(
-              width: 34,
-              height: 34,
+              width: 32,
+              height: 32,
               child: Padding(
                 padding: EdgeInsets.all(8),
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: CircularProgressIndicator(strokeWidth: 1.7),
               ),
-            )
-          else if (item.connected)
-            PopupMenuButton<String>(
-              tooltip: strings.settings,
-              color: AppColors.secondaryColor,
-              icon: Icon(Icons.more_horiz_rounded, color: foreground, size: 22),
-              onSelected: (value) {
-                if (value == 'disconnect') onDisconnect();
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem(
-                  value: 'disconnect',
-                  child: Text(strings.disconnect),
-                ),
-              ],
             )
           else
             IconButton(
-              tooltip: strings.connect,
-              onPressed: onConnect,
-              icon: Icon(Icons.add_rounded, color: foreground, size: 25),
+              onPressed: item.connected ? onManage : onConnect,
+              icon: Icon(
+                item.connected ? Icons.more_horiz_rounded : Icons.add_rounded,
+                color: foreground,
+                size: 23,
+              ),
             ),
         ],
       ),
@@ -604,55 +632,216 @@ class _IntegrationRow extends StatelessWidget {
   }
 }
 
-class _IntegrationLogo extends StatelessWidget {
+class _IntegrationManagementSheet extends StatefulWidget {
   final IntegrationItem item;
-  final double size;
+  final Future<void> Function() onDisconnect;
 
-  const _IntegrationLogo({required this.item, required this.size});
+  const _IntegrationManagementSheet({
+    required this.item,
+    required this.onDisconnect,
+  });
+
+  @override
+  State<_IntegrationManagementSheet> createState() =>
+      _IntegrationManagementSheetState();
+}
+
+class _IntegrationManagementSheetState
+    extends State<_IntegrationManagementSheet> {
+  Set<String>? _allowed;
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
+
+  Future<void> _reload() async {
+    final rules = await IntegrationPermissionStore.instance
+        .alwaysAllowedTools(widget.item.slug);
+    if (mounted) setState(() => _allowed = rules);
+  }
+
+  Future<void> _remove(String toolSlug) async {
+    await IntegrationPermissionStore.instance.setAlwaysAllowed(
+      widget.item.slug,
+      toolSlug,
+      allowed: false,
+    );
+    await _reload();
+  }
+
+  String _humanize(String slug) {
+    final prefix = '${widget.item.slug.toUpperCase()}_';
+    final value = slug.startsWith(prefix) ? slug.substring(prefix.length) : slug;
+    return value
+        .split('_')
+        .where((part) => part.isNotEmpty)
+        .map((part) => '${part[0]}${part.substring(1).toLowerCase()}')
+        .join(' ');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final copy = _ManageStrings.of(context);
     final foreground = AppColors.primaryColor.inverted;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: AppColors.secondaryColor,
-        borderRadius: BorderRadius.circular(size * 0.24),
-        border: Border.all(color: foreground.withValues(alpha: 0.08)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: FutureBuilder<Uint8List?>(
-        future: IntegrationService.instance.loadLogo(item.logo),
-        builder: (context, snapshot) {
-          final bytes = snapshot.data;
-          if (bytes != null && bytes.isNotEmpty) {
-            return Padding(
-              padding: EdgeInsets.all(size * 0.10),
-              child: Image.memory(
-                bytes,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.medium,
-                gaplessPlayback: true,
-              ),
-            );
-          }
-          final initial = item.name.trim().isEmpty
-              ? '•'
-              : item.name.trim().characters.first.toUpperCase();
-          return Center(
-            child: Text(
-              initial,
+    final allowed = _allowed;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                IntegrationLogo(
+                  name: widget.item.name,
+                  logoUrl: widget.item.logo,
+                  size: 44,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.item.name,
+                        style: TextStyle(
+                          color: foreground,
+                          fontFamily: 'Inter',
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        copy.connected,
+                        style: TextStyle(
+                          color: foreground.withValues(alpha: 0.50),
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+            Text(
+              copy.permissions,
               style: TextStyle(
                 color: foreground,
                 fontFamily: 'Inter',
-                fontSize: size * 0.34,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),
             ),
-          );
-        },
+            const SizedBox(height: 5),
+            Text(
+              copy.permissionsHint,
+              style: TextStyle(
+                color: foreground.withValues(alpha: 0.55),
+                fontFamily: 'Inter',
+                fontSize: 12.5,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (allowed == null)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: CircularProgressIndicator(strokeWidth: 1.7),
+                ),
+              )
+            else if (allowed.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  copy.askEveryTime,
+                  style: TextStyle(
+                    color: foreground.withValues(alpha: 0.60),
+                    fontFamily: 'Inter',
+                    fontSize: 12.5,
+                  ),
+                ),
+              )
+            else
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: ListView(
+                  shrinkWrap: true,
+                  children: allowed
+                      .map(
+                        (tool) => SwitchListTile.adaptive(
+                          contentPadding: EdgeInsets.zero,
+                          value: true,
+                          onChanged: (_) => _remove(tool),
+                          title: Text(
+                            _humanize(tool),
+                            style: TextStyle(
+                              color: foreground,
+                              fontFamily: 'Inter',
+                              fontSize: 13,
+                            ),
+                          ),
+                          subtitle: Text(
+                            copy.alwaysAllowed,
+                            style: TextStyle(
+                              color: foreground.withValues(alpha: 0.48),
+                              fontFamily: 'Inter',
+                              fontSize: 11.5,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: widget.onDisconnect,
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: AppColors.septenaryColor.withValues(alpha: 0.55),
+                  ),
+                  foregroundColor: AppColors.septenaryColor,
+                ),
+                child: Text(copy.disconnect),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+class _ManageStrings {
+  final String code;
+  const _ManageStrings(this.code);
+
+  factory _ManageStrings.of(BuildContext context) =>
+      _ManageStrings(Localizations.localeOf(context).languageCode);
+
+  bool get _tr => code == 'tr';
+  String get connected => _tr ? 'Bağlı' : 'Connected';
+  String get permissions => _tr ? 'İzinler' : 'Permissions';
+  String get permissionsHint => _tr
+      ? 'Her zaman izin verdiğin işlemleri buradan kapatabilirsin. Diğer işlemler çalışırken Cortex tekrar sorar.'
+      : 'Turn off actions you previously allowed permanently. Cortex asks again for every other action.';
+  String get askEveryTime => _tr
+      ? 'Kalıcı izin yok. İşlem gerektiğinde Cortex senden izin isteyecek.'
+      : 'No permanent permissions. Cortex will ask when an action is needed.';
+  String get alwaysAllowed => _tr ? 'Her zaman izin verildi' : 'Always allowed';
+  String get disconnect => _tr ? 'Bağlantıyı kaldır' : 'Disconnect';
 }
