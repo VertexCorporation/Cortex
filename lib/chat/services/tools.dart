@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,9 +32,30 @@ class CortexTool {
   }
 }
 
+class _ScopedDocumentContext {
+  final Map<String, dynamic> document;
+  final DateTime registeredAt;
+
+  const _ScopedDocumentContext({
+    required this.document,
+    required this.registeredAt,
+  });
+}
+
 /// Central registry for all available tools.
 class ToolRegistry {
   static final Map<String, CortexTool> _tools = {};
+
+  /// Document attachments are registered by an opaque per-attachment scope.
+  ///
+  /// The old implementation kept one process-global `_currentDocuments` list.
+  /// Two conversations generating concurrently could therefore overwrite each
+  /// other's document payload and a later document-free request could inherit
+  /// an older PDF. Scopes make document lookup explicit and request-safe: the
+  /// model receives the scope in the attachment marker and must echo it in the
+  /// `read_document` call.
+  static final Map<String, _ScopedDocumentContext> _documentsByScope = {};
+  static const Duration _documentScopeTtl = Duration(minutes: 15);
 
   static void register(CortexTool tool) {
     _tools[tool.name] = tool;
@@ -59,12 +82,21 @@ class ToolRegistry {
           'parameters': {
             'type': 'object',
             'properties': {
+              'document_scope': {
+                'type': 'string',
+                'description':
+                    'Opaque document scope shown in the attachment marker. Copy it exactly.',
+              },
+              // Kept for backwards/provider compatibility. The client scopes
+              // one attachment per call and rewrites this to 0 before the
+              // server tool executes, so models do not have to reason about a
+              // process-global document list.
               'document_index': {
                 'type': 'integer',
                 'description': l10n.toolReadDocumentIndexParam,
               }
             },
-            'required': ['document_index']
+            'required': ['document_scope']
           }
         }
       },
@@ -181,18 +213,56 @@ class ToolRegistry {
     ];
   }
 
-  /// Stores documents for the current request context (PDF, XLSX, etc.)
-  static List<Map<String, dynamic>>? _currentDocuments;
-
-  /// Sets the documents context for tool execution.
-  /// Call this before executing tools that need document access.
-  static void setDocumentsContext(List<Map<String, dynamic>> documents) {
-    _currentDocuments = documents;
+  static void _pruneExpiredDocumentContexts() {
+    final cutoff = DateTime.now().subtract(_documentScopeTtl);
+    _documentsByScope.removeWhere(
+      (_, context) => context.registeredAt.isBefore(cutoff),
+    );
   }
 
-  /// Clears the documents context after tool execution.
+  /// Registers document metadata for tool execution.
+  ///
+  /// The metadata intentionally contains a local path instead of eager base64
+  /// bytes. Encoding is deferred until `read_document` is actually called,
+  /// which avoids a large allocation for attachments the model never needs to
+  /// open.
+  static void setDocumentsContext(List<Map<String, dynamic>> documents) {
+    _pruneExpiredDocumentContexts();
+    final now = DateTime.now();
+    for (final document in documents) {
+      final scope = document['scope']?.toString();
+      if (scope == null || scope.isEmpty) continue;
+      _documentsByScope[scope] = _ScopedDocumentContext(
+        document: Map<String, dynamic>.from(document),
+        registeredAt: now,
+      );
+    }
+  }
+
+  /// Legacy cleanup hook kept for callers that already invoke it after a tool
+  /// loop. Scoped contexts cannot be cleared globally here because another
+  /// conversation may still be using one. Expired entries are pruned instead.
   static void clearDocumentsContext() {
-    _currentDocuments = null;
+    _pruneExpiredDocumentContexts();
+  }
+
+  static Future<Map<String, dynamic>?> _materializeScopedDocument(
+      String scope) async {
+    _pruneExpiredDocumentContexts();
+    final scoped = _documentsByScope[scope];
+    if (scoped == null) return null;
+
+    final document = Map<String, dynamic>.from(scoped.document);
+    final path = document.remove('path')?.toString();
+    document.remove('scope');
+    if (path == null || path.isEmpty) return null;
+
+    final file = File(path);
+    if (!await file.exists()) return null;
+
+    final bytes = await file.readAsBytes();
+    document['data'] = base64Encode(bytes);
+    return document;
   }
 
   static Future<String> _executeOnServer(
@@ -200,20 +270,37 @@ class ToolRegistry {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return "Error: User not authenticated.";
+      final requestUserId = user.uid;
 
-      final token = await user.getIdToken();
-      final dio = createFulcrumHttp();
-
-      // Include documents if this is a read_document call
+      final Map<String, dynamic> forwardedArgs = Map.from(args);
       final Map<String, dynamic> requestData = {
         'name': name,
-        'args': args,
+        'args': forwardedArgs,
       };
 
-      if (name == 'read_document' && _currentDocuments != null) {
-        requestData['documents'] = _currentDocuments;
+      if (name == 'read_document') {
+        final scope = forwardedArgs.remove('document_scope')?.toString();
+        if (scope == null || scope.isEmpty) {
+          return "Error: Missing document_scope for read_document.";
+        }
+
+        final document = await _materializeScopedDocument(scope);
+        if (document == null) {
+          return "Error: Document is unavailable or its scope has expired.";
+        }
+
+        // The server receives exactly one scoped document, therefore its
+        // document index is always 0 regardless of what a provider emitted.
+        forwardedArgs['document_index'] = 0;
+        requestData['documents'] = [document];
       }
 
+      final token = await user.getIdToken();
+      if (FirebaseAuth.instance.currentUser?.uid != requestUserId) {
+        return "Error: User session changed while executing tool.";
+      }
+
+      final dio = createFulcrumHttp();
       final response = await dio.post(
         _executeToolUrl,
         data: requestData,
@@ -225,10 +312,6 @@ class ToolRegistry {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        // The server returns the JSON string directly usually, or an object.
-        // If it returns an object, we might need to stringify it if the
-        // calling code expects a string result from the tool.
-        // CortexTool.function returns Future<String>.
         if (data is Map || data is List) {
           return jsonEncode(data);
         }
@@ -256,8 +339,6 @@ class ToolRegistry {
       name: 'get_stock_price',
       description: 'Get stock/crypto price.',
       parameters: {},
-      // Definitions handle on server, but we keep empties or minimal for local registry if needed?
-      // Actually registry only uses name to find handler. Parameters here are unused if getLocalizedToolsJson returns [].
       function: (args) => _executeOnServer('get_stock_price', args),
     ));
 
