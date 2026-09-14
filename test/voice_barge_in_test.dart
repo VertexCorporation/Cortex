@@ -76,11 +76,11 @@ void main() {
     expect(detector.shouldBargeIn, true);
   });
 
-  test('single-word transcripts are not evidence', () {
+  test('a confident non-echo single word can interrupt', () {
     detector = armedWith('the assistant is explaining');
     detector.onUserTranscript(text: 'hey', confidence: 0.99);
     sustainLoud(ms: 500);
-    expect(detector.shouldBargeIn, false);
+    expect(detector.shouldBargeIn, true);
   });
 
   test('the assistant\'s own words echoed back are not evidence', () {
@@ -147,6 +147,18 @@ void main() {
     expect(BargeInDetector.echoSimilarity('alpha beta', 'gamma delta'), 0.0);
     expect(BargeInDetector.echoSimilarity('', 'anything'), 0.0);
   });
+
+  test(
+    'single-word speaker echo is rejected and non-Latin speech can interrupt',
+    () {
+      detector = armedWith('The answer is Paris');
+      detector.onUserTranscript(text: 'Paris', confidence: 0.99);
+      sustainLoud();
+      expect(detector.shouldBargeIn, false);
+      detector.onUserTranscript(text: 'انتظر', confidence: 0.99);
+      expect(detector.shouldBargeIn, true);
+    },
+  );
 
   test('reset clears every gate and the one-shot latch', () {
     detector = armedWith('the assistant is explaining');

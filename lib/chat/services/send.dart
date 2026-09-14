@@ -20,6 +20,7 @@ import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/services/voice.dart';
+import 'package:cortex/chat/services/voice_health.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/notifications/extrovert.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -40,6 +41,7 @@ import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/rag/chat.dart';
 
 import 'tools.dart';
+import 'flow.dart';
 import 'send/media.dart';
 import 'send/circuit.dart';
 import 'send/saver.dart';
@@ -281,6 +283,8 @@ class SendService {
     String? overrideModelId,
     bool isHidden = false,
     bool flowMode = false,
+    String? flowParticipant,
+    bool flowParticipantTurn = false,
     // CONTINUATION MODE: resume a server-reported truncated response
     // (`isIncomplete`). No new user text is sent; the response loop keeps
     // the partial answer in context and appends a continuation instruction,
@@ -294,6 +298,7 @@ class SendService {
     // typed chats never log through this path.
     if (kDebugMode &&
         (_inputProvider.isVoiceModeActive || _voiceService.isFlowActive)) {
+      VoiceTelemetry.mark('SendService invoked');
       debugPrint(
         '[VoiceLoop] SendService.sendMessage text="${messageText.length > 48 ? messageText.substring(0, 48) : messageText}" hidden=$isHidden flow=$flowMode',
       );
@@ -350,7 +355,10 @@ class SendService {
 
     // A continuation carries no new user text by design — the response loop
     // appends the continuation instruction itself.
-    if (text.isEmpty && currentAttachmentPaths.isEmpty && !isContinue) {
+    if (text.isEmpty &&
+        currentAttachmentPaths.isEmpty &&
+        !isContinue &&
+        !flowParticipantTurn) {
       return false;
     }
 
@@ -658,10 +666,18 @@ class SendService {
       // This is critical for background task tracking.
       targetConvId = _conversationProvider.conversationID;
 
-      int aiMessageIndex;
+      // Autonomous Flow turns are assistant-only continuations. A blank chat
+      // still follows normal lazy creation: Flow cannot create an empty chat
+      // without a committed user turn.
+      if (flowParticipantTurn && targetConvId == null) {
+        debugPrint('[SendService] Dropping Flow turn without a conversation.');
+        return false;
+      }
+
+      int aiMessageIndex = -1;
       if (isRegenerate && regenerateAiIndex != null) {
         aiMessageIndex = regenerateAiIndex;
-      } else {
+      } else if (!flowParticipantTurn) {
         if (targetConvId == null) {
           final newConvId = _uuid.v4();
           targetConvId = newConvId;
@@ -678,7 +694,7 @@ class SendService {
           newConvIdForTitle = newConvId;
           defaultTitleForServer = defaultTitle;
 
-          if (isHidden) {
+          if (isHidden && !flowParticipantTurn) {
             _conversationProvider.startEphemeralSession(
               newConvId,
               modelForStorage,
@@ -786,6 +802,26 @@ class SendService {
             (_inputProvider.isVoiceModeActive || _voiceService.isFlowActive)) {
           debugPrint('[SendService] user message inserted text="$displayText"');
         }
+      }
+
+      if (flowParticipantTurn) {
+        aiMessageIndex = _conversationProvider.appendAssistantThinking(
+          model: apiModelIdForSend,
+          flowParticipant: flowParticipant ?? FlowParticipant.blue.key,
+        );
+      } else if (flowParticipant != null &&
+          aiMessageIndex >= 0 &&
+          aiMessageIndex < _conversationProvider.messages.length) {
+        // The thinking placeholder represents the assistant response, so its
+        // model and participant metadata must be attached before streaming.
+        final placeholder = _conversationProvider.messages[aiMessageIndex];
+        _conversationProvider.updateMessageAtIndex(
+          aiMessageIndex,
+          placeholder.copyWith(
+            model: apiModelIdForSend,
+            flowParticipant: flowParticipant,
+          ),
+        );
       }
       targetAiMessageIndex = aiMessageIndex;
 
@@ -963,6 +999,7 @@ class SendService {
               enableThinkingMode: enableThinkingMode,
               targetConvId: convId,
               generationTarget: generationTarget,
+              flowParticipant: flowParticipant,
               onTitleReceived: handleServerTitle,
               activeMode: activeMode,
               flowMode: flowMode,
@@ -1222,7 +1259,10 @@ class SendService {
         hasAttachments: currentAttachmentPaths.isNotEmpty,
       );
 
-      if (!isRegenerate && !isHidden && context.mounted) {
+      if (!isRegenerate &&
+          !isHidden &&
+          !flowParticipantTurn &&
+          context.mounted) {
         try {
           context
               .read<ExtrovertNotificationService>()
@@ -1330,6 +1370,7 @@ class SendService {
     bool flowMode = false,
     bool isContinue = false,
     String? continuationPartial,
+    String? flowParticipant,
   }) async {
     // [VoiceLoop] boundary evidence (debug-only): the chat request left the
     // client for the model.
@@ -1360,6 +1401,7 @@ class SendService {
           targetModelId: modelId,
           langCode: langCode,
           isCharacterModel: isCharacterModel,
+          preserveFlowHistory: flowMode,
         );
 
     // 2. Add Current User Message to Context (Manual Construction)
@@ -1838,6 +1880,15 @@ class SendService {
         if (enableWebSearch) {
           setWebSearchActive(true);
         }
+        final flowInstruction = flowParticipant == null
+            ? null
+            : 'You are the ${FlowParticipantMetadata.fromKey(flowParticipant)?.displayName ?? flowParticipant} participant in a live Cortex Flow roundtable. Other AI participants and the human share this conversation. Respond to the conversation so far, build on or respectfully challenge previous participants, do not impersonate them, and keep this turn concise and natural for spoken audio.';
+        final delegatedInstruction =
+            [_userMemoryProvider.customInstruction, flowInstruction]
+                .whereType<String>()
+                .where((value) => value.trim().isNotEmpty)
+                .join('\n\n');
+
         await _apiService.getOnlineModelResponse(
           modelId: modelId,
           isPremium: isPremium,
@@ -1847,7 +1898,9 @@ class SendService {
           source: modelData.source,
           localizations: localizations,
           langCode: langCode,
-          customInstruction: _userMemoryProvider.customInstruction,
+          customInstruction: delegatedInstruction.isEmpty
+              ? null
+              : delegatedInstruction,
           userMemory: _userMemoryProvider.memory,
           characterRole: modelData.role,
           voiceMode: _inputProvider.isVoiceModeActive,
@@ -2555,6 +2608,7 @@ class SendService {
         includeInContext: true,
         attachmentPaths: mergedAttachments,
         model: existingMsg?.model ?? modelId,
+        flowParticipant: existingMsg?.flowParticipant,
         webSearchSources: existingMsg?.webSearchSources,
         // Durable tool trace: steps recorded before the conversation went to
         // the background, merged with whatever the DB message already had.
@@ -2627,6 +2681,7 @@ class SendService {
         includeInContext: false,
         attachmentPaths: mergedAttachments,
         model: existingMsg?.model ?? modelId,
+        flowParticipant: existingMsg?.flowParticipant,
       );
 
       await ChatStorageService.upsertMessage(

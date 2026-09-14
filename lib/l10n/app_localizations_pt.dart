@@ -1731,6 +1731,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get agentBlue => 'Blue';
 
   @override
+  String get agentGreen => 'Green';
+
+  @override
+  String get agentYellow => 'Yellow';
+
+  @override
   String get agentPurple => 'Purple';
 
   @override

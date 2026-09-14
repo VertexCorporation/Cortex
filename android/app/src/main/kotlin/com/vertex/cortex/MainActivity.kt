@@ -22,6 +22,13 @@ import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : FlutterFragmentActivity() {
+    companion object {
+        private var voiceBackgroundChannel: MethodChannel? = null
+
+        fun notifyVoiceStopRequested() {
+            voiceBackgroundChannel?.invokeMethod("stopRequested", null)
+        }
+    }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         // Disable contrast enforcement to prevent MIUI/HyperOS from forcing
@@ -83,6 +90,34 @@ class MainActivity : FlutterFragmentActivity() {
         super.configureFlutterEngine(flutterEngine)
 
         val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        voiceBackgroundChannel = MethodChannel(
+            messenger,
+            "com.vertex.cortex/voice_background",
+        )
+        voiceBackgroundChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "start" -> {
+                    val intent = Intent(this, VoiceForegroundService::class.java)
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(intent)
+                        } else {
+                            startService(intent)
+                        }
+                        result.success(null)
+                    } catch (error: SecurityException) {
+                        Log.e(TAG, "Could not start Voice foreground service", error)
+                        result.error("VOICE_SERVICE_START_FAILED", "Permission denied", null)
+                    }
+                }
+                "stop" -> {
+                    stopService(Intent(this, VoiceForegroundService::class.java))
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
 
         LlamaService.setMethodChannel(MethodChannel(messenger, LLAMA_CH))
 

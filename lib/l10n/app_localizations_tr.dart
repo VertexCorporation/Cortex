@@ -1719,6 +1719,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get agentBlue => 'Blue';
 
   @override
+  String get agentGreen => 'Yeşil';
+
+  @override
+  String get agentYellow => 'Sarı';
+
+  @override
   String get agentPurple => 'Purple';
 
   @override

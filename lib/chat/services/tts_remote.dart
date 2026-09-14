@@ -14,6 +14,7 @@
 // on-device voice.
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
@@ -47,6 +48,10 @@ class RemoteTtsService {
   final Set<CancelToken> _requests = {};
   int _generation = 0;
 
+  /// Live playback activity for the orb. It is driven by the actual player
+  /// state/position, never by a second audio stream or recorder.
+  final ValueNotifier<double> outputLevel = ValueNotifier<double>(0);
+
   /// The voice the user picked, kept here so voice mode does not have to reach
   /// for a provider on every sentence. VoiceCatalogProvider writes it; null
   /// means the server picks.
@@ -56,7 +61,7 @@ class RemoteTtsService {
   /// so playing through audioplayers instead means configuring it here too —
   /// otherwise iOS routes playback to the earpiece and the microphone drops
   /// out mid-conversation.
-  static final AudioContext _voiceContext = AudioContext(
+  static final AudioContext voiceAudioContext = AudioContext(
     iOS: AudioContextIOS(
       category: AVAudioSessionCategory.playAndRecord,
       options: const {
@@ -101,13 +106,21 @@ class RemoteTtsService {
   Future<AudioPlayer> _ensurePlayer() async {
     if (!_contextConfigured) {
       try {
-        await AudioPlayer.global.setAudioContext(_voiceContext);
+        await AudioPlayer.global.setAudioContext(voiceAudioContext);
         _contextConfigured = true;
       } catch (e) {
         debugPrint("[RemoteTts] Could not set audio context: $e");
       }
     }
-    return _player ??= AudioPlayer();
+    if (_player == null) {
+      final player = AudioPlayer();
+      player.positionUpdater = TimerPositionUpdater(
+        getPosition: player.getCurrentPosition,
+        interval: const Duration(milliseconds: 40),
+      );
+      _player = player;
+    }
+    return _player!;
   }
 
   /// Fire-and-forget request sent when a voice session OPENS. The synthesis
@@ -154,7 +167,11 @@ class RemoteTtsService {
   ///
   /// Returns null when speech is unavailable for any reason — no session, no
   /// balance, provider down — so the caller can fall back rather than stall.
-  Future<Uint8List?> synthesize(String text, {String? voiceId}) async {
+  Future<Uint8List?> synthesize(
+    String text, {
+    String? voiceId,
+    String? telemetryLabel,
+  }) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty || trimmed.length > maxChars) return null;
 
@@ -168,7 +185,8 @@ class RemoteTtsService {
     final preview = trimmed.length > 18
         ? '${trimmed.substring(0, 18)}…'
         : trimmed;
-    VoiceTelemetry.mark('TTS synth request start: "$preview"');
+    final requestLabel = telemetryLabel == null ? '' : ' ($telemetryLabel)';
+    VoiceTelemetry.mark('TTS synth request start$requestLabel: "$preview"');
 
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -208,11 +226,22 @@ class RemoteTtsService {
       }
       final bytes = Uint8List.fromList(response.data!);
       if (bytes.isEmpty) return null;
+      // The synthesis endpoint returns signed 16-bit mono PCM so the orb can
+      // follow the same audio that is actually sent to the speaker.  Keep the
+      // player contract stable by wrapping raw PCM in a small WAV container;
+      // already-containerized responses remain untouched for compatibility
+      // with older/local endpoints.
+      final contentType =
+          response.headers.value(Headers.contentTypeHeader)?.toLowerCase() ??
+          '';
+      final playable = _isWave(bytes) || !contentType.contains('pcm')
+          ? bytes
+          : _pcmToWave(bytes);
       VoiceTelemetry.mark(
         'TTS bytes ready (${DateTime.now().difference(synthStartedAt).inMilliseconds}ms, '
-        '${(bytes.length / 1024).round()}KB)',
+        '${(playable.length / 1024).round()}KB)',
       );
-      return bytes;
+      return playable;
     } catch (e) {
       if (kDebugMode) debugPrint('[RemoteTts] Synthesis unavailable.');
       return null;
@@ -225,10 +254,12 @@ class RemoteTtsService {
   ///
   /// Returns false if playback could not start, so the caller can speak the
   /// same sentence on-device instead of skipping it.
-  Future<bool> play(Uint8List bytes) async {
+  Future<bool> play(Uint8List bytes, {String? label}) async {
     StreamSubscription<void>? onComplete;
     StreamSubscription<PlayerState>? onState;
+    StreamSubscription<Duration>? onPosition;
     final generation = _generation;
+    final envelope = _pcmEnvelope(bytes);
     try {
       final player = await _ensurePlayer();
       if (generation != _generation) return true;
@@ -245,29 +276,50 @@ class RemoteTtsService {
 
       onComplete = player.onPlayerComplete.listen((_) => finish());
       onState = player.onPlayerStateChanged.listen((state) {
+        if (state == PlayerState.playing && envelope.isNotEmpty) {
+          outputLevel.value = envelope.first;
+        }
         if (state == PlayerState.stopped || state == PlayerState.completed) {
+          outputLevel.value = 0;
           finish();
         }
       });
 
       // Subscribe before play: short clips can finish before play() returns.
-      VoiceTelemetry.mark('TTS playback start');
-      await player.play(BytesSource(bytes));
+      final name = label == null
+          ? ''
+          : ': "${label.length > 18 ? '${label.substring(0, 18)}…' : label}"';
+      VoiceTelemetry.mark('TTS playback start$name');
+      // Subscribe before play: short clips can finish before play() returns.
+      onPosition = player.onPositionChanged.listen((value) {
+        if (envelope.isEmpty) {
+          outputLevel.value = 0;
+          return;
+        }
+        final frame = (value.inMilliseconds * _envelopeRateHz / 1000).floor();
+        outputLevel.value = envelope[frame.clamp(0, envelope.length - 1)];
+      });
+      await player.play(
+        BytesSource(bytes, mimeType: _isWave(bytes) ? 'audio/wav' : null),
+      );
       await completer.future;
-      VoiceTelemetry.mark('TTS playback complete');
+      VoiceTelemetry.mark('TTS playback complete$name');
       return true;
     } catch (e) {
       debugPrint("[RemoteTts] play failed: $e");
       return false;
     } finally {
+      outputLevel.value = 0;
       await onComplete?.cancel();
       await onState?.cancel();
+      await onPosition?.cancel();
     }
   }
 
   /// Cuts playback short — used when the user interrupts.
   Future<void> stop() async {
     _generation++;
+    outputLevel.value = 0;
     for (final request in _requests) {
       request.cancel('Voice interrupted');
     }
@@ -285,4 +337,108 @@ class RemoteTtsService {
     } catch (_) {}
     _player = null;
   }
+
+  static const int _pcmSampleRate = 16000;
+  static const int _pcmChannels = 1;
+  static const int _pcmBitsPerSample = 16;
+  static const int _envelopeFrameSamples = 320; // 20 ms at 16 kHz
+  static const int _envelopeRateHz = _pcmSampleRate ~/ _envelopeFrameSamples;
+
+  static bool _isWave(Uint8List bytes) {
+    if (bytes.length < 12) return false;
+    return String.fromCharCodes(bytes.sublist(0, 4)) == 'RIFF' &&
+        String.fromCharCodes(bytes.sublist(8, 12)) == 'WAVE';
+  }
+
+  static Uint8List _pcmToWave(Uint8List pcm) {
+    final header = ByteData(44);
+    final dataLength = pcm.length;
+    final byteRate = _pcmSampleRate * _pcmChannels * _pcmBitsPerSample ~/ 8;
+    final blockAlign = _pcmChannels * _pcmBitsPerSample ~/ 8;
+    void ascii(int offset, String value) {
+      for (var i = 0; i < value.length; i++) {
+        header.setUint8(offset + i, value.codeUnitAt(i));
+      }
+    }
+
+    ascii(0, 'RIFF');
+    header.setUint32(4, 36 + dataLength, Endian.little);
+    ascii(8, 'WAVE');
+    ascii(12, 'fmt ');
+    header.setUint32(16, 16, Endian.little);
+    header.setUint16(20, 1, Endian.little);
+    header.setUint16(22, _pcmChannels, Endian.little);
+    header.setUint32(24, _pcmSampleRate, Endian.little);
+    header.setUint32(28, byteRate, Endian.little);
+    header.setUint16(32, blockAlign, Endian.little);
+    header.setUint16(34, _pcmBitsPerSample, Endian.little);
+    ascii(36, 'data');
+    header.setUint32(40, dataLength, Endian.little);
+    return Uint8List.fromList(<int>[...header.buffer.asUint8List(), ...pcm]);
+  }
+
+  static List<double> _pcmEnvelope(Uint8List bytes) {
+    if (!_isWave(bytes) || bytes.length < 44) return const <double>[];
+    final data = ByteData.sublistView(bytes);
+    var offset = 12;
+    var dataOffset = -1;
+    var dataLength = 0;
+    var channels = _pcmChannels;
+    var bits = _pcmBitsPerSample;
+    while (offset + 8 <= bytes.length) {
+      final id = String.fromCharCodes(bytes.sublist(offset, offset + 4));
+      final length = data.getUint32(offset + 4, Endian.little);
+      final body = offset + 8;
+      if (body > bytes.length) break;
+      if (id == 'fmt ' && length >= 16 && body + 16 <= bytes.length) {
+        channels = data.getUint16(body + 2, Endian.little);
+        bits = data.getUint16(body + 14, Endian.little);
+      } else if (id == 'data') {
+        dataOffset = body;
+        dataLength = math.min(length, bytes.length - body);
+        break;
+      }
+      offset = body + length + (length.isOdd ? 1 : 0);
+    }
+    if (dataOffset < 0 || bits != 16 || channels < 1 || dataLength < 2) {
+      return const <double>[];
+    }
+    final sampleBytes = channels * 2;
+    final samples = dataLength ~/ sampleBytes;
+    final frameCount = (samples / _envelopeFrameSamples).ceil();
+    final result = <double>[];
+    for (var frame = 0; frame < frameCount; frame++) {
+      final start = frame * _envelopeFrameSamples;
+      final end = math.min(start + _envelopeFrameSamples, samples);
+      if (start >= end) break;
+      var sum = 0.0;
+      var peak = 0.0;
+      for (var sample = start; sample < end; sample++) {
+        var channelSum = 0.0;
+        for (var channel = 0; channel < channels; channel++) {
+          final byte = dataOffset + (sample * channels + channel) * 2;
+          final value = data.getInt16(byte, Endian.little) / 32768.0;
+          channelSum += value;
+        }
+        final amplitude = (channelSum / channels).abs();
+        sum += amplitude * amplitude;
+        if (amplitude > peak) peak = amplitude;
+      }
+      // RMS gives a stable syllable envelope; a little peak contribution keeps
+      // consonants visible without making the orb flash on every sample.
+      final rms = math.sqrt(sum / (end - start));
+      result.add((rms * 0.75 + peak * 0.25).clamp(0.0, 1.0));
+    }
+    return result;
+  }
+
+  @visibleForTesting
+  static Uint8List pcmWaveForTesting(Uint8List pcm) => _pcmToWave(pcm);
+
+  @visibleForTesting
+  static List<double> pcmEnvelopeForTesting(Uint8List wave) =>
+      _pcmEnvelope(wave);
+
+  static String? mimeTypeForBytes(Uint8List bytes) =>
+      _isWave(bytes) ? 'audio/wav' : null;
 }

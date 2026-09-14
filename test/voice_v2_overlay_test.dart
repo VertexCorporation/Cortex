@@ -2,6 +2,9 @@
 
 import 'dart:async';
 
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cortex/design.dart';
+
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/services/send.dart';
 import 'package:cortex/chat/messages/messages.dart';
@@ -9,6 +12,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/voice.dart';
+import 'package:cortex/chat/services/flow.dart';
 import 'package:cortex/chat/screen/widgets/voice.dart';
 import 'package:cortex/chat/screen/widgets/voice_orb.dart';
 import 'package:cortex/chat/screen/widgets/bottom/input/buttons.dart';
@@ -57,6 +61,17 @@ class _OverlayVoice extends ChangeNotifier implements VoiceService {
   Completer<void>? pendingStop;
   @override
   void setFlowMode(bool enabled) {}
+  @override
+  void configureFlow({
+    required FutureOr<void> Function(
+      FlowParticipant participant,
+      String modelId,
+    )
+    onFlowTurn,
+    required List<String> modelIds,
+    List<String?>? voiceIds,
+    VoidCallback? onAssistantInterrupted,
+  }) {}
   @override
   Future<void> startSession({
     BuildContext? context,
@@ -180,7 +195,7 @@ void main() {
     'voice button morphs before audio teardown completes and X cancels entry',
     (tester) async {
       final input = InputProvider();
-      final voice = _OverlayVoice(VoiceState.idle, activeSession: false);
+      final voice = _OverlayVoice(VoiceState.listening, activeSession: true);
       voice.pendingStop = Completer<void>();
       addTearDown(input.dispose);
       await _pumpComposerVoice(tester, input: input, voice: voice);
@@ -463,6 +478,45 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    'orb grows from capsule and expanded center excludes system insets',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 800);
+      tester.view.devicePixelRatio = 1;
+      tester.view.padding = const FakeViewPadding(top: 32);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPadding);
+      final input = InputProvider()..setVoiceModeActive(true);
+      final panel = ValueNotifier<double>(80);
+      addTearDown(input.dispose);
+      addTearDown(panel.dispose);
+      await _pumpOverlay(
+        tester,
+        input: input,
+        voice: _OverlayVoice(VoiceState.listening),
+        panelHeight: panel,
+        active: true,
+        initialPump: Duration.zero,
+      );
+      final origin = tester.getCenter(find.byType(VoiceOrb));
+      expect(origin.dy, closeTo(800 - 80 + 40 - 18, 1));
+      await tester.pump(const Duration(milliseconds: 450));
+      expect(tester.getCenter(find.byType(VoiceOrb)).dy, lessThan(origin.dy));
+      await tester.tap(find.byType(VoiceOrb));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 450));
+      expect(
+        tester.getCenter(find.byType(VoiceOrb)).dy,
+        closeTo(32 + (800 - 32) / 2, 1),
+      );
+      expect(
+        tester.getSize(find.byType(VoiceOrb)).width,
+        closeTo(390 * 0.70, 1),
+      );
+    },
+  );
+
   testWidgets('deactivating animates the orb away and reports completion', (
     tester,
   ) async {
@@ -501,6 +555,58 @@ void main() {
     expect(exited, isTrue);
     expect(tester.takeException(), isNull);
   });
+
+  for (final expanded in [false, true]) {
+    testWidgets(
+      'voice entry from expanded=$expanded grows controls without double movement',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 800);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final input = InputProvider();
+        final focus = FocusNode();
+        addTearDown(input.dispose);
+        addTearDown(focus.dispose);
+        await _pumpComposerVoice(tester, input: input, composerFocus: focus);
+        if (expanded) {
+          focus.requestFocus();
+          await tester.pumpAndSettle();
+        }
+        final button = find.byType(AddPhotoButton);
+        final before = tester.getCenter(button);
+        final width = tester.getSize(button).width;
+        input.setVoiceModeActive(true);
+        focus.unfocus();
+        await tester.pump();
+        for (var i = 0; i < 8; i++) {
+          await tester.pump(const Duration(milliseconds: 50));
+          if (expanded) {
+            expect(tester.getCenter(button).dx, closeTo(before.dx, 0.1));
+          }
+          final x = find.descendant(
+            of: find.byKey(const ValueKey('voice_exit')),
+            matching: find.byType(SvgPicture),
+          );
+          expect(
+            tester.getSize(x),
+            const Size(CortexDesign.icon, CortexDesign.icon),
+          );
+        }
+        expect(tester.getSize(button).width, greaterThan(width));
+        if (!expanded) expect(tester.getCenter(button).dx, lessThan(before.dx));
+        final frame = tester
+            .widgetList<Container>(
+              find.descendant(of: button, matching: find.byType(Container)),
+            )
+            .map((w) => w.decoration)
+            .whereType<BoxDecoration>()
+            .first;
+        expect((frame.border! as Border).top.color.a, 1);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets(
     'voice activation hides the capsule and immediately offers Flow/X',
@@ -810,10 +916,10 @@ void main() {
         initialPump: Duration.zero,
       );
 
-      // Entry: step through the whole presence animation (260ms) at frame
+      // Entry: step through the whole presence animation (380ms) at frame
       // granularity, asserting every built Opacity stays in range. The old
       // easeOutBack-driven opacity crashed mid-entry here.
-      for (var i = 0; i < 30; i++) {
+      for (var i = 0; i < 45; i++) {
         await tester.pump(const Duration(milliseconds: 10));
         final opacities = tester
             .widgetList<Opacity>(find.byType(Opacity))
@@ -835,7 +941,7 @@ void main() {
         initialPump: Duration.zero,
         onExited: () => exits++,
       );
-      for (var i = 0; i < 30; i++) {
+      for (var i = 0; i < 45; i++) {
         await tester.pump(const Duration(milliseconds: 10));
         expect(tester.takeException(), isNull);
       }
@@ -858,12 +964,13 @@ Future<void> _pumpComposerVoice(
   WidgetTester tester, {
   required InputProvider input,
   _OverlayVoice? voice,
+  FocusNode? composerFocus,
 }) async {
   final loc = await AppLocalizations.delegate.load(const Locale('en'));
   final text = TextEditingController();
-  final focus = FocusNode();
+  final focus = composerFocus ?? FocusNode();
   addTearDown(text.dispose);
-  addTearDown(focus.dispose);
+  if (composerFocus == null) addTearDown(focus.dispose);
   await tester.pumpWidget(
     MultiProvider(
       providers: [

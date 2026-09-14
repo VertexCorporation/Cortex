@@ -678,6 +678,8 @@
   "thought": "Thought",
   "agentRed": "Red",
   "agentBlue": "Blue",
+  "agentGreen": "Green",
+  "agentYellow": "Yellow",
   "agentPurple": "Purple",
   "flowMode": "Flow Mode",
   "premium": "Premium",

@@ -57,8 +57,7 @@ class SplashTimeline {
   }
 
   /// Canonical successor inside the cycle (decagon folds back to Cortex).
-  static int nextShape(int shape) =>
-      shape < lastShape ? shape + 1 : firstShape;
+  static int nextShape(int shape) => shape < lastShape ? shape + 1 : firstShape;
 
   /// Strictly alternating rotation: clockwise → counter-clockwise → …
   /// The running transition index never resets — not even when the polygon
@@ -91,6 +90,8 @@ class CortexStartupSplash extends StatefulWidget {
     super.key,
     required this.onComplete,
     this.ready = false,
+    this.inlineSize,
+    this.foreground,
   });
 
   /// Fires exactly once, when the final Cortex icon has been reached and the
@@ -102,15 +103,20 @@ class CortexStartupSplash extends StatefulWidget {
   /// into the final Cortex icon. Cortex is never held before this is true.
   final bool ready;
 
+  /// Reuse the startup animation inside chat without a screen background.
+  final double? inlineSize;
+  final Color? foreground;
+
   @override
   State<CortexStartupSplash> createState() => _CortexStartupSplashState();
 }
 
 class _CortexStartupSplashState extends State<CortexStartupSplash>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller =
-      AnimationController(vsync: this, duration: SplashTimeline.segmentDuration)
-        ..addStatusListener(_onTransitionStatus);
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: SplashTimeline.segmentDuration,
+  )..addStatusListener(_onTransitionStatus);
   late final SplashGeometry _geometry = SplashGeometry();
   final SplashFrame _frame = SplashFrame();
 
@@ -223,6 +229,27 @@ class _CortexStartupSplashState extends State<CortexStartupSplash>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.inlineSize != null) {
+      return RepaintBoundary(
+        child: SizedBox.square(
+          dimension: widget.inlineSize,
+          child: CustomPaint(
+            painter: CortexSplashPainter(
+              progress: _controller,
+              geometry: _geometry,
+              frame: _frame,
+              foreground:
+                  widget.foreground ?? Theme.of(context).colorScheme.onSurface,
+              // Keep the startup motion and visuals, but scale the whole
+              // design so the morphing core shape spans the compact inline
+              // box — never the startup's fullscreen dimensions.
+              unit:
+                  widget.inlineSize! / CortexSplashPainter.coreShapeDesignSpan,
+            ),
+          ),
+        ),
+      );
+    }
     // Native launch screens use system brightness, before saved preferences load.
     final dark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -347,11 +374,16 @@ class SplashGeometry {
 }
 
 class CortexSplashPainter extends CustomPainter {
+  /// Span of the morphing core shape in startup-design logical pixels:
+  /// 16 source units × 8 (see the scale comment in [paint]).
+  static const double coreShapeDesignSpan = 128;
+
   CortexSplashPainter({
     required this.progress,
     required this.geometry,
     required this.frame,
     required this.foreground,
+    this.unit = 1.0,
   }) : super(repaint: progress) {
     _glow.shader = ui.Gradient.radial(
       Offset.zero,
@@ -359,11 +391,19 @@ class CortexSplashPainter extends CustomPainter {
       [foreground.withValues(alpha: .065), foreground.withValues(alpha: 0)],
       [0, 1],
     );
+    // The ring weight is part of the design; scale it with everything else
+    // so inline reuse keeps the exact startup proportions.
+    _pulse.strokeWidth = 1.15 * unit;
   }
   final Animation<double> progress;
   final SplashGeometry geometry;
   final SplashFrame frame;
   final Color foreground;
+
+  /// Uniform multiplier for the whole startup design. The startup splash
+  /// always paints at 1.0; inline reuse scales the design down instead of
+  /// redrawing it, so motion, geometry and pulse proportions stay identical.
+  final double unit;
   final Path _ring = Path();
   final Paint _fill = Paint();
   final Paint _pulse = Paint()
@@ -380,7 +420,8 @@ class CortexSplashPainter extends CustomPainter {
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
     if (t > 0 && t < 1) {
-      final radius = 52 * (1.08 + .44 * Curves.easeOutCubic.transform(t));
+      final radius =
+          52 * unit * (1.08 + .44 * Curves.easeOutCubic.transform(t));
       canvas.save();
       canvas.scale(radius * 1.3);
       _glow.color = Colors.white.withValues(alpha: wave);
@@ -392,8 +433,9 @@ class CortexSplashPainter extends CustomPainter {
       // glow keep their exact style and timing.
     }
     canvas.rotate(SplashTimeline.rotation(t, frame.direction));
-    // 16 source units × 8 = 128 logical pixels, shared with native launch assets.
-    final scale = 8 * (1 + wave * .038);
+    // 16 source units × 8 = 128 logical pixels, shared with native launch
+    // assets; inline reuse scales the whole design by [unit].
+    final scale = 8 * unit * (1 + wave * .038);
     canvas.scale(scale);
     _ring.reset();
     _ring.fillType = PathFillType.evenOdd;
@@ -423,6 +465,7 @@ class CortexSplashPainter extends CustomPainter {
   @override
   bool shouldRepaint(CortexSplashPainter oldDelegate) =>
       oldDelegate.foreground != foreground ||
+      oldDelegate.unit != unit ||
       oldDelegate.progress != progress ||
       !identical(oldDelegate.frame, frame);
 }

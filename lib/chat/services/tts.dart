@@ -3,6 +3,7 @@
 // Text-to-Speech service for reading messages aloud.
 
 import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -135,8 +136,7 @@ class TtsService with ChangeNotifier {
 
   String _originalText = '';
   int _currentOffset = 0;
-  bool _isInterrupted =
-      false; // To prevent completion handler from clearing state during seek/pause
+  bool _isInterrupted = false; // To prevent completion handler from clearing state during seek/pause
 
   Future<void> speak(String text, {String? languageCode}) async {
     if (!_isInitialized) {
@@ -160,12 +160,18 @@ class TtsService with ChangeNotifier {
 
     // --- ENHANCED REGEX FILTERING ---
     // 0. Remove <think> and <memory> blocks and their trailing colons/whitespace
-    String cleanText =
-        text.replaceAll(RegExp(r'<think>[\s\S]*?</think>[\s:]*'), '');
-    cleanText =
-        cleanText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'), '');
-    cleanText =
-        cleanText.replaceAll(RegExp(r'\[SYSTEM MEMORY DIRECTIVE\][\s\S]*'), '');
+    String cleanText = text.replaceAll(
+      RegExp(r'<think>[\s\S]*?</think>[\s:]*'),
+      '',
+    );
+    cleanText = cleanText.replaceAll(
+      RegExp(r'<memory>[\s\S]*?</memory>[\s:]*'),
+      '',
+    );
+    cleanText = cleanText.replaceAll(
+      RegExp(r'\[SYSTEM MEMORY DIRECTIVE\][\s\S]*'),
+      '',
+    );
 
     // 1. Remove Code Blocks (```...```) content entirely
     cleanText = cleanText.replaceAll(RegExp(r'```[\s\S]*?```'), '');
@@ -174,8 +180,9 @@ class TtsService with ChangeNotifier {
     cleanText = cleanText.replaceAll(RegExp(r'`.*?`'), '');
 
     // 3. Remove Markdown Links [Label](URL) -> Label
-    cleanText =
-        cleanText.replaceAllMapped(RegExp(r'\[([^\]]+)\]\([^\)]+\)'), (match) {
+    cleanText = cleanText.replaceAllMapped(RegExp(r'\[([^\]]+)\]\([^\)]+\)'), (
+      match,
+    ) {
       return match.group(1) ?? '';
     });
 
@@ -190,7 +197,8 @@ class TtsService with ChangeNotifier {
 
     // 7. Filter Emojis & Specific Symbols
     final emojiRegex = RegExp(
-        r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|[\u2700-\u27bf])');
+      r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|[\u2700-\u27bf])',
+    );
     cleanText = cleanText.replaceAll(emojiRegex, '');
 
     // 8. Remove LaTeX/Math markers and block math
@@ -206,12 +214,16 @@ class TtsService with ChangeNotifier {
 
     // 9. Remove Widget/Flutter notation patterns (e.g., Widget(), Container(), etc.)
     // Match PascalCase followed by parentheses with content
-    cleanText =
-        cleanText.replaceAll(RegExp(r'\b[A-Z][a-zA-Z]*\s*\([^)]*\)'), '');
+    cleanText = cleanText.replaceAll(
+      RegExp(r'\b[A-Z][a-zA-Z]*\s*\([^)]*\)'),
+      '',
+    );
 
     // 10. Remove remaining noisy symbols
-    cleanText =
-        cleanText.replaceAll(RegExp(r'[\=\\\$\;\<\>\{\}\[\]\^\_\|\~]'), '');
+    cleanText = cleanText.replaceAll(
+      RegExp(r'[\=\\\$\;\<\>\{\}\[\]\^\_\|\~]'),
+      '',
+    );
 
     // 11. Remove standalone numbers that aren't part of sentences
     // (e.g., step numbers like "1." at start of line)
@@ -344,7 +356,9 @@ class TtsService with ChangeNotifier {
         unawaited(_advanceRemote(index));
       });
 
-      await player.play(BytesSource(bytes));
+      await player.play(
+        BytesSource(bytes, mimeType: RemoteTtsService.mimeTypeForBytes(bytes)),
+      );
       _state = TtsState.playing;
       notifyListeners();
       return true;

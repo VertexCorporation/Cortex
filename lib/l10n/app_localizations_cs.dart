@@ -1721,6 +1721,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get agentBlue => 'Modrá';
 
   @override
+  String get agentGreen => 'Green';
+
+  @override
+  String get agentYellow => 'Yellow';
+
+  @override
   String get agentPurple => 'Fialová';
 
   @override

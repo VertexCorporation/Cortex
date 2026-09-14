@@ -57,24 +57,29 @@ void main() {
       final key = GlobalKey<_OrbHostState>();
       await tester.pumpWidget(_OrbHost(key: key));
       final controller = key.currentState!.controller;
+      for (var i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
       final initial = controller.breathingScale;
       final size = tester.getSize(find.byType(VoiceOrb));
       for (var i = 0; i < 120; i++) {
         await tester.pump(const Duration(milliseconds: 50));
-        expect(controller.breathingScale, inInclusiveRange(0.976, 0.999));
+        expect(controller.breathingScale, inInclusiveRange(0.76, 0.80));
       }
       expect(controller.motionTime, greaterThan(0));
       await tester.pump(const Duration(milliseconds: 500));
       expect(controller.breathingScale, isNot(initial));
       final idleSpeed = controller.motionSpeed;
       controller.setPhase(VoiceOrbPhase.speaking);
+      controller.setOutputLevel(1);
       for (var i = 0; i < 60; i++) {
         await tester.pump(const Duration(milliseconds: 16));
       }
       expect(controller.motionSpeed, greaterThan(idleSpeed));
       controller.setPhase(VoiceOrbPhase.subdued);
+      controller.setOutputLevel(0);
       final phase = controller.motionTime;
-      for (var i = 0; i < 120; i++) {
+      for (var i = 0; i < 240; i++) {
         await tester.pump(const Duration(milliseconds: 16));
       }
       expect(controller.motionTime, greaterThan(phase));
@@ -85,6 +90,74 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'listening and real input/output envelopes stay bounded and reactive',
+    (tester) async {
+      final key = GlobalKey<_OrbHostState>();
+      await tester.pumpWidget(_OrbHost(key: key));
+      final controller = key.currentState!.controller;
+      controller.setPhase(VoiceOrbPhase.listening);
+      for (var i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      final listening = controller.breathingScale;
+      expect(listening, inInclusiveRange(1.02, 1.08));
+
+      controller.setMicLevel(0.9);
+      for (var i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      expect(controller.breathingScale, greaterThan(listening));
+      expect(controller.breathingScale, lessThan(1.15));
+
+      controller.setPhase(VoiceOrbPhase.speaking);
+      controller.setMicLevel(0);
+      controller.setOutputLevel(1);
+      for (var i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      expect(controller.ttsSmooth, greaterThan(0));
+      expect(controller.motionTime, greaterThan(0));
+      expect(controller.breathingScale, lessThan(1.06));
+
+      controller.setOutputLevel(0);
+      for (var i = 0; i < 25; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      expect(controller.ttsSmooth, lessThan(0.5));
+      expect(controller.breathingScale, inInclusiveRange(0.98, 1.03));
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets('connecting phase is half-size, quiet, and becomes listening', (
+    tester,
+  ) async {
+    final key = GlobalKey<_OrbHostState>();
+    await tester.pumpWidget(_OrbHost(key: key));
+    final controller = key.currentState!.controller;
+
+    controller.setPhase(VoiceOrbPhase.connecting);
+    controller.setIntensity(0.16);
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(controller.breathingScale, inInclusiveRange(0.49, 0.51));
+
+    controller.setPhase(VoiceOrbPhase.listening);
+    controller.setIntensity(1);
+    final start = controller.breathingScale;
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(controller.breathingScale, greaterThan(start));
+    expect(controller.breathingScale, lessThan(0.65));
+    for (var i = 0; i < 44; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(controller.breathingScale, greaterThan(1.02));
+    expect(controller.motionTime, greaterThan(0));
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
 
   test('the fallback gradient specs keep colors and colorStops aligned', () {
     const a = Color(0xFFC9B6F2);

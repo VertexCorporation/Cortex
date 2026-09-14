@@ -3,13 +3,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:cortex/cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
+
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import 'database.dart';
 import '../messages/messages.dart';
+
 import 'package:cortex/axon/inbox/logic/search_hit.dart';
 
 class ChatStorageService {
@@ -46,19 +49,15 @@ class ChatStorageService {
     if (isFluxMode) return;
     try {
       final db = await DbHelper().db;
-      await db.insert(
-        'conversations',
-        {
-          'id': id,
-          'title': title,
-          'modelId': modelId,
-          'modelTitle': modelTitle ?? '',
-          'modelImagePath': modelImagePath ?? '',
-          'isStarred': isStarred ? 1 : 0,
-          'lastMessageDate': DateTime.now().millisecondsSinceEpoch,
-        },
-        conflictAlgorithm: ConflictAlgorithm.ignore,
-      );
+      await db.insert('conversations', {
+        'id': id,
+        'title': title,
+        'modelId': modelId,
+        'modelTitle': modelTitle ?? '',
+        'modelImagePath': modelImagePath ?? '',
+        'isStarred': isStarred ? 1 : 0,
+        'lastMessageDate': DateTime.now().millisecondsSinceEpoch,
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
       AppDataState().markUserDataAsChanged();
     } catch (e) {
@@ -69,8 +68,9 @@ class ChatStorageService {
   // --- FEATURE: Deep Search ---
   /// Searches for conversations containing messages matching the query.
   /// Returns a list of conversation IDs.
-  static Future<List<String>> searchConversations(
-      {required String query}) async {
+  static Future<List<String>> searchConversations({
+    required String query,
+  }) async {
     if (query.trim().isEmpty) {
       return [];
     }
@@ -99,7 +99,8 @@ class ChatStorageService {
       final db = await DbHelper().db;
       if (query.trim().length < 2) return [];
 
-      final results = await db.rawQuery('''
+      final results = await db.rawQuery(
+        '''
         SELECT 
           m.conversationId, 
           m.text AS snippet, 
@@ -110,7 +111,9 @@ class ChatStorageService {
         WHERE instr(m.text, ?) > 0 AND m.text IS NOT NULL AND m.text != ''
         ORDER BY m.ts DESC 
         LIMIT 50
-      ''', [query]);
+      ''',
+        [query],
+      );
 
       return results.map((row) {
         return SearchHit(
@@ -118,7 +121,8 @@ class ChatStorageService {
           title: (row['title'] as String?) ?? 'Sohbet',
           snippet: row['snippet'] as String,
           timestamp: DateTime.fromMillisecondsSinceEpoch(
-              row['timestamp'] as int? ?? 0),
+            row['timestamp'] as int? ?? 0,
+          ),
           query: query,
         );
       }).toList();
@@ -131,7 +135,7 @@ class ChatStorageService {
   /// Optimized fetch: Gets all conversations joined with their last message details.
   /// Replaces the N+1 loop in InboxViewModel.
   static Future<List<Map<String, dynamic>>>
-      getConversationsWithLastMessage() async {
+  getConversationsWithLastMessage() async {
     try {
       final db = await DbHelper().db;
       // We use a LEFT JOIN on the last message for each conversation.
@@ -187,35 +191,35 @@ class ChatStorageService {
     } else if (modelId == 'cortex/roleplay') {
       resolvedId = 'cortex/roleplay';
     } else {
-      final String modelSeriesId =
-          modelService.getBaseIdFromFullId(modelId, langCode: langCode);
+      final String modelSeriesId = modelService.getBaseIdFromFullId(
+        modelId,
+        langCode: langCode,
+      );
       if (modelSeriesId.isNotEmpty) {
         resolvedId = modelSeriesId;
       }
     }
 
     final allModels = modelService.getCachedModelsSync();
-    final bool isValidSeriesId = allModels.any((m) => m.id == resolvedId) ||
+    final bool isValidSeriesId =
+        allModels.any((m) => m.id == resolvedId) ||
         resolvedId == 'cortex/auto' ||
         resolvedId == 'cortex/roleplay' ||
         resolvedId == 'dynamic';
 
     if (resolvedId.isEmpty || !isValidSeriesId) {
       debugPrint(
-          "[Storage] FAILED to add recent model. Could not resolve a valid series ID from '$modelId'.");
+        "[Storage] FAILED to add recent model. Could not resolve a valid series ID from '$modelId'.",
+      );
       return;
     }
 
     try {
       final db = await DbHelper().db;
-      await db.insert(
-        'recent_models',
-        {
-          'model_id': resolvedId,
-          'last_used': DateTime.now().millisecondsSinceEpoch
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await db.insert('recent_models', {
+        'model_id': resolvedId,
+        'last_used': DateTime.now().millisecondsSinceEpoch,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
       CacheService.invalidate(CacheKey.recentModels);
       debugPrint("[Storage] Added/Updated '$resolvedId' in recent models.");
     } catch (e) {
@@ -228,15 +232,20 @@ class ChatStorageService {
     required ModelService modelService,
   }) async {
     final db = await DbHelper().db;
-    final List<Map<String, dynamic>> rows = await db.query('recent_models',
-        columns: ['model_id'], orderBy: 'last_used DESC', limit: 10);
+    final List<Map<String, dynamic>> rows = await db.query(
+      'recent_models',
+      columns: ['model_id'],
+      orderBy: 'last_used DESC',
+      limit: 10,
+    );
 
     if (rows.isEmpty) return [];
 
     List<ModelEntity> allAvailableModels = modelService.getCachedModelsSync();
     if (allAvailableModels.isEmpty) {
       debugPrint(
-          "[Storage] Master model cache is empty. Awaiting initial load...");
+        "[Storage] Master model cache is empty. Awaiting initial load...",
+      );
       final loadedModels = await modelService.getModels(langCode: langCode);
       allAvailableModels = loadedModels ?? [];
     }
@@ -252,7 +261,8 @@ class ChatStorageService {
         recentSeriesIds.add(modelIdFromDb);
       } else {
         debugPrint(
-            "[Storage] Ignoring recent model '$modelIdFromDb' because it no longer exists.");
+          "[Storage] Ignoring recent model '$modelIdFromDb' because it no longer exists.",
+        );
       }
       if (recentSeriesIds.length >= 3) break;
     }
@@ -261,7 +271,9 @@ class ChatStorageService {
   }
 
   static Future<void> _updateConversationTimestamp(
-      String convId, Database db) async {
+    String convId,
+    Database db,
+  ) async {
     if (isFluxMode) return;
     try {
       await db.update(
@@ -313,10 +325,7 @@ class ChatStorageService {
       final db = await DbHelper().db;
       await db.update(
         'conversations',
-        {
-          'modelTitle': modelTitle,
-          'modelImagePath': modelImagePath,
-        },
+        {'modelTitle': modelTitle, 'modelImagePath': modelImagePath},
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -328,7 +337,10 @@ class ChatStorageService {
   /* ---------- messages (append / update) ---------- */
 
   static Future<void> updateStoredMessage(
-      String convId, Message m, int idx) async {
+    String convId,
+    Message m,
+    int idx,
+  ) async {
     if (isFluxMode || !m.isVisible) return;
     try {
       final db = await DbHelper().db;
@@ -353,6 +365,7 @@ class ChatStorageService {
           'ts': DateTime.now().millisecondsSinceEpoch,
           'toolSteps': m.toolSteps.isNotEmpty ? jsonEncode(m.toolSteps) : null,
           'isIncomplete': m.isIncomplete ? 1 : 0,
+          'flowParticipant': m.flowParticipant,
         },
         where: 'conversationId = ? AND idx = ?',
         whereArgs: [convId, idx],
@@ -364,7 +377,9 @@ class ChatStorageService {
   }
 
   static Future<void> saveCurrentMessages(
-      String convId, List<Message> msgs) async {
+    String convId,
+    List<Message> msgs,
+  ) async {
     if (isFluxMode) return;
     // Filter out invisible messages from the batch save
     final visibleMsgs = msgs.where((m) => m.isVisible).toList();
@@ -372,8 +387,11 @@ class ChatStorageService {
     try {
       final db = await DbHelper().db;
       final batch = db.batch();
-      batch
-          .delete('messages', where: 'conversationId = ?', whereArgs: [convId]);
+      batch.delete(
+        'messages',
+        where: 'conversationId = ?',
+        whereArgs: [convId],
+      );
 
       for (int i = 0; i < visibleMsgs.length; i++) {
         final m = visibleMsgs[i];
@@ -400,6 +418,7 @@ class ChatStorageService {
           'ts': DateTime.now().millisecondsSinceEpoch,
           'toolSteps': m.toolSteps.isNotEmpty ? jsonEncode(m.toolSteps) : null,
           'isIncomplete': m.isIncomplete ? 1 : 0,
+          'flowParticipant': m.flowParticipant,
         });
       }
       await batch.commit(noResult: true);
@@ -429,12 +448,12 @@ class ChatStorageService {
   /* ---------- helpers ---------- */
 
   static Future<Map<String, dynamic>?> getLastMessage(
-      String conversationID) async {
+    String conversationID,
+  ) async {
     final db = await DbHelper().db;
     final rows = await db.query(
       'messages',
-      where:
-          'conversationId = ? AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))',
+      where: 'conversationId = ? AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))',
       whereArgs: [conversationID],
       orderBy: 'idx DESC',
       limit: 1,
@@ -443,13 +462,16 @@ class ChatStorageService {
   }
 
   static Future<List<Message>> removeEmptyMessagesForConversation(
-      String convId, List<Message> inMemory) async {
+    String convId,
+    List<Message> inMemory,
+  ) async {
     try {
       final db = await DbHelper().db;
-      await db.delete('messages',
-          where:
-              'conversationId = ? AND (text IS NULL OR length(text) = 0) AND (photoPath IS NULL OR length(photoPath)=0)',
-          whereArgs: [convId]);
+      await db.delete(
+        'messages',
+        where: 'conversationId = ? AND (text IS NULL OR length(text) = 0) AND (photoPath IS NULL OR length(photoPath)=0)',
+        whereArgs: [convId],
+      );
     } catch (e) {
       _handleDiskError(e, 'removeEmptyMessagesForConversation');
     }
@@ -461,7 +483,9 @@ class ChatStorageService {
   }
 
   static Future<Map<String, dynamic>?> getMessageByIdx(
-      String convId, int idx) async {
+    String convId,
+    int idx,
+  ) async {
     final db = await DbHelper().db;
     final rows = await db.query(
       'messages',
@@ -497,14 +521,16 @@ class ChatStorageService {
         'isUser': m.isUserMessage ? 1 : 0,
         'text': m.text,
         'photoPath': serializedAttachments,
-        'webSearchSources':
-            m.webSearchSources != null ? jsonEncode(m.webSearchSources) : null,
+        'webSearchSources': m.webSearchSources != null
+            ? jsonEncode(m.webSearchSources)
+            : null,
         'isReported': m.isReported ? 1 : 0,
         'model': m.model,
         'includeInContext': m.includeInContext ? 1 : 0,
         'ts': DateTime.now().millisecondsSinceEpoch,
         'toolSteps': m.toolSteps.isNotEmpty ? jsonEncode(m.toolSteps) : null,
         'isIncomplete': m.isIncomplete ? 1 : 0,
+        'flowParticipant': m.flowParticipant,
       };
 
       await db.insert(
@@ -516,8 +542,9 @@ class ChatStorageService {
       await _updateConversationTimestamp(convId, db);
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      final displayPath =
-          m.attachmentPaths.isNotEmpty ? m.attachmentPaths.first : null;
+      final displayPath = m.attachmentPaths.isNotEmpty
+          ? m.attachmentPaths.first
+          : null;
 
       _lastMsgController.add({
         'convId': convId,
@@ -554,14 +581,14 @@ class ChatStorageService {
   /// Returns all media attachment paths for a specific conversation.
   /// Used to clean up files from disk when a conversation is deleted.
   static Future<List<String>> getMediaPathsForConversation(
-      String convId) async {
+    String convId,
+  ) async {
     try {
       final db = await DbHelper().db;
       final rows = await db.query(
         'messages',
         columns: ['photoPath'],
-        where:
-            'conversationId = ? AND photoPath IS NOT NULL AND length(photoPath) > 0',
+        where: 'conversationId = ? AND photoPath IS NOT NULL AND length(photoPath) > 0',
         whereArgs: [convId],
       );
       return rows
@@ -570,7 +597,8 @@ class ChatStorageService {
           .toList();
     } catch (e) {
       debugPrint(
-          "[ChatStorage] Error fetching media paths for conversation: $e");
+        "[ChatStorage] Error fetching media paths for conversation: $e",
+      );
       return [];
     }
   }
@@ -607,8 +635,9 @@ class ChatStorageService {
         return;
       }
 
-      final List<String> convIds =
-          convsToDelete.map((row) => row['id'] as String).toList();
+      final List<String> convIds = convsToDelete
+          .map((row) => row['id'] as String)
+          .toList();
 
       for (final cid in convIds) {
         final mediaPaths = await getMediaPathsForConversation(cid);
@@ -646,7 +675,7 @@ class ChatStorageService {
           'isStarred': starred ? 1 : 0,
           'starredDate': starred
               ? DateTime.now().millisecondsSinceEpoch
-              : 0 // Save date or 0
+              : 0, // Save date or 0
         },
         where: 'id = ?',
         whereArgs: [id],
@@ -667,7 +696,8 @@ class ChatStorageService {
     final trimmedTitle = newTitle.trim();
     if (id.trim().isEmpty || trimmedTitle.isEmpty) {
       debugPrint(
-          "[ChatStorage.rename] Skipped empty rename. source=$source id='$id' titleLength=${trimmedTitle.length}");
+        "[ChatStorage.rename] Skipped empty rename. source=$source id='$id' titleLength=${trimmedTitle.length}",
+      );
       return false;
     }
 
@@ -685,7 +715,8 @@ class ChatStorageService {
       );
 
       debugPrint(
-          "[ChatStorage.rename] source=$source id=$id affectedRows=$affectedRows expected=${expectedCurrentTitle != null} title='$trimmedTitle'");
+        "[ChatStorage.rename] source=$source id=$id affectedRows=$affectedRows expected=${expectedCurrentTitle != null} title='$trimmedTitle'",
+      );
 
       if (affectedRows <= 0) {
         return false;
@@ -725,7 +756,8 @@ class ChatStorageService {
     try {
       final db = await DbHelper().db;
       debugPrint(
-          "[ChatStorage] Deleting all conversations, messages, and recent models history.");
+        "[ChatStorage] Deleting all conversations, messages, and recent models history.",
+      );
 
       // Delete all media files first
       final rows = await db.query(
@@ -762,7 +794,8 @@ class ChatStorageService {
   static Future<bool> hasAnyConversations() async {
     final db = await DbHelper().db;
     final count = Sqflite.firstIntValue(
-        await db.rawQuery('SELECT COUNT(*) FROM conversations'));
+      await db.rawQuery('SELECT COUNT(*) FROM conversations'),
+    );
     return count != null && count > 0;
   }
 
@@ -770,10 +803,12 @@ class ChatStorageService {
     if (e.toString().contains("SQLITE_FULL") ||
         e.toString().contains("database or disk is full")) {
       debugPrint(
-          "[ChatStorage] CRITICAL: Device storage is full. '$operationName' failed. Data was NOT saved to prevent crash.");
+        "[ChatStorage] CRITICAL: Device storage is full. '$operationName' failed. Data was NOT saved to prevent crash.",
+      );
     } else if (kIsWeb) {
       debugPrint(
-          "[ChatStorage] Web platform ignored unsupported database write for: '$operationName'.");
+        "[ChatStorage] Web platform ignored unsupported database write for: '$operationName'.",
+      );
     } else {
       // Best-effort persistence: these writes are fire-and-forget from the
       // conversation provider (upsertMessage is intentionally unawaited), so
@@ -781,7 +816,8 @@ class ChatStorageService {
       // any transient DB error (locked DB, missing path, plugin missing in
       // tests) even though nothing upstream can recover from it.
       debugPrint(
-          "[ChatStorage] Unexpected error in '$operationName': $e — write skipped (best-effort persistence).");
+        "[ChatStorage] Unexpected error in '$operationName': $e — write skipped (best-effort persistence).",
+      );
     }
   }
 

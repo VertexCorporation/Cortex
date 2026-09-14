@@ -23,16 +23,20 @@
 // GPU orb (see voice_orb.dart + shaders/voice_orb.frag) is the primary
 // experience now.
 
+import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/voice.dart';
+import 'package:cortex/chat/services/flow.dart';
+import 'package:cortex/chat/services/tts_remote.dart';
 import 'package:cortex/chat/screen/widgets/voice_orb.dart';
 import 'package:cortex/funds/funds.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/user.dart';
+import 'package:cortex/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,12 +50,9 @@ import 'package:provider/provider.dart';
 /// mapping stable as the participant set grows, and active-model changes
 /// glide through the controller's palette interpolation.
 List<Color> flowAgentPalettes() {
-  return const [
-    Color(0xFFEFA8A6), // identity red — soft coral
-    Color(0xFFA6B9F2), // identity blue — powder blue
-    Color(0xFFA8D9B4), // identity green — soft sage
-    Color(0xFFF2DDA0), // identity yellow — soft butter
-  ];
+  return FlowParticipant.values
+      .map((participant) => participant.color)
+      .toList(growable: false);
 }
 
 /// The normal Voice Mode orb interior — the product reference palette: a
@@ -146,6 +147,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
   /// Mic-level feed: raw SoundService notifications are pushed straight
   /// into the controller (no setState, no widget rebuilds at frame rate).
   SpeechService? _speechService;
+  final RemoteTtsService _tts = RemoteTtsService.instance;
   bool _disposed = false;
 
   static const double _compactOrbSize = 64.0;
@@ -160,9 +162,10 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
     )..addListener(_syncExpandToShader);
     _presenceController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 380),
     );
     _orb = VoiceOrbController(vsync: this);
+    _tts.outputLevel.addListener(_onOutputLevel);
     _orb.load();
     if (widget.active) {
       _presenceController.forward();
@@ -195,6 +198,16 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
     }
   }
 
+  void _onOutputLevel() {
+    if (_disposed) return;
+    // Output samples are meaningful only once the voice pipeline has entered
+    // the speaking state.  Startup must remain visually dormant even if a
+    // stale player callback arrives while the socket is connecting.
+    _orb.setOutputLevel(
+      _orb.phase == VoiceOrbPhase.speaking ? _tts.outputLevel.value : 0,
+    );
+  }
+
   @override
   void didUpdateWidget(VoiceSessionOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -212,6 +225,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
   void dispose() {
     _disposed = true;
     _speechService?.removeListener(_onSpeechLevel);
+    _tts.outputLevel.removeListener(_onOutputLevel);
     _expandController.dispose();
     _presenceController.dispose();
     _orb.dispose();
@@ -278,8 +292,9 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
         0,
         palettes.length - 1,
       );
+      final activeColor = palettes[agent];
       _orb.setPalette(
-        primary: palettes[agent],
+        primary: activeColor,
         secondary: voicePastelLavender,
         accent: voicePastelBlushPink,
       );
@@ -290,14 +305,23 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
           phase = VoiceOrbPhase.flow;
           multicolor = 1.0;
           intensity = 0.9;
+          _orb.setPalette(
+            primary: FlowParticipant.blue.color,
+            secondary: Color.lerp(
+              FlowParticipant.red.color,
+              FlowParticipant.yellow.color,
+              0.5,
+            )!,
+            accent: FlowParticipant.green.color,
+          );
         case VoiceState.processing:
           phase = VoiceOrbPhase.flow;
           intensity = 0.85;
         case VoiceState.speaking:
           phase = VoiceOrbPhase.speaking;
         case VoiceState.connecting:
-          phase = VoiceOrbPhase.subdued;
-          intensity = 0.45;
+          phase = VoiceOrbPhase.connecting;
+          intensity = 0.16;
         case VoiceState.failed:
           phase = VoiceOrbPhase.subdued;
           intensity = 0.35;
@@ -322,7 +346,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
         case VoiceState.speaking:
           phase = VoiceOrbPhase.speaking;
         case VoiceState.connecting:
-          phase = VoiceOrbPhase.subdued;
+          phase = VoiceOrbPhase.connecting;
           intensity = 0.45;
         case VoiceState.failed:
           phase = VoiceOrbPhase.subdued;
@@ -331,6 +355,16 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
           phase = VoiceOrbPhase.subdued;
           intensity = 0.5;
       }
+    }
+
+    if (phase == VoiceOrbPhase.connecting) {
+      // Keep the startup orb recognizably Cortex while it wakes, but strongly
+      // desaturate it and avoid implying that the microphone is ready.
+      _orb.setPalette(
+        primary: Color.lerp(voicePastelLavender, AppColors.border, 0.68)!,
+        secondary: Color.lerp(voicePastelPowderBlue, AppColors.border, 0.68)!,
+        accent: Color.lerp(voicePastelBlushPink, AppColors.border, 0.72)!,
+      );
     }
 
     if (voiceAllowanceExhausted(voiceService, context.read<UserProvider?>())) {
@@ -354,86 +388,106 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
     final voiceService = context.watch<VoiceService>();
     _syncOrbInputs(voiceService);
 
-    // MediaQuery size accessors that do not subscribe to viewInsets: the
-    // orb never rebuilds from keyboard changes.
-    final size = MediaQuery.sizeOf(context);
     final safeTop = MediaQuery.paddingOf(context).top;
-    // A SMALLER expanded orb: 70% of width capped at 288 — the fullscreen
-    // stage reads as a jewel, not a moon.
-    final fullOrbSize = size.width * 0.70 > 288.0 ? 288.0 : size.width * 0.70;
+    // The host shrinks while the keyboard closes. Use its actual bounds so
+    // the capsule and orb share coordinates throughout focused entry.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.biggest;
+        final usableHeight = (size.height - safeTop - widget.bottomSafe).clamp(
+          0.0,
+          double.infinity,
+        );
+        // Leave enough room for the bounded listening/user-speech scale
+        // envelope so the expanded sphere stays inside the usable stage.
+        final fullOrbSize = math.min(
+          288.0,
+          math.min(size.width * 0.70, usableHeight * 0.78),
+        );
 
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        _presenceController,
-        _expandController,
-        widget.panelHeight,
-      ]),
-      builder: (context, _) {
-        // SCALE keeps the playful easeOutBack overshoot (~1.05x near the
-        // end of the animation). Every OPACITY must use a monotonic 0..1
-        // curve instead: easeOutBack overshoots past 1.0 and `Opacity`
-        // asserts [0.0, 1.0], which crashed the overlay mid-entry AND
-        // mid-exit on device (entry and exit both pass through the
-        // overshoot region). Fullscreen's `expandT * presence` product
-        // stays <= 1.0 for the same reason — both factors monotonic.
-        final presenceScale = Curves.easeOutBack.transform(
-          _presenceController.value,
-        );
-        final presence = Curves.easeOutCubic.transform(
-          _presenceController.value,
-        );
-        final expandT = Curves.easeInOutCubic.transform(
-          _expandController.value,
-        );
-        final orbSize = lerpDouble(_compactOrbSize, fullOrbSize, expandT)!;
+        return AnimatedBuilder(
+          animation: Listenable.merge([
+            _presenceController,
+            _expandController,
+            widget.panelHeight,
+          ]),
+          builder: (context, _) {
+            // SCALE keeps the playful easeOutBack overshoot (~1.05x near the
+            // end of the animation). Every OPACITY must use a monotonic 0..1
+            // curve instead: easeOutBack overshoots past 1.0 and `Opacity`
+            // asserts [0.0, 1.0], which crashed the overlay mid-entry AND
+            // mid-exit on device (entry and exit both pass through the
+            // overshoot region). Fullscreen's `expandT * presence` product
+            // stays <= 1.0 for the same reason — both factors monotonic.
+            final presenceScale = Curves.easeOutBack.transform(
+              _presenceController.value,
+            );
+            final presence = Curves.easeOutCubic.transform(
+              _presenceController.value,
+            );
+            final expandT = Curves.easeInOutCubic.transform(
+              _expandController.value,
+            );
+            final orbSize = lerpDouble(_compactOrbSize, fullOrbSize, expandT)!;
 
-        // COMPACT anchor: the composer panel's top edge. Live height means
-        // attachments/edit growth pushes the orb upward frame-accurately;
-        // briefing visibility is not part of the equation at all.
-        final composerTop =
-            size.height - widget.bottomSafe - widget.panelHeight.value;
-        final compactCenter = Offset(
-          size.width / 2,
-          composerTop - _orbGapAboveComposer - orbSize / 2,
-        );
-        // FULLSCREEN anchor: the true vertical center of the SafeArea —
-        // notch-aware via MediaQuery top, home-indicator-aware via the
-        // same bottomSafe inset that anchors compact mode — so the orb
-        // never rides high under the notch the way the old raw
-        // 0.40·height fraction did.
-        final fullCenter = Offset(
-          size.width / 2,
-          safeTop + (size.height - safeTop - widget.bottomSafe) / 2,
-        );
-        final center = Offset.lerp(compactCenter, fullCenter, expandT)!;
+            // COMPACT anchor: the composer panel's top edge. Live height means
+            // attachments/edit growth pushes the orb upward frame-accurately;
+            // briefing visibility is not part of the equation at all.
+            final composerTop =
+                size.height - widget.bottomSafe - widget.panelHeight.value;
+            final compactCenter = Offset(
+              size.width / 2,
+              composerTop - _orbGapAboveComposer - orbSize / 2,
+            );
+            // FULLSCREEN anchor: the true vertical center of the SafeArea —
+            // notch-aware via MediaQuery top, home-indicator-aware via the
+            // same bottomSafe inset that anchors compact mode — so the orb
+            // never rides high under the notch the way the old raw
+            // 0.40·height fraction did.
+            final fullCenter = Offset(
+              size.width / 2,
+              safeTop + (size.height - safeTop - widget.bottomSafe) / 2,
+            );
+            final collapseOrigin = Offset(
+              size.width / 2,
+              composerTop + widget.panelHeight.value / 2 - 18,
+            );
+            final entryCenter = Offset.lerp(
+              collapseOrigin,
+              compactCenter,
+              presence,
+            )!;
+            final center = Offset.lerp(entryCenter, fullCenter, expandT)!;
 
-        return IgnorePointer(
-          // The overlay owns no interaction while it has fully faded out.
-          ignoring: _presenceController.isDismissed,
-          child: Stack(
-            children: [
-              // The orb: one widget instance from compact through fullscreen
-              // — the controller keeps shader phase/state continuity while
-              // only its geometry lerps.
-              Positioned(
-                left: center.dx - orbSize / 2,
-                top: center.dy - orbSize / 2,
-                child: Transform.scale(
-                  // Scale is the one place the easeOutBack overshoot is
-                  // welcome (a slight 1.05x pop as the orb settles in).
-                  scale: 0.65 + 0.35 * presenceScale,
-                  child: Opacity(
-                    opacity: presence,
-                    child: VoiceOrb(
-                      controller: _orb,
-                      size: orbSize,
-                      onTap: _toggleFullscreen,
+            return IgnorePointer(
+              // The overlay owns no interaction while it has fully faded out.
+              ignoring: _presenceController.isDismissed,
+              child: Stack(
+                children: [
+                  // The orb: one widget instance from compact through fullscreen
+                  // — the controller keeps shader phase/state continuity while
+                  // only its geometry lerps.
+                  Positioned(
+                    left: center.dx - orbSize / 2,
+                    top: center.dy - orbSize / 2,
+                    child: Transform.scale(
+                      // Scale is the one place the easeOutBack overshoot is
+                      // welcome (a slight 1.05x pop as the orb settles in).
+                      scale: 0.15 + 0.85 * presenceScale,
+                      child: Opacity(
+                        opacity: presence,
+                        child: VoiceOrb(
+                          controller: _orb,
+                          size: orbSize,
+                          onTap: _toggleFullscreen,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

@@ -19,7 +19,7 @@
 //   uTime       2       seconds since the visual started (phase continuity)
 //   uMic        3       smoothed microphone amplitude 0..1 (listening)
 //   uTts        4       smoothed output/TTS amplitude 0..1 (speaking)
-//   uState      5       0 subdued, 1 listening, 2 speaking, 3 thinking, 4 flow
+//   uState      5       0 subdued, 1 listening, 2 speaking, 3 thinking, 4 flow, 5 connecting
 //   uExpand     6       compact->fullscreen transition progress 0..1
 //   uIntensity  7       overall energy 0..1 (dimmed while connecting/failed)
 //   uColorA     8..10   base pastel rgb (lavender / flow identity)
@@ -82,27 +82,40 @@ void main() {
   float edge = 0.478;
   float mask = 1.0 - smoothstep(edge - 0.006, edge + 0.002, r);
 
-  float level = max(uMic, uTts);
+  float inputLevel = clamp(uMic, 0.0, 1.0);
+  float outputLevel = clamp(uTts, 0.0, 1.0);
+  // Keep a quiet living motion through syllable pauses while letting the
+  // measured PCM envelope visibly intensify the material during speech.
+  float speakingFloor = (uState > 1.5 && uState < 2.5) ? 0.14 : 0.0;
 
   // Accumulated on the continuous controller clock with interpolated speed.
   // Changing speaking state cannot jump the liquid phase.
+  // Output amplitude is measured from the PCM that is being played. Let it
+  // affect the material itself (domain warp, field velocity and light), while
+  // keeping the outer sphere calm and bounded.
   float tt = uTime;
+  float outputMotion = max(speakingFloor, outputLevel) *
+      (0.45 + 0.75 * max(speakingFloor, outputLevel));
+  vec2 outputDrift = vec2(
+    sin(tt * 2.4 + 1.7) * 0.035,
+    cos(tt * 2.0 - 0.8) * 0.035
+  ) * outputMotion;
 
   // Big soft blobs: LOW-frequency field coordinates — never streaks, never
   // high-frequency turbulence.
-  vec2 p = uv * (1.30 - 0.22 * uExpand);
+  vec2 p = uv * (1.30 - 0.22 * uExpand) + outputDrift;
 
   vec2 w1 = vec2(
-    fbm(p + vec2(tt * 0.8, -tt * 0.45)),
-    fbm(p + vec2(-tt * 0.5, tt * 0.9) + 31.4)
+    fbm(p + vec2(tt * (0.8 + 0.55 * outputMotion), -tt * (0.45 + 0.32 * outputMotion))),
+    fbm(p + vec2(-tt * (0.5 + 0.42 * outputMotion), tt * (0.9 + 0.62 * outputMotion)) + 31.4)
   );
   vec2 w2 = vec2(
-    fbm(p * 1.65 + vec2(-tt * 0.6, tt * 0.5) + 57.2),
-    fbm(p * 1.85 + vec2(tt * 0.35, -tt * 0.95) + 12.7)
+    fbm(p * 1.65 + vec2(-tt * (0.6 + 0.45 * outputMotion), tt * (0.5 + 0.35 * outputMotion)) + 57.2),
+    fbm(p * 1.85 + vec2(tt * (0.35 + 0.30 * outputMotion), -tt * (0.95 + 0.70 * outputMotion)) + 12.7)
   );
 
-  float f1 = fbm(p * 1.60 + w1 * (0.85 + 0.20 * level) + vec2(0.0, tt));
-  float f2 = fbm(p * 2.05 + w2 * (1.10 + 0.25 * level) + vec2(tt * 0.8, 0.0));
+  float f1 = fbm(p * 1.60 + w1 * (0.85 + 0.28 * inputLevel + 0.70 * outputMotion) + vec2(0.0, tt));
+  float f2 = fbm(p * 2.05 + w2 * (1.10 + 0.32 * inputLevel + 0.90 * outputMotion) + vec2(tt * (0.8 + 0.6 * outputMotion), 0.0));
   float f3 = fbm(p * 2.55 - w1 * 0.75 + vec2(44.0 - tt * 0.5, tt * 0.6));
 
   // Base: a soft warped vertical wash of the two base pastels.
@@ -123,6 +136,12 @@ void main() {
     vec3(0.80, 0.93, 0.95),
     0.10 * smoothstep(0.40, 0.86, f2 - 0.5 * f3)
   );
+
+  // A bounded output-driven color/light response makes syllables readable
+  // even when the device speaker is muted, without flashing or creating a
+  // glow outside the clipped sphere.
+  col = mix(col, col.bgr * vec3(0.98, 1.02, 1.04), 0.14 * outputMotion);
+  col *= 1.0 + 0.16 * outputMotion * smoothstep(0.25, 0.95, f2 + 0.25 * f3);
   col = mix(
     col,
     vec3(1.00, 0.98, 0.94),

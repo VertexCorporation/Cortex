@@ -24,7 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 /// The visual phase the orb is in. Drives the shader's motion character.
-enum VoiceOrbPhase { subdued, listening, speaking, thinking, flow }
+enum VoiceOrbPhase { subdued, connecting, listening, speaking, thinking, flow }
 
 class VoiceOrbController extends ChangeNotifier {
   VoiceOrbController({required TickerProvider vsync}) {
@@ -68,6 +68,8 @@ class VoiceOrbController extends ChangeNotifier {
   // --- Inputs --------------------------------------------------------------
   double _micTarget = 0;
   double _micSmooth = 0;
+  double _outputTarget = 0;
+  double _outputSmooth = 0;
   double _ttsSmooth = 0;
   VoiceOrbPhase _phase = VoiceOrbPhase.subdued;
   double _intensity = 1.0;
@@ -84,12 +86,20 @@ class VoiceOrbController extends ChangeNotifier {
   double _motionTime = 0;
   double _motionSpeed = 0.035;
   double _intensitySmooth = 1.0;
+  double _phaseScale = 0.5;
   bool _disposed = false;
 
   /// One raw microphone level sample (0..1). Cheap: no notifyListeners —
   /// smoothing happens on the ticker and repaints only the orb's layer.
   void setMicLevel(double level) {
     _micTarget = level.clamp(0.0, 1.0);
+  }
+
+  /// Output activity from the live TTS player. This is deliberately separate
+  /// from the microphone envelope: the assistant can be speaking while the
+  /// recorder is quiet, and the orb must keep reacting in that state.
+  void setOutputLevel(double level) {
+    _outputTarget = level.clamp(0.0, 1.0);
   }
 
   void setPhase(VoiceOrbPhase phase) {
@@ -128,37 +138,42 @@ class VoiceOrbController extends ChangeNotifier {
     final nextTime = elapsed.inMicroseconds / 1e6;
     final dt = (nextTime - _timeSec).clamp(0.0, 0.1);
     _timeSec = nextTime;
-    final activity = math.max(_micSmooth, _ttsSmooth);
-    final speedTarget =
-        0.035 + 0.08 * activity + (_phase == VoiceOrbPhase.flow ? 0.02 : 0.0);
+    final output = _outputTarget;
+    final outputK = 1 - math.exp(-dt / (output > _outputSmooth ? 0.06 : 0.24));
+    _outputSmooth += (output - _outputSmooth) * outputK;
+    _ttsSmooth = _outputSmooth;
+    final activity = math.max(_micSmooth, _outputSmooth);
+    final speedTarget = _phase == VoiceOrbPhase.connecting
+        ? 0.012 + 0.012 * activity
+        : 0.035 +
+              0.08 * activity +
+              (_phase == VoiceOrbPhase.speaking
+                  ? 0.16 + 0.36 * _outputSmooth
+                  : 0) +
+              (_phase == VoiceOrbPhase.flow ? 0.02 : 0.0);
     _motionSpeed += (speedTarget - _motionSpeed) * (1 - math.exp(-dt / 0.7));
     _motionTime += dt * _motionSpeed;
     _intensitySmooth +=
         (_intensity - _intensitySmooth) * (1 - math.exp(-dt / 0.7));
+
+    final phaseScaleTarget = switch (_phase) {
+      VoiceOrbPhase.connecting => 0.5,
+      VoiceOrbPhase.listening ||
+      VoiceOrbPhase.thinking ||
+      VoiceOrbPhase.flow => 1.04,
+      VoiceOrbPhase.speaking => 1.0,
+      VoiceOrbPhase.subdued => 0.78,
+    };
+    // Readiness should feel like the orb waking up rather than a size jump.
+    final phaseScaleRate = phaseScaleTarget > _phaseScale ? 0.14 : 0.08;
+    _phaseScale +=
+        (phaseScaleTarget - _phaseScale) * (1 - math.exp(-dt / phaseScaleRate));
 
     // EMA smoothing: fast attack (a syllable starts), slower release.
     final target = _micTarget;
     final k = 1 - math.exp(-dt / (target > _micSmooth ? 0.045 : 0.25));
     _micSmooth += (target - _micSmooth) * k;
     if (_micSmooth < 0.001) _micSmooth = 0;
-
-    // Organic speech envelope while the assistant talks (no output meter
-    // exists for remote TTS; a mixed-sine power curve reads as speech).
-    if (_phase == VoiceOrbPhase.speaking) {
-      final t = _timeSec;
-      final env =
-          0.28 +
-          0.34 *
-              (0.5 + 0.5 * math.sin(t * 2.6)) *
-              (0.5 + 0.5 * math.sin(t * 0.9)) +
-          0.20 *
-              (0.5 + 0.5 * math.sin(t * 5.3)) *
-              (0.5 + 0.5 * math.sin(t * 1.7));
-      _ttsSmooth +=
-          (env.clamp(0.0, 1.0) - _ttsSmooth) * (1 - math.exp(-dt / 0.08));
-    } else {
-      _ttsSmooth *= math.exp(-dt / 0.35);
-    }
 
     // Palette glide (Flow active-speaker changes interpolate smoothly).
     final paletteStep = 1 - math.exp(-dt / 1.2);
@@ -184,10 +199,14 @@ class VoiceOrbController extends ChangeNotifier {
 
   // Six-second breath, confined to paint bounds. Audio blends into the same
   // phase, never starts/stops a second controller or changes layout size.
-  double get breathingScale =>
-      0.985 +
-      0.009 * math.sin(_timeSec * math.pi / 3) +
-      0.005 * math.max(_micSmooth, _ttsSmooth);
+  double get breathingScale {
+    return _phaseScale +
+        0.009 * math.sin(_timeSec * math.pi / 3) +
+        0.10 *
+            _micSmooth.clamp(0.0, 1.0) *
+            (_phase == VoiceOrbPhase.speaking ? 0.45 : 1.0);
+  }
+
   double get micSmooth => _micSmooth;
   double get ttsSmooth => _ttsSmooth;
   VoiceOrbPhase get phase => _phase;
@@ -205,6 +224,8 @@ class VoiceOrbController extends ChangeNotifier {
     switch (_phase) {
       case VoiceOrbPhase.subdued:
         return 0;
+      case VoiceOrbPhase.connecting:
+        return 5;
       case VoiceOrbPhase.listening:
         return 1;
       case VoiceOrbPhase.speaking:
@@ -348,11 +369,19 @@ class VoiceOrbPainter extends CustomPainter {
         'fallback gradient colors/colorStops must match',
       );
       final drift = controller.motionTime;
+      final outputMotion = controller.ttsSmooth;
       final blobCenter = Offset(
-        (at.dx + 0.035 * math.sin(drift + at.dy * 6)) * size.width,
-        (at.dy + 0.035 * math.cos(drift + at.dx * 6)) * size.height,
+        (at.dx +
+                (0.035 + 0.025 * outputMotion) *
+                    math.sin(drift * (1 + outputMotion) + at.dy * 6)) *
+            size.width,
+        (at.dy +
+                (0.035 + 0.025 * outputMotion) *
+                    math.cos(drift * (1 + outputMotion) + at.dx * 6)) *
+            size.height,
       );
-      final blobRadius = radiusFactor * size.shortestSide;
+      final blobRadius =
+          radiusFactor * size.shortestSide * (1 + 0.025 * outputMotion);
       canvas.drawCircle(
         blobCenter,
         blobRadius,

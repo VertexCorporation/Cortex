@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -14,8 +15,13 @@ import 'package:cortex/chat/services/stt_remote.dart';
 import 'package:cortex/chat/services/tts_remote.dart';
 import 'package:cortex/chat/services/voice_barge_in.dart';
 import 'package:cortex/chat/services/voice_echo.dart';
+import 'package:cortex/chat/services/voice_background.dart';
 import 'package:cortex/chat/services/voice_health.dart';
+import 'package:cortex/chat/services/voice_sounds.dart';
 import 'package:cortex/chat/services/voice_turns.dart';
+import 'package:cortex/chat/services/flow.dart';
+
+import 'flow_text.dart';
 
 /// The realtime Voice/Flow lifecycle. One enum, one truth: no combination of
 /// booleans can put the session in two states at once. UI-compat: the four
@@ -32,6 +38,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   final SpeechService _speechService;
   final FlutterTts _flutterTts;
   VoiceState _state = VoiceState.idle;
+  bool _listeningCuePlayed = false;
 
   VoiceState get state => _state;
 
@@ -41,6 +48,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
   String _currentLocale = "en-US";
   Timer? _silenceTimer;
+  Timer? _adaptiveSegmentTimer;
   Timer? _voiceTimer;
   Function(String)? _onFinalSentence; // Callback to send text to AI
 
@@ -50,18 +58,63 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// device log instead of masquerading as "listening" (it once did: audio
   /// focus paused the recorder mid-session with zero other symptoms).
   Timer? _healthTimer;
+  DateTime? _lastPlaybackEndedAt;
+  int _sentenceSequence = 0;
+  Future<Uint8List?>? _prefetchFuture;
+  String? _prefetchText;
+  int? _prefetchGeneration;
 
   /// Turn-scoped telemetry flags: the first streamed AI chunk of a turn and
   /// the first transcript after playback both produce one [VoiceTelemetry]
   /// mark each, which is exactly the pair of timings real-device testing
   /// cares about (STT final → first AI token; TTS complete → next user
   /// audio).
+  bool _flowTurnCompleted = false;
   bool _firstAiChunkSeen = false;
+  bool _firstSentenceSeen = false;
   bool _awaitingPostTtsTranscript = false;
 
   bool isFlowMode = false; // "Setup" mode (Flow selected but not started)
   bool isFlowActive = false; // "Active" mode (Flow loop running)
-  int currentFlowAgentIndex = 0; // 0, 1, 2 for the 3 agents
+  int currentFlowAgentIndex = 0; // Blue, Red, Green, Yellow
+  final FlowOrchestrator _flow = FlowOrchestrator();
+  List<String> _flowModelIds = const [
+    'cortex/auto',
+    'cortex/auto',
+    'cortex/auto',
+    'cortex/auto',
+  ];
+  List<String?> _flowVoiceIds = const [null, null, null, null];
+  FutureOr<void> Function(FlowParticipant participant, String modelId)?
+  _onFlowTurn;
+  VoidCallback? _onAssistantInterrupted;
+
+  FlowPhase get flowPhase => _flow.phase;
+
+  FlowParticipant get currentFlowParticipant =>
+      FlowParticipant.values[currentFlowAgentIndex.clamp(0, 3)];
+
+  List<String> get flowModelIds => List.unmodifiable(_flowModelIds);
+
+  void configureFlow({
+    required FutureOr<void> Function(
+      FlowParticipant participant,
+      String modelId,
+    )
+    onFlowTurn,
+    required List<String> modelIds,
+    List<String?>? voiceIds,
+    VoidCallback? onAssistantInterrupted,
+  }) {
+    _onFlowTurn = onFlowTurn;
+    _onAssistantInterrupted = onAssistantInterrupted;
+    if (modelIds.length == FlowParticipant.values.length) {
+      _flowModelIds = List.unmodifiable(modelIds);
+    }
+    if (voiceIds != null && voiceIds.length == FlowParticipant.values.length) {
+      _flowVoiceIds = List.unmodifiable(voiceIds);
+    }
+  }
 
   // --- SESSION IDENTITY ---------------------------------------------------
   // Every async artifact of a voice session (STT results, silence timers,
@@ -84,6 +137,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// assistant audio) for this long is an abandoned session — end it rather
   /// than letting it consume provider time and daily allowance forever.
   static const Duration _inactivityTimeout = Duration(seconds: 90);
+  static const Duration _adaptiveSegmentPause = Duration(milliseconds: 700);
+  static const int _adaptiveSegmentMinimum = 42;
+  static const int _adaptiveSegmentMaximum = 220;
   Timer? _inactivityTimer;
 
   /// The realtime-speech window the server reserved for the CURRENT provider
@@ -179,6 +235,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   bool _isSpeaking = false;
 
   final RemoteTtsService _remoteTts = RemoteTtsService.instance;
+  final VoiceBackgroundService _backgroundService = VoiceBackgroundService();
 
   /// Bumped whenever speech is cancelled. Remote audio is fetched over the
   /// network, so a sentence can still be in flight when the user interrupts;
@@ -190,6 +247,11 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _cancelPendingSpeech() {
     _speechGeneration++;
     _sentenceQueue.clear();
+    _adaptiveSegmentTimer?.cancel();
+    _adaptiveSegmentTimer = null;
+    _prefetchFuture = null;
+    _prefetchText = null;
+    _prefetchGeneration = null;
     // Playback is over from the barge-in detector's point of view too: the
     // post-TTS echo discard window starts here. The transcript echo filter
     // opens its strong window from the same instant.
@@ -214,10 +276,14 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
        _reconnectBackoffOverride = reconnectBackoff,
        _flutterTts = flutterTts ?? FlutterTts() {
     _initTts();
+    _backgroundService.onStopRequested = () {
+      unawaited(stopSession(reason: VoiceEndReason.user));
+    };
     _speechService.addListener(_onSpeechStatusChange);
-    // App-lifecycle policy: backgrounding the app ends the realtime session
-    // (microphone released, provider usage settled, audio stopped). Nothing
-    // voice-related may keep running unobserved in the background.
+    // An active Voice session opts into the platform's audio lifetime before
+    // the activity can be backgrounded. The native service owns only the
+    // notification/process lifetime; Flutter remains the sole recorder,
+    // socket and playback owner.
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -232,15 +298,13 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
-      final gen = _activeGeneration;
-      if (gen != null) {
-        debugPrint(
-          "[VoiceService] Session $gen ended: app backgrounded ($state).",
-        );
-        unawaited(_endSession(gen, VoiceEndReason.background));
-      }
+    final gen = _activeGeneration;
+    if (gen != null &&
+        (state == AppLifecycleState.paused ||
+            state == AppLifecycleState.detached)) {
+      debugPrint(
+        '[VoiceService] Session $gen remains active while app is $state.',
+      );
     }
   }
 
@@ -252,6 +316,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _activeGeneration = null;
     _cancelPendingSpeech();
     unawaited(_remoteTts.stop());
+    unawaited(_backgroundService.stop());
     super.dispose();
   }
 
@@ -275,6 +340,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _cancelAllTimers() {
     _silenceTimer?.cancel();
     _silenceTimer = null;
+    _adaptiveSegmentTimer?.cancel();
+    _adaptiveSegmentTimer = null;
     _voiceTimer?.cancel();
     _voiceTimer = null;
     _testModeTimer?.cancel();
@@ -366,52 +433,63 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
   void _updateState(VoiceState newState) {
     if (_state != newState) {
+      if (newState == VoiceState.listening &&
+          _state == VoiceState.connecting &&
+          !_listeningCuePlayed) {
+        _listeningCuePlayed = true;
+        VoiceInteractionSounds.listeningReady();
+      }
       _state = newState;
       notifyListeners();
     }
   }
 
-  void toggleFlowMode() async {
-    isFlowMode = !isFlowMode;
-    // Reset state when toggling
-    isFlowActive = false;
-    currentFlowAgentIndex = 0;
-
-    // IMMEDIATE INTERRUPTION LOGIC: the current session (mic + speech) ends
-    // cleanly; the toggled mode re-opens what it needs below.
-    await stopSession(resetState: false);
-
-    // TRANSITION LOGIC
+  void toggleFlowMode() {
     if (isFlowMode) {
-      // Voice -> Flow: "Stop listening instantly and morph to line".
-      _updateState(VoiceState.processing);
-      debugPrint(
-        "[VoiceService] Switched to Flow Mode: Stopped Listening, Visual=Line",
-      );
-    } else {
-      // Flow -> Voice: "Start listening instantly and morph to dot". A fresh
-      // session generation is created by startListening — no stale artifacts.
-      setAiGenerationComplete(false);
-      _updateState(VoiceState.listening);
-      debugPrint("[VoiceService] Switched to Voice Mode: Visual=Dot");
-      startListening(context: _lastContext);
+      isFlowMode = false;
+      isFlowActive = false;
+      _voiceTimer?.cancel();
+      _flow.stop();
+      _onAssistantInterrupted?.call();
+      final gen = _activeGeneration;
+      if (gen != null) unawaited(_haltAssistantSpeech(gen));
+      currentFlowAgentIndex = 0;
+      if (_activeGeneration != null) {
+        _updateState(VoiceState.listening);
+      }
+      notifyListeners();
+      return;
     }
 
+    isFlowMode = true;
+    isFlowActive = true;
+    _flow.begin(newGeneration: (_activeGeneration ?? 0) + 1);
+    currentFlowAgentIndex = FlowParticipant.blue.index;
+    _isFlowInterrupted = false;
+    _updateState(VoiceState.listening);
     notifyListeners();
+
+    // Flow is layered on the existing Voice session. The microphone stays
+    // alive so the user can interrupt any participant without a new session.
   }
 
   void setFlowMode(bool enabled) {
     if (isFlowMode == enabled) return;
     isFlowMode = enabled;
     isFlowActive = false;
+    _voiceTimer?.cancel();
+    if (!enabled) _flow.stop();
     currentFlowAgentIndex = 0;
     notifyListeners();
   }
 
   void startFlow() async {
+    if (_activeGeneration == null) return;
     isFlowActive = true;
+    isFlowMode = true;
     currentFlowAgentIndex = 0;
-    _updateState(VoiceState.processing);
+    _flow.begin(newGeneration: _activeGeneration!);
+    _requestFlowTurn(_activeGeneration!);
   }
 
   // Overload startFlow to accept the prompt text directly from UI
@@ -420,7 +498,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     // if the overlay somehow started flow without one.
     final gen = _ensureSession();
     isFlowActive = true;
+    isFlowMode = true;
     currentFlowAgentIndex = 0;
+    _flow.begin(newGeneration: gen);
     _fullAiResponseBuffer.clear();
 
     // Switch to "Processing" to show 1st agent thinking
@@ -428,12 +508,77 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _updateVoiceParams(0); // Reset voice
     _armInactivityTimer(gen);
 
-    // Trigger callback to send initial hidden message
-    _shouldNextMessageBeHidden = true;
-    if (_onFinalSentence != null) {
+    // Legacy test/embedding seam: callers that have not supplied the new
+    // participant callback still receive the original initial prompt once.
+    if (_onFlowTurn != null) {
+      _requestFlowTurn(gen);
+    } else if (_onFinalSentence != null) {
       debugPrint("[VoiceService] Flow turn started (session $gen).");
       _onFinalSentence!(prompt);
     }
+  }
+
+  void _requestFlowTurn(int gen) {
+    if (gen != _activeGeneration || !isFlowActive || _onFlowTurn == null) {
+      return;
+    }
+    _flowTurnCompleted = false;
+    _aiGenerationComplete = false;
+    _firstAiChunkSeen = false;
+    _firstSentenceSeen = false;
+    _fullAiResponseBuffer.clear();
+    _incomingTextBuffer.clear();
+    final participant = currentFlowParticipant;
+    final modelId = _flowModelIds[participant.index];
+    final flowGeneration = _flow.generation;
+    _flow.beginAiTurn(participant);
+    _updateState(VoiceState.processing);
+    _armInactivityTimer(gen);
+    debugPrint(
+      '[VoiceService] Flow turn requested round=${_flow.round} participant=${participant.key} model=$modelId generation=$flowGeneration',
+    );
+    unawaited(
+      Future<void>.sync(() => _onFlowTurn!(participant, modelId)).catchError((
+        error,
+      ) {
+        debugPrint(
+          '[VoiceService] Flow participant ${participant.key} failed: $error',
+        );
+        if (gen == _activeGeneration && flowGeneration == _flow.generation) {
+          _advanceFlowAfterTurn(gen, flowGeneration);
+        }
+      }),
+    );
+  }
+
+  void _advanceFlowAfterTurn(int gen, int flowGeneration) {
+    if (gen != _activeGeneration ||
+        flowGeneration != _flow.generation ||
+        !isFlowActive) {
+      return;
+    }
+    if (_flowTurnCompleted) return;
+    _flowTurnCompleted = true;
+    final next = _flow.completeAi(expectedGeneration: flowGeneration);
+    if (next == null) {
+      _updateState(VoiceState.listening);
+      _voiceTimer?.cancel();
+      _voiceTimer = Timer(const Duration(milliseconds: 1400), () {
+        if (gen != _activeGeneration || !isFlowActive) return;
+        _flow.beginNextRound(expectedGeneration: flowGeneration);
+        currentFlowAgentIndex = FlowParticipant.blue.index;
+        notifyListeners();
+        _requestFlowTurn(gen);
+      });
+      return;
+    }
+    currentFlowAgentIndex = next.index;
+    notifyListeners();
+    _voiceTimer?.cancel();
+    _voiceTimer = Timer(const Duration(milliseconds: 220), () {
+      if (gen != _activeGeneration || !isFlowActive) return;
+      _requestFlowTurn(gen);
+    });
   }
 
   bool _isFlowInterrupted = false;
@@ -444,7 +589,12 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       "[VoiceService] Interrupting Flow. Transitioning to Listen Mode.",
     );
     _isFlowInterrupted = true;
+    _flow.interruptForUser();
+    currentFlowAgentIndex = FlowParticipant.blue.index;
+    _voiceTimer?.cancel();
+    _onAssistantInterrupted?.call();
     _isSpeaking = false;
+    _firstSentenceSeen = false;
     _cancelPendingSpeech();
     _incomingTextBuffer.clear();
 
@@ -470,8 +620,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _isSpeaking = false;
     _cancelPendingSpeech();
     _incomingTextBuffer.clear();
-    await _flutterTts.stop();
-    await _remoteTts.stop();
+    await Future.wait([_remoteTts.stop(), _flutterTts.stop()]);
   }
 
   /// Barge-in: the user started talking over the assistant. Stops the
@@ -487,19 +636,22 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _interruptForBargeIn(int gen) {
     if (gen != _activeGeneration || _state != VoiceState.speaking) return;
     debugPrint("[VoiceService] Barge-in (session $gen): cutting audio.");
-    unawaited(
-      _haltAssistantSpeech(gen).then((_) {
-        if (gen != _activeGeneration) return;
-        _turns.beginTurn();
-        _liveTranscript = "";
-        _isLiveUserMessage = true;
-        // Fresh evidence cycle for the next time the assistant speaks.
-        _bargeIn.reset();
-        _updateState(VoiceState.listening);
-        _armInactivityTimer(gen);
-        notifyListeners();
-      }),
-    );
+    final interruptedText = _bargeIn.acceptedTranscript;
+    _onAssistantInterrupted?.call();
+    // Switch the transcript consumer synchronously so the result that triggered
+    // interruption is accepted by SpeechService's following text callback.
+    _turns.beginTurn();
+    _liveTranscript = "";
+    _isLiveUserMessage = true;
+    if (isFlowActive) {
+      _voiceTimer?.cancel();
+      _flow.interruptForUser();
+      currentFlowAgentIndex = FlowParticipant.blue.index;
+    }
+    _updateState(VoiceState.listening);
+    _armInactivityTimer(gen);
+    unawaited(_haltAssistantSpeech(gen));
+    if (interruptedText.isNotEmpty) _onSttResult(gen, interruptedText);
   }
 
   void stopSpeaking({BuildContext? context}) async {
@@ -521,8 +673,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _restoreFlow() {
     debugPrint("[VoiceService] Resuming Flow after silence/interruption.");
     _isFlowInterrupted = false;
-    // Trigger the flow loop again naturally
-    setAiGenerationComplete(true);
+    final gen = _activeGeneration;
+    if (gen != null && isFlowActive) _requestFlowTurn(gen);
   }
 
   bool _shouldNextMessageBeHidden = false;
@@ -593,6 +745,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     // request is rejected by the server within milliseconds — it boots the
     // container while the user is still speaking.
     VoiceTelemetry.begin();
+    _listeningCuePlayed = false;
     VoiceTelemetry.mark('voice session opening');
     unawaited(_remoteTts.warmup());
 
@@ -618,19 +771,26 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       SystemChannels.textInput.invokeMethod('TextInput.hide');
     }
 
-    // Configure TTS language
-    try {
-      await _flutterTts.setLanguage(locale);
-    } catch (e) {
-      debugPrint("[VoiceService] TTS Language Set Error: $e");
-    }
-
-    if (context != null && !context.mounted) return;
+    // TTS configuration is not a microphone prerequisite. Start it without
+    // waiting; only the foreground lifetime must precede capture on Android.
+    unawaited(
+      _flutterTts.setLanguage(locale).then<void>((_) {}).catchError((e) {
+        debugPrint("[VoiceService] TTS Language Set Error: $e");
+      }),
+    );
 
     final gen = _ensureSession();
     debugPrint(
       "[VoiceService] Session $gen starting (${isFlowMode ? "flow" : "voice"}).",
     );
+    // Expose the startup state before the platform foreground bridge and
+    // recorder/socket initialization begin. The orb can therefore stay
+    // dormant immediately on entry instead of briefly implying readiness.
+    _updateState(VoiceState.connecting);
+    await _backgroundService.start();
+    if (gen != _activeGeneration) return;
+    if (context != null && !context.mounted) return;
+    VoiceTelemetry.mark('voice foreground lifetime requested');
     await _beginListening(gen);
   }
 
@@ -703,9 +863,12 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     await _speechService.stopListening();
     await _flutterTts.stop();
     await _remoteTts.stop();
+    await _backgroundService.stop();
 
     // stopSession stops everything, including a running flow loop.
     isFlowActive = false;
+    _flow.stop();
+    currentFlowAgentIndex = FlowParticipant.blue.index;
     _incomingTextBuffer.clear();
     _fullAiResponseBuffer.clear();
     if (gen != null) {
@@ -785,6 +948,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _silenceTimer = Timer(const Duration(seconds: 2), () {
       if (gen != _activeGeneration) return;
       if (turnId != _turns.currentTurnId) return; // this turn already ended
+      VoiceTelemetry.mark('user speech endpoint detected');
       unawaited(_finalizeUserSpeech(gen, turnId: turnId));
     });
   }
@@ -852,10 +1016,16 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
     _updateState(VoiceState.processing);
     _firstAiChunkSeen = false;
+    _firstSentenceSeen = false;
+    _flowTurnCompleted = false;
+    _aiGenerationComplete = false;
+    _fullAiResponseBuffer.clear();
+    _incomingTextBuffer.clear();
 
     // Commit the turn: exactly THIS turn's speech — the tracker guarantees
     // the buffer never contains words of previously committed turns.
     final String textToSend = _turns.commit();
+    VoiceTelemetry.mark('STT final received');
     VoiceTelemetry.mark('STT final → chat request: "$textToSend"');
 
     // User speech is visible (breaks the flow loop temporarily; the user can
@@ -872,6 +1042,13 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _aiGenerationComplete = false;
     _isFlowInterrupted = false; // Reset flag on successful speech
     _emptyNativeRestarts = 0;
+
+    if (isFlowActive) {
+      _voiceTimer?.cancel();
+      _flow.interruptForUser();
+      currentFlowAgentIndex = FlowParticipant.blue.index;
+      notifyListeners();
+    }
 
     if (_onFinalSentence != null) {
       // Pass only user text to callback - voice system prompt is handled separately
@@ -902,6 +1079,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     return cleaned;
   }
 
+  String? _flowVoiceId() =>
+      isFlowActive ? _flowVoiceIds[currentFlowParticipant.index] : null;
+
   /// Called by SendService when AI streams text chunks.
   void onAiStreamCallback(String chunk) {
     final gen = _activeGeneration;
@@ -910,9 +1090,21 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       _firstAiChunkSeen = true;
       VoiceTelemetry.mark('first AI token received');
     }
-    _incomingTextBuffer.write(chunk);
+    if (isFlowActive && _flow.phase == FlowPhase.thinking) {
+      _flow.markAiSpeaking();
+      notifyListeners();
+    }
+    final previous = isFlowActive
+        ? FlowText.sanitize(_fullAiResponseBuffer.toString(), streaming: true)
+        : _fullAiResponseBuffer.toString();
     _fullAiResponseBuffer.write(chunk);
-    _liveTranscript = _cleanResponseText(_fullAiResponseBuffer.toString());
+    final visible = isFlowActive
+        ? FlowText.sanitize(_fullAiResponseBuffer.toString(), streaming: true)
+        : _fullAiResponseBuffer.toString();
+    if (visible.startsWith(previous)) {
+      _incomingTextBuffer.write(visible.substring(previous.length));
+    }
+    _liveTranscript = _cleanResponseText(visible);
     _isLiveUserMessage = false;
     notifyListeners();
     _armInactivityTimer(gen);
@@ -923,6 +1115,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void onAiResponseFinished() {
     final gen = _activeGeneration;
     if (gen == null) return;
+    _adaptiveSegmentTimer?.cancel();
+    _adaptiveSegmentTimer = null;
     // Speak any remaining text in buffer
     if (_incomingTextBuffer.isNotEmpty) {
       String text = _cleanResponseText(_incomingTextBuffer.toString());
@@ -942,6 +1136,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     if (currentText.contains('<function') ||
         currentText.contains('<memory>') ||
         currentText.contains('<think>')) {
+      _adaptiveSegmentTimer?.cancel();
+      _adaptiveSegmentTimer = null;
       _incomingTextBuffer.clear();
       _incomingTextBuffer.write(currentText);
       return;
@@ -949,27 +1145,74 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
     currentText = currentText.replaceAll("```", "");
 
-    // Pattern: any of .?! followed by a space or new line
+    // Natural multilingual sentence boundaries: the punctuation must be
+    // followed by whitespace or the end of the currently streamed text so a
+    // decimal number or an abbreviation is not split prematurely.
     RegExp delimiter = RegExp(r'[.?!：。](?=\s|$)');
 
-    if (delimiter.hasMatch(currentText)) {
-      int splitIndex =
-          currentText.indexOf(delimiter) + 1; // Include the punctuation
-      String sentence = currentText.substring(0, splitIndex).trim();
-      String remaining = currentText.substring(splitIndex);
-
+    while (true) {
+      final match = delimiter.firstMatch(currentText);
+      if (match == null) break;
+      final splitIndex = match.end; // Include the punctuation.
+      final sentence = currentText.substring(0, splitIndex).trim();
+      currentText = currentText.substring(splitIndex);
       if (sentence.isNotEmpty) {
         _enqueueSentence(sentence);
-        _incomingTextBuffer.clear();
-        _incomingTextBuffer.write(remaining);
-
-        // Recursively check
-        _checkForSentences();
-      } else {
-        _incomingTextBuffer.clear();
-        _incomingTextBuffer.write(remaining);
       }
     }
+
+    _incomingTextBuffer
+      ..clear()
+      ..write(currentText);
+    _scheduleAdaptiveSegmentFlush();
+  }
+
+  /// When a model pauses inside a long clause, wait for a short real stream
+  /// pause and split only at a word boundary. This starts TTS before the full
+  /// response arrives without chopping Turkish/multilingual words or creating
+  /// tiny fragments.
+  void _scheduleAdaptiveSegmentFlush() {
+    _adaptiveSegmentTimer?.cancel();
+    _adaptiveSegmentTimer = null;
+    final gen = _activeGeneration;
+    if (gen == null || _aiGenerationComplete) return;
+
+    final current = _cleanResponseText(_incomingTextBuffer.toString()).trim();
+    if (current.length < _adaptiveSegmentMinimum) return;
+    final speechGeneration = _speechGeneration;
+    _adaptiveSegmentTimer = Timer(_adaptiveSegmentPause, () {
+      _adaptiveSegmentTimer = null;
+      if (gen != _activeGeneration ||
+          speechGeneration != _speechGeneration ||
+          _aiGenerationComplete) {
+        return;
+      }
+
+      final latest = _cleanResponseText(_incomingTextBuffer.toString()).trim();
+      final splitIndex = _adaptiveSplitIndex(latest);
+      if (splitIndex == null) return;
+      final chunk = latest.substring(0, splitIndex).trim();
+      final remaining = latest.substring(splitIndex).trimLeft();
+      if (chunk.length < _adaptiveSegmentMinimum) return;
+
+      _incomingTextBuffer
+        ..clear()
+        ..write(remaining);
+      VoiceTelemetry.mark(
+        'adaptive speech chunk ready (${chunk.length} chars)',
+      );
+      _enqueueSentence(chunk);
+      _checkForSentences();
+    });
+  }
+
+  int? _adaptiveSplitIndex(String text) {
+    if (text.length < _adaptiveSegmentMinimum) return null;
+    final limit = math.min(text.length, _adaptiveSegmentMaximum);
+    final bounded = text.substring(0, limit);
+    final whitespace = bounded.lastIndexOf(RegExp(r'\s'));
+    if (whitespace < _adaptiveSegmentMinimum) return null;
+    return whitespace;
   }
 
   void _enqueueSentence(String sentence) {
@@ -985,8 +1228,41 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     VoiceTelemetry.mark(
       'sentence queued (${_sentenceQueue.length + 1}): "${speechText.length > 18 ? '${speechText.substring(0, 18)}…' : speechText}"',
     );
+    VoiceTelemetry.mark(
+      _firstSentenceSeen
+          ? 'speakable sentence extracted'
+          : 'first speakable sentence extracted',
+    );
+    VoiceTelemetry.mark('generation chunk ready (${speechText.length} chars)');
+    _firstSentenceSeen = true;
     _sentenceQueue.add(speechText);
+    if (_isSpeaking) {
+      VoiceTelemetry.mark(
+        'sentence prefetch eligible (queue=${_sentenceQueue.length})',
+      );
+      _startPrefetchIfNeeded();
+    }
     _processQueue();
+  }
+
+  /// Keep at most one ordered look-ahead synthesis in flight. This is called
+  /// both when the current sentence starts and when a later sentence arrives
+  /// while playback is already running, which avoids queue starvation when
+  /// punctuation arrives after sentence N has begun playing.
+  void _startPrefetchIfNeeded() {
+    if (_prefetchFuture != null || _sentenceQueue.isEmpty) return;
+    final generation = _speechGeneration;
+    final text = _sentenceQueue.first;
+    _prefetchText = text;
+    _prefetchGeneration = generation;
+    VoiceTelemetry.mark(
+      'TTS prefetch start for sentence ${_sentenceSequence + 1}',
+    );
+    _prefetchFuture = _remoteTts.synthesize(
+      text,
+      voiceId: _flowVoiceId(),
+      telemetryLabel: 'sentence ${_sentenceSequence + 1}',
+    );
   }
 
   Future<void> _processQueue() async {
@@ -996,11 +1272,6 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       // Already active.
       return;
     }
-
-    // The next sentence's audio is fetched while the current one plays, so the
-    // gap between sentences is playback-to-playback rather than a network
-    // round trip each time.
-    Future<Uint8List?>? prefetched;
 
     // Safety Loop
     while (_sentenceQueue.isNotEmpty) {
@@ -1012,6 +1283,14 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       _updateState(VoiceState.speaking);
       final int generation = _speechGeneration;
       final String next = _sentenceQueue.removeAt(0);
+      final sentenceNumber = ++_sentenceSequence;
+
+      if (_lastPlaybackEndedAt != null) {
+        VoiceTelemetry.mark(
+          'sentence $sentenceNumber playback gap '
+          '${DateTime.now().difference(_lastPlaybackEndedAt!).inMilliseconds}ms',
+        );
+      }
 
       // The sentence being spoken becomes the barge-in detector's echo
       // fingerprint: transcripts of these words arriving during playback are
@@ -1022,11 +1301,23 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
       debugPrint("[VoiceService] Speaking: $next");
 
-      final Future<Uint8List?> pending =
-          prefetched ?? _remoteTts.synthesize(next);
-      prefetched = _sentenceQueue.isEmpty
-          ? null
-          : _remoteTts.synthesize(_sentenceQueue.first);
+      final prefetched =
+          _prefetchFuture != null &&
+              _prefetchText == next &&
+              _prefetchGeneration == generation
+          ? _prefetchFuture!
+          : _remoteTts.synthesize(
+              next,
+              voiceId: _flowVoiceId(),
+              telemetryLabel: 'sentence $sentenceNumber',
+            );
+      _prefetchFuture = null;
+      _prefetchText = null;
+      _prefetchGeneration = null;
+      // Start the next look-ahead before awaiting sentence N's bytes or
+      // playback. It may complete entirely while N is being spoken.
+      _startPrefetchIfNeeded();
+      final Future<Uint8List?> pending = prefetched;
 
       final Uint8List? audio = await pending;
       if (generation != _speechGeneration) return;
@@ -1037,19 +1328,28 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       // than going silent.
       bool spoken = false;
       if (audio != null) {
-        spoken = await _remoteTts.play(audio);
+        spoken = await _remoteTts.play(
+          audio,
+          label: 'sentence $sentenceNumber',
+        );
       }
       if (generation != _speechGeneration) return;
       if (gen != _activeGeneration) return;
       if (!spoken) {
+        // The platform flutter_tts fallback does not expose decoded PCM
+        // samples. Keep continuous idle motion instead of fabricating an
+        // output waveform; remote PCM playback supplies the real envelope.
+        _remoteTts.outputLevel.value = 0;
         await _flutterTts.speak(next);
         // await _flutterTts.speak() waits because we set awaitSpeakCompletion(true)
         // So this line blocks until speech is done.
         if (generation != _speechGeneration) return;
         if (gen != _activeGeneration) return;
+        _remoteTts.outputLevel.value = 0;
       }
 
       _isSpeaking = false;
+      _lastPlaybackEndedAt = DateTime.now();
       _armInactivityTimer(gen);
     }
 
@@ -1061,6 +1361,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     // next user audio forwarded" timing.
     _awaitingPostTtsTranscript = true;
     _isSpeaking = false;
+    _prefetchFuture = null;
+    _prefetchText = null;
+    _prefetchGeneration = null;
     // Natural end of playback: the post-TTS echo discard window starts, and
     // the autonomous-resume path below returns the session to listening
     // without the user doing anything.
@@ -1083,45 +1386,19 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     // session reacts through the ordinary lifecycle.
 
     if (complete && !_isSpeaking && _sentenceQueue.isEmpty) {
-      // Flow Mode Logic: Cycle to next agent
       if (isFlowActive) {
-        // Wait a bit before next turn. Cancel any pending timer FIRST —
-        // a second completion must never orphan the first timer: an
-        // orphaned rotation timer still fires (it is only
-        // generation-guarded) and would double-advance the agents.
-        _voiceTimer?.cancel();
-        _voiceTimer = Timer(const Duration(milliseconds: 800), () {
-          if (gen != _activeGeneration) return;
-          if (!isFlowActive) return; // check if cancelled
-
-          // Prepare next turn
-          currentFlowAgentIndex = (currentFlowAgentIndex + 1) % 3;
-          notifyListeners();
-          _updateVoiceParams(currentFlowAgentIndex);
-
-          // Send hidden message to next agent
-          final previousResponse = _fullAiResponseBuffer.toString();
-          _fullAiResponseBuffer.clear();
-
-          // Flow Mode turn: previous response is already in conversation context,
-          // so we only re-inject it here to satisfy the non-empty message guard.
-          final String prompt = previousResponse;
-
-          _updateState(VoiceState.processing);
-          _armInactivityTimer(gen);
-
-          _shouldNextMessageBeHidden = true;
-          if (_onFinalSentence != null) {
-            debugPrint(
-              "[VoiceService] Triggering verified next Flow turn: Agent $currentFlowAgentIndex",
-            );
-            _onFinalSentence!(prompt);
-          } else {
-            debugPrint(
-              "[VoiceService] CRITICAL ERROR: _onFinalSentence is null!",
-            );
-          }
-        });
+        if (_flow.phase == FlowPhase.idle || _flow.phase == FlowPhase.stopped) {
+          _flow.begin(newGeneration: gen);
+          _flow.beginAiTurn(currentFlowParticipant);
+        }
+        // A user turn is the first Blue response of a restarted round. The
+        // normal send path has already persisted that user message; advance
+        // only after Blue's audio has finished.
+        if (_flow.phase == FlowPhase.userSpeaking) {
+          _flow.beginAiTurn(FlowParticipant.blue);
+          currentFlowAgentIndex = FlowParticipant.blue.index;
+        }
+        _advanceFlowAfterTurn(gen, _flow.generation);
         return;
       }
 
@@ -1152,6 +1429,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _reconnectAttempts = 0;
     _emptyNativeRestarts = 0;
     _recyclePending = false;
+    _lastPlaybackEndedAt = null;
+    _sentenceSequence = 0;
     _bargeIn.reset();
     _echoFilter.reset();
     // A fresh session starts a fresh turn lifecycle: no fragment of any
@@ -1264,6 +1543,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
         text: result.text,
         confidence: result.confidence,
       );
+      if (_bargeIn.shouldBargeIn) _interruptForBargeIn(gen);
     }
   }
 

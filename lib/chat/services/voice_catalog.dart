@@ -43,7 +43,8 @@ class CortexVoice {
       id: id.trim(),
       name: name is String && name.trim().isNotEmpty ? name.trim() : id.trim(),
       gender: _genderFrom(raw['gender']),
-      description: raw['description'] is String &&
+      description:
+          raw['description'] is String &&
               (raw['description'] as String).trim().isNotEmpty
           ? (raw['description'] as String).trim()
           : null,
@@ -63,6 +64,30 @@ class CortexVoice {
   }
 }
 
+/// Stable gender-aware casting from published voice identities. Catalog
+/// reordering cannot change the cast; explicit server assignments win.
+List<String?> resolveFlowVoices(
+  List<CortexVoice> voices, {
+  Map<String, String> configured = const {},
+}) {
+  final used = <String>{};
+  final sorted = [...voices]..sort((a, b) => a.id.compareTo(b.id));
+  final result = <String?>[];
+  for (final slot in ['blue', 'red', 'green', 'yellow']) {
+    final gender = slot == 'blue' || slot == 'green'
+        ? VoiceGender.female
+        : VoiceGender.male;
+    final eligible = sorted
+        .where((v) => v.gender == gender && !used.contains(v.id))
+        .toList();
+    final preferred = eligible.where((v) => v.id == configured[slot]).toList();
+    final voice = preferred.isNotEmpty ? preferred.first : eligible.firstOrNull;
+    result.add(voice?.id);
+    if (voice != null) used.add(voice.id);
+  }
+  return List.unmodifiable(result);
+}
+
 class VoiceCatalogProvider extends ChangeNotifier {
   static const String _prefsKey = 'selected_voice_id';
 
@@ -72,6 +97,9 @@ class VoiceCatalogProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _hasLoaded = false;
 
+  Map<String, String> _flowVoiceIds = {};
+  List<String?> get flowVoiceIds =>
+      resolveFlowVoices(_voices, configured: _flowVoiceIds);
   List<CortexVoice> get voices => _voices;
   bool get isLoading => _isLoading;
   bool get hasLoaded => _hasLoaded;
@@ -126,6 +154,14 @@ class VoiceCatalogProvider extends ChangeNotifier {
             ? rawDefault.trim()
             : null;
 
+        final configured = data['flowVoiceIds'];
+        if (configured is Map) {
+          _flowVoiceIds = {
+            for (final entry in configured.entries)
+              if (entry.key is String && entry.value is String)
+                entry.key as String: entry.value as String,
+          };
+        }
         final rawList = data['voices'];
         if (rawList is List) {
           _voices = rawList
@@ -147,7 +183,8 @@ class VoiceCatalogProvider extends ChangeNotifier {
         _voices.isNotEmpty &&
         !_voices.any((v) => v.id == _selectedVoiceId)) {
       debugPrint(
-          "[VoiceCatalog] Stored voice is no longer published; clearing.");
+        "[VoiceCatalog] Stored voice is no longer published; clearing.",
+      );
       _selectedVoiceId = null;
       unawaitedClear();
     }

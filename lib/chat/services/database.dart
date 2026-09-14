@@ -12,7 +12,7 @@ class DbHelper {
 
   Database? _db;
   Future<Database>? _openingDb;
-  static const int _latestVersion = 12; // Define the latest version here
+  static const int _latestVersion = 13; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -65,7 +65,8 @@ class DbHelper {
         ts                INTEGER,
         webSearchSources  TEXT,
         toolSteps         TEXT,
-        isIncomplete      INTEGER DEFAULT 0
+        isIncomplete      INTEGER DEFAULT 0,
+        flowParticipant   TEXT
       );
     ''');
     await d.execute('''
@@ -128,7 +129,8 @@ class DbHelper {
       switch (i + 1) {
         case 2:
           batch.execute(
-              'ALTER TABLE conversations ADD COLUMN isStarred INTEGER DEFAULT 0;');
+            'ALTER TABLE conversations ADD COLUMN isStarred INTEGER DEFAULT 0;',
+          );
           batch.execute('''
             CREATE UNIQUE INDEX IF NOT EXISTS messages_conv_idx
             ON messages(conversationId, idx);
@@ -136,7 +138,8 @@ class DbHelper {
           break;
         case 3:
           batch.execute(
-              'ALTER TABLE conversations ADD COLUMN lastMessageDate INTEGER DEFAULT 0;');
+            'ALTER TABLE conversations ADD COLUMN lastMessageDate INTEGER DEFAULT 0;',
+          );
           break;
         case 4:
           batch.execute('ALTER TABLE messages ADD COLUMN uuid TEXT;');
@@ -151,17 +154,21 @@ class DbHelper {
           break;
         case 6:
           batch.execute(
-              'ALTER TABLE conversations ADD COLUMN starredDate INTEGER DEFAULT 0;');
+            'ALTER TABLE conversations ADD COLUMN starredDate INTEGER DEFAULT 0;',
+          );
           break;
         case 7:
           batch.execute(
-              'ALTER TABLE messages ADD COLUMN webSearchSources TEXT;');
+            'ALTER TABLE messages ADD COLUMN webSearchSources TEXT;',
+          );
           break;
         case 8:
           batch.execute(
-              "ALTER TABLE conversations ADD COLUMN modelTitle TEXT DEFAULT '';");
+            "ALTER TABLE conversations ADD COLUMN modelTitle TEXT DEFAULT '';",
+          );
           batch.execute(
-              "ALTER TABLE conversations ADD COLUMN modelImagePath TEXT DEFAULT '';");
+            "ALTER TABLE conversations ADD COLUMN modelImagePath TEXT DEFAULT '';",
+          );
           break;
         case 9:
           batch.execute('''
@@ -177,7 +184,8 @@ class DbHelper {
           break;
         case 10:
           batch.execute(
-              "ALTER TABLE conversations ADD COLUMN isArchived INTEGER DEFAULT 0;");
+            "ALTER TABLE conversations ADD COLUMN isArchived INTEGER DEFAULT 0;",
+          );
           break;
         case 11:
           batch.execute('''
@@ -216,7 +224,13 @@ class DbHelper {
           //   cut-short response is never mistaken for a complete one.
           batch.execute('ALTER TABLE messages ADD COLUMN toolSteps TEXT;');
           batch.execute(
-              'ALTER TABLE messages ADD COLUMN isIncomplete INTEGER DEFAULT 0;');
+            'ALTER TABLE messages ADD COLUMN isIncomplete INTEGER DEFAULT 0;',
+          );
+          break;
+        case 13:
+          batch.execute(
+            'ALTER TABLE messages ADD COLUMN flowParticipant TEXT;',
+          );
           break;
       }
     }
@@ -233,10 +247,12 @@ class DbHelper {
 
       await _db!.execute('VACUUM');
       debugPrint(
-          "[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
+        "[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).",
+      );
     } catch (e) {
       debugPrint(
-          "[DatabaseHelper] Optimization failed (likely disk full or locked): $e");
+        "[DatabaseHelper] Optimization failed (likely disk full or locked): $e",
+      );
     }
   }
 }

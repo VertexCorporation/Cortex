@@ -22,11 +22,14 @@ import 'package:cortex/server/user.dart';
 import '../../../../../internet.dart';
 import '../../../../../library/backend/data/service.dart';
 import '../../../../../theme.dart';
-import '../../../../../main.dart';
 import '../../../../services/select.dart';
 import '../../../../services/speech.dart';
 import '../../../../services/voice.dart';
+import '../../../../services/flow.dart';
+import '../../../../services/voice_sounds.dart';
+import '../../../../services/voice_catalog.dart';
 import '../../../../services/send.dart';
+import '../../../../services/stop.dart';
 import '../panels/features/sheet.dart';
 import '../panels/selection/sheet.dart';
 
@@ -148,6 +151,8 @@ class MicButton extends StatelessWidget {
         );
         if (!started) {
           inputProvider.setVoiceRecording(false);
+        } else {
+          VoiceInteractionSounds.listeningReady();
         }
       },
       child: SvgPicture.asset(
@@ -349,50 +354,37 @@ class ActionButtonWidget extends StatelessWidget {
     );
   }
 
-  /// X — exits Voice Mode entirely (session stop + UI teardown). Replaces
-  /// the send/voice control for the whole voice session; the existing
-  /// AnimatedSwitcher crossfades between them. The container GROWS in from
-  /// 75% on entry (the right control assembling onto the voice stage next
-  /// to Flow) while the glyph holds its fixed [CortexDesign.icon] size the
-  /// whole way: the container is the affordance and may move; the glyph is
-  /// the meaning and must not pulse.
+  /// The composer owns container growth; the X glyph stays at its design size.
   Widget _buildVoiceExitButton(BuildContext context, double size) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.75, end: 1.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutBack,
-      child: SvgPicture.asset(
-        'assets/icons/x.svg',
-        width: CortexDesign.icon,
-        height: CortexDesign.icon,
-        colorFilter: ColorFilter.mode(
-          AppColors.primaryColor.inverted,
-          BlendMode.srcIn,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        VoiceInteractionSounds.leavingVoice();
+        context.read<VoiceService>().stopSession();
+        final input = context.read<InputProvider>();
+        input.setVoiceOverlayExpanded(false);
+        input.setVoiceModeActive(false);
+      },
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Center(
+          child: SvgPicture.asset(
+            'assets/icons/x.svg',
+            width: CortexDesign.icon,
+            height: CortexDesign.icon,
+            colorFilter: ColorFilter.mode(
+              AppColors.primaryColor.inverted,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
       ),
-      builder: (context, grow, glyph) {
-        final double grown = size * grow;
-        return GestureDetector(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            final voiceService = context.read<VoiceService>();
-            final inputProvider = context.read<InputProvider>();
-            voiceService.stopSession();
-            inputProvider.setVoiceOverlayExpanded(false);
-            inputProvider.setVoiceModeActive(false);
-          },
-          child: Container(
-            width: grown,
-            height: grown,
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(grown / 2),
-              border: Border.all(color: AppColors.border, width: 1.0),
-            ),
-            child: Center(child: glyph),
-          ),
-        );
-      },
     );
   }
 
@@ -433,7 +425,7 @@ class ActionButtonWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: enabled
-          ? () {
+          ? () async {
               HapticFeedback.lightImpact();
               onSend();
             }
@@ -478,6 +470,7 @@ class ActionButtonWidget extends StatelessWidget {
               // focus chains are aborted by the voice-mode guards in
               // screen.dart/view.dart/EditService (a state check, not a
               // timing hack), so nothing re-opens it after this either.
+              context.read<InputProvider>().setVoiceModeActive(true);
               FocusScope.of(context).unfocus();
               SystemChannels.textInput.invokeMethod('TextInput.hide');
 
@@ -500,36 +493,60 @@ class ActionButtonWidget extends StatelessWidget {
               )) {
                 return;
               }
+              VoiceInteractionSounds.enteringVoice();
               final sendService = context.read<SendService>();
               final localizations = AppLocalizations.of(context)!;
               final localeCode = session.getLocale().languageCode;
-              final conversationProvider = context
-                  .read<ConversationProvider>(); // Restore variable
-
-              // [NEW] LOGIC: If chat is not empty, start a new conversation automatically
-              if (conversationProvider.messages.isNotEmpty) {
-                mainScreenKey.currentState?.startNewConversation(
-                  closeSidebar: false,
-                  preserveVoiceMode: true,
-                );
-                // Wait a brief moment for state to reset?
-                // startNewConversation is async-ish but returns void.
-                // It resets providers. We should yield to event loop.
-                await Future.delayed(const Duration(milliseconds: 100));
-              }
+              // Voice is an input mode inside the current chat. Do not reset
+              // the conversation here: SendService owns the normal lazy chat
+              // creation path when the first spoken turn is committed.
+              final conversationProvider = context.read<ConversationProvider>();
 
               // [INTERRUPTION] Stop any active text generation
               if (conversationProvider.isWaitingForResponse) {
                 conversationProvider.stopGenerating();
               }
 
-              // [INTERRUPTION] Stop any active TTS speaking (and ensure clean slate)
-              await voiceService.stopSession(resetState: true);
+              // Only tear down an existing session. Avoid paying the full
+              // recorder/player cleanup cost on the common first entry.
+              if (voiceService.isSessionActive ||
+                  voiceService.state != VoiceState.idle) {
+                await voiceService.stopSession(resetState: true);
+              }
 
               if (!context.mounted) return;
 
               // X may have been pressed while audio teardown was pending.
               if (!inputProvider.isVoiceModeActive) return;
+
+              voiceService.configureFlow(
+                modelIds: List.filled(
+                  FlowParticipant.values.length,
+                  session.modelId ?? 'cortex/auto',
+                ),
+                voiceIds: context.read<VoiceCatalogProvider?>()?.flowVoiceIds,
+                onFlowTurn: (participant, modelId) async {
+                  if (!context.mounted) return;
+                  final sent = await sendService.sendMessage(
+                    context: context,
+                    localizations: localizations,
+                    messageText: '',
+                    overrideModelId: modelId,
+                    flowMode: true,
+                    flowParticipant: participant.key,
+                    flowParticipantTurn: true,
+                  );
+                  if (!sent) {
+                    throw StateError('Flow participant generation failed');
+                  }
+                },
+                onAssistantInterrupted: () {
+                  // Barge-in must cancel the active model request as well as
+                  // TTS; otherwise the old SendService lane can hold the
+                  // conversation guard when the new user turn commits.
+                  unawaited(context.read<StopService>().stopResponse());
+                },
+              );
 
               // Start Voice Session
               await voiceService.startSession(
@@ -542,9 +559,15 @@ class ActionButtonWidget extends StatelessWidget {
                       context: context,
                       localizations: localizations,
                       messageText: text,
-                      isHidden: voiceService.shouldNextMessageBeHidden,
-                      overrideModelId: 'cortex/auto',
+                      overrideModelId: voiceService.isFlowActive
+                          ? voiceService.flowModelIds[voiceService
+                                .currentFlowParticipant
+                                .index]
+                          : 'cortex/auto',
                       flowMode: voiceService.isFlowActive,
+                      flowParticipant: voiceService.isFlowActive
+                          ? voiceService.currentFlowParticipant.key
+                          : null,
                     );
                   }
                 },
@@ -665,20 +688,23 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         widget.hasSelectedFeature ||
         composerFeatureActive(inputProvider, currentModel);
 
-    final double progress = widget.bubbleProgress.clamp(0.0, 1.0);
-    final Color rawBackgroundColor = isFeatureActive
+    final double progress = flowStage
+        ? 1.0
+        : widget.bubbleProgress.clamp(0.0, 1.0);
+    final bool visualActive = flowStage ? flowOn : isFeatureActive;
+    final Color rawBackgroundColor = visualActive
         ? AppColors.primaryColor.inverted
         : AppColors.background;
     final Color backgroundColor = rawBackgroundColor.withValues(
       alpha: rawBackgroundColor.a * progress,
     );
-    final Color rawBorderColor = isFeatureActive
+    final Color rawBorderColor = visualActive
         ? AppColors.primaryColor.inverted
         : AppColors.border;
     final Color borderColor = rawBorderColor.withValues(
       alpha: rawBorderColor.a * progress,
     );
-    final Color iconColor = isFeatureActive
+    final Color iconColor = visualActive
         ? AppColors.primaryColor
         : AppColors.primaryColor.inverted;
 
@@ -698,10 +724,10 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
               HapticFeedback.heavyImpact();
             }
           : flowStage
-          ? () {
+          ? () async {
               HapticFeedback.lightImpact();
               final user = context.read<UserProvider?>();
-              if (voiceAllowanceExhausted(voiceService, user)) {
+              if (!flowOn && voiceAllowanceExhausted(voiceService, user)) {
                 // Tier-correct routing (Free → Plus, Plus → Pro, Pro →
                 // Ultra; Ultra opens nothing — see voice.dart).
                 openVoiceUpgrade(
@@ -711,6 +737,14 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
                 return;
               }
               voiceService.toggleFlowMode();
+              final conversation = context.read<ConversationProvider>();
+              if (voiceService.isFlowMode &&
+                  conversation.messages.any(
+                    (message) =>
+                        message.isUserMessage && message.text.trim().isNotEmpty,
+                  )) {
+                voiceService.startFlow();
+              }
             }
           : () async {
               HapticFeedback.lightImpact();
@@ -789,22 +823,9 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
     // (its semantics included) twice per session. Keeping the shape
     // constant and animating only the opacity value leaves the element and
     // semantics trees untouched while dimming exactly as before.
-    // VOICE ENTRY GROWTH: when the composer flips into the voice stage, the
-    // Flow container grows in from 75% — the left control assembling onto
-    // the stage next to the X. Transform (not width) keeps the row layout
-    // stable during the grow; the flow glyph is size-relative by design, so
-    // it rides along (unlike the X, whose glyph stays fixed).
-    final Widget stageBubble = TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: flowStage ? 0.75 : 1.0, end: 1.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutBack,
-      builder: (context, grow, child) =>
-          Transform.scale(scale: grow, child: child),
-      child: bubble,
-    );
     return Opacity(
       opacity: widget.isDimmed && !flowStage ? 0.4 : 1.0,
-      child: stageBubble,
+      child: bubble,
     );
   }
 }
