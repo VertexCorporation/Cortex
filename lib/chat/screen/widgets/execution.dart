@@ -231,7 +231,7 @@ class _DocumentArtifactCardState extends State<_DocumentArtifactCard> {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: AppColors.backgroundColor,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: AppColors.border.withValues(alpha: 0.45),
