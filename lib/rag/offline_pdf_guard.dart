@@ -7,6 +7,13 @@
 class OfflinePdfPageGuard {
   const OfflinePdfPageGuard._();
 
+  // Turkish users naturally write forms such as "3. sayfada", "3. sayfayı",
+  // "3. sayfanın" and "3. sayfası". Keep the accepted suffixes explicit so a
+  // random word beginning with "sayfa" cannot accidentally become a page
+  // selector.
+  static const String _trPageWord =
+      r'sayfa(?:da|de|dan|den|nın|nin|nun|nün|yı|yi|yu|yü|sı|si|su|sü)?';
+
   static String apply({
     required String queryText,
     required String context,
@@ -61,6 +68,17 @@ class OfflinePdfPageGuard {
         '[/DOCUMENT_CONTEXT]';
   }
 
+  /// Normalizes explicit page intent for the retrieval engine without changing
+  /// the user's real question. The current retriever recognizes canonical
+  /// `page N` metadata selectors, so Turkish inflected forms are appended as
+  /// canonical selectors. The final guard still receives the original query.
+  static String normalizeForRetrieval(String query) {
+    final pages = requestedPages(query).toList()..sort();
+    if (pages.isEmpty) return query;
+    final canonical = pages.map((page) => 'page $page').join(' ');
+    return '$query $canonical';
+  }
+
   static Set<int> requestedPages(String query) {
     final pages = <int>{};
 
@@ -70,16 +88,24 @@ class OfflinePdfPageGuard {
     }
 
     final afterWord = RegExp(
-      r'\b(?:sayfa|page)\s*(?:no\.?|number)?\s*[:#]?\s*(\d{1,4})\b',
+      '\\b(?:$_trPageWord|page)\\s*(?:no\\.?|number)?\\s*[:#]?\\s*(\\d{1,4})\\b',
       caseSensitive: false,
+      unicode: true,
     );
     final beforeWord = RegExp(
-      r'\b(\d{1,4})\.?\s*(?:sayfa|page)\b',
+      '\\b(\\d{1,4})\\.?\\s*(?:$_trPageWord|page)\\b',
       caseSensitive: false,
+      unicode: true,
     );
-    final range = RegExp(
-      r'\b(?:sayfa|page)\s*(\d{1,4})\s*[-–—]\s*(\d{1,4})\b',
+    final rangeAfterWord = RegExp(
+      '\\b(?:$_trPageWord|page)\\s*(\\d{1,4})\\s*[-–—]\\s*(\\d{1,4})\\b',
       caseSensitive: false,
+      unicode: true,
+    );
+    final rangeBeforeWord = RegExp(
+      '\\b(\\d{1,4})\\s*[-–—]\\s*(\\d{1,4})\\.?\\s*(?:$_trPageWord|page)\\b',
+      caseSensitive: false,
+      unicode: true,
     );
 
     for (final match in afterWord.allMatches(query)) {
@@ -88,14 +114,24 @@ class OfflinePdfPageGuard {
     for (final match in beforeWord.allMatches(query)) {
       add(match.group(1));
     }
-    for (final match in range.allMatches(query)) {
+
+    void addRange(RegExpMatch match) {
       final start = int.tryParse(match.group(1) ?? '');
       final end = int.tryParse(match.group(2) ?? '');
-      if (start == null || end == null || start <= 0 || end < start) continue;
+      if (start == null || end == null || start <= 0 || end < start) return;
+      // A page request is a precision operation. Bound a user-supplied range
+      // so it can never turn into an accidental whole-document context dump.
       final cappedEnd = end > start + 19 ? start + 19 : end;
       for (var page = start; page <= cappedEnd && page <= 1500; page++) {
         pages.add(page);
       }
+    }
+
+    for (final match in rangeAfterWord.allMatches(query)) {
+      addRange(match);
+    }
+    for (final match in rangeBeforeWord.allMatches(query)) {
+      addRange(match);
     }
 
     return pages;
