@@ -97,3 +97,125 @@ class IntegrationCatalogPage {
     );
   }
 }
+
+class IntegrationToolInfo {
+  final String slug;
+  final String name;
+  final String description;
+  final String toolkitSlug;
+  final String toolkitName;
+  final String? toolkitLogo;
+  final String? version;
+  final Map<String, dynamic> inputParameters;
+
+  const IntegrationToolInfo({
+    required this.slug,
+    required this.name,
+    required this.description,
+    required this.toolkitSlug,
+    required this.toolkitName,
+    required this.toolkitLogo,
+    required this.version,
+    required this.inputParameters,
+  });
+
+  factory IntegrationToolInfo.fromJson(Map<String, dynamic> json) {
+    return IntegrationToolInfo(
+      slug: (json['slug'] ?? '').toString(),
+      name: (json['name'] ?? json['slug'] ?? '').toString(),
+      description: (json['description'] ?? json['humanDescription'] ?? '').toString(),
+      toolkitSlug: (json['toolkitSlug'] ?? '').toString(),
+      toolkitName: (json['toolkitName'] ?? json['toolkitSlug'] ?? '').toString(),
+      toolkitLogo: json['toolkitLogo']?.toString(),
+      version: json['version']?.toString(),
+      inputParameters: json['inputParameters'] is Map
+          ? Map<String, dynamic>.from(json['inputParameters'] as Map)
+          : const <String, dynamic>{},
+    );
+  }
+
+  Map<String, dynamic> compactForModel() => {
+        'tool_slug': slug,
+        'name': name,
+        'description': description,
+        'toolkit_slug': toolkitSlug,
+        'toolkit_name': toolkitName,
+        if (version != null && version!.isNotEmpty) 'version': version,
+        'input_parameters': inputParameters,
+      };
+}
+
+class IntegrationToolDiscovery {
+  final bool connectionRequired;
+  final String? suggestedToolkitSlug;
+  final String? suggestedToolkitName;
+  final String? suggestedToolkitLogo;
+  final List<IntegrationToolInfo> tools;
+
+  const IntegrationToolDiscovery({
+    required this.connectionRequired,
+    required this.suggestedToolkitSlug,
+    required this.suggestedToolkitName,
+    required this.suggestedToolkitLogo,
+    required this.tools,
+  });
+
+  factory IntegrationToolDiscovery.fromJson(Map<String, dynamic> json) {
+    final suggested = json['suggestedToolkit'];
+    final suggestedMap = suggested is Map
+        ? Map<String, dynamic>.from(suggested)
+        : const <String, dynamic>{};
+    final rawTools = json['tools'];
+    return IntegrationToolDiscovery(
+      connectionRequired: json['connectionRequired'] == true,
+      suggestedToolkitSlug: suggestedMap['slug']?.toString(),
+      suggestedToolkitName: suggestedMap['name']?.toString(),
+      suggestedToolkitLogo: suggestedMap['logo']?.toString(),
+      tools: rawTools is List
+          ? rawTools
+              .whereType<Map>()
+              .map((item) => IntegrationToolInfo.fromJson(
+                    Map<String, dynamic>.from(item),
+                  ))
+              .where((item) => item.slug.isNotEmpty)
+              .toList(growable: false)
+          : const <IntegrationToolInfo>[],
+    );
+  }
+}
+
+class IntegrationExecutionResult {
+  final bool success;
+  final dynamic data;
+  final String? error;
+  final String? code;
+  final String toolkitSlug;
+  final String toolkitName;
+  final String? toolkitLogo;
+
+  const IntegrationExecutionResult({
+    required this.success,
+    required this.data,
+    required this.error,
+    required this.code,
+    required this.toolkitSlug,
+    required this.toolkitName,
+    required this.toolkitLogo,
+  });
+
+  factory IntegrationExecutionResult.fromJson(Map<String, dynamic> json) {
+    final toolkit = json['toolkit'];
+    final toolkitMap = toolkit is Map
+        ? Map<String, dynamic>.from(toolkit)
+        : const <String, dynamic>{};
+    return IntegrationExecutionResult(
+      success: json['success'] == true,
+      data: json['data'],
+      error: json['error']?.toString(),
+      code: json['code']?.toString(),
+      toolkitSlug: (toolkitMap['slug'] ?? '').toString(),
+      toolkitName: (toolkitMap['name'] ?? toolkitMap['slug'] ?? '').toString(),
+      toolkitLogo: toolkitMap['logo']?.toString(),
+    );
+  }
+}
