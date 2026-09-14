@@ -4,10 +4,33 @@ import 'dart:typed_data';
 import 'package:cortex/network/fulcrum_http.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 import 'model.dart';
 
-class IntegrationService {
+class IntegrationLimitException implements Exception {
+  const IntegrationLimitException();
+}
+
+class IntegrationConnectionRequiredException implements Exception {
+  final String toolkitSlug;
+  final String toolkitName;
+  final String? logoUrl;
+
+  const IntegrationConnectionRequiredException({
+    required this.toolkitSlug,
+    required this.toolkitName,
+    required this.logoUrl,
+  });
+}
+
+/// Fulcrum-backed integration client.
+///
+/// Composio credentials never enter the app. This class only talks to
+/// authenticated Fulcrum endpoints and keeps a tiny amount of ephemeral state
+/// for the current chat turn and live tool activity presentation.
+class IntegrationService extends ChangeNotifier {
   IntegrationService._();
 
   static final IntegrationService instance = IntegrationService._();
@@ -16,12 +39,13 @@ class IntegrationService {
       'https://europe-west1-vertex-ai-1618.cloudfunctions.net';
   static const int maxLogoBytes = 2 * 1024 * 1024;
   static const int _maxLogoCacheEntries = 72;
+  static const Uuid _uuid = Uuid();
 
   final Dio _api = createFulcrumHttp(
     BaseOptions(
       connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 25),
-      sendTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 45),
+      sendTimeout: const Duration(seconds: 20),
     ),
   );
   final Dio _logoClient = Dio(
@@ -34,6 +58,30 @@ class IntegrationService {
   );
 
   final LinkedHashMap<String, Uint8List> _logoCache = LinkedHashMap();
+  IntegrationCatalogPage? _lastCatalog;
+  String? _turnId;
+
+  IntegrationToolInfo? _activeIntegrationTool;
+  IntegrationToolInfo? get activeIntegrationTool => _activeIntegrationTool;
+
+  List<IntegrationItem> get installed =>
+      _lastCatalog?.installed ?? const <IntegrationItem>[];
+
+  void setActiveIntegrationTool(IntegrationToolInfo? tool) {
+    if (identical(tool, _activeIntegrationTool)) return;
+    _activeIntegrationTool = tool;
+    notifyListeners();
+  }
+
+  String _ensureTurnId() => _turnId ??= _uuid.v4();
+
+  /// Ends the message-scoped integration usage identity. ToolRegistry calls
+  /// this when the assistant's tool loop finishes so multiple tool calls in
+  /// one answer count as one plugin-powered message, not one action each.
+  void endTurn() {
+    _turnId = null;
+    setActiveIntegrationTool(null);
+  }
 
   Future<Map<String, String>> _authHeaders() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -66,7 +114,95 @@ class IntegrationService {
 
     final data = response.data;
     if (data == null) throw StateError('Empty integrations response.');
-    return IntegrationCatalogPage.fromJson(data);
+    final catalog = IntegrationCatalogPage.fromJson(data);
+
+    // Preserve installed accounts even when this response is a narrow search.
+    if (search.trim().isEmpty || _lastCatalog == null) {
+      _lastCatalog = catalog;
+    } else {
+      _lastCatalog = IntegrationCatalogPage(
+        items: catalog.items,
+        installed: catalog.installed.isNotEmpty
+            ? catalog.installed
+            : _lastCatalog!.installed,
+        nextCursor: catalog.nextCursor,
+        totalItems: catalog.totalItems,
+      );
+    }
+    notifyListeners();
+    return catalog;
+  }
+
+  Future<IntegrationToolDiscovery> discoverTools({
+    required String capability,
+    String? preferredToolkit,
+  }) async {
+    final response = await _api.get<Map<String, dynamic>>(
+      '$_base/discoverIntegrationTools',
+      queryParameters: {
+        'query': capability.trim(),
+        if (preferredToolkit != null && preferredToolkit.trim().isNotEmpty)
+          'preferredToolkit': preferredToolkit.trim().toLowerCase(),
+      },
+      options: Options(headers: await _authHeaders()),
+    );
+
+    final data = response.data;
+    if (data == null) throw StateError('Empty integration tools response.');
+    return IntegrationToolDiscovery.fromJson(data);
+  }
+
+  Future<IntegrationExecutionResult> executeTool({
+    required String toolSlug,
+    required Map<String, dynamic> arguments,
+    String? version,
+  }) async {
+    final headers = await _authHeaders();
+    try {
+      final response = await _api.post<Map<String, dynamic>>(
+        '$_base/executeIntegrationTool',
+        data: {
+          'toolSlug': toolSlug,
+          'arguments': arguments,
+          'turnId': _ensureTurnId(),
+          if (version != null && version.trim().isNotEmpty)
+            'version': version.trim(),
+        },
+        options: Options(headers: headers),
+      );
+      final data = response.data;
+      if (data == null) throw StateError('Empty integration execution response.');
+      return IntegrationExecutionResult.fromJson(data);
+    } on DioException catch (error) {
+      final raw = error.response?.data;
+      final body = raw is Map
+          ? Map<String, dynamic>.from(raw)
+          : const <String, dynamic>{};
+      final code = body['code']?.toString();
+      if (code == 'integration_daily_limit') {
+        throw const IntegrationLimitException();
+      }
+      if (code == 'integration_connection_required') {
+        final toolkit = body['toolkit'];
+        final map = toolkit is Map
+            ? Map<String, dynamic>.from(toolkit)
+            : const <String, dynamic>{};
+        throw IntegrationConnectionRequiredException(
+          toolkitSlug: (map['slug'] ?? '').toString(),
+          toolkitName: (map['name'] ?? map['slug'] ?? 'Plugin').toString(),
+          logoUrl: map['logo']?.toString(),
+        );
+      }
+      rethrow;
+    }
+  }
+
+  IntegrationItem? installedBySlug(String slug) {
+    final normalized = slug.trim().toLowerCase();
+    for (final item in installed) {
+      if (item.slug.toLowerCase() == normalized) return item;
+    }
+    return null;
   }
 
   Future<Uri> createConnection(String toolkitSlug) async {
@@ -108,7 +244,8 @@ class IntegrationService {
         rawUrl,
         options: Options(
           responseType: ResponseType.stream,
-          validateStatus: (status) => status != null && status >= 200 && status < 300,
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 300,
         ),
       );
 
