@@ -108,6 +108,13 @@ class IntegrationPermissionStore {
   }
 
   Future<bool> isAlwaysAllowed(String toolkitSlug, String toolSlug) async {
+    final mode = await modeForToolkit(toolkitSlug);
+    if (mode == IntegrationPermissionMode.allowAll) return true;
+    if (mode == IntegrationPermissionMode.allowRead &&
+        isClearlyReadOnly(toolkitSlug: toolkitSlug, toolSlug: toolSlug)) {
+      return true;
+    }
+
     final rules = await alwaysAllowedTools(toolkitSlug);
     return rules.contains(toolSlug.trim().toUpperCase());
   }
