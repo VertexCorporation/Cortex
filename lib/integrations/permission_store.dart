@@ -25,6 +25,53 @@ class IntegrationPermissionStore {
   static const String _alwaysPrefix = 'integration.always.';
   static const String _modePrefix = 'integration.mode.';
 
+  static const Set<String> _readVerbs = {
+    'GET',
+    'LIST',
+    'READ',
+    'SEARCH',
+    'FIND',
+    'FETCH',
+    'LOOKUP',
+    'QUERY',
+    'RETRIEVE',
+    'VIEW',
+    'CHECK',
+    'DESCRIBE',
+    'INSPECT',
+    'DOWNLOAD',
+  };
+
+  static const Set<String> _writeVerbs = {
+    'CREATE',
+    'SEND',
+    'UPDATE',
+    'EDIT',
+    'DELETE',
+    'REMOVE',
+    'WRITE',
+    'POST',
+    'PUT',
+    'PATCH',
+    'ADD',
+    'UPLOAD',
+    'MOVE',
+    'COPY',
+    'ARCHIVE',
+    'TRASH',
+    'RESTORE',
+    'INVITE',
+    'ACCEPT',
+    'DECLINE',
+    'CANCEL',
+    'MERGE',
+    'PUBLISH',
+    'EXECUTE',
+    'RUN',
+    'REPLY',
+    'FORWARD',
+  };
+
   String _alwaysKey(String toolkitSlug) =>
       '$_alwaysPrefix${toolkitSlug.toLowerCase()}';
   String _modeKey(String toolkitSlug) =>
@@ -63,6 +110,56 @@ class IntegrationPermissionStore {
   Future<bool> isAlwaysAllowed(String toolkitSlug, String toolSlug) async {
     final rules = await alwaysAllowedTools(toolkitSlug);
     return rules.contains(toolSlug.trim().toUpperCase());
+  }
+
+  /// Conservative local classifier used only by the "Allow reading" preset.
+  /// Unknown actions are NOT treated as reads; Cortex asks instead.
+  bool isClearlyReadOnly({
+    required String toolkitSlug,
+    required String toolSlug,
+    String description = '',
+  }) {
+    var normalized = toolSlug.trim().toUpperCase();
+    final toolkitPrefix = '${toolkitSlug.trim().toUpperCase()}_';
+    if (normalized.startsWith(toolkitPrefix)) {
+      normalized = normalized.substring(toolkitPrefix.length);
+    }
+
+    final tokens = normalized
+        .split(RegExp(r'[_\-\s]+'))
+        .where((value) => value.isNotEmpty)
+        .toList(growable: false);
+    if (tokens.isEmpty) return false;
+
+    // Any mutation-looking verb wins over a read-looking verb. This prevents
+    // names such as "GET_AND_DELETE" from being auto-approved.
+    if (tokens.any(_writeVerbs.contains)) return false;
+    if (_readVerbs.contains(tokens.first)) return true;
+
+    // Descriptions are a weak fallback only when they clearly say read-only.
+    final text = description.toLowerCase();
+    const mutationWords = [
+      'create',
+      'send',
+      'update',
+      'edit',
+      'delete',
+      'remove',
+      'write',
+      'change',
+      'modify',
+      'upload',
+      'post',
+      'publish',
+    ];
+    if (mutationWords.any(text.contains)) return false;
+
+    return text.contains('read-only') ||
+        text.contains('read only') ||
+        text.startsWith('get ') ||
+        text.startsWith('list ') ||
+        text.startsWith('search ') ||
+        text.startsWith('fetch ');
   }
 
   Future<void> setAlwaysAllowed(
