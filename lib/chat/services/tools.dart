@@ -77,7 +77,6 @@ class ToolRegistry {
   static List<Map<String, dynamic>> getLocalizedToolsJson(
       String langCode, AppLocalizations l10n) {
     return [
-      // 0. Read uploaded or generated documents.
       {
         'type': 'function',
         'function': {
@@ -92,9 +91,6 @@ class ToolRegistry {
                 'description':
                     'Opaque document scope shown in the attachment marker. Copy it exactly.',
               },
-              // Kept for backwards/provider compatibility. The client scopes
-              // one attachment per call and rewrites this to 0 before the
-              // server tool executes.
               'document_index': {
                 'type': 'integer',
                 'description': l10n.toolReadDocumentIndexParam,
@@ -104,8 +100,6 @@ class ToolRegistry {
           }
         }
       },
-
-      // 1. Create a real file on the device and attach it to the AI message.
       {
         'type': 'function',
         'function': {
@@ -196,8 +190,6 @@ class ToolRegistry {
           }
         }
       },
-
-      // 2. Edit a scoped user/generated document without overwriting original.
       {
         'type': 'function',
         'function': {
@@ -242,8 +234,6 @@ class ToolRegistry {
           }
         }
       },
-
-      // 3. Stock & Crypto Price
       {
         'type': 'function',
         'function': {
@@ -261,7 +251,6 @@ class ToolRegistry {
           }
         }
       },
-      // 4. Weather
       {
         'type': 'function',
         'function': {
@@ -279,7 +268,6 @@ class ToolRegistry {
           }
         }
       },
-      // 5. Python Code Execution
       {
         'type': 'function',
         'function': {
@@ -297,7 +285,6 @@ class ToolRegistry {
           }
         }
       },
-      // 6. Calculator
       {
         'type': 'function',
         'function': {
@@ -315,7 +302,6 @@ class ToolRegistry {
           }
         }
       },
-      // 7. Chart Rendering
       {
         'type': 'function',
         'function': {
@@ -363,12 +349,6 @@ class ToolRegistry {
     );
   }
 
-  /// Registers document metadata for tool execution.
-  ///
-  /// The metadata intentionally contains a local path instead of eager base64
-  /// bytes. Encoding is deferred until `read_document` is actually called,
-  /// which avoids a large allocation for attachments the model never needs to
-  /// open.
   static void setDocumentsContext(List<Map<String, dynamic>> documents) {
     _pruneExpiredDocumentContexts();
     final now = DateTime.now();
@@ -382,9 +362,6 @@ class ToolRegistry {
     }
   }
 
-  /// Legacy cleanup hook kept for callers that already invoke it after a tool
-  /// loop. Scoped contexts cannot be cleared globally here because another
-  /// conversation may still be using one. Expired entries are pruned instead.
   static void clearDocumentsContext() {
     _pruneExpiredDocumentContexts();
   }
@@ -418,12 +395,16 @@ class ToolRegistry {
     final fileName = artifact['file_name']?.toString();
     final format = artifact['format']?.toString();
     if (path == null || path.isEmpty || fileName == null || format == null) {
-      return jsonEncode({'summary': 'Document operation finished without a usable artifact.'});
+      return jsonEncode({
+        'summary': 'Document operation finished without a usable artifact.'
+      });
     }
 
     final file = File(path);
     if (!await file.exists()) {
-      return jsonEncode({'summary': 'Document operation finished, but the output file is missing.'});
+      return jsonEncode({
+        'summary': 'Document operation finished, but the output file is missing.'
+      });
     }
 
     final scope = _uuid.v4();
@@ -442,20 +423,24 @@ class ToolRegistry {
     final summary = [
       artifact['summary']?.toString() ?? 'Document ready.',
       'Document scope: $scope.',
-      'The file has been attached to this assistant message.',
+      'The document card is available in the assistant message and can be shared or saved from there.',
       if (warning != null && warning.isNotEmpty) 'Note: $warning',
     ].join(' ');
 
+    // SendService recognizes structured widget responses. The local file path
+    // is placed only inside the rendered widget marker; SendService replaces
+    // the tool result returned to the online model with [summary], so device
+    // paths never leave the UI channel.
     return jsonEncode({
-      'summary': summary,
-      // Internal-only envelope. SendService strips the local path before the
-      // tool result is returned to the online model.
-      '_artifact': {
-        'path': path,
+      'widget': 'code_execution',
+      'data': {
+        'artifact_path': path,
         'file_name': fileName,
         'format': format,
         'document_scope': scope,
-      }
+        if (warning != null && warning.isNotEmpty) 'warning': warning,
+      },
+      'summary': summary,
     });
   }
 
@@ -513,8 +498,6 @@ class ToolRegistry {
           return "Error: Document is unavailable or its scope has expired.";
         }
 
-        // The server receives exactly one scoped document, therefore its
-        // document index is always 0 regardless of what a provider emitted.
         forwardedArgs['document_index'] = 0;
         requestData['documents'] = [document];
       }
@@ -548,7 +531,6 @@ class ToolRegistry {
     }
   }
 
-  /// Initializes the default set of free, premium tools.
   static void initialize() {
     register(CortexTool(
       name: 'read_document',
