@@ -54,7 +54,6 @@ class ToolRegistry {
   static List<Map<String, dynamic>> getLocalizedToolsJson(
       String langCode, AppLocalizations l10n) {
     return [
-      // 0. Read Document - for PDF/XLSX/etc parsing
       {
         'type': 'function',
         'function': {
@@ -72,7 +71,6 @@ class ToolRegistry {
           }
         }
       },
-      // 1. Stock & Crypto Price
       {
         'type': 'function',
         'function': {
@@ -90,7 +88,6 @@ class ToolRegistry {
           }
         }
       },
-      // 2. Weather
       {
         'type': 'function',
         'function': {
@@ -108,7 +105,6 @@ class ToolRegistry {
           }
         }
       },
-      // 3. Python Code Execution
       {
         'type': 'function',
         'function': {
@@ -126,7 +122,6 @@ class ToolRegistry {
           }
         }
       },
-      // 4. Calculator
       {
         'type': 'function',
         'function': {
@@ -144,7 +139,6 @@ class ToolRegistry {
           }
         }
       },
-      // 5. Chart Rendering
       {
         'type': 'function',
         'function': {
@@ -182,8 +176,6 @@ class ToolRegistry {
           }
         }
       },
-      // 6. Integration discovery. Keeps the model context small by searching
-      // only the connected app actions relevant to the current request.
       {
         'type': 'function',
         'function': {
@@ -208,8 +200,6 @@ class ToolRegistry {
           }
         }
       },
-      // 7. Integration execution. The client always applies the user's
-      // per-action permission policy before Fulcrum/Composio receives a call.
       {
         'type': 'function',
         'function': {
@@ -231,11 +221,6 @@ class ToolRegistry {
               'version': {
                 'type': 'string',
                 'description': 'Optional exact version returned by discovery.'
-              },
-              'action_description': {
-                'type': 'string',
-                'description':
-                    'Short user-facing description of the requested action. Cortex verifies metadata before showing permission.'
               }
             },
             'required': ['tool_slug', 'arguments']
@@ -245,16 +230,12 @@ class ToolRegistry {
     ];
   }
 
-  /// Stores documents for the current request context (PDF, XLSX, etc.)
   static List<Map<String, dynamic>>? _currentDocuments;
 
-  /// Sets the documents context for tool execution.
-  /// Call this before executing tools that need document access.
   static void setDocumentsContext(List<Map<String, dynamic>> documents) {
     _currentDocuments = documents;
   }
 
-  /// Clears request-scoped tool state after the assistant turn.
   static void clearDocumentsContext() {
     _currentDocuments = null;
     IntegrationService.instance.endTurn();
@@ -353,52 +334,17 @@ class ToolRegistry {
     }
     final arguments = Map<String, dynamic>.from(rawArguments);
 
-    IntegrationToolInfo? verifiedTool;
     try {
-      final prefix = toolSlug.contains('_')
-          ? toolSlug.substring(0, toolSlug.indexOf('_')).toLowerCase()
-          : null;
-      final lookup = await IntegrationService.instance.discoverTools(
-        capability: toolSlug,
-        preferredToolkit: prefix,
-      );
-      for (final tool in lookup.tools) {
-        if (tool.slug.toUpperCase() == toolSlug) {
-          verifiedTool = tool;
-          break;
-        }
-      }
-
-      if (verifiedTool == null) {
-        if (lookup.connectionRequired) {
-          final slug = lookup.suggestedToolkitSlug ?? prefix ?? '';
-          final name = lookup.suggestedToolkitName ??
-              (slug.isEmpty ? 'Plugin' : _humanize(slug));
-          await IntegrationDialogs.showConnectionRequired(
-            toolkitSlug: slug,
-            toolkitName: name,
-            logoUrl: lookup.suggestedToolkitLogo,
-            search: slug,
-          );
-          return jsonEncode({
-            'error': 'Required plugin is not connected.',
-            'code': 'integration_connection_required',
-          });
-        }
-        return jsonEncode({
-          'error': 'The requested integration action was not verified. Discover it again.',
-          'code': 'integration_tool_not_verified',
-        });
-      }
+      // Resolve exact action metadata from Fulcrum before asking the user.
+      // This prevents model-written permission text from understating what an
+      // integration action will actually do.
+      final IntegrationToolInfo verifiedTool =
+          await IntegrationService.instance.inspectTool(toolSlug);
 
       IntegrationService.instance.setActiveIntegrationTool(verifiedTool);
-      final requestedDescription =
-          (args['action_description'] ?? '').toString().trim();
       final actionDescription = verifiedTool.description.isNotEmpty
           ? verifiedTool.description
-          : requestedDescription.isNotEmpty
-              ? requestedDescription
-              : verifiedTool.name;
+          : verifiedTool.name;
 
       final decision = await IntegrationDialogs.requestActionPermission(
         toolkitSlug: verifiedTool.toolkitSlug,
@@ -461,7 +407,6 @@ class ToolRegistry {
         .join(' ');
   }
 
-  /// Initializes the default set of free, premium tools.
   static void initialize() {
     register(CortexTool(
       name: 'read_document',
