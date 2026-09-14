@@ -8,6 +8,7 @@ import 'package:cortex/rag/ingestion.dart';
 import 'package:cortex/rag/injector.dart';
 import 'package:cortex/rag/models.dart';
 import 'package:cortex/rag/offline_pdf.dart';
+import 'package:cortex/rag/offline_pdf_guard.dart';
 import 'package:cortex/rag/retrieval.dart';
 import 'package:cortex/rag/storage.dart';
 import 'package:flutter/foundation.dart';
@@ -64,13 +65,9 @@ class RagChatService {
         .toSet()
         .toList(growable: false);
 
-    // Direct PDF attachments use a dedicated, tiny-model-safe path. It keeps
-    // page identity, strips repeated header/footer noise, persists a compact
-    // page-aware index, and injects only a handful of relevant excerpts.
-    //
-    // We intentionally keep this path deterministic: no LLM is invoked during
-    // parsing/indexing. This prevents a 600M-2B local model from burning its
-    // context window trying to "understand" the whole PDF before answering.
+    // Direct PDF attachments use a dedicated tiny-model-safe path: page
+    // identity, layout-noise cleanup, a persistent canonical index and only a
+    // handful of high-value excerpts. Parsing/indexing never invokes an LLM.
     final pdfAttachments =
         uniqueAttachments.where(_isPdf).toList(growable: false);
     final nonPdfAttachments =
@@ -79,13 +76,20 @@ class RagChatService {
     String? compactPdfContext;
     if (pdfAttachments.isNotEmpty) {
       try {
-        compactPdfContext = await _offlinePdfContext.buildContext(
+        final rawPdfContext = await _offlinePdfContext.buildContext(
           queryText: queryText,
           pdfPaths: pdfAttachments,
-          // Conservative default chosen for small offline models. The compact
-          // context is also safe for online models on this shared code path.
+          // Conservative default on this shared RAG surface. The PDF engine
+          // itself supports explicit 600M/1B/2B profiles; the offline-only
+          // caller can later pass the selected model size without reindexing.
           modelSize: 1500,
         );
+        if (rawPdfContext != null && rawPdfContext.isNotEmpty) {
+          compactPdfContext = OfflinePdfPageGuard.apply(
+            queryText: queryText,
+            context: rawPdfContext,
+          );
+        }
       } catch (e) {
         debugPrint('[RagChatService] compact PDF context failed: $e');
       }
@@ -145,16 +149,13 @@ class RagChatService {
       return compactPdfContext;
     }
 
-    // The compact PDF block already contains its own strict grounding rule.
-    // Keep it first so tiny models see the highest-value material before the
-    // generic document context.
+    // Highest-value bounded PDF evidence comes first. Generic library/non-PDF
+    // RAG follows only when both are active.
     return '$compactPdfContext\n\n$regularContext';
   }
 
   Future<RagDocument?> _ensureIndexed(String path) async {
     try {
-      // Use the path index directly rather than loading the entire document
-      // table once per attachment.
       final prior = await _storage.getDocumentByPath(path);
       if (prior != null && prior.status == RagDocumentStatus.indexed) {
         return prior;
@@ -173,8 +174,6 @@ class RagChatService {
     final ids = documentIds.toList(growable: false);
     final results = <RagRetrievalResult>[];
 
-    // Two bulk reads replace getDocument() for each document plus individual
-    // chunk queries. This matters when several library documents are selected.
     final documents = await _storage.getDocumentsByIds(ids);
     final docsById = <String, RagDocument>{
       for (final document in documents) document.id: document,
@@ -186,11 +185,13 @@ class RagChatService {
       if (doc == null) continue;
       final chunks = chunksByDoc[id] ?? const <RagChunk>[];
       for (final chunk in chunks.take(topK)) {
-        results.add(RagRetrievalResult(
-          chunk: chunk,
-          document: doc,
-          score: 0,
-        ));
+        results.add(
+          RagRetrievalResult(
+            chunk: chunk,
+            document: doc,
+            score: 0,
+          ),
+        );
         if (results.length >= topK) return results;
       }
     }
