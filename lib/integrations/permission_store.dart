@@ -1,24 +1,60 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Persistent, user-controlled permission rules for integration actions.
+/// Global permission behavior for one connected integration.
 ///
-/// Only an explicit "Always allow" decision is persisted. A one-time allow
-/// and a rejection live only for the current prompt, which keeps the default
-/// posture conservative while still allowing users to remove remembered
-/// permissions from the Plugins screen.
+/// - [askEveryTime]: ask before every action unless the user explicitly chose
+///   "Always allow" for that exact action.
+/// - [allowRead]: automatically allow clearly read-only actions, but still ask
+///   before anything that can create, send, update or delete data.
+/// - [allowAll]: automatically allow all verified actions for this integration.
+///
+/// The mode lives entirely on-device. Fulcrum/Composio never receives or owns
+/// the user's local permission preference.
+enum IntegrationPermissionMode {
+  askEveryTime,
+  allowRead,
+  allowAll,
+}
+
 class IntegrationPermissionStore {
   IntegrationPermissionStore._();
 
   static final IntegrationPermissionStore instance =
       IntegrationPermissionStore._();
 
-  static const String _prefix = 'integration.always.';
+  static const String _alwaysPrefix = 'integration.always.';
+  static const String _modePrefix = 'integration.mode.';
 
-  String _key(String toolkitSlug) => '$_prefix${toolkitSlug.toLowerCase()}';
+  String _alwaysKey(String toolkitSlug) =>
+      '$_alwaysPrefix${toolkitSlug.toLowerCase()}';
+  String _modeKey(String toolkitSlug) =>
+      '$_modePrefix${toolkitSlug.toLowerCase()}';
+
+  Future<IntegrationPermissionMode> modeForToolkit(String toolkitSlug) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_modeKey(toolkitSlug));
+    return switch (raw) {
+      'allowRead' => IntegrationPermissionMode.allowRead,
+      'allowAll' => IntegrationPermissionMode.allowAll,
+      _ => IntegrationPermissionMode.askEveryTime,
+    };
+  }
+
+  /// Applying a top-level preset clears old per-action exceptions so the
+  /// selected policy is immediately predictable to the user. New explicit
+  /// "Always allow" decisions can still be created later from an action prompt.
+  Future<void> setMode(
+    String toolkitSlug,
+    IntegrationPermissionMode mode,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_modeKey(toolkitSlug), mode.name);
+    await prefs.remove(_alwaysKey(toolkitSlug));
+  }
 
   Future<Set<String>> alwaysAllowedTools(String toolkitSlug) async {
     final prefs = await SharedPreferences.getInstance();
-    return (prefs.getStringList(_key(toolkitSlug)) ?? const <String>[])
+    return (prefs.getStringList(_alwaysKey(toolkitSlug)) ?? const <String>[])
         .map((value) => value.trim().toUpperCase())
         .where((value) => value.isNotEmpty)
         .toSet();
@@ -47,14 +83,19 @@ class IntegrationPermissionStore {
 
     final sorted = rules.toList()..sort();
     if (sorted.isEmpty) {
-      await prefs.remove(_key(toolkitSlug));
+      await prefs.remove(_alwaysKey(toolkitSlug));
     } else {
-      await prefs.setStringList(_key(toolkitSlug), sorted);
+      await prefs.setStringList(_alwaysKey(toolkitSlug), sorted);
     }
   }
 
-  Future<void> clearToolkit(String toolkitSlug) async {
+  /// Restores Cortex's conservative default: ask before actions and remove all
+  /// per-action permanent exceptions for the integration.
+  Future<void> resetToolkit(String toolkitSlug) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_key(toolkitSlug));
+    await prefs.remove(_modeKey(toolkitSlug));
+    await prefs.remove(_alwaysKey(toolkitSlug));
   }
+
+  Future<void> clearToolkit(String toolkitSlug) => resetToolkit(toolkitSlug);
 }
