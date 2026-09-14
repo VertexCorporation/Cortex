@@ -1,6 +1,7 @@
 import 'package:cortex/design.dart';
 import 'dart:async';
 import 'package:cortex/app.dart';
+import 'package:cortex/integrations/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
@@ -417,6 +418,8 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
       'calculate': ['Hesaplanıyor', 'Hesaplandı'],
       'need_web_search': ['Web aranıyor', 'Web araması tamamlandı'],
       'web_search': ['Web aranıyor', 'Web araması tamamlandı'],
+      'discover_integration_tools': ['Uygun eklenti aranıyor', 'Eklenti bulundu'],
+      'execute_integration_tool': ['Eklenti ile işlem yapılıyor', 'Eklenti işlemi tamamlandı'],
     };
     final pair = labels[name] ??
         (isTurkish
@@ -433,6 +436,8 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
       'calculate': ['Calculating', 'Calculated'],
       'need_web_search': ['Searching the web', 'Web search complete'],
       'web_search': ['Searching the web', 'Web search complete'],
+      'discover_integration_tools': ['Finding the right plugin', 'Plugin found'],
+      'execute_integration_tool': ['Using plugin', 'Plugin action completed'],
     };
     final englishPair = english[name] ?? ['Using a tool', 'Tool completed'];
     return active ? englishPair[0] : englishPair[1];
@@ -459,6 +464,9 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
       visibleSteps.add(widget.activeTool);
     }
     final isActive = widget.activeTool.isNotEmpty;
+    final isIntegrationActive = isActive &&
+        (widget.activeTool == 'discover_integration_tools' ||
+            widget.activeTool == 'execute_integration_tool');
     final title = isActive
         ? _label(context, widget.activeTool, active: true)
         : (Localizations.localeOf(context).languageCode == 'tr'
@@ -477,6 +485,8 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (isIntegrationActive)
+                  IntegrationLiveActivity(toolActivity: widget.activeTool),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
