@@ -3,6 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
+import '../../integrations/screen.dart';
+import '../../integrations/strings.dart';
+import '../../navigation.dart';
+
 // Components
 import 'item.dart';
 
@@ -33,6 +37,7 @@ class AxonMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final integrationStrings = IntegrationStrings.of(context);
 
     // --- Layout Constants ---
     final double horizontalPadding = referenceWidth * 0.05;
@@ -60,6 +65,23 @@ class AxonMenu extends StatelessWidget {
             label: localizations.ragFeatureTitle,
             iconPath: 'assets/icons/attachment.svg',
             onTap: onDocumentsTap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: false,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 1.75 PLUGINS / INTEGRATIONS ---
+          // Uses the same AxonItem component and spacing as every existing
+          // shortcut so adding integrations does not alter the sidebar design.
+          AxonItem(
+            label: integrationStrings.title,
+            iconPath: 'assets/icons/plugins.svg',
+            onTap: () => navigateToScreen(
+              const IntegrationsScreen(),
+              direction: const Offset(1.0, 0.0),
+            ),
             screenHeight: screenHeight,
             referenceWidth: referenceWidth,
             reduceIconSize: true,
