@@ -152,6 +152,33 @@ class IntegrationService extends ChangeNotifier {
     return IntegrationToolDiscovery.fromJson(data);
   }
 
+  /// Resolves one exact Composio action on Fulcrum before Cortex asks for
+  /// permission. The permission card therefore uses trusted toolkit metadata
+  /// and a server-provided action description, never model-authored wording.
+  Future<IntegrationToolInfo> inspectTool(String toolSlug) async {
+    final response = await _api.get<Map<String, dynamic>>(
+      '$_base/getIntegrationTool',
+      queryParameters: {'toolSlug': toolSlug.trim().toUpperCase()},
+      options: Options(headers: await _authHeaders()),
+    );
+    final data = response.data;
+    if (data == null) throw StateError('Empty integration tool response.');
+    if (data['code']?.toString() == 'integration_connection_required') {
+      final toolkit = data['toolkit'];
+      final map = toolkit is Map
+          ? Map<String, dynamic>.from(toolkit)
+          : const <String, dynamic>{};
+      throw IntegrationConnectionRequiredException(
+        toolkitSlug: (map['slug'] ?? '').toString(),
+        toolkitName: (map['name'] ?? map['slug'] ?? 'Plugin').toString(),
+        logoUrl: map['logo']?.toString(),
+      );
+    }
+    final rawTool = data['tool'];
+    if (rawTool is! Map) throw StateError('Integration tool metadata missing.');
+    return IntegrationToolInfo.fromJson(Map<String, dynamic>.from(rawTool));
+  }
+
   Future<IntegrationExecutionResult> executeTool({
     required String toolSlug,
     required Map<String, dynamic> arguments,
