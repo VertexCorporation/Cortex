@@ -76,8 +76,14 @@ class RagChatService {
     String? compactPdfContext;
     if (pdfAttachments.isNotEmpty) {
       try {
+        // The final page guard understands natural Turkish inflections such as
+        // "3. sayfada" / "3. sayfayı". Append canonical `page N` selectors
+        // only for retrieval so the page-aware engine locks onto the same
+        // metadata even though its internal parser intentionally stays simple.
+        final retrievalQuery =
+            OfflinePdfPageGuard.normalizeForRetrieval(queryText);
         final rawPdfContext = await _offlinePdfContext.buildContext(
-          queryText: queryText,
+          queryText: retrievalQuery,
           pdfPaths: pdfAttachments,
           // Conservative default on this shared RAG surface. The PDF engine
           // itself supports explicit 600M/1B/2B profiles; the offline-only
