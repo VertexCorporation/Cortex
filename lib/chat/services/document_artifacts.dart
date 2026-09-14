@@ -10,11 +10,11 @@ import 'package:pdf/widgets.dart' as pw;
 
 import 'package:cortex/rag/extractors.dart';
 
-/// Creates and edits user-visible document artifacts on-device.
+/// Deterministic on-device file engine used by the chat tools.
 ///
-/// The LLM only decides WHAT should be created/changed. This service owns the
-/// deterministic file-format work so normal online models and Dynamic Chat do
-/// not need to emit binary files or know OOXML/PDF internals.
+/// The model decides WHAT should be created or changed. Cortex owns the file
+/// format work so online models and Dynamic Chat never need to emit binary
+/// files or understand OOXML/PDF internals.
 class DocumentArtifactService {
   static const int _maxToolPayloadChars = 750000;
 
@@ -40,7 +40,6 @@ class DocumentArtifactService {
     'json',
   };
 
-  /// Creates a document and returns internal artifact metadata.
   static Future<Map<String, dynamic>> create(Map<String, dynamic> args) async {
     _guardToolPayload(args);
 
@@ -92,8 +91,7 @@ class DocumentArtifactService {
     );
   }
 
-  /// Edits an already-scoped document. A NEW artifact is always produced;
-  /// the original user attachment is never overwritten.
+  /// Produces a revised copy. The user's original file is never overwritten.
   static Future<Map<String, dynamic>> edit(
     Map<String, dynamic> args, {
     required String sourcePath,
@@ -110,30 +108,45 @@ class DocumentArtifactService {
       throw ArgumentError('Editing .$extension files is not supported.');
     }
 
+    final operations = _mapList(args['operations']);
+    if (operations.isEmpty) {
+      throw ArgumentError('edit_document requires at least one operation.');
+    }
+
     final output = await _outputFile(
       requestedName: args['file_name']?.toString(),
       extension: extension,
       fallbackBase: '${p.basenameWithoutExtension(source.path)}_edited',
     );
 
-    final operations = _mapList(args['operations']);
-    if (operations.isEmpty) {
-      throw ArgumentError('edit_document requires at least one operation.');
-    }
-
     String? warning;
     switch (extension) {
       case 'xlsx':
         await _editXlsx(source, output, operations);
         break;
+      case 'pdf':
+        warning = await _rebuildTextDocument(
+          source,
+          output,
+          operations,
+          format: 'pdf',
+        );
+        break;
       case 'docx':
-        await _editDocx(source, output, operations);
+        warning = await _rebuildTextDocument(
+          source,
+          output,
+          operations,
+          format: 'docx',
+        );
         break;
       case 'pptx':
-        await _editPptx(source, output, operations);
-        break;
-      case 'pdf':
-        warning = await _editPdf(source, output, operations);
+        warning = await _rebuildTextDocument(
+          source,
+          output,
+          operations,
+          format: 'pptx',
+        );
         break;
       case 'txt':
       case 'md':
@@ -146,15 +159,13 @@ class DocumentArtifactService {
     return _artifactMetadata(
       output,
       format: extension,
-      summary: 'Edited ${p.basename(source.path)} and created ${p.basename(output.path)}.',
+      summary:
+          'Edited ${p.basename(source.path)} and created ${p.basename(output.path)}.',
       warning: warning,
     );
   }
 
   static void _guardToolPayload(Map<String, dynamic> args) {
-    // Tool arguments arrive from an online model. Bound the serialized payload
-    // before building in-memory documents so a malformed/overlong tool call
-    // cannot allocate an unbounded amount of memory on a phone.
     final encoded = jsonEncode(args);
     if (encoded.length > _maxToolPayloadChars) {
       throw ArgumentError('Document tool payload is too large.');
@@ -175,9 +186,10 @@ class DocumentArtifactService {
         ? '${fallbackBase}_${DateTime.now().millisecondsSinceEpoch}'
         : p.basename(raw);
 
-    // Do not let a model-controlled file name escape the app-owned directory.
-    baseName = baseName.replaceAll(RegExp(r'[^A-Za-z0-9._()\- ]'), '_');
-    if (baseName.isEmpty) {
+    // Hyphen is deliberately last in the character class so the RegExp is
+    // valid on every Dart target. This also prevents model-controlled paths.
+    baseName = baseName.replaceAll(RegExp(r'[^A-Za-z0-9._() -]'), '_');
+    if (baseName.isEmpty || baseName == '.' || baseName == '..') {
       baseName = '${fallbackBase}_${DateTime.now().millisecondsSinceEpoch}';
     }
 
@@ -196,7 +208,6 @@ class DocumentArtifactService {
         ),
       );
     }
-    await candidate.parent.create(recursive: true);
     return candidate;
   }
 
@@ -242,16 +253,19 @@ class DocumentArtifactService {
     pw.Font? regular;
     pw.Font? bold;
     try {
-      regular = pw.Font.ttf(await rootBundle.load('assets/fonts/inter/Inter-Regular.ttf'));
-      bold = pw.Font.ttf(await rootBundle.load('assets/fonts/inter/Inter-Bold.ttf'));
+      regular = pw.Font.ttf(
+        await rootBundle.load('assets/fonts/inter/Inter-Regular.ttf'),
+      );
+      bold = pw.Font.ttf(
+        await rootBundle.load('assets/fonts/inter/Inter-Bold.ttf'),
+      );
     } catch (_) {
-      // The package's built-in font remains a valid fallback if an asset was
-      // unexpectedly unavailable. Production builds bundle both Inter files.
+      // Built-in fonts remain a fallback if bundled fonts cannot be loaded.
     }
 
-    final theme = regular != null
-        ? pw.ThemeData.withFont(base: regular, bold: bold ?? regular)
-        : null;
+    final theme = regular == null
+        ? null
+        : pw.ThemeData.withFont(base: regular, bold: bold ?? regular);
 
     final widgets = <pw.Widget>[];
     final title = (args['title'] ?? '').toString().trim();
@@ -259,30 +273,34 @@ class DocumentArtifactService {
       widgets.add(pw.Header(level: 0, child: pw.Text(title)));
     }
 
-    final intro = (args['content'] ?? '').toString();
-    if (intro.trim().isNotEmpty) {
-      widgets.addAll(_pdfParagraphs(intro));
-    }
+    final content = (args['content'] ?? '').toString();
+    widgets.addAll(_pdfParagraphs(content));
 
     for (final section in _mapList(args['sections'])) {
-      final heading = (section['heading'] ?? section['title'] ?? '').toString().trim();
+      final heading =
+          (section['heading'] ?? section['title'] ?? '').toString().trim();
       final body = (section['body'] ?? section['content'] ?? '').toString();
       if (heading.isNotEmpty) {
         widgets.add(pw.SizedBox(height: 8));
         widgets.add(pw.Header(level: 1, child: pw.Text(heading)));
       }
-      if (body.trim().isNotEmpty) widgets.addAll(_pdfParagraphs(body));
+      widgets.addAll(_pdfParagraphs(body));
     }
 
     for (final table in _mapList(args['tables'])) {
       final headers = _dynamicList(table['headers']);
       final rows = _rowList(table['rows']);
       if (headers.isEmpty && rows.isEmpty) continue;
-      widgets.add(pw.SizedBox(height: 12));
+
       final data = <List<dynamic>>[
-        if (headers.isNotEmpty) headers.map((e) => e?.toString() ?? '').toList(),
-        ...rows.map((row) => row.map((e) => e?.toString() ?? '').toList()),
+        if (headers.isNotEmpty)
+          headers.map((value) => value?.toString() ?? '').toList(),
+        ...rows.map(
+          (row) => row.map((value) => value?.toString() ?? '').toList(),
+        ),
       ];
+
+      widgets.add(pw.SizedBox(height: 12));
       widgets.add(
         pw.TableHelper.fromTextArray(
           data: data,
@@ -303,66 +321,40 @@ class DocumentArtifactService {
   }
 
   static List<pw.Widget> _pdfParagraphs(String text) {
-    return text
-        .split(RegExp(r'\n\s*\n'))
-        .where((part) => part.trim().isNotEmpty)
+    if (text.trim().isEmpty) return const <pw.Widget>[];
+    return _paragraphStrings(text)
         .map<pw.Widget>(
-          (part) => pw.Padding(
+          (paragraph) => pw.Padding(
             padding: const pw.EdgeInsets.only(bottom: 8),
-            child: pw.Text(part.trim()),
+            child: pw.Text(paragraph),
           ),
         )
         .toList();
   }
 
-  static Future<String?> _editPdf(
-    File source,
-    File output,
-    List<Map<String, dynamic>> operations,
-  ) async {
-    final extracted = await DocTextExtractor().extractText(source.path);
-    if (extracted == null) {
-      throw ArgumentError('Could not extract text from the PDF.');
-    }
-
-    var text = extracted;
-    for (final operation in operations) {
-      final type = operation['type']?.toString() ?? '';
-      if (type == 'replace_text') {
-        text = _replaceText(text, operation);
-      } else if (type == 'append_text') {
-        final value = (operation['text'] ?? '').toString();
-        if (value.isNotEmpty) text = '$text\n\n$value';
-      } else {
-        throw ArgumentError('PDF edit operation not supported: $type');
-      }
-    }
-
-    await _writePdf(output, {
-      'title': p.basenameWithoutExtension(source.path),
-      'content': text,
-    });
-    return 'The PDF was rebuilt from extracted text; complex original layout, forms, or positioned graphics may not be preserved.';
-  }
-
   // ---------------------------------------------------------------------------
-  // DOCX (minimal OOXML creation + text-preserving replacement)
+  // DOCX
   // ---------------------------------------------------------------------------
 
   static Future<void> _writeDocx(File output, Map<String, dynamic> args) async {
     final body = StringBuffer();
     final title = (args['title'] ?? '').toString().trim();
-    if (title.isNotEmpty) body.write(_wordParagraph(title, style: 'Title'));
+    if (title.isNotEmpty) {
+      body.write(_wordParagraph(title, bold: true, sizeHalfPoints: 32));
+    }
 
-    final content = (args['content'] ?? '').toString();
-    for (final paragraph in _paragraphStrings(content)) {
+    for (final paragraph in _paragraphStrings((args['content'] ?? '').toString())) {
       body.write(_wordParagraph(paragraph));
     }
 
     for (final section in _mapList(args['sections'])) {
-      final heading = (section['heading'] ?? section['title'] ?? '').toString().trim();
-      final sectionBody = (section['body'] ?? section['content'] ?? '').toString();
-      if (heading.isNotEmpty) body.write(_wordParagraph(heading, style: 'Heading1'));
+      final heading =
+          (section['heading'] ?? section['title'] ?? '').toString().trim();
+      final sectionBody =
+          (section['body'] ?? section['content'] ?? '').toString();
+      if (heading.isNotEmpty) {
+        body.write(_wordParagraph(heading, bold: true, sizeHalfPoints: 26));
+      }
       for (final paragraph in _paragraphStrings(sectionBody)) {
         body.write(_wordParagraph(paragraph));
       }
@@ -371,8 +363,9 @@ class DocumentArtifactService {
     for (final table in _mapList(args['tables'])) {
       final headers = _dynamicList(table['headers']);
       final rows = _rowList(table['rows']);
-      if (headers.isEmpty && rows.isEmpty) continue;
-      body.write(_wordTable(headers, rows));
+      if (headers.isNotEmpty || rows.isNotEmpty) {
+        body.write(_wordTable(headers, rows));
+      }
     }
 
     final documentXml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -381,7 +374,7 @@ class DocumentArtifactService {
     $body
     <w:sectPr>
       <w:pgSz w:w="11906" w:h="16838"/>
-      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/>
     </w:sectPr>
   </w:body>
 </w:document>''';
@@ -390,13 +383,23 @@ class DocumentArtifactService {
     _addUtf8(archive, '[Content_Types].xml', _docxContentTypes);
     _addUtf8(archive, '_rels/.rels', _docxRootRels);
     _addUtf8(archive, 'word/document.xml', documentXml);
-    _addUtf8(archive, 'word/styles.xml', _docxStyles);
     await _writeZip(output, archive);
   }
 
-  static String _wordParagraph(String text, {String? style}) {
-    final escaped = _xml(text);
-    return '''<w:p>${style == null ? '' : '<w:pPr><w:pStyle w:val="$style"/></w:pPr>'}<w:r><w:t xml:space="preserve">$escaped</w:t></w:r></w:p>''';
+  static String _wordParagraph(
+    String text, {
+    bool bold = false,
+    int? sizeHalfPoints,
+  }) {
+    final runProperties = StringBuffer();
+    if (bold) runProperties.write('<w:b/>');
+    if (sizeHalfPoints != null) {
+      runProperties.write('<w:sz w:val="$sizeHalfPoints"/>');
+    }
+    final rPr = runProperties.isEmpty
+        ? ''
+        : '<w:rPr>${runProperties.toString()}</w:rPr>';
+    return '<w:p><w:r>$rPr<w:t xml:space="preserve">${_xml(text)}</w:t></w:r></w:p>';
   }
 
   static String _wordTable(List<dynamic> headers, List<List<dynamic>> rows) {
@@ -404,68 +407,26 @@ class DocumentArtifactService {
       if (headers.isNotEmpty) headers,
       ...rows,
     ];
-    final buffer = StringBuffer('<w:tbl><w:tblPr><w:tblBorders>'
-        '<w:top w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/>'
-        '<w:bottom w:val="single" w:sz="4"/><w:right w:val="single" w:sz="4"/>'
-        '<w:insideH w:val="single" w:sz="4"/><w:insideV w:val="single" w:sz="4"/>'
-        '</w:tblBorders></w:tblPr>');
+    final buffer = StringBuffer(
+      '<w:tbl><w:tblPr><w:tblBorders>'
+      '<w:top w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/>'
+      '<w:bottom w:val="single" w:sz="4"/><w:right w:val="single" w:sz="4"/>'
+      '<w:insideH w:val="single" w:sz="4"/><w:insideV w:val="single" w:sz="4"/>'
+      '</w:tblBorders></w:tblPr>',
+    );
     for (final row in allRows) {
       buffer.write('<w:tr>');
       for (final value in row) {
-        buffer.write('<w:tc><w:tcPr/><w:p><w:r><w:t xml:space="preserve">'
-            '${_xml(value?.toString() ?? '')}</w:t></w:r></w:p></w:tc>');
+        buffer.write(
+          '<w:tc><w:p><w:r><w:t xml:space="preserve">'
+          '${_xml(value?.toString() ?? '')}'
+          '</w:t></w:r></w:p></w:tc>',
+        );
       }
       buffer.write('</w:tr>');
     }
     buffer.write('</w:tbl>');
     return buffer.toString();
-  }
-
-  static Future<void> _editDocx(
-    File source,
-    File output,
-    List<Map<String, dynamic>> operations,
-  ) async {
-    final archive = ZipDecoder().decodeBytes(await source.readAsBytes());
-    final replacements = operations.where((op) => op['type'] == 'replace_text').toList();
-    final appends = operations.where((op) => op['type'] == 'append_text').toList();
-    final unsupported = operations.where(
-      (op) => op['type'] != 'replace_text' && op['type'] != 'append_text',
-    );
-    if (unsupported.isNotEmpty) {
-      throw ArgumentError('DOCX supports replace_text and append_text operations.');
-    }
-
-    final out = Archive();
-    for (final item in archive.files.where((f) => f.isFile)) {
-      var bytes = List<int>.from(item.content as List<int>);
-      if (item.name == 'word/document.xml') {
-        var xml = utf8.decode(bytes, allowMalformed: true);
-        for (final op in replacements) {
-          final find = _xml((op['find'] ?? '').toString());
-          final replace = _xml((op['replace'] ?? '').toString());
-          if (find.isNotEmpty) {
-            xml = op['replace_all'] == false
-                ? _replaceFirst(xml, find, replace)
-                : xml.replaceAll(find, replace);
-          }
-        }
-        if (appends.isNotEmpty) {
-          final appended = appends
-              .map((op) => _wordParagraph((op['text'] ?? '').toString()))
-              .join();
-          final sectIndex = xml.indexOf('<w:sectPr');
-          if (sectIndex >= 0) {
-            xml = '${xml.substring(0, sectIndex)}$appended${xml.substring(sectIndex)}';
-          } else {
-            xml = xml.replaceFirst('</w:body>', '$appended</w:body>');
-          }
-        }
-        bytes = utf8.encode(xml);
-      }
-      out.addFile(ArchiveFile(item.name, bytes.length, bytes));
-    }
-    await _writeZip(output, out);
   }
 
   // ---------------------------------------------------------------------------
@@ -543,16 +504,17 @@ class DocumentArtifactService {
           _excelValue(operation['value']),
         );
       } else if (type == 'append_row') {
-        sheet.appendRow(_dynamicList(operation['values']).map(_excelValue).toList());
+        sheet.appendRow(
+          _dynamicList(operation['values']).map(_excelValue).toList(),
+        );
       } else if (type == 'replace_text') {
         final find = (operation['find'] ?? '').toString();
         final replace = (operation['replace'] ?? '').toString();
         if (find.isEmpty) continue;
         for (final row in sheet.rows) {
           for (final cell in row) {
-            final value = cell?.value;
-            if (cell == null || value == null) continue;
-            final text = value.toString();
+            if (cell == null || cell.value == null) continue;
+            final text = cell.value.toString();
             if (!text.contains(find)) continue;
             cell.value = excel.TextCellValue(
               operation['replace_all'] == false
@@ -587,19 +549,19 @@ class DocumentArtifactService {
   }
 
   // ---------------------------------------------------------------------------
-  // PPTX (simple valid OOXML deck + text replacement)
+  // PPTX
   // ---------------------------------------------------------------------------
 
   static Future<void> _writePptx(File output, Map<String, dynamic> args) async {
     final slides = _mapList(args['slides']);
-    final normalized = slides.isNotEmpty
-        ? slides
-        : <Map<String, dynamic>>[
+    final normalized = slides.isEmpty
+        ? <Map<String, dynamic>>[
             {
               'title': args['title'] ?? '',
               'body': args['content'] ?? '',
             }
-          ];
+          ]
+        : slides;
 
     final archive = Archive();
     _addUtf8(archive, '[Content_Types].xml', _pptxContentTypes(normalized.length));
@@ -628,10 +590,14 @@ class DocumentArtifactService {
       final spec = normalized[i];
       final title = (spec['title'] ?? '').toString();
       final body = (spec['body'] ?? spec['content'] ?? '').toString();
-      final bullets = _dynamicList(spec['bullets']).map((e) => e?.toString() ?? '').toList();
+      final bullets = _dynamicList(spec['bullets'])
+          .map((value) => value?.toString() ?? '')
+          .where((value) => value.trim().isNotEmpty)
+          .map((value) => '• $value')
+          .toList();
       final combinedBody = [
         if (body.trim().isNotEmpty) body.trim(),
-        ...bullets.where((e) => e.trim().isNotEmpty).map((e) => '• $e'),
+        ...bullets,
       ].join('\n');
 
       _addUtf8(
@@ -649,37 +615,8 @@ class DocumentArtifactService {
     await _writeZip(output, archive);
   }
 
-  static Future<void> _editPptx(
-    File source,
-    File output,
-    List<Map<String, dynamic>> operations,
-  ) async {
-    if (operations.any((op) => op['type'] != 'replace_text')) {
-      throw ArgumentError('PPTX editing currently supports replace_text.');
-    }
-
-    final archive = ZipDecoder().decodeBytes(await source.readAsBytes());
-    final out = Archive();
-    for (final item in archive.files.where((f) => f.isFile)) {
-      var bytes = List<int>.from(item.content as List<int>);
-      if (item.name.startsWith('ppt/slides/slide') && item.name.endsWith('.xml')) {
-        var xml = utf8.decode(bytes, allowMalformed: true);
-        for (final operation in operations) {
-          final find = _xml((operation['find'] ?? '').toString());
-          final replace = _xml((operation['replace'] ?? '').toString());
-          if (find.isEmpty) continue;
-          xml = operation['replace_all'] == false
-              ? _replaceFirst(xml, find, replace)
-              : xml.replaceAll(find, replace);
-        }
-        bytes = utf8.encode(xml);
-      }
-      out.addFile(ArchiveFile(item.name, bytes.length, bytes));
-    }
-    await _writeZip(output, out);
-  }
-
-  static String _pptxSlide(String title, String body) => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static String _pptxSlide(String title, String body) =>
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
   <p:cSld><p:spTree>
     <p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
@@ -703,8 +640,10 @@ class DocumentArtifactService {
   ) {
     final paragraphs = text.split('\n').map((line) {
       return '<a:p><a:r><a:rPr lang="en-US" sz="$fontSize" b="${bold ? 1 : 0}"/>'
-          '<a:t>${_xml(line)}</a:t></a:r><a:endParaRPr lang="en-US" sz="$fontSize"/></a:p>';
+          '<a:t>${_xml(line)}</a:t></a:r>'
+          '<a:endParaRPr lang="en-US" sz="$fontSize"/></a:p>';
     }).join();
+
     return '''<p:sp>
       <p:nvSpPr><p:cNvPr id="$id" name="$name"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
       <p:spPr><a:xfrm><a:off x="$x" y="$y"/><a:ext cx="$cx" cy="$cy"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>
@@ -713,7 +652,70 @@ class DocumentArtifactService {
   }
 
   // ---------------------------------------------------------------------------
-  // Plain text / CSV / JSON
+  // Rebuild-based editing for PDF/DOCX/PPTX
+  // ---------------------------------------------------------------------------
+
+  static Future<String?> _rebuildTextDocument(
+    File source,
+    File output,
+    List<Map<String, dynamic>> operations, {
+    required String format,
+  }) async {
+    final extracted = await DocTextExtractor().extractText(source.path);
+    if (extracted == null) {
+      throw ArgumentError('Could not extract text from the source document.');
+    }
+
+    var text = extracted;
+    for (final operation in operations) {
+      final type = operation['type']?.toString() ?? '';
+      if (type == 'replace_text') {
+        text = _replaceText(text, operation);
+      } else if (type == 'append_text') {
+        final value = (operation['text'] ?? '').toString();
+        if (value.isNotEmpty) {
+          text = '$text${text.endsWith('\n') ? '' : '\n'}$value';
+        }
+      } else {
+        throw ArgumentError('$format edit operation not supported: $type');
+      }
+    }
+
+    if (format == 'pdf') {
+      await _writePdf(output, {
+        'title': p.basenameWithoutExtension(source.path),
+        'content': text,
+      });
+      return 'The PDF was rebuilt from extracted text; complex original layout, forms, or positioned graphics may not be preserved.';
+    }
+
+    if (format == 'docx') {
+      await _writeDocx(output, {
+        'title': p.basenameWithoutExtension(source.path),
+        'content': text,
+      });
+      return 'The DOCX was rebuilt from extracted text; complex original styling, images, headers, or positioned elements may not be preserved.';
+    }
+
+    final slideBodies = text
+        .split(RegExp(r'\n\s*\n'))
+        .map((part) => part.trim())
+        .where((part) => part.isNotEmpty)
+        .toList();
+    await _writePptx(output, {
+      'slides': [
+        for (var i = 0; i < slideBodies.length; i++)
+          {
+            'title': 'Slide ${i + 1}',
+            'body': slideBodies[i],
+          }
+      ],
+    });
+    return 'The PPTX was rebuilt from extracted text; original theme, images, animations, and exact slide layout may not be preserved.';
+  }
+
+  // ---------------------------------------------------------------------------
+  // TXT / MD / CSV / JSON
   // ---------------------------------------------------------------------------
 
   static Future<void> _editTextFile(
@@ -728,10 +730,16 @@ class DocumentArtifactService {
         text = _replaceText(text, operation);
       } else if (type == 'append_text') {
         final value = (operation['text'] ?? '').toString();
-        if (value.isNotEmpty) text = '$text${text.endsWith('\n') ? '' : '\n'}$value';
+        if (value.isNotEmpty) {
+          text = '$text${text.endsWith('\n') ? '' : '\n'}$value';
+        }
       } else {
         throw ArgumentError('Text edit operation not supported: $type');
       }
+    }
+
+    if (p.extension(source.path).toLowerCase() == '.json') {
+      jsonDecode(text);
     }
     await output.writeAsString(text, flush: true);
   }
@@ -740,10 +748,13 @@ class DocumentArtifactService {
     final buffer = StringBuffer();
     final title = (args['title'] ?? '').toString().trim();
     if (title.isNotEmpty) buffer.writeln('$title\n');
+
     final content = (args['content'] ?? '').toString();
     if (content.isNotEmpty) buffer.writeln(content);
+
     for (final section in _mapList(args['sections'])) {
-      final heading = (section['heading'] ?? section['title'] ?? '').toString().trim();
+      final heading =
+          (section['heading'] ?? section['title'] ?? '').toString().trim();
       final body = (section['body'] ?? section['content'] ?? '').toString();
       if (heading.isNotEmpty) buffer.writeln('\n$heading');
       if (body.isNotEmpty) buffer.writeln(body);
@@ -773,7 +784,7 @@ class DocumentArtifactService {
       };
 
   // ---------------------------------------------------------------------------
-  // Shared helpers
+  // Helpers / OOXML constants
   // ---------------------------------------------------------------------------
 
   static String _replaceText(String text, Map<String, dynamic> operation) {
@@ -793,15 +804,15 @@ class DocumentArtifactService {
 
   static List<String> _paragraphStrings(String text) => text
       .split(RegExp(r'\n\s*\n'))
-      .map((e) => e.trim())
-      .where((e) => e.isNotEmpty)
+      .map((part) => part.trim())
+      .where((part) => part.isNotEmpty)
       .toList();
 
   static List<Map<String, dynamic>> _mapList(dynamic value) {
     if (value is! List) return const [];
     return value
         .whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
+        .map((item) => Map<String, dynamic>.from(item))
         .toList();
   }
 
@@ -812,7 +823,10 @@ class DocumentArtifactService {
 
   static List<List<dynamic>> _rowList(dynamic value) {
     if (value is! List) return const [];
-    return value.whereType<List>().map((e) => List<dynamic>.from(e)).toList();
+    return value
+        .whereType<List>()
+        .map((row) => List<dynamic>.from(row))
+        .toList();
   }
 
   static String _xml(String value) => value
@@ -833,32 +847,28 @@ class DocumentArtifactService {
     await output.writeAsBytes(bytes, flush: true);
   }
 
-  static const String _docxContentTypes = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _docxContentTypes =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
 </Types>''';
 
-  static const String _docxRootRels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _docxRootRels =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
 </Relationships>''';
 
-  static const String _docxStyles = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>
-  <w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:rPr><w:b/><w:sz w:val="32"/></w:rPr></w:style>
-  <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:rPr><w:b/><w:sz w:val="26"/></w:rPr></w:style>
-</w:styles>''';
-
-  static const String _pptxRootRels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _pptxRootRels =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
 </Relationships>''';
 
-  static String _pptxContentTypes(int slideCount) => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static String _pptxContentTypes(int slideCount) =>
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
@@ -869,7 +879,8 @@ class DocumentArtifactService {
   ${List.generate(slideCount, (i) => '<Override PartName="/ppt/slides/slide${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>').join()}
 </Types>''';
 
-  static String _pptxPresentation(int slideCount) => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static String _pptxPresentation(int slideCount) =>
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
   <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>
   <p:sldIdLst>${List.generate(slideCount, (i) => '<p:sldId id="${256 + i}" r:id="rId${i + 2}"/>').join()}</p:sldIdLst>
@@ -877,35 +888,41 @@ class DocumentArtifactService {
   <p:notesSz cx="6858000" cy="9144000"/>
 </p:presentation>''';
 
-  static String _pptxPresentationRels(int slideCount) => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static String _pptxPresentationRels(int slideCount) =>
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
   ${List.generate(slideCount, (i) => '<Relationship Id="rId${i + 2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide${i + 1}.xml"/>').join()}
 </Relationships>''';
 
-  static const String _pptxSlideRels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _pptxSlideRels =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
 </Relationships>''';
 
-  static const String _pptxSlideLayoutRels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _pptxSlideLayoutRels =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/>
 </Relationships>''';
 
-  static const String _pptxSlideMasterRels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _pptxSlideMasterRels =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
   <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="../theme/theme1.xml"/>
 </Relationships>''';
 
-  static const String _pptxSlideLayout = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _pptxSlideLayout =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank" preserve="1">
   <p:cSld name="Blank"><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>
   <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
 </p:sldLayout>''';
 
-  static const String _pptxSlideMaster = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _pptxSlideMaster =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
   <p:cSld name="Master"><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>
   <p:clrMap accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" bg1="lt1" bg2="lt2" folHlink="folHlink" hlink="hlink" tx1="dk1" tx2="dk2"/>
@@ -913,7 +930,8 @@ class DocumentArtifactService {
   <p:txStyles><p:titleStyle/><p:bodyStyle/><p:otherStyle/></p:txStyles>
 </p:sldMaster>''';
 
-  static const String _pptxTheme = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  static const String _pptxTheme =
+      '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Cortex">
   <a:themeElements>
     <a:clrScheme name="Cortex"><a:dk1><a:sysClr val="windowText" lastClr="000000"/></a:dk1><a:lt1><a:sysClr val="window" lastClr="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="1F1F1F"/></a:dk2><a:lt2><a:srgbClr val="F2F2F2"/></a:lt2><a:accent1><a:srgbClr val="4F46E5"/></a:accent1><a:accent2><a:srgbClr val="06B6D4"/></a:accent2><a:accent3><a:srgbClr val="10B981"/></a:accent3><a:accent4><a:srgbClr val="F59E0B"/></a:accent4><a:accent5><a:srgbClr val="EF4444"/></a:accent5><a:accent6><a:srgbClr val="8B5CF6"/></a:accent6><a:hlink><a:srgbClr val="0563C1"/></a:hlink><a:folHlink><a:srgbClr val="954F72"/></a:folHlink></a:clrScheme>
