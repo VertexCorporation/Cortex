@@ -7,7 +7,11 @@ void main() {
   group('scoped binary document attachments', () {
     test('PDF metadata is scoped without eager base64 encoding', () async {
       final dir = await Directory.systemTemp.createTemp('cortex_document_test');
-      addTearDown(() => dir.delete(recursive: true));
+      addTearDown(() async {
+        if (await dir.exists()) {
+          await dir.delete(recursive: true);
+        }
+      });
 
       final pdf = File('${dir.path}/report.pdf');
       await pdf.writeAsBytes('%PDF-1.4\n% Cortex regression fixture\n'.codeUnits);
@@ -25,8 +29,11 @@ void main() {
       expect(document['path'], pdf.path);
       expect(document['fileName'], 'report.pdf');
       expect(document['extension'], 'pdf');
-      expect(document.containsKey('data'), isFalse,
-          reason: 'binary bytes must be encoded only when read_document runs');
+      expect(
+        document.containsKey('data'),
+        isFalse,
+        reason: 'binary bytes must be encoded only when read_document runs',
+      );
       expect(block['text'].toString(), contains(scope!));
 
       final extracted = Utils.extractDocuments([block]);
@@ -41,7 +48,11 @@ void main() {
 
     test('processing the same PDF twice creates independent scopes', () async {
       final dir = await Directory.systemTemp.createTemp('cortex_document_test');
-      addTearDown(() => dir.delete(recursive: true));
+      addTearDown(() async {
+        if (await dir.exists()) {
+          await dir.delete(recursive: true);
+        }
+      });
 
       final pdf = File('${dir.path}/same-name.pdf');
       await pdf.writeAsBytes('%PDF-1.4\n% scope isolation\n'.codeUnits);
@@ -52,8 +63,11 @@ void main() {
       final firstScope = (first!['_document'] as Map)['scope'];
       final secondScope = (second!['_document'] as Map)['scope'];
 
-      expect(firstScope, isNot(equals(secondScope)),
-          reason: 'concurrent chat turns must never share document identity');
+      expect(
+        firstScope,
+        isNot(equals(secondScope)),
+        reason: 'concurrent chat turns must never share document identity',
+      );
     });
   });
 }
