@@ -7,6 +7,7 @@ import 'package:cortex/performance/bounded_pool.dart';
 import 'package:cortex/rag/ingestion.dart';
 import 'package:cortex/rag/injector.dart';
 import 'package:cortex/rag/models.dart';
+import 'package:cortex/rag/offline_pdf.dart';
 import 'package:cortex/rag/retrieval.dart';
 import 'package:cortex/rag/storage.dart';
 import 'package:flutter/foundation.dart';
@@ -26,12 +27,15 @@ class RagChatService {
     required this._ingestion,
     required this._storage,
     RagContextInjector? injector,
-  }) : _injector = injector ?? const RagContextInjector();
+    OfflinePdfContextService? offlinePdfContext,
+  })  : _injector = injector ?? const RagContextInjector(),
+        _offlinePdfContext = offlinePdfContext ?? OfflinePdfContextService();
 
   final RetrievalEngine _retrievalEngine;
   final RagIngestionService _ingestion;
   final RagStorageService _storage;
   final RagContextInjector _injector;
+  final OfflinePdfContextService _offlinePdfContext;
 
   // Extraction/indexing can be CPU and storage heavy. Two concurrent files
   // gives attachment batches useful overlap without saturating a mobile device.
@@ -43,6 +47,8 @@ class RagChatService {
     return kRagDocumentExtensions
         .contains(path.substring(dot + 1).toLowerCase());
   }
+
+  static bool _isPdf(String path) => path.toLowerCase().endsWith('.pdf');
 
   Future<String?> buildContext({
     required String queryText,
@@ -58,10 +64,37 @@ class RagChatService {
         .toSet()
         .toList(growable: false);
 
+    // Direct PDF attachments use a dedicated, tiny-model-safe path. It keeps
+    // page identity, strips repeated header/footer noise, persists a compact
+    // page-aware index, and injects only a handful of relevant excerpts.
+    //
+    // We intentionally keep this path deterministic: no LLM is invoked during
+    // parsing/indexing. This prevents a 600M-2B local model from burning its
+    // context window trying to "understand" the whole PDF before answering.
+    final pdfAttachments =
+        uniqueAttachments.where(_isPdf).toList(growable: false);
+    final nonPdfAttachments =
+        uniqueAttachments.where((path) => !_isPdf(path)).toList(growable: false);
+
+    String? compactPdfContext;
+    if (pdfAttachments.isNotEmpty) {
+      try {
+        compactPdfContext = await _offlinePdfContext.buildContext(
+          queryText: queryText,
+          pdfPaths: pdfAttachments,
+          // Conservative default chosen for small offline models. The compact
+          // context is also safe for online models on this shared code path.
+          modelSize: 1500,
+        );
+      } catch (e) {
+        debugPrint('[RagChatService] compact PDF context failed: $e');
+      }
+    }
+
     final attachedIds = <String>{};
-    if (uniqueAttachments.isNotEmpty) {
+    if (nonPdfAttachments.isNotEmpty) {
       final indexed = await _attachmentPool.mapSettled<String, RagDocument?>(
-        uniqueAttachments,
+        nonPdfAttachments,
         (path, _) => _ensureIndexed(path),
       );
       for (final document in indexed.values.whereType<RagDocument>()) {
@@ -76,27 +109,46 @@ class RagChatService {
     }
     documentIds.addAll(attachedIds);
 
-    if (documentIds.isEmpty) return null;
+    String? regularContext;
+    if (documentIds.isNotEmpty) {
+      final query = queryText.trim();
+      final topK = query.length < 40 ? 2 : 4;
 
-    final query = queryText.trim();
-    final topK = query.length < 40 ? 2 : 4;
+      List<RagRetrievalResult> results = query.isNotEmpty
+          ? await _retrievalEngine.query(
+              query: query,
+              documentIds: documentIds.toList(growable: false),
+              topK: topK,
+            )
+          : const <RagRetrievalResult>[];
 
-    List<RagRetrievalResult> results = query.isNotEmpty
-        ? await _retrievalEngine.query(
-            query: query,
-            documentIds: documentIds.toList(growable: false),
-            topK: topK,
-          )
-        : const <RagRetrievalResult>[];
+      if (results.isEmpty && attachedIds.isNotEmpty) {
+        results = await _firstChunks(attachedIds, topK);
+      }
 
-    if (results.isEmpty && attachedIds.isNotEmpty) {
-      results = await _firstChunks(attachedIds, topK);
+      if (results.isNotEmpty) {
+        final context = _injector.buildContext(results);
+        if (context.isNotEmpty) {
+          regularContext = _injector.buildSystemInstruction(context);
+        }
+      }
     }
 
-    if (results.isEmpty) return null;
-    final context = _injector.buildContext(results);
-    if (context.isEmpty) return null;
-    return _injector.buildSystemInstruction(context);
+    if ((compactPdfContext == null || compactPdfContext.isEmpty) &&
+        (regularContext == null || regularContext.isEmpty)) {
+      return null;
+    }
+    if (compactPdfContext == null || compactPdfContext.isEmpty) {
+      return regularContext;
+    }
+    if (regularContext == null || regularContext.isEmpty) {
+      return compactPdfContext;
+    }
+
+    // The compact PDF block already contains its own strict grounding rule.
+    // Keep it first so tiny models see the highest-value material before the
+    // generic document context.
+    return '$compactPdfContext\n\n$regularContext';
   }
 
   Future<RagDocument?> _ensureIndexed(String path) async {
