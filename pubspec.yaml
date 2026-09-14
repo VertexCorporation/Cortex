@@ -45,7 +45,7 @@ dependencies:
 
   # --- DEVICE & UTILITIES ---
   url_launcher: ^6.3.1
-  path_provider: ^2.1.6
+  path_provider: ^2.0.11
   shared_preferences: ^2.3.2
   permission_handler: ^12.0.1
   speech_to_text: ^7.0.0
@@ -67,7 +67,7 @@ dependencies:
 
   # --- RAG / DOCUMENT CHAT ---
   pdfrx: ^2.6.1
-  pdf: ^3.13.0
+  pdf: ^3.11.3
   excel: ^4.0.6
   archive: ^3.6.1
   xml: ^6.5.0
