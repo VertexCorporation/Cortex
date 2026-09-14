@@ -1,6 +1,10 @@
 import 'dart:convert';
-import 'package:dio/dio.dart';
+
+import 'package:cortex/integrations/dialogs.dart';
+import 'package:cortex/integrations/model.dart';
+import 'package:cortex/integrations/service.dart';
 import 'package:cortex/network/fulcrum_http.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
@@ -178,6 +182,66 @@ class ToolRegistry {
           }
         }
       },
+      // 6. Integration discovery. Keeps the model context small by searching
+      // only the connected app actions relevant to the current request.
+      {
+        'type': 'function',
+        'function': {
+          'name': 'discover_integration_tools',
+          'description':
+              'Find a small set of actions from the user\'s connected plugins that can complete the request. Use this before execute_integration_tool. Describe the capability in natural language. You may provide a preferred toolkit such as gmail, github, slack, notion, googlecalendar or googledrive. If the required app is not connected, Cortex will ask the user to connect it.',
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'capability': {
+                'type': 'string',
+                'description':
+                    'What needs to be done, e.g. "read recent emails for a summary" or "create a GitHub issue".'
+              },
+              'preferred_toolkit': {
+                'type': 'string',
+                'description':
+                    'Optional toolkit slug when the user named a specific service.'
+              }
+            },
+            'required': ['capability']
+          }
+        }
+      },
+      // 7. Integration execution. The client always applies the user's
+      // per-action permission policy before Fulcrum/Composio receives a call.
+      {
+        'type': 'function',
+        'function': {
+          'name': 'execute_integration_tool',
+          'description':
+              'Execute one exact action returned by discover_integration_tools. Use only for an action the user requested. Cortex will show a permission prompt unless the user previously chose Always allow for this exact action. Never invent a tool_slug.',
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'tool_slug': {
+                'type': 'string',
+                'description':
+                    'Exact tool_slug returned by discover_integration_tools.'
+              },
+              'arguments': {
+                'type': 'object',
+                'description': 'Arguments matching the discovered input schema.'
+              },
+              'version': {
+                'type': 'string',
+                'description': 'Optional exact version returned by discovery.'
+              },
+              'action_description': {
+                'type': 'string',
+                'description':
+                    'Short user-facing description of the requested action. Cortex verifies metadata before showing permission.'
+              }
+            },
+            'required': ['tool_slug', 'arguments']
+          }
+        }
+      },
     ];
   }
 
@@ -190,9 +254,10 @@ class ToolRegistry {
     _currentDocuments = documents;
   }
 
-  /// Clears the documents context after tool execution.
+  /// Clears request-scoped tool state after the assistant turn.
   static void clearDocumentsContext() {
     _currentDocuments = null;
+    IntegrationService.instance.endTurn();
   }
 
   static Future<String> _executeOnServer(
@@ -204,7 +269,6 @@ class ToolRegistry {
       final token = await user.getIdToken();
       final dio = createFulcrumHttp();
 
-      // Include documents if this is a read_document call
       final Map<String, dynamic> requestData = {
         'name': name,
         'args': args,
@@ -225,10 +289,6 @@ class ToolRegistry {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        // The server returns the JSON string directly usually, or an object.
-        // If it returns an object, we might need to stringify it if the
-        // calling code expects a string result from the tool.
-        // CortexTool.function returns Future<String>.
         if (data is Map || data is List) {
           return jsonEncode(data);
         }
@@ -241,9 +301,168 @@ class ToolRegistry {
     }
   }
 
+  static Future<String> _discoverIntegrationTools(
+      Map<String, dynamic> args) async {
+    final capability = (args['capability'] ?? '').toString().trim();
+    final preferred = args['preferred_toolkit']?.toString().trim();
+    if (capability.isEmpty) {
+      return jsonEncode({'error': 'A capability description is required.'});
+    }
+
+    try {
+      final discovery = await IntegrationService.instance.discoverTools(
+        capability: capability,
+        preferredToolkit: preferred,
+      );
+
+      if (discovery.connectionRequired) {
+        final slug = discovery.suggestedToolkitSlug ?? preferred ?? '';
+        final name = discovery.suggestedToolkitName ??
+            (slug.isEmpty ? 'Plugin' : _humanize(slug));
+        await IntegrationDialogs.showConnectionRequired(
+          toolkitSlug: slug,
+          toolkitName: name,
+          logoUrl: discovery.suggestedToolkitLogo,
+          search: slug.isEmpty ? preferred : slug,
+        );
+        return jsonEncode({
+          'connection_required': true,
+          'toolkit': {'slug': slug, 'name': name},
+          'message':
+              'The required plugin is not connected. Cortex showed the user a connection prompt. Do not claim the requested data was accessed.',
+        });
+      }
+
+      return jsonEncode({
+        'connection_required': false,
+        'tools': discovery.tools.map((tool) => tool.compactForModel()).toList(),
+        'instruction':
+            'Choose only an exact tool_slug from this list. If none fits, refine discovery instead of inventing a slug.',
+      });
+    } catch (e) {
+      return jsonEncode({'error': 'Integration discovery failed: $e'});
+    }
+  }
+
+  static Future<String> _executeIntegrationTool(
+      Map<String, dynamic> args) async {
+    final toolSlug = (args['tool_slug'] ?? '').toString().trim().toUpperCase();
+    final rawArguments = args['arguments'];
+    if (toolSlug.isEmpty || rawArguments is! Map) {
+      return jsonEncode({'error': 'Invalid integration action request.'});
+    }
+    final arguments = Map<String, dynamic>.from(rawArguments);
+
+    IntegrationToolInfo? verifiedTool;
+    try {
+      final prefix = toolSlug.contains('_')
+          ? toolSlug.substring(0, toolSlug.indexOf('_')).toLowerCase()
+          : null;
+      final lookup = await IntegrationService.instance.discoverTools(
+        capability: toolSlug,
+        preferredToolkit: prefix,
+      );
+      for (final tool in lookup.tools) {
+        if (tool.slug.toUpperCase() == toolSlug) {
+          verifiedTool = tool;
+          break;
+        }
+      }
+
+      if (verifiedTool == null) {
+        if (lookup.connectionRequired) {
+          final slug = lookup.suggestedToolkitSlug ?? prefix ?? '';
+          final name = lookup.suggestedToolkitName ??
+              (slug.isEmpty ? 'Plugin' : _humanize(slug));
+          await IntegrationDialogs.showConnectionRequired(
+            toolkitSlug: slug,
+            toolkitName: name,
+            logoUrl: lookup.suggestedToolkitLogo,
+            search: slug,
+          );
+          return jsonEncode({
+            'error': 'Required plugin is not connected.',
+            'code': 'integration_connection_required',
+          });
+        }
+        return jsonEncode({
+          'error': 'The requested integration action was not verified. Discover it again.',
+          'code': 'integration_tool_not_verified',
+        });
+      }
+
+      IntegrationService.instance.setActiveIntegrationTool(verifiedTool);
+      final requestedDescription =
+          (args['action_description'] ?? '').toString().trim();
+      final actionDescription = verifiedTool.description.isNotEmpty
+          ? verifiedTool.description
+          : requestedDescription.isNotEmpty
+              ? requestedDescription
+              : verifiedTool.name;
+
+      final decision = await IntegrationDialogs.requestActionPermission(
+        toolkitSlug: verifiedTool.toolkitSlug,
+        toolkitName: verifiedTool.toolkitName,
+        logoUrl: verifiedTool.toolkitLogo,
+        toolSlug: verifiedTool.slug,
+        actionDescription: actionDescription,
+      );
+      if (decision == IntegrationPermissionDecision.reject) {
+        return jsonEncode({
+          'error': 'User rejected the integration action.',
+          'code': 'integration_permission_rejected',
+        });
+      }
+
+      final result = await IntegrationService.instance.executeTool(
+        toolSlug: verifiedTool.slug,
+        arguments: arguments,
+        version: verifiedTool.version,
+      );
+      return jsonEncode({
+        'success': result.success,
+        'data': result.data,
+        if (result.error != null) 'error': result.error,
+        'toolkit': {
+          'slug': result.toolkitSlug,
+          'name': result.toolkitName,
+        },
+      });
+    } on IntegrationLimitException {
+      await IntegrationDialogs.showDailyLimitReached();
+      return jsonEncode({
+        'error': 'Daily plugin usage limit reached.',
+        'code': 'integration_daily_limit',
+      });
+    } on IntegrationConnectionRequiredException catch (e) {
+      await IntegrationDialogs.showConnectionRequired(
+        toolkitSlug: e.toolkitSlug,
+        toolkitName: e.toolkitName,
+        logoUrl: e.logoUrl,
+        search: e.toolkitSlug,
+      );
+      return jsonEncode({
+        'error': 'Required plugin is not connected.',
+        'code': 'integration_connection_required',
+      });
+    } catch (e) {
+      return jsonEncode({'error': 'Integration action failed: $e'});
+    } finally {
+      IntegrationService.instance.setActiveIntegrationTool(null);
+    }
+  }
+
+  static String _humanize(String slug) {
+    if (slug.isEmpty) return 'Plugin';
+    return slug
+        .split(RegExp(r'[_-]+'))
+        .where((part) => part.isNotEmpty)
+        .map((part) => '${part[0].toUpperCase()}${part.substring(1).toLowerCase()}')
+        .join(' ');
+  }
+
   /// Initializes the default set of free, premium tools.
   static void initialize() {
-    // 0. Read Document (PDF, XLSX, etc.)
     register(CortexTool(
       name: 'read_document',
       description: 'Read document content.',
@@ -251,17 +470,13 @@ class ToolRegistry {
       function: (args) => _executeOnServer('read_document', args),
     ));
 
-    // 1. Stock & Crypto Price
     register(CortexTool(
       name: 'get_stock_price',
       description: 'Get stock/crypto price.',
       parameters: {},
-      // Definitions handle on server, but we keep empties or minimal for local registry if needed?
-      // Actually registry only uses name to find handler. Parameters here are unused if getLocalizedToolsJson returns [].
       function: (args) => _executeOnServer('get_stock_price', args),
     ));
 
-    // 2. Weather
     register(CortexTool(
       name: 'get_weather',
       description: 'Get weather.',
@@ -269,7 +484,6 @@ class ToolRegistry {
       function: (args) => _executeOnServer('get_weather', args),
     ));
 
-    // 3. Code Execution
     register(CortexTool(
       name: 'run_python_code',
       description: 'Run python code.',
@@ -277,7 +491,6 @@ class ToolRegistry {
       function: (args) => _executeOnServer('run_python_code', args),
     ));
 
-    // 4. Calculator
     register(CortexTool(
       name: 'calculate',
       description: 'Calculate expression.',
@@ -285,12 +498,25 @@ class ToolRegistry {
       function: (args) => _executeOnServer('calculate', args),
     ));
 
-    // 5. Chart Rendering
     register(CortexTool(
       name: 'render_chart',
       description: 'Render chart.',
       parameters: {},
       function: (args) => _executeOnServer('render_chart', args),
+    ));
+
+    register(CortexTool(
+      name: 'discover_integration_tools',
+      description: 'Discover connected integration actions.',
+      parameters: {},
+      function: _discoverIntegrationTools,
+    ));
+
+    register(CortexTool(
+      name: 'execute_integration_tool',
+      description: 'Execute a permission-gated integration action.',
+      parameters: {},
+      function: _executeIntegrationTool,
     ));
   }
 }
