@@ -566,6 +566,40 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     );
   }
 
+  String _integrationBenefit(BuildContext context, String planType) {
+    final language = Localizations.localeOf(context).languageCode;
+    const copy = <String, Map<String, List<String>>>{
+      'en': {'plans': ['Plugin usage', 'More plugin usage', 'Advanced plugin usage', 'Unlimited plugin usage']},
+      'tr': {'plans': ['Eklenti kullanımı', 'Daha fazla eklenti kullanımı', 'Gelişmiş eklenti kullanımı', 'Sınırsız eklenti kullanımı']},
+      'de': {'plans': ['Plugin-Nutzung', 'Mehr Plugin-Nutzung', 'Erweiterte Plugin-Nutzung', 'Unbegrenzte Plugin-Nutzung']},
+      'es': {'plans': ['Uso de complementos', 'Más uso de complementos', 'Uso avanzado de complementos', 'Uso ilimitado de complementos']},
+      'fr': {'plans': ['Utilisation des extensions', 'Plus d’utilisation des extensions', 'Utilisation avancée des extensions', 'Utilisation illimitée des extensions']},
+      'it': {'plans': ['Uso dei plugin', 'Più utilizzo dei plugin', 'Uso avanzato dei plugin', 'Uso illimitato dei plugin']},
+      'pt': {'plans': ['Uso de plugins', 'Mais uso de plugins', 'Uso avançado de plugins', 'Uso ilimitado de plugins']},
+      'ru': {'plans': ['Использование плагинов', 'Больше использования плагинов', 'Расширенное использование плагинов', 'Безлимитное использование плагинов']},
+      'ar': {'plans': ['استخدام الإضافات', 'استخدام أكبر للإضافات', 'استخدام متقدم للإضافات', 'استخدام غير محدود للإضافات']},
+      'zh': {'plans': ['插件使用', '更多插件使用', '高级插件使用', '无限插件使用']},
+      'ja': {'plans': ['プラグイン利用', 'より多くのプラグイン利用', '高度なプラグイン利用', '無制限のプラグイン利用']},
+      'ko': {'plans': ['플러그인 사용', '더 많은 플러그인 사용', '고급 플러그인 사용', '무제한 플러그인 사용']},
+      'nl': {'plans': ['Plug-ingebruik', 'Meer plug-ingebruik', 'Geavanceerd plug-ingebruik', 'Onbeperkt plug-ingebruik']},
+      'sv': {'plans': ['Tilläggsanvändning', 'Mer tilläggsanvändning', 'Avancerad tilläggsanvändning', 'Obegränsad tilläggsanvändning']},
+      'no': {'plans': ['Bruk av programtillegg', 'Mer bruk av programtillegg', 'Avansert bruk av programtillegg', 'Ubegrenset bruk av programtillegg']},
+      'id': {'plans': ['Penggunaan plugin', 'Lebih banyak penggunaan plugin', 'Penggunaan plugin lanjutan', 'Penggunaan plugin tanpa batas']},
+      'hi': {'plans': ['प्लगइन उपयोग', 'अधिक प्लगइन उपयोग', 'उन्नत प्लगइन उपयोग', 'असीमित प्लगइन उपयोग']},
+      'hu': {'plans': ['Bővítményhasználat', 'Több bővítményhasználat', 'Fejlett bővítményhasználat', 'Korlátlan bővítményhasználat']},
+      'cs': {'plans': ['Používání doplňků', 'Více používání doplňků', 'Pokročilé používání doplňků', 'Neomezené používání doplňků']},
+      'az': {'plans': ['Əlavə istifadəsi', 'Daha çox əlavə istifadəsi', 'Təkmil əlavə istifadəsi', 'Limitsiz əlavə istifadəsi']},
+    };
+    final plans = copy[language]?['plans'] ?? copy['en']!['plans']!;
+    final index = switch (planType) {
+      'plus' => 1,
+      'pro' => 2,
+      'ultra' => 3,
+      _ => 0,
+    };
+    return plans[index];
+  }
+
   Widget _buildBenefitsList(
     BuildContext context,
     AppLocalizations localizations,
@@ -573,6 +607,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
   ) {
     final screenWidth = MediaQuery.of(context).size.width.clamp(0.0, 500.0);
     final double horizontalPadding = screenWidth * 0.06;
+    final pluginBenefit = _integrationBenefit(context, planType);
 
     // Benefits that should be highlighted when special offer is active
     final highlightedBenefits = {
@@ -588,6 +623,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit5,
         localizations.benefit4,
         localizations.benefit7,
+        pluginBenefit,
         localizations.benefit9,
         localizations.benefit10,
         localizations.benefit11,
@@ -597,6 +633,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     } else if (planType == 'pro') {
       benefits = [
         localizations.oldBenefits,
+        pluginBenefit,
         localizations.benefit5,
         localizations.benefit1,
         localizations.benefit10,
@@ -608,6 +645,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     } else if (planType == 'ultra') {
       benefits = [
         localizations.oldBenefits,
+        pluginBenefit,
         localizations.benefitVideoGeneration,
         localizations.benefit8,
         localizations.benefit1,

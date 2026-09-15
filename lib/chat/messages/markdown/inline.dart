@@ -80,8 +80,6 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
                     style: baseStyle.copyWith(
                         fontSize: fs * 0.9, fontFamily: 'monospace'))));
       case 'displayMath':
-        // $$…$$ — the canonical block form, rendered as a standalone,
-        // horizontally scrollable (fog-edged) math widget.
         return WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: SafeMathTex(
@@ -91,8 +89,6 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
           ),
         );
       case 'inlineMath':
-        // $…$ — math flowing with the text. Malformed LaTeX degrades to the
-        // literal source text via SafeMathTex's fallback, never a crash.
         return WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: SafeMathTex(
@@ -101,8 +97,6 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
           ),
         );
       case 'inlineMathParen':
-        // \(…\) — TeX's inline delimiter, flowing with the text exactly like
-        // $…$ above. Both delimiters are two characters wide at each end.
         return WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: SafeMathTex(
@@ -116,17 +110,20 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
 
         final title = m.group(1)!;
         final url = m.group(2)!;
+        final generatedFile = isGeneratedFileLink(url);
 
         int urlIndex = 0;
-        if (urlMap != null) {
+        if (!generatedFile && urlMap != null) {
           if (!urlMap.containsKey(url)) {
             urlMap[url] = urlMap.length + 1;
           }
           urlIndex = urlMap[url]!;
         }
 
-        String displayTitle = title;
-        if (displayTitle.length > 30) {
+        String displayTitle = generatedFile
+            ? generatedFileDownloadLabel(context)
+            : title;
+        if (!generatedFile && displayTitle.length > 30) {
           try {
             displayTitle = Uri.parse(url).host.replaceAll('www.', '');
           } catch (_) {}
@@ -135,21 +132,39 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
         return WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: GestureDetector(
-            onTap: () => openLink(context, url),
+            behavior: HitTestBehavior.opaque,
+            onTap: () => generatedFile
+                ? downloadGeneratedFile(context, url)
+                : openLink(context, url),
             child: Padding(
               padding:
                   const EdgeInsets.only(left: 4.0, right: 2.0, bottom: 2.0),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: EdgeInsets.symmetric(
+                  horizontal: generatedFile ? 9 : 6,
+                  vertical: generatedFile ? 5 : 2,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                      color: AppColors.primaryColor.inverted, width: 0.5),
+                    color: AppColors.primaryColor.inverted.withValues(
+                      alpha: generatedFile ? 0.34 : 1,
+                    ),
+                    width: 0.5,
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (generatedFile) ...[
+                      Icon(
+                        Icons.download_rounded,
+                        size: fs * 0.92,
+                        color: AppColors.primaryColor.inverted,
+                      ),
+                      const SizedBox(width: 6),
+                    ],
                     if (urlIndex > 0) ...[
                       Text(
                         urlIndex.toString(),
@@ -165,9 +180,12 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
                       child: Text(
                         displayTitle,
                         style: TextStyle(
-                          fontSize: fs * 0.70,
+                          fontSize: generatedFile ? fs * 0.78 : fs * 0.70,
+                          fontWeight: generatedFile
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                           color: AppColors.primaryColor.inverted
-                              .withValues(alpha: 0.8),
+                              .withValues(alpha: generatedFile ? 0.95 : 0.8),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -181,6 +199,49 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
         );
       case 'bareUrl':
         final url = matchText.trim();
+        final generatedFile = isGeneratedFileLink(url);
+        if (generatedFile) {
+          return WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => downloadGeneratedFile(context, url),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.primaryColor.inverted
+                        .withValues(alpha: 0.34),
+                    width: 0.5,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.download_rounded,
+                      size: fs * 0.92,
+                      color: AppColors.primaryColor.inverted,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      generatedFileDownloadLabel(context),
+                      style: TextStyle(
+                        fontSize: fs * 0.78,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.95),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         urlMap?.putIfAbsent(url, () => urlMap.length + 1);
         return WidgetSpan(
             child: GestureDetector(

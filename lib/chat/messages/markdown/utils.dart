@@ -1,6 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/fog.dart';
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,32 +25,169 @@ double baseFs(BuildContext context) {
 final RegExp _multlineOpen = RegExp(r'\\begin\{multline');
 final RegExp _multlinePair =
     RegExp(r'\\begin\{(multline\*?)\}([\s\S]*?)(?:\\end\{\1\}|$)');
-// A row break immediately before \end{multline} would render an empty last
-// row once converted (models often emit one, and it is very common while the
-// equation is still streaming). \s* tolerates the trailing newline too.
 final RegExp _trailingRowBreak = RegExp(r'(?:\s*\\\\)+\s*$');
+
+const String _generatedFileOrigin =
+    'https://executetool-o5h7dmtija-ew.a.run.app';
+const int _maxGeneratedFileBytes = 64 * 1024 * 1024;
+
+bool isGeneratedFileLink(String rawUrl) {
+  final value = rawUrl.trim();
+  if (value.startsWith('/file/') ||
+      value.startsWith('file/') ||
+      value.startsWith('/files/') ||
+      value.startsWith('files/')) {
+    return true;
+  }
+
+  final uri = Uri.tryParse(value);
+  if (uri == null) return false;
+  return uri.scheme == 'https' &&
+      uri.host == 'executetool-o5h7dmtija-ew.a.run.app' &&
+      (uri.path.startsWith('/file/') || uri.path.startsWith('/files/'));
+}
+
+Uri? _resolveGeneratedFileUri(String rawUrl) {
+  final value = rawUrl.trim();
+  if (!isGeneratedFileLink(value)) return null;
+
+  final direct = Uri.tryParse(value);
+  if (direct != null && direct.hasScheme) return direct;
+
+  final normalized = value.startsWith('/') ? value : '/$value';
+  return Uri.parse(_generatedFileOrigin).resolve(normalized);
+}
+
+String generatedFileDownloadLabel(BuildContext context) {
+  final code = Localizations.localeOf(context).languageCode;
+  return switch (code) {
+    'tr' => 'İndir',
+    'de' => 'Herunterladen',
+    'es' => 'Descargar',
+    'fr' => 'Télécharger',
+    'it' => 'Scarica',
+    'pt' => 'Baixar',
+    'ru' => 'Скачать',
+    'ar' => 'تنزيل',
+    'zh' => '下载',
+    'ja' => 'ダウンロード',
+    'ko' => '다운로드',
+    'nl' => 'Downloaden',
+    'sv' => 'Ladda ner',
+    'no' => 'Last ned',
+    'id' => 'Unduh',
+    'hi' => 'डाउनलोड',
+    'hu' => 'Letöltés',
+    'cs' => 'Stáhnout',
+    'az' => 'Endir',
+    _ => 'Download',
+  };
+}
+
+String _generatedFileName(Uri uri) {
+  if (uri.pathSegments.isEmpty) return 'cortex_file';
+  final decoded = Uri.decodeComponent(uri.pathSegments.last).trim();
+  if (decoded.isEmpty) return 'cortex_file';
+  return decoded.replaceAll(RegExp(r'[^A-Za-z0-9._()\- ]'), '_');
+}
+
+String _downloadDialogTitle(BuildContext context) {
+  return Localizations.localeOf(context).languageCode == 'tr'
+      ? 'Dosyayı indir'
+      : 'Download file';
+}
+
+String _downloadedMessage(BuildContext context) {
+  return Localizations.localeOf(context).languageCode == 'tr'
+      ? 'Dosya indirildi'
+      : 'File downloaded';
+}
+
+Future<void> downloadGeneratedFile(
+  BuildContext context,
+  String rawUrl,
+) async {
+  final uri = _resolveGeneratedFileUri(rawUrl);
+  if (uri == null) return;
+
+  try {
+    final headers = <String, dynamic>{};
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final token = await user.getIdToken();
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+    }
+
+    final client = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 20),
+        receiveTimeout: const Duration(minutes: 2),
+        followRedirects: true,
+        maxRedirects: 4,
+      ),
+    );
+
+    final response = await client.get<ResponseBody>(
+      uri.toString(),
+      options: Options(
+        responseType: ResponseType.stream,
+        headers: headers,
+        validateStatus: (status) =>
+            status != null && status >= 200 && status < 300,
+      ),
+    );
+
+    final declared =
+        int.tryParse(response.headers.value(Headers.contentLengthHeader) ?? '');
+    if (declared != null && declared > _maxGeneratedFileBytes) {
+      throw StateError('Generated file is too large.');
+    }
+
+    final body = response.data;
+    if (body == null) throw StateError('Empty generated file response.');
+
+    final builder = BytesBuilder(copy: false);
+    var total = 0;
+    await for (final chunk in body.stream) {
+      total += chunk.length;
+      if (total > _maxGeneratedFileBytes) {
+        throw StateError('Generated file is too large.');
+      }
+      builder.add(chunk);
+    }
+
+    final bytes = builder.takeBytes();
+    if (bytes.isEmpty) throw StateError('Generated file is empty.');
+
+    final savedPath = await FilePicker.platform.saveFile(
+      dialogTitle: _downloadDialogTitle(context),
+      fileName: _generatedFileName(uri),
+      bytes: bytes,
+    );
+
+    if (savedPath != null && context.mounted) {
+      Provider.of<IntrovertNotificationService>(context, listen: false)
+          .showNotification(
+        message: _downloadedMessage(context),
+        type: NotificationType.success,
+        bottomOffset: 0.22,
+      );
+    }
+  } catch (_) {
+    if (!context.mounted) return;
+    Provider.of<IntrovertNotificationService>(context, listen: false)
+        .showNotification(
+      message: AppLocalizations.of(context)!.anErrorOccurred,
+      type: NotificationType.error,
+      bottomOffset: 0.22,
+    );
+  }
+}
 
 /// Normalizes the amsmath `multline` environment (and its starred form) to
 /// something flutter_math_fork 0.7.4 can actually render.
-///
-/// flutter_math_fork knows the matrix family, `cases`, `aligned`,
-/// `alignedat`, `array`/`darray` and `subarray` — but NOT `multline`
-/// (`gathered` is literally commented out in its environment table), so a
-/// `$$\begin{multline}…\end{multline}$$` block would hit SafeMathTex's
-/// literal-source fallback and dump raw LaTeX into the chat.
-///
-/// `aligned` is the safe approximation: it shares `multline`'s `\\` row
-/// semantics and is already exercised by this pipeline, so the body is
-/// preserved verbatim. A still-OPEN `multline` (the stream has not sent
-/// `\end{multline}` yet, or the response was truncated) is auto-closed at
-/// the end of its body so the rows rendered so far appear as math
-/// immediately; if the partial body is still unparseable (an unfinished
-/// `\frac` etc.) flutter_math's own error handling degrades to the literal
-/// source — never a crash.
-///
-/// Input without `\begin{multline` is returned untouched (same instance on
-/// the fast path), so `aligned`, `cases`, matrices and every other
-/// environment keep rendering byte-identically.
 String normalizeMultiline(String latex) {
   if (!_multlineOpen.hasMatch(latex)) return latex;
   return latex.replaceAllMapped(_multlinePair, (m) {
@@ -58,10 +200,6 @@ String normalizeMultiline(String latex) {
 class SafeMathTex extends StatefulWidget {
   final String latex;
   final TextStyle textStyle;
-
-  /// `false` (default, `$…$`) — renders inline, flowing with the text.
-  /// `true` (`$$…$$`) — standalone block: vertical padding, full width,
-  /// and horizontal scroll behind fog edges when the equation overflows.
   final bool display;
 
   const SafeMathTex({
@@ -86,15 +224,8 @@ class _SafeMathTexState extends State<SafeMathTex> {
 
   @override
   Widget build(BuildContext context) {
-    // flutter_math_fork renders malformed input through onErrorFallback
-    // (literal source text) — the outer catch is belt and braces so a math
-    // span can never crash the whole message pipeline.
     Widget content;
     try {
-      // multline is normalized (to aligned) before parsing — see
-      // [normalizeMultiline]. The fallback keeps showing the ORIGINAL latex
-      // the model emitted, so a malformed span degrades to the honest
-      // literal source, never a crash.
       content = Math.tex(
         normalizeMultiline(widget.latex),
         textStyle: widget.textStyle,
@@ -104,17 +235,8 @@ class _SafeMathTexState extends State<SafeMathTex> {
       content = Text(widget.latex, style: widget.textStyle);
     }
 
-    if (!widget.display) {
-      // Inline math: sit in the text flow, no scrolling container (a
-      // horizontal ScrollView inside a WidgetSpan would greedily take the
-      // full line width and break the paragraph layout).
-      return content;
-    }
+    if (!widget.display) return content;
 
-    // Display math: wide equations scroll horizontally behind the shared
-    // fade-out fog edges (lib/fog.dart), exactly like code blocks. The
-    // LayoutBuilder guard keeps this safe even if some future host hands
-    // the span unbounded width (a bare SizedBox(infinity) would crash then).
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: LayoutBuilder(builder: (context, constraints) {
@@ -146,6 +268,11 @@ class MatchRange {
 }
 
 void openLink(BuildContext context, String urlString) async {
+  if (isGeneratedFileLink(urlString)) {
+    await downloadGeneratedFile(context, urlString);
+    return;
+  }
+
   final uri = Uri.tryParse(urlString);
   if (uri == null) return;
   final l10n = AppLocalizations.of(context)!;
@@ -227,7 +354,7 @@ void openLink(BuildContext context, String urlString) async {
                               listen: false)
                           .showNotification(
                         message: AppLocalizations.of(context)!.anErrorOccurred,
-                        type: NotificationType.success,
+                        type: NotificationType.error,
                         bottomOffset: 0.22,
                       );
                     }
