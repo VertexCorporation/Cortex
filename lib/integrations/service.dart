@@ -59,13 +59,16 @@ class IntegrationService extends ChangeNotifier {
 
   final LinkedHashMap<String, Uint8List> _logoCache = LinkedHashMap();
   IntegrationCatalogPage? _lastCatalog;
+  String? _catalogUserId;
   String? _turnId;
 
   IntegrationToolInfo? _activeIntegrationTool;
   IntegrationToolInfo? get activeIntegrationTool => _activeIntegrationTool;
 
   List<IntegrationItem> get installed =>
-      _lastCatalog?.installed ?? const <IntegrationItem>[];
+      _catalogUserId == FirebaseAuth.instance.currentUser?.uid
+          ? _lastCatalog?.installed ?? const <IntegrationItem>[]
+          : const <IntegrationItem>[];
 
   void setActiveIntegrationTool(IntegrationToolInfo? tool) {
     if (identical(tool, _activeIntegrationTool)) return;
@@ -83,10 +86,16 @@ class IntegrationService extends ChangeNotifier {
     setActiveIntegrationTool(null);
   }
 
-  Future<Map<String, String>> _authHeaders() async {
+  Future<Map<String, String>> _authHeaders({String? expectedUserId}) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw StateError('Authentication required.');
+    if (expectedUserId != null && user.uid != expectedUserId) {
+      throw StateError('User session changed.');
+    }
     final token = await user.getIdToken();
+    if (FirebaseAuth.instance.currentUser?.uid != user.uid) {
+      throw StateError('User session changed.');
+    }
     if (token == null || token.isEmpty) {
       throw StateError('Authentication token unavailable.');
     }
@@ -101,6 +110,8 @@ class IntegrationService extends ChangeNotifier {
     String? category,
     int limit = 220,
   }) async {
+    final requestUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (requestUserId == null) throw StateError('Authentication required.');
     final response = await _api.get<Map<String, dynamic>>(
       '$_base/getIntegrations',
       queryParameters: {
@@ -109,9 +120,14 @@ class IntegrationService extends ChangeNotifier {
         if (category != null && category.trim().isNotEmpty)
           'category': category.trim(),
       },
-      options: Options(headers: await _authHeaders()),
+      options: Options(headers: await _authHeaders(expectedUserId: requestUserId)),
     );
 
+    if (requestUserId != FirebaseAuth.instance.currentUser?.uid) {
+      throw StateError('User session changed.');
+    }
+    if (_catalogUserId != requestUserId) _lastCatalog = null;
+    _catalogUserId = requestUserId;
     final data = response.data;
     if (data == null) throw StateError('Empty integrations response.');
     final catalog = IntegrationCatalogPage.fromJson(data);
@@ -183,8 +199,9 @@ class IntegrationService extends ChangeNotifier {
     required String toolSlug,
     required Map<String, dynamic> arguments,
     String? version,
+    String? expectedUserId,
   }) async {
-    final headers = await _authHeaders();
+    final headers = await _authHeaders(expectedUserId: expectedUserId);
     try {
       final response = await _api.post<Map<String, dynamic>>(
         '$_base/executeIntegrationTool',

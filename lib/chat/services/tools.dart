@@ -327,6 +327,10 @@ class ToolRegistry {
 
   static Future<String> _executeIntegrationTool(
       Map<String, dynamic> args) async {
+    final requestUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (requestUserId == null) {
+      return jsonEncode({'error': 'Authentication required.'});
+    }
     final toolSlug = (args['tool_slug'] ?? '').toString().trim().toUpperCase();
     final rawArguments = args['arguments'];
     if (toolSlug.isEmpty || rawArguments is! Map) {
@@ -340,6 +344,9 @@ class ToolRegistry {
       // integration action will actually do.
       final IntegrationToolInfo verifiedTool =
           await IntegrationService.instance.inspectTool(toolSlug);
+      if (requestUserId != FirebaseAuth.instance.currentUser?.uid) {
+        return jsonEncode({'error': 'User session changed. Action cancelled.'});
+      }
 
       IntegrationService.instance.setActiveIntegrationTool(verifiedTool);
       final actionDescription = verifiedTool.description.isNotEmpty
@@ -361,6 +368,7 @@ class ToolRegistry {
       }
 
       final result = await IntegrationService.instance.executeTool(
+        expectedUserId: requestUserId,
         toolSlug: verifiedTool.slug,
         arguments: arguments,
         version: verifiedTool.version,

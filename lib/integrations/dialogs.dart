@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'logo.dart';
 import 'permission_store.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'screen.dart';
 
 /// Per-action decision used by integration execution.
@@ -27,8 +28,13 @@ class IntegrationDialogs {
     required String toolSlug,
     required String actionDescription,
   }) async {
+    final requestUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (requestUserId == null) return IntegrationPermissionDecision.reject;
     final store = IntegrationPermissionStore.instance;
     if (await store.isAlwaysAllowed(toolkitSlug, toolSlug)) {
+      if (requestUserId != FirebaseAuth.instance.currentUser?.uid) {
+        return IntegrationPermissionDecision.reject;
+      }
       return IntegrationPermissionDecision.alwaysAllow;
     }
 
@@ -119,6 +125,9 @@ class IntegrationDialogs {
     );
 
     final decision = result ?? IntegrationPermissionDecision.reject;
+    if (requestUserId != FirebaseAuth.instance.currentUser?.uid) {
+      return IntegrationPermissionDecision.reject;
+    }
     if (decision == IntegrationPermissionDecision.alwaysAllow) {
       await store.setAlwaysAllowed(toolkitSlug, toolSlug, allowed: true);
     }

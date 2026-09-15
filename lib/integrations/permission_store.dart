@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 /// Global permission behavior for one connected integration.
 ///
@@ -10,17 +11,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 /// The mode lives entirely on-device. Fulcrum/Composio never receives or owns
 /// the user's local permission preference.
-enum IntegrationPermissionMode {
-  askEveryTime,
-  allowRead,
-  allowAll,
-}
+enum IntegrationPermissionMode { askEveryTime, allowRead, allowAll }
 
 class IntegrationPermissionStore {
-  IntegrationPermissionStore._();
+  IntegrationPermissionStore({required String? Function() currentUserId})
+    : _currentUserId = currentUserId;
 
-  static final IntegrationPermissionStore instance =
-      IntegrationPermissionStore._();
+  final String? Function() _currentUserId;
+
+  static final IntegrationPermissionStore instance = IntegrationPermissionStore(
+    currentUserId: () => FirebaseAuth.instance.currentUser?.uid,
+  );
 
   static const String _alwaysPrefix = 'integration.always.';
   static const String _modePrefix = 'integration.mode.';
@@ -72,14 +73,18 @@ class IntegrationPermissionStore {
     'FORWARD',
   };
 
-  String _alwaysKey(String toolkitSlug) =>
-      '$_alwaysPrefix${toolkitSlug.toLowerCase()}';
-  String _modeKey(String toolkitSlug) =>
-      '$_modePrefix${toolkitSlug.toLowerCase()}';
+  // Do not migrate legacy global grants: their account owner is unknown.
+  String _alwaysKey(String toolkitSlug, String uid) =>
+      '${_alwaysPrefix}v2.${Uri.encodeComponent(uid)}.${toolkitSlug.trim().toLowerCase()}';
+  String _modeKey(String toolkitSlug, String uid) =>
+      '${_modePrefix}v2.${Uri.encodeComponent(uid)}.${toolkitSlug.trim().toLowerCase()}';
 
   Future<IntegrationPermissionMode> modeForToolkit(String toolkitSlug) async {
+    final uid = _currentUserId();
+    if (uid == null) return IntegrationPermissionMode.askEveryTime;
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_modeKey(toolkitSlug));
+    if (uid != _currentUserId()) return IntegrationPermissionMode.askEveryTime;
+    final raw = prefs.getString(_modeKey(toolkitSlug, uid));
     return switch (raw) {
       'allowRead' => IntegrationPermissionMode.allowRead,
       'allowAll' => IntegrationPermissionMode.allowAll,
@@ -94,21 +99,31 @@ class IntegrationPermissionStore {
     String toolkitSlug,
     IntegrationPermissionMode mode,
   ) async {
+    final uid = _currentUserId();
+    if (uid == null) throw StateError('Authentication required.');
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_modeKey(toolkitSlug), mode.name);
-    await prefs.remove(_alwaysKey(toolkitSlug));
+    if (uid != _currentUserId()) throw StateError('User session changed.');
+    await prefs.setString(_modeKey(toolkitSlug, uid), mode.name);
+    await prefs.remove(_alwaysKey(toolkitSlug, uid));
   }
 
   Future<Set<String>> alwaysAllowedTools(String toolkitSlug) async {
+    final uid = _currentUserId();
+    if (uid == null) return {};
     final prefs = await SharedPreferences.getInstance();
-    return (prefs.getStringList(_alwaysKey(toolkitSlug)) ?? const <String>[])
+    if (uid != _currentUserId()) return {};
+    return (prefs.getStringList(_alwaysKey(toolkitSlug, uid)) ??
+            const <String>[])
         .map((value) => value.trim().toUpperCase())
         .where((value) => value.isNotEmpty)
         .toSet();
   }
 
   Future<bool> isAlwaysAllowed(String toolkitSlug, String toolSlug) async {
+    final uid = _currentUserId();
+    if (uid == null) return false;
     final mode = await modeForToolkit(toolkitSlug);
+    if (uid != _currentUserId()) return false;
     if (mode == IntegrationPermissionMode.allowAll) return true;
     if (mode == IntegrationPermissionMode.allowRead &&
         isClearlyReadOnly(toolkitSlug: toolkitSlug, toolSlug: toolSlug)) {
@@ -116,7 +131,8 @@ class IntegrationPermissionStore {
     }
 
     final rules = await alwaysAllowedTools(toolkitSlug);
-    return rules.contains(toolSlug.trim().toUpperCase());
+    return uid == _currentUserId() &&
+        rules.contains(toolSlug.trim().toUpperCase());
   }
 
   /// Conservative local classifier used only by the "Allow reading" preset.
@@ -174,8 +190,11 @@ class IntegrationPermissionStore {
     String toolSlug, {
     required bool allowed,
   }) async {
+    final uid = _currentUserId();
+    if (uid == null) throw StateError('Authentication required.');
     final prefs = await SharedPreferences.getInstance();
     final rules = await alwaysAllowedTools(toolkitSlug);
+    if (uid != _currentUserId()) throw StateError('User session changed.');
     final normalized = toolSlug.trim().toUpperCase();
     if (normalized.isEmpty) return;
 
@@ -187,18 +206,20 @@ class IntegrationPermissionStore {
 
     final sorted = rules.toList()..sort();
     if (sorted.isEmpty) {
-      await prefs.remove(_alwaysKey(toolkitSlug));
+      await prefs.remove(_alwaysKey(toolkitSlug, uid));
     } else {
-      await prefs.setStringList(_alwaysKey(toolkitSlug), sorted);
+      await prefs.setStringList(_alwaysKey(toolkitSlug, uid), sorted);
     }
   }
 
   /// Restores Cortex's conservative default: ask before actions and remove all
   /// per-action permanent exceptions for the integration.
   Future<void> resetToolkit(String toolkitSlug) async {
+    final uid = _currentUserId();
+    if (uid == null) return;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_modeKey(toolkitSlug));
-    await prefs.remove(_alwaysKey(toolkitSlug));
+    await prefs.remove(_modeKey(toolkitSlug, uid));
+    await prefs.remove(_alwaysKey(toolkitSlug, uid));
   }
 
   Future<void> clearToolkit(String toolkitSlug) => resetToolkit(toolkitSlug);
