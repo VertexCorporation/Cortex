@@ -17,6 +17,7 @@ import 'package:cortex/rag/extractors.dart';
 /// files or understand OOXML/PDF internals.
 class DocumentArtifactService {
   static const int _maxToolPayloadChars = 750000;
+  static const int maxSourceBytes = 20 * 1024 * 1024;
 
   static const Set<String> supportedCreateFormats = {
     'pdf',
@@ -76,9 +77,8 @@ class DocumentArtifactService {
         break;
       case 'json':
         await output.writeAsString(
-          const JsonEncoder.withIndent('  ').convert(
-            args['data'] ?? _documentJson(args),
-          ),
+          const JsonEncoder.withIndent('  ')
+              .convert(args['data'] ?? _documentJson(args)),
           flush: true,
         );
         break;
@@ -102,8 +102,14 @@ class DocumentArtifactService {
     if (!await source.exists()) {
       throw ArgumentError('The source document no longer exists.');
     }
+    if (await source.length() > maxSourceBytes) {
+      throw ArgumentError('Source document exceeds the 20 MB editing limit.');
+    }
 
-    final extension = p.extension(source.path).replaceFirst('.', '').toLowerCase();
+    final extension = p
+        .extension(source.path)
+        .replaceFirst('.', '')
+        .toLowerCase();
     if (!supportedEditFormats.contains(extension)) {
       throw ArgumentError('Editing .$extension files is not supported.');
     }
@@ -198,17 +204,31 @@ class DocumentArtifactService {
       baseName = '${p.basenameWithoutExtension(baseName)}$wantedExtension';
     }
 
-    var candidate = File(p.join(directory.path, baseName));
-    if (await candidate.exists()) {
-      final stamp = DateTime.now().millisecondsSinceEpoch;
-      candidate = File(
-        p.join(
-          directory.path,
-          '${p.basenameWithoutExtension(baseName)}_$stamp$wantedExtension',
-        ),
-      );
+    // Atomically allocate a private directory, including concurrent calls with
+    // identical names. An exists-then-write check could overwrite another result.
+    if (baseName.length > 120) {
+      baseName =
+          '${p.basenameWithoutExtension(baseName).substring(0, 100)}$wantedExtension';
     }
-    return candidate;
+    final uniqueDirectory = await directory.createTemp('artifact_');
+    return File(p.join(uniqueDirectory.path, baseName));
+  }
+
+  /// Model-authored widget markers are untrusted. Never share arbitrary app
+  /// files (databases, preferences, credentials) via an artifact_path marker.
+  static Future<File> resolveShareableArtifact(String path) async {
+    final root = await getApplicationDocumentsDirectory();
+    final directory = Directory(p.join(root.path, 'Cortex', 'Documents'));
+    final canonicalRoot = await directory.resolveSymbolicLinks();
+    final file = File(path);
+    final canonicalPath = await file.resolveSymbolicLinks();
+    if (!p.isWithin(canonicalRoot, canonicalPath) ||
+        !supportedCreateFormats.contains(
+          p.extension(canonicalPath).substring(1).toLowerCase(),
+        )) {
+      throw ArgumentError('Not a Cortex document artifact.');
+    }
+    return File(canonicalPath);
   }
 
   static Map<String, dynamic> _artifactMetadata(
@@ -230,12 +250,10 @@ class DocumentArtifactService {
   static String _mediaTypeFor(String extension) {
     return switch (extension) {
       'pdf' => 'application/pdf',
-      'docx' =>
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'xlsx' =>
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'pptx' =>
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       'csv' => 'text/csv',
       'json' => 'application/json',
       'md' => 'text/markdown',
@@ -277,8 +295,9 @@ class DocumentArtifactService {
     widgets.addAll(_pdfParagraphs(content));
 
     for (final section in _mapList(args['sections'])) {
-      final heading =
-          (section['heading'] ?? section['title'] ?? '').toString().trim();
+      final heading = (section['heading'] ?? section['title'] ?? '')
+          .toString()
+          .trim();
       final body = (section['body'] ?? section['content'] ?? '').toString();
       if (heading.isNotEmpty) {
         widgets.add(pw.SizedBox(height: 8));
@@ -314,6 +333,14 @@ class DocumentArtifactService {
     document.addPage(
       pw.MultiPage(
         theme: theme,
+        maxPages: 100,
+        header: (context) {
+          // MultiPage's own page-limit assertion is disabled in release builds.
+          if (context.pageNumber > 100) {
+            throw ArgumentError('PDF exceeds 100 pages; split the document.');
+          }
+          return pw.SizedBox(height: 0);
+        },
         build: (_) => widgets,
       ),
     );
@@ -343,15 +370,18 @@ class DocumentArtifactService {
       body.write(_wordParagraph(title, bold: true, sizeHalfPoints: 32));
     }
 
-    for (final paragraph in _paragraphStrings((args['content'] ?? '').toString())) {
+    for (final paragraph in _paragraphStrings(
+      (args['content'] ?? '').toString(),
+    )) {
       body.write(_wordParagraph(paragraph));
     }
 
     for (final section in _mapList(args['sections'])) {
-      final heading =
-          (section['heading'] ?? section['title'] ?? '').toString().trim();
-      final sectionBody =
-          (section['body'] ?? section['content'] ?? '').toString();
+      final heading = (section['heading'] ?? section['title'] ?? '')
+          .toString()
+          .trim();
+      final sectionBody = (section['body'] ?? section['content'] ?? '')
+          .toString();
       if (heading.isNotEmpty) {
         body.write(_wordParagraph(heading, bold: true, sizeHalfPoints: 26));
       }
@@ -368,7 +398,8 @@ class DocumentArtifactService {
       }
     }
 
-    final documentXml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    final documentXml =
+        '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:body>
     $body
@@ -403,10 +434,7 @@ class DocumentArtifactService {
   }
 
   static String _wordTable(List<dynamic> headers, List<List<dynamic>> rows) {
-    final allRows = <List<dynamic>>[
-      if (headers.isNotEmpty) headers,
-      ...rows,
-    ];
+    final allRows = <List<dynamic>>[if (headers.isNotEmpty) headers, ...rows];
     final buffer = StringBuffer(
       '<w:tbl><w:tblPr><w:tblBorders>'
       '<w:top w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/>'
@@ -466,7 +494,13 @@ class DocumentArtifactService {
           first = false;
         }
       }
-      if (workbook.tables.length > 1 && workbook.tables.containsKey('Sheet1')) {
+      if (workbook.tables.length > 1 &&
+          workbook.tables.containsKey('Sheet1') &&
+          !sheets.any(
+            (spec) =>
+                _safeSheetName((spec['name'] ?? 'Sheet').toString()) ==
+                'Sheet1',
+          )) {
         workbook.delete('Sheet1');
       }
     }
@@ -490,7 +524,9 @@ class DocumentArtifactService {
           ? requestedSheet
           : workbook.tables.keys.firstOrNull;
       if (sheetName == null || !workbook.tables.containsKey(sheetName)) {
-        throw ArgumentError('Sheet not found: ${requestedSheet ?? '(default)'}');
+        throw ArgumentError(
+          'Sheet not found: ${requestedSheet ?? '(default)'}',
+        );
       }
       final sheet = workbook[sheetName];
 
@@ -499,10 +535,13 @@ class DocumentArtifactService {
         if (!RegExp(r'^[A-Z]{1,3}[1-9][0-9]*$').hasMatch(cell)) {
           throw ArgumentError('Invalid Excel cell reference: $cell');
         }
-        sheet.updateCell(
-          excel.CellIndex.indexByString(cell),
-          _excelValue(operation['value']),
-        );
+        final index = excel.CellIndex.indexByString(cell);
+        if (index.rowIndex >= 10000 || index.columnIndex >= 256) {
+          throw ArgumentError(
+            'Cell exceeds the mobile editing limit (10000 rows, 256 columns).',
+          );
+        }
+        sheet.updateCell(index, _excelValue(operation['value']));
       } else if (type == 'append_row') {
         sheet.appendRow(
           _dynamicList(operation['values']).map(_excelValue).toList(),
@@ -513,7 +552,7 @@ class DocumentArtifactService {
         if (find.isEmpty) continue;
         for (final row in sheet.rows) {
           for (final cell in row) {
-            if (cell == null || cell.value == null) continue;
+            if (cell == null || cell.value is! excel.TextCellValue) continue;
             final text = cell.value.toString();
             if (!text.contains(find)) continue;
             cell.value = excel.TextCellValue(
@@ -556,17 +595,22 @@ class DocumentArtifactService {
     final slides = _mapList(args['slides']);
     final normalized = slides.isEmpty
         ? <Map<String, dynamic>>[
-            {
-              'title': args['title'] ?? '',
-              'body': args['content'] ?? '',
-            }
+            {'title': args['title'] ?? '', 'body': args['content'] ?? ''},
           ]
         : slides;
 
     final archive = Archive();
-    _addUtf8(archive, '[Content_Types].xml', _pptxContentTypes(normalized.length));
+    _addUtf8(
+      archive,
+      '[Content_Types].xml',
+      _pptxContentTypes(normalized.length),
+    );
     _addUtf8(archive, '_rels/.rels', _pptxRootRels);
-    _addUtf8(archive, 'ppt/presentation.xml', _pptxPresentation(normalized.length));
+    _addUtf8(
+      archive,
+      'ppt/presentation.xml',
+      _pptxPresentation(normalized.length),
+    );
     _addUtf8(
       archive,
       'ppt/_rels/presentation.xml.rels',
@@ -662,7 +706,7 @@ class DocumentArtifactService {
     required String format,
   }) async {
     final extracted = await DocTextExtractor().extractText(source.path);
-    if (extracted == null) {
+    if (extracted == null || extracted.trim().isEmpty) {
       throw ArgumentError('Could not extract text from the source document.');
     }
 
@@ -705,10 +749,7 @@ class DocumentArtifactService {
     await _writePptx(output, {
       'slides': [
         for (var i = 0; i < slideBodies.length; i++)
-          {
-            'title': 'Slide ${i + 1}',
-            'body': slideBodies[i],
-          }
+          {'title': 'Slide ${i + 1}', 'body': slideBodies[i]},
       ],
     });
     return 'The PPTX was rebuilt from extracted text; original theme, images, animations, and exact slide layout may not be preserved.';
@@ -753,8 +794,9 @@ class DocumentArtifactService {
     if (content.isNotEmpty) buffer.writeln(content);
 
     for (final section in _mapList(args['sections'])) {
-      final heading =
-          (section['heading'] ?? section['title'] ?? '').toString().trim();
+      final heading = (section['heading'] ?? section['title'] ?? '')
+          .toString()
+          .trim();
       final body = (section['body'] ?? section['content'] ?? '').toString();
       if (heading.isNotEmpty) buffer.writeln('\n$heading');
       if (body.isNotEmpty) buffer.writeln(body);
@@ -777,11 +819,11 @@ class DocumentArtifactService {
   }
 
   static Map<String, dynamic> _documentJson(Map<String, dynamic> args) => {
-        'title': args['title'] ?? '',
-        'content': args['content'] ?? '',
-        'sections': args['sections'] ?? const [],
-        'tables': args['tables'] ?? const [],
-      };
+    'title': args['title'] ?? '',
+    'content': args['content'] ?? '',
+    'sections': args['sections'] ?? const [],
+    'tables': args['tables'] ?? const [],
+  };
 
   // ---------------------------------------------------------------------------
   // Helpers / OOXML constants
@@ -790,7 +832,18 @@ class DocumentArtifactService {
   static String _replaceText(String text, Map<String, dynamic> operation) {
     final find = (operation['find'] ?? '').toString();
     final replace = (operation['replace'] ?? '').toString();
-    if (find.isEmpty) return text;
+    if (find.isEmpty || !text.contains(find)) {
+      throw ArgumentError(
+        'Replacement text was not found; no revised file was written.',
+      );
+    }
+    final matches = operation['replace_all'] == false
+        ? 1
+        : find.allMatches(text).length;
+    if (text.length + matches * (replace.length - find.length) >
+        _maxToolPayloadChars) {
+      throw ArgumentError('Replacement would make the document too large.');
+    }
     return operation['replace_all'] == false
         ? _replaceFirst(text, find, replace)
         : text.replaceAll(find, replace);

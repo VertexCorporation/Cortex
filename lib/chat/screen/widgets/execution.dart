@@ -1,10 +1,11 @@
-import 'dart:io';
+import 'package:cortex/chat/services/document_artifacts.dart';
 
 import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../../messages/codeblocks.dart';
 
 class CodeExecutionWidget extends StatefulWidget {
@@ -97,10 +98,7 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
                       const Divider(height: 1),
                       Padding(
                         padding: const EdgeInsets.all(12),
-                        child: CodeBlockWidget(
-                          code: code,
-                          language: 'python',
-                        ),
+                        child: CodeBlockWidget(code: code, language: 'python'),
                       ),
                       if (output.isNotEmpty || hasError) ...[
                         const Divider(height: 1),
@@ -189,20 +187,27 @@ class _DocumentArtifactCardState extends State<_DocumentArtifactCard> {
     final path = widget.data['artifact_path']?.toString() ?? '';
     if (path.isEmpty) return;
 
-    final file = File(path);
-    if (!await file.exists()) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Document file is no longer available.')),
-      );
-      return;
-    }
-
     setState(() => _sharing = true);
     try {
+      final file = await DocumentArtifactService.resolveShareableArtifact(path);
+      if (!mounted) return;
+      final box = context.findRenderObject() as RenderBox?;
       await SharePlus.instance.share(
-        ShareParams(files: [XFile(path)]),
+        ShareParams(
+          files: [XFile(file.path)],
+          sharePositionOrigin: box == null
+              ? null
+              : box.localToGlobal(Offset.zero) & box.size,
+        ),
       );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Document file is unavailable or cannot be shared.'),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _sharing = false);
     }

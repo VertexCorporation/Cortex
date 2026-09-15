@@ -384,6 +384,9 @@ class ToolRegistry {
 
     final file = File(path);
     if (!await file.exists()) return null;
+    if (await file.length() > DocumentArtifactService.maxSourceBytes) {
+      throw ArgumentError('Document exceeds the 20 MB reading limit.');
+    }
 
     final bytes = await file.readAsBytes();
     document['data'] = base64Encode(bytes);
