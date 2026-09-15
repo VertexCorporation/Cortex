@@ -140,6 +140,13 @@ void main() {
   });
 
   group('OfflinePdfPageGuard', () {
+    test('recognizes Turkish non-ASCII suffixes and rejects longer words', () {
+      for (final word in ['sayfayı', 'sayfanın', 'sayfası', 'sayfada']) {
+        expect(OfflinePdfPageGuard.requestedPages('99. $word açıkla'), {99});
+      }
+      expect(OfflinePdfPageGuard.requestedPages('3-5. sayfayı açıkla'), {3, 4, 5});
+      expect(OfflinePdfPageGuard.requestedPages('99. sayfacık'), isEmpty);
+    });
     test('returns an honest status when a requested page was not indexed', () {
       const context = '[DOCUMENT_CONTEXT]\n'
           '[SOURCE x.pdf | PAGE 2]\nhello\n'

@@ -93,7 +93,7 @@ class OfflinePdfPageGuard {
       unicode: true,
     );
     final beforeWord = RegExp(
-      '\\b(\\d{1,4})\\.?\\s*(?:$_trPageWord|page)\\b',
+      '\\b(\\d{1,4})\\.?\\s*(?:$_trPageWord|page)(?![\\p{L}\\p{N}_])',
       caseSensitive: false,
       unicode: true,
     );
@@ -103,7 +103,7 @@ class OfflinePdfPageGuard {
       unicode: true,
     );
     final rangeBeforeWord = RegExp(
-      '\\b(\\d{1,4})\\s*[-–—]\\s*(\\d{1,4})\\.?\\s*(?:$_trPageWord|page)\\b',
+      '\\b(\\d{1,4})\\s*[-–—]\\s*(\\d{1,4})\\.?\\s*(?:$_trPageWord|page)(?![\\p{L}\\p{N}_])',
       caseSensitive: false,
       unicode: true,
     );
