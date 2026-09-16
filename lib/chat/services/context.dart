@@ -9,9 +9,6 @@ import 'package:cortex/chat/services/metrics.dart';
 import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/chat/services/flow.dart';
 
-// ignore: depend_on_referenced_packages
-import 'package:path/path.dart' as p;
-
 /// Service responsible for building the list of messages in the format
 /// required by the backend API. It reads the current state from the relevant providers.
 class ContextService {
@@ -149,18 +146,24 @@ class ContextService {
       }
     }
 
-    // 2. Attachment Content
-    if (includeImage && message.hasAttachments) {
+    // Preserve the same media type and MIME detection used on the first turn.
+    // Missing or unsupported visual evidence must not disappear silently.
+    if (message.hasAttachments) {
       for (final path in message.attachmentPaths) {
-        if (_isImageFile(path) ||
-            (includeAllMedia && (_isVideoFile(path) || _isAudioFile(path)))) {
-          final String? base64Image = await Utils.formatBase64Media(path);
-          if (base64Image != null) {
-            mediaParts.add({
-              "type": "image_url",
-              "image_url": {"url": base64Image},
-            });
-          }
+        final kind = await Utils.mediaKind(path);
+        if (kind == null) continue;
+        final allowed = includeImage && (kind == 'image' || includeAllMedia);
+        final block = allowed ? await Utils.processAttachment(path) : null;
+        if (block != null) {
+          mediaParts.add(block);
+        } else {
+          textParts.add({
+            'type': 'text',
+            'text':
+                '[A $kind attachment from this turn is unavailable to you. '
+                'Do not infer its contents or claim to have inspected it. '
+                'If needed, ask the user to attach it again or use a compatible model.]',
+          });
         }
       }
     }
@@ -171,7 +174,9 @@ class ContextService {
       if (mediaParts.isEmpty) {
         results.add({
           "role": "user",
-          "content": textParts.isNotEmpty ? textParts.first["text"] : " ",
+          "content": textParts.isNotEmpty
+              ? textParts.map((part) => part['text']).join('\n')
+              : " ",
         });
       } else {
         results.add({
@@ -183,7 +188,9 @@ class ContextService {
       if (textParts.isNotEmpty || mediaParts.isEmpty) {
         results.add({
           "role": "assistant",
-          "content": textParts.isNotEmpty ? textParts.first["text"] : " ",
+          "content": textParts.isNotEmpty
+              ? textParts.map((part) => part['text']).join('\n')
+              : " ",
         });
       }
 
@@ -196,30 +203,6 @@ class ContextService {
     }
 
     return results;
-  }
-
-  bool _isImageFile(String path) {
-    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return [
-      'jpg',
-      'jpeg',
-      'png',
-      'webp',
-      'gif',
-      'bmp',
-      'heic',
-      'heif',
-    ].contains(ext);
-  }
-
-  bool _isVideoFile(String path) {
-    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['mp4', 'mov', 'm4v', 'webm', 'mkv', 'avi'].contains(ext);
-  }
-
-  bool _isAudioFile(String path) {
-    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac', 'opus'].contains(ext);
   }
 
   bool _isLowEndModel(String modelId) {

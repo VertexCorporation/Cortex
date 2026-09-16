@@ -82,6 +82,7 @@ class Utils {
         // Read file bytes. For very large video files this could OOM,
         // but for now we follow the existing pattern.
         final mediaBytes = await mediaFile.readAsBytes();
+        if (mediaBytes.isEmpty) return null;
         final mimeType = lookupMimeType(mediaPath, headerBytes: mediaBytes) ??
             'application/octet-stream';
 
@@ -115,6 +116,35 @@ class Utils {
     } finally {
       await handle?.close();
     }
+  }
+
+  /// Detect history media using the same MIME evidence as new attachments.
+  /// Only reads a small header; documents are not loaded into history here.
+  static Future<String?> mediaKind(String path) async {
+    final uri = Uri.tryParse(path);
+    final lower = path.toLowerCase();
+    String? mime;
+    if (lower.startsWith('data:')) {
+      mime = lower.substring(5).split(';').first.split(',').first;
+    } else if (uri?.scheme == 'https' || uri?.scheme == 'http') {
+      mime = lookupMimeType(uri!.path);
+    } else {
+      final probe = await _readMimeProbe(File(path));
+      mime = lookupMimeType(path, headerBytes: probe.isEmpty ? null : probe);
+    }
+    for (final kind in ['image', 'video', 'audio']) {
+      if (mime?.startsWith('$kind/') == true) return kind;
+    }
+    return null;
+  }
+
+  /// Never silently send a current turn without its requested attachment.
+  static Future<Map<String, dynamic>> requireAttachment(String path) async {
+    final block = await processAttachment(path);
+    if (block == null) {
+      throw StateError('Attachment could not be read. Please attach it again.');
+    }
+    return block;
   }
 
   /// Processes an attachment path and returns the correct OpenAI-compatible content block.
