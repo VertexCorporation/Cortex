@@ -1434,8 +1434,8 @@ class SendService {
       userContent.add({"type": "text", "text": combinedText.trim()});
     }
     for (var path in attachments) {
-      final block = await Utils.processAttachment(path);
-      if (block != null) userContent.add(block);
+      final block = await Utils.requireAttachment(path);
+      userContent.add(block);
     }
 
     // CONTINUATION: append the partial answer as the assistant turn the model
