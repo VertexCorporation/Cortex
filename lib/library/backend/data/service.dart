@@ -11,6 +11,7 @@
 //
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:cortex/library/backend/data/entity.dart';
@@ -19,6 +20,7 @@ import 'package:cortex/library/backend/data/repository.dart';
 import 'package:flutter/foundation.dart';
 
 import 'defaults.dart';
+import 'package:cortex/performance/adaptive_batcher.dart';
 
 /// The [ModelService] class is the main provider of model-related data and
 /// business logic for the application.
@@ -46,6 +48,31 @@ class ModelService with ChangeNotifier {
   Future<List<ModelEntity>?>? _pendingFetch;
   String? _pendingFetchLanguage;
   final Map<String, bool> _imageFileChecks = {};
+  final Map<String, ModelEntity> _modelsById = {};
+  final Map<String, ModelEntity> _variantParents = {};
+  final LinkedHashMap<String, ModelEntity> _resolvedVariants = LinkedHashMap();
+  bool _lookupsDirty = true;
+
+  void _invalidateLookups() {
+    _lookupsDirty = true;
+    _modelsById.clear();
+    _variantParents.clear();
+    _resolvedVariants.clear();
+  }
+
+  void _ensureLookups() {
+    if (!_lookupsDirty) return;
+    for (final model in _cachedEntities ?? const <ModelEntity>[]) {
+      // Preserve the existing first-match and exact-ID precedence rules.
+      _modelsById.putIfAbsent(model.id, () => model);
+      for (final id in model.variants?.keys ?? const <String>[]) {
+        _variantParents.putIfAbsent(id, () => model);
+      }
+    }
+    _lookupsDirty = false;
+  }
+
+
 
   bool _imageFileExists(String path) {
     if (_imageFileChecks.isEmpty) {
@@ -135,6 +162,7 @@ class ModelService with ChangeNotifier {
       }
 
       _cachedEntities = finalEntities;
+      _invalidateLookups();
       _cachedEntitiesLangCode = normalizedLangCode;
       debugPrint(
           "$logPrefix: Caching ${finalEntities.length} ENRICHED model entities.");
@@ -221,19 +249,11 @@ class ModelService with ChangeNotifier {
     String langCode,
   ) async {
     rawModels = ModelDefaults.normalizeModelFamilies(rawModels);
-    var finalEntities = <ModelEntity>[];
-    for (int i = 0; i < rawModels.length; i++) {
-      final rawMap = rawModels[i];
-      final tempEntity = ModelEntity.fromMap(rawMap, langCode);
-      final resolvedPath = getModelImagePath(tempEntity);
-      finalEntities.add(tempEntity.copyWith(imagePath: resolvedPath));
-
-      // Yield to the event loop frequently to completely eliminate UI stutter
-      // during heavy synchronous filesystem checks.
-      if (i % 5 == 0) {
-        await Future.delayed(Duration.zero);
-      }
-    }
+    var finalEntities = await const AdaptiveBatcher()
+        .map<Map<String, dynamic>, ModelEntity>(rawModels, (rawMap, _) {
+          final entity = ModelEntity.fromMap(rawMap, langCode);
+          return entity.copyWith(imagePath: getModelImagePath(entity));
+        });
 
     const int minOfflineSizeMb = 300;
     const int maxOfflineRamMb = 32000;
@@ -342,6 +362,7 @@ class ModelService with ChangeNotifier {
     if (rawModels == null || rawModels.isEmpty) return;
 
     _cachedEntities = _buildEntitiesFromRaw(rawModels, normalizedLangCode);
+    _invalidateLookups();
     _cachedEntitiesLangCode = normalizedLangCode;
   }
 
@@ -439,20 +460,9 @@ class ModelService with ChangeNotifier {
       return true;
     }
 
-    final allModels = getCachedModelsSync();
-    if (allModels.isEmpty) return false;
-
-    if (allModels.any((model) => model.id == modelId)) {
-      return true;
-    }
-
-    for (final modelSeries in allModels) {
-      if (modelSeries.variants?.containsKey(modelId) ?? false) {
-        return true;
-      }
-    }
-
-    return false;
+    _ensureLookups();
+    return _modelsById.containsKey(modelId) ||
+        _variantParents.containsKey(modelId);
   }
 
   /// Clears all in-memory caches for both raw data (in repository) and processed entities.
@@ -468,6 +478,7 @@ class ModelService with ChangeNotifier {
       _repository.forceSyncOnNextLoad();
     }
     _cachedEntities = null;
+    _invalidateLookups();
     _cachedEntitiesLangCode = null;
 
     debugPrint("[ModelService] All model caches cleared.");
@@ -478,6 +489,7 @@ class ModelService with ChangeNotifier {
     if (_cachedEntities == null) return;
     _cachedEntities!.removeWhere((m) => m.id == newModel.id);
     _cachedEntities!.add(newModel);
+    _invalidateLookups();
     notifyListeners();
   }
 
@@ -487,6 +499,7 @@ class ModelService with ChangeNotifier {
     final int originalLength = _cachedEntities!.length;
     _cachedEntities!.removeWhere((m) => m.id == modelId);
     if (_cachedEntities!.length < originalLength) {
+      _invalidateLookups();
       notifyListeners();
     }
   }
@@ -497,6 +510,7 @@ class ModelService with ChangeNotifier {
     final index = _cachedEntities!.indexWhere((m) => m.id == updatedEntity.id);
     if (index != -1) {
       _cachedEntities![index] = updatedEntity;
+      _invalidateLookups();
     }
   }
 
@@ -510,12 +524,10 @@ class ModelService with ChangeNotifier {
     if (allModels.isEmpty) {
       return fullId.contains('/') ? fullId.split('/').first : fullId;
     }
-    if (allModels.any((model) => model.id == fullId)) return fullId;
-    for (final modelSeries in allModels) {
-      if (modelSeries.variants?.containsKey(fullId) ?? false) {
-        return modelSeries.id;
-      }
-    }
+    _ensureLookups();
+    if (_modelsById.containsKey(fullId)) return fullId;
+    final parent = _variantParents[fullId];
+    if (parent != null) return parent.id;
     return fullId;
   }
 
@@ -557,28 +569,31 @@ class ModelService with ChangeNotifier {
       return _createFallbackEntity(modelId, langCode: langCode);
     }
 
-    // Search 1: Exact match
-    try {
-      return allModels.firstWhere((model) => model.id == modelId);
-    } catch (_) {
-      // Not found, proceed.
+    _ensureLookups();
+    final exact = _modelsById[modelId];
+    if (exact != null) return exact;
+    final cached = _resolvedVariants.remove(modelId);
+    if (cached != null) {
+      _resolvedVariants[modelId] = cached;
+      return cached;
     }
-
-    // Search 2: Match within variants
-    for (final modelSeries in allModels) {
-      if (modelSeries.variants?.containsKey(modelId) ?? false) {
-        final variantData =
-            modelSeries.variants![modelId] as Map<String, dynamic>;
-        final mergedMap = {
-          ...modelSeries.toMap(),
-          ...variantData,
-          'id': variantData['id'] ?? modelId,
-          'title': variantData['title'],
-          'imagePath': modelSeries.imagePath,
-        };
-        mergedMap.remove('variants');
-        return ModelEntity.fromMap(mergedMap, langCode);
+    final parent = _variantParents[modelId];
+    if (parent != null) {
+      final variantData = parent.variants![modelId] as Map<String, dynamic>;
+      final mergedMap = {
+        ...parent.toMap(),
+        ...variantData,
+        'id': variantData['id'] ?? modelId,
+        'title': variantData['title'],
+        'imagePath': parent.imagePath,
+      }..remove('variants');
+      final entity = ModelEntity.fromMap(mergedMap, langCode);
+      // Keep memory bounded even when the catalogue has thousands of variants.
+      if (_resolvedVariants.length >= 128) {
+        _resolvedVariants.remove(_resolvedVariants.keys.first);
       }
+      _resolvedVariants[modelId] = entity;
+      return entity;
     }
 
     debugPrint(
