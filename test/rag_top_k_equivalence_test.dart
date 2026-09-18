@@ -67,10 +67,11 @@ void main() {
                 ((tf * 2.5) /
                     (tf + 1.5 * (0.25 + 0.75 * (row.$3.length / average))));
           }
-          if (score > 0)
+          if (score > 0) {
             expected.add(
               Bm25Hit(document: row.$1, chunk: row.$2, score: score),
             );
+          }
         }
         expected.sort((a, b) {
           final score = b.score.compareTo(a.score);
