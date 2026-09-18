@@ -6,12 +6,13 @@ import 'package:flutter_test/flutter_test.dart';
 class CatalogRepository implements ModelRepository {
   final rows = <Map<String, dynamic>>[
     {
-      'id': 'example',
-      'title': 'Example',
+      'id': 'qwen',
+      'title': 'Qwen',
+      'series': 'Qwen',
       'type': 'online',
       'variants': {
-        'example/vision': {
-          'id': 'example/vision',
+        'qwen/vision': {
+          'id': 'qwen/vision',
           'title': {'en': 'Vision', 'tr': 'Görsel'},
           'modalities': {'image': true},
         },
@@ -36,58 +37,56 @@ void main() {
   late ModelService service;
   setUp(() async {
     service = ModelService(repository: CatalogRepository());
-    await service.getModels(langCode: 'en');
+    final models = await service.getModels(langCode: 'en');
+    expect(service.hasError, isFalse);
+    expect(models, isNotNull);
+    expect(models!.map((model) => model.id), contains('qwen'));
+    expect(service.hasModelInCache('qwen/vision'), isTrue);
   });
   tearDown(() => service.dispose());
 
   test(
     'variant resolution is reused and keeps modality and parent identity',
     () {
-      final first = service.getPreciseModelData(
-        'example/vision',
-        langCode: 'en',
-      );
+      final first = service.getPreciseModelData('qwen/vision', langCode: 'en');
       expect(
         identical(
           first,
-          service.getPreciseModelData('example/vision', langCode: 'en'),
+          service.getPreciseModelData('qwen/vision', langCode: 'en'),
         ),
         isTrue,
       );
       expect(first.modalities['image'], isTrue);
-      expect(service.hasModelInCache('example/vision'), isTrue);
-      expect(service.getBaseIdFromFullId('example/vision'), 'example');
+      expect(service.hasModelInCache('qwen/vision'), isTrue);
+      expect(service.getBaseIdFromFullId('qwen/vision'), 'qwen');
     },
   );
 
   test('exact ID wins over variant and removals invalidate cached matches', () {
-    service.getPreciseModelData('example/vision', langCode: 'en');
+    service.getPreciseModelData('qwen/vision', langCode: 'en');
     final exact = ModelEntity.fromMap({
-      'id': 'example/vision',
+      'id': 'qwen/vision',
       'title': 'Exact',
       'type': 'online',
     }, 'en');
     service.addModelToEntityCache(exact);
     expect(
-      service.getPreciseModelData('example/vision', langCode: 'en'),
+      service.getPreciseModelData('qwen/vision', langCode: 'en'),
       same(exact),
     );
     service.removeModelFromEntityCache(exact.id);
-    expect(service.getBaseIdFromFullId('example/vision'), 'example');
-    service.removeModelFromEntityCache('example');
-    expect(service.hasModelInCache('example/vision'), isFalse);
+    expect(service.getBaseIdFromFullId('qwen/vision'), 'qwen');
+    service.removeModelFromEntityCache('qwen');
+    expect(service.hasModelInCache('qwen/vision'), isFalse);
   });
 
   test('updated parent invalidates resolved variant', () {
-    final before = service.getPreciseModelData(
-      'example/vision',
-      langCode: 'en',
-    );
-    final parent = service.getPreciseModelData('example', langCode: 'en');
+    final before = service.getPreciseModelData('qwen/vision', langCode: 'en');
+    final parent = service.getPreciseModelData('qwen', langCode: 'en');
     service.updateCachedEntity(
       parent.copyWith(imagePath: 'assets/updated.png'),
     );
-    final after = service.getPreciseModelData('example/vision', langCode: 'en');
+    final after = service.getPreciseModelData('qwen/vision', langCode: 'en');
     expect(after, isNot(same(before)));
     expect(after.imagePath, 'assets/updated.png');
   });
@@ -96,17 +95,18 @@ void main() {
     'switching locale cannot reuse a localized variant from prior locale',
     () {
       final english = service.getPreciseModelData(
-        'example/vision',
+        'qwen/vision',
         langCode: 'en',
       );
       final turkish = service.getPreciseModelData(
-        'example/vision',
+        'qwen/vision',
         langCode: 'tr',
       );
       expect(turkish, isNot(same(english)));
-      expect(turkish.displayTitle, isNot(english.displayTitle));
+      expect(english.displayTitle, 'Vision');
+      expect(turkish.displayTitle, 'Görsel');
       service.clearAllCache();
-      expect(service.hasModelInCache('example/vision'), isFalse);
+      expect(service.hasModelInCache('qwen/vision'), isFalse);
     },
   );
 }
