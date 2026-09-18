@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
+
 import 'models.dart';
 
 class Bm25Hit {
@@ -103,12 +105,11 @@ class Bm25IndexCache {
 
   int get documentCount => _documents.length;
   int get chunkCount => _documents.values.fold<int>(
-        0,
-        (sum, entry) => sum + entry.index.chunkCount,
-      );
+    0,
+    (sum, entry) => sum + entry.index.chunkCount,
+  );
 
-  Bm25DocumentIndex? get(String documentId) =>
-      _documents[documentId]?.index;
+  Bm25DocumentIndex? get(String documentId) => _documents[documentId]?.index;
 
   Bm25DocumentIndex put({
     required RagDocument document,
@@ -140,10 +141,7 @@ class Bm25IndexCache {
 
 /// Scores a selected set of already-tokenized document indexes.
 class Bm25Scorer {
-  const Bm25Scorer({
-    this.k1 = 1.5,
-    this.b = 0.75,
-  });
+  const Bm25Scorer({this.k1 = 1.5, this.b = 0.75});
 
   final double k1;
   final double b;
@@ -210,30 +208,34 @@ class Bm25Scorer {
 
     if (scores.isEmpty) return const <Bm25Hit>[];
 
-    // Keeping only topK while scoring would reduce sort work further, but RAG
-    // corpora are usually modest. Sorting only matched chunks already avoids
-    // the old full-corpus sort and keeps deterministic tie behavior simple.
-    final ordered = scores.entries.toList(growable: false)
-      ..sort((a, b) {
-        final scoreOrder = b.value.compareTo(a.value);
-        if (scoreOrder != 0) return scoreOrder;
-        final aRef = refs[a.key]!;
-        final bRef = refs[b.key]!;
-        final docOrder = aRef.$1.id.compareTo(bRef.$1.id);
-        if (docOrder != 0) return docOrder;
-        return aRef.$2.chunkIndex.compareTo(bRef.$2.chunkIndex);
-      });
+    int compare(MapEntry<_ChunkKey, double> a, MapEntry<_ChunkKey, double> b) {
+      final scoreOrder = b.value.compareTo(a.value);
+      if (scoreOrder != 0) return scoreOrder;
+      final aRef = refs[a.key]!;
+      final bRef = refs[b.key]!;
+      final docOrder = aRef.$1.id.compareTo(bRef.$1.id);
+      if (docOrder != 0) return docOrder;
+      return aRef.$2.chunkIndex.compareTo(bRef.$2.chunkIndex);
+    }
 
-    final count = topK < ordered.length ? topK : ordered.length;
+    // The root is the worst retained result. Score every matching chunk as
+    // before, but sort only the best K; score and tie ordering stay identical.
+    final best = HeapPriorityQueue<MapEntry<_ChunkKey, double>>(
+      (a, b) => compare(b, a),
+    );
+    for (final entry in scores.entries) {
+      if (best.length < topK) {
+        best.add(entry);
+      } else if (compare(entry, best.first) < 0) {
+        best.removeFirst();
+        best.add(entry);
+      }
+    }
+    final ordered = best.toUnorderedList()..sort(compare);
     final hits = <Bm25Hit>[];
-    for (var i = 0; i < count; i++) {
-      final entry = ordered[i];
+    for (final entry in ordered) {
       final ref = refs[entry.key]!;
-      hits.add(Bm25Hit(
-        document: ref.$1,
-        chunk: ref.$2,
-        score: entry.value,
-      ));
+      hits.add(Bm25Hit(document: ref.$1, chunk: ref.$2, score: entry.value));
     }
     return hits;
   }

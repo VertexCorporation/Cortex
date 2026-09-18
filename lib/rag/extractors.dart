@@ -6,7 +6,9 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:typed_data';
+
 import 'package:archive/archive.dart';
 import 'package:excel/excel.dart' as excel;
 import 'package:pdfrx/pdfrx.dart';
@@ -91,8 +93,10 @@ class DocTextExtractor {
 
   /// Extracts plain text from [path]. Returns `null` if extraction failed or
   /// the format is unsupported.
-  Future<String?> extractText(String path,
-      {ServerDocParser? serverFallback}) async {
+  Future<String?> extractText(
+    String path, {
+    ServerDocParser? serverFallback,
+  }) async {
     try {
       final file = File(path);
       if (!await file.exists()) return null;
@@ -106,9 +110,11 @@ class DocTextExtractor {
 
       // 2. On-device binary formats.
       if (extension == 'pdf') return await _extractPdf(path);
-      if (extension == 'docx') return await _extractDocx(file);
-      if (extension == 'xlsx') return await _extractXlsx(file);
-      if (extension == 'pptx') return await _extractPptx(file);
+      if (extension == 'docx' || extension == 'xlsx' || extension == 'pptx') {
+        // Pass only the path to the worker: bytes, ZIP/XML trees and workbook
+        // objects never cross isolates or compete with Flutter frame rendering.
+        return await Isolate.run(() => _extractOfficeFile(path, extension));
+      }
 
       // 3. Legacy formats → server fallback.
       if (serverFallbackExtensions.contains(extension)) {
@@ -174,10 +180,11 @@ class DocTextExtractor {
     final archive = ZipDecoder().decodeBytes(bytes);
     final sb = StringBuffer();
 
-    final slideNames = archive.files
-        .where((f) => f.isFile && f.name.startsWith('ppt/slides/slide'))
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final slideNames =
+        archive.files
+            .where((f) => f.isFile && f.name.startsWith('ppt/slides/slide'))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
 
     for (final slide in slideNames) {
       final text = _parseOoxmlText(
@@ -248,9 +255,9 @@ class DocTextExtractor {
       final sb = StringBuffer();
 
       // Paragraph elements (local name, namespace-agnostic).
-      final paragraphs = document.descendants
-          .whereType<XmlElement>()
-          .where((e) => e.name.local == paragraphTag);
+      final paragraphs = document.descendants.whereType<XmlElement>().where(
+        (e) => e.name.local == paragraphTag,
+      );
 
       for (final para in paragraphs) {
         final texts = para.descendants
@@ -275,4 +282,16 @@ class DocTextExtractor {
     // ignore: avoid_print
     print(message);
   }
+}
+
+// Top-level worker prevents capturing the extractor or any UI/plugin state.
+Future<String?> _extractOfficeFile(String path, String extension) {
+  final extractor = DocTextExtractor();
+  final file = File(path);
+  return switch (extension) {
+    'docx' => extractor._extractDocx(file),
+    'xlsx' => extractor._extractXlsx(file),
+    'pptx' => extractor._extractPptx(file),
+    _ => Future.value(null),
+  };
 }

@@ -12,7 +12,8 @@
 //
 
 import 'dart:async';
-import 'dart:io'; // Required for File checks
+import 'dart:io';
+import 'package:cortex/chat/services/offline_cpu_policy.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/processor.dart';
@@ -244,13 +245,6 @@ class OfflineService {
     }
   }
 
-  /// Computes optimal thread count based on total device RAM as a proxy for CPU power.
-  int _computeOptimalThreads(int totalRAM) {
-    if (totalRAM <= 4096) return 2;
-    if (totalRAM <= 8192) return 4;
-    return 6; // High-end devices
-  }
-
   Future<bool> cacheModel(String path) async {
     if (_sessionProvider.isLocalModelLoaded) {
       return true;
@@ -291,18 +285,12 @@ class OfflineService {
       nGpu = 99;
     }
 
-    // DYNAMIC THREADS based on RAM (proxy for CPU power)
-    const memoryChannel = MethodChannel('com.vertex.cortex/memory');
-    int ramMB = 4096;
-    try {
-      ramMB = await memoryChannel.invokeMethod<int>('getDeviceMemory') ?? 4096;
-    } catch (e) {
-      debugPrint("[OfflineService] Failed to getDeviceMemory for threads: $e");
+    final int logicalCores = Platform.numberOfProcessors;
+    final int nThreads = OfflineCpuPolicy.threadCount(logicalCores);
+    if (kDebugMode) {
+      debugPrint('[OfflineService] ctx=$nCtx gpu=$nGpu '
+          'threads=$nThreads logicalCores=$logicalCores');
     }
-    final int nThreads = _computeOptimalThreads(ramMB);
-
-    debugPrint(
-        "[OfflineService] 🚀 Caching Model => ctx=$nCtx, gpu=$nGpu, threads=$nThreads (RAM: $ramMB MB)");
 
     _lastLoadFailureKind = _LoadFailureKind.none;
 

@@ -11,6 +11,8 @@ class ScrollService {
   ScrollController? _scrollController;
   ValueNotifier<bool>? _showScrollDownButtonNotifier;
   VoidCallback? _listener;
+  Future<void>? _pendingBottomScroll;
+  int _controllerEpoch = 0;
 
   ScrollService();
 
@@ -19,6 +21,8 @@ class ScrollService {
     if (_scrollController != null) {
       detachListener();
     }
+    _controllerEpoch++;
+    _pendingBottomScroll = null;
     _scrollController = controller;
   }
 
@@ -27,6 +31,8 @@ class ScrollService {
   void reset() {
     detachListener();
     hideButtonImmediately(); // FIX: Explicitly hide button when resetting/leaving chat
+    _controllerEpoch++;
+    _pendingBottomScroll = null;
     _scrollController = null;
   }
 
@@ -133,7 +139,7 @@ class ScrollService {
       try {
         _showScrollDownButtonNotifier!.value = false;
       } catch (e) {
-// wow
+        // wow
       }
     }
 
@@ -143,7 +149,7 @@ class ScrollService {
           _scrollController!.removeListener(_listener!);
         }
       } catch (e) {
-// wow
+        // wow
       }
     }
 
@@ -154,24 +160,38 @@ class ScrollService {
   Future<void> scrollToBottom({
     double threshold = 10.0,
     Duration duration = const Duration(milliseconds: 300),
-  }) async {
-    await WidgetsBinding.instance.endOfFrame;
-
-    final position = _getSafePosition();
-    if (position == null) return;
-
-    try {
-      final targetOffset = position.maxScrollExtent;
-      if ((targetOffset - position.pixels).abs() < threshold) return;
-
-      await _scrollController!.animateTo(
-        targetOffset,
-        duration: duration,
-        curve: Curves.easeOut,
-      );
-    } catch (e) {
-      // safe catch
+  }) {
+    // Token bursts can request the same layout/animation dozens of times.
+    // Share only the pending frame; later frames may target newly laid-out text.
+    final pending = _pendingBottomScroll;
+    if (pending != null) return pending;
+    final epoch = _controllerEpoch;
+    final controller = _scrollController;
+    late final Future<void> operation;
+    Future<void> scrollAfterLayout() async {
+      await WidgetsBinding.instance.endOfFrame;
+      if (identical(_pendingBottomScroll, operation)) {
+        _pendingBottomScroll = null;
+      }
+      if (epoch != _controllerEpoch || controller != _scrollController) return;
+      final position = _getSafePosition();
+      if (position == null || controller == null) return;
+      try {
+        final targetOffset = position.maxScrollExtent;
+        if ((targetOffset - position.pixels).abs() < threshold) return;
+        await controller.animateTo(
+          targetOffset,
+          duration: duration,
+          curve: Curves.easeOut,
+        );
+      } catch (_) {
+        // The controller can detach while a route or chat is being replaced.
+      }
     }
+
+    operation = scrollAfterLayout();
+    _pendingBottomScroll = operation;
+    return operation;
   }
 
   void jumpToBottom() {
@@ -202,8 +222,8 @@ class ScrollService {
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
     final Color iconColor =
         themeColors.statusBarIconBrightness == Brightness.light
-            ? Colors.white.withValues(alpha: 0.9)
-            : Colors.black.withValues(alpha: 0.8);
+        ? Colors.white.withValues(alpha: 0.9)
+        : Colors.black.withValues(alpha: 0.8);
 
     // Add extra padding so it perfectly clears the input field edge and shadow
     const double extraMargin = 24.0;
@@ -242,8 +262,9 @@ class ScrollService {
                     },
                     customBorder: const CircleBorder(),
                     splashColor: AppColors.primaryColor.withValues(alpha: 0.3),
-                    highlightColor:
-                        AppColors.primaryColor.withValues(alpha: 0.1),
+                    highlightColor: AppColors.primaryColor.withValues(
+                      alpha: 0.1,
+                    ),
                     child: Container(
                       padding: EdgeInsets.all(screenWidth * 0.025),
                       decoration: BoxDecoration(
@@ -265,8 +286,10 @@ class ScrollService {
                         'assets/icons/arrov.svg',
                         width: CortexDesign.icon,
                         height: CortexDesign.icon,
-                        colorFilter:
-                            ColorFilter.mode(iconColor, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                          iconColor,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),

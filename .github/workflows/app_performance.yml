@@ -1,0 +1,65 @@
+name: App performance regression checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/chat/services/offline*'
+      - 'lib/chat/services/scroll.dart'
+      - 'lib/library/backend/data/service.dart'
+      - 'lib/rag/**'
+      - 'test/**'
+      - '.github/workflows/app_performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: app-performance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Analyze changed production code
+        run: >-
+          flutter analyze --no-fatal-infos --no-fatal-warnings
+          lib/chat/services/offline.dart lib/chat/services/offline_cpu_policy.dart
+          lib/chat/services/scroll.dart lib/library/backend/data/service.dart
+          lib/rag/bm25_index.dart lib/rag/extractors.dart
+      - name: Run regression tests
+        run: >-
+          flutter test
+          test/offline_cpu_policy_test.dart test/model_lookup_cache_test.dart
+          test/document_worker_test.dart test/scroll_coalescing_test.dart
+          test/rag_top_k_equivalence_test.dart test/rag_bm25_index_test.dart
+          test/rag_bm25_test.dart test/offline_context_isolation_test.dart
+          test/offline_prompt_and_tokens_test.dart
+      - name: Full analyzer report
+        if: always()
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Compile Android and native llama in debug mode
+        run: flutter build apk --debug --target-platform android-arm64
