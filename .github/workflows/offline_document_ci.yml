@@ -1,0 +1,51 @@
+name: Offline Document Engine CI
+
+on:
+  push:
+    branches:
+      - feat/offline-document-engine
+    paths:
+      - 'lib/rag/offline_pdf.dart'
+      - 'lib/rag/offline_pdf_guard.dart'
+      - 'lib/rag/chat.dart'
+      - 'test/offline_pdf_context_test.dart'
+      - 'architecture/cortex/offline_document_engine.md'
+      - '.github/workflows/offline_document_ci.yml'
+  pull_request:
+    paths:
+      - 'lib/rag/offline_pdf.dart'
+      - 'lib/rag/offline_pdf_guard.dart'
+      - 'lib/rag/chat.dart'
+      - 'test/offline_pdf_context_test.dart'
+      - 'architecture/cortex/offline_document_engine.md'
+      - '.github/workflows/offline_document_ci.yml'
+  workflow_dispatch:
+
+jobs:
+  offline-document-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.2'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze offline document files
+        run: >-
+          flutter analyze
+          lib/rag/offline_pdf.dart
+          lib/rag/offline_pdf_guard.dart
+          lib/rag/chat.dart
+          test/offline_pdf_context_test.dart
+
+      - name: Run offline PDF context tests
+        run: flutter test test/offline_pdf_context_test.dart
