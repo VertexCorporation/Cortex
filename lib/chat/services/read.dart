@@ -32,6 +32,9 @@ class ReadService {
     required this._backgroundTaskService,
   });
 
+  /// Invalidates reads that are still resolving a conversation or its media.
+  void cancelPendingLoads() => _loadGeneration++;
+
   /// Loads a conversation using the provided manager.
   Future<void> loadConversation(ConversationManager manager,
       {required String languageCode}) async {
@@ -99,7 +102,7 @@ class ReadService {
   /// Fetches a ConversationManager by its ID and then loads the full conversation.
   Future<void> loadConversationById(String conversationId,
       {required String languageCode}) async {
-    _loadGeneration++;
+    final loadGeneration = ++_loadGeneration;
     // CRITICAL FIX: Eagerly set loading state before manager resolution (DB fetch)
     // This prevents the empty screen flash while waiting for the database!
     // By passing startLoading: true, it clears and sets loading in ONE state update.
@@ -107,6 +110,7 @@ class ReadService {
 
     final manager = await ConversationManager.fromId(conversationId,
         langCode: languageCode, modelService: _modelService);
+    if (loadGeneration != _loadGeneration) return;
 
     if (manager != null) {
       await loadConversation(manager, languageCode: languageCode);
@@ -230,7 +234,12 @@ class ReadService {
       final List<Message> loadedMessages = rows.map((r) {
         if (r['uuid'] == null) needsDbUpdate = true;
         // Message.fromMap handles the migration from 'photoPath' to 'attachmentPaths'
-        return Message.fromMap(r);
+        final message = Message.fromMap(r);
+        // Older rows lack UUIDs. Give each row a stable, conversation-scoped
+        // identity so Flutter cannot reuse its tile for a different chat.
+        return message.id == null
+            ? message.copyWith(id: 'legacy:$convId:${r['id'] ?? r['idx']}')
+            : message;
       }).toList();
 
       if (loadGeneration != _loadGeneration) {
@@ -256,6 +265,8 @@ class ReadService {
       // basename). Re-rooting in memory keeps media visible in chat history;
       // the next full save persists the healed paths.
       final healedMessages = await _healAttachmentPaths(loadedMessages);
+
+      if (loadGeneration != _loadGeneration) return false;
 
       _conversationProvider.loadMessages(healedMessages);
 

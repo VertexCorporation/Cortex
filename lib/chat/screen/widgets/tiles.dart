@@ -737,6 +737,7 @@ class Tiles {
   static Widget buildMessagesList({
     required BuildContext context,
     required List<Message> messages,
+    required String? conversationId,
     required ScrollController scrollController,
     required bool isEditingMode,
     required int? editingMessageIndex,
@@ -779,8 +780,7 @@ class Tiles {
               top: totalTopPadding,
               bottom: bottomPadding + (screenHeight * 0.01)),
           // ignore: deprecated_member_use
-          cacheExtent:
-              2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
+          cacheExtent: screenHeight * 1.5,
           addAutomaticKeepAlives:
               true, // FIX: Restored to true to prevent scroll jumps on viewport resize for variable-height messages
           addRepaintBoundaries:
@@ -802,7 +802,8 @@ class Tiles {
               context: context,
               message: message,
               index: realIndex,
-              key: ValueKey(message.id ?? 'message_slot_$realIndex'),
+              key: ValueKey(
+                  '${conversationId ?? 'new'}:${message.id ?? 'message_slot_$realIndex'}'),
               isEditingMode: isEditingMode,
               editingMessageIndex: editingMessageIndex,
               onEdit: () => onEdit(realIndex),

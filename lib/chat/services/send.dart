@@ -561,9 +561,14 @@ class SendService {
                   (v) => (v['modalities']?['image'] == true),
                   orElse: () => null,
                 );
-                apiModelIdForSend = visionModel != null
-                    ? visionModel['id']
-                    : getPreferredCandidates(downloadedVariants).first['id'];
+                if (visionModel == null) {
+                  // A text-only model cannot inspect this image. Do not send
+                  // the text alone and present its guess as image analysis.
+                  errorMessage = localizations.ragUnsupportedType;
+                  apiModelIdForSend = null;
+                } else {
+                  apiModelIdForSend = visionModel['id'];
+                }
               } else {
                 apiModelIdForSend = getPreferredCandidates(downloadedVariants)
                     .first['id'];
@@ -576,9 +581,12 @@ class SendService {
                 (v) => (v['modalities']?['image'] == true),
                 orElse: () => null,
               );
-              apiModelIdForSend = visionModel != null
-                  ? visionModel['id']
-                  : getPreferredCandidates(variants).first['id'];
+              if (visionModel == null) {
+                errorMessage = localizations.ragUnsupportedType;
+                apiModelIdForSend = null;
+              } else {
+                apiModelIdForSend = visionModel['id'];
+              }
             } else {
               apiModelIdForSend = getPreferredCandidates(variants).first['id'];
             }
@@ -1435,7 +1443,11 @@ class SendService {
     }
     for (var path in attachments) {
       final block = await Utils.processAttachment(path);
-      if (block != null) userContent.add(block);
+      if (block == null) {
+        throw ApiException(localizations.falErrorImageCorrupted,
+            code: 'ATTACHMENT_UNAVAILABLE');
+      }
+      userContent.add(block);
     }
 
     // CONTINUATION: append the partial answer as the assistant turn the model

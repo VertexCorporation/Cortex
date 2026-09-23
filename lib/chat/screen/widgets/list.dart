@@ -62,6 +62,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
   void _keepRevealedTextVisible() {
     if (_revealScrollScheduled || !mounted) return;
+    final conversationId = context.read<ConversationProvider>().conversationID;
     final controller = widget.scrollController;
     if (!controller.hasClients || controller.positions.length != 1) return;
     final position = controller.position;
@@ -72,20 +73,14 @@ class _ChatMessageListState extends State<ChatMessageList> {
     _revealScrollScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _revealScrollScheduled = false;
-      if (!mounted || !controller.hasClients) return;
+      if (!mounted ||
+          conversationId != context.read<ConversationProvider>().conversationID ||
+          !controller.hasClients) return;
       final current = controller.position;
       if (current.maxScrollExtent - current.pixels <= 160) {
         current.jumpTo(current.maxScrollExtent);
       }
     });
-  }
-
-  @override
-  void didUpdateWidget(covariant ChatMessageList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // If we want to detect "new chat" specifically, we might need to watch the conversation ID.
-    // For now, let's rely on the parent rebuild or key change if checking a new chat.
-    // Usually, changing chats rebuilds this widget entirely if key changes.
   }
 
   @override
@@ -99,7 +94,10 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
     // Scroll to bottom when messages just finished loading (switching chats)
     if (conversationProvider.justFinishedLoading) {
+      final conversationId = conversationProvider.conversationID;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted ||
+            conversationId != conversationProvider.conversationID) return;
         _scrollToBottomIfNeeded();
         // Consume the flag so we don't scroll again on every rebuild
         conversationProvider.consumeJustFinishedLoadingFlag();
@@ -132,6 +130,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
         child: Tiles.buildMessagesList(
           context: context,
           messages: messages,
+          conversationId: conversationProvider.conversationID,
           scrollController: widget.scrollController,
           modelId: sessionProvider.modelId ?? '',
           isEditingMode: inputProvider.isEditingMode,

@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'package:flutter/cupertino.dart';
 import 'package:mime/mime.dart';
 import '../../library/backend/data/entity.dart';
@@ -79,26 +80,26 @@ class Utils {
     try {
       final mediaFile = File(mediaPath);
       if (await mediaFile.exists()) {
-        // Read file bytes. For very large video files this could OOM,
-        // but for now we follow the existing pattern.
-        final mediaBytes = await mediaFile.readAsBytes();
-        final mimeType = lookupMimeType(mediaPath, headerBytes: mediaBytes) ??
-            'application/octet-stream';
-
-        if (!mimeType.startsWith('image/') &&
-            !mimeType.startsWith('video/') &&
-            !mimeType.startsWith('audio/')) {
-          debugPrint("Unsupported media type '$mimeType' for file: $mediaPath");
-          return null;
-        }
-
-        final base64Media = base64Encode(mediaBytes);
-        return 'data:$mimeType;base64,$base64Media';
+        // Reading and encoding multi-megabyte media can stall Flutter frames.
+        // Pass only the path to the worker; large byte buffers stay off the UI isolate.
+        return await Isolate.run(() => _encodeMediaFile(mediaPath));
       }
     } catch (e) {
       debugPrint("Error reading or encoding media file: $e");
     }
     return null;
+  }
+
+  static Future<String?> _encodeMediaFile(String mediaPath) async {
+    final mediaBytes = await File(mediaPath).readAsBytes();
+    final mimeType = lookupMimeType(mediaPath, headerBytes: mediaBytes) ??
+        'application/octet-stream';
+    if (!mimeType.startsWith('image/') &&
+        !mimeType.startsWith('video/') &&
+        !mimeType.startsWith('audio/')) {
+      return null;
+    }
+    return 'data:$mimeType;base64,${base64Encode(mediaBytes)}';
   }
 
   /// Reads only enough bytes for MIME sniffing. Some Android/iOS picker cache

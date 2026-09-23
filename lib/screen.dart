@@ -67,6 +67,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   bool _isDialogOpen = false;
   int _forceCloseGeneration = 0;
   int _keyboardOpenGeneration = 0;
+  int _chatNavigationGeneration = 0;
 
   double _accumulatedDrag = 0.0;
   bool _hasTriggeredNavigation = false;
@@ -565,6 +566,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   Future<void> openConversation(ConversationManager manager) async {
+    final navigationGeneration = ++_chatNavigationGeneration;
+    context.read<ReadService>().cancelPendingLoads();
     _forceCloseKeyboard();
 
     // CRITICAL FIX: Set loading state synchronously NO MATTER WHAT!
@@ -575,7 +578,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     await context.read<AppInitializer>().onCoreServicesReady;
 
-    if (!mounted) return;
+    if (!mounted || navigationGeneration != _chatNavigationGeneration) return;
 
     AnalyticsService().logChatScreen();
     AnalyticsService().logTabSwitched('chat');
@@ -590,6 +593,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       manager,
       languageCode: localeProvider.locale.languageCode,
     );
+    if (!mounted || navigationGeneration != _chatNavigationGeneration) return;
 
     if (mounted) {
       final session = context.read<ChatSessionProvider>();
@@ -625,12 +629,14 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     bool restoreDefaultModel = true,
     bool preserveVoiceMode = false,
   }) {
+    final navigationGeneration = ++_chatNavigationGeneration;
+    context.read<ReadService>().cancelPendingLoads();
     // Skip keyboard close on first launch so auto-focus can open it
     if (!autoFocus) {
       _forceCloseKeyboard();
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
+      if (!mounted || navigationGeneration != _chatNavigationGeneration) return;
       _updateCurrentView(MainScreenView.chat);
       AnalyticsService().logChatScreen();
       AnalyticsService().logTabSwitched('chat');
@@ -644,6 +650,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       // Ordinary new-chat actions still tear down the voice session.
       if (input.isVoiceModeActive && !preserveVoiceMode) {
         await voiceService.stopSession();
+        if (!mounted || navigationGeneration != _chatNavigationGeneration) return;
         input.setVoiceModeActive(false);
       }
 
@@ -655,6 +662,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
       if (restoreDefaultModel) {
         await session.initializeDefaultSession();
+        if (!mounted || navigationGeneration != _chatNavigationGeneration) return;
       }
 
       conv.clearConversation();
@@ -683,13 +691,16 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   Future<void> startChatWithModel(ModelEntity model) {
+    final navigationGeneration = ++_chatNavigationGeneration;
+    context.read<ReadService>().cancelPendingLoads();
     _forceCloseKeyboard();
     final completer = Completer<void>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        if (!mounted) return;
+        if (!mounted || navigationGeneration != _chatNavigationGeneration) return;
         _updateCurrentView(MainScreenView.chat);
         await context.read<SelectionService>().selectModel(model);
+        if (!mounted || navigationGeneration != _chatNavigationGeneration) return;
 
         closeAxon();
 

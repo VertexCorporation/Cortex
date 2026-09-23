@@ -153,7 +153,6 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// it (observability + tests).
   int? get voiceWindowSeconds => _voiceWindowSeconds;
   Timer? _windowTimer;
-  Timer? _budgetTicker;
   bool _recyclePending = false;
 
   // --- REALTIME VOICE ALLOWANCE (server-authoritative, client mirrors) ----
@@ -163,8 +162,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// enforces at mint time.
   int? voiceAllowanceSeconds;
 
-  /// Seconds left in the daily pool as the server last reported it. Updated
-  /// at every mint; ticked down locally between mints for the countdown.
+  /// Unreserved seconds in the daily pool as last reported by the server.
+  /// Each mint has already subtracted its window from this number.
   int? remainingVoiceSeconds;
 
   /// True when the last STT start failed specifically because the daily
@@ -350,8 +349,6 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _inactivityTimer = null;
     _windowTimer?.cancel();
     _windowTimer = null;
-    _budgetTicker?.cancel();
-    _budgetTicker = null;
     _healthTimer?.cancel();
     _healthTimer = null;
   }
@@ -1700,7 +1697,6 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
         },
       );
     }
-    _startBudgetTicker(gen);
     notifyListeners();
   }
 
@@ -1770,24 +1766,6 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       if (gen != _activeGeneration) return;
       debugPrint("[VoiceService] Session $gen ended: inactivity timeout.");
       unawaited(_endSession(gen, VoiceEndReason.inactivity));
-    });
-  }
-
-  /// Smooth local countdown between mints; the server's numbers stay
-  /// authoritative at every mint and settlement.
-  void _startBudgetTicker(int gen) {
-    if (gen != _activeGeneration) return;
-    _budgetTicker?.cancel();
-    _budgetTicker = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (gen != _activeGeneration) {
-        _budgetTicker?.cancel();
-        return;
-      }
-      final remaining = remainingVoiceSeconds;
-      if (remaining != null && remaining > 0) {
-        remainingVoiceSeconds = remaining > 5 ? remaining - 5 : 0;
-        notifyListeners();
-      }
     });
   }
 

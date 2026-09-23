@@ -888,7 +888,11 @@ class ApiService {
     }
     for (final path in attachmentPaths) {
       final contentBlock = await Utils.processAttachment(path);
-      if (contentBlock != null) userMessageContent.add(contentBlock);
+      if (contentBlock == null) {
+        throw ApiException(localizations.falErrorImageCorrupted,
+            code: 'ATTACHMENT_UNAVAILABLE');
+      }
+      userMessageContent.add(contentBlock);
     }
     if (userMessageContent.isNotEmpty) {
       messages.add({"role": "user", "content": userMessageContent});
@@ -1233,7 +1237,11 @@ class ApiService {
     }
     for (final path in attachmentPaths) {
       final contentBlock = await Utils.processAttachment(path);
-      if (contentBlock != null) userMessageContent.add(contentBlock);
+      if (contentBlock == null) {
+        throw ApiException(localizations.falErrorImageCorrupted,
+            code: 'ATTACHMENT_UNAVAILABLE');
+      }
+      userMessageContent.add(contentBlock);
     }
 
     // Extract documents for tool processing (PDF, XLSX, etc.) BEFORE cleaning

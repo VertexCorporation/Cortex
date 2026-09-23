@@ -337,6 +337,10 @@ class ChatViewState extends State<ChatView>
     final isMessagesEmpty = context.select<ConversationProvider, bool>(
       (c) => c.messages.isEmpty,
     );
+    // Re-key the message list when changing between two non-empty chats.
+    final conversationId = context.select<ConversationProvider, String?>(
+      (c) => c.conversationID,
+    );
 
     final isVoiceModeActive = context.select<InputProvider, bool>(
       (p) => p.isVoiceModeActive,
@@ -386,6 +390,7 @@ class ChatViewState extends State<ChatView>
             isMessagesEmpty,
             isVoiceModeActive,
             isVoiceOverlayExpanded,
+            conversationId,
           ),
         ),
         _buildBottomFog(screenHeight),
@@ -434,6 +439,7 @@ class ChatViewState extends State<ChatView>
     bool isEmpty,
     bool isVoiceMode,
     bool isVoiceExpanded,
+    String? conversationId,
   ) {
     // Voice Mode V2: the conversation STAYS visible in compact mode — the
     // orb floats above the composer over live chat. Only the fullscreen
@@ -467,7 +473,7 @@ class ChatViewState extends State<ChatView>
               );
             }
             return ChatMessageList(
-              key: const ValueKey('list'),
+              key: ValueKey('list:$conversationId'),
               scrollController: scrollController,
               editService: editService,
               bottomPadding: bottomPadding,
