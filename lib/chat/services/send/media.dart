@@ -282,7 +282,7 @@ class MediaRouter {
   }
 
   /// Music must use a catalogue-advertised music generator, not a TTS or
-  /// generic sound-effect fallback. Fulcrum retains auth and pricing control.
+  /// generic sound-effect fallback. The backend retains auth/pricing control.
   ModelEntity? findMusicGenerationModel({
     required String langCode,
     required bool isUserSubscribed,

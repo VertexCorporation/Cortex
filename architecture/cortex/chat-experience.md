@@ -38,16 +38,14 @@ whose catalogue metadata explicitly advertises music. TTS and generic sound
 models are excluded. Missing music capability is reported before the request;
 the client never substitutes a demo song. Generation, audio events, persistence,
 playback and sharing use the existing media pipeline. Duration/style/lyrics
-remain user prompt content; provider capability enforcement stays in Fulcrum.
+remain user prompt content; provider capability enforcement stays on the backend.
 Music failures retain their provider error instead of retrying generic audio
 routing, which could generate speech or sound effects. The music path disables
 text tools and web search, and excludes audio-only editing models.
 
-The Fulcrum GitHub repository was inaccessible during development. The supplied
-Fulcrum-main (5).zip confirms the `generating_audio` and `audio_chunk {url}`
-contracts and the `speech` accounting lane. This archive does not establish the
-current deployment or live music-provider availability. No Fulcrum files are
-modified, and live provider/billing validation needs an authenticated device.
+The integration uses the existing `generating_audio` and `audio_chunk {url}`
+contracts and the `speech` accounting lane. Live music-provider availability
+and billing behavior require validation on an authenticated device.
 
 ## Verification
 
