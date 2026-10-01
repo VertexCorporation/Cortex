@@ -76,7 +76,7 @@ void main() {
     expect(find.text('Choose an intelligence'), findsOneWidget);
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    expect(find.text('Device model'), findsOneWidget);
+    expect(find.text('Device Model'), findsOneWidget);
     expect(find.text('Download'), findsOneWidget);
     expect(local.downloads, 0);
     await tester.tap(find.text('Download'));
