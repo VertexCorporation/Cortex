@@ -13,6 +13,9 @@ No purchase verification or backend entitlement logic is changed.
 models with known RAM and file size are eligible. The RAM budget uses available
 memory, reserves 512 MB, and is capped at 70% of total RAM. New downloads require
 a secure URL and storage headroom. Suitable installed models are preferred.
+The iOS memory channel reports app RSS rather than system-wide usage, so its
+automatic recommendation uses a reduced 35% physical-RAM budget with the same
+reserve. This is a conservative heuristic, not a measured iOS process limit.
 Unknown device requirements produce a manual-library fallback. Recommendation
 is not an inference benchmark and cannot guarantee a particular token rate.
 

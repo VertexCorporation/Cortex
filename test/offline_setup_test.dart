@@ -28,6 +28,13 @@ void main() {
     expect(recommended?.id, 'small');
   });
 
+  test('app resident memory must not be mistaken for system-wide free RAM on iOS', () {
+    final recommended = recommendOfflineModel(models: [
+      model('small', ram: 1024), model('too-large', ram: 4096),
+    ], device: device(used: 128), usedMemoryIsSystemWide: false);
+    expect(recommended?.id, 'small');
+  });
+
   test('unknown requirements, paid models and online models are not auto-selected', () {
     expect(recommendOfflineModel(models: [
       model('unknown', ram: null), model('premium', tier: 'premium'),

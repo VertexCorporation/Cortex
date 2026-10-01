@@ -8,9 +8,14 @@ ModelEntity? recommendOfflineModel({
   required Iterable<ModelEntity> models,
   required SystemInfoData device,
   Set<String> installedIds = const {},
+  bool usedMemoryIsSystemWide = true,
 }) {
   if (device.deviceMemory <= 0 || device.freeStorage < 0) return null;
-  final freeMemory = device.usedMemory >= 0
+  // The iOS channel reports this app's resident memory, not system usage.
+  // Never subtract that from physical RAM and call the remainder available.
+  final freeMemory = !usedMemoryIsSystemWide
+      ? device.deviceMemory * 0.35
+      : device.usedMemory >= 0
       ? device.deviceMemory - device.usedMemory
       : device.deviceMemory * 0.55;
   final memoryBudget = math.min(device.deviceMemory * 0.7,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -71,6 +72,7 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
           .map((entry) => entry.key).toSet();
       final model = recommendOfflineModel(
         models: candidates.values, device: device, installedIds: installed,
+        usedMemoryIsSystemWide: defaultTargetPlatform != TargetPlatform.iOS,
       );
       setState(() { _loading = false; _model = model; });
     } catch (_) {
