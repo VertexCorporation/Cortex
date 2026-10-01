@@ -1717,6 +1717,12 @@ class AppLocalizationsNo extends AppLocalizations {
   String get agentBlue => 'Blå';
 
   @override
+  String get agentGreen => 'Green';
+
+  @override
+  String get agentYellow => 'Yellow';
+
+  @override
   String get agentPurple => 'Lilla';
 
   @override

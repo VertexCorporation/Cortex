@@ -174,10 +174,12 @@ class DocTextExtractor {
     final archive = ZipDecoder().decodeBytes(bytes);
     final sb = StringBuffer();
 
+    final slidePattern = RegExp(r'^ppt/slides/slide(\d+)\.xml$');
     final slideNames = archive.files
-        .where((f) => f.isFile && f.name.startsWith('ppt/slides/slide'))
+        .where((f) => f.isFile && slidePattern.hasMatch(f.name))
         .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+      ..sort((a, b) => int.parse(slidePattern.firstMatch(a.name)!.group(1)!)
+          .compareTo(int.parse(slidePattern.firstMatch(b.name)!.group(1)!)));
 
     for (final slide in slideNames) {
       final text = _parseOoxmlText(

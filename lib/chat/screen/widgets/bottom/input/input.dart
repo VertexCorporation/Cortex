@@ -499,17 +499,20 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                 right: CortexDesign.readingInset(viewportWidth) + capsuleInset,
                 top: -1.0,
                 bottom: -1.0,
-                child: Transform.scale(
-                  scaleX: 1.0 - 0.45 * voiceT,
-                  scaleY: 1.0 - 0.06 * voiceT,
-                  child: Opacity(
-                    opacity: 1.0 - voiceT,
-                    child: DecoratedBox(
-                      key: const ValueKey('composer_capsule'),
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(radius),
-                        border: Border.all(color: AppColors.border, width: 1),
+                child: Transform(
+                  transform: Matrix4.translationValues(0, -18 * voiceT, 0),
+                  child: Transform.scale(
+                    scaleX: 1.0 - 0.80 * voiceT,
+                    scaleY: 1.0 - 0.45 * voiceT,
+                    child: Opacity(
+                      opacity: 1.0 - voiceT,
+                      child: DecoratedBox(
+                        key: const ValueKey('composer_capsule'),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(radius),
+                          border: Border.all(color: AppColors.border, width: 1),
+                        ),
                       ),
                     ),
                   ),
@@ -628,7 +631,11 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         hasActiveFeature;
     final bool hasSelectedFeature = hasActiveFeature;
 
-    _syncExpandAnimation(isComposerExpanded);
+    if (!isVoiceMode && _voiceMorphController.isDismissed) {
+      _syncExpandAnimation(isComposerExpanded);
+    } else {
+      _expandController.stop();
+    }
 
     // Shared composer geometry. The capsule is compact while collapsed (all
     // controls inside) and opens slightly once expanded, at which point the
@@ -661,8 +668,13 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
             final double voiceT = _voiceMorphAnimation.value;
 
             // The detachable bubbles swell slowly along with the expansion.
-            final double buttonScale = lerpDouble(1.0, expandedButtonGrow, t)!;
-            final double grownButtonSize = buttonSize * buttonScale;
+            final double normalScale = lerpDouble(1.0, expandedButtonGrow, t)!;
+            final double buttonScale = lerpDouble(
+              normalScale,
+              expandedButtonGrow * 1.08,
+              voiceT,
+            )!;
+            final double grownButtonSize = buttonSize * normalScale;
 
             // Detached bubbles ride in the margin between the capsule border
             // and the screen edge, offset so the screen-side gap is ~3x the
@@ -681,8 +693,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
               -detach,
               voiceT,
             )!;
-            final double plusLeft = controlOffset;
-            final double actionRight = controlOffset;
+            // Grow around each existing center, with no extra translation.
+            final growthInset = buttonSize * (buttonScale - normalScale) / 2;
+            final double plusLeft = controlOffset - growthInset;
+            final double actionRight = controlOffset - growthInset;
             // The microphone never detaches; it slides to the interior right
             // edge once the action button vacates its collapsed slot.
             final double micRight = lerpDouble(

@@ -17,6 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/stt_remote.dart';
+import 'package:cortex/chat/services/stt_route.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 // --- Mocks ---
@@ -55,6 +56,7 @@ class MockSpeechService extends SpeechService {
     required String locale,
     required Function(String text) onResult,
     SpeechOwner owner = SpeechOwner.dictation,
+    VoiceLanguageState? languageState,
     void Function(SttCloseInfo info)? onClosed,
     void Function(SttLease lease)? onLease,
     void Function(SttResult result)? onSttResult,
@@ -385,6 +387,32 @@ void main() {
     },
   );
 
+  test('transcript-triggered barge-in keeps its first words without stopping capture', () async {
+    await startTestSession();
+    voiceService.onAiStreamCallback('The assistant is explaining a plan.');
+    await Future<void>.delayed(Duration.zero);
+    mockSpeechService.remoteActive = true;
+    fakeNow = fakeNow.add(const Duration(milliseconds: 300));
+    mockSpeechService.level = 0.8;
+    mockSpeechService.notifyListeners();
+    fakeNow = fakeNow.add(const Duration(milliseconds: 200));
+    final stops = mockSpeechService.stopCount;
+    mockSpeechService.emitStructured(
+      const SttResult('wait please', isFinal: false, confidence: 0.95),
+    );
+    expect(voiceService.state, VoiceState.listening);
+    expect(voiceService.liveTranscript, 'wait please');
+    expect(mockSpeechService.stopCount, stops);
+    mockSpeechService.emitStructured(
+      const SttResult(
+        'wait please explain that',
+        isFinal: true,
+        confidence: 0.95,
+      ),
+    );
+    expect(voiceService.liveTranscript, 'wait please explain that');
+  });
+
   test('barge-in: confident, non-echo speech during playback cuts audio and returns to listening', () async {
     await startTestSession();
 
@@ -463,7 +491,7 @@ void main() {
   });
 
   test(
-    'low-confidence and single-word transcripts are not barge-in evidence',
+    'low-confidence transcripts and single-word speaker echo are rejected',
     () async {
       await startTestSession();
 
@@ -477,9 +505,9 @@ void main() {
       mockSpeechService.emitStructured(
         const SttResult('stop talking now', isFinal: true, confidence: 0.4),
       );
-      // Single word: too little to be a user turn.
+      // A single word from the assistant is still speaker echo.
       mockSpeechService.emitStructured(
-        const SttResult('hey', isFinal: true, confidence: 0.95),
+        const SttResult('explaining', isFinal: true, confidence: 0.95),
       );
 
       mockSpeechService.level = 0.8;
@@ -779,8 +807,8 @@ void main() {
 
     expect(
       voiceService.currentFlowAgentIndex,
-      0,
-      reason: 'rotation is deferred to the 800ms boundary',
+      1,
+      reason: 'next participant is selected once before generation starts',
     );
 
     await Future<void>.delayed(const Duration(milliseconds: 1200));
@@ -790,7 +818,11 @@ void main() {
       1,
       reason: 'exactly one rotation may run for a double completion',
     );
-    expect(submittedTurns, ['agent zero is speaking']);
+    expect(
+      submittedTurns,
+      isEmpty,
+      reason: 'Flow must never fabricate a user turn',
+    );
   });
 
   test(
@@ -1158,7 +1190,10 @@ void main() {
 
       // A non-string error falls through to the raw body rather than
       // casting anything.
-      expect(RemoteSttService.refusalBodyPreview({'error': 7}), '{error: 7}');
+      expect(
+        RemoteSttService.refusalBodyPreview({'error': 7}),
+        'unrecognized error object',
+      );
 
       // No body at all is an empty preview, not a crash.
       expect(RemoteSttService.refusalBodyPreview(null), '');

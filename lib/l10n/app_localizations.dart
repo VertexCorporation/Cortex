@@ -3198,6 +3198,18 @@ abstract class AppLocalizations {
   /// **'Blue'**
   String get agentBlue;
 
+  /// No description provided for @agentGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get agentGreen;
+
+  /// No description provided for @agentYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get agentYellow;
+
   /// No description provided for @agentPurple.
   ///
   /// In en, this message translates to:

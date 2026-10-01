@@ -1728,6 +1728,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get agentBlue => 'Kék';
 
   @override
+  String get agentGreen => 'Green';
+
+  @override
+  String get agentYellow => 'Yellow';
+
+  @override
   String get agentPurple => 'Lila';
 
   @override

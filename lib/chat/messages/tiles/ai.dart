@@ -1,8 +1,13 @@
 import 'package:cortex/design.dart';
+import 'package:cortex/startup/splash.dart';
+
 import 'dart:io';
+
 import 'package:flutter/scheduler.dart';
+
 import 'ai/reveal_timeline.dart';
 import 'ai/reveal_text.dart';
+
 import 'package:cortex/app.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/backend/data/entity.dart';
@@ -10,9 +15,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../../library/utils.dart';
 import '../../../theme.dart';
 import '../messages.dart';
+
 import 'package:cortex/chat/messages/markdown/parser.dart';
 import 'package:cortex/chat/screen/widgets/thinking.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -22,10 +29,13 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/internet.dart';
 import 'package:cortex/server/credits.dart';
+
 import '../../../notifications/introvert.dart';
 import '../options/change.dart';
 import '../options/panel.dart';
+
 import 'package:cortex/chat/services/tts.dart';
+import 'package:cortex/chat/services/flow.dart';
 import 'package:cortex/arts/provider.dart';
 import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:pasteboard/pasteboard.dart';
@@ -114,9 +124,11 @@ class _AIMessageTileState extends State<AIMessageTile>
     super.initState();
     _isInitialLoad = !widget.message.isThinking && !widget.message.isError;
     _reveal = RevealTimeline()
-      ..reset(widget.message.displayableText,
-          complete: !widget.message.isThinking,
-          showImmediately: !widget.message.isThinking);
+      ..reset(
+        widget.message.displayableText,
+        complete: !widget.message.isThinking,
+        showImmediately: !widget.message.isThinking,
+      );
     _finishNotificationSent = !widget.message.isThinking;
     _revealTicker = createTicker((elapsed) {
       final delta = elapsed - _previousFrame;
@@ -127,21 +139,33 @@ class _AIMessageTileState extends State<AIMessageTile>
     _reveal.addListener(_onRevealChanged);
     widget.message.notifier.addListener(_onStreamToken);
     _entryCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
-    _entryScaleAnim =
-        CurvedAnimation(parent: _entryCtl, curve: Curves.elasticOut);
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _entryScaleAnim = CurvedAnimation(
+      parent: _entryCtl,
+      curve: Curves.elasticOut,
+    );
     _fadeCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
-    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _fadeCtl, curve: Curves.easeOut),
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
     );
+    _fadeAnim = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _fadeCtl, curve: Curves.easeOut));
     _thinkPulseCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1000));
-    _thinkPulseAnim = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _thinkPulseCtl, curve: Curves.easeInOut),
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
     );
+    _thinkPulseAnim = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _thinkPulseCtl, curve: Curves.easeInOut));
     _thinkRotateCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 4000));
+      vsync: this,
+      duration: const Duration(milliseconds: 4000),
+    );
 
     if (widget.message.isThinking && !widget.message.isError) {
       _thinkPulseCtl.repeat(reverse: true);
@@ -150,9 +174,13 @@ class _AIMessageTileState extends State<AIMessageTile>
     }
 
     _headerEntryCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 400));
-    _headerEntryAnim =
-        CurvedAnimation(parent: _headerEntryCtl, curve: Curves.easeOut);
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _headerEntryAnim = CurvedAnimation(
+      parent: _headerEntryCtl,
+      curve: Curves.easeOut,
+    );
     _regenerationExitCtl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -253,7 +281,10 @@ class _AIMessageTileState extends State<AIMessageTile>
   }
 
   void _beginRegenerationExit(
-      Message oldMessage, Widget? oldEmbeddedMedia, Message newMessage) {
+    Message oldMessage,
+    Widget? oldEmbeddedMedia,
+    Message newMessage,
+  ) {
     if (_isRegenerating) return;
 
     _isRegenerating = true;
@@ -331,8 +362,10 @@ class _AIMessageTileState extends State<AIMessageTile>
   }
 
   void _acceptStreamText() {
-    _reveal.accept(widget.message.displayableText,
-        complete: !widget.message.isThinking);
+    _reveal.accept(
+      widget.message.displayableText,
+      complete: !widget.message.isThinking,
+    );
     _startRevealClock();
   }
 
@@ -364,20 +397,25 @@ class _AIMessageTileState extends State<AIMessageTile>
     // 1. Stream Starting Logic
     final bool isStreamStarting =
         (old.message.displayableText.isEmpty && old.embeddedMedia == null) &&
-            (widget.message.displayableText.isNotEmpty ||
-                widget.embeddedMedia != null) &&
-            widget.message.isThinking;
+        (widget.message.displayableText.isNotEmpty ||
+            widget.embeddedMedia != null) &&
+        widget.message.isThinking;
 
     if (isStreamStarting && !_isRegenerating && !widget.message.isError) {
       debugPrint("$logPrefix Stream starting. Revealing header.");
       if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
       if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();
 
-      _thinkPulseCtl.animateTo(1.0,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeOutBack);
-      _thinkRotateCtl.animateTo(_thinkRotateCtl.value.roundToDouble(),
-          duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+      _thinkPulseCtl.animateTo(
+        1.0,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutBack,
+      );
+      _thinkRotateCtl.animateTo(
+        _thinkRotateCtl.value.roundToDouble(),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
       _headerEntryCtl.forward();
     }
 
@@ -457,7 +495,6 @@ class _AIMessageTileState extends State<AIMessageTile>
         _acceptStreamText();
       }
     }
-
     // 6. Static Text Change
     else if (!widget.message.isError &&
         widget.message.displayableText != old.message.displayableText &&
@@ -605,7 +642,9 @@ class _AIMessageTileState extends State<AIMessageTile>
                           ),
                         ),
                         if (_shouldShowFallbackNotice(
-                            context, displayedMessage))
+                          context,
+                          displayedMessage,
+                        ))
                           FadeTransition(
                             opacity: _regenerationExitAnim,
                             child: TweenAnimationBuilder<double>(
@@ -615,17 +654,15 @@ class _AIMessageTileState extends State<AIMessageTile>
                               builder: (context, value, child) {
                                 return Transform.translate(
                                   offset: Offset(0, 10 * (1 - value)),
-                                  child: Opacity(
-                                    opacity: value,
-                                    child: child,
-                                  ),
+                                  child: Opacity(opacity: value, child: child),
                                 );
                               },
                               child: Padding(
                                 padding: EdgeInsets.only(
-                                    top: 8 * scale,
-                                    left: 12 * scale,
-                                    right: 12 * scale),
+                                  top: 8 * scale,
+                                  left: 12 * scale,
+                                  right: 12 * scale,
+                                ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

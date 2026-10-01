@@ -1,6 +1,7 @@
 // lib/chat/providers/conversation.dart
 
 import 'dart:async';
+
 import 'package:cortex/chat/services/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -50,8 +51,9 @@ class ConversationProvider with ChangeNotifier {
   ConversationProvider() {
     try {
       if (Firebase.apps.isNotEmpty) {
-        _authSub =
-            FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        _authSub = FirebaseAuth.instance.authStateChanges().listen((
+          User? user,
+        ) {
           if (user == null) {
             resetForLogout();
           }
@@ -127,8 +129,10 @@ class ConversationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearConversation(
-      {bool resetLoadingState = true, bool startLoading = false}) {
+  void clearConversation({
+    bool resetLoadingState = true,
+    bool startLoading = false,
+  }) {
     // Cancel any pending stream updates
     _streamThrottleTimer?.cancel();
     _streamThrottleTimer = null;
@@ -242,14 +246,19 @@ class ConversationProvider with ChangeNotifier {
     notifyListeners();
     await (() async {
       try {
-        await ChatStorageService.saveConversation(id, title, [],
-            modelId: modelIdForStorage,
-            modelTitle: modelTitleForStorage,
-            modelImagePath: modelImagePathForStorage);
+        await ChatStorageService.saveConversation(
+          id,
+          title,
+          [],
+          modelId: modelIdForStorage,
+          modelTitle: modelTitleForStorage,
+          modelImagePath: modelImagePathForStorage,
+        );
         await ChatStorageService.upsertMessage(id, 0, userMessage);
       } catch (e) {
         debugPrint(
-            '[ConversationProvider] Failed to persist new conversation: $e');
+          '[ConversationProvider] Failed to persist new conversation: $e',
+        );
       }
     })();
     CacheService.invalidateConversationCache();
@@ -264,6 +273,7 @@ class ConversationProvider with ChangeNotifier {
       isUserMessage: false,
       isThinking: true,
       model: userMessage.model,
+      flowParticipant: userMessage.flowParticipant,
     );
 
     _messages.add(userMessage);
@@ -276,17 +286,46 @@ class ConversationProvider with ChangeNotifier {
 
     if (_conversationID != null) {
       ChatStorageService.upsertMessage(
-          _conversationID!, _messages.length - 2, userMessage);
+        _conversationID!,
+        _messages.length - 2,
+        userMessage,
+      );
     }
 
     notifyListeners();
   }
 
+  /// Adds an assistant turn without inventing a user message. Flow uses this
+  /// for Red/Green/Yellow (and later rounds) so every participant shares the
+  /// normal conversation history as an ordinary assistant message.
+  int appendAssistantThinking({
+    required String model,
+    required String flowParticipant,
+  }) {
+    final message = Message(
+      text: '',
+      isUserMessage: false,
+      isThinking: true,
+      model: model,
+      flowParticipant: flowParticipant,
+    );
+    _messages.add(message);
+    _isWaitingForResponse = true;
+    _responseStopped = false;
+    _isLoadingMessages = false;
+    _streamBuffer = StringBuffer();
+    notifyListeners();
+    return _messages.length - 1;
+  }
+
   /// Starts a session solely in memory. Does not save to storage yet.
   /// Used for Flow Mode hidden prompts.
   void startEphemeralSession(
-      String id, String modelIdForStorage, Message userMessage,
-      {String? title}) {
+    String id,
+    String modelIdForStorage,
+    Message userMessage, {
+    String? title,
+  }) {
     _conversationID = id;
     _conversationTitle = title ?? "New Chat";
     _isEphemeral = true;
@@ -315,13 +354,18 @@ class ConversationProvider with ChangeNotifier {
     // For Flow Mode, we might have set a specific title in startEphemeralSession
     final title = _conversationTitle ?? "New Chat";
 
-    await ChatStorageService.saveConversation(_conversationID!, title, [],
-        modelId: _messages.first.model);
+    await ChatStorageService.saveConversation(
+      _conversationID!,
+      title,
+      [],
+      modelId: _messages.first.model,
+    );
 
     final futures = <Future>[];
     for (int i = 0; i < _messages.length; i++) {
       futures.add(
-          ChatStorageService.upsertMessage(_conversationID!, i, _messages[i]));
+        ChatStorageService.upsertMessage(_conversationID!, i, _messages[i]),
+      );
     }
     await Future.wait(futures);
 
@@ -343,7 +387,8 @@ class ConversationProvider with ChangeNotifier {
   void prepareForRegeneration(int aiMessageIndex, String newModelId) {
     if (aiMessageIndex < 0) {
       debugPrint(
-          "[ConversationProvider] Invalid negative index for regeneration. Aborting.");
+        "[ConversationProvider] Invalid negative index for regeneration. Aborting.",
+      );
       return;
     }
 
@@ -353,7 +398,8 @@ class ConversationProvider with ChangeNotifier {
       _messages = _messages.sublist(0, aiMessageIndex);
     } else {
       debugPrint(
-          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages.length}. Aborting regeneration prep.");
+        "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages.length}. Aborting regeneration prep.",
+      );
       return;
     }
 
@@ -377,7 +423,8 @@ class ConversationProvider with ChangeNotifier {
 
     notifyListeners();
     debugPrint(
-        "[ConversationProvider] Atomically prepared for regeneration. List truncated to index $aiMessageIndex and 'thinking' bubble added.");
+      "[ConversationProvider] Atomically prepared for regeneration. List truncated to index $aiMessageIndex and 'thinking' bubble added.",
+    );
   }
 
   /// Marks a truncated AI message as the target of a continuation request.
@@ -391,13 +438,15 @@ class ConversationProvider with ChangeNotifier {
   void prepareForContinuation(int aiMessageIndex) {
     if (aiMessageIndex < 0 || aiMessageIndex >= _messages.length) {
       debugPrint(
-          "[ConversationProvider] Invalid index $aiMessageIndex for continuation. Aborting.");
+        "[ConversationProvider] Invalid index $aiMessageIndex for continuation. Aborting.",
+      );
       return;
     }
     final target = _messages[aiMessageIndex];
     if (target.isUserMessage) {
       debugPrint(
-          "[ConversationProvider] Continuation target is a user message. Aborting.");
+        "[ConversationProvider] Continuation target is a user message. Aborting.",
+      );
       return;
     }
 
@@ -410,17 +459,20 @@ class ConversationProvider with ChangeNotifier {
     _isWaitingForResponse = true;
     _responseStopped = false;
     _isLoadingMessages = false;
-    _streamBuffer = null; // Lazily re-seeded from the (kept) text on first chunk
+    _streamBuffer =
+        null; // Lazily re-seeded from the (kept) text on first chunk
 
     notifyListeners();
     debugPrint(
-        "[ConversationProvider] Prepared for continuation at index $aiMessageIndex (${target.text.length} chars kept).");
+      "[ConversationProvider] Prepared for continuation at index $aiMessageIndex (${target.text.length} chars kept).",
+    );
   }
 
   /// Appends a chunk of text to the last AI message in the list (for streaming responses).
   /// Uses throttling to prevent excessive UI rebuilds during fast streaming.
   void appendToLastBotMessage(String chunk) {
-    final hadVisibleText = _messages.isNotEmpty &&
+    final hadVisibleText =
+        _messages.isNotEmpty &&
         !_messages.last.isUserMessage &&
         _messages.last.displayableText.isNotEmpty;
     if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
@@ -436,15 +488,17 @@ class ConversationProvider with ChangeNotifier {
       _streamBuffer ??= StringBuffer(lastMessage.text);
       _streamBuffer!.write(textToAppend);
 
-      _messages[_messages.length - 1] =
-          lastMessage.copyWithText(_streamBuffer!.toString());
+      _messages[_messages.length - 1] = lastMessage.copyWithText(
+        _streamBuffer!.toString(),
+      );
     } else {
       String initialText = chunk;
       if (initialText.startsWith('\n')) {
         initialText = initialText.trimLeft();
       }
       _messages.add(
-          Message(text: initialText, isUserMessage: false, isThinking: true));
+        Message(text: initialText, isUserMessage: false, isThinking: true),
+      );
     }
 
     _scheduleStreamUpdate();
@@ -584,11 +638,17 @@ class ConversationProvider with ChangeNotifier {
         if (_isEphemeral) {
           promoteToPersistentSession().then((_) {
             ChatStorageService.upsertMessage(
-                _conversationID!, index, _messages[index]);
+              _conversationID!,
+              index,
+              _messages[index],
+            );
           });
         } else {
           ChatStorageService.upsertMessage(
-              _conversationID!, index, _messages[index]);
+            _conversationID!,
+            index,
+            _messages[index],
+          );
         }
       }
     }
@@ -619,7 +679,10 @@ class ConversationProvider with ChangeNotifier {
 
   /// Updates an existing AI message with an error state.
   void setErrorMessage(
-      int index, String errorMessage, bool isContentFlagError) {
+    int index,
+    String errorMessage,
+    bool isContentFlagError,
+  ) {
     if (index < 0 || index >= _messages.length) return;
 
     final aiMessage = _messages[index];
@@ -632,7 +695,8 @@ class ConversationProvider with ChangeNotifier {
         aiMessage.text.isEmpty &&
         errorMessage.isEmpty) {
       debugPrint(
-          "[ConversationProvider] Error/Stop occurred with empty message. Fading out.");
+        "[ConversationProvider] Error/Stop occurred with empty message. Fading out.",
+      );
       _messages[index] = aiMessage.copyWith(opacity: 0.0);
       _isWaitingForResponse = false;
       notifyListeners();
@@ -660,11 +724,15 @@ class ConversationProvider with ChangeNotifier {
       final userMessageIndex = index - 1;
       final userMessage = _messages[userMessageIndex];
       if (userMessage.isUserMessage) {
-        _messages[userMessageIndex] =
-            userMessage.copyWith(includeInContext: false);
+        _messages[userMessageIndex] = userMessage.copyWith(
+          includeInContext: false,
+        );
         if (_conversationID != null) {
           ChatStorageService.updateStoredMessage(
-              _conversationID!, _messages[userMessageIndex], userMessageIndex);
+            _conversationID!,
+            _messages[userMessageIndex],
+            userMessageIndex,
+          );
         }
       }
     }
@@ -675,26 +743,34 @@ class ConversationProvider with ChangeNotifier {
 
   /// Adds a new user message and a corresponding error message to the list.
   void showSendError(
-      Message userMessage, String errorMessage, bool isContentFlagError) {
+    Message userMessage,
+    String errorMessage,
+    bool isContentFlagError,
+  ) {
     if (_messages.isNotEmpty && _messages.last.isThinking) {
       setErrorMessage(_messages.length - 1, errorMessage, isContentFlagError);
       return;
     }
 
-    final finalUserMessage =
-        userMessage.copyWith(includeInContext: !isContentFlagError);
+    final finalUserMessage = userMessage.copyWith(
+      includeInContext: !isContentFlagError,
+    );
     final errorAIMessage = Message(
-        text: errorMessage,
-        isUserMessage: false,
-        isError: true,
-        includeInContext: false);
+      text: errorMessage,
+      isUserMessage: false,
+      isError: true,
+      includeInContext: false,
+    );
 
     _messages.add(finalUserMessage);
     _messages.add(errorAIMessage);
 
     if (_conversationID != null) {
       ChatStorageService.upsertMessage(
-          _conversationID!, _messages.length - 2, finalUserMessage);
+        _conversationID!,
+        _messages.length - 2,
+        finalUserMessage,
+      );
     }
 
     _isWaitingForResponse = false;
@@ -723,7 +799,10 @@ class ConversationProvider with ChangeNotifier {
       );
       if (_conversationID != null) {
         ChatStorageService.updateStoredMessage(
-            _conversationID!, _messages[index], index);
+          _conversationID!,
+          _messages[index],
+          index,
+        );
       }
       _isWaitingForResponse = false;
       notifyListeners();
@@ -737,9 +816,15 @@ class ConversationProvider with ChangeNotifier {
 
     if (_conversationID != null) {
       ChatStorageService.upsertMessage(
-          _conversationID!, _messages.length - 2, userMessage);
+        _conversationID!,
+        _messages.length - 2,
+        userMessage,
+      );
       ChatStorageService.upsertMessage(
-          _conversationID!, _messages.length - 1, recoveryAiMessage);
+        _conversationID!,
+        _messages.length - 1,
+        recoveryAiMessage,
+      );
     }
 
     _isWaitingForResponse = false;
@@ -752,8 +837,11 @@ class ConversationProvider with ChangeNotifier {
   /// still a plain assistant bubble (not error/thinking), and an actual
   /// change — a stale refinement arriving after a switch or reset is
   /// dropped silently.
-  void updateCreditRecoveryText(int index, String text,
-      {String? expectedConversationId}) {
+  void updateCreditRecoveryText(
+    int index,
+    String text, {
+    String? expectedConversationId,
+  }) {
     if (expectedConversationId != null &&
         _conversationID != expectedConversationId) {
       return;
@@ -766,7 +854,10 @@ class ConversationProvider with ChangeNotifier {
     _messages[index] = message.copyWith(text: text);
     if (_conversationID != null) {
       ChatStorageService.updateStoredMessage(
-          _conversationID!, _messages[index], index);
+        _conversationID!,
+        _messages[index],
+        index,
+      );
     }
     notifyListeners();
   }

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import 'stt_remote.dart';
+import 'stt_route.dart';
 import 'voice_turns.dart';
 
 /// Who owns the microphone right now. There is exactly one logical owner at
@@ -24,9 +25,9 @@ enum SpeechOwner { dictation, voice, flow }
 ///    installed recognizer locale, with English as the fallback.
 ///
 ///  * **Voice Mode / Flow Mode** (`owner: SpeechOwner.voice` / `flow`) — the
-///    realtime conversational surfaces. Remote-first ([RemoteSttService]:
-///    Deepgram, then AssemblyAI, both behind Fulcrum-minted tokens), with
-///    the native recognizer as the final resilience fallback.
+///    realtime conversational surfaces. Remote-first ([RemoteSttService])
+///    through Fulcrum's role-based realtime_voice_stt route, with the native
+///    recognizer as the final resilience fallback.
 class SpeechService with ChangeNotifier {
   final SpeechToText _speech = SpeechToText();
   final RemoteSttService _remote = RemoteSttService.instance;
@@ -198,7 +199,7 @@ class SpeechService with ChangeNotifier {
   ///
   /// Engine policy belongs to the OWNER, not the caller's mood:
   ///  * dictation → native recognizer only, never remote, never a credit;
-  ///  * voice/flow → remote first (Deepgram, then AssemblyAI), with the
+  ///  * voice/flow → remote first (catalog-selected provider), with the
   ///    native recognizer as the final resilience fallback.
   ///
   /// Returns whether a capture actually started. Every callback handed out is
@@ -208,6 +209,7 @@ class SpeechService with ChangeNotifier {
     required String locale,
     required Function(String text) onResult,
     SpeechOwner owner = SpeechOwner.dictation,
+    VoiceLanguageState? languageState,
     void Function(SttCloseInfo info)? onClosed,
     void Function(SttLease lease)? onLease,
     void Function(SttResult result)? onSttResult,
@@ -230,6 +232,13 @@ class SpeechService with ChangeNotifier {
 
     // 2. Voice/Flow: remote first.
     if (owner != SpeechOwner.dictation) {
+      // The app/device locale is a soft prior in automatic mode. It informs
+      // the route selector without forcing a provider or reconnecting when a
+      // later transcript supplies stronger language evidence.
+      final language = locale.split(RegExp(r'[-_]')).first.toLowerCase();
+      _remote.setLanguageState(
+        languageState ?? VoiceLanguageState(currentLanguage: language),
+      );
       final startedRemote = await _remote.start(
         onResult: (result) {
           if (_disposed || generation != _generation || !_usingRemote) return;
@@ -279,6 +288,10 @@ class SpeechService with ChangeNotifier {
         _notifyNow();
         return true;
       }
+    }
+
+    if (owner != SpeechOwner.dictation && _remote.fallbackBlocked) {
+      return false;
     }
 
     // 3. Native path: always for dictation, the fallback for voice/flow.
@@ -359,10 +372,10 @@ class SpeechService with ChangeNotifier {
     } catch (e) {
       debugPrint("[Speech] Remote stop failed: $e");
     }
-    try {
-      await _speech.stop();
-    } catch (_) {
-      // The native engine was never started — nothing to stop.
+    if (_isAvailable) {
+      try {
+        await _speech.stop();
+      } catch (_) {}
     }
   }
 

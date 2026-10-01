@@ -36,9 +36,9 @@ Around it: `ContextService` (context construction), `SemanticMemoryService` (mem
 Two deliberately separate speech experiences behind `SpeechService` (speech.dart) — the app's single microphone gateway; there is exactly one logical mic owner at any moment, and a new owner always stops the previous capture first:
 
 - **Ordinary dictation** (composer mic button, `SpeechOwner.dictation`): native recognizer ONLY — the app language is mapped to an installed recognizer locale with an English fallback, and no remote speech credits are ever spent.
-- **Voice Mode / Flow Mode** (`SpeechOwner.voice`/`flow`): remote-first — `RemoteSttService` (stt_remote.dart) streams the microphone straight to Deepgram nova-3 (multilingual) with AssemblyAI universal-3-5-pro as the live fallback, both behind Fulcrum-minted short-lived tokens; the native recognizer is the final resilience fallback. Start/stop are serialized and epoch-guarded inside `RemoteSttService`, so no ghost recorder or socket can survive a superseded session.
+- **Voice Mode / Flow Mode** (`SpeechOwner.voice`/`flow`): remote-first — `RemoteSttService` (stt_remote.dart) requests Fulcrum's role-based `realtime_voice_stt` route, then executes the returned provider adapter (ElevenLabs Scribe, Deepgram, AssemblyAI, or a migration fallback) with a sticky session route. The native recognizer is the final resilience fallback for provider/transport failures only. HTTP 401/402/403 block fallback across all speech engines; only 403 `voice_daily_limit` marks the shared allowance exhausted. Token responses are read as plain text before safe object decoding, including malformed JSON and infrastructure error pages. Start/stop are serialized and epoch-guarded inside `RemoteSttService`, so no ghost recorder or socket can survive a superseded session.
 
-`VoiceService` (voice.dart) owns the realtime session lifecycle: an explicit `VoiceState` machine (idle/connecting/listening/processing/speaking/failed), session generations (every STT result, timer, TTS completion, flow turn and reconnect is generation-guarded; stale artifacts of a stopped session can never mutate its successor), one CONTINUOUS provider session per voice session recycled at the server's reserved-window boundary (the daily pool is re-checked at every mint), amplitude+transcript barge-in while the assistant speaks, bounded reconnects (3/session), a 90s inactivity timeout, and app-background session teardown. Voice and Flow share this one core — Flow is a mode flag plus agent cycling on top of the same session.
+`VoiceService` (voice.dart) owns the realtime session lifecycle: an explicit `VoiceState` machine (idle/connecting/listening/processing/speaking/failed), session generations (every STT result, timer, TTS completion, flow turn and reconnect is generation-guarded; stale artifacts of a stopped session can never mutate its successor), one CONTINUOUS provider session per voice session recycled at the server's reserved-window boundary (the daily pool is re-checked at every mint), amplitude+transcript barge-in while the assistant speaks, bounded reconnects (3/session), a 90s inactivity timeout, and an Android foreground-service bridge that keeps an active session alive across screen lock/background. Voice and Flow share this one core — Flow is a mode flag plus agent cycling on top of the same session.
 
 `TtsService`/`TtsState` + `RemoteTtsService` (tts_remote.dart — ElevenLabs, proxied per sentence through Fulcrum with native flutter_tts fallback; also serves read-aloud), `VoiceCatalogProvider`/`CortexVoice` (voice_catalog.dart). Provider secrets (Deepgram, AssemblyAI, ElevenLabs) stay server-side behind Fulcrum `voice.js` endpoints.
 
@@ -50,18 +50,20 @@ The daily realtime Voice/Flow allowance (seconds; one shared pool for both modes
 only the center capsule and changes the visible side controls to Flow/X.
 `isVoiceOverlayExpanded` controls only orb geometry and conversation presentation.
 Compact and expanded Voice Mode both keep Flow/X; only X restores text input.
-There is no separate transcript or rectangular dim surface above the controls.
+The 380 ms entry retains the existing composer expansion geometry, grows controls around their centers, and moves the shrinking capsule upward as the orb emerges from its collapse point. Flow always paints its frame and X retains its fixed glyph size. There is no separate transcript or rectangular dim surface above the controls.
 
 `VoiceOrbController` keeps one continuous ticker across phases and sizes. It
 integrates smoothed liquid speed, slowly interpolates internal palettes, and
 paints a bounded six-second breath without changing layout or border thickness.
-Remote TTS exposes no amplitude meter; speaking uses the existing synthesized
-speech envelope. Microphone amplitude remains smoothed from `SpeechService`.
+Remote TTS requests 16 kHz PCM, wraps it in WAV for playback, and derives a
+smoothed output envelope from the exact samples being played. Microphone
+amplitude remains smoothed from `SpeechService`; both envelopes feed the orb
+shader independently.
 
 The overlay uses the published allowance and terminal server limit response to
 show an internal purple palette. A live reserved window is not treated as
 exhausted merely because the unreserved pool is empty. Exhausted orb/Flow taps
-open the existing `FundsScreen(initialPlanType: 'plus')`; they cannot retry audio.
+use `UserProvider.subscription.effectiveTier` to open the next plan (Free → Plus, Plus → Pro, Pro → Ultra). Ultra remains on the exhausted visual; these taps cannot retry audio.
 Plus, Pro and Ultra share the localized `benefitMoreVoiceChat` benefit.
 
 ## Tools

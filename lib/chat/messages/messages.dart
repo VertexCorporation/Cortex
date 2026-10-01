@@ -1,6 +1,9 @@
 // lib/chat/messages/messages.dart
 
 import 'dart:convert';
+
+import '../services/flow_text.dart';
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,17 +23,23 @@ class Message {
   // Message text is immutable. Compute once per Message instance, including
   // streaming copies, instead of re-running both scans on every widget read.
   static final _partialMemoryTag = RegExp(
-      r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
-      caseSensitive: false);
+    r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
+    caseSensitive: false,
+  );
   static final _memoryTag = RegExp(
-      r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*', caseSensitive: false);
-  late final String _displayableText = text
-        .replaceAll(
-            _partialMemoryTag,
-            '')
-        .replaceAll(
-            _memoryTag,
-            '');
+    r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*',
+    caseSensitive: false,
+  );
+  late final String _displayableText = _visibleText();
+  String _visibleText() {
+    final cleaned = text
+        .replaceAll(_partialMemoryTag, '')
+        .replaceAll(_memoryTag, '');
+    return flowParticipant != null && !isUserMessage
+        ? FlowText.sanitize(cleaned, streaming: isThinking)
+        : cleaned;
+  }
+
   String get displayableText => _displayableText;
 
   /// The boolean variable for controlling the message type
@@ -42,6 +51,10 @@ class Message {
 
   /// The model ID used to generate this message (if it's an AI message).
   final String? model;
+
+  /// Stable Flow participant identity for assistant turns. Null for normal
+  /// chat messages and user messages.
+  final String? flowParticipant;
 
   /// Indicates if this message should be included in the context for future API calls.
   final bool includeInContext;
@@ -106,6 +119,7 @@ class Message {
     required this.isUserMessage,
     this.attachmentPaths = const [],
     this.model,
+    this.flowParticipant,
     this.includeInContext = true,
     this.isReported = false,
     this.isThinking = false,
@@ -130,6 +144,7 @@ class Message {
     required this.isUserMessage,
     required this.attachmentPaths,
     required this.model,
+    required this.flowParticipant,
     required this.includeInContext,
     required this.isReported,
     required this.isThinking,
@@ -173,6 +188,7 @@ class Message {
     bool? isUserMessage,
     List<String>? attachmentPaths,
     String? model,
+    String? flowParticipant,
     bool? includeInContext,
     bool? isReported,
     bool? isThinking,
@@ -202,6 +218,7 @@ class Message {
       isUserMessage: isUserMessage ?? this.isUserMessage,
       attachmentPaths: attachmentPaths ?? this.attachmentPaths,
       model: model ?? this.model,
+      flowParticipant: flowParticipant ?? this.flowParticipant,
       includeInContext: includeInContext ?? this.includeInContext,
       isReported: isReported ?? this.isReported,
       isThinking: isThinking ?? this.isThinking,
@@ -232,6 +249,7 @@ class Message {
       isUserMessage: isUserMessage,
       attachmentPaths: attachmentPaths,
       model: model,
+      flowParticipant: flowParticipant,
       includeInContext: includeInContext,
       isReported: isReported,
       isThinking: isThinking,
@@ -307,6 +325,7 @@ class Message {
       isUserMessage: (map['isUser'] as int? ?? 0) == 1,
       attachmentPaths: paths,
       model: map['model'] as String?,
+      flowParticipant: map['flowParticipant'] as String?,
       includeInContext: (map['includeInContext'] as int? ?? 1) == 1,
       isReported: (map['isReported'] as int? ?? 0) == 1,
       isThinking: (map['isThinking'] as int? ?? 0) == 1,
@@ -353,6 +372,7 @@ class Message {
       'isUser': isUserMessage ? 1 : 0,
       'attachmentPaths': attachmentPaths,
       'model': model,
+      'flowParticipant': flowParticipant,
       'includeInContext': includeInContext ? 1 : 0,
       'isReported': isReported ? 1 : 0,
       'isThinking': isThinking ? 1 : 0,
@@ -361,8 +381,9 @@ class Message {
       'isAttachmentUploading': isAttachmentUploading ? 1 : 0,
       'isVisible': isVisible ? 1 : 0,
       'isWebSearchActive': isWebSearchActive ? 1 : 0,
-      'webSearchSources':
-          webSearchSources != null ? jsonEncode(webSearchSources) : null,
+      'webSearchSources': webSearchSources != null
+          ? jsonEncode(webSearchSources)
+          : null,
       'isServerFallback': isServerFallback ? 1 : 0,
       'toolSteps': toolSteps.isNotEmpty ? jsonEncode(toolSteps) : null,
       'isIncomplete': isIncomplete ? 1 : 0,

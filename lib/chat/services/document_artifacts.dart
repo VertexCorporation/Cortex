@@ -812,7 +812,8 @@ class DocumentArtifactService {
 
   static String _csvCell(dynamic value) {
     final text = value?.toString() ?? '';
-    if (text.contains(',') || text.contains('"') || text.contains('\n')) {
+    if (text.contains(',') || text.contains('"') ||
+        text.contains('\n') || text.contains('\r')) {
       return '"${text.replaceAll('"', '""')}"';
     }
     return text;

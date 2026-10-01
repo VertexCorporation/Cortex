@@ -148,7 +148,6 @@ class EditService {
       TextPosition(offset: _controller.text.length),
     );
 
-    await Future.delayed(const Duration(milliseconds: 100));
     _ensureKeyboardFocus();
   }
 
@@ -169,9 +168,7 @@ class EditService {
   }
 
   void _ensureKeyboardFocus() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
+    requestFocus();
   }
 
   /// Whether the input's focus node currently holds focus.

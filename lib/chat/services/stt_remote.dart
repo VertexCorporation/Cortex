@@ -2,12 +2,10 @@
 //
 // Realtime speech for Voice Mode and Flow Mode.
 //
-// The microphone streams straight to Deepgram (nova-3 multilingual) with
-// AssemblyAI universal-3-5-pro as the live fallback, rather than through
-// Fulcrum. Both providers run on short-lived tokens minted by the server, so
-// the server only has to mint one and settle it — the audio itself never
-// touches our infrastructure, which keeps latency to a single hop and the
-// Cloud Function bill to one short call per session.
+// The microphone streams to the provider/model selected by Fulcrum's
+// realtime_voice_stt route. Deepgram and AssemblyAI remain migration fallbacks
+// while catalog-backed routes roll out; each adapter uses a short-lived token
+// minted by the server, so audio never touches our infrastructure.
 //
 // Everything here degrades to false/null rather than throwing. The caller
 // keeps the on-device recognizer as the final fallback, so a failure means
@@ -31,6 +29,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:record/record.dart';
 
 import 'voice_health.dart';
+import 'stt_route.dart';
 
 /// Proxies may return JSON as text or HTML/plain-text errors on 5xx.
 /// Decode only objects; never cast an infrastructure error body to a map.
@@ -47,6 +46,25 @@ Map<String, dynamic>? decodeSpeechTokenResponse(dynamic body) {
   return null;
 }
 
+/// Keep decoding under our control even when a proxy labels HTML as JSON.
+Future<Response<dynamic>> requestSpeechToken(
+  Dio dio,
+  String endpoint, {
+  required String idToken,
+  required Map<String, dynamic> data,
+}) => dio.post<dynamic>(
+  endpoint,
+  data: data,
+  options: Options(
+    headers: {
+      'Authorization': 'Bearer $idToken',
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    responseType: ResponseType.plain,
+    validateStatus: (_) => true,
+  ),
+);
+
 /// One transcript update. Deepgram sends a running best guess and then a
 /// settled version of the same span; [isFinal] separates them so the caller
 /// can replace rather than append.
@@ -57,11 +75,17 @@ Map<String, dynamic>? decodeSpeechTokenResponse(dynamic body) {
 /// provider payload without the field); consumers must treat it as
 /// "cannot judge", never as zero.
 class SttResult {
-  const SttResult(this.text, {required this.isFinal, this.confidence});
+  const SttResult(
+    this.text, {
+    required this.isFinal,
+    this.confidence,
+    this.language,
+  });
 
   final String text;
   final bool isFinal;
   final double? confidence;
+  final String? language;
 }
 
 class _SpeechLease {
@@ -72,6 +96,8 @@ class _SpeechLease {
     this.allowanceVoiceSeconds,
     this.remainingVoiceSeconds,
     this.reservedVoiceSeconds,
+    this.model,
+    this.routeId,
   });
 
   final String token;
@@ -80,6 +106,8 @@ class _SpeechLease {
   final int? allowanceVoiceSeconds;
   final int? remainingVoiceSeconds;
   final int? reservedVoiceSeconds;
+  final String? model;
+  final String? routeId;
 }
 
 /// What the server told us when it minted the realtime-speech window: the
@@ -94,6 +122,8 @@ class SttLease {
     this.allowanceVoiceSeconds,
     this.remainingVoiceSeconds,
     this.reservedVoiceSeconds,
+    this.model,
+    this.routeId,
   });
 
   final String provider;
@@ -108,6 +138,8 @@ class SttLease {
 
   /// Seconds reserved for THIS window.
   final int? reservedVoiceSeconds;
+  final String? model;
+  final String? routeId;
 }
 
 /// How the caller should react to a provider socket that closed on its own.
@@ -227,6 +259,8 @@ class RemoteSttService {
       "https://getspeechtoken-o5h7dmtija-ew.a.run.app";
   static const String _assemblyTokenEndpoint =
       "https://getassemblytoken-o5h7dmtija-ew.a.run.app";
+  static const String _routeEndpoint =
+      "https://getrealtimesttroute-o5h7dmtija-ew.a.run.app";
   static const String _settleUsageEndpoint =
       "https://settlespeechusage-o5h7dmtija-ew.a.run.app";
 
@@ -236,12 +270,6 @@ class RemoteSttService {
 
   /// `language=multi` selects nova-3 multilingual. Turkish is not covered by
   /// the cheaper monolingual model, so this is not an optional upgrade.
-  static const String _listenUrl =
-      "wss://api.deepgram.com/v1/listen"
-      "?model=nova-3&language=multi&encoding=linear16"
-      "&sample_rate=$_sampleRate&channels=1"
-      "&interim_results=true&smart_format=true";
-
   final Dio _dio = createFulcrumHttp(
     BaseOptions(
       connectTimeout: const Duration(seconds: 10),
@@ -273,6 +301,9 @@ class RemoteSttService {
   void Function(SttCloseInfo info)? _activeOnClosed;
   void Function(SttLease lease)? _activeOnLease;
   String? _activeMode;
+  VoiceLanguageState _languageState = const VoiceLanguageState();
+  SttRoute? _stickyRoute;
+  final Set<String> _failedRouteProviders = <String>{};
 
   /// When the last audio chunk actually reached the provider socket.
   /// KeepAlive is only sent while this is stale — never while audio frames
@@ -432,6 +463,13 @@ class RemoteSttService {
   /// showing a generic dead microphone.
   bool dailyVoiceLimitReached = false;
 
+  /// An account/auth refusal applies to every speech engine.
+  bool fallbackBlocked = false;
+
+  @visibleForTesting
+  static bool blocksSpeechFallback(int? status) =>
+      status == 401 || status == 402 || status == 403;
+
   /// Build number and hardware, attached to every report.
   ///
   /// Two testers on two builds produced logs that could not be told apart,
@@ -493,6 +531,9 @@ class RemoteSttService {
         data: <String, dynamic>{
           'lastFailure': failure,
           'reportOnly': true,
+          if (_stickyRoute?.provider != null)
+            'provider': _stickyRoute!.provider,
+          if (_stickyRoute?.model != null) 'model': _stickyRoute!.model,
           ...await _deviceContext(),
         },
         options: Options(
@@ -500,11 +541,67 @@ class RemoteSttService {
             'Authorization': 'Bearer $idToken',
             'Content-Type': 'application/json; charset=UTF-8',
           },
+          responseType: ResponseType.plain,
           validateStatus: (_) => true,
         ),
       );
     } catch (e) {
       debugPrint("[RemoteStt] Could not report failure: $e");
+    }
+  }
+
+  /// Updates the session language prior without forcing a provider reconnect.
+  /// A new route is requested only on the next session/recovery boundary.
+  void setLanguageState(VoiceLanguageState state) {
+    _languageState = state;
+  }
+
+  Future<SttRoute?> _fetchDynamicRoute({String? mode}) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return null;
+      final idToken = await user.getIdToken();
+      if (idToken == null) return null;
+      final route = _stickyRoute;
+      final response = await requestSpeechToken(
+        _dio,
+        _routeEndpoint,
+        idToken: idToken,
+        data: <String, dynamic>{
+          'mode': ?mode,
+          ..._languageState.toJson(),
+          if (_failedRouteProviders.isNotEmpty)
+            'excludeProviders': _failedRouteProviders.toList(growable: false),
+          if (route != null) 'currentRoute': route.toRequestJson(),
+        },
+      );
+      final data = decodeSttRouteBody(response.data);
+      if (response.statusCode != 200) {
+        dailyVoiceLimitReached = isDailyVoiceLimitRefusal(
+          response.statusCode,
+          data,
+        );
+        fallbackBlocked = blocksSpeechFallback(response.statusCode);
+        _fail(
+          mintRefusalCode('stt_route', response.statusCode),
+          'contentType=${response.headers.value(Headers.contentTypeHeader)} ${refusalBodyPreview(response.data)}',
+        );
+        return null;
+      }
+      final parsed = SttRoute.fromBody(data);
+      if (parsed == null) {
+        _fail('STT_ROUTE_MALFORMED', '200 without provider/model/token');
+        return null;
+      }
+      _stickyRoute = parsed;
+      VoiceTelemetry.mark(
+        'STT route selected provider=${parsed.provider} model=${parsed.model} '
+        'sticky=${data?['explain'] is Map && (data?['explain'] as Map)['reason'] == 'sticky_session_route'}',
+      );
+      return parsed;
+    } catch (error) {
+      _fail('STT_ROUTE_REQUEST_FAILED', error);
+      return null;
     }
   }
 
@@ -522,8 +619,10 @@ class RemoteSttService {
       _lastFailure = null;
 
       VoiceTelemetry.mark('STT lease request start');
-      final response = await _dio.post<dynamic>(
+      final response = await requestSpeechToken(
+        _dio,
         _tokenEndpoint,
+        idToken: idToken,
         data: <String, dynamic>{
           if (previousFailure != null) ...{
             'lastFailure': previousFailure,
@@ -531,15 +630,9 @@ class RemoteSttService {
           },
           'mode': ?mode,
         },
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $idToken',
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          validateStatus: (_) => true,
-        ),
       );
 
+      fallbackBlocked = blocksSpeechFallback(response.statusCode);
       final data = decodeSpeechTokenResponse(response.data);
       if (response.statusCode != 200) {
         // Only the exact 403 + voice_daily_limit pair raises the limit flag
@@ -557,7 +650,8 @@ class RemoteSttService {
         // without a device log.
         _fail(
           mintRefusalCode('deepgram', response.statusCode),
-          refusalBodyPreview(response.data),
+          'contentType=${response.headers.value(Headers.contentTypeHeader)} '
+          '${refusalBodyPreview(response.data)}',
         );
         VoiceTelemetry.mark('STT lease refused (HTTP ${response.statusCode})');
         debugPrint("[RemoteStt] Token declined: HTTP ${response.statusCode}");
@@ -571,6 +665,7 @@ class RemoteSttService {
         return null;
       }
       final sessionId = data?['sessionId'];
+      final model = data?['model'];
       final voice = _readVoiceFields(data);
       final provider = data?['provider'] == 'assemblyai'
           ? 'assemblyai'
@@ -580,6 +675,7 @@ class RemoteSttService {
         token: token,
         sessionId: sessionId is String ? sessionId : null,
         provider: provider,
+        model: model is String ? model : null,
         allowanceVoiceSeconds: voice?['allowanceSeconds'],
         remainingVoiceSeconds: voice?['remainingSeconds'],
         reservedVoiceSeconds: voice?['reservedSeconds'],
@@ -652,15 +748,33 @@ class RemoteSttService {
   /// through — nothing here casts or parses the body).
   @visibleForTesting
   static String refusalBodyPreview(dynamic rawBody, [int limit = 160]) {
-    if (rawBody is Map) {
-      final error = rawBody['error'];
+    final decoded = decodeSpeechTokenResponse(rawBody);
+    if (decoded != null) {
+      final error = decoded['error'];
       if (error is String) return _collapseForReport(error, limit);
+      return 'unrecognized error object';
     }
     return _collapseForReport(rawBody?.toString() ?? '', limit);
   }
 
   static String _collapseForReport(String text, int limit) {
-    final collapsed = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+    final redacted = text
+        .replaceAll(
+          RegExp(r'''(?:Bearer|Token)\s+[^\s<>"']+''', caseSensitive: false),
+          '[credential redacted]',
+        )
+        .replaceAll(
+          RegExp(r'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'),
+          '[JWT redacted]',
+        )
+        .replaceAll(
+          RegExp(
+            r'''(?:access_token|token|api[_-]?key|authorization|x-firebase-appcheck)["']*\s*[:=]\s*["']?[^\s<>"',}]+''',
+            caseSensitive: false,
+          ),
+          '[credential redacted]',
+        );
+    final collapsed = redacted.replaceAll(RegExp(r'\s+'), ' ').trim();
     if (collapsed.length <= limit) return collapsed;
     return collapsed.substring(0, limit);
   }
@@ -672,19 +786,15 @@ class RemoteSttService {
       final idToken = await user.getIdToken();
       if (idToken == null) return null;
 
-      final response = await _dio.post<dynamic>(
+      final response = await requestSpeechToken(
+        _dio,
         _assemblyTokenEndpoint,
+        idToken: idToken,
         data: mode == null
             ? const <String, dynamic>{}
             : <String, dynamic>{'mode': mode},
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $idToken',
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          validateStatus: (_) => true,
-        ),
       );
+      fallbackBlocked = blocksSpeechFallback(response.statusCode);
       final data = decodeSpeechTokenResponse(response.data);
       if (response.statusCode != 200) {
         // Same exact-pair rule as the Deepgram mint: only 403 +
@@ -696,7 +806,8 @@ class RemoteSttService {
         );
         _fail(
           mintRefusalCode('assemblyai', response.statusCode),
-          refusalBodyPreview(response.data),
+          'contentType=${response.headers.value(Headers.contentTypeHeader)} '
+          '${refusalBodyPreview(response.data)}',
         );
         VoiceTelemetry.mark(
           'STT assembly lease refused (HTTP ${response.statusCode})',
@@ -709,12 +820,14 @@ class RemoteSttService {
         return null;
       }
       final sessionId = data?['sessionId'];
+      final model = data?['model'];
       final voice = _readVoiceFields(data);
       VoiceTelemetry.mark('STT assembly lease granted');
       return _SpeechLease(
         token: token,
         sessionId: sessionId is String ? sessionId : null,
         provider: 'assemblyai',
+        model: model is String ? model : null,
         allowanceVoiceSeconds: voice?['allowanceSeconds'],
         remainingVoiceSeconds: voice?['remainingSeconds'],
         reservedVoiceSeconds: voice?['reservedSeconds'],
@@ -729,6 +842,7 @@ class RemoteSttService {
   Future<bool> _startAssemblyAi({
     required AudioRecorder recorder,
     required String token,
+    String model = 'universal-3-5-pro',
     required int epoch,
     String? sessionId,
     required void Function(SttResult result) onResult,
@@ -747,7 +861,7 @@ class RemoteSttService {
           .replace(
             queryParameters: {
               'sample_rate': '$_sampleRate',
-              'speech_model': 'universal-3-5-pro',
+              'speech_model': model,
               'token': token,
             },
           );
@@ -830,6 +944,95 @@ class RemoteSttService {
     return true;
   }
 
+  Future<bool> _startElevenLabs({
+    required AudioRecorder recorder,
+    required String token,
+    required String model,
+    required int epoch,
+    String? sessionId,
+    String? language,
+    required void Function(SttResult result) onResult,
+    void Function(SttCloseInfo info)? onClosed,
+  }) async {
+    final socketGen = ++_socketGen;
+    try {
+      final query = <String, String>{
+        'model_id': model,
+        'token': token,
+        'audio_format': 'pcm_16000',
+      };
+      if (language != null && language.isNotEmpty) {
+        query['language_code'] = language;
+      }
+      final url = Uri.parse(
+        'wss://api.elevenlabs.io/v1/speech-to-text/realtime',
+      ).replace(queryParameters: query);
+      VoiceTelemetry.mark('STT socket connect start (elevenlabs)');
+      _socket = await WebSocket.connect(url.toString())
+          .timeout(const Duration(seconds: 10));
+    } catch (error) {
+      _fail('ELEVENLABS_CONNECT_FAILED', error);
+      _socket = null;
+      return false;
+    }
+    _recorder = recorder;
+    _provider = 'elevenlabs';
+    _sessionId = sessionId;
+    _sessionStartedAt = DateTime.now();
+    _lastErrorMsgCode = null;
+    _pcmForwarded = false;
+    _socket!.listen(
+      (dynamic message) {
+        if (epoch != _epoch || socketGen != _socketGen || message is! String) {
+          return;
+        }
+        final result = _parseElevenLabsTranscript(message);
+        if (result != null) {
+          _transcriptsSeen++;
+          onResult(result);
+        }
+      },
+      onError: (Object error) {
+        if (epoch != _epoch || socketGen != _socketGen) return;
+        _handleUnexpectedSocketDeath(
+          epoch,
+          SttCloseInfo(
+            provider: 'elevenlabs',
+            closeCode: _socket?.closeCode,
+            closeReason: _socket?.closeReason,
+            closeClass: SttCloseInfo.classify(
+              provider: 'elevenlabs',
+              closeCode: _socket?.closeCode,
+              closeReason: _socket?.closeReason,
+            ),
+          ),
+          onClosed,
+        );
+      },
+      onDone: () {
+        if (epoch != _epoch || socketGen != _socketGen || _closing) return;
+        _handleUnexpectedSocketDeath(
+          epoch,
+          SttCloseInfo(
+            provider: 'elevenlabs',
+            closeCode: _socket?.closeCode,
+            closeReason: _socket?.closeReason,
+            closeClass: SttCloseInfo.classify(
+              provider: 'elevenlabs',
+              closeCode: _socket?.closeCode,
+              closeReason: _socket?.closeReason,
+            ),
+          ),
+          onClosed,
+        );
+      },
+      cancelOnError: true,
+    );
+    _startCaptureWatchdog(epoch);
+    VoiceTelemetry.mark('STT socket open (elevenlabs)');
+    return true;
+  }
+
   /// Opens the microphone and starts transcribing.
   ///
   /// Returns false if the remote path could not be established, in which case
@@ -861,6 +1064,59 @@ class RemoteSttService {
     );
   }
 
+  Future<bool> _openDynamicRoute(
+    SttRoute route, {
+    required AudioRecorder recorder,
+    required int epoch,
+    required void Function(SttResult result) onResult,
+    void Function(SttCloseInfo info)? onClosed,
+    void Function(SttLease lease)? onLease,
+  }) async {
+    final lease = _SpeechLease(
+      token: route.token,
+      sessionId: route.sessionId,
+      provider: route.provider,
+      model: route.model,
+      routeId: route.routeId,
+      allowanceVoiceSeconds: route.allowanceVoiceSeconds,
+      remainingVoiceSeconds: route.remainingVoiceSeconds,
+      reservedVoiceSeconds: route.reservedVoiceSeconds,
+    );
+    final opened = switch (route.provider) {
+      'elevenlabs' => await _startElevenLabs(
+        recorder: recorder,
+        token: route.token,
+        model: route.model,
+        language: route.language,
+        sessionId: route.sessionId,
+        epoch: epoch,
+        onResult: onResult,
+        onClosed: onClosed,
+      ),
+      'assemblyai' => await _startAssemblyAi(
+        recorder: recorder,
+        token: route.token,
+        model: route.model,
+        sessionId: route.sessionId,
+        epoch: epoch,
+        onResult: onResult,
+        onClosed: onClosed,
+      ),
+      _ => await _openDeepgramSocket(
+        lease: lease,
+        epoch: epoch,
+        onResult: onResult,
+        onClosed: onClosed,
+      ),
+    };
+    if (opened) {
+      _announceLease(lease, onLease);
+      return true;
+    }
+    await _abandonLease(lease);
+    return false;
+  }
+
   Future<bool> _startInternal({
     required void Function(SttResult result) onResult,
     void Function(SttCloseInfo info)? onClosed,
@@ -869,11 +1125,18 @@ class RemoteSttService {
   }) async {
     final int epoch = ++_epoch;
     dailyVoiceLimitReached = false;
+    fallbackBlocked = false;
     // Every transcript that reaches the caller also refreshes the health
     // clock — "last transcript received" is one of the facts the health line
     // reports, and the watchdog's recovery decisions are auditable from it.
     void stampedOnResult(SttResult result) {
       _lastTranscriptAt = DateTime.now();
+      if (result.language != null && result.confidence != null) {
+        _languageState = _languageState.observe(
+          result.language,
+          result.confidence!,
+        );
+      }
       onResult(result);
     }
 
@@ -900,6 +1163,7 @@ class RemoteSttService {
     }
     _closing = false;
     _pending.clear();
+    _failedRouteProviders.clear();
 
     final recorder = AudioRecorder();
     try {
@@ -933,10 +1197,45 @@ class RemoteSttService {
       return false;
     }
 
-    // ── 2. Now that there is audio to send, buy a token ──
+    // ── 2. Ask the role-based router for a sticky provider/model route. ──
+    // The legacy provider endpoints remain the migration fallback while
+    // deployments converge on the generic route function.
+    final dynamicRoute = await _fetchDynamicRoute(mode: mode);
+    if (dynamicRoute != null) {
+      final opened = await _openDynamicRoute(
+        dynamicRoute,
+        recorder: recorder,
+        epoch: epoch,
+        onResult: stampedOnResult,
+        onClosed: onClosed,
+        onLease: onLease,
+      );
+      if (opened) {
+        return true;
+      }
+      _failedRouteProviders.add(dynamicRoute.provider);
+      final retryRoute = await _fetchDynamicRoute(mode: mode);
+      if (retryRoute != null &&
+          await _openDynamicRoute(
+            retryRoute,
+            recorder: recorder,
+            epoch: epoch,
+            onResult: stampedOnResult,
+            onClosed: onClosed,
+            onLease: onLease,
+          )) {
+        return true;
+      }
+      if (fallbackBlocked) {
+        await _stopInternal();
+        return false;
+      }
+    }
+
+    // ── 3. Legacy migration fallback: buy a Deepgram token. ──
     final lease = await _fetchToken(mode: mode);
     if (lease == null) {
-      if (dailyVoiceLimitReached) {
+      if (fallbackBlocked) {
         await _stopInternal();
         return false;
       }
@@ -947,6 +1246,7 @@ class RemoteSttService {
         final startedAssembly = await _startAssemblyAi(
           recorder: recorder,
           token: assemblyLease.token,
+          model: assemblyLease.model ?? 'universal-3-5-pro',
           sessionId: assemblyLease.sessionId,
           epoch: epoch,
           onResult: stampedOnResult,
@@ -989,6 +1289,7 @@ class RemoteSttService {
       final startedAssembly = await _startAssemblyAi(
         recorder: recorder,
         token: assemblyLease.token,
+        model: assemblyLease.model ?? 'universal-3-5-pro',
         sessionId: assemblyLease.sessionId,
         epoch: epoch,
         onResult: stampedOnResult,
@@ -1019,8 +1320,21 @@ class RemoteSttService {
     final socketGen = ++_socketGen;
     try {
       VoiceTelemetry.mark('STT socket connect start (deepgram)');
+      final deepgramUrl = Uri.parse('wss://api.deepgram.com/v1/listen').replace(
+        queryParameters: {
+          'model': lease.model ?? 'nova-3',
+          'language': lease.model?.contains('multilingual') == true
+              ? 'multi'
+              : 'multi',
+          'encoding': 'linear16',
+          'sample_rate': '$_sampleRate',
+          'channels': '1',
+          'interim_results': 'true',
+          'smart_format': 'true',
+        },
+      );
       _socket = await WebSocket.connect(
-        _listenUrl,
+        deepgramUrl.toString(),
         headers: {'Authorization': 'Bearer ${lease.token}'},
       ).timeout(const Duration(seconds: 10));
     } catch (e) {
@@ -1179,6 +1493,7 @@ class RemoteSttService {
       }
       final socket = _socket;
       if (socket == null || socket.readyState != WebSocket.open) return;
+      if (_provider == 'elevenlabs') return;
       if (!keepAliveDue(
         provider: _provider,
         lastAudioSentAt: _lastAudioSentAt,
@@ -1434,8 +1749,27 @@ class RemoteSttService {
     } catch (_) {}
 
     final epoch = _epoch;
-    // A fresh token — the old one died with the socket. Deepgram first,
-    // then the AssemblyAI takeover, mirroring the original start path.
+    // Re-mint the sticky catalog route first. Only a failed route/provider
+    // recovery falls through to the legacy provider walk.
+    final dynamicRoute = await _fetchDynamicRoute(mode: _activeMode);
+    final recorder = _recorder;
+    if (dynamicRoute != null && recorder != null) {
+      if (await _openDynamicRoute(
+        dynamicRoute,
+        recorder: recorder,
+        epoch: epoch,
+        onResult: onResult,
+        onClosed: onClosed,
+        onLease: onLease,
+      )) {
+        return true;
+      }
+      if (fallbackBlocked) {
+        return false;
+      }
+    }
+    // A fresh legacy token — the old one died with the socket. Deepgram first,
+    // then the AssemblyAI takeover, mirroring the migration fallback.
     final lease = await _fetchToken(mode: _activeMode);
     if (lease != null) {
       final opened = await _openDeepgramSocket(
@@ -1455,13 +1789,13 @@ class RemoteSttService {
     // When the daily pool is exhausted the takeover mint draws from the
     // same empty pool: a pointless request that would also report the limit
     // state as if it were new.
-    if (!dailyVoiceLimitReached) {
+    if (!fallbackBlocked) {
       final assemblyLease = await _fetchAssemblyToken(mode: _activeMode);
-      final recorder = _recorder;
       if (assemblyLease != null && recorder != null) {
         final started = await _startAssemblyAi(
           recorder: recorder,
           token: assemblyLease.token,
+          model: assemblyLease.model ?? 'universal-3-5-pro',
           sessionId: assemblyLease.sessionId,
           epoch: epoch,
           onResult: onResult,
@@ -1532,10 +1866,26 @@ class RemoteSttService {
       await outgoing?.close();
     } catch (_) {}
 
-    // A fresh lease for the new socket. When the daily pool is exhausted
+    // A fresh sticky catalog route for the new socket. When the daily pool is exhausted
     // the mint is refused and the AssemblyAI takeover is pointless — its
     // mint draws from the same empty pool — so the rotation fails and the
     // caller ends the session with the limit reason.
+    final dynamicRoute = await _fetchDynamicRoute(mode: _activeMode);
+    final recorder = _recorder;
+    if (dynamicRoute != null && recorder != null) {
+      if (await _openDynamicRoute(
+        dynamicRoute,
+        recorder: recorder,
+        epoch: _epoch,
+        onResult: onResult,
+        onClosed: onClosed,
+        onLease: onLease,
+      )) {
+        VoiceTelemetry.mark('STT socket rotated (${dynamicRoute.provider})');
+        return true;
+      }
+      if (fallbackBlocked) return false;
+    }
     final lease = await _fetchToken(mode: _activeMode);
     if (lease != null) {
       final epoch = _epoch;
@@ -1553,13 +1903,13 @@ class RemoteSttService {
       // The rotation's fresh lease died with the failed connect: settle it
       // before the takeover mint reads the same daily pool.
       await _abandonLease(lease);
-      if (!dailyVoiceLimitReached) {
+      if (!fallbackBlocked) {
         final assemblyLease = await _fetchAssemblyToken(mode: _activeMode);
-        final recorder = _recorder;
         if (assemblyLease != null && recorder != null) {
           final started = await _startAssemblyAi(
             recorder: recorder,
             token: assemblyLease.token,
+            model: assemblyLease.model ?? 'universal-3-5-pro',
             sessionId: assemblyLease.sessionId,
             epoch: epoch,
             onResult: onResult,
@@ -1593,6 +1943,8 @@ class RemoteSttService {
         allowanceVoiceSeconds: lease.allowanceVoiceSeconds,
         remainingVoiceSeconds: lease.remainingVoiceSeconds,
         reservedVoiceSeconds: lease.reservedVoiceSeconds,
+        model: lease.model,
+        routeId: lease.routeId,
       ),
     );
   }
@@ -1705,11 +2057,11 @@ class RemoteSttService {
           if (socket != null && socket.readyState == WebSocket.open) {
             if (_pending.isNotEmpty) {
               for (final held in _pending) {
-                socket.add(held);
+                _sendPcmChunk(socket, held);
               }
               _pending.clear();
             }
-            socket.add(chunk);
+            _sendPcmChunk(socket, chunk);
             if (!_pcmForwarded) {
               _pcmForwarded = true;
               VoiceTelemetry.mark('first PCM forwarded to socket');
@@ -1766,6 +2118,20 @@ class RemoteSttService {
     }
 
     return false;
+  }
+
+  void _sendPcmChunk(WebSocket socket, Uint8List chunk) {
+    if (_provider == 'elevenlabs') {
+      socket.add(
+        jsonEncode({
+          'message_type': 'input_audio_chunk',
+          'audio_base_64': base64Encode(chunk),
+          'commit': false,
+        }),
+      );
+    } else {
+      socket.add(chunk);
+    }
   }
 
   /// Closes the microphone and the socket, asking Deepgram to flush whatever
@@ -1842,11 +2208,21 @@ class RemoteSttService {
     if (socket != null) {
       try {
         if (socket.readyState == WebSocket.open) {
-          socket.add(
-            jsonEncode({
-              'type': provider == 'assemblyai' ? 'Terminate' : 'CloseStream',
-            }),
-          );
+          if (provider == 'elevenlabs') {
+            socket.add(
+              jsonEncode({
+                'message_type': 'input_audio_chunk',
+                'audio_base_64': '',
+                'commit': true,
+              }),
+            );
+          } else {
+            socket.add(
+              jsonEncode({
+                'type': provider == 'assemblyai' ? 'Terminate' : 'CloseStream',
+              }),
+            );
+          }
           // Let the provider deliver its final usage metadata before closing.
           await Future<void>.delayed(const Duration(milliseconds: 400));
         }
@@ -1900,6 +2276,7 @@ class RemoteSttService {
             'Authorization': 'Bearer $idToken',
             'Content-Type': 'application/json; charset=UTF-8',
           },
+          responseType: ResponseType.plain,
           validateStatus: (_) => true,
         ),
       );
@@ -2003,6 +2380,11 @@ class RemoteSttService {
         transcript.trim(),
         isFinal: decoded['is_final'] == true,
         confidence: confidence is num ? confidence.toDouble() : null,
+        language: decoded['language'] is String
+            ? decoded['language'] as String
+            : decoded['detected_language'] is String
+            ? decoded['detected_language'] as String
+            : null,
       );
     } catch (e) {
       debugPrint("[RemoteStt] Could not parse message: $e");
@@ -2063,9 +2445,40 @@ class RemoteSttService {
         transcript.trim(),
         isFinal: decoded['end_of_turn'] == true,
         confidence: confidence is num ? confidence.toDouble() : null,
+        language: decoded['language'] is String
+            ? decoded['language'] as String
+            : null,
       );
     } catch (e) {
       debugPrint("[RemoteStt] Could not parse AssemblyAI message: $e");
+      return null;
+    }
+  }
+
+  SttResult? _parseElevenLabsTranscript(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) return null;
+      final type = decoded['message_type'] ?? decoded['type'];
+      final text = decoded['text'] ?? decoded['transcript'];
+      if (text is! String || text.trim().isEmpty) return null;
+      final finalResult =
+          type == 'committed_transcript' ||
+          type == 'committed_transcript_with_timestamps' ||
+          decoded['is_final'] == true;
+      final confidence = decoded['confidence'];
+      return SttResult(
+        text.trim(),
+        isFinal: finalResult,
+        confidence: confidence is num ? confidence.toDouble() : null,
+        language: decoded['language_code'] is String
+            ? decoded['language_code'] as String
+            : decoded['language'] is String
+            ? decoded['language'] as String
+            : null,
+      );
+    } catch (error) {
+      debugPrint('[RemoteStt] Could not parse ElevenLabs message: $error');
       return null;
     }
   }

@@ -13,7 +13,7 @@
 // when several independent signals agree:
 //
 //   * a transcript the provider was confident about (>= [minConfidence]),
-//     with at least [minWords] words (single-word echoes don't count),
+//     with at least [minWords] words (single-word echoes are rejected),
 //   * that is not the assistant's own words echoed back ([echoSimilarity]
 //     against the recently spoken sentences below [echoSimilarityLimit]),
 //   * arriving outside the [postTtsDiscardWindow] after playback stopped
@@ -36,7 +36,7 @@ class BargeInDetector {
 
   /// How long the level must stay above the floor to count as a sustained
   /// voice, not a transient blip.
-  static const Duration amplitudeSustain = Duration(milliseconds: 300);
+  static const Duration amplitudeSustain = Duration(milliseconds: 180);
 
   /// Provider confidence an incoming transcript needs to count as evidence.
   /// Null confidence ("unknown", not "zero") does not disqualify — the
@@ -44,7 +44,7 @@ class BargeInDetector {
   static const double minConfidence = 0.75;
 
   /// Minimum word count in the transcript evidence.
-  static const int minWords = 2;
+  static const int minWords = 1;
 
   /// Token-set similarity at or above which a transcript is judged to be
   /// the assistant's own words coming back (echo), not the user.
@@ -74,6 +74,7 @@ class BargeInDetector {
   /// Whether an accepted transcript (confident, non-echo, in-window) has
   /// been seen since the last reset.
   bool _transcriptEvidence = false;
+  String acceptedTranscript = '';
 
   /// One-shot latch: barge-in fires once per reset cycle.
   bool _fired = false;
@@ -123,10 +124,14 @@ class BargeInDetector {
 
     // The assistant's own words bouncing back from the speaker.
     for (final fingerprint in _assistantFingerprints) {
-      if (echoSimilarity(text, fingerprint) >= echoSimilarityLimit) return;
+      if (echoSimilarity(text, fingerprint) >= echoSimilarityLimit ||
+          fingerprint.split(' ').contains(_normalize(text))) {
+        return;
+      }
     }
 
     _transcriptEvidence = true;
+    acceptedTranscript = text;
   }
 
   /// One microphone level sample (0..1) observed while the assistant speaks.
@@ -160,6 +165,7 @@ class BargeInDetector {
     _loudSince = null;
     _loudNow = false;
     _transcriptEvidence = false;
+    acceptedTranscript = '';
     _fired = false;
   }
 
@@ -184,7 +190,7 @@ class BargeInDetector {
   static String _normalize(String text) {
     return text
         .toLowerCase()
-        .replaceAll(RegExp(r'[^a-z0-9çğıöşü\s]'), ' ')
+        .replaceAll(RegExp(r'[^\p{L}\p{N}\s]', unicode: true), ' ')
         .trim();
   }
 }
