@@ -32,6 +32,7 @@ class _PremiumButtonState extends State<PremiumButton>
   late final AnimationController _shineController;
   late final Animation<double> _shineAnimation;
   Timer? _timer;
+  Timer? _initialShineTimer;
 
   @override
   void initState() {
@@ -48,7 +49,7 @@ class _PremiumButtonState extends State<PremiumButton>
     );
 
     // Start initial animation after 1 second
-    Future.delayed(const Duration(seconds: 1), () {
+    _initialShineTimer = Timer(const Duration(seconds: 1), () {
       if (mounted) _shineController.forward(from: 0.0);
     });
 
@@ -67,6 +68,7 @@ class _PremiumButtonState extends State<PremiumButton>
 
   @override
   void dispose() {
+    _initialShineTimer?.cancel();
     _shineController.dispose();
     _timer?.cancel();
     super.dispose();
