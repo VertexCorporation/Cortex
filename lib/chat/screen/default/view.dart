@@ -359,9 +359,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   isDisabled: false,
                   // "Use Offline" must select a local offline model — never
                   // arm Web Search (the accidental coupling this button used
-                  // to have). The canonical action picks the strongest
-                  // installed offline model, or routes to the Library's
-                  // Local Models section (pulse) when none is installed.
+                  // to have). Empty chat opens the guided local setup.
                   onTap: () => showOfflineSetup(context),
                 ),
               ),

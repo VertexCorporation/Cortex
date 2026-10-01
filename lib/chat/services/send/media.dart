@@ -290,9 +290,19 @@ class MediaRouter {
 
   static bool isMusicGenerationModel(ModelEntity model) {
     if (!model.isServerSide || model.source.toLowerCase() != 'fal' ||
-        model.outputs['audio'] != true) return false;
+        model.outputs['audio'] != true) {
+      return false;
+    }
+    // The composer starts from text. Audio-only editors need an attachment.
+    if (model.modalities['text'] == false ||
+        (model.modalities['audio'] == true && model.modalities['text'] != true)) {
+      return false;
+    }
     final id = model.id.toLowerCase();
-    if (id.contains('tts') || id.contains('text-to-speech')) return false;
+    if (id.contains('tts') || id.contains('text-to-speech') ||
+        model.category.toLowerCase() == 'speech') {
+      return false;
+    }
     final metadata = '${model.id} ${model.displayTitle} ${model.displaySummary}'
         .toLowerCase().replaceAll('ü', 'u').replaceAll('ş', 's').replaceAll('ı', 'i');
     return model.category == 'music' || model.outputs['music'] == true ||

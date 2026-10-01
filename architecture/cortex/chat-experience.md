@@ -39,6 +39,9 @@ models are excluded. Missing music capability is reported before the request;
 the client never substitutes a demo song. Generation, audio events, persistence,
 playback and sharing use the existing media pipeline. Duration/style/lyrics
 remain user prompt content; provider capability enforcement stays in Fulcrum.
+Music failures retain their provider error instead of retrying generic audio
+routing, which could generate speech or sound effects. The music path disables
+text tools and web search, and excludes audio-only editing models.
 
 The Fulcrum GitHub repository was inaccessible during development. The supplied
 Fulcrum-main (5).zip confirms the `generating_audio` and `audio_chunk {url}`
