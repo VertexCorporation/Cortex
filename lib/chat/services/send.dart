@@ -443,6 +443,7 @@ class SendService {
         ChatInputMode.imageGeneration => 'image',
         ChatInputMode.videoGeneration => 'video',
         ChatInputMode.audioGeneration => 'audio',
+        ChatInputMode.musicGeneration => 'audio',
         _ => null,
       };
 
@@ -509,6 +510,18 @@ class SendService {
         );
       }
 
+      if (activeMode == ChatInputMode.musicGeneration) {
+        final musicModel = _mediaRouter.findMusicGenerationModel(
+          langCode: langCode,
+          isUserSubscribed: sessionProvider.isUserSubscribed,
+        );
+        if (musicModel == null) {
+          throw ApiException(localizations.musicGenerationUnavailable,
+              code: 'MUSIC_MODEL_UNAVAILABLE');
+        }
+        apiModelIdForSend = musicModel.id;
+      }
+
       final intentResolvedModelId = _mediaRouter.resolveAttachmentIntentModelId(
         currentModelId: apiModelIdForSend ?? 'cortex/auto',
         text: text,
@@ -521,7 +534,8 @@ class SendService {
       }
 
       // Smart Selection Logic
-      if (apiModelIdForSend != null && apiModelIdForSend != 'cortex/auto') {
+      if (activeMode != ChatInputMode.musicGeneration &&
+          apiModelIdForSend != null && apiModelIdForSend != 'cortex/auto') {
         final ModelEntity entity = _modelService.getPreciseModelData(
           apiModelIdForSend,
           langCode: langCode,
@@ -1776,16 +1790,6 @@ class SendService {
         await Future.delayed(const Duration(seconds: 2));
         await onImageReceived(
           "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-        );
-        _conversationProvider.finishBotResponse(aiMessageIndex);
-        return;
-      }
-
-      if (initialText.toLowerCase().trim() == "test audio") {
-        onMediaGenerating('audio');
-        await Future.delayed(const Duration(seconds: 2));
-        await onAudioReceived(
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         );
         _conversationProvider.finishBotResponse(aiMessageIndex);
         return;

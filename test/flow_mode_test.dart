@@ -4,6 +4,28 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('restarting Flow under the same voice session invalidates old completions', () {
+    final flow = FlowOrchestrator();
+    final old = flow.begin(newGeneration: 7);
+    flow.stop();
+    final current = flow.begin(newGeneration: 7);
+    expect(current, greaterThan(old));
+    expect(flow.completeAi(expectedGeneration: old), isNull);
+    expect(flow.currentParticipant, FlowParticipant.blue);
+    expect(flow.completeAi(expectedGeneration: current), FlowParticipant.red);
+  });
+
+  test('a completion cannot advance a human turn or restart a stopped round', () {
+    final flow = FlowOrchestrator()..begin(newGeneration: 3);
+    flow.beginUserTurn();
+    expect(flow.completeAi(expectedGeneration: flow.generation), isNull);
+    expect(flow.phase, FlowPhase.userSpeaking);
+    flow.stop();
+    flow.beginNextRound(expectedGeneration: flow.generation);
+    expect(flow.phase, FlowPhase.stopped);
+    expect(flow.round, 0);
+  });
+
   test('Flow progresses Blue → Red → Green → Yellow', () {
     final flow = FlowOrchestrator()..begin(newGeneration: 7);
 

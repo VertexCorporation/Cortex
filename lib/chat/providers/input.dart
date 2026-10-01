@@ -23,6 +23,7 @@ enum ChatInputMode {
   imageGeneration,
   videoGeneration,
   audioGeneration,
+  musicGeneration,
 }
 
 enum AttachmentType { image, document }

@@ -9,6 +9,7 @@ ChatInputMode? generationModeForTarget(String targetType) {
     'image' => ChatInputMode.imageGeneration,
     'video' => ChatInputMode.videoGeneration,
     'audio' => ChatInputMode.audioGeneration,
+    'music' => ChatInputMode.musicGeneration,
     _ => null,
   };
 }

@@ -68,7 +68,10 @@ class FlowOrchestrator {
   bool get isRunning => phase != FlowPhase.idle && phase != FlowPhase.stopped;
 
   int begin({int? newGeneration}) {
-    generation = newGeneration ?? generation + 1;
+    // Session identities can be reused across Flow restarts. The Flow epoch
+    // must still increase so callbacks from the old round cannot advance it.
+    generation = newGeneration != null && newGeneration > generation
+        ? newGeneration : generation + 1;
     round = 0;
     currentParticipant = FlowParticipant.blue;
     phase = FlowPhase.thinking;
@@ -90,7 +93,8 @@ class FlowOrchestrator {
   }
 
   FlowParticipant? completeAi({required int expectedGeneration}) {
-    if (expectedGeneration != generation || !isRunning) return null;
+    if (expectedGeneration != generation ||
+        (phase != FlowPhase.thinking && phase != FlowPhase.aiSpeaking)) return null;
     if (currentParticipant == FlowParticipant.yellow) {
       phase = FlowPhase.interRoundPause;
       return null;
@@ -103,7 +107,9 @@ class FlowOrchestrator {
   }
 
   FlowParticipant beginNextRound({required int expectedGeneration}) {
-    if (expectedGeneration != generation) return currentParticipant;
+    if (expectedGeneration != generation || phase != FlowPhase.interRoundPause) {
+      return currentParticipant;
+    }
     round++;
     currentParticipant = FlowParticipant.blue;
     phase = FlowPhase.thinking;
