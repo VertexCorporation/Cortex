@@ -791,6 +791,47 @@ void main() {
     },
   );
 
+  test('four failed Flow participants end the session without an endless request loop', () async {
+    await startTestSession();
+    var requests = 0;
+    voiceService.configureFlow(
+      modelIds: List.filled(4, 'cortex/auto'),
+      onFlowTurn: (_, _) {
+        requests++;
+        throw StateError('provider unavailable');
+      },
+    );
+    voiceService.startFlowWithPrompt('Discuss the topic.');
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+
+    expect(requests, 4);
+    expect(voiceService.isSessionActive, isFalse);
+    expect(voiceService.lastEndReason, VoiceEndReason.error);
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    expect(requests, 4);
+  });
+
+  test('interrupting Flow cancels the next participant and keeps the live microphone', () async {
+    await startTestSession();
+    var requests = 0;
+    voiceService.configureFlow(
+      modelIds: List.filled(4, 'cortex/auto'),
+      onFlowTurn: (_, _) { requests++; },
+    );
+    voiceService.startFlowWithPrompt('Discuss the topic.');
+    voiceService.setAiGenerationComplete(true);
+    final captureStarts = mockSpeechService.startCount;
+    voiceService.interruptFlowAndListen();
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+
+    expect(requests, 1);
+    expect(voiceService.isSessionActive, isTrue);
+    expect(voiceService.state, VoiceState.listening);
+    expect(mockSpeechService.isListening, isTrue);
+    expect(mockSpeechService.startCount, captureStarts);
+    expect(voiceService.liveTranscript, isEmpty);
+  });
+
   test('a double completion schedules exactly ONE flow rotation (no orphaned timer)', () async {
     await startTestSession();
     voiceService.setFlowMode(true);

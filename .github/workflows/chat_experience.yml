@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: chat-experience-${{ github.ref }}
+  group: chat-experience-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
   regression:
