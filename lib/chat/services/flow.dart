@@ -94,7 +94,9 @@ class FlowOrchestrator {
 
   FlowParticipant? completeAi({required int expectedGeneration}) {
     if (expectedGeneration != generation ||
-        (phase != FlowPhase.thinking && phase != FlowPhase.aiSpeaking)) return null;
+        (phase != FlowPhase.thinking && phase != FlowPhase.aiSpeaking)) {
+      return null;
+    }
     if (currentParticipant == FlowParticipant.yellow) {
       phase = FlowPhase.interRoundPause;
       return null;

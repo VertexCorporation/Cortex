@@ -3,6 +3,7 @@ import 'package:cortex/chat/screen/widgets/offline_setup.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
+import 'package:cortex/library/backend/download/download.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class _Session extends ChangeNotifier implements ChatSessionProvider {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _Catalogue implements ModelService {
+class _Catalogue extends ChangeNotifier implements ModelService {
   @override
   Future<List<ModelEntity>?> getModels({required String langCode}) async => [
     ModelEntity.fromMap({'id': 'offline-test', 'title': 'Device model',
@@ -28,8 +29,12 @@ class _Catalogue implements ModelService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _Local extends ModelLocalStateProvider {
+class _Local extends ChangeNotifier implements ModelLocalStateProvider {
   int downloads = 0;
+  @override
+  Map<String, bool> get downloadCompleted => const {};
+  @override
+  Map<String, DownloadManager> get downloadManagers => const {};
   @override
   Future<bool> requestPermissionAndStartDownload({required BuildContext context,
       required String id, required String? url}) async {
@@ -37,7 +42,7 @@ class _Local extends ModelLocalStateProvider {
     return false;
   }
   @override
-  void dispose() {}
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
@@ -52,10 +57,11 @@ void main() {
       }
     });
     final local = _Local();
+    addTearDown(local.dispose);
     await tester.pumpWidget(MultiProvider(providers: [
       ChangeNotifierProvider<ChatSessionProvider>(create: (_) => _Session()),
       ChangeNotifierProvider<ModelLocalStateProvider>.value(value: local),
-      Provider<ModelService>(create: (_) => _Catalogue()),
+      ChangeNotifierProvider<ModelService>(create: (_) => _Catalogue()),
       ChangeNotifierProvider<ThemeProvider>(create: (_) => ThemeProvider('dark')),
     ], child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,

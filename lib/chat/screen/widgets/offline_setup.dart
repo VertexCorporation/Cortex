@@ -43,7 +43,7 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
   int _generation = 0;
   bool _loading = false;
   bool _startingDownload = false;
-  bool _downloadRequested = false;
+  bool _downloadFailed = false;
   ModelEntity? _model;
 
   Future<void> _recommend() async {
@@ -86,11 +86,18 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
   Future<void> _download() async {
     final model = _model;
     if (model == null || _startingDownload) return;
-    setState(() { _startingDownload = true; });
-    final started = await context.read<ModelLocalStateProvider>()
-        .requestPermissionAndStartDownload(context: context, id: model.id, url: model.url);
-    if (!mounted) return;
-    setState(() { _startingDownload = false; _downloadRequested = started; });
+    setState(() { _startingDownload = true; _downloadFailed = false; });
+    var started = false;
+    try {
+      started = await context.read<ModelLocalStateProvider>()
+          .requestPermissionAndStartDownload(context: context, id: model.id, url: model.url);
+    } catch (_) {
+      // Keep the panel retryable if permission or download setup fails.
+    } finally {
+      if (mounted) {
+        setState(() { _startingDownload = false; _downloadFailed = !started; });
+      }
+    }
   }
 
   void _useModel() {
@@ -98,7 +105,9 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
     if (model == null) return;
     final local = context.read<ModelLocalStateProvider>();
     if (local.downloadCompleted[model.id] != true ||
-        !local.isModelOnDisk(local.getFilePathById(model.id))) return;
+        !local.isModelOnDisk(local.getFilePathById(model.id))) {
+      return;
+    }
     final input = context.read<InputProvider>();
     input.clearWebSearch();
     input.setFeatureMode(ChatInputMode.offline);
@@ -116,7 +125,10 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
     final local = context.watch<ModelLocalStateProvider>();
     final model = _model;
     final manager = model == null ? null : local.downloadManagers[model.id];
-    final ready = model != null && local.downloadCompleted[model.id] == true;
+    final ready = model != null && local.downloadCompleted[model.id] == true &&
+        local.isModelOnDisk(local.getFilePathById(model.id));
+    final missingRegisteredFile = model != null &&
+        local.downloadCompleted[model.id] == true && !ready;
     final downloading = manager?.isDownloading == true;
     final paused = manager?.isPaused == true;
     final title = switch (_page) {
@@ -172,7 +184,7 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
                     Text(l10n.downloaded(manager.progress.round())),
                   ],
                   if (paused) Text(l10n.downloadPaused),
-                  if (_downloadRequested && !downloading && !ready && !paused)
+                  if (_downloadFailed && !downloading && !ready && !paused)
                     Text(l10n.downloadFailed),
                 ],
               ],
@@ -194,8 +206,9 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
             if (_page == 2 && !_loading)
               SizedBox(width: double.infinity, child: FilledButton(
                 onPressed: _startingDownload || downloading ? null
-                    : model == null || paused ? _openLibrary : ready ? _useModel : _download,
-                child: Text(model == null || paused ? l10n.offlineModels
+                    : model == null || paused || missingRegisteredFile
+                        ? _openLibrary : ready ? _useModel : _download,
+                child: Text(model == null || paused || missingRegisteredFile ? l10n.offlineModels
                     : ready ? l10n.useOffline : downloading || _startingDownload
                         ? l10n.downloading : l10n.download),
               )),

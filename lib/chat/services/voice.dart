@@ -572,7 +572,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       _voiceTimer?.cancel();
       _voiceTimer = Timer(const Duration(milliseconds: 1400), () {
         if (gen != _activeGeneration || !isFlowActive ||
-            flowGeneration != _flow.generation) return;
+            flowGeneration != _flow.generation) {
+          return;
+        }
         _flow.beginNextRound(expectedGeneration: flowGeneration);
         currentFlowAgentIndex = FlowParticipant.blue.index;
         notifyListeners();
@@ -585,7 +587,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     _voiceTimer?.cancel();
     _voiceTimer = Timer(const Duration(milliseconds: 220), () {
       if (gen != _activeGeneration || !isFlowActive ||
-          flowGeneration != _flow.generation) return;
+          flowGeneration != _flow.generation) {
+        return;
+      }
       _requestFlowTurn(gen);
     });
   }
