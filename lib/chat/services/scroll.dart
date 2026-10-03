@@ -4,6 +4,7 @@ import 'package:cortex/design.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 
 /// A service class to manage all scrolling-related logic.
@@ -11,6 +12,24 @@ class ScrollService {
   ScrollController? _scrollController;
   ValueNotifier<bool>? _showScrollDownButtonNotifier;
   VoidCallback? _listener;
+  bool _followPaused = false;
+  bool _automaticScrollScheduled = false;
+  int _scrollEpoch = 0;
+
+  /// User input takes priority over token and reveal callbacks, even before
+  /// the first drag has moved far enough to leave the bottom threshold.
+  void handleScrollNotification(ScrollNotification notification) {
+    if (notification.depth != 0) return;
+    if ((notification is ScrollStartNotification &&
+            notification.dragDetails != null) ||
+        (notification is UserScrollNotification &&
+            notification.direction == ScrollDirection.forward)) {
+      _followPaused = true;
+      _scrollEpoch++;
+    } else if (notification is ScrollEndNotification) {
+      _followPaused = !isUserAtBottom();
+    }
+  }
 
   ScrollService();
 
@@ -19,12 +38,16 @@ class ScrollService {
     if (_scrollController != null) {
       detachListener();
     }
+    _scrollEpoch++;
+    _followPaused = false;
     _scrollController = controller;
   }
 
   /// Manually forces the button to hide and resets internal state.
   /// Call this when leaving the chat (dispose) or switching conversations.
   void reset() {
+    _scrollEpoch++;
+    _followPaused = false;
     detachListener();
     hideButtonImmediately(); // FIX: Explicitly hide button when resetting/leaving chat
     _scrollController = null;
@@ -154,31 +177,50 @@ class ScrollService {
   Future<void> scrollToBottom({
     double threshold = 10.0,
     Duration duration = const Duration(milliseconds: 300),
+    bool force = false,
   }) async {
-    await WidgetsBinding.instance.endOfFrame;
-
-    final position = _getSafePosition();
-    if (position == null) return;
-
+    if (!force && (_followPaused || _automaticScrollScheduled)) return;
+    if (force) {
+      _followPaused = false;
+      _scrollEpoch++;
+    }
+    final epoch = _scrollEpoch;
+    final controller = _scrollController;
+    if (!force) _automaticScrollScheduled = true;
     try {
+      await WidgetsBinding.instance.endOfFrame;
+      if (epoch != _scrollEpoch || controller != _scrollController) return;
+      final position = _getSafePosition();
+      if (position == null || (!force && _followPaused)) return;
+      // A live drag or fling must never be cancelled by arriving tokens.
+      if (!force && position.isScrollingNotifier.value) return;
       final targetOffset = position.maxScrollExtent;
       if ((targetOffset - position.pixels).abs() < threshold) return;
-
-      await _scrollController!.animateTo(
-        targetOffset,
-        duration: duration,
-        curve: Curves.easeOut,
-      );
-    } catch (e) {
-      // safe catch
+      if (force) {
+        await position.animateTo(
+          targetOffset,
+          duration: duration,
+          curve: Curves.easeOut,
+        );
+      } else {
+        // Follow once per frame without starting a new driven animation on
+        // every token (which would repeatedly interrupt the user's gesture).
+        position.jumpTo(targetOffset);
+      }
+    } finally {
+      if (!force) _automaticScrollScheduled = false;
     }
   }
 
   void jumpToBottom() {
+    final epoch = _scrollEpoch;
+    final controller = _scrollController;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (epoch != _scrollEpoch || controller != _scrollController ||
+          _followPaused) return;
       final position = _getSafePosition();
-      if (position != null) {
-        _scrollController!.jumpTo(position.maxScrollExtent);
+      if (position != null && !position.isScrollingNotifier.value) {
+        position.jumpTo(position.maxScrollExtent);
       }
     });
   }
@@ -238,7 +280,7 @@ class ScrollService {
                       HapticFeedback.lightImpact();
                       // Hide button immediately on tap
                       hideButtonImmediately();
-                      scrollToBottom();
+                      scrollToBottom(force: true);
                     },
                     customBorder: const CircleBorder(),
                     splashColor: AppColors.primaryColor.withValues(alpha: 0.3),

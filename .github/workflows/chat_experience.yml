@@ -37,7 +37,8 @@ jobs:
           test/flow_mode_test.dart test/voice_test.dart
           test/voice_turn_test.dart test/voice_barge_in_test.dart
           test/offline_use_action_test.dart test/media_classification_test.dart
-          test/composer_feature_state_test.dart
+          test/composer_feature_state_test.dart test/chat_scroll_test.dart
+          test/reveal_text_test.dart test/reveal_timeline_test.dart
   android:
     runs-on: ubuntu-latest
     timeout-minutes: 40
