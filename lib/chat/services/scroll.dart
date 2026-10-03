@@ -21,6 +21,10 @@ class ScrollService {
   void beginConversation() {
     _scrollEpoch++;
     _followPaused = false;
+    // An activity from the previous history must not keep the new list in
+    // scrolling state or emit a stale upward direction on its first layout.
+    final position = _getSafePosition();
+    if (position is ScrollPositionWithSingleContext) position.goIdle();
   }
 
   /// User input takes priority over token and reveal callbacks, even before
