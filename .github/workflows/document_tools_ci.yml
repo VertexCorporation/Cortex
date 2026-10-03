@@ -1,0 +1,58 @@
+name: Document tools validation
+on:
+  push:
+    branches: [feat/document-tools]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/chat/services/document_artifacts.dart'
+      - 'lib/chat/services/tools.dart'
+      - 'lib/chat/services/utils.dart'
+      - 'lib/chat/screen/widgets/execution.dart'
+      - 'lib/rag/extractors.dart'
+      - 'pubspec.yaml'
+      - 'test/document_*.dart'
+      - '.github/workflows/document_tools_ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: document-tools-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter gen-l10n
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - run: >-
+          flutter test test/document_artifact_safety_test.dart
+          test/document_attachment_scope_test.dart test/document_roundtrip_test.dart
+          test/rag_extractors_test.dart test/media_classification_test.dart
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter gen-l10n
+      - run: flutter build apk --debug --target-platform android-arm64

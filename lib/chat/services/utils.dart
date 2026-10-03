@@ -4,11 +4,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:mime/mime.dart';
+import 'package:uuid/uuid.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 
 /// A collection of static utility methods used across the application.
 class Utils {
+  static const Uuid _uuid = Uuid();
+
   static bool isLocalModel(
     String? modelId, {
     required String langCode,
@@ -124,7 +127,7 @@ class Utils {
   ///
   /// Returns a map with:
   /// - Standard content fields for API
-  /// - "_document": Optional document data for tool processing (binary files)
+  /// - "_document": Optional scoped document metadata for tool processing
   static Future<Map<String, dynamic>?> processAttachment(String path) async {
     try {
       final lowerPath = path.toLowerCase();
@@ -234,8 +237,10 @@ class Utils {
         }
       }
 
-      // 3. Binary documents - need server-side processing via tool
-      // These require specialized parsers (pdf-parse, mammoth for docx, xlsx, etc.)
+      // 3. Binary documents - parsed only if/when the model calls read_document.
+      // Keeping the local path here avoids eagerly reading + base64-encoding a
+      // potentially large PDF on the UI path. ToolRegistry materializes the
+      // scoped file immediately before the authenticated server tool call.
       final binaryDocExtensions = [
         'pdf', // PDF documents
         'doc', 'docx', // Word documents
@@ -245,37 +250,32 @@ class Utils {
       ];
 
       if (binaryDocExtensions.contains(extension)) {
-        try {
-          final bytes = await file.readAsBytes();
-          final base64Data = base64Encode(bytes);
-
-          // Determine document type for better tool instructions
-          String docType = 'document';
-          if (extension == 'pdf') {
-            docType = 'PDF';
-          } else if (['doc', 'docx', 'odt'].contains(extension)) {
-            docType = 'Word document';
-          } else if (['xls', 'xlsx', 'ods', 'csv'].contains(extension)) {
-            docType = 'spreadsheet';
-          } else if (['ppt', 'pptx', 'odp'].contains(extension)) {
-            docType = 'presentation';
-          }
-
-          return {
-            "type": "text",
-            "text":
-                "[Attached: $fileName ($docType)]\nUse the read_document tool to extract and read the contents of this file.",
-            "_document": {
-              "data": base64Data,
-              "media_type": mimeType,
-              "fileName": fileName,
-              "extension": extension,
-            }
-          };
-        } catch (e) {
-          debugPrint("[Utils] Error reading binary file: $e");
-          return null;
+        String docType = 'document';
+        if (extension == 'pdf') {
+          docType = 'PDF';
+        } else if (['doc', 'docx', 'odt'].contains(extension)) {
+          docType = 'Word document';
+        } else if (['xls', 'xlsx', 'ods', 'csv'].contains(extension)) {
+          docType = 'spreadsheet';
+        } else if (['ppt', 'pptx', 'odp'].contains(extension)) {
+          docType = 'presentation';
         }
+
+        final scope = _uuid.v4();
+        final fileSize = await file.length();
+        return {
+          "type": "text",
+          "text":
+              "[Attached: $fileName ($docType)]\nDocument scope: $scope\nUse the read_document tool with document_scope=\"$scope\" to extract and read this file. Do not reuse a scope from another message.",
+          "_document": {
+            "scope": scope,
+            "path": path,
+            "media_type": mimeType,
+            "fileName": fileName,
+            "extension": extension,
+            "size": fileSize,
+          }
+        };
       }
 
       // 4. Unknown/unsupported files - try text first, then report unsupported
@@ -298,14 +298,16 @@ class Utils {
     }
   }
 
-  /// Extracts document data from processed attachments for tool execution.
-  /// Returns a list of document objects that can be sent to the server for read_document tool.
+  /// Extracts scoped document metadata from processed attachments for tool execution.
+  /// Returns a list of document objects that can later be materialized by read_document.
   static List<Map<String, dynamic>> extractDocuments(
       List<Map<String, dynamic>> contentBlocks) {
     final documents = <Map<String, dynamic>>[];
     for (final block in contentBlocks) {
       if (block.containsKey('_document')) {
-        documents.add(block['_document'] as Map<String, dynamic>);
+        documents.add(
+          Map<String, dynamic>.from(block['_document'] as Map<String, dynamic>),
+        );
       }
     }
     return documents;

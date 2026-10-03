@@ -1,7 +1,11 @@
+import 'package:cortex/chat/services/document_artifacts.dart';
+
 import 'package:cortex/design.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../../messages/codeblocks.dart';
 
 class CodeExecutionWidget extends StatefulWidget {
@@ -16,15 +20,21 @@ class CodeExecutionWidget extends StatefulWidget {
 class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
   bool _isExpanded = true;
 
+  bool get _isDocumentArtifact {
+    final path = widget.data['artifact_path']?.toString() ?? '';
+    return path.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isDocumentArtifact) {
+      return _DocumentArtifactCard(data: widget.data);
+    }
+
     final code = widget.data['code'] ?? '';
     final output = widget.data['output'] ?? '';
     final error = widget.data['error'];
     final bool hasError = error != null && error.toString().isNotEmpty;
-
-    // final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
-    // final isDark = themeColors.primaryColor == Colors.black;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -40,7 +50,6 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
           InkWell(
             onTap: () => setState(() => _isExpanded = !_isExpanded),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
@@ -78,8 +87,6 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
               ),
             ),
           ),
-
-          // Animated Content
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -89,25 +96,20 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Divider(height: 1),
-                      // Code Block
                       Padding(
                         padding: const EdgeInsets.all(12),
-                        child: CodeBlockWidget(
-                          code: code,
-                          language: 'python',
-                        ),
+                        child: CodeBlockWidget(code: code, language: 'python'),
                       ),
-                      // Output Section
                       if (output.isNotEmpty || hasError) ...[
                         const Divider(height: 1),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                                0xFF1E1E1E), // Always dark terminal background
-                            borderRadius: const BorderRadius.vertical(
-                                bottom: Radius.circular(12)),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF1E1E1E),
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(12),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,20 +126,20 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
                               const SizedBox(height: 8),
                               if (hasError)
                                 SelectableText(
-                                  error,
+                                  error.toString(),
                                   style: const TextStyle(
                                     fontFamily: 'monospace',
                                     fontSize: 13,
-                                    color: Color(0xFFEF5350), // Soft Red
+                                    color: Color(0xFFEF5350),
                                   ),
                                 ),
                               if (output.isNotEmpty)
                                 SelectableText(
-                                  output,
+                                  output.toString(),
                                   style: const TextStyle(
                                     fontFamily: 'monospace',
                                     fontSize: 13,
-                                    color: Color(0xFFE0E0E0), // Off-white
+                                    color: Color(0xFFE0E0E0),
                                   ),
                                 ),
                             ],
@@ -148,6 +150,157 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
                   )
                 : const SizedBox.shrink(),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Reuses the existing `code_execution` widget channel for document files so
+/// SendService can keep its stable widget protocol. The local path never goes
+/// back to the online model: it is embedded only in the UI widget payload.
+class _DocumentArtifactCard extends StatefulWidget {
+  final Map<String, dynamic> data;
+
+  const _DocumentArtifactCard({required this.data});
+
+  @override
+  State<_DocumentArtifactCard> createState() => _DocumentArtifactCardState();
+}
+
+class _DocumentArtifactCardState extends State<_DocumentArtifactCard> {
+  bool _sharing = false;
+
+  IconData _iconFor(String format) {
+    return switch (format.toLowerCase()) {
+      'pdf' => Icons.picture_as_pdf_rounded,
+      'xlsx' || 'csv' => Icons.table_chart_rounded,
+      'pptx' => Icons.slideshow_rounded,
+      'docx' => Icons.description_rounded,
+      'json' => Icons.data_object_rounded,
+      _ => Icons.insert_drive_file_rounded,
+    };
+  }
+
+  Future<void> _share() async {
+    if (_sharing) return;
+    final path = widget.data['artifact_path']?.toString() ?? '';
+    if (path.isEmpty) return;
+
+    setState(() => _sharing = true);
+    try {
+      final file = await DocumentArtifactService.resolveShareableArtifact(path);
+      if (!mounted) return;
+      final box = context.findRenderObject() as RenderBox?;
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          sharePositionOrigin: box == null
+              ? null
+              : box.localToGlobal(Offset.zero) & box.size,
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Document file is unavailable or cannot be shared.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fileName = widget.data['file_name']?.toString() ?? 'Document';
+    final format = widget.data['format']?.toString().toUpperCase() ?? 'FILE';
+    final warning = widget.data['warning']?.toString();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.55)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.border.withValues(alpha: 0.45),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  _iconFor(format),
+                  color: AppColors.primaryColor.inverted,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fileName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      format,
+                      style: TextStyle(
+                        color: AppColors.tertiaryColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                tooltip: 'Share / Save',
+                onPressed: _sharing ? null : _share,
+                icon: _sharing
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.ios_share_rounded),
+              ),
+            ],
+          ),
+          if (warning != null && warning.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              warning,
+              style: TextStyle(
+                color: AppColors.tertiaryColor,
+                fontSize: 11,
+                height: 1.35,
+              ),
+            ),
+          ],
         ],
       ),
     );
