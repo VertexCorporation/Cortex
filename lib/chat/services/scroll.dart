@@ -34,7 +34,7 @@ class ScrollService {
       _followPaused = true;
       _scrollEpoch++;
     } else if (notification is ScrollEndNotification) {
-      _followPaused = !isUserAtBottom();
+      if (_followPaused && isUserAtBottom()) _followPaused = false;
     }
   }
 
