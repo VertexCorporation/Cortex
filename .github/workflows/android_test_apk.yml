@@ -1,0 +1,70 @@
+name: Android test APK
+on:
+  push:
+    branches: [feat/voice-offline-music]
+    paths: ['pubspec.yaml', '.github/workflows/android_test_apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter gen-l10n
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Select signing configuration
+        id: signing
+        env:
+          CORTEX_JKS_BASE64: ${{ secrets.CORTEX_JKS }}
+          KEY_PASS: ${{ secrets.JKS_PASSWORD }}
+        shell: bash
+        run: |
+          if [[ -n "$CORTEX_JKS_BASE64" && -n "$KEY_PASS" ]]; then
+            printf '%s' "$CORTEX_JKS_BASE64" | base64 --decode > android/app/Cortex.jks
+            printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=ai\nstoreFile=Cortex.jks\n' "$KEY_PASS" "$KEY_PASS" > android/key.properties
+            echo 'mode=release' >> "$GITHUB_OUTPUT"
+          else
+            echo 'mode=debug' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build arm64 test APK
+        env:
+          BUILD_MODE: ${{ steps.signing.outputs.mode }}
+        run: flutter build apk --$BUILD_MODE --target-platform android-arm64 --build-name 8.8.5 --build-number 885
+      - name: Verify APK version and signature
+        env:
+          BUILD_MODE: ${{ steps.signing.outputs.mode }}
+        shell: bash
+        run: |
+          mkdir -p apk-output
+          cp "build/app/outputs/flutter-apk/app-${BUILD_MODE}.apk" apk-output/Cortex-8.8.5-885.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging apk-output/Cortex-8.8.5-885.apk > apk-output/build-info.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          info = Path('apk-output/build-info.txt').read_text().splitlines()[0]
+          assert "name='com.vertex.cortex'" in info, info
+          assert "versionCode='885'" in info, info
+          assert "versionName='8.8.5'" in info, info
+          PY
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose apk-output/Cortex-8.8.5-885.apk
+          printf 'Build mode: %s\nSource commit: %s\n' "$BUILD_MODE" "$GITHUB_SHA" >> apk-output/build-info.txt
+          sha256sum apk-output/Cortex-8.8.5-885.apk > apk-output/sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cortex-8.8.5-885-APK
+          path: apk-output/
+          if-no-files-found: error
+          retention-days: 14
