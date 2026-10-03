@@ -33,6 +33,8 @@ class ChatMessageList extends StatefulWidget {
 }
 
 class _ChatMessageListState extends State<ChatMessageList> {
+  String? _lastConversationId;
+  bool _conversationObserved = false;
   @override
   void initState() {
     super.initState();
@@ -67,6 +69,12 @@ class _ChatMessageListState extends State<ChatMessageList> {
     final inputProvider = context.watch<InputProvider>();
     context.watch<ThemeProvider>();
 
+    if (!_conversationObserved ||
+        _lastConversationId != conversationProvider.conversationID) {
+      _conversationObserved = true;
+      _lastConversationId = conversationProvider.conversationID;
+      context.read<ScrollService>().beginConversation();
+    }
     final messages = conversationProvider.messages;
 
     // Scroll to bottom when messages just finished loading (switching chats)
@@ -146,6 +154,12 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
   void _handleReport(BuildContext context, int index,
       ConversationProvider conversationProvider) {
+    if (!_conversationObserved ||
+        _lastConversationId != conversationProvider.conversationID) {
+      _conversationObserved = true;
+      _lastConversationId = conversationProvider.conversationID;
+      context.read<ScrollService>().beginConversation();
+    }
     final messages = conversationProvider.messages;
     if (index < 0 || index >= messages.length) return;
 

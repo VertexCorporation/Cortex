@@ -99,6 +99,19 @@ void main() {
     expect(controller.position.extentAfter, 0);
   });
 
+  testWidgets('new conversation discards paused follow and old callbacks',
+      (tester) async {
+    await mount(tester);
+    await tester.drag(find.byType(ListView), const Offset(0, 200));
+    await tester.pumpAndSettle();
+    service.beginConversation();
+    service.jumpToBottom();
+    await tester.pump();
+    expect(controller.position.extentAfter, 0);
+    await grow(tester);
+    expect(controller.position.extentAfter, 0);
+  });
+
   testWidgets('returning manually to the bottom resumes following', (tester) async {
     await mount(tester);
     await tester.drag(find.byType(ListView), const Offset(0, 200));

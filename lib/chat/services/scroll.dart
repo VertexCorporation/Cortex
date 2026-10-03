@@ -16,6 +16,13 @@ class ScrollService {
   bool _automaticScrollScheduled = false;
   int _scrollEpoch = 0;
 
+  /// A different conversation starts its own follow state and invalidates
+  /// callbacks queued for the previous history.
+  void beginConversation() {
+    _scrollEpoch++;
+    _followPaused = false;
+  }
+
   /// User input takes priority over token and reveal callbacks, even before
   /// the first drag has moved far enough to leave the bottom threshold.
   void handleScrollNotification(ScrollNotification notification) {
