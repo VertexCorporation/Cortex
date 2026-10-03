@@ -9,11 +9,12 @@ ChatInputMode? generationModeForTarget(String targetType) {
     'image' => ChatInputMode.imageGeneration,
     'video' => ChatInputMode.videoGeneration,
     'audio' => ChatInputMode.audioGeneration,
+    'music' => ChatInputMode.musicGeneration,
     _ => null,
   };
 }
 
-/// Logic for the "Create Image/Video/Audio" buttons: instead of sending
+/// Logic for the "Create Image/Video/Audio/Music" buttons: instead of sending
 /// anything, this activates the matching input feature (exactly like
 /// selecting a feature from the Features sheet), which highlights the "+"
 /// button of the input field until the user sends their prompt.
@@ -43,8 +44,8 @@ void setGenerationFeatureMode(
     inputProvider.setFeatureMode(mode);
   }
 
-  // Always hand off to dynamic chat; the server-side router picks the model
-  // based on the generation key, without running intent analysis.
+  // Start from dynamic chat. On send, music pins a catalogue music generator;
+  // other media targets retain the backend's automatic routing.
   if (!session.isDynamicChat) {
     session.startDynamicConversation(savePreference: true);
   }

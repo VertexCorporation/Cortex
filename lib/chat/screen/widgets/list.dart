@@ -33,7 +33,8 @@ class ChatMessageList extends StatefulWidget {
 }
 
 class _ChatMessageListState extends State<ChatMessageList> {
-  bool _revealScrollScheduled = false;
+  String? _lastConversationId;
+  bool _conversationObserved = false;
   @override
   void initState() {
     super.initState();
@@ -45,39 +46,12 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
   void _scrollToBottomIfNeeded() {
     if (!mounted) return;
-    final controller = widget.scrollController;
-    if (!controller.hasClients) return;
-
-    // Handle multiple scroll positions safely
-    if (controller.positions.isEmpty) return;
-    if (controller.positions.length > 1) {
-      // If multiple positions, try to jump each to max extent
-      for (final position in controller.positions) {
-        position.jumpTo(position.maxScrollExtent);
-      }
-    } else {
-      controller.jumpTo(controller.position.maxScrollExtent);
-    }
+    context.read<ScrollService>().jumpToBottom();
   }
 
   void _keepRevealedTextVisible() {
-    if (_revealScrollScheduled || !mounted) return;
-    final controller = widget.scrollController;
-    if (!controller.hasClients || controller.positions.length != 1) return;
-    final position = controller.position;
-    // Respect an intentional upward scroll. The normal chat-follow behavior
-    // only applies while the user is already close to the live bottom.
-    if (position.maxScrollExtent - position.pixels > 120) return;
-
-    _revealScrollScheduled = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _revealScrollScheduled = false;
-      if (!mounted || !controller.hasClients) return;
-      final current = controller.position;
-      if (current.maxScrollExtent - current.pixels <= 160) {
-        current.jumpTo(current.maxScrollExtent);
-      }
-    });
+    if (!mounted) return;
+    context.read<ScrollService>().maintainScrollAtBottom(threshold: 120);
   }
 
   @override
@@ -95,6 +69,12 @@ class _ChatMessageListState extends State<ChatMessageList> {
     final inputProvider = context.watch<InputProvider>();
     context.watch<ThemeProvider>();
 
+    if (!_conversationObserved ||
+        _lastConversationId != conversationProvider.conversationID) {
+      _conversationObserved = true;
+      _lastConversationId = conversationProvider.conversationID;
+      context.read<ScrollService>().beginConversation();
+    }
     final messages = conversationProvider.messages;
 
     // Scroll to bottom when messages just finished loading (switching chats)
@@ -112,6 +92,9 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
     return NotificationListener<Notification>(
       onNotification: (notification) {
+        if (notification is ScrollNotification) {
+          context.read<ScrollService>().handleScrollNotification(notification);
+        }
         if (notification is AiMessageRevealNotification) {
           _keepRevealedTextVisible();
           return false;
@@ -171,6 +154,12 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
   void _handleReport(BuildContext context, int index,
       ConversationProvider conversationProvider) {
+    if (!_conversationObserved ||
+        _lastConversationId != conversationProvider.conversationID) {
+      _conversationObserved = true;
+      _lastConversationId = conversationProvider.conversationID;
+      context.read<ScrollService>().beginConversation();
+    }
     final messages = conversationProvider.messages;
     if (index < 0 || index >= messages.length) return;
 

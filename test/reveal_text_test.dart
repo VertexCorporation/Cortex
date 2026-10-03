@@ -116,9 +116,14 @@ void main() {
               as RenderRepaintBoundary)
           .toImage(pixelRatio: 2);
       final bytes = await snapshot.toByteData(format: ui.ImageByteFormat.png);
-      await File('/private/tmp/cortex-reveal-overlap.png')
-          .writeAsBytes(bytes!.buffer.asUint8List());
-      snapshot.dispose();
+      final directory = await Directory.systemTemp.createTemp('cortex-reveal-');
+      try {
+        await File('${directory.path}/overlap.png')
+            .writeAsBytes(bytes!.buffer.asUint8List());
+      } finally {
+        snapshot.dispose();
+        await directory.delete(recursive: true);
+      }
     });
     while (reveal.pendingLength > 0) {
       reveal.advance(const Duration(milliseconds: 16));

@@ -27,7 +27,7 @@ void main() {
     expect(generationModeForTarget('unknown'), isNull);
   });
 
-  for (final type in ['image', 'video', 'audio']) {
+  for (final type in ['image', 'video', 'audio', 'music']) {
     testWidgets('$type button activates the input feature mode',
         (tester) async {
       final input = InputProvider()..setFeatureMode(ChatInputMode.study);

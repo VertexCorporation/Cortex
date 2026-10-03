@@ -70,6 +70,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// cares about (STT final → first AI token; TTS complete → next user
   /// audio).
   bool _flowTurnCompleted = false;
+  int _consecutiveFlowFailures = 0;
   bool _firstAiChunkSeen = false;
   bool _firstSentenceSeen = false;
   bool _awaitingPostTtsTranscript = false;
@@ -545,6 +546,12 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
           '[VoiceService] Flow participant ${participant.key} failed: $error',
         );
         if (gen == _activeGeneration && flowGeneration == _flow.generation) {
+          _consecutiveFlowFailures++;
+          if (_consecutiveFlowFailures >= FlowParticipant.values.length) {
+            // A whole failed round must not mint requests forever.
+            unawaited(_endSession(gen, VoiceEndReason.error));
+            return;
+          }
           _advanceFlowAfterTurn(gen, flowGeneration);
         }
       }),
@@ -564,7 +571,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
       _updateState(VoiceState.listening);
       _voiceTimer?.cancel();
       _voiceTimer = Timer(const Duration(milliseconds: 1400), () {
-        if (gen != _activeGeneration || !isFlowActive) return;
+        if (gen != _activeGeneration || !isFlowActive ||
+            flowGeneration != _flow.generation) {
+          return;
+        }
         _flow.beginNextRound(expectedGeneration: flowGeneration);
         currentFlowAgentIndex = FlowParticipant.blue.index;
         notifyListeners();
@@ -576,7 +586,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     _voiceTimer?.cancel();
     _voiceTimer = Timer(const Duration(milliseconds: 220), () {
-      if (gen != _activeGeneration || !isFlowActive) return;
+      if (gen != _activeGeneration || !isFlowActive ||
+          flowGeneration != _flow.generation) {
+        return;
+      }
       _requestFlowTurn(gen);
     });
   }
@@ -585,6 +598,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
   void interruptFlowAndListen() async {
     final gen = _activeGeneration;
+    if (gen == null) return;
     debugPrint(
       "[VoiceService] Interrupting Flow. Transitioning to Listen Mode.",
     );
@@ -593,24 +607,17 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     currentFlowAgentIndex = FlowParticipant.blue.index;
     _voiceTimer?.cancel();
     _onAssistantInterrupted?.call();
-    _isSpeaking = false;
+    _aiGenerationComplete = false;
     _firstSentenceSeen = false;
-    _cancelPendingSpeech();
-    _incomingTextBuffer.clear();
-
-    // [FIX] Ensure TTS is completely stopped
-    await _flutterTts.stop();
-
-    // [FIX] Reset flow loop flag so it doesn't resume
-    setAiGenerationComplete(false);
-
-    // [FIX] Set state to Listening (Round Circle)
+    _turns.beginTurn();
+    _speechService.beginNewUserTurn();
+    _liveTranscript = '';
     _updateState(VoiceState.listening);
-
-    // [FIX] Open Microphone
-    if (gen != null) {
-      unawaited(_beginListening(gen));
-    }
+    _armInactivityTimer(gen);
+    // Stop both remote and native playback and invalidate queued synthesis.
+    await _haltAssistantSpeech(gen);
+    if (gen != _activeGeneration) return;
+    if (!_speechService.isListening) unawaited(_beginListening(gen));
   }
 
   /// Everything "the assistant must stop talking now" does, shared by the
@@ -1086,6 +1093,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void onAiStreamCallback(String chunk) {
     final gen = _activeGeneration;
     if (gen == null) return; // No live session: nothing to speak into.
+    if (chunk.trim().isNotEmpty) _consecutiveFlowFailures = 0;
     if (!_firstAiChunkSeen) {
       _firstAiChunkSeen = true;
       VoiceTelemetry.mark('first AI token received');
@@ -1427,6 +1435,7 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     final gen = ++_generation;
     _activeGeneration = gen;
     _reconnectAttempts = 0;
+    _consecutiveFlowFailures = 0;
     _emptyNativeRestarts = 0;
     _recyclePending = false;
     _lastPlaybackEndedAt = null;

@@ -1,0 +1,60 @@
+name: Chat experience validation
+on:
+  push:
+    branches: [feat/voice-offline-music]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/chat/**'
+      - 'lib/l10n/*.arb'
+      - 'test/**'
+      - '.github/workflows/chat_experience.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: chat-experience-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter gen-l10n
+      - name: Analyze the application
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Voice, Flow, offline setup and music regression tests
+        run: >-
+          flutter test test/offline_setup_test.dart test/offline_setup_sheet_test.dart
+          test/music_generation_test.dart test/generation_test.dart
+          test/flow_mode_test.dart test/voice_test.dart
+          test/voice_turn_test.dart test/voice_barge_in_test.dart
+          test/offline_use_action_test.dart test/media_classification_test.dart
+          test/composer_feature_state_test.dart test/chat_scroll_test.dart
+          test/reveal_text_test.dart test/reveal_timeline_test.dart
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter gen-l10n
+      - run: flutter build apk --debug --target-platform android-arm64

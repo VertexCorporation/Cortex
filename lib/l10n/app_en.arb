@@ -1041,5 +1041,19 @@
   "voiceDailyLimitReached": "You've used today's voice time. It renews after midnight.",
   "@voiceDailyLimitReached": {
     "description": "Shown when the daily realtime Voice/Flow allowance is exhausted and the server refused to start a new session."
-  }
+  },
+  "offlineSetupWelcome": "Would you like to use Cortex offline?",
+  "offlineSetupWelcomeBody": "Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.",
+  "offlineSetupChoiceTitle": "Your own local Cortex",
+  "offlineSetupChoiceBody": "Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.",
+  "offlineSetupChooseSpecific": "Choose an intelligence",
+  "offlineSetupContinue": "Continue",
+  "offlineSetupChecking": "Checking your device",
+  "offlineSetupCheckingBody": "We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.",
+  "offlineSetupReadyTitle": "Ready for offline chat",
+  "offlineSetupReadyBody": "This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.",
+  "offlineSetupNoMatch": "We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.",
+  "featureCreateMusicTitle": "Create Music",
+  "featureCreateMusicDescription": "Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.",
+  "musicGenerationUnavailable": "No compatible music generator is available in the current catalogue. Please try again later. No music request was sent."
 }

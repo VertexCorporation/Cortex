@@ -23,6 +23,7 @@ import 'package:cortex/navigation.dart';
 import 'package:cortex/login/upgrade.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/funds/funds.dart';
+import '../widgets/offline_setup.dart';
 
 class ChatEmptyState extends StatefulWidget {
   final double bottomPadding;
@@ -332,13 +333,13 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   borderRadius: borderRadius,
                   buttonSpacing: buttonSpacing,
                   iconPath: 'assets/icons/voice.svg',
-                  title: l10n.featureCreateAudioTitle,
+                  title: l10n.featureCreateMusicTitle,
                   iconColor:
                       AppColors.background.inverted.withValues(alpha: 0.2),
                   // Disabled while the balance cannot cover the published
                   // speech cost (audio maps to the server's 'speech' lane).
                   isDisabled: !credits.canGenerate('speech'),
-                  onTap: () => _handleGeneration(context, 'audio'),
+                  onTap: () => _handleGeneration(context, 'music'),
                 ),
               ),
               SizedBox(width: buttonSpacing),
@@ -358,10 +359,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   isDisabled: false,
                   // "Use Offline" must select a local offline model — never
                   // arm Web Search (the accidental coupling this button used
-                  // to have). The canonical action picks the strongest
-                  // installed offline model, or routes to the Library's
-                  // Local Models section (pulse) when none is installed.
-                  onTap: () => handleUseOfflineAction(context),
+                  // to have). Empty chat opens the guided local setup.
+                  onTap: () => showOfflineSetup(context),
                 ),
               ),
             ],
@@ -523,7 +522,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // FeatureSheet gate; the server routes audio generation to its
     // 'speech' lane. Fail-open inside canGenerate keeps pre-publication
     // user documents working — the server stays the final gate.
-    if (!credits.canGenerate(targetType == 'audio' ? 'speech' : targetType)) {
+    if (!credits.canGenerate(
+        targetType == 'audio' || targetType == 'music' ? 'speech' : targetType)) {
       navigateToScreen(const FundsScreen(), direction: const Offset(1.0, 0.0));
       return;
     }

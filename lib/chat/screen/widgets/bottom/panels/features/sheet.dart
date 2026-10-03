@@ -16,6 +16,7 @@ import 'package:cortex/server/user.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/funds/funds.dart';
+import '../../../offline_setup.dart';
 
 import '../../../../../providers/input.dart';
 import '../selection/sheet.dart';
@@ -319,11 +320,9 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                             isOfflineModelSelected) {
                           _selectDynamicModel(context);
                         } else {
-                          // Canonical action (chat/services/select.dart):
-                          // picks the strongest installed offline model,
-                          // never arms Web Search, routes to the Library's
-                          // Local Models pulse when nothing is installed.
-                          handleUseOfflineAction(context);
+                          Navigator.pop(context);
+                          showOfflineSetup(widget.parentContext);
+                          return;
                         }
                         Navigator.pop(context);
                       },
@@ -402,6 +401,23 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                           widget.parentContext,
                           targetType: 'image',
                         );
+                      },
+                    ),
+
+                    FeaturesSheetButton(
+                      iconData: Icons.music_note_outlined,
+                      title: l10n.featureCreateMusicTitle,
+                      description: l10n.featureCreateMusicDescription,
+                      isSelected: currentMode == ChatInputMode.musicGeneration,
+                      isDisabled: !creditsManager.canGenerate('speech'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        if (!mediaAvailable || !creditsManager.canGenerate('speech')) {
+                          navigateToScreen(const FundsScreen(),
+                              direction: const Offset(1.0, 0.0));
+                          return;
+                        }
+                        setGenerationFeatureMode(widget.parentContext, targetType: 'music');
                       },
                     ),
 

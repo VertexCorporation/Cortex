@@ -150,7 +150,7 @@ class MediaRouter {
       'hareketlendir',
       'canlandir'
     ];
-    const audioTerms = ['audio', 'voice', 'sound', 'music', 'ses', 'muzik'];
+    const audioTerms = ['audio', 'voice', 'sound', 'music', 'song', 'ses', 'muzik', 'sarki'];
     const generateTerms = [
       'generate',
       'create',
@@ -279,6 +279,34 @@ class MediaRouter {
         return true;
       },
     );
+  }
+
+  /// Music must use a catalogue-advertised music generator, not a TTS or
+  /// generic sound-effect fallback. The backend retains auth/pricing control.
+  ModelEntity? findMusicGenerationModel({
+    required String langCode,
+    required bool isUserSubscribed,
+  }) => pickModel(langCode, isUserSubscribed, isMusicGenerationModel);
+
+  static bool isMusicGenerationModel(ModelEntity model) {
+    if (!model.isServerSide || model.source.toLowerCase() != 'fal' ||
+        model.outputs['audio'] != true) {
+      return false;
+    }
+    // The composer starts from text. Audio-only editors need an attachment.
+    if (model.modalities['text'] == false ||
+        (model.modalities['audio'] == true && model.modalities['text'] != true)) {
+      return false;
+    }
+    final id = model.id.toLowerCase();
+    if (id.contains('tts') || id.contains('text-to-speech') ||
+        model.category.toLowerCase() == 'speech') {
+      return false;
+    }
+    final metadata = '${model.id} ${model.displayTitle} ${model.displaySummary}'
+        .toLowerCase().replaceAll('ü', 'u').replaceAll('ş', 's').replaceAll('ı', 'i');
+    return model.category == 'music' || model.outputs['music'] == true ||
+        RegExp(r'\b(music|song|müzik|muzik|şarkı|sarki|lyria)\b').hasMatch(metadata);
   }
 
   ModelEntity? findAttachmentUnderstandingModel({
