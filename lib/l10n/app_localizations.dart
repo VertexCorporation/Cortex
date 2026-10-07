@@ -4031,6 +4031,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You\'ve used today\'s voice time. It renews after midnight.'**
   String get voiceDailyLimitReached;
+
+  /// No description provided for @offlineSetupWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to use Cortex offline?'**
+  String get offlineSetupWelcome;
+
+  /// No description provided for @offlineSetupWelcomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.'**
+  String get offlineSetupWelcomeBody;
+
+  /// No description provided for @offlineSetupChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own local Cortex'**
+  String get offlineSetupChoiceTitle;
+
+  /// No description provided for @offlineSetupChoiceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.'**
+  String get offlineSetupChoiceBody;
+
+  /// No description provided for @offlineSetupChooseSpecific.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an intelligence'**
+  String get offlineSetupChooseSpecific;
+
+  /// No description provided for @offlineSetupContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get offlineSetupContinue;
+
+  /// No description provided for @offlineSetupChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking your device'**
+  String get offlineSetupChecking;
+
+  /// No description provided for @offlineSetupCheckingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.'**
+  String get offlineSetupCheckingBody;
+
+  /// No description provided for @offlineSetupReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for offline chat'**
+  String get offlineSetupReadyTitle;
+
+  /// No description provided for @offlineSetupReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.'**
+  String get offlineSetupReadyBody;
+
+  /// No description provided for @offlineSetupNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.'**
+  String get offlineSetupNoMatch;
+
+  /// No description provided for @featureCreateMusicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Music'**
+  String get featureCreateMusicTitle;
+
+  /// No description provided for @featureCreateMusicDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.'**
+  String get featureCreateMusicDescription;
+
+  /// No description provided for @musicGenerationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.'**
+  String get musicGenerationUnavailable;
 }
 
 class _AppLocalizationsDelegate

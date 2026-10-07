@@ -223,8 +223,11 @@ class ScrollService {
     final epoch = _scrollEpoch;
     final controller = _scrollController;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (epoch != _scrollEpoch || controller != _scrollController ||
-          _followPaused) return;
+      if (epoch != _scrollEpoch ||
+          controller != _scrollController ||
+          _followPaused) {
+        return;
+      }
       final position = _getSafePosition();
       if (position != null && !position.isScrollingNotifier.value) {
         position.jumpTo(position.maxScrollExtent);

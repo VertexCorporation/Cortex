@@ -44,6 +44,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   bool _isVerified = false;
   bool _isResendLoading = false;
   bool _isContinuing = false;
+  bool _verificationCheckInFlight = false;
 
   /// Securely saves the user's credentials after they register, ensuring the
   /// "Remember Me" feature works correctly from the very first launch.
@@ -118,10 +119,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     // This timer periodically checks if the user's email has been verified.
     // This is where the network call happens and where the error must be handled.
     _emailCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      // THE FIX IS IMPLEMENTED HERE:
-      // We wrap the entire network-dependent logic in a try-catch block
-      // to gracefully handle potential network failures without crashing the app.
-      Future(() async {
+      if (_verificationCheckInFlight || !mounted) return;
+      _verificationCheckInFlight = true;
+      Future<void>(() async {
         try {
           final user = FirebaseAuth.instance.currentUser;
 
@@ -143,7 +143,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           final freshUser = FirebaseAuth.instance.currentUser;
 
           // Check the verification status on the fresh user object.
-          if (freshUser != null && freshUser.emailVerified) {
+          if (mounted && freshUser != null && freshUser.emailVerified) {
             dev.log(
                 '[EmailVerification] Email has been successfully verified for ${freshUser.email}.',
                 name: 'EmailVerification');
@@ -172,6 +172,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               '[EmailVerification] A generic error occurred during verification check.',
               name: 'EmailVerification',
               error: e);
+        } finally {
+          _verificationCheckInFlight = false;
         }
       });
     });
@@ -208,6 +210,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   void _cancelTimers() {
     _countdownTimer?.cancel();
     _emailCheckTimer?.cancel();
+    _verificationCheckInFlight = false;
   }
 
   @override

@@ -25,6 +25,13 @@ Registration posts a username suggestion to the `usernameSuggestions` Firestore 
 
 `AppBootstrap`/`AppGatekeeper` (main.dart) and `AppInitializer` (initialization.dart) coordinate startup readiness, authentication state, onboarding (`OnboardingScreen`, meet.dart) and forced upgrades (`UpdateRequiredScreen`, update.dart, `AppUpgraderMessages`). `MaintenanceScreen` (maintenance.dart) covers server-side maintenance gates.
 
+Unverified email accounts may enter the app through the limited-access path.
+This is an onboarding state, not an authorization boundary: Fulcrum must enforce
+verification requirements for protected operations, while the client may only
+hide or disable corresponding affordances. The verification screen serializes
+its periodic `reload()` check so a slow network request cannot overlap the next
+poll, and cancels timers when the screen is disposed.
+
 ## UI
 
 `AuthScreen` (login/screen.dart), `LoginForm`/`RegisterForm` (login/view/), `EmailVerificationScreen` (login/verify.dart) with animated code entry, driven by `LoginController`/`AuthMode` (login/controller.dart).

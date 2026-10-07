@@ -16,6 +16,10 @@ Rules of thumb:
 
 `main.dart` initializes Firebase, Firestore persistence, preferences, downloader, Crashlytics, FCM, orientation and providers. `AppBootstrap`/`AppGatekeeper` (main.dart) gate the first frame on bootstrap and auth; `BootstrapResult` carries readiness; `TabProvider` holds shell tab state. `AppInitializer` (initialization.dart) coordinates readiness, authentication state, onboarding and upgrade coordination (`AppStatus`, `AppUpgraderMessages`).
 
+Downloader initialization keeps certificate verification enabled. Development
+network debugging must use an explicit test transport or local fixture rather
+than disabling TLS validation in the app bootstrap.
+
 `app.dart` builds the `MaterialApp` (class `Cortex`) with theme, localization and analytics. `screen.dart` (`MainScreen`) is the feature shell. Navigation helpers live in `routes.dart` (`FadeRoute`, `SlideRightRoute`) and `navigation.dart`; runtime errors are caught by `ErrorBoundary` (boundary.dart). `AppLifecycleManager` (lifecycle.dart) tracks foreground/background.
 
 ### App Check rollout

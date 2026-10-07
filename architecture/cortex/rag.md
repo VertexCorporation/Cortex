@@ -10,6 +10,12 @@ Concurrent requests for the same file path are coalesced into one extraction/ind
 
 Extraction runs on-device through `DocTextExtractor` (extractors.dart). Legacy binary formats (.doc, .xls, .odt, ...) fall back to the server: `_parseViaServer` uploads the file, base64-encoded, to the authenticated `read_document` hosted tool (the `executetool` endpoint) and unwraps the response (`ServerDocParser` handles the server format). The fallback reuses one configured Dio client rather than allocating a new client for every document.
 
+Because the current fallback contract is JSON plus base64 rather than a
+streaming or multipart upload, server-fallback files are capped below the
+general indexing limit (`RagIngestionService.maxServerFallbackFileSizeBytes`).
+This prevents several in-memory copies of a large document from being created;
+the cap should be revisited when the backend accepts streaming uploads.
+
 ## Chunking and storage
 
 `DocumentChunker` (chunker.dart) splits extracted text into chunks. `RagStorageService` (storage.dart) persists documents and chunks locally. Domain models live in models.dart: `RagDocument`, `RagChunk`, `RagRetrievalResult`, `RagDocumentStatus`.

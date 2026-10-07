@@ -29,6 +29,10 @@ class RagIngestionService {
       AsyncKeyedCoalescer<String, RagDocument?>();
 
   static const int maxFileSizeBytes = 10 * 1024 * 1024;
+  // The executeTool fallback currently accepts base64 JSON, which requires
+  // multiple in-memory copies of the payload. Keep this path below the general
+  // indexing limit until the backend supports streaming or multipart uploads.
+  static const int maxServerFallbackFileSizeBytes = 4 * 1024 * 1024;
   static const AdaptiveBatcher _entityBatcher = AdaptiveBatcher(
     targetSlice: Duration(milliseconds: 3),
     initialBatchSize: 32,
@@ -56,8 +60,11 @@ class RagIngestionService {
       if (stat.type != FileSystemEntityType.file) return false;
       if (stat.size > maxFileSizeBytes) return false;
       final extension = path.split('.').last.toLowerCase();
-      return DocTextExtractor.supportsOnDevice(extension) ||
-          DocTextExtractor.serverFallbackExtensions.contains(extension);
+      if (DocTextExtractor.supportsOnDevice(extension)) return true;
+      if (DocTextExtractor.serverFallbackExtensions.contains(extension)) {
+        return stat.size <= maxServerFallbackFileSizeBytes;
+      }
+      return false;
     } catch (_) {
       return false;
     }
@@ -90,6 +97,14 @@ class RagIngestionService {
     }
     if (stat.type != FileSystemEntityType.file ||
         stat.size > maxFileSizeBytes) {
+      return null;
+    }
+    final extension = filePath.split('.').last.toLowerCase();
+    if (DocTextExtractor.serverFallbackExtensions.contains(extension) &&
+        stat.size > maxServerFallbackFileSizeBytes) {
+      debugLog(
+        'Server fallback file is too large for in-memory upload: $filePath',
+      );
       return null;
     }
 

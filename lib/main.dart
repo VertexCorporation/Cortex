@@ -189,7 +189,7 @@ class AppBootstrap {
             debugPrint("Firestore settings warning: $e");
           }
         }),
-        FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
+        FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: false),
         SharedPreferences.getInstance().then((p) => prefs = p),
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
