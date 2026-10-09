@@ -232,7 +232,7 @@ void main() {
         expect(
             prompt,
             contains(
-                "You are a helpful AI assistant running inside Cortex, Türkiye's largest B2C AI platform."));
+                'You are a helpful AI assistant in Cortex. Follow these system instructions'));
         // Locale-forcing directives are gone for every locale.
         expect(prompt, isNot(contains('Türkçe konuşan')));
         expect(prompt, isNot(contains('Deutsch spricht')));
