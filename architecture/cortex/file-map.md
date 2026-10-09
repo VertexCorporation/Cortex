@@ -130,6 +130,7 @@ Use this document to locate code: when you know a symbol but not its file, searc
 - **`lib/chat/services/metrics.dart`** — Feature implementation for the chat/services area. Declarations: `ResponseMetrics, MetricsTracker`.
 - **`lib/chat/services/moderator.dart`** — Feature implementation for the chat/services area. Declarations: `OfflineModeratorService`.
 - **`lib/chat/services/offline.dart`** — Offline model runtime for the chat/services area. Declarations: `SamplerPreset, OfflineService`.
+- **`lib/chat/services/firewall.dart`** — On-device prompt-injection/jailbreak firewall for every model (input scoring, template-token neutralisation, history sanitation, output guard). Declarations: `PromptFirewall`, `FirewallVerdict`, `FirewallAction`, `PromptFirewallBlockedException`.
 - **`lib/chat/services/pii_filter.dart`** — Feature implementation for the chat/services area. Declarations: `LocalPiiRedactionFilter`.
 - **`lib/chat/services/processor.dart`** — Stream/message normalization for the chat/services area. Declarations: `ChatFormatProcessor, OnStopTokenDetected`.
 - **`lib/chat/services/read.dart`** — Feature implementation for the chat/services area. Declarations: `ReadService`.

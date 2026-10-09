@@ -37,6 +37,7 @@ import 'package:cortex/chat/screen/widgets/bottom/guest.dart';
 import '../messages/messages.dart';
 
 import 'package:cortex/chat/providers/memory.dart';
+import 'package:cortex/chat/services/firewall.dart';
 import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/rag/chat.dart';
 
@@ -861,7 +862,10 @@ class SendService {
       if (isServerSide &&
           text.isNotEmpty &&
           !isHidden &&
-          _isMemoryWorthy(text)) {
+          _isMemoryWorthy(text) &&
+          // FIREWALL: an injection payload must never become a persistent
+          // memory that is re-injected into every future request.
+          PromptFirewall.inspect(text).action == FirewallAction.allow) {
         debugPrint("[SendService] Triggering Memory Extraction...");
         _apiService
             .extractUserMemory(text, langCode)
@@ -869,6 +873,10 @@ class SendService {
               if (facts != null && facts.isNotEmpty) {
                 bool memoryAdded = false;
                 for (final fact in facts) {
+                  if (PromptFirewall.inspect(fact).action !=
+                      FirewallAction.allow) {
+                    continue;
+                  }
                   if (!_userMemoryProvider.memoryList.contains(fact)) {
                     await _userMemoryProvider.addMemory(fact);
                     memoryAdded = true;
@@ -919,6 +927,20 @@ class SendService {
         '(${isAutoRouter ? 'dynamic' : 'manual'}) | '
         'serverSide=$isServerSide | generationTarget=$generationTarget',
       );
+
+      // PROMPT FIREWALL: every model (offline and online) is shielded from
+      // jailbreak / prompt-injection payloads. A blocked turn never reaches
+      // a model; the fixed continuation instruction is trusted client text.
+      final FirewallVerdict firewallVerdict =
+          isContinue ? FirewallVerdict.clean : PromptFirewall.inspect(text);
+      if (firewallVerdict.action != FirewallAction.allow) {
+        // Signal ids and score only — never message contents.
+        debugPrint('[PromptFirewall] $firewallVerdict');
+      }
+      if (firewallVerdict.isBlocked) {
+        throw ApiException(localizations.errorPromptFlagged,
+            code: 'PROMPT_FIREWALL_BLOCKED');
+      }
 
       if (!isServerSide) {
         // Offline Flow
@@ -1032,6 +1054,7 @@ class SendService {
               continuationPartial: isContinue
                   ? _conversationProvider.messages[aiMessageIndex].text
                   : null,
+              hardenUserTurn: firewallVerdict.needsHardening,
             );
             success = true;
           } catch (e) {
@@ -1396,6 +1419,7 @@ class SendService {
     bool isContinue = false,
     String? continuationPartial,
     String? flowParticipant,
+    bool hardenUserTurn = false,
   }) async {
     // [VoiceLoop] boundary evidence (debug-only): the chat request left the
     // client for the model.
@@ -1429,6 +1453,12 @@ class SendService {
           preserveFlowHistory: flowMode,
         );
 
+    // FIREWALL: a jailbreak that slipped into an earlier turn (or a reply
+    // that accepted one) must not keep steering the model.
+    final bool historyHardening =
+        PromptFirewall.historyNeedsHardening(contextMessages);
+    contextMessages = PromptFirewall.sanitizeHistory(contextMessages);
+
     // 2. Add Current User Message to Context (Manual Construction)
     // We do this manually because attachments need to be processed into base64 blocks
     final List<Map<String, dynamic>> userContent = [];
@@ -1456,7 +1486,13 @@ class SendService {
     }
 
     if (combinedText.isNotEmpty) {
-      userContent.add({"type": "text", "text": combinedText.trim()});
+      final String trimmed = combinedText.trim();
+      userContent.add({
+        "type": "text",
+        "text": (hardenUserTurn || historyHardening)
+            ? PromptFirewall.hardenUserText(trimmed)
+            : trimmed,
+      });
     }
     for (var path in attachments) {
       final block = await Utils.processAttachment(path);

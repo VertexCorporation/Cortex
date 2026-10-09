@@ -5,6 +5,8 @@ import 'package:cortex/design.dart';
 
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/chat/services/firewall.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -538,6 +540,7 @@ class _RoleplayChatScreenState extends State<RoleplayChatScreen>
     final sessionProvider = context.read<ChatSessionProvider>();
     final selectedModel = sessionProvider.selectedModel;
     final dio = context.read<Dio>();
+    final flaggedText = AppLocalizations.of(context)!.errorPromptFlagged;
 
     await context.read<RoleplayProvider>().sendMessage(
           text: text,
@@ -545,12 +548,16 @@ class _RoleplayChatScreenState extends State<RoleplayChatScreen>
             if (selectedModel == null) {
               return '⚠️ Lütfen bir model seç.';
             }
-            return _service.generateResponse(
-              history: history,
-              character: character,
-              model: selectedModel,
-              dio: dio,
-            );
+            try {
+              return await _service.generateResponse(
+                history: history,
+                character: character,
+                model: selectedModel,
+                dio: dio,
+              );
+            } on PromptFirewallBlockedException {
+              return '⛔ $flaggedText';
+            }
           },
         );
   }

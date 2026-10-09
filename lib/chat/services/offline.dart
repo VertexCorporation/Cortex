@@ -27,6 +27,7 @@ import '../../library/backend/data/service.dart';
 import '../../library/backend/data/format.dart';
 import '../../library/backend/data/defaults.dart';
 import 'context.dart';
+import 'firewall.dart';
 
 class SamplerPreset {
   final double temperature;
@@ -132,6 +133,11 @@ class OfflineService {
   String? _lastVisibleChunk;
   int _lastVisibleChunkRepeatCount = 0;
   bool _forceAbortCurrentStream = false;
+
+  // Output firewall: the opening of the reply is probed for signs that the
+  // model accepted a jailbreak ("[@X] activated", "DAN mode enabled").
+  String _firewallOutputProbe = '';
+  static const int _firewallProbeChars = 1500;
 
   // ===========================================================================
   // Native stream lifecycle — cross-conversation isolation
@@ -804,6 +810,9 @@ class OfflineService {
     if (processor == null) {
       if (_shouldAbortForRepetition(rawToken)) {
         _handleRepetitionAbort();
+      } else if (_isOutputCompromised(rawToken)) {
+        _didEmitVisibleOutput = true;
+        _handleFirewallOutputAbort();
       } else {
         _didEmitVisibleOutput = true;
         _responseService.onMessageResponse(rawToken);
@@ -815,6 +824,11 @@ class OfflineService {
     if (processedToken == null || processedToken.isEmpty) return;
     if (_shouldAbortForRepetition(processedToken)) {
       _handleRepetitionAbort();
+      return;
+    }
+    if (_isOutputCompromised(processedToken)) {
+      _didEmitVisibleOutput = true;
+      _handleFirewallOutputAbort();
       return;
     }
 
@@ -974,7 +988,42 @@ class OfflineService {
     // precedence when the catalog defines one. No locale-forcing directives —
     // the model should follow the user's language from the conversation.
     final String role = (model.role ?? '').trim();
-    final String systemPrompt = role.isNotEmpty ? role : _offlineSystemPrompt;
+    final String baseSystemPrompt =
+        role.isNotEmpty ? role : _offlineSystemPrompt;
+
+    // FIREWALL: user turns, history and RAG passages are untrusted. Their
+    // chat-template markers are defused so they can never forge a
+    // system/assistant turn in this raw prompt, and earlier jailbreak turns
+    // (plus the replies they produced) are withheld. Clean text is
+    // unchanged, so normal prompts stay byte-for-byte identical.
+    final List<String?> templateMarkers = <String?>[
+      effectiveTokens.systemStart,
+      effectiveTokens.systemEnd,
+      effectiveTokens.userStart,
+      effectiveTokens.userEnd,
+      effectiveTokens.assistantStart,
+      effectiveTokens.assistantEnd,
+      ...effectiveTokens.stopGeneration,
+    ];
+    String untrusted(String text) => PromptFirewall.neutralizeControlTokens(
+        text,
+        extraTokens: templateMarkers);
+
+    final rawHistory = await _contextService.buildContextMessages(
+      includeLastUser: false,
+      targetModelId: model.id,
+      langCode: langCode,
+    );
+    final bool harden =
+        PromptFirewall.inspect(latestMessage).action != FirewallAction.allow ||
+            PromptFirewall.historyNeedsHardening(rawHistory);
+    final history = PromptFirewall.sanitizeHistory(rawHistory);
+
+    final bool hasSystemTurn =
+        effectiveTokens.systemStart?.isNotEmpty ?? false;
+    final String systemPrompt = harden && hasSystemTurn
+        ? '$baseSystemPrompt\n\n${PromptFirewall.securityDirective}'
+        : baseSystemPrompt;
 
     // System Preamble
     if (systemPrompt.isNotEmpty &&
@@ -985,13 +1034,7 @@ class OfflineService {
           content: systemPrompt);
     }
 
-    // Chat History
-    final history = await _contextService.buildContextMessages(
-      includeLastUser: false,
-      targetModelId: model.id,
-      langCode: langCode,
-    );
-
+    // Chat History (fetched and sanitized above)
     // Composition log (counts only — never message contents) so cross-
     // conversation leakage can be verified from logs: a brand-new chat MUST
     // show historyMessages=0, a same-chat follow-up MUST show its own turns.
@@ -1000,7 +1043,7 @@ class OfflineService {
 
     for (final msg in history) {
       final role = msg['role'];
-      final content = _extractVisibleText(msg['content']);
+      final content = untrusted(_extractVisibleText(msg['content']));
       if (content.isEmpty) continue;
 
       if (role == 'user') {
@@ -1025,9 +1068,15 @@ class OfflineService {
         'chatFormatProvided=${format != null}.');
 
     // Last User Message
-    final String effectiveLatest = (ragContext != null && ragContext.isNotEmpty)
-        ? '$ragContext\n\n$latestMessage'
-        : latestMessage;
+    final String safeLatest = untrusted(latestMessage);
+    final String latestWithRag = (ragContext != null && ragContext.isNotEmpty)
+        ? '${untrusted(ragContext)}\n\n$safeLatest'
+        : safeLatest;
+    // Formats without a system turn (e.g. Gemma) carry the directive in the
+    // user turn instead.
+    final String effectiveLatest = harden && !hasSystemTurn
+        ? PromptFirewall.hardenUserText(latestWithRag)
+        : latestWithRag;
     _appendTurn(sb,
         start: effectiveTokens.userStart ?? '',
         end: effectiveTokens.userEnd,
@@ -1076,7 +1125,25 @@ class OfflineService {
     }
   }
 
+  bool _isOutputCompromised(String visibleChunk) {
+    if (_firewallOutputProbe.length >= _firewallProbeChars) return false;
+    _firewallOutputProbe += visibleChunk;
+    return PromptFirewall.isCompromisedOutput(_firewallOutputProbe);
+  }
+
+  /// Stops a reply that shows the model accepted a prompt injection. Like a
+  /// model control token, native code is asked to stop WITHOUT closing the
+  /// event gate, so the terminal completion still finalizes this response.
+  void _handleFirewallOutputAbort() {
+    if (_forceAbortCurrentStream) return;
+    _forceAbortCurrentStream = true;
+    debugPrint('[PromptFirewall] Offline output guard stopped a reply.');
+    _responseService.onMessageResponse(PromptFirewall.outputStoppedNotice);
+    unawaited(_requestNativeStopForControlToken());
+  }
+
   void _resetRepetitionGuardState() {
+    _firewallOutputProbe = '';
     _visibleHistory = '';
     _lastVisibleChunk = null;
     _lastVisibleChunkRepeatCount = 0;
