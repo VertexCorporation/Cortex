@@ -25,13 +25,25 @@ class RoleplayService {
   }) async {
     // FIREWALL: the latest user turn and a user-created character's own
     // prompt are untrusted. A jailbreak in either never reaches the model.
-    final latestUser =
-        history.lastWhere((m) => m.isUser, orElse: () => _emptyMessage).text;
-    final userVerdict = PromptFirewall.inspect(latestUser);
+    final userTurns =
+        history.where((m) => m.isUser).map((m) => m.text).toList();
+    final latestUser = userTurns.isEmpty ? '' : userTurns.removeLast();
+    // The window of recent user turns catches split attacks.
+    final userVerdict = PromptFirewall.inspectConversation(
+      userTurns.length > PromptFirewall.multiTurnWindow - 1
+          ? userTurns.sublist(
+              userTurns.length - (PromptFirewall.multiTurnWindow - 1))
+          : userTurns,
+      latestUser,
+    );
     final characterVerdict = character.isOfficial
         ? FirewallVerdict.clean
-        : PromptFirewall.inspect(
-            '${character.systemPrompt}\n${character.worldContext ?? ''}');
+        : PromptFirewall.inspect([
+            character.name,
+            character.systemPrompt,
+            character.worldContext ?? '',
+            for (final t in character.traits) t.name,
+          ].join('\n'));
     for (final verdict in [userVerdict, characterVerdict]) {
       if (verdict.action != FirewallAction.allow) {
         debugPrint('[PromptFirewall] roleplay $verdict');
@@ -62,7 +74,14 @@ class RoleplayService {
         if (choices != null && choices.isNotEmpty) {
           final msg = choices[0]['message'] as Map<String, dynamic>?;
           if (msg != null) {
-            return (msg['content'] as String? ?? '').trim();
+            final content = (msg['content'] as String? ?? '').trim();
+            // FIREWALL output guard: a reply that accepted a jailbreak is
+            // never shown or kept in the session history.
+            if (PromptFirewall.isCompromisedOutput(content)) {
+              debugPrint('[PromptFirewall] roleplay output withheld.');
+              return PromptFirewall.outputStoppedNotice.trim();
+            }
+            return content;
           }
         }
       }
@@ -73,13 +92,6 @@ class RoleplayService {
       rethrow;
     }
   }
-
-  static final RoleplayMessage _emptyMessage = RoleplayMessage(
-    id: '',
-    text: '',
-    isUser: true,
-    timestamp: DateTime.fromMillisecondsSinceEpoch(0),
-  );
 
   String _buildSystemPrompt(RoleplayCharacter character,
       {bool harden = false}) {

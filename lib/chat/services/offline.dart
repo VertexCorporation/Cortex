@@ -134,10 +134,10 @@ class OfflineService {
   int _lastVisibleChunkRepeatCount = 0;
   bool _forceAbortCurrentStream = false;
 
-  // Output firewall: the opening of the reply is probed for signs that the
-  // model accepted a jailbreak ("[@X] activated", "DAN mode enabled").
-  String _firewallOutputProbe = '';
-  static const int _firewallProbeChars = 1500;
+  // Output firewall: a sliding window over the whole reply is checked for
+  // signs that the model accepted a jailbreak ("[@X] activated",
+  // "DAN mode enabled"), so padding cannot push it past a fixed prefix.
+  final FirewallOutputGuard _outputGuard = FirewallOutputGuard();
 
   // ===========================================================================
   // Native stream lifecycle — cross-conversation isolation
@@ -1070,7 +1070,9 @@ class OfflineService {
     // Last User Message
     final String safeLatest = untrusted(latestMessage);
     final String latestWithRag = (ragContext != null && ragContext.isNotEmpty)
-        ? '${untrusted(ragContext)}\n\n$safeLatest'
+        // Document excerpts are third-party data (indirect injection):
+        // fenced when suspicious, withheld when malicious.
+        ? '${PromptFirewall.guardUntrustedContent(untrusted(ragContext), source: 'Document excerpt')}\n\n$safeLatest'
         : safeLatest;
     // Formats without a system turn (e.g. Gemma) carry the directive in the
     // user turn instead.
@@ -1125,11 +1127,8 @@ class OfflineService {
     }
   }
 
-  bool _isOutputCompromised(String visibleChunk) {
-    if (_firewallOutputProbe.length >= _firewallProbeChars) return false;
-    _firewallOutputProbe += visibleChunk;
-    return PromptFirewall.isCompromisedOutput(_firewallOutputProbe);
-  }
+  bool _isOutputCompromised(String visibleChunk) =>
+      _outputGuard.feed(visibleChunk);
 
   /// Stops a reply that shows the model accepted a prompt injection. Like a
   /// model control token, native code is asked to stop WITHOUT closing the
@@ -1143,7 +1142,7 @@ class OfflineService {
   }
 
   void _resetRepetitionGuardState() {
-    _firewallOutputProbe = '';
+    _outputGuard.reset();
     _visibleHistory = '';
     _lastVisibleChunk = null;
     _lastVisibleChunkRepeatCount = 0;

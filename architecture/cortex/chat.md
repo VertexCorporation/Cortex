@@ -25,7 +25,13 @@ Around it: `ContextService` (context construction), `SemanticMemoryService` (mem
 
 ## Prompt firewall (chat/services/firewall.dart)
 
-`PromptFirewall` shields every model from jailbreak/prompt-injection payloads. Text is canonicalised (invisible/bidi chars, homoglyphs, Turkish diacritics, leetspeak) and scored by independent signal families combined as 1 - Π(1 - w): `allow` / `harden` (≥ 0.5, the request carries `securityDirective`) / `block` (≥ 0.85, or ≥ 0.75 across 3+ families). `SendService` blocks before routing (`PROMPT_FIREWALL_BLOCKED`, shown as `errorPromptFlagged`), never extracts memory from flagged text, sanitizes server history and hardens the user turn. `OfflineService` defuses chat-template markers in all untrusted text (user, history, RAG), withholds earlier jailbreak turns, appends the directive only when flagged (clean prompts stay byte-identical) and stops replies that acknowledge a jailbreak. `RoleplayService` checks the user turn and user-created character prompts. Logs carry signal ids and scores only, never content. Server-side enforcement in Fulcrum is still required for clients that bypass the app.
+`PromptFirewall` shields every model from jailbreak/prompt-injection payloads. Text is canonicalised (invisible/bidi chars, combining marks, full-width/circled/small-caps/math letters, mixed-script homoglyphs, diacritics, leetspeak, spacing) and the WHOLE text is scored, plus decoded base64/URL blobs, reversed text and ROT13, by signal families in EN/TR/DE/ES/FR/PT/IT/NL/ID/RU/AR/ZH/JA/KO/HI, combined as 1 - Π(1 - w): `allow` / `harden` (≥ 0.5, the user turn is fenced in `<user_message>` behind `securityDirective`) / `block` (≥ 0.8, or ≥ 0.7 across 3+ families).
+
+- `SendService`: blocks before routing via `inspectConversation` (rolling window of 4 user turns catches split attacks; `PROMPT_FIREWALL_BLOCKED` is user-facing, never retried on a fallback model); sanitizes history (blocked/split-attack turns and compromised replies withheld); never extracts memory from flagged text; custom instructions and memory items must pass the stricter system-slot bar (`isSafeForSystemSlot`) or are not sent; RAG excerpts, inlined text attachments and tool results go through `guardUntrustedContent` (fenced or withheld); `FirewallOutputGuard` drops the rest of a stream that acknowledges a jailbreak and skips its tool calls.
+- `OfflineService`: defuses chat-template markers and fence tags in all untrusted text, withholds earlier attack turns, appends the directive only when flagged (clean prompts stay byte-identical) and stops replies via the sliding output guard.
+- `RoleplayService`: conversation window on user turns, user-created character name/prompt/world/traits, history sanitation, compromised replies replaced.
+
+Logs carry signal ids and scores only, never content. Server-side enforcement in Fulcrum is still required for clients that bypass the app.
 
 ## Online transport (chat/services/api.dart)
 

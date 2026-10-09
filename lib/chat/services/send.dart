@@ -931,8 +931,14 @@ class SendService {
       // PROMPT FIREWALL: every model (offline and online) is shielded from
       // jailbreak / prompt-injection payloads. A blocked turn never reaches
       // a model; the fixed continuation instruction is trusted client text.
-      final FirewallVerdict firewallVerdict =
-          isContinue ? FirewallVerdict.clean : PromptFirewall.inspect(text);
+      // The window of recent user turns catches an attack split across
+      // several messages.
+      final FirewallVerdict firewallVerdict = isContinue
+          ? FirewallVerdict.clean
+          : PromptFirewall.inspectConversation(
+              _recentUserTurnsBefore(text),
+              text,
+            );
       if (firewallVerdict.action != FirewallAction.allow) {
         // Signal ids and score only — never message contents.
         debugPrint('[PromptFirewall] $firewallVerdict');
@@ -1376,6 +1382,21 @@ class SendService {
     }
   }
 
+  /// Up to [PromptFirewall.multiTurnWindow] - 1 user turns preceding the
+  /// one being sent (oldest first), for split-attack detection.
+  List<String> _recentUserTurnsBefore(String current) {
+    final turns = _conversationProvider.messages
+        .where((m) => m.isUserMessage && m.text.trim().isNotEmpty)
+        .map((m) => m.text)
+        .toList();
+    // The current turn is usually already inserted; do not count it twice.
+    if (turns.isNotEmpty && turns.last.trim() == current.trim()) {
+      turns.removeLast();
+    }
+    const keep = PromptFirewall.multiTurnWindow - 1;
+    return turns.length > keep ? turns.sublist(turns.length - keep) : turns;
+  }
+
   Future<void> _delayed(Duration duration) {
     _retryTimer?.cancel();
     final completer = Completer<void>();
@@ -1475,28 +1496,39 @@ class SendService {
 
     String combinedText = "";
     if (ragActive) {
-      final safeContext = LocalPiiRedactionFilter.redact(ragContext);
+      // FIREWALL: document excerpts are third-party data (indirect prompt
+      // injection): fenced when suspicious, withheld when malicious.
+      final safeContext = PromptFirewall.guardUntrustedContent(
+        LocalPiiRedactionFilter.redact(ragContext),
+        source: 'Document excerpt',
+      );
       if (safeContext.isNotEmpty) {
         combinedText += "$safeContext\n\n";
       }
     }
 
     if (initialText.isNotEmpty) {
-      combinedText += initialText;
+      combinedText += (hardenUserTurn || historyHardening)
+          ? PromptFirewall.hardenUserText(initialText)
+          : initialText;
     }
 
     if (combinedText.isNotEmpty) {
-      final String trimmed = combinedText.trim();
-      userContent.add({
-        "type": "text",
-        "text": (hardenUserTurn || historyHardening)
-            ? PromptFirewall.hardenUserText(trimmed)
-            : trimmed,
-      });
+      userContent.add({"type": "text", "text": combinedText.trim()});
     }
     for (var path in attachments) {
       final block = await Utils.processAttachment(path);
-      if (block != null) userContent.add(block);
+      if (block == null) continue;
+      // FIREWALL: inlined text files are untrusted as well.
+      if (block["type"] == "text" &&
+          block["text"] is String &&
+          !block.containsKey("_document")) {
+        block["text"] = PromptFirewall.guardUntrustedContent(
+          block["text"] as String,
+          source: 'Attached file',
+        );
+      }
+      userContent.add(block);
     }
 
     // CONTINUATION: append the partial answer as the assistant turn the model
@@ -1533,6 +1565,9 @@ class SendService {
     // State for managing featureReasoning block - OUTSIDE loop to persist across iterations
     // enablefeatureReasoning is already defined above when building context
     bool isfeatureReasoningBlockActive = false;
+    // FIREWALL output guard: once the reply shows the model accepted a
+    // jailbreak, the rest of the stream is dropped and a notice is shown.
+    final FirewallOutputGuard outputGuard = FirewallOutputGuard();
     bool hasEverHadfeatureReasoning =
         false; // Track if we've seen any featureReasoning
 
@@ -1663,6 +1698,16 @@ class SendService {
         }
 
         _clearPendingMediaState(targetConvId, aiMessageIndex);
+
+        if (outputGuard.tripped) return;
+        if (outputGuard.feed(text)) {
+          debugPrint('[PromptFirewall] Online output guard stopped a reply.');
+          appendStreamChunk(
+            PromptFirewall.outputStoppedNotice,
+            flushImmediately: true,
+          );
+          return;
+        }
 
         appendStreamChunk(text, sendToVoice: true, scrollIfNeeded: true);
       }
@@ -1935,8 +1980,25 @@ class SendService {
         final flowInstruction = flowParticipant == null
             ? null
             : 'You are the ${FlowParticipantMetadata.fromKey(flowParticipant)?.displayName ?? flowParticipant} participant in a live Cortex Flow roundtable. Other AI participants and the human share this conversation. Respond to the conversation so far, build on or respectfully challenge previous participants, do not impersonate them, and keep this turn concise and natural for spoken audio.';
+        // FIREWALL: custom instructions and memory are user-editable but
+        // land in the backend's system prompt, so they must pass the
+        // stricter system-slot bar; unsafe entries are not sent.
+        final String? safeCustomInstruction =
+            PromptFirewall.sanitizeCustomInstruction(
+              _userMemoryProvider.customInstruction,
+            );
+        if (safeCustomInstruction != _userMemoryProvider.customInstruction) {
+          debugPrint('[PromptFirewall] custom instruction withheld.');
+        }
+        final List<String> safeMemoryItems =
+            PromptFirewall.sanitizeMemoryItems(_userMemoryProvider.memoryList);
+        if (safeMemoryItems.length != _userMemoryProvider.memoryList.length) {
+          debugPrint('[PromptFirewall] '
+              '${_userMemoryProvider.memoryList.length - safeMemoryItems.length}'
+              ' memory item(s) withheld.');
+        }
         final delegatedInstruction =
-            [_userMemoryProvider.customInstruction, flowInstruction]
+            [safeCustomInstruction, flowInstruction]
                 .whereType<String>()
                 .where((value) => value.trim().isNotEmpty)
                 .join('\n\n');
@@ -1953,7 +2015,7 @@ class SendService {
           customInstruction: delegatedInstruction.isEmpty
               ? null
               : delegatedInstruction,
-          userMemory: _userMemoryProvider.memory,
+          userMemory: safeMemoryItems.join('\n'),
           characterRole: modelData.role,
           voiceMode: _inputProvider.isVoiceModeActive,
           featureMode: activeMode == ChatInputMode.study
@@ -2012,8 +2074,9 @@ class SendService {
         );
       }
 
-      // Post-Response: Check for Tools
-      if (turnToolCalls.isNotEmpty) {
+      // Post-Response: Check for Tools. A reply stopped by the output guard
+      // never executes the tool calls it requested.
+      if (turnToolCalls.isNotEmpty && !outputGuard.tripped) {
         shouldContinue = true; // We need to loop again to send results
 
         // Close reasoning block before tool execution if it's still open.
@@ -2089,12 +2152,16 @@ class SendService {
 
           setToolActivity(name, completed: true);
 
-          // Add Tool Result to History
+          // Add Tool Result to History. FIREWALL: tool output (documents,
+          // web content) is untrusted third-party data.
           contextMessages.add({
             "role": "tool",
             "tool_call_id": callId,
             "name": name,
-            "content": result,
+            "content": PromptFirewall.guardUntrustedContent(
+              result,
+              source: 'Tool output',
+            ),
           });
         }
       }
@@ -2482,6 +2549,7 @@ class SendService {
       'LIMIT_AUDIO_INSUFFICIENT',
       'LIMIT_MEDIA_INSUFFICIENT',
       'VIDEO_ULTRA_ONLY',
+      'PROMPT_FIREWALL_BLOCKED',
     };
 
     if (userFacingCodes.contains(code)) return false;
