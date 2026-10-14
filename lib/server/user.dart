@@ -130,6 +130,7 @@ class UserProvider with ChangeNotifier {
       SubscriptionEntitlement.fromUserData(
         _userData,
         isAnonymous: isAnonymous,
+        uid: _activeUid ?? _safeCurrentUser?.uid,
       );
 
   /// Credit limits for the user's effective tier, published by the server on

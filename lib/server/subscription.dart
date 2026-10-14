@@ -29,11 +29,11 @@ enum SubscriptionTier {
   /// Index of the tier for plan-comparison arithmetic
   /// (free < plus < pro < ultra).
   int get planIndex => switch (this) {
-        SubscriptionTier.free => 0,
-        SubscriptionTier.plus => 1,
-        SubscriptionTier.pro => 2,
-        SubscriptionTier.ultra => 3,
-      };
+    SubscriptionTier.free => 0,
+    SubscriptionTier.plus => 1,
+    SubscriptionTier.pro => 2,
+    SubscriptionTier.ultra => 3,
+  };
 }
 
 /// How the entitlement was granted. `renewable` and `promotional` are
@@ -103,7 +103,8 @@ enum SubscriptionSource {
   playStore('play_store'),
   referral('referral'),
   admin('admin'),
-  internalTest('internal_test');
+  internalTest('internal_test'),
+  vertex('vertex');
 
   const SubscriptionSource(this.value);
   final String value;
@@ -115,6 +116,7 @@ enum SubscriptionSource {
       'referral' => SubscriptionSource.referral,
       'admin' => SubscriptionSource.admin,
       'internal_test' => SubscriptionSource.internalTest,
+      'vertex' => SubscriptionSource.vertex,
       _ => null,
     };
   }
@@ -199,9 +201,41 @@ class SubscriptionEntitlement {
   static SubscriptionEntitlement fromUserData(
     Map<String, dynamic>? userData, {
     bool isAnonymous = false,
+    String? uid,
   }) {
-    if (isAnonymous) return none;
+    if (isAnonymous || userData?['accountType'] == 'anonymous') return none;
+    final paid = _fromPaidUserData(userData);
+    if (paid.effectiveTier != SubscriptionTier.free) return paid;
+    final sponsor = userData?['vertexSponsorship'];
+    // Display only. Fulcrum verifies the Ed25519 signature and document UID
+    // at every authorization/credit decision; this parser grants no access.
+    if (userData?['isVertex'] == true &&
+        uid != null &&
+        sponsor is Map &&
+        sponsor['uid'] == uid &&
+        sponsor['source'] == 'vertex' &&
+        sponsor['tier'] == 'plus' &&
+        sponsor['batch'] is String &&
+        RegExp(r'^[a-f0-9]{64}$').hasMatch(sponsor['batch'] as String) &&
+        sponsor['signature'] is String &&
+        RegExp(r'^[A-Za-z0-9+/]{86}==$')
+            .hasMatch(sponsor['signature'] as String)) {
+      final startedAt = _parseDate(sponsor['startedAt']);
+      if (startedAt != null && !startedAt.isAfter(DateTime.now())) {
+        return SubscriptionEntitlement(
+          tier: SubscriptionTier.plus,
+          status: SubscriptionStatus.active,
+          source: SubscriptionSource.vertex,
+          updatedAt: startedAt,
+        );
+      }
+    }
+    return paid;
+  }
 
+  static SubscriptionEntitlement _fromPaidUserData(
+    Map<String, dynamic>? userData,
+  ) {
     final raw = userData?['subscription'];
     if (raw is! Map) return none;
 
@@ -214,8 +248,9 @@ class SubscriptionEntitlement {
       status: SubscriptionStatus.fromValue(_readString(raw['status'])),
       expiresAt: _parseDate(raw['expiresAt']),
       productId: _readString(raw['productId']),
-      billingPeriod:
-          SubscriptionBillingPeriod.fromValue(_readString(raw['billingPeriod'])),
+      billingPeriod: SubscriptionBillingPeriod.fromValue(
+        _readString(raw['billingPeriod']),
+      ),
       source: SubscriptionSource.fromValue(_readString(raw['source'])),
       testGrant: raw['testGrant'] == true,
       updatedAt: _parseDate(raw['updatedAt']),
@@ -240,6 +275,7 @@ class SubscriptionEntitlement {
   bool get isActive {
     if (tier == SubscriptionTier.free) return false;
     if (status != SubscriptionStatus.active) return false;
+    if (source == SubscriptionSource.vertex) return true;
     if (mode == SubscriptionMode.lifetime) return true;
     final expiry = expiresAt;
     return expiry != null && expiry.isAfter(DateTime.now());
@@ -250,16 +286,15 @@ class SubscriptionEntitlement {
 
   /// The tier the user is actually entitled to: the nominal tier while
   /// active, [SubscriptionTier.free] otherwise.
-  SubscriptionTier get effectiveTier =>
-      isActive ? tier : SubscriptionTier.free;
+  SubscriptionTier get effectiveTier => isActive ? tier : SubscriptionTier.free;
 
   /// Maximum characters allowed in a chat context, mirroring the server.
   int get chatCharacterLimit => switch (effectiveTier) {
-        SubscriptionTier.free => 100000,
-        SubscriptionTier.plus => 250000,
-        SubscriptionTier.pro => 500000,
-        SubscriptionTier.ultra => 1000000,
-      };
+    SubscriptionTier.free => 100000,
+    SubscriptionTier.plus => 250000,
+    SubscriptionTier.pro => 500000,
+    SubscriptionTier.ultra => 1000000,
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -276,15 +311,15 @@ class SubscriptionEntitlement {
 
   @override
   int get hashCode => Object.hash(
-        tier,
-        mode,
-        status,
-        expiresAt,
-        productId,
-        billingPeriod,
-        source,
-        testGrant,
-      );
+    tier,
+    mode,
+    status,
+    expiresAt,
+    productId,
+    billingPeriod,
+    source,
+    testGrant,
+  );
 
   @override
   String toString() =>
@@ -336,8 +371,10 @@ class CreditLimits {
   /// of `creditLimits`; such documents converge on the next daily renewal.
   /// These must match the free tier of `TIER_LIMITS` and are never
   /// authoritative.
-  static const CreditLimits fallback =
-      CreditLimits(dailyGrant: 50, debtFloor: -50);
+  static const CreditLimits fallback = CreditLimits(
+    dailyGrant: 50,
+    debtFloor: -50,
+  );
 
   /// Parses the `creditLimits` map from a user document. Absent or partial
   /// maps (legacy documents) resolve to [fallback].
@@ -364,8 +401,11 @@ class CreditLimits {
     return costs;
   }
 
-  static int? _readInt(dynamic value) =>
-      value is int ? value : value is num ? value.toInt() : null;
+  static int? _readInt(dynamic value) => value is int
+      ? value
+      : value is num
+      ? value.toInt()
+      : null;
 
   @override
   bool operator ==(Object other) =>
@@ -378,7 +418,11 @@ class CreditLimits {
 
   @override
   int get hashCode => Object.hash(
-      dailyGrant, debtFloor, voiceDailySeconds, const MapEquality().hash(operationCosts));
+    dailyGrant,
+    debtFloor,
+    voiceDailySeconds,
+    const MapEquality().hash(operationCosts),
+  );
 
   @override
   String toString() =>
@@ -441,8 +485,8 @@ class VoiceUsage {
       consumedSeconds: seconds is int
           ? (seconds < 0 ? 0 : seconds)
           : seconds is num
-              ? (seconds < 0 ? 0 : seconds.toInt())
-              : 0,
+          ? (seconds < 0 ? 0 : seconds.toInt())
+          : 0,
     );
   }
 
