@@ -4,4 +4,4 @@ Fulcrum resolves signed Vertex sponsorship separately from the user's paid subsc
 
 This is display logic only. Fulcrum verifies the Ed25519 signature and authoritative document UID at every access/credit decision. No client write or privilege-grant endpoint is added. Requires the linked Fulcrum PR, reviewed security rules and separately approved server configuration; no app/production release is performed here.
 
-Validation: 28 subscription/sponsorship Flutter tests passed; `flutter analyze --no-pub` reported no issues. On this machine `DEVELOPER_DIR=/Library/Developer/CommandLineTools` was used for the existing test-native-asset tools.
+Validation: 28 subscription/sponsorship Flutter tests passed; After synchronizing current-main dependencies and generating localization output, `flutter analyze --no-pub --no-fatal-infos` has no errors/warnings; one existing informational lint remains in `lib/chat/services/scroll.dart:227`. On this machine `DEVELOPER_DIR=/Library/Developer/CommandLineTools` was used for the existing test-native-asset tools.
