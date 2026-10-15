@@ -45,7 +45,7 @@ jobs:
           echo "storeFile=Cortex.jks" >> android/key.properties
 
       - name: Build APK (Release)
-        run: flutter build apk --release
+        run: flutter build appbundle --release
 
       - name: Build AppBundle (Release)
         run: flutter build appbundle --release
@@ -55,7 +55,7 @@ jobs:
         with:
           name: android-release-artifacts
           path: |
-            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/flutter-apk/app-release.aab
             build/app/outputs/bundle/release/app-release.aab
 
   build-ios:
