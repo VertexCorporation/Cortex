@@ -1,0 +1,22 @@
+name: cortex notification receipts
+on:
+  push:
+    branches:
+      - 'fix/notification-device-receipts-*'
+  pull_request:
+    paths:
+      - 'lib/notifications/extrovert/**'
+      - '.github/workflows/notification-receipts-ci.yml'
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Analyze notification service and part files
+        run: flutter analyze --no-pub lib/notifications/extrovert/service.dart
