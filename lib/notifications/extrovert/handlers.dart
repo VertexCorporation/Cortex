@@ -8,10 +8,103 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     // Ensure Firebase is initialized for this isolate.
     await Firebase.initializeApp();
     debugPrint("--- Background Message Handler triggered by FCM ---");
-    debugPrint("FCM Data payload: ${message.data}");
-    await _showLocalizedNotification(message.data);
+    // Payloads may contain user-specific fields; never log raw FCM data.
+    if (message.notification == null) {
+      if (await _showLocalizedNotification(message.data, background: true)) {
+        await _reportNotificationReceipt(message.data);
+      }
+    } else {
+      // A notification+data message is normally presented by the OS in background.
+      // This receipt means the Dart handler received it, not that the user viewed it.
+      await _reportNotificationReceipt(message.data);
+    }
   } catch (e, s) {
     debugPrint("FATAL: Error in firebaseMessagingBackgroundHandler: $e\n$s");
+  }
+}
+
+/// This reports app-handled notifications, not guaranteed OS banner delivery.
+Future<void> _reportNotificationReceipt(Map<String, dynamic> data) async {
+  final id = data['vertex_notification_id'];
+  if (id is! String || !RegExp(r'^[a-f0-9]{64}
+/// It dynamically selects the correct channel based on the payload.
+Future<bool> _showLocalizedNotification(Map<String, dynamic> data,
+    {bool background = false, RemoteNotification? original}) async {
+  final notificationContent = await _buildLocalizedContent(data);
+  final String title = (notificationContent['title']?.isNotEmpty == true
+      ? notificationContent['title']
+      : original?.title) ?? '';
+  final String body = (notificationContent['body']?.isNotEmpty == true
+      ? notificationContent['body']
+      : original?.body) ?? '';
+  if (title.isEmpty) {
+    debugPrint('[Notification Displayer] No notification text available.');
+    return false;
+  }
+
+  final String channelId = data['channel_id'] ?? 'cortex_notifications';
+  final String channelName = data['channel_name'] ?? 'Cortex Updates';
+  final String channelDescription = data['channel_desc'] ??
+      'Notifications about news and updates from Cortex.';
+
+  final BigTextStyleInformation bigTextStyleInformation =
+      BigTextStyleInformation(
+    body,
+    htmlFormatBigText: false,
+    contentTitle: title,
+    htmlFormatContentTitle: false,
+  );
+
+  final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    channelId,
+    channelName,
+    channelDescription: channelDescription,
+    importance: Importance.max,
+    priority: Priority.high,
+    styleInformation: bigTextStyleInformation,
+  );
+
+  final NotificationDetails platformDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ));
+
+  final plugin = FlutterLocalNotificationsPlugin();
+  if (background) {
+    // Background handlers run in a separate isolate; plugin initialization
+    // performed by the foreground service does not carry over.
+    await plugin.initialize(
+      const InitializationSettings(
+        android: AndroidInitializationSettings('ic_notification'),
+        iOS: DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        ),
+      ),
+    );
+  }
+  await plugin.show(
+    DateTime.now().millisecondsSinceEpoch.toSigned(31),
+    title,
+    body,
+    platformDetails,
+    payload: jsonEncode(data),
+  );
+  return true;
+}
+).hasMatch(id)) return;
+  if (FirebaseAuth.instance.currentUser == null) return;
+  try {
+    await FirebaseFunctions.instanceFor(region: 'europe-west1')
+        .httpsCallable('recordNotificationReceipt')
+        .call(<String, dynamic>{'taskId': id});
+  } catch (_) {
+    // Receipt telemetry must never prevent a notification from being shown.
+    debugPrint('[Extrovert] Notification receipt unavailable.');
   }
 }
 
