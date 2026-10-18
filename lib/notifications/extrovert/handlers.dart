@@ -9,7 +9,10 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await Firebase.initializeApp();
     debugPrint("--- Background Message Handler triggered by FCM ---");
     // Payloads may contain user-specific fields; never log raw FCM data.
-    await _showLocalizedNotification(message.data, background: true);
+    if (message.notification == null) {
+      await _showLocalizedNotification(message.data, background: true);
+    }
+    // Notification+data payloads are normally presented by the OS in background.
     await _reportNotificationReceipt(message.data);
   } catch (e, s) {
     debugPrint("FATAL: Error in firebaseMessagingBackgroundHandler: $e\n$s");
@@ -22,16 +25,18 @@ Future<void> _reportNotificationReceipt(Map<String, dynamic> data) async {
   if (id is! String || !RegExp(r'^[a-f0-9]{64}
 /// It dynamically selects the correct channel based on the payload.
 Future<void> _showLocalizedNotification(Map<String, dynamic> data,
-    {bool background = false}) async {
+    {bool background = false, RemoteNotification? original}) async {
   final notificationContent = await _buildLocalizedContent(data);
-  if (notificationContent.isEmpty || notificationContent['title']!.isEmpty) {
-    debugPrint(
-        "[Notification Displayer] Could not build localized content. Aborting display.");
+  final String title = (notificationContent['title']?.isNotEmpty == true
+      ? notificationContent['title']
+      : original?.title) ?? '';
+  final String body = (notificationContent['body']?.isNotEmpty == true
+      ? notificationContent['body']
+      : original?.body) ?? '';
+  if (title.isEmpty) {
+    debugPrint('[Notification Displayer] No notification text available.');
     return;
   }
-
-  final String title = notificationContent['title']!;
-  final String body = notificationContent['body']!;
 
   final String channelId = data['channel_id'] ?? 'cortex_notifications';
   final String channelName = data['channel_name'] ?? 'Cortex Updates';
