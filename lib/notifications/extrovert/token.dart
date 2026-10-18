@@ -90,9 +90,13 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
         debugPrint("[Extrovert] Token refresh stream error: $err");
       });
 
-      FirebaseMessaging.onMessage.listen((RemoteMessage msg) {
-        debugPrint("[Extrovert] Foreground FCM received.");
-        _showLocalizedNotification(msg.data);
+      FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
+        try {
+          await _showLocalizedNotification(msg.data, original: msg.notification);
+          await _reportNotificationReceipt(msg.data);
+        } catch (error) {
+          debugPrint('[Extrovert] Foreground notification display failed.');
+        }
       });
 
       final initialMessage = await _fcm.getInitialMessage();
