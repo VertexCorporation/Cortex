@@ -92,8 +92,9 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
 
       FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
         try {
-          await _showLocalizedNotification(msg.data, original: msg.notification);
-          await _reportNotificationReceipt(msg.data);
+          if (await _showLocalizedNotification(msg.data, original: msg.notification)) {
+            await _reportNotificationReceipt(msg.data);
+          }
         } catch (error) {
           debugPrint('[Extrovert] Foreground notification display failed.');
         }
