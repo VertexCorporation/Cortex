@@ -10,10 +10,14 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     debugPrint("--- Background Message Handler triggered by FCM ---");
     // Payloads may contain user-specific fields; never log raw FCM data.
     if (message.notification == null) {
-      await _showLocalizedNotification(message.data, background: true);
+      if (await _showLocalizedNotification(message.data, background: true)) {
+        await _reportNotificationReceipt(message.data);
+      }
+    } else {
+      // A notification+data message is normally presented by the OS in background.
+      // This receipt means the Dart handler received it, not that the user viewed it.
+      await _reportNotificationReceipt(message.data);
     }
-    // Notification+data payloads are normally presented by the OS in background.
-    await _reportNotificationReceipt(message.data);
   } catch (e, s) {
     debugPrint("FATAL: Error in firebaseMessagingBackgroundHandler: $e\n$s");
   }
@@ -24,7 +28,7 @@ Future<void> _reportNotificationReceipt(Map<String, dynamic> data) async {
   final id = data['vertex_notification_id'];
   if (id is! String || !RegExp(r'^[a-f0-9]{64}
 /// It dynamically selects the correct channel based on the payload.
-Future<void> _showLocalizedNotification(Map<String, dynamic> data,
+Future<bool> _showLocalizedNotification(Map<String, dynamic> data,
     {bool background = false, RemoteNotification? original}) async {
   final notificationContent = await _buildLocalizedContent(data);
   final String title = (notificationContent['title']?.isNotEmpty == true
@@ -35,7 +39,7 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data,
       : original?.body) ?? '';
   if (title.isEmpty) {
     debugPrint('[Notification Displayer] No notification text available.');
-    return;
+    return false;
   }
 
   final String channelId = data['channel_id'] ?? 'cortex_notifications';
@@ -90,6 +94,7 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data,
     platformDetails,
     payload: jsonEncode(data),
   );
+  return true;
 }
 ).hasMatch(id)) return;
   if (FirebaseAuth.instance.currentUser == null) return;
