@@ -2220,4 +2220,216 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get voiceDailyLimitReached =>
       'You\'ve used today\'s voice time. It renews after midnight.';
+
+  @override
+  String get offlineSetupWelcome => 'Would you like to use Cortex offline?';
+
+  @override
+  String get offlineSetupWelcomeBody =>
+      'Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.';
+
+  @override
+  String get offlineSetupChoiceTitle => 'Your own local Cortex';
+
+  @override
+  String get offlineSetupChoiceBody =>
+      'Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.';
+
+  @override
+  String get offlineSetupChooseSpecific => 'Choose an intelligence';
+
+  @override
+  String get offlineSetupContinue => 'Continue';
+
+  @override
+  String get offlineSetupChecking => 'Checking your device';
+
+  @override
+  String get offlineSetupCheckingBody =>
+      'We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.';
+
+  @override
+  String get offlineSetupReadyTitle => 'Ready for offline chat';
+
+  @override
+  String get offlineSetupReadyBody =>
+      'This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.';
+
+  @override
+  String get offlineSetupNoMatch =>
+      'We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.';
+
+  @override
+  String get featureCreateMusicTitle => 'Create Music';
+
+  @override
+  String get featureCreateMusicDescription =>
+      'Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.';
+
+  @override
+  String get musicGenerationUnavailable =>
+      'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
+
+  @override
+  String get appsTitle => 'التطبيقات';
+
+  @override
+  String get appsInstalled => 'المثبتة';
+
+  @override
+  String get appsPopular => 'الشائعة';
+
+  @override
+  String get appsAll => 'كل التطبيقات';
+
+  @override
+  String get appsSearchHint => 'ابحث في التطبيقات';
+
+  @override
+  String get appsNoResults => 'لم يتم العثور على تطبيقات';
+
+  @override
+  String get appsLoadError => 'تعذّر تحميل التطبيقات.';
+
+  @override
+  String get appsRetry => 'إعادة المحاولة';
+
+  @override
+  String get appsConnect => 'ربط';
+
+  @override
+  String get appsConnected => 'مرتبط';
+
+  @override
+  String get appsDisconnect => 'إلغاء الربط';
+
+  @override
+  String appsDisconnectConfirm(String app) {
+    return 'هل تريد إلغاء ربط $app؟ لن يتمكن Cortex من استخدامه بعد ذلك.';
+  }
+
+  @override
+  String appsConnectBrowserHint(String app) {
+    return 'أكمل تسجيل الدخول إلى $app في المتصفح، ثم عُد إلى Cortex.';
+  }
+
+  @override
+  String get appsConnectFailed => 'تعذّر بدء الربط. حاول مرة أخرى.';
+
+  @override
+  String get appsDisconnectFailed => 'تعذّر إلغاء ربط التطبيق. حاول مرة أخرى.';
+
+  @override
+  String appsConnectToUse(String app) {
+    return 'اربط $app ليتمكن Cortex من استخدامه في محادثاتك.';
+  }
+
+  @override
+  String appsActionsCount(int count) {
+    return '$count إجراء';
+  }
+
+  @override
+  String get appsPermissions => 'الأذونات';
+
+  @override
+  String get appsPermissionAsk => 'اسأل في كل مرة';
+
+  @override
+  String get appsPermissionAskDescription =>
+      'يطلب Cortex موافقتك قبل كل إجراء في هذا التطبيق.';
+
+  @override
+  String get appsPermissionAllow => 'السماح دائمًا';
+
+  @override
+  String get appsPermissionAllowDescription =>
+      'يمكن لـ Cortex القراءة وتنفيذ الإجراءات في هذا التطبيق دون سؤال.';
+
+  @override
+  String get appsPermissionReadOnly => 'قراءة فقط';
+
+  @override
+  String get appsPermissionReadOnlyDescription =>
+      'يمكن لـ Cortex القراءة فقط. الإرسال والتعديل والحذف محظورة.';
+
+  @override
+  String get appsPermissionOff => 'متوقف';
+
+  @override
+  String get appsPermissionOffDescription =>
+      'لن يستخدم Cortex هذا التطبيق في محادثاتك.';
+
+  @override
+  String get appsPermissionSaveFailed => 'تعذّر حفظ الإذن. حاول مرة أخرى.';
+
+  @override
+  String appsConfirmTitle(String app) {
+    return 'السماح لـ $app؟';
+  }
+
+  @override
+  String appsConfirmBody(String app, String action) {
+    return 'يريد Cortex تنفيذ \"$action\" في $app.';
+  }
+
+  @override
+  String get appsConfirmAllowOnce => 'السماح مرة واحدة';
+
+  @override
+  String get appsConfirmDeny => 'رفض';
+
+  @override
+  String get appsCategoryOther => 'أخرى';
+
+  @override
+  String get appsCategoryProductivity => 'الإنتاجية';
+
+  @override
+  String get appsCategoryCommunication => 'التواصل';
+
+  @override
+  String get appsCategoryDeveloper => 'أدوات المطورين';
+
+  @override
+  String get appsCategorySales => 'المبيعات وإدارة العملاء';
+
+  @override
+  String get appsCategoryMarketing => 'التسويق';
+
+  @override
+  String get appsCategoryFinance => 'المالية';
+
+  @override
+  String get appsCategorySocial => 'وسائل التواصل الاجتماعي';
+
+  @override
+  String get appsCategoryAnalytics => 'التحليلات';
+
+  @override
+  String get appsCategoryProjects => 'إدارة المشاريع';
+
+  @override
+  String get appsCategoryFiles => 'الملفات والتخزين';
+
+  @override
+  String get appsCategoryCommerce => 'التجارة الإلكترونية';
+
+  @override
+  String get appsCategoryAi => 'الذكاء الاصطناعي والأتمتة';
+
+  @override
+  String get appsCategoryDesign => 'التصميم';
+
+  @override
+  String get appsCategoryEducation => 'التعليم';
+
+  @override
+  String get appsCategorySupport => 'دعم العملاء';
+
+  @override
+  String get appsCategoryScheduling => 'التقويم والجدولة';
+
+  @override
+  String get appsCategoryEntertainment => 'الترفيه والوسائط';
 }

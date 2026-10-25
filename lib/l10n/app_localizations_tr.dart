@@ -2224,4 +2224,218 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get voiceDailyLimitReached =>
       'Bugünün ses süresini kullandınız. Gece yarısından sonra yenilenir.';
+
+  @override
+  String get offlineSetupWelcome =>
+      'Cortex’i internetsiz kullanmak ister misin?';
+
+  @override
+  String get offlineSetupWelcomeBody =>
+      'Bir modeli bir kez indir, sonra internet olmadan cihazında sohbet et. Mesajların cihazında kalır. Web araması ve bulutta medya üretimi için internet gerekir.';
+
+  @override
+  String get offlineSetupChoiceTitle => 'Sana özel lokal Cortex';
+
+  @override
+  String get offlineSetupChoiceBody =>
+      'Cortex’te geniş bir internetsiz model kataloğu var. Devam ederek cihazına uygun ücretsiz bir model önerisi alabilirsin. Plus ile katalogdan belirli bir zekâyı kendin seçebilirsin.';
+
+  @override
+  String get offlineSetupChooseSpecific => 'Spesifik zekâ seç';
+
+  @override
+  String get offlineSetupContinue => 'Devam et';
+
+  @override
+  String get offlineSetupChecking => 'Cihazın inceleniyor';
+
+  @override
+  String get offlineSetupCheckingBody =>
+      'Kullanılabilir bellek ve depolama alanını katalogdaki gereksinimlerle karşılaştırıyoruz. Onay vermeden hiçbir model indirilmez.';
+
+  @override
+  String get offlineSetupReadyTitle => 'İnternetsiz sohbete hazır';
+
+  @override
+  String get offlineSetupReadyBody =>
+      'Bu öneri, cihazının rahat çalışması için güvenlik payı bırakır. Modeli indir; hazır olduğunda İnternetsiz Kullan’a bas. İndirme sürerken bu paneli kapatabilirsin.';
+
+  @override
+  String get offlineSetupNoMatch =>
+      'Cihaz ve katalog bilgileriyle güvenli bir model öneremedik. Seçenekleri elle incelemek için İnternetsiz Modeller’i aç.';
+
+  @override
+  String get featureCreateMusicTitle => 'Müzik oluştur';
+
+  @override
+  String get featureCreateMusicDescription =>
+      'İstediğin tarzı, duyguyu, süreyi ve sözleri anlat. Uyumlu bir müzik modeliyle üret, dinle ve paylaş. Medya kredilerini kullanır.';
+
+  @override
+  String get musicGenerationUnavailable =>
+      'Güncel katalogda uyumlu bir müzik üreticisi bulunamadı. Lütfen daha sonra tekrar dene. Müzik isteği gönderilmedi.';
+
+  @override
+  String get appsTitle => 'Uygulamalar';
+
+  @override
+  String get appsInstalled => 'Kurulu';
+
+  @override
+  String get appsPopular => 'Popüler';
+
+  @override
+  String get appsAll => 'Tüm uygulamalar';
+
+  @override
+  String get appsSearchHint => 'Uygulamalarda ara';
+
+  @override
+  String get appsNoResults => 'Uygulama bulunamadı';
+
+  @override
+  String get appsLoadError => 'Uygulamalar yüklenemedi.';
+
+  @override
+  String get appsRetry => 'Tekrar dene';
+
+  @override
+  String get appsConnect => 'Bağla';
+
+  @override
+  String get appsConnected => 'Bağlı';
+
+  @override
+  String get appsDisconnect => 'Bağlantıyı kes';
+
+  @override
+  String appsDisconnectConfirm(String app) {
+    return '$app bağlantısı kesilsin mi? Cortex artık bu uygulamayı kullanamayacak.';
+  }
+
+  @override
+  String appsConnectBrowserHint(String app) {
+    return '$app girişini tarayıcında tamamla, ardından Cortex\'e geri dön.';
+  }
+
+  @override
+  String get appsConnectFailed => 'Bağlantı başlatılamadı. Tekrar dene.';
+
+  @override
+  String get appsDisconnectFailed =>
+      'Uygulamanın bağlantısı kesilemedi. Tekrar dene.';
+
+  @override
+  String appsConnectToUse(String app) {
+    return 'Cortex\'in sohbetlerinde kullanabilmesi için $app uygulamasını bağla.';
+  }
+
+  @override
+  String appsActionsCount(int count) {
+    return '$count eylem';
+  }
+
+  @override
+  String get appsPermissions => 'İzinler';
+
+  @override
+  String get appsPermissionAsk => 'Her seferinde sor';
+
+  @override
+  String get appsPermissionAskDescription =>
+      'Cortex bu uygulamadaki her eylemden önce onayını ister.';
+
+  @override
+  String get appsPermissionAllow => 'Her zaman izin ver';
+
+  @override
+  String get appsPermissionAllowDescription =>
+      'Cortex bu uygulamada sormadan okuyabilir ve işlem yapabilir.';
+
+  @override
+  String get appsPermissionReadOnly => 'Yalnızca okuma';
+
+  @override
+  String get appsPermissionReadOnlyDescription =>
+      'Cortex yalnızca okuyabilir. Gönderme, düzenleme ve silme engellenir.';
+
+  @override
+  String get appsPermissionOff => 'Kapalı';
+
+  @override
+  String get appsPermissionOffDescription =>
+      'Cortex bu uygulamayı sohbetlerinde kullanmaz.';
+
+  @override
+  String get appsPermissionSaveFailed => 'İzin kaydedilemedi. Tekrar dene.';
+
+  @override
+  String appsConfirmTitle(String app) {
+    return '$app için izin verilsin mi?';
+  }
+
+  @override
+  String appsConfirmBody(String app, String action) {
+    return 'Cortex, $app içinde \"$action\" eylemini çalıştırmak istiyor.';
+  }
+
+  @override
+  String get appsConfirmAllowOnce => 'Bir kez izin ver';
+
+  @override
+  String get appsConfirmDeny => 'Reddet';
+
+  @override
+  String get appsCategoryOther => 'Diğer';
+
+  @override
+  String get appsCategoryProductivity => 'Üretkenlik';
+
+  @override
+  String get appsCategoryCommunication => 'İletişim';
+
+  @override
+  String get appsCategoryDeveloper => 'Geliştirici araçları';
+
+  @override
+  String get appsCategorySales => 'Satış ve CRM';
+
+  @override
+  String get appsCategoryMarketing => 'Pazarlama';
+
+  @override
+  String get appsCategoryFinance => 'Finans';
+
+  @override
+  String get appsCategorySocial => 'Sosyal medya';
+
+  @override
+  String get appsCategoryAnalytics => 'Analitik';
+
+  @override
+  String get appsCategoryProjects => 'Proje yönetimi';
+
+  @override
+  String get appsCategoryFiles => 'Dosyalar ve depolama';
+
+  @override
+  String get appsCategoryCommerce => 'E-ticaret';
+
+  @override
+  String get appsCategoryAi => 'Yapay zekâ ve otomasyon';
+
+  @override
+  String get appsCategoryDesign => 'Tasarım';
+
+  @override
+  String get appsCategoryEducation => 'Eğitim';
+
+  @override
+  String get appsCategorySupport => 'Müşteri desteği';
+
+  @override
+  String get appsCategoryScheduling => 'Takvim ve planlama';
+
+  @override
+  String get appsCategoryEntertainment => 'Eğlence ve medya';
 }

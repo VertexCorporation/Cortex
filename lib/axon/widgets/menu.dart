@@ -12,6 +12,7 @@ class AxonMenu extends StatelessWidget {
   final int activeTab;
   final VoidCallback onLibraryTap;
   final VoidCallback onDocumentsTap;
+  final VoidCallback onAppsTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
   final VoidCallback onRoleplayTap;
@@ -24,6 +25,7 @@ class AxonMenu extends StatelessWidget {
     required this.activeTab,
     required this.onLibraryTap,
     required this.onDocumentsTap,
+    required this.onAppsTap,
     required this.onCreateAITap,
     required this.onArtsTap,
     required this.onRoleplayTap,
@@ -60,6 +62,18 @@ class AxonMenu extends StatelessWidget {
             label: localizations.ragFeatureTitle,
             iconPath: 'assets/icons/attachment.svg',
             onTap: onDocumentsTap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: false,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 1.6 APPS (connected third-party apps) ---
+          AxonItem(
+            label: localizations.appsTitle,
+            iconPath: 'assets/icons/apps.svg',
+            onTap: onAppsTap,
             screenHeight: screenHeight,
             referenceWidth: referenceWidth,
             reduceIconSize: true,

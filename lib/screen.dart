@@ -13,6 +13,8 @@ import 'main.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import 'apps/screen.dart';
+import 'routes.dart';
 import 'axon/view.dart';
 import 'chat/controller.dart';
 import 'chat/providers/conversation.dart';
@@ -97,6 +99,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       onNewChatTap: () => startNewConversation(),
       onLibraryTap: switchToLibrary,
       onDocumentsTap: _openDocumentLibrary,
+      onAppsTap: _openApps,
       onCreateAITap: switchToCreate,
       onArtsTap: openArtsScreen,
       onRoleplayTap: openRoleplayScreen,
@@ -268,6 +271,12 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   void _openDocumentLibrary() {
     closeAxon();
     _updateCurrentView(MainScreenView.documents);
+  }
+
+  void _openApps() {
+    _forceCloseKeyboard();
+    closeAxon();
+    Navigator.of(context).push(SlideRightRoute(page: const AppsScreen()));
   }
 
   void _closeAxonWithAnimation() {

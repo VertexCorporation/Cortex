@@ -19,6 +19,7 @@ Catalog of the Fulcrum backend (`functions/`). `index.js` requires every family 
 - **`src/title.js`** (92) — `generateFastTitle`: fast titles through Groq.
 - **`src/tools.js`** (550) — `executeTool`, `TOOLS`: server-side tool definitions/execution incl. hosted code execution.
 - **`src/voice.js`** (356) — `getSpeechToken`, `getAssemblyToken`, `synthesizeSpeech`, `settleSpeechUsage`: Deepgram/AssemblyAI/ElevenLabs endpoints with server-side secrets.
+- **`src/integrations.js`** — `getIntegrations`, `setIntegrationPermission`, `startIntegrationConnection`, `disconnectIntegration`, `discoverIntegrationTools`, `getIntegrationTool`, `executeIntegrationTool`: Composio-backed Cortex Apps (catalog, OAuth links, per-app permissions, tool discovery/execution with daily quotas). Pure helpers in `src/integrationPolicy.js`. See `../cortex/apps.md`.
 - **`src/chat.js`** (99) — `onNewChatMessage`: Firestore trigger, new-chat push notification.
 
 ## Identity and commercial

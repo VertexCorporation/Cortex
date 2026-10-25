@@ -13,6 +13,17 @@ Use this document to locate code: when you know a symbol but not its file, searc
 ### `appbar.dart/`
 
 - **`lib/appbar.dart`** — App bar UI for the  area. Declarations: `CortexAppBar, DualActionPill, _BackButton, _AxonToggleButton, _AxonToggleButtonState, _AnimatedTitleWrapper, _AnimatedTitleWrapperState, AppBarButton, CortexLeadingMode`.
+### `apps/`
+
+- **`lib/apps/categories.dart`** — Localized shelves for Composio categories. Declarations: `AppGroup`.
+- **`lib/apps/chat_tools.dart`** — Chat tools for connected apps and the approval dialog. Declarations: `AppChatTools, _Decision, _ConfirmDialog`.
+- **`lib/apps/controller.dart`** — Catalog, connection and permission state. Declarations: `ConnectedAppSummary, AppsController`.
+- **`lib/apps/detail.dart`** — App detail sheet with connect and permissions. Declarations: `showAppDetail, AppDetailSheet, _AppDetailSheetState, _Spinner, _PermissionTile`.
+- **`lib/apps/logo.dart`** — Cached SVG/raster app logos with monogram fallback. Declarations: `AppLogo, _AppLogoState, _LogoCache, _LogoData, _Monogram`.
+- **`lib/apps/models.dart`** — App integration models. Declarations: `AppPermission, AppCategory, CortexApp, AppAction, AppsCatalogPage`.
+- **`lib/apps/screen.dart`** — Apps directory and shelf list screens. Declarations: `AppsScreen, _AppsScreenState, AppsListScreen, _ErrorState`.
+- **`lib/apps/service.dart`** — Fulcrum integration endpoint client. Declarations: `AppsService, AppsException`.
+- **`lib/apps/widgets.dart`** — Shared Apps UI pieces. Declarations: `AppsSectionHeader, AppRow, AppsBackButton, AppsTopBar, AppsSearchField`.
 ### `arts/`
 
 - **`lib/arts/provider.dart`** — Reactive Provider state for the arts area. Declarations: `ArtItem, ArtsProvider, ArtType`.

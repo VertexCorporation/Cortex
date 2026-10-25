@@ -1,8 +1,8 @@
 name: Android test APK
 on:
   push:
-    branches: [feat/voice-offline-music]
-    paths: ['pubspec.yaml', '.github/workflows/android_test_apk.yml']
+    branches: [feat/voice-offline-music, ccr-23570192-6fqvsp]
+    paths: ['pubspec.yaml', 'lib/**', 'assets/**', 'android/**', '.github/workflows/android_test_apk.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -26,6 +26,15 @@ jobs:
       - run: flutter pub get
       - run: flutter gen-l10n
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Read app version from pubspec
+        id: version
+        shell: bash
+        run: |
+          version="$(sed -n 's/^version: *\([0-9.]*\)+\([0-9]*\).*/\1 \2/p' pubspec.yaml)"
+          read -r name code <<< "$version"
+          [[ -n "$name" && -n "$code" ]] || { echo 'pubspec version missing' >&2; exit 1; }
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
       - name: Select signing configuration
         id: signing
         env:
@@ -43,28 +52,34 @@ jobs:
       - name: Build arm64 test APK
         env:
           BUILD_MODE: ${{ steps.signing.outputs.mode }}
-        run: flutter build apk --$BUILD_MODE --target-platform android-arm64 --build-name 8.8.5 --build-number 885
+          BUILD_NAME: ${{ steps.version.outputs.name }}
+          BUILD_NUMBER: ${{ steps.version.outputs.code }}
+        run: flutter build apk --$BUILD_MODE --target-platform android-arm64 --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
       - name: Verify APK version and signature
         env:
           BUILD_MODE: ${{ steps.signing.outputs.mode }}
+          BUILD_NAME: ${{ steps.version.outputs.name }}
+          BUILD_NUMBER: ${{ steps.version.outputs.code }}
         shell: bash
         run: |
+          apk="apk-output/Cortex-$BUILD_NAME-$BUILD_NUMBER.apk"
           mkdir -p apk-output
-          cp "build/app/outputs/flutter-apk/app-${BUILD_MODE}.apk" apk-output/Cortex-8.8.5-885.apk
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging apk-output/Cortex-8.8.5-885.apk > apk-output/build-info.txt
+          cp "build/app/outputs/flutter-apk/app-${BUILD_MODE}.apk" "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" > apk-output/build-info.txt
           python3 - <<'PY'
+          import os
           from pathlib import Path
           info = Path('apk-output/build-info.txt').read_text().splitlines()[0]
           assert "name='com.vertex.cortex'" in info, info
-          assert "versionCode='885'" in info, info
-          assert "versionName='8.8.5'" in info, info
+          assert f"versionCode='{os.environ['BUILD_NUMBER']}'" in info, info
+          assert f"versionName='{os.environ['BUILD_NAME']}'" in info, info
           PY
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose apk-output/Cortex-8.8.5-885.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           printf 'Build mode: %s\nSource commit: %s\n' "$BUILD_MODE" "$GITHUB_SHA" >> apk-output/build-info.txt
-          sha256sum apk-output/Cortex-8.8.5-885.apk > apk-output/sha256.txt
+          sha256sum "$apk" > apk-output/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: Cortex-8.8.5-885-APK
+          name: Cortex-${{ steps.version.outputs.name }}-${{ steps.version.outputs.code }}-APK
           path: apk-output/
           if-no-files-found: error
           retention-days: 14

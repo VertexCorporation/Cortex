@@ -12,6 +12,7 @@ This is the entry point for all architecture documentation. **Read this file fir
 | `cortex/library.md` | Model catalog, downloads, custom GGUF models |
 | `cortex/auth.md` | Login/registration, anonymous accounts, sessions, onboarding gates |
 | `cortex/payments.md` | Subscriptions, in-app purchases, credits, entitlements |
+| `cortex/apps.md` | Connected third-party apps (Composio): Apps screen, permissions, chat app tools |
 | `cortex/file-map.md` | Locating any of the 304 Dart files (declarations + responsibility) |
 | `fulcrum/overview.md` | Firebase Functions backend layout and trust boundary |
 | `fulcrum/generation.md` | Generation gateway, routing, provider streaming, SSE contract |
@@ -35,6 +36,7 @@ This is the entry point for all architecture documentation. **Read this file fir
 | Startup or crash issue | `cortex/overview.md` |
 | "Which file is X in?" | `cortex/file-map.md` or `fulcrum/functions-map.md` |
 | Notifications/news/leaderboard features | `fulcrum/functions-map.md` |
+| Connected apps / Composio integrations | `cortex/apps.md` |
 
 ## 2. System map
 

@@ -417,6 +417,8 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
       'calculate': ['Hesaplanıyor', 'Hesaplandı'],
       'need_web_search': ['Web aranıyor', 'Web araması tamamlandı'],
       'web_search': ['Web aranıyor', 'Web araması tamamlandı'],
+      'find_app_actions': ['Uygulamalarda aranıyor', 'Uygulama eylemleri bulundu'],
+      'run_app_action': ['Uygulama kullanılıyor', 'Uygulama eylemi tamamlandı'],
     };
     final pair = labels[name] ??
         (isTurkish
@@ -433,6 +435,8 @@ class _ToolActivityWidgetState extends State<ToolActivityWidget>
       'calculate': ['Calculating', 'Calculated'],
       'need_web_search': ['Searching the web', 'Web search complete'],
       'web_search': ['Searching the web', 'Web search complete'],
+      'find_app_actions': ['Searching your apps', 'App actions found'],
+      'run_app_action': ['Using an app', 'App action complete'],
     };
     final englishPair = english[name] ?? ['Using a tool', 'Tool completed'];
     return active ? englishPair[0] : englishPair[1];

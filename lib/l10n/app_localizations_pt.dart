@@ -2241,4 +2241,219 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get voiceDailyLimitReached =>
       'You\'ve used today\'s voice time. It renews after midnight.';
+
+  @override
+  String get offlineSetupWelcome => 'Would you like to use Cortex offline?';
+
+  @override
+  String get offlineSetupWelcomeBody =>
+      'Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.';
+
+  @override
+  String get offlineSetupChoiceTitle => 'Your own local Cortex';
+
+  @override
+  String get offlineSetupChoiceBody =>
+      'Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.';
+
+  @override
+  String get offlineSetupChooseSpecific => 'Choose an intelligence';
+
+  @override
+  String get offlineSetupContinue => 'Continue';
+
+  @override
+  String get offlineSetupChecking => 'Checking your device';
+
+  @override
+  String get offlineSetupCheckingBody =>
+      'We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.';
+
+  @override
+  String get offlineSetupReadyTitle => 'Ready for offline chat';
+
+  @override
+  String get offlineSetupReadyBody =>
+      'This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.';
+
+  @override
+  String get offlineSetupNoMatch =>
+      'We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.';
+
+  @override
+  String get featureCreateMusicTitle => 'Create Music';
+
+  @override
+  String get featureCreateMusicDescription =>
+      'Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.';
+
+  @override
+  String get musicGenerationUnavailable =>
+      'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
+
+  @override
+  String get appsTitle => 'Apps';
+
+  @override
+  String get appsInstalled => 'Instalados';
+
+  @override
+  String get appsPopular => 'Populares';
+
+  @override
+  String get appsAll => 'Todos os apps';
+
+  @override
+  String get appsSearchHint => 'Pesquisar apps';
+
+  @override
+  String get appsNoResults => 'Nenhum app encontrado';
+
+  @override
+  String get appsLoadError => 'Não foi possível carregar os apps.';
+
+  @override
+  String get appsRetry => 'Tentar novamente';
+
+  @override
+  String get appsConnect => 'Conectar';
+
+  @override
+  String get appsConnected => 'Conectado';
+
+  @override
+  String get appsDisconnect => 'Desconectar';
+
+  @override
+  String appsDisconnectConfirm(String app) {
+    return 'Desconectar $app? O Cortex não poderá mais usá-lo.';
+  }
+
+  @override
+  String appsConnectBrowserHint(String app) {
+    return 'Conclua o login no $app no navegador e depois volte ao Cortex.';
+  }
+
+  @override
+  String get appsConnectFailed =>
+      'Não foi possível iniciar a conexão. Tente novamente.';
+
+  @override
+  String get appsDisconnectFailed =>
+      'Não foi possível desconectar o app. Tente novamente.';
+
+  @override
+  String appsConnectToUse(String app) {
+    return 'Conecte o $app para que o Cortex possa usá-lo nas suas conversas.';
+  }
+
+  @override
+  String appsActionsCount(int count) {
+    return '$count ações';
+  }
+
+  @override
+  String get appsPermissions => 'Permissões';
+
+  @override
+  String get appsPermissionAsk => 'Perguntar sempre';
+
+  @override
+  String get appsPermissionAskDescription =>
+      'O Cortex pede sua aprovação antes de cada ação neste app.';
+
+  @override
+  String get appsPermissionAllow => 'Sempre permitir';
+
+  @override
+  String get appsPermissionAllowDescription =>
+      'O Cortex pode ler e agir neste app sem perguntar.';
+
+  @override
+  String get appsPermissionReadOnly => 'Somente leitura';
+
+  @override
+  String get appsPermissionReadOnlyDescription =>
+      'O Cortex só pode ler. Enviar, editar e excluir estão bloqueados.';
+
+  @override
+  String get appsPermissionOff => 'Desativado';
+
+  @override
+  String get appsPermissionOffDescription =>
+      'O Cortex não usará este app nas suas conversas.';
+
+  @override
+  String get appsPermissionSaveFailed =>
+      'Não foi possível salvar a permissão. Tente novamente.';
+
+  @override
+  String appsConfirmTitle(String app) {
+    return 'Permitir $app?';
+  }
+
+  @override
+  String appsConfirmBody(String app, String action) {
+    return 'O Cortex quer executar \"$action\" no $app.';
+  }
+
+  @override
+  String get appsConfirmAllowOnce => 'Permitir uma vez';
+
+  @override
+  String get appsConfirmDeny => 'Negar';
+
+  @override
+  String get appsCategoryOther => 'Outros';
+
+  @override
+  String get appsCategoryProductivity => 'Produtividade';
+
+  @override
+  String get appsCategoryCommunication => 'Comunicação';
+
+  @override
+  String get appsCategoryDeveloper => 'Ferramentas de desenvolvimento';
+
+  @override
+  String get appsCategorySales => 'Vendas e CRM';
+
+  @override
+  String get appsCategoryMarketing => 'Marketing';
+
+  @override
+  String get appsCategoryFinance => 'Finanças';
+
+  @override
+  String get appsCategorySocial => 'Redes sociais';
+
+  @override
+  String get appsCategoryAnalytics => 'Análises';
+
+  @override
+  String get appsCategoryProjects => 'Gestão de projetos';
+
+  @override
+  String get appsCategoryFiles => 'Arquivos e armazenamento';
+
+  @override
+  String get appsCategoryCommerce => 'E-commerce';
+
+  @override
+  String get appsCategoryAi => 'IA e automação';
+
+  @override
+  String get appsCategoryDesign => 'Design';
+
+  @override
+  String get appsCategoryEducation => 'Educação';
+
+  @override
+  String get appsCategorySupport => 'Suporte ao cliente';
+
+  @override
+  String get appsCategoryScheduling => 'Agenda e planejamento';
+
+  @override
+  String get appsCategoryEntertainment => 'Entretenimento e mídia';
 }

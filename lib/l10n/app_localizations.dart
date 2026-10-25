@@ -4031,6 +4031,384 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You\'ve used today\'s voice time. It renews after midnight.'**
   String get voiceDailyLimitReached;
+
+  /// No description provided for @offlineSetupWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to use Cortex offline?'**
+  String get offlineSetupWelcome;
+
+  /// No description provided for @offlineSetupWelcomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.'**
+  String get offlineSetupWelcomeBody;
+
+  /// No description provided for @offlineSetupChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own local Cortex'**
+  String get offlineSetupChoiceTitle;
+
+  /// No description provided for @offlineSetupChoiceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.'**
+  String get offlineSetupChoiceBody;
+
+  /// No description provided for @offlineSetupChooseSpecific.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an intelligence'**
+  String get offlineSetupChooseSpecific;
+
+  /// No description provided for @offlineSetupContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get offlineSetupContinue;
+
+  /// No description provided for @offlineSetupChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking your device'**
+  String get offlineSetupChecking;
+
+  /// No description provided for @offlineSetupCheckingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.'**
+  String get offlineSetupCheckingBody;
+
+  /// No description provided for @offlineSetupReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for offline chat'**
+  String get offlineSetupReadyTitle;
+
+  /// No description provided for @offlineSetupReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.'**
+  String get offlineSetupReadyBody;
+
+  /// No description provided for @offlineSetupNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.'**
+  String get offlineSetupNoMatch;
+
+  /// No description provided for @featureCreateMusicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Music'**
+  String get featureCreateMusicTitle;
+
+  /// No description provided for @featureCreateMusicDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.'**
+  String get featureCreateMusicDescription;
+
+  /// No description provided for @musicGenerationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.'**
+  String get musicGenerationUnavailable;
+
+  /// No description provided for @appsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps'**
+  String get appsTitle;
+
+  /// No description provided for @appsInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get appsInstalled;
+
+  /// No description provided for @appsPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get appsPopular;
+
+  /// No description provided for @appsAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All apps'**
+  String get appsAll;
+
+  /// No description provided for @appsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search apps'**
+  String get appsSearchHint;
+
+  /// No description provided for @appsNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No apps found'**
+  String get appsNoResults;
+
+  /// No description provided for @appsLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps couldn\'t be loaded.'**
+  String get appsLoadError;
+
+  /// No description provided for @appsRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get appsRetry;
+
+  /// No description provided for @appsConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get appsConnect;
+
+  /// No description provided for @appsConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get appsConnected;
+
+  /// No description provided for @appsDisconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get appsDisconnect;
+
+  /// No description provided for @appsDisconnectConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect {app}? Cortex will no longer be able to use it.'**
+  String appsDisconnectConfirm(String app);
+
+  /// No description provided for @appsConnectBrowserHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish signing in to {app} in your browser, then come back to Cortex.'**
+  String appsConnectBrowserHint(String app);
+
+  /// No description provided for @appsConnectFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection couldn\'t be started. Try again.'**
+  String get appsConnectFailed;
+
+  /// No description provided for @appsDisconnectFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The app couldn\'t be disconnected. Try again.'**
+  String get appsDisconnectFailed;
+
+  /// No description provided for @appsConnectToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect {app} so Cortex can use it in your chats.'**
+  String appsConnectToUse(String app);
+
+  /// No description provided for @appsActionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} actions'**
+  String appsActionsCount(int count);
+
+  /// No description provided for @appsPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get appsPermissions;
+
+  /// No description provided for @appsPermissionAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask every time'**
+  String get appsPermissionAsk;
+
+  /// No description provided for @appsPermissionAskDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex asks for your approval before each action in this app.'**
+  String get appsPermissionAskDescription;
+
+  /// No description provided for @appsPermissionAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Always allow'**
+  String get appsPermissionAllow;
+
+  /// No description provided for @appsPermissionAllowDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex can read and take actions in this app without asking.'**
+  String get appsPermissionAllowDescription;
+
+  /// No description provided for @appsPermissionReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Read only'**
+  String get appsPermissionReadOnly;
+
+  /// No description provided for @appsPermissionReadOnlyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex can only read. Sending, editing and deleting are blocked.'**
+  String get appsPermissionReadOnlyDescription;
+
+  /// No description provided for @appsPermissionOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get appsPermissionOff;
+
+  /// No description provided for @appsPermissionOffDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex won\'t use this app in your chats.'**
+  String get appsPermissionOffDescription;
+
+  /// No description provided for @appsPermissionSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The permission couldn\'t be saved. Try again.'**
+  String get appsPermissionSaveFailed;
+
+  /// No description provided for @appsConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow {app}?'**
+  String appsConfirmTitle(String app);
+
+  /// No description provided for @appsConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex wants to run \"{action}\" in {app}.'**
+  String appsConfirmBody(String app, String action);
+
+  /// No description provided for @appsConfirmAllowOnce.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow once'**
+  String get appsConfirmAllowOnce;
+
+  /// No description provided for @appsConfirmDeny.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny'**
+  String get appsConfirmDeny;
+
+  /// No description provided for @appsCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get appsCategoryOther;
+
+  /// No description provided for @appsCategoryProductivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Productivity'**
+  String get appsCategoryProductivity;
+
+  /// No description provided for @appsCategoryCommunication.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication'**
+  String get appsCategoryCommunication;
+
+  /// No description provided for @appsCategoryDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer tools'**
+  String get appsCategoryDeveloper;
+
+  /// No description provided for @appsCategorySales.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales & CRM'**
+  String get appsCategorySales;
+
+  /// No description provided for @appsCategoryMarketing.
+  ///
+  /// In en, this message translates to:
+  /// **'Marketing'**
+  String get appsCategoryMarketing;
+
+  /// No description provided for @appsCategoryFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get appsCategoryFinance;
+
+  /// No description provided for @appsCategorySocial.
+  ///
+  /// In en, this message translates to:
+  /// **'Social media'**
+  String get appsCategorySocial;
+
+  /// No description provided for @appsCategoryAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get appsCategoryAnalytics;
+
+  /// No description provided for @appsCategoryProjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Project management'**
+  String get appsCategoryProjects;
+
+  /// No description provided for @appsCategoryFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Files & storage'**
+  String get appsCategoryFiles;
+
+  /// No description provided for @appsCategoryCommerce.
+  ///
+  /// In en, this message translates to:
+  /// **'E-commerce'**
+  String get appsCategoryCommerce;
+
+  /// No description provided for @appsCategoryAi.
+  ///
+  /// In en, this message translates to:
+  /// **'AI & automation'**
+  String get appsCategoryAi;
+
+  /// No description provided for @appsCategoryDesign.
+  ///
+  /// In en, this message translates to:
+  /// **'Design'**
+  String get appsCategoryDesign;
+
+  /// No description provided for @appsCategoryEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get appsCategoryEducation;
+
+  /// No description provided for @appsCategorySupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer support'**
+  String get appsCategorySupport;
+
+  /// No description provided for @appsCategoryScheduling.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar & scheduling'**
+  String get appsCategoryScheduling;
+
+  /// No description provided for @appsCategoryEntertainment.
+  ///
+  /// In en, this message translates to:
+  /// **'Entertainment & media'**
+  String get appsCategoryEntertainment;
 }
 
 class _AppLocalizationsDelegate

@@ -1055,5 +1055,99 @@
   "offlineSetupNoMatch": "We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.",
   "featureCreateMusicTitle": "Create Music",
   "featureCreateMusicDescription": "Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.",
-  "musicGenerationUnavailable": "No compatible music generator is available in the current catalogue. Please try again later. No music request was sent."
+  "musicGenerationUnavailable": "No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.",
+  "appsTitle": "Apps",
+  "appsInstalled": "Installed",
+  "appsPopular": "Popular",
+  "appsAll": "All apps",
+  "appsSearchHint": "Search apps",
+  "appsNoResults": "No apps found",
+  "appsLoadError": "Apps couldn't be loaded.",
+  "appsRetry": "Try again",
+  "appsConnect": "Connect",
+  "appsConnected": "Connected",
+  "appsDisconnect": "Disconnect",
+  "appsDisconnectConfirm": "Disconnect {app}? Cortex will no longer be able to use it.",
+  "@appsDisconnectConfirm": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "appsConnectBrowserHint": "Finish signing in to {app} in your browser, then come back to Cortex.",
+  "@appsConnectBrowserHint": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "appsConnectFailed": "The connection couldn't be started. Try again.",
+  "appsDisconnectFailed": "The app couldn't be disconnected. Try again.",
+  "appsConnectToUse": "Connect {app} so Cortex can use it in your chats.",
+  "@appsConnectToUse": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "appsActionsCount": "{count} actions",
+  "@appsActionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appsPermissions": "Permissions",
+  "appsPermissionAsk": "Ask every time",
+  "appsPermissionAskDescription": "Cortex asks for your approval before each action in this app.",
+  "appsPermissionAllow": "Always allow",
+  "appsPermissionAllowDescription": "Cortex can read and take actions in this app without asking.",
+  "appsPermissionReadOnly": "Read only",
+  "appsPermissionReadOnlyDescription": "Cortex can only read. Sending, editing and deleting are blocked.",
+  "appsPermissionOff": "Off",
+  "appsPermissionOffDescription": "Cortex won't use this app in your chats.",
+  "appsPermissionSaveFailed": "The permission couldn't be saved. Try again.",
+  "appsConfirmTitle": "Allow {app}?",
+  "@appsConfirmTitle": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "appsConfirmBody": "Cortex wants to run \"{action}\" in {app}.",
+  "@appsConfirmBody": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "appsConfirmAllowOnce": "Allow once",
+  "appsConfirmDeny": "Deny",
+  "appsCategoryOther": "Other",
+  "appsCategoryProductivity": "Productivity",
+  "appsCategoryCommunication": "Communication",
+  "appsCategoryDeveloper": "Developer tools",
+  "appsCategorySales": "Sales & CRM",
+  "appsCategoryMarketing": "Marketing",
+  "appsCategoryFinance": "Finance",
+  "appsCategorySocial": "Social media",
+  "appsCategoryAnalytics": "Analytics",
+  "appsCategoryProjects": "Project management",
+  "appsCategoryFiles": "Files & storage",
+  "appsCategoryCommerce": "E-commerce",
+  "appsCategoryAi": "AI & automation",
+  "appsCategoryDesign": "Design",
+  "appsCategoryEducation": "Education",
+  "appsCategorySupport": "Customer support",
+  "appsCategoryScheduling": "Calendar & scheduling",
+  "appsCategoryEntertainment": "Entertainment & media"
 }

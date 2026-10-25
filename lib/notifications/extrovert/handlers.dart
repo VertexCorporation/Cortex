@@ -26,7 +26,19 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// This reports app-handled notifications, not guaranteed OS banner delivery.
 Future<void> _reportNotificationReceipt(Map<String, dynamic> data) async {
   final id = data['vertex_notification_id'];
-  if (id is! String || !RegExp(r'^[a-f0-9]{64}
+  if (id is! String || !RegExp(r'^[a-f0-9]{64}$').hasMatch(id)) return;
+  if (FirebaseAuth.instance.currentUser == null) return;
+  try {
+    await FirebaseFunctions.instanceFor(region: 'europe-west1')
+        .httpsCallable('recordNotificationReceipt')
+        .call(<String, dynamic>{'taskId': id});
+  } catch (_) {
+    // Receipt telemetry must never prevent a notification from being shown.
+    debugPrint('[Extrovert] Notification receipt unavailable.');
+  }
+}
+
+/// Displays the notification using FlutterLocalNotifications.
 /// It dynamically selects the correct channel based on the payload.
 Future<bool> _showLocalizedNotification(Map<String, dynamic> data,
     {bool background = false, RemoteNotification? original}) async {
@@ -95,67 +107,4 @@ Future<bool> _showLocalizedNotification(Map<String, dynamic> data,
     payload: jsonEncode(data),
   );
   return true;
-}
-).hasMatch(id)) return;
-  if (FirebaseAuth.instance.currentUser == null) return;
-  try {
-    await FirebaseFunctions.instanceFor(region: 'europe-west1')
-        .httpsCallable('recordNotificationReceipt')
-        .call(<String, dynamic>{'taskId': id});
-  } catch (_) {
-    // Receipt telemetry must never prevent a notification from being shown.
-    debugPrint('[Extrovert] Notification receipt unavailable.');
-  }
-}
-
-/// Displays the notification using FlutterLocalNotifications.
-/// It dynamically selects the correct channel based on the payload.
-Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
-  final notificationContent = await _buildLocalizedContent(data);
-  if (notificationContent.isEmpty || notificationContent['title']!.isEmpty) {
-    debugPrint(
-        "[Notification Displayer] Could not build localized content. Aborting display.");
-    return;
-  }
-
-  final String title = notificationContent['title']!;
-  final String body = notificationContent['body']!;
-
-  final String channelId = data['channel_id'] ?? 'cortex_notifications';
-  final String channelName = data['channel_name'] ?? 'Cortex Updates';
-  final String channelDescription = data['channel_desc'] ??
-      'Notifications about news and updates from Cortex.';
-
-  final BigTextStyleInformation bigTextStyleInformation =
-      BigTextStyleInformation(
-    body,
-    htmlFormatBigText: false,
-    contentTitle: title,
-    htmlFormatContentTitle: false,
-  );
-
-  final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-    channelId,
-    channelName,
-    channelDescription: channelDescription,
-    importance: Importance.max,
-    priority: Priority.high,
-    styleInformation: bigTextStyleInformation,
-  );
-
-  final NotificationDetails platformDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: const DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ));
-
-  await FlutterLocalNotificationsPlugin().show(
-    DateTime.now().millisecondsSinceEpoch.toSigned(31),
-    title,
-    body,
-    platformDetails,
-    payload: jsonEncode(data),
-  );
 }

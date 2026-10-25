@@ -14,6 +14,7 @@ class Axon extends StatefulWidget {
   final VoidCallback onNewChatTap;
   final VoidCallback onLibraryTap;
   final VoidCallback onDocumentsTap;
+  final VoidCallback onAppsTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
   final VoidCallback onNewsTap;
@@ -29,6 +30,7 @@ class Axon extends StatefulWidget {
     required this.onNewChatTap,
     required this.onLibraryTap,
     required this.onDocumentsTap,
+    required this.onAppsTap,
     required this.onCreateAITap,
     required this.onArtsTap,
     required this.onRoleplayTap,
@@ -172,6 +174,7 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
           onNewChatTap: widget.onNewChatTap,
           onLibraryTap: widget.onLibraryTap,
           onDocumentsTap: widget.onDocumentsTap,
+          onAppsTap: widget.onAppsTap,
           onCreateAITap: widget.onCreateAITap,
           onArtsTap: widget.onArtsTap,
           onRoleplayTap: widget.onRoleplayTap,

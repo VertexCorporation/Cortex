@@ -2234,4 +2234,219 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get voiceDailyLimitReached =>
       'You\'ve used today\'s voice time. It renews after midnight.';
+
+  @override
+  String get offlineSetupWelcome => 'Would you like to use Cortex offline?';
+
+  @override
+  String get offlineSetupWelcomeBody =>
+      'Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.';
+
+  @override
+  String get offlineSetupChoiceTitle => 'Your own local Cortex';
+
+  @override
+  String get offlineSetupChoiceBody =>
+      'Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.';
+
+  @override
+  String get offlineSetupChooseSpecific => 'Choose an intelligence';
+
+  @override
+  String get offlineSetupContinue => 'Continue';
+
+  @override
+  String get offlineSetupChecking => 'Checking your device';
+
+  @override
+  String get offlineSetupCheckingBody =>
+      'We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.';
+
+  @override
+  String get offlineSetupReadyTitle => 'Ready for offline chat';
+
+  @override
+  String get offlineSetupReadyBody =>
+      'This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.';
+
+  @override
+  String get offlineSetupNoMatch =>
+      'We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.';
+
+  @override
+  String get featureCreateMusicTitle => 'Create Music';
+
+  @override
+  String get featureCreateMusicDescription =>
+      'Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.';
+
+  @override
+  String get musicGenerationUnavailable =>
+      'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
+
+  @override
+  String get appsTitle => 'Alkalmazások';
+
+  @override
+  String get appsInstalled => 'Telepítve';
+
+  @override
+  String get appsPopular => 'Népszerű';
+
+  @override
+  String get appsAll => 'Összes alkalmazás';
+
+  @override
+  String get appsSearchHint => 'Alkalmazások keresése';
+
+  @override
+  String get appsNoResults => 'Nincs találat';
+
+  @override
+  String get appsLoadError => 'Az alkalmazásokat nem sikerült betölteni.';
+
+  @override
+  String get appsRetry => 'Újra';
+
+  @override
+  String get appsConnect => 'Csatlakoztatás';
+
+  @override
+  String get appsConnected => 'Csatlakoztatva';
+
+  @override
+  String get appsDisconnect => 'Leválasztás';
+
+  @override
+  String appsDisconnectConfirm(String app) {
+    return 'Leválasztod a(z) $app alkalmazást? A Cortex többé nem tudja használni.';
+  }
+
+  @override
+  String appsConnectBrowserHint(String app) {
+    return 'Fejezd be a bejelentkezést a(z) $app alkalmazásba a böngészőben, majd térj vissza a Cortexbe.';
+  }
+
+  @override
+  String get appsConnectFailed =>
+      'A kapcsolatot nem sikerült elindítani. Próbáld újra.';
+
+  @override
+  String get appsDisconnectFailed =>
+      'Az alkalmazást nem sikerült leválasztani. Próbáld újra.';
+
+  @override
+  String appsConnectToUse(String app) {
+    return 'Csatlakoztasd a(z) $app alkalmazást, hogy a Cortex használhassa a csevegéseidben.';
+  }
+
+  @override
+  String appsActionsCount(int count) {
+    return '$count művelet';
+  }
+
+  @override
+  String get appsPermissions => 'Engedélyek';
+
+  @override
+  String get appsPermissionAsk => 'Mindig kérdezzen';
+
+  @override
+  String get appsPermissionAskDescription =>
+      'A Cortex minden művelet előtt a jóváhagyásodat kéri ebben az alkalmazásban.';
+
+  @override
+  String get appsPermissionAllow => 'Mindig engedélyezve';
+
+  @override
+  String get appsPermissionAllowDescription =>
+      'A Cortex kérdezés nélkül olvashat és műveleteket végezhet ebben az alkalmazásban.';
+
+  @override
+  String get appsPermissionReadOnly => 'Csak olvasás';
+
+  @override
+  String get appsPermissionReadOnlyDescription =>
+      'A Cortex csak olvashat. A küldés, szerkesztés és törlés tiltott.';
+
+  @override
+  String get appsPermissionOff => 'Kikapcsolva';
+
+  @override
+  String get appsPermissionOffDescription =>
+      'A Cortex nem használja ezt az alkalmazást a csevegéseidben.';
+
+  @override
+  String get appsPermissionSaveFailed =>
+      'Az engedélyt nem sikerült menteni. Próbáld újra.';
+
+  @override
+  String appsConfirmTitle(String app) {
+    return 'Engedélyezed: $app?';
+  }
+
+  @override
+  String appsConfirmBody(String app, String action) {
+    return 'A Cortex futtatni szeretné ezt: „$action” – $app.';
+  }
+
+  @override
+  String get appsConfirmAllowOnce => 'Egyszeri engedélyezés';
+
+  @override
+  String get appsConfirmDeny => 'Elutasítás';
+
+  @override
+  String get appsCategoryOther => 'Egyéb';
+
+  @override
+  String get appsCategoryProductivity => 'Termelékenység';
+
+  @override
+  String get appsCategoryCommunication => 'Kommunikáció';
+
+  @override
+  String get appsCategoryDeveloper => 'Fejlesztői eszközök';
+
+  @override
+  String get appsCategorySales => 'Értékesítés és CRM';
+
+  @override
+  String get appsCategoryMarketing => 'Marketing';
+
+  @override
+  String get appsCategoryFinance => 'Pénzügyek';
+
+  @override
+  String get appsCategorySocial => 'Közösségi média';
+
+  @override
+  String get appsCategoryAnalytics => 'Analitika';
+
+  @override
+  String get appsCategoryProjects => 'Projektmenedzsment';
+
+  @override
+  String get appsCategoryFiles => 'Fájlok és tárhely';
+
+  @override
+  String get appsCategoryCommerce => 'E-kereskedelem';
+
+  @override
+  String get appsCategoryAi => 'MI és automatizálás';
+
+  @override
+  String get appsCategoryDesign => 'Dizájn';
+
+  @override
+  String get appsCategoryEducation => 'Oktatás';
+
+  @override
+  String get appsCategorySupport => 'Ügyfélszolgálat';
+
+  @override
+  String get appsCategoryScheduling => 'Naptár és ütemezés';
+
+  @override
+  String get appsCategoryEntertainment => 'Szórakozás és média';
 }

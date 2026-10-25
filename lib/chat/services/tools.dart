@@ -5,6 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/apps/chat_tools.dart';
+import 'package:cortex/apps/controller.dart';
 import 'package:uuid/uuid.dart';
 
 import 'document_artifacts.dart';
@@ -339,6 +341,8 @@ class ToolRegistry {
           }
         }
       },
+      // Connected apps (Gmail, Notion…), only while at least one is usable.
+      ...AppChatTools.toolsJson(),
     ];
   }
 
@@ -535,6 +539,22 @@ class ToolRegistry {
   }
 
   static void initialize() {
+    AppsController.instance.restore();
+
+    register(CortexTool(
+      name: AppChatTools.findTool,
+      description: 'Find actions in connected apps.',
+      parameters: {},
+      function: AppChatTools.find,
+    ));
+
+    register(CortexTool(
+      name: AppChatTools.runTool,
+      description: 'Run an action in a connected app.',
+      parameters: {},
+      function: AppChatTools.run,
+    ));
+
     register(CortexTool(
       name: 'read_document',
       description: 'Read document content.',

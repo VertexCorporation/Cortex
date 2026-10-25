@@ -2115,4 +2115,212 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get voiceDailyLimitReached =>
       'You\'ve used today\'s voice time. It renews after midnight.';
+
+  @override
+  String get offlineSetupWelcome => 'Would you like to use Cortex offline?';
+
+  @override
+  String get offlineSetupWelcomeBody =>
+      'Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.';
+
+  @override
+  String get offlineSetupChoiceTitle => 'Your own local Cortex';
+
+  @override
+  String get offlineSetupChoiceBody =>
+      'Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.';
+
+  @override
+  String get offlineSetupChooseSpecific => 'Choose an intelligence';
+
+  @override
+  String get offlineSetupContinue => 'Continue';
+
+  @override
+  String get offlineSetupChecking => 'Checking your device';
+
+  @override
+  String get offlineSetupCheckingBody =>
+      'We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.';
+
+  @override
+  String get offlineSetupReadyTitle => 'Ready for offline chat';
+
+  @override
+  String get offlineSetupReadyBody =>
+      'This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.';
+
+  @override
+  String get offlineSetupNoMatch =>
+      'We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.';
+
+  @override
+  String get featureCreateMusicTitle => 'Create Music';
+
+  @override
+  String get featureCreateMusicDescription =>
+      'Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.';
+
+  @override
+  String get musicGenerationUnavailable =>
+      'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
+
+  @override
+  String get appsTitle => '应用';
+
+  @override
+  String get appsInstalled => '已安装';
+
+  @override
+  String get appsPopular => '热门';
+
+  @override
+  String get appsAll => '全部应用';
+
+  @override
+  String get appsSearchHint => '搜索应用';
+
+  @override
+  String get appsNoResults => '未找到应用';
+
+  @override
+  String get appsLoadError => '无法加载应用。';
+
+  @override
+  String get appsRetry => '重试';
+
+  @override
+  String get appsConnect => '连接';
+
+  @override
+  String get appsConnected => '已连接';
+
+  @override
+  String get appsDisconnect => '断开连接';
+
+  @override
+  String appsDisconnectConfirm(String app) {
+    return '要断开 $app 吗?Cortex 将无法再使用它。';
+  }
+
+  @override
+  String appsConnectBrowserHint(String app) {
+    return '请在浏览器中完成 $app 登录,然后返回 Cortex。';
+  }
+
+  @override
+  String get appsConnectFailed => '无法开始连接,请重试。';
+
+  @override
+  String get appsDisconnectFailed => '无法断开应用连接,请重试。';
+
+  @override
+  String appsConnectToUse(String app) {
+    return '连接 $app,让 Cortex 可以在你的对话中使用它。';
+  }
+
+  @override
+  String appsActionsCount(int count) {
+    return '$count 个操作';
+  }
+
+  @override
+  String get appsPermissions => '权限';
+
+  @override
+  String get appsPermissionAsk => '每次询问';
+
+  @override
+  String get appsPermissionAskDescription => 'Cortex 在此应用中执行每个操作前都会征求你的同意。';
+
+  @override
+  String get appsPermissionAllow => '始终允许';
+
+  @override
+  String get appsPermissionAllowDescription => 'Cortex 可以无需询问地在此应用中读取和执行操作。';
+
+  @override
+  String get appsPermissionReadOnly => '仅读取';
+
+  @override
+  String get appsPermissionReadOnlyDescription => 'Cortex 只能读取。发送、编辑和删除均被阻止。';
+
+  @override
+  String get appsPermissionOff => '关闭';
+
+  @override
+  String get appsPermissionOffDescription => 'Cortex 不会在你的对话中使用此应用。';
+
+  @override
+  String get appsPermissionSaveFailed => '无法保存权限,请重试。';
+
+  @override
+  String appsConfirmTitle(String app) {
+    return '允许 $app?';
+  }
+
+  @override
+  String appsConfirmBody(String app, String action) {
+    return 'Cortex 想在 $app 中运行“$action”。';
+  }
+
+  @override
+  String get appsConfirmAllowOnce => '允许一次';
+
+  @override
+  String get appsConfirmDeny => '拒绝';
+
+  @override
+  String get appsCategoryOther => '其他';
+
+  @override
+  String get appsCategoryProductivity => '效率';
+
+  @override
+  String get appsCategoryCommunication => '沟通';
+
+  @override
+  String get appsCategoryDeveloper => '开发者工具';
+
+  @override
+  String get appsCategorySales => '销售与 CRM';
+
+  @override
+  String get appsCategoryMarketing => '营销';
+
+  @override
+  String get appsCategoryFinance => '财务';
+
+  @override
+  String get appsCategorySocial => '社交媒体';
+
+  @override
+  String get appsCategoryAnalytics => '分析';
+
+  @override
+  String get appsCategoryProjects => '项目管理';
+
+  @override
+  String get appsCategoryFiles => '文件与存储';
+
+  @override
+  String get appsCategoryCommerce => '电子商务';
+
+  @override
+  String get appsCategoryAi => 'AI 与自动化';
+
+  @override
+  String get appsCategoryDesign => '设计';
+
+  @override
+  String get appsCategoryEducation => '教育';
+
+  @override
+  String get appsCategorySupport => '客户支持';
+
+  @override
+  String get appsCategoryScheduling => '日历与日程';
+
+  @override
+  String get appsCategoryEntertainment => '娱乐与媒体';
 }

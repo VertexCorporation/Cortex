@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cortex/analytics/service.dart';
+import 'package:cortex/apps/chat_tools.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -1556,6 +1557,9 @@ class SendService {
     if (cleanedUserContent.isNotEmpty) {
       contextMessages.add({"role": "user", "content": cleanedUserContent});
     }
+
+    // Every app action in this reply shares one daily-quota turn.
+    AppChatTools.beginTurn();
 
     // Loop Variables
     bool shouldContinue = true;
