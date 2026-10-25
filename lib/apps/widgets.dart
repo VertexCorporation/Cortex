@@ -234,7 +234,10 @@ class AppsSearchField extends StatelessWidget {
               cursorColor: AppColors.senaryColor,
               decoration: InputDecoration(
                 isCollapsed: true,
+                filled: false,
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
                 hintText: hint,
                 hintStyle: TextStyle(color: muted, fontSize: 16),
               ),

@@ -16,6 +16,7 @@ import 'controller.dart';
 import 'detail.dart';
 import 'logo.dart';
 import 'models.dart';
+import 'service.dart';
 import 'widgets.dart';
 
 const double _maxContentWidth = 720;
@@ -171,8 +172,14 @@ class _AppsScreenState extends State<AppsScreen> with WidgetsBindingObserver {
       return const Center(child: CircularProgressIndicator());
     }
     if (apps.isEmpty && _controller.error != null) {
+      final error = _controller.error;
       return _ErrorState(
         message: l10n.appsLoadError,
+        // Status code helps tell an undeployed backend (404) from a
+        // provider outage (502) when users report the problem.
+        detail: error is AppsException && error.status != null
+            ? 'HTTP ${error.status}'
+            : null,
         retry: l10n.appsRetry,
         onRetry: () => _controller.load(language: _language, force: true),
       );
@@ -328,11 +335,13 @@ class AppsListScreen extends StatelessWidget {
 
 class _ErrorState extends StatelessWidget {
   final String message;
+  final String? detail;
   final String retry;
   final VoidCallback onRetry;
 
   const _ErrorState({
     required this.message,
+    this.detail,
     required this.retry,
     required this.onRetry,
   });
@@ -352,6 +361,13 @@ class _ErrorState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 15),
             ),
+            if (detail != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                detail!,
+                style: TextStyle(color: AppColors.tertiaryColor, fontSize: 12),
+              ),
+            ],
             const SizedBox(height: 12),
             TextButton(onPressed: onRetry, child: Text(retry)),
           ],
