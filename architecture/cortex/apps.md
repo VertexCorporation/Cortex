@@ -1,5 +1,7 @@
 # Cortex Apps (connected third-party apps)
 
+> **Hidden:** `kAppsEnabled` in `lib/apps/feature.dart` is `false` until Fulcrum's integration endpoints are deployed. It hides the sidebar entry and the chat tools; set it to `true` to ship Apps.
+
 Users connect services such as Gmail, Google Calendar, Notion, GitHub or Slack so the assistant can read and act in them from chat. Connections, OAuth and tool execution run through Composio, but **only Fulcrum talks to Composio**; Cortex sends the Firebase ID token and never sees the Composio key.
 
 ## Client (`lib/apps/`)

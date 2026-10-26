@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import 'controller.dart';
+import 'feature.dart';
 import 'logo.dart';
 import 'models.dart';
 import 'service.dart';
@@ -42,6 +43,7 @@ class AppChatTools {
 
   /// Tool definitions, offered only while at least one app is usable.
   static List<Map<String, dynamic>> toolsJson() {
+    if (!kAppsEnabled) return const [];
     final apps = AppsController.instance.chatApps;
     if (apps.isEmpty) return const [];
     final names = apps.map((app) => '${app.name} (${app.slug})').join(', ');

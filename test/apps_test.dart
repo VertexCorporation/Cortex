@@ -1,6 +1,7 @@
 import 'package:cortex/apps/categories.dart';
 import 'package:cortex/apps/chat_tools.dart';
 import 'package:cortex/apps/controller.dart';
+import 'package:cortex/apps/feature.dart';
 import 'package:cortex/apps/models.dart';
 import 'package:cortex/apps/widgets.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -90,6 +91,11 @@ void main() {
       expect(controller.chatApps.map((a) => a.slug), ['gmail']);
 
       final tools = AppChatTools.toolsJson();
+      if (!kAppsEnabled) {
+        // Hidden feature: chat never offers app tools.
+        expect(tools, isEmpty);
+        return;
+      }
       expect(tools.map((t) => t['function']['name']),
           [AppChatTools.findTool, AppChatTools.runTool]);
       final appEnum = tools.first['function']['parameters']['properties']['app']['enum'];

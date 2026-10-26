@@ -1,6 +1,7 @@
 // lib/axon/widgets/menu.dart
 
 import 'package:flutter/material.dart';
+import 'package:cortex/apps/feature.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
 // Components
@@ -70,16 +71,18 @@ class AxonMenu extends StatelessWidget {
           SizedBox(height: verticalSpacing),
 
           // --- 1.6 APPS (connected third-party apps) ---
-          AxonItem(
-            label: localizations.appsTitle,
-            iconPath: 'assets/icons/apps.svg',
-            onTap: onAppsTap,
-            screenHeight: screenHeight,
-            referenceWidth: referenceWidth,
-            reduceIconSize: true,
-            isActive: false,
-          ),
-          SizedBox(height: verticalSpacing),
+          if (kAppsEnabled) ...[
+            AxonItem(
+              label: localizations.appsTitle,
+              iconPath: 'assets/icons/apps.svg',
+              onTap: onAppsTap,
+              screenHeight: screenHeight,
+              referenceWidth: referenceWidth,
+              reduceIconSize: true,
+              isActive: false,
+            ),
+            SizedBox(height: verticalSpacing),
+          ],
 
           // --- 2. ARTS ---
           AxonItem(
