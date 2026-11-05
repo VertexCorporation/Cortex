@@ -39,7 +39,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "az": [
@@ -48,7 +62,21 @@
     "agentGreen",
     "agentYellow",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "cs": [
@@ -91,7 +119,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "de": [
@@ -134,7 +176,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "es": [
@@ -177,7 +233,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "fr": [
@@ -220,7 +290,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "hi": [
@@ -263,7 +347,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "hu": [
@@ -306,7 +404,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "id": [
@@ -349,7 +461,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "it": [
@@ -392,7 +518,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "ja": [
@@ -435,7 +575,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "ko": [
@@ -478,7 +632,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "nl": [
@@ -521,7 +689,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "no": [
@@ -564,7 +746,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "pt": [
@@ -607,7 +803,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "ru": [
@@ -650,7 +860,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "sv": [
@@ -693,7 +917,21 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ],
 
   "tr": [
@@ -741,6 +979,20 @@
     "voiceMale",
     "voiceFemale",
     "voiceTimeRemaining",
-    "voiceDailyLimitReached"
+    "voiceDailyLimitReached",
+    "offlineSetupWelcome",
+    "offlineSetupWelcomeBody",
+    "offlineSetupChoiceTitle",
+    "offlineSetupChoiceBody",
+    "offlineSetupChooseSpecific",
+    "offlineSetupContinue",
+    "offlineSetupChecking",
+    "offlineSetupCheckingBody",
+    "offlineSetupReadyTitle",
+    "offlineSetupReadyBody",
+    "offlineSetupNoMatch",
+    "featureCreateMusicTitle",
+    "featureCreateMusicDescription",
+    "musicGenerationUnavailable"
   ]
 }

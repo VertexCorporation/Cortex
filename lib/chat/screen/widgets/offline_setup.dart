@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
-import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/offline_setup.dart';
@@ -11,17 +10,33 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/backend/system.dart';
+import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/main.dart';
 import 'package:cortex/theme.dart';
+import 'package:cortex/internet.dart';
 import '../appbar/premium.dart';
 
 Future<void> showOfflineSetup(BuildContext context) async {
-  if (context.read<ConversationProvider>().messages.isNotEmpty) {
+  final internet = context.read<InternetProvider>();
+  await internet.checkInternetConnection();
+
+  if (!context.mounted) return;
+
+  final hasInstalledModel = hasInstalledOfflineModel(
+    context.read<ModelCatalogProvider>().allModels,
+    context.read<ModelLocalStateProvider>(),
+  );
+
+  if (hasInstalledModel) {
     handleUseOfflineAction(context);
     return;
   }
+
+  if (internet.isConnected) return;
+
   FocusScope.of(context).unfocus();
+
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -41,6 +56,7 @@ class OfflineSetupSheet extends StatefulWidget {
 
 class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
   int _page = 0;
+  bool _forward = true;
   int _generation = 0;
   bool _loading = false;
   bool _startingDownload = false;
@@ -52,7 +68,7 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
     final service = context.read<ModelService>();
     final local = context.read<ModelLocalStateProvider>();
     final language = Localizations.localeOf(context).languageCode;
-    setState(() { _page = 2; _loading = true; _model = null; });
+    setState(() { _forward = true; _page = 2; _loading = true; _model = null; });
     try {
       final device = await SystemInfoProvider.fetchSystemInfo();
       final catalogue = await service.getModels(langCode: language) ?? <ModelEntity>[];
@@ -155,7 +171,7 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
               if (_page > 0) IconButton(
                 onPressed: downloading || _startingDownload ? null : () {
                   _generation++;
-                  setState(() { _page--; _loading = false; });
+                  setState(() { _forward = false; _page--; _loading = false; });
                 }, icon: const Icon(Icons.arrow_back),
               ),
               const Spacer(),
@@ -163,35 +179,89 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
               IconButton(tooltip: l10n.cancel, onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close)),
             ]),
-            Expanded(child: SingleChildScrollView(child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                Icon(_loading ? Icons.memory : Icons.offline_bolt_outlined, size: 48),
-                const SizedBox(height: 20),
-                Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 12),
-                Text(description, style: Theme.of(context).textTheme.bodyLarge),
-                if (_page == 2 && _loading) const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24), child: LinearProgressIndicator()),
-                if (_page == 2 && model != null) ...[
-                  const SizedBox(height: 24),
-                  ListTile(contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.smart_toy_outlined),
-                    title: Text(model.displayTitle),
-                    subtitle: Text('${model.size} MB • ${model.ram} MB RAM'),
+            Expanded(child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              reverseDuration: const Duration(milliseconds: 200),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              layoutBuilder: (current, previous) => Stack(
+                alignment: Alignment.topLeft,
+                children: [...previous, if (current != null) current],
+              ),
+              transitionBuilder: (child, animation) {
+                final incoming = child.key == ValueKey<String>('$_page-$_loading');
+                final dx = (_forward ? 1 : -1) * (incoming ? 0.12 : -0.12);
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(begin: Offset(dx, 0), end: Offset.zero)
+                        .animate(animation),
+                    child: child,
                   ),
-                  if (downloading) ...[
-                    LinearProgressIndicator(value: (manager!.progress / 100).clamp(0, 1)),
-                    Text(l10n.downloaded(manager.progress.round())),
+                );
+              },
+              child: SingleChildScrollView(
+                key: ValueKey<String>('$_page-$_loading'),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    _AnimatedHeroIcon(page: _page, loading: _loading),
+                    const SizedBox(height: 20),
+                    Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                    const SizedBox(height: 12),
+                    Text(description, style: Theme.of(context).textTheme.bodyLarge),
+                    if (_page == 2 && _loading) const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: LinearProgressIndicator()),
+                    if (_page == 2 && model != null) ...[
+                      const SizedBox(height: 24),
+                      ListTile(contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.smart_toy_outlined),
+                        title: Text(model.displayTitle),
+                        subtitle: Text('${model.size} MB • ${model.ram} MB RAM'),
+                      ),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        alignment: Alignment.topCenter,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (downloading) ...[
+                              TweenAnimationBuilder<double>(
+                                tween: Tween(end: (manager!.progress / 100).clamp(0, 1).toDouble()),
+                                duration: const Duration(milliseconds: 300),
+                                builder: (_, v, __) => LinearProgressIndicator(value: v),
+                              ),
+                              Text(l10n.downloaded(manager.progress.round())),
+                            ],
+                            if (paused) Text(l10n.downloadPaused),
+                            if (_downloadFailed && !downloading && !ready && !paused)
+                              Text(l10n.downloadFailed),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
-                  if (paused) Text(l10n.downloadPaused),
-                  if (_downloadFailed && !downloading && !ready && !paused)
-                    Text(l10n.downloadFailed),
-                ],
-              ],
-            ))),
+                ),
+              ),
+            )),
             const SizedBox(height: 16),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOutCubic,
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
+                      .animate(animation),
+                  child: child,
+                ),
+              ),
+              child: KeyedSubtree(
+                key: ValueKey<String>('btn-$_page-$_loading'),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
             if (_page == 1) Row(children: [
               Expanded(child: PremiumButton(label: l10n.offlineSetupChooseSpecific,
                 height: 48, onTap: () {
@@ -203,7 +273,7 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
               Expanded(child: FilledButton(onPressed: _recommend,
                 child: Text(l10n.offlineSetupContinue))),
             ]) else if (_page == 0) SizedBox(width: double.infinity,
-              child: FilledButton(onPressed: () => setState(() { _page = 1; }),
+              child: FilledButton(onPressed: () => setState(() { _forward = true; _page = 1; }),
                 child: Text(l10n.offlineSetupContinue))),
             if (_page == 2 && !_loading)
               SizedBox(width: double.infinity, child: FilledButton(
@@ -214,8 +284,52 @@ class _OfflineSetupSheetState extends State<OfflineSetupSheet> {
                     : ready ? l10n.useOffline : downloading || _startingDownload
                         ? l10n.downloading : l10n.download),
               )),
+                ]),
+              ),
+            ),
           ]),
         ),
+      ),
+    );
+  }
+}
+
+
+class _AnimatedHeroIcon extends StatefulWidget {
+  const _AnimatedHeroIcon({required this.page, required this.loading});
+  final int page;
+  final bool loading;
+
+  @override
+  State<_AnimatedHeroIcon> createState() => _AnimatedHeroIconState();
+}
+
+class _AnimatedHeroIconState extends State<_AnimatedHeroIcon>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this, duration: const Duration(milliseconds: 1100),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() { _pulse.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = widget.loading ? Icons.memory : Icons.offline_bolt_outlined;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (child, animation) => ScaleTransition(
+        scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+        child: FadeTransition(opacity: animation, child: child),
+      ),
+      child: AnimatedBuilder(
+        key: ValueKey<IconData>(icon),
+        animation: _pulse,
+        builder: (_, child) => Transform.scale(
+          scale: widget.loading ? 0.9 + 0.2 * _pulse.value : 1.0,
+          child: child,
+        ),
+        child: Icon(icon, size: 48),
       ),
     );
   }

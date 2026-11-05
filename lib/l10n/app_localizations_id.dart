@@ -2232,4 +2232,53 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get voiceDailyLimitReached =>
       'You\'ve used today\'s voice time. It renews after midnight.';
+
+  @override
+  String get offlineSetupWelcome => 'Would you like to use Cortex offline?';
+
+  @override
+  String get offlineSetupWelcomeBody =>
+      'Download a model once, then chat on your device without an internet connection. Your messages stay on your device. Online search and cloud media generation still need internet.';
+
+  @override
+  String get offlineSetupChoiceTitle => 'Your own local Cortex';
+
+  @override
+  String get offlineSetupChoiceBody =>
+      'Cortex offers a broad catalogue of offline models. Continue to let us recommend a suitable free model for your device. With Plus, you can choose a specific intelligence from the catalogue.';
+
+  @override
+  String get offlineSetupChooseSpecific => 'Choose an intelligence';
+
+  @override
+  String get offlineSetupContinue => 'Continue';
+
+  @override
+  String get offlineSetupChecking => 'Checking your device';
+
+  @override
+  String get offlineSetupCheckingBody =>
+      'We are checking available memory and storage and comparing the catalogue requirements. No model is downloaded until you confirm.';
+
+  @override
+  String get offlineSetupReadyTitle => 'Ready for offline chat';
+
+  @override
+  String get offlineSetupReadyBody =>
+      'This recommendation leaves room for your device to keep running smoothly. Download it now, then tap Use Offline when it is ready. You can close this panel while the download continues.';
+
+  @override
+  String get offlineSetupNoMatch =>
+      'We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.';
+
+  @override
+  String get featureCreateMusicTitle => 'Create Music';
+
+  @override
+  String get featureCreateMusicDescription =>
+      'Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.';
+
+  @override
+  String get musicGenerationUnavailable =>
+      'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
 }
