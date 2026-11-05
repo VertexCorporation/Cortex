@@ -2224,4 +2224,54 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get voiceDailyLimitReached =>
       'Bugünün ses süresini kullandınız. Gece yarısından sonra yenilenir.';
+
+  @override
+  String get offlineSetupWelcome =>
+      'Cortex’i internetsiz kullanmak ister misin?';
+
+  @override
+  String get offlineSetupWelcomeBody =>
+      'Bir modeli bir kez indir, sonra internet olmadan cihazında sohbet et. Mesajların cihazında kalır. Web araması ve bulutta medya üretimi için internet gerekir.';
+
+  @override
+  String get offlineSetupChoiceTitle => 'Sana özel lokal Cortex';
+
+  @override
+  String get offlineSetupChoiceBody =>
+      'Cortex’te geniş bir internetsiz model kataloğu var. Devam ederek cihazına uygun ücretsiz bir model önerisi alabilirsin. Plus ile katalogdan belirli bir zekâyı kendin seçebilirsin.';
+
+  @override
+  String get offlineSetupChooseSpecific => 'Spesifik zekâ seç';
+
+  @override
+  String get offlineSetupContinue => 'Devam et';
+
+  @override
+  String get offlineSetupChecking => 'Cihazın inceleniyor';
+
+  @override
+  String get offlineSetupCheckingBody =>
+      'Kullanılabilir bellek ve depolama alanını katalogdaki gereksinimlerle karşılaştırıyoruz. Onay vermeden hiçbir model indirilmez.';
+
+  @override
+  String get offlineSetupReadyTitle => 'İnternetsiz sohbete hazır';
+
+  @override
+  String get offlineSetupReadyBody =>
+      'Bu öneri, cihazının rahat çalışması için güvenlik payı bırakır. Modeli indir; hazır olduğunda İnternetsiz Kullan’a bas. İndirme sürerken bu paneli kapatabilirsin.';
+
+  @override
+  String get offlineSetupNoMatch =>
+      'Cihaz ve katalog bilgileriyle güvenli bir model öneremedik. Seçenekleri elle incelemek için İnternetsiz Modeller’i aç.';
+
+  @override
+  String get featureCreateMusicTitle => 'Müzik oluştur';
+
+  @override
+  String get featureCreateMusicDescription =>
+      'İstediğin tarzı, duyguyu, süreyi ve sözleri anlat. Uyumlu bir müzik modeliyle üret, dinle ve paylaş. Medya kredilerini kullanır.';
+
+  @override
+  String get musicGenerationUnavailable =>
+      'Güncel katalogda uyumlu bir müzik üreticisi bulunamadı. Lütfen daha sonra tekrar dene. Müzik isteği gönderilmedi.';
 }
