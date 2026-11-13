@@ -69,3 +69,7 @@ android_signing_keys.zip
 .cursor/ios/llama.xcframework/
 # Widget Preview related
 .widget_preview/
+
+# CI-only generated diagnostics and signing export settings
+build-logs/
+ios/ExportOptions.plist

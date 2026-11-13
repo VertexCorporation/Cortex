@@ -1,71 +1,126 @@
 name: Flutter Build & Release
 
 on:
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-android:
     name: Build Android (APK & AAB)
     runs-on: ubuntu-latest
+    timeout-minutes: 100
     steps:
-      - name: Checkout Code
+      - name: Checkout Code (including llama.cpp)
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: recursive
 
-      - name: Setup Java
+      - name: Setup Java 21 (matches Gradle toolchains)
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: zulu
+          java-version: '21'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
           flutter-version: '3.47.2'
           cache: true
 
-      - name: Install Dependencies
-        run: flutter pub get
+      - name: Prepare diagnostic directory
+        run: mkdir -p build-logs
 
-      - name: Decode Android Keystore
+      - name: Flutter SDK information
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter --version 2>&1 | tee build-logs/android-flutter-version.log
+          java -version 2>&1 | tee build-logs/android-java-version.log
+
+      - name: Install dependencies and generate localizations
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter pub get 2>&1 | tee build-logs/android-pub-get.log
+          flutter gen-l10n 2>&1 | tee build-logs/android-gen-l10n.log
+
+      - name: Verify native llama.cpp source is checked out
+        shell: bash
+        run: |
+          test -f vendor/llama.cpp/CMakeLists.txt || { echo 'ERROR: vendor/llama.cpp missing. Check submodule checkout.'; exit 1; }
+          test -f android/llama/src/main/cpp/CMakeLists.txt || { echo 'ERROR: Android llama CMakeLists.txt missing.'; exit 1; }
+
+      - name: Configure Android signing or select debug build
+        id: signing
+        shell: bash
         env:
           CORTEX_JKS_BASE64: ${{ secrets.CORTEX_JKS }}
+          JKS_PASSWORD: ${{ secrets.JKS_PASSWORD }}
+        run: bash scripts/ci/configure_android_signing.sh
+
+      - name: Build signed release APK
+        if: steps.signing.outputs.release_ready == 'true'
+        shell: bash
         run: |
-          echo "$CORTEX_JKS_BASE64" | base64 --decode > android/app/Cortex.jks
+          set -o pipefail
+          flutter build apk --release 2>&1 | tee build-logs/android-release-apk.log
 
-      - name: Create key.properties
-        env:
-          KEY_PASS: ${{ secrets.JKS_PASSWORD }}
+      - name: Build signed release AAB
+        if: steps.signing.outputs.release_ready == 'true'
+        shell: bash
         run: |
-          echo "storePassword=$KEY_PASS" > android/key.properties
-          echo "keyPassword=$KEY_PASS" >> android/key.properties
-          echo "keyAlias=ai" >> android/key.properties
-          echo "storeFile=Cortex.jks" >> android/key.properties
+          set -o pipefail
+          flutter build appbundle --release 2>&1 | tee build-logs/android-release-aab.log
 
-      - name: Build APK (Release)
-        run: flutter build apk --release
+      - name: Build debug APK (signing secrets absent)
+        if: steps.signing.outputs.release_ready == 'false'
+        shell: bash
+        run: |
+          set -o pipefail
+          echo 'No Android release signing secrets. Producing a debug APK, NOT a Play Store release.' | tee build-logs/android-signing-status.log
+          flutter build apk --debug --target-platform android-arm64 2>&1 | tee build-logs/android-debug-apk.log
 
-      - name: Build AppBundle (Release)
-        run: flutter build appbundle --release
-
-      - name: Upload Android Release Assets
+      - name: Upload Android release files
+        if: steps.signing.outputs.release_ready == 'true' && success()
         uses: actions/upload-artifact@v4
         with:
           name: android-release-artifacts
+          if-no-files-found: error
+          retention-days: 14
           path: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
 
+      - name: Upload Android debug APK
+        if: steps.signing.outputs.release_ready == 'false' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk-NOT-FOR-STORE
+          if-no-files-found: error
+          retention-days: 14
+          path: build/app/outputs/flutter-apk/app-debug.apk
+
+      - name: Upload Android build logs (also on failure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-logs
+          path: build-logs/
+          if-no-files-found: warn
+          retention-days: 14
+
   build-ios:
     name: Build iOS (IPA)
     runs-on: macos-latest
+    timeout-minutes: 110
     steps:
-      - name: Checkout Code
+      - name: Checkout Code (including llama.cpp)
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: recursive
 
       - name: Setup Xcode Version
         uses: maxim-lobanov/setup-xcode@v1
@@ -75,80 +130,97 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
           flutter-version: '3.47.2'
           cache: true
 
-      - name: Install Dependencies
-        run: |
-          flutter clean
-          flutter pub get
-          rm -rf ios/Pods ios/Podfile.lock
-          cd ios
-          pod install --repo-update
+      - name: Prepare diagnostic directory
+        run: mkdir -p build-logs
 
-      - name: Install Apple Certificate and Provisioning Profile
+      - name: Flutter and Xcode information
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter --version 2>&1 | tee build-logs/ios-flutter-version.log
+          xcodebuild -version 2>&1 | tee build-logs/ios-xcode-version.log
+
+      - name: Install dependencies and CocoaPods (preserve lockfile)
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter pub get 2>&1 | tee build-logs/ios-pub-get.log
+          flutter gen-l10n 2>&1 | tee build-logs/ios-gen-l10n.log
+          (cd ios && pod install --repo-update) 2>&1 | tee build-logs/ios-pod-install.log
+
+      - name: Check iOS signing credentials
+        id: signing
+        shell: bash
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
           P12_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASS }}
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: bash scripts/ci/check_ios_signing.sh
+
+      - name: Install Apple signing assets and generate ExportOptions.plist
+        if: steps.signing.outputs.release_ready == 'true'
+        shell: bash
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASS }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: bash scripts/ci/install_ios_signing.sh
+
+      - name: Build signed IPA (App Store Connect)
+        if: steps.signing.outputs.release_ready == 'true'
+        shell: bash
         run: |
-          # Create temporary variables for paths
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          set -o pipefail
+          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist 2>&1 | tee build-logs/ios-release-ipa.log
 
-          # Decode certificates and profiles from base64
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
-
-          # Create a temporary keychain for signing
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security default-keychain -s $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-
-          # Import certificate into keychain
-          security import $CERTIFICATE_PATH -k $KEYCHAIN_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-
-          # Extract UUID from the provisioning profile and rename it correctly
-          UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(security cms -D -i $PP_PATH))
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
-
-          # Extract Team ID and Profile Name to create a robust ExportOptions.plist
-          TEAM_ID=$(/usr/libexec/PlistBuddy -c "Print TeamIdentifier:0" /dev/stdin <<< $(security cms -D -i $PP_PATH))
-          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< $(security cms -D -i $PP_PATH))
-          
-          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ios/ExportOptions.plist
-          echo "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" >> ios/ExportOptions.plist
-          echo "<plist version=\"1.0\">" >> ios/ExportOptions.plist
-          echo "<dict>" >> ios/ExportOptions.plist
-          echo "    <key>method</key>" >> ios/ExportOptions.plist
-          echo "    <string>app-store</string>" >> ios/ExportOptions.plist
-          echo "    <key>uploadBitcode</key>" >> ios/ExportOptions.plist
-          echo "    <false/>" >> ios/ExportOptions.plist
-          echo "    <key>uploadSymbols</key>" >> ios/ExportOptions.plist
-          echo "    <true/>" >> ios/ExportOptions.plist
-          echo "    <key>compileBitcode</key>" >> ios/ExportOptions.plist
-          echo "    <false/>" >> ios/ExportOptions.plist
-          echo "    <key>teamID</key>" >> ios/ExportOptions.plist
-          echo "    <string>$TEAM_ID</string>" >> ios/ExportOptions.plist
-          echo "    <key>provisioningProfiles</key>" >> ios/ExportOptions.plist
-          echo "    <dict>" >> ios/ExportOptions.plist
-          echo "        <key>com.vertex.cortex</key>" >> ios/ExportOptions.plist
-          echo "        <string>$PROFILE_NAME</string>" >> ios/ExportOptions.plist
-          echo "    </dict>" >> ios/ExportOptions.plist
-          echo "</dict>" >> ios/ExportOptions.plist
-          echo "</plist>" >> ios/ExportOptions.plist
-
-      - name: Build IPA (Release)
+      - name: Build unsigned iOS app (signing secrets absent)
+        if: steps.signing.outputs.release_ready == 'false'
+        shell: bash
         run: |
-          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+          set -o pipefail
+          echo 'No Apple signing secrets. Compiling unsigned iOS .app; no distributable IPA can be created.' | tee build-logs/ios-signing-status.log
+          flutter build ios --release --no-codesign 2>&1 | tee build-logs/ios-unsigned-app.log
 
-      - name: Upload iOS Release Artifacts
+      - name: Upload signed IPA
+        if: steps.signing.outputs.release_ready == 'true' && success()
         uses: actions/upload-artifact@v4
         with:
           name: ios-release-artifacts
+          if-no-files-found: error
+          retention-days: 14
           path: build/ios/ipa/*.ipa
+
+      - name: Upload unsigned iOS app (NOT an IPA)
+        if: steps.signing.outputs.release_ready == 'false' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-unsigned-app-NOT-FOR-DISTRIBUTION
+          if-no-files-found: error
+          retention-days: 14
+          path: build/ios/iphoneos/Runner.app/
+
+      - name: Upload iOS build logs (also on failure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: build-logs/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Remove temporary Apple signing keychain and secrets
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/cortex-build-signing.keychain-db" ]; then
+            security delete-keychain "$RUNNER_TEMP/cortex-build-signing.keychain-db" || true
+          fi
+          rm -f "$RUNNER_TEMP/cortex-build-certificate.p12" \
+                "$RUNNER_TEMP/cortex-build-profile.mobileprovision" \
+                "$RUNNER_TEMP/cortex-build-profile.plist"
