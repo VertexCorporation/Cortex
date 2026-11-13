@@ -202,7 +202,9 @@ jobs:
             --upload-app \
             --type ios \
             --file build/ios/ipa/cortex.ipa \
-            --apiKey "$APP_STORE_CONNECT_KEY_ID"
+            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_KEY_ID" \
+            --api-key-subject user
 
       - name: Upload signed IPA
         if: steps.signing.outputs.release_ready == 'true' && success()
