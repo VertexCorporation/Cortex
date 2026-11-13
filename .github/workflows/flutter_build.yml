@@ -187,6 +187,23 @@ jobs:
           echo 'No Apple signing secrets. Compiling unsigned iOS .app; no distributable IPA can be created.' | tee build-logs/ios-signing-status.log
           flutter build ios --release --no-codesign 2>&1 | tee build-logs/ios-unsigned-app.log
 
+      - name: Upload IPA to TestFlight
+        if: steps.signing.outputs.release_ready == 'true' && success()
+        shell: bash
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          printf '%s' "$APP_STORE_CONNECT_PRIVATE_KEY" > "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
+          chmod 600 "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
+
+          xcrun altool \
+            --upload-app \
+            --type ios \
+            --file build/ios/ipa/cortex.ipa \
+            --apiKey "$APP_STORE_CONNECT_KEY_ID"
+
       - name: Upload signed IPA
         if: steps.signing.outputs.release_ready == 'true' && success()
         uses: actions/upload-artifact@v4
