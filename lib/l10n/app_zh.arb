@@ -671,6 +671,7 @@
   "reportNotTrue": "这不是真实的",
   "reportSubmitted": "举报已成功提交。",
   "requestFailed": "发生错误，请重试。",
+  "errorDetailsHint": "点按即可查看详情。",
   "resendCode": "重新发送验证邮件",
   "restorePurchases": "恢复购买",
   "resume": "恢复",

@@ -17,7 +17,6 @@ import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/settings/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,6 +26,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:upgrader/upgrader.dart';
 import 'cache.dart';
 import 'chat/services/moderator.dart';
+import 'crash_report.dart';
 import 'internet.dart';
 import 'l10n/app_localizations.dart';
 import 'library/backend/download/download.dart';
@@ -66,6 +66,14 @@ class AppUpgraderMessages extends UpgraderMessages {
     }
   }
 }
+
+/// Browser-safe system language code.
+///
+/// `Platform.localeName` throws `UnsupportedError` on web, so the resolved
+/// platform dispatcher locale is used there instead.
+String get _systemLanguageCode => kIsWeb
+    ? PlatformDispatcher.instance.locale.languageCode.split('_').first
+    : Platform.localeName.split('_').first;
 
 /// The core service for managing the application's lifecycle and state.
 class AppInitializer with ChangeNotifier {
@@ -203,7 +211,7 @@ class AppInitializer with ChangeNotifier {
     // stub model data from SharedPreferences. ChatSessionProvider hydrates
     // when the catalog arrives via refreshModelAfterCatalogLoad().
     // This saves 1-3s on cold start (network latency for Firestore fetch).
-    final sysLocale = Platform.localeName.split('_').first;
+    final sysLocale = _systemLanguageCode;
     unawaited(_modelService.getModels(langCode: sysLocale).then((_) {
       dev.log("[AppInitializer] Model catalog loaded successfully");
     }).catchError((e) {
@@ -357,7 +365,7 @@ class AppInitializer with ChangeNotifier {
       _runInBackground(reconcileLocalAndRemoteModelCounts);
       _runInBackground(reconcileAndSyncPurchases);
 
-      if (Platform.isAndroid) {
+      if (!kIsWeb && Platform.isAndroid) {
         _runInBackground(ReferralHandler.checkAndStoreReferrer);
       }
 
@@ -586,12 +594,7 @@ class AppInitializer with ChangeNotifier {
 
       final isPermissionDenied = error.toString().contains('permission-denied');
       if (!isPermissionDenied) {
-        FirebaseCrashlytics.instance.recordError(
-          error,
-          stackTrace,
-          reason: 'FalStatusListener',
-          fatal: false,
-        );
+        reportError(error, stackTrace, reason: 'FalStatusListener');
       }
       _falStatusSubscription?.cancel();
       _falStatusSubscription = null;
@@ -606,12 +609,7 @@ class AppInitializer with ChangeNotifier {
     } catch (e, s) {
       debugPrint(
           "AppInitializer: Anonymous entitlement registration failed: $e");
-      FirebaseCrashlytics.instance.recordError(
-        e,
-        s,
-        reason: "AnonymousDeviceEntitlement",
-        fatal: false,
-      );
+      reportError(e, s, reason: "AnonymousDeviceEntitlement");
     }
   }
 
@@ -814,7 +812,7 @@ class AppInitializer with ChangeNotifier {
             // Success Path
             // Also fetch models here! Useful if they logged out and logged in (cache was cleared).
             try {
-              final sysLocale = Platform.localeName.split('_').first;
+              final sysLocale = _systemLanguageCode;
               // Don't wait for it completely here to not block ready.
               unawaited(
                   _modelService.getModels(langCode: sysLocale).catchError((e) {
@@ -923,8 +921,7 @@ class AppInitializer with ChangeNotifier {
               // it's safer to log it and sign out to prevent stuck states.
               debugPrint(
                   "[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
-              FirebaseCrashlytics.instance
-                  .recordError(e, s, reason: "AuthFlow_UnhandledFirebase");
+              reportError(e, s, reason: "AuthFlow_UnhandledFirebase");
               await signOut();
               break;
           }
@@ -943,8 +940,7 @@ class AppInitializer with ChangeNotifier {
           // Otherwise, it's a crash-worthy logic error.
           debugPrint(
               "[_determineUserFlow] Critical system error: $e. Signing out.");
-          FirebaseCrashlytics.instance
-              .recordError(e, s, reason: "AuthFlow_SystemError");
+          reportError(e, s, reason: "AuthFlow_SystemError");
           await signOut();
         } // end else
       } // end catch (e, s)
@@ -1039,7 +1035,7 @@ class AppInitializer with ChangeNotifier {
   void _runInBackground(Future<void> Function() task) {
     task().catchError((e, s) {
       debugPrint("Background task failed: $e\n$s");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: "backgroundTask");
+      reportError(e, s, reason: "backgroundTask");
     });
   }
 }

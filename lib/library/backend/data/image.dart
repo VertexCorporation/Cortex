@@ -2,7 +2,8 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' if (dart.library.html) 'dart:typed_data';
+
+import 'image_file.dart';
 
 import 'package:cortex/performance/write_behind.dart';
 import 'package:flutter/foundation.dart';
@@ -172,9 +173,7 @@ class ModelImageCache {
       final localPath = paths[id];
       if (localPath == null) continue;
       try {
-        final file = File(localPath);
-        if (await file.exists()) {
-          await file.delete();
+        if (await deleteLocalImageFile(localPath)) {
           debugPrint('[ModelImageCache] Deleted cached image file: $localPath');
         }
       } catch (e) {

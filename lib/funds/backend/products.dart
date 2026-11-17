@@ -98,6 +98,17 @@ extension FundsProducts on FundsBackend {
       return;
     }
 
+    if (kIsWeb) {
+      // Store billing has no web implementation. Fulcrum-managed entitlements
+      // keep working, but there are no store products to list.
+      log('Products not fetched: store billing is unavailable on web.',
+          name: FundsBackend._logName);
+      _products = const [];
+      _errorMessage = null;
+      _setLoading(false);
+      return;
+    }
+
     if (!await InternetService().hasInternet()) {
       _setError(_localizations?.noInternetConnection ?? 'noInternetConnection');
       return;

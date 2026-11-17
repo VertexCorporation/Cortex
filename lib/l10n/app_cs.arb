@@ -232,6 +232,7 @@
   "ocean": "Oceán",
   "scarletSnow": "Scarlet Snow",
   "requestFailed": "Došlo k chybě, zkuste to prosím znovu.",
+  "errorDetailsHint": "Klepnutím zobrazíte podrobnosti.",
   "changeModel": "Změnit",
   "edit": "Upravit",
   "editingMessageInfo": "Úprava této zprávy restartuje konverzaci odsud.",

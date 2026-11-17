@@ -671,6 +671,7 @@
   "reportNotTrue": "यह सच नहीं है",
   "reportSubmitted": "रिपोर्ट सफलतापूर्वक सबमिट की गई",
   "requestFailed": "एक त्रुटि हुई, कृपया पुनः प्रयास करें।",
+  "errorDetailsHint": "विवरण देखने के लिए टैप करें।",
   "resendCode": "सत्यापन ई-मेल पुनः भेजें",
   "restorePurchases": "खरीदारी वापस लौटाएं",
   "resume": "फिर से शुरू करें",

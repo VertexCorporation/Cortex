@@ -232,6 +232,7 @@
   "ocean": "Óceán",
   "scarletSnow": "Skarlát hó",
   "requestFailed": "Hiba történt. Kérjük, próbálja újra.",
+  "errorDetailsHint": "Koppintson a részletek megtekintéséhez.",
   "changeModel": "Változás",
   "edit": "Szerkesztés",
   "editingMessageInfo": "Az üzenet szerkesztése innen indítja újra a beszélgetést.",

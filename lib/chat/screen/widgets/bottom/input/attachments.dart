@@ -268,8 +268,8 @@ class _AttachmentItem extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12.0),
-          child: Image.file(
-            attachment.file,
+          child: Image(
+            image: attachment.displayImage,
             width: size,
             height: size,
             fit: BoxFit.cover,

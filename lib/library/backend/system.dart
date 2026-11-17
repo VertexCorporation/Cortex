@@ -1,4 +1,4 @@
-//lib/library/backend/system.dart
+﻿//lib/library/backend/system.dart
 
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
@@ -22,6 +22,9 @@ class SystemInfoProvider {
     try {
       final int result = await _memoryChannel.invokeMethod('getDeviceMemory');
       return result;
+    } on MissingPluginException {
+      // Web/desktop: native channel unavailable.
+      return -1;
     } on PlatformException catch (e) {
       if (kDebugMode) {
         print("Failed to get device memory: '${e.message}'");
@@ -34,6 +37,9 @@ class SystemInfoProvider {
     try {
       final int result = await _memoryChannel.invokeMethod('getUsedMemory');
       return result;
+    } on MissingPluginException {
+      // Web/desktop: native channel unavailable.
+      return -1;
     } on PlatformException catch (e) {
       if (kDebugMode) {
         print("Failed to get used memory: '${e.message}'");
@@ -46,6 +52,9 @@ class SystemInfoProvider {
     try {
       final int result = await _storageChannel.invokeMethod('getFreeStorage');
       return result;
+    } on MissingPluginException {
+      // Web/desktop: native channel unavailable.
+      return -1;
     } on PlatformException catch (e) {
       if (kDebugMode) {
         print("Failed to get free storage: '${e.message}'");
@@ -58,6 +67,9 @@ class SystemInfoProvider {
     try {
       final int result = await _storageChannel.invokeMethod('getTotalStorage');
       return result;
+    } on MissingPluginException {
+      // Web/desktop: native channel unavailable.
+      return -1;
     } on PlatformException catch (e) {
       if (kDebugMode) {
         print("Failed to get total storage: '${e.message}'");
@@ -85,3 +97,5 @@ class SystemInfoData {
     required this.usedMemory,
   });
 }
+
+

@@ -707,6 +707,7 @@
   "reportNotTrue": "Bu doğru değil",
   "reportSubmitted": "Rapor başarıyla gönderildi.",
   "requestFailed": "Bir hata oluştu, lütfen tekrar deneyin.",
+  "errorDetailsHint": "Detayları görmek için dokunun.",
   "resendCode": "Doğrulama e-postasını yeniden gönder",
   "restorePurchases": "Satın Alımları Geri Yükle",
   "resume": "Devam Et",

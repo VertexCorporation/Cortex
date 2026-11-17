@@ -52,6 +52,21 @@ class Utils {
 
   /// A static utility to read any file, encode it to Base64, and return its data and MIME type.
   static Future<Map<String, String>?> formatBase64File(String filePath) async {
+    // Web attachments are already data: URLs — pass them through untouched.
+    if (filePath.startsWith('data:')) {
+      // data:<mime>;base64,<payload> — the payload is the base64 data itself.
+      final commaIndex = filePath.indexOf(',');
+      if (commaIndex == -1) return null;
+      final mimePart = filePath.substring(5, commaIndex); // after "data:"
+      final mimeType = mimePart.split(';').first.isNotEmpty
+          ? mimePart.split(';').first
+          : 'application/octet-stream';
+      final base64Data = filePath
+          .substring(commaIndex + 1)
+          .replaceAll(RegExp(r'\s+'), '');
+      if (base64Data.isEmpty) return null;
+      return {'mime_type': mimeType, 'data': base64Data};
+    }
     try {
       final file = File(filePath);
       if (await file.exists()) {
@@ -79,6 +94,8 @@ class Utils {
   /// A static utility function to read a media file (image/video/audio), encode it to Base64,
   /// and format it as a data URL string.
   static Future<String?> formatBase64Media(String mediaPath) async {
+    // Web attachments are already data: URLs — pass them through untouched.
+    if (mediaPath.startsWith('data:')) return mediaPath;
     try {
       final mediaFile = File(mediaPath);
       if (await mediaFile.exists()) {

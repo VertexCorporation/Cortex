@@ -109,6 +109,7 @@ dependencies:
   audioplayers: ^6.6.0
   video_player: ^2.9.2
   record: ^7.1.1
+  sqflite_common_ffi_web: ^1.2.2
 
 dev_dependencies:
   flutter_test:

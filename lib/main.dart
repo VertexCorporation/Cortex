@@ -1,4 +1,4 @@
-// main.dart
+﻿// main.dart
 //
 // Entry point and global bootstrapping for Cortex.
 // - Initializes Firebase, Crashlytics, messaging, time zones, and orientation.
@@ -14,6 +14,7 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/app.dart';
+import 'package:cortex/crash_report.dart';
 import 'package:cortex/screen.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
@@ -27,7 +28,7 @@ import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,8 @@ import 'package:cortex/startup/splash.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart' show databaseFactory;
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart' show databaseFactoryFfiWeb;
 
 import 'axon/inbox/logic/general.dart';
 import 'arts/provider.dart';
@@ -157,7 +160,11 @@ class AppBootstrap {
     SharedPreferences? prefs;
     try {
       await Future.wait([
-        Firebase.initializeApp().then((_) async {
+        // Web needs explicit options (no google-services/plist integration);
+        // io platforms resolve their app natively.
+        Firebase.initializeApp(
+          options: kIsWeb ? DefaultFirebaseOptions.web : null,
+        ).then((_) async {
           // Install providers before Firestore, auth, or callable traffic starts.
           // Activation configures the SDK; it does not wait for attestation.
           // Web/desktop do not have production Firebase configuration here.
@@ -189,7 +196,10 @@ class AppBootstrap {
             debugPrint("Firestore settings warning: $e");
           }
         }),
-        FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
+        // Web: flutter_downloader has no web implementation and its stub
+        // initialize() throws UnimplementedError.
+        if (!kIsWeb)
+          FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
         SharedPreferences.getInstance().then((p) => prefs = p),
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
@@ -229,7 +239,7 @@ class AppBootstrap {
         return;
       }
 
-      FirebaseCrashlytics.instance.recordFlutterError(details);
+      reportFlutterError(details);
     };
 
     PlatformDispatcher.instance.onError = (error, stack) {
@@ -250,23 +260,36 @@ class AppBootstrap {
         return true;
       }
 
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
+      reportError(error, stack);
       return true;
     };
 
     // 3. Register background message handler.
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-    FlutterDownloader.registerCallback(downloadCallback);
+    // Web: flutter_downloader has no web implementation, so initialize() was
+    // skipped above and registerCallback would assert "plugin not
+    // initialized".
+    if (!kIsWeb) {
+      FlutterDownloader.registerCallback(downloadCallback);
+    }
 
     // 5. Bypass Auth Check for Splash/Onboarding.
     AppStatus initialStatus;
-    final initialUser = FirebaseAuth.instance.currentUser;
-    if (initialUser == null) {
-      initialStatus =
-          AppStatus.initializing; // Let AppInitializer attempt anonymous login
-    } else {
-      initialStatus = AppStatus.ready;
+    try {
+      final initialUser = FirebaseAuth.instance.currentUser;
+      if (initialUser == null) {
+        initialStatus =
+            AppStatus.initializing; // Let AppInitializer attempt anonymous login
+      } else {
+        initialStatus = AppStatus.ready;
+      }
+    } catch (e) {
+      // No resolvable default Firebase app (e.g. a web target without web
+      // options). Do not fail bootstrap here; the AppInitializer attempts
+      // anonymous login and falls back to the login screen when it cannot.
+      debugPrint('[AppBootstrap] Auth session unavailable: $e');
+      initialStatus = AppStatus.initializing;
     }
 
     // 6. Determine Theme.
@@ -319,6 +342,13 @@ class AppBootstrap {
 /// - Boots the [AppGatekeeper], which does the heavy lifting via a FutureBuilder.
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Web: sqflite runs through the ffi-web factory (IndexedDB-backed). Set it
+  // once before any database is opened; the rest of the sqflite code is
+  // unchanged (see the sqflite_common_ffi_web docs).
+  if (kIsWeb) {
+    databaseFactory = databaseFactoryFfiWeb;
+  }
 
   // PERFORMANCE: Highly restrictive image caching for 1GB RAM devices.
   // We limit the cache to 50 images or 30MB, whichever comes first, to prevent OOM errors.
@@ -924,3 +954,4 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ),
   ];
 }
+

@@ -232,6 +232,7 @@
   "ocean": "Ocean",
   "scarletSnow": "Scarlet Snow",
   "requestFailed": "Ett fel uppstod, försök igen.",
+  "errorDetailsHint": "Tryck för att se detaljerna.",
   "changeModel": "Ändra",
   "edit": "Redigera",
   "editingMessageInfo": "Om du redigerar det här meddelandet startas konversationen om härifrån.",

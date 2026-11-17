@@ -697,6 +697,7 @@
   "reportNotTrue": "Bu doğru deyil",
   "reportSubmitted": "Şikayət uğurla göndərildi",
   "requestFailed": "Xəta baş verdi, zəhmət olmasa yenidən cəhd edin.",
+  "errorDetailsHint": "Detayları görmək üçün toxunun.",
   "resendCode": "Təsdiq e-poçtunu yenidən göndər",
   "restorePurchases": "Satınalmaları bərpa edin",
   "resume": "Davam etdir",

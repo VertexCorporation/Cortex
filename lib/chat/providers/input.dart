@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart'
+    show FileImage, ImageProvider, NetworkImage;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/chat/messages/messages.dart';
 
@@ -38,6 +40,13 @@ class InputAttachment {
   String get fileName => p.basename(file.path);
 
   String get extension => p.extension(file.path).toLowerCase();
+
+  /// Display provider that works on every platform: on web the attachment
+  /// "path" is a `data:` URL (dart:io File operations are unavailable in the
+  /// browser), which the web image engine decodes natively.
+  ImageProvider get displayImage => kIsWeb
+      ? NetworkImage(file.path)
+      : FileImage(file) as ImageProvider;
 }
 
 /// A dedicated provider responsible for managing the transient state of the user input area.

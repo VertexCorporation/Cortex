@@ -671,6 +671,7 @@
   "reportNotTrue": "これは真実ではありません",
   "reportSubmitted": "報告が正常に送信されました",
   "requestFailed": "エラーが発生しました。もう一度お試しください。",
+  "errorDetailsHint": "タップして詳細を表示します。",
   "resendCode": "確認メールを再送信",
   "restorePurchases": "購入を復元する",
   "resume": "再開",
