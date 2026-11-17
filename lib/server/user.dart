@@ -48,6 +48,8 @@ class UserProvider with ChangeNotifier {
   String? _activeUid;
   int _listenerGeneration = 0;
   bool _disposed = false;
+  Timer? _userListenerRetryTimer;
+  int _permissionRetryAttempt = 0;
 
   final FingerprintGuard _dataFingerprint = FingerprintGuard();
 
@@ -116,12 +118,32 @@ class UserProvider with ChangeNotifier {
     return _activeUid == user.uid;
   }
 
-  String get username => _userData?['username'] as String? ?? 'Guest';
+  String get username {
+    final profileName = _userData?['username'] as String?;
+    if (profileName != null &&
+        profileName.isNotEmpty &&
+        profileName != 'Guest') {
+      return profileName;
+    }
+
+    // The profile cache can still describe the anonymous account immediately
+    // after Firebase links it to a permanent provider.
+    final user = _safeCurrentUser;
+    if (user != null && !user.isAnonymous) {
+      final displayName = user.displayName?.trim();
+      if (displayName != null && displayName.isNotEmpty) return displayName;
+      final email = user.email;
+      if (email != null && email.contains('@')) return email.split('@').first;
+    }
+    return profileName ?? 'Guest';
+  }
   bool get isVertex => _userData?['isVertex'] == true;
 
   bool get isAnonymous {
     final user = _safeCurrentUser;
-    if (user != null && user.isAnonymous) return true;
+    // Firebase Auth is authoritative for whether provider linking succeeded;
+    // Firestore/cache may still contain the previous anonymous profile.
+    if (user != null) return user.isAnonymous;
     if (_userData == null) return false;
     return _userData!['accountType'] == 'anonymous';
   }
@@ -154,6 +176,13 @@ class UserProvider with ChangeNotifier {
   }
 
   void listenToUserData(User user) {
+    _userListenerRetryTimer?.cancel();
+    _userListenerRetryTimer = null;
+    _permissionRetryAttempt = 0;
+    _attachUserDataListener(user);
+  }
+
+  void _attachUserDataListener(User user) {
     _listenerGeneration++;
     final generation = _listenerGeneration;
     final accountChanged = _activeUid != user.uid;
@@ -200,8 +229,22 @@ class UserProvider with ChangeNotifier {
 
       debugPrint('[UserProvider] Error listening to user data: $error');
       if (error is FirebaseException && error.code == 'permission-denied') {
-        unawaited(clearDataOnSignOut());
+        // Firestore can deny the first read while a user profile is being
+        // provisioned. Keep Auth and cached identity intact, then retry.
+        _scheduleUserListenerRetry(user, generation);
       }
+    });
+  }
+
+  void _scheduleUserListenerRetry(User user, int generation) {
+    if (_userListenerRetryTimer != null || _disposed) return;
+
+    final seconds = 1 << _permissionRetryAttempt.clamp(0, 5).toInt();
+    _permissionRetryAttempt = (_permissionRetryAttempt + 1).clamp(0, 5).toInt();
+    _userListenerRetryTimer = Timer(Duration(seconds: seconds), () {
+      _userListenerRetryTimer = null;
+      if (_disposed || !_isCurrentUser(user, generation)) return;
+      _attachUserDataListener(user);
     });
   }
 
@@ -247,6 +290,9 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> clearDataOnSignOut() async {
+    _userListenerRetryTimer?.cancel();
+    _userListenerRetryTimer = null;
+    _permissionRetryAttempt = 0;
     _listenerGeneration++;
     _activeUid = null;
     await _userSubscription?.cancel();
@@ -337,6 +383,8 @@ class UserProvider with ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _userListenerRetryTimer?.cancel();
+    _userListenerRetryTimer = null;
     _listenerGeneration++;
     _userSubscription?.cancel();
     unawaited(_cacheWrites.flush());

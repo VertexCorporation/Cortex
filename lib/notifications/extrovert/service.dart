@@ -132,6 +132,17 @@ class ExtrovertNotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_greetingsChannel);
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(
+          const AndroidNotificationChannel(
+            'task_reminders',
+            'Task reminders',
+            description: 'Reminders for your Cortex tasks.',
+            importance: Importance.high,
+          ),
+        );
 
     const AndroidInitializationSettings initSettingsAndroid =
         AndroidInitializationSettings('ic_notification');
@@ -152,4 +163,56 @@ class ExtrovertNotificationService {
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
   }
+
+  /// Requests notification permission only when the user enables a reminder.
+  Future<bool> requestTaskReminderPermission() async {
+    if (!_isInitialized) await initialize();
+    final ios = await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+    final macos = await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            MacOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+    final android = await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+    return ios ?? macos ?? android ?? true;
+  }
+
+  Future<void> scheduleTaskReminder({
+    required int notificationId,
+    required String title,
+    required DateTime scheduledAt,
+  }) async {
+    if (!_isInitialized) await initialize();
+    final scheduled = timezone.TZDateTime.from(scheduledAt, timezone.local);
+    await _localNotifications.zonedSchedule(
+      notificationId,
+      'Cortex',
+      title,
+      scheduled,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'task_reminders',
+          'Task reminders',
+          channelDescription: 'Reminders for your Cortex tasks.',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      payload: jsonEncode({'screen': 'tasks'}),
+      androidScheduleMode: AndroidScheduleMode.inexact,
+    );
+  }
+
+  Future<void> cancelTaskReminder(int notificationId) =>
+      _localNotifications.cancel(notificationId);
 }

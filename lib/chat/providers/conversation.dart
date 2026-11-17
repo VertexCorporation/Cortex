@@ -246,7 +246,7 @@ class ConversationProvider with ChangeNotifier {
     notifyListeners();
     await (() async {
       try {
-        await ChatStorageService.saveConversation(
+        final persistedTitle = await ChatStorageService.saveConversation(
           id,
           title,
           [],
@@ -254,6 +254,10 @@ class ConversationProvider with ChangeNotifier {
           modelTitle: modelTitleForStorage,
           modelImagePath: modelImagePathForStorage,
         );
+        if (persistedTitle != null && _conversationID == id) {
+          _conversationTitle = persistedTitle;
+          notifyListeners();
+        }
         await ChatStorageService.upsertMessage(id, 0, userMessage);
       } catch (e) {
         debugPrint(
@@ -350,21 +354,27 @@ class ConversationProvider with ChangeNotifier {
   Future<void> promoteToPersistentSession() async {
     if (!_isEphemeral || _conversationID == null) return;
 
+    final conversationId = _conversationID!;
+
     // We can use a generic title or generate one later.
     // For Flow Mode, we might have set a specific title in startEphemeralSession
     final title = _conversationTitle ?? "New Chat";
 
-    await ChatStorageService.saveConversation(
-      _conversationID!,
+    final persistedTitle = await ChatStorageService.saveConversation(
+      conversationId,
       title,
       [],
       modelId: _messages.first.model,
     );
+    if (persistedTitle != null && _conversationID == conversationId) {
+      _conversationTitle = persistedTitle;
+      notifyListeners();
+    }
 
     final futures = <Future>[];
     for (int i = 0; i < _messages.length; i++) {
       futures.add(
-        ChatStorageService.upsertMessage(_conversationID!, i, _messages[i]),
+        ChatStorageService.upsertMessage(conversationId, i, _messages[i]),
       );
     }
     await Future.wait(futures);

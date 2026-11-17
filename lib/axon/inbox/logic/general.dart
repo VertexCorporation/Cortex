@@ -681,13 +681,13 @@ class InboxViewModel extends ChangeNotifier {
       return;
     }
 
-    final persisted = await ChatStorageService.renameConversation(
+    final persistedTitle = await ChatStorageService.renameConversation(
       conversationID,
       trimmedTitle,
       source: 'axon_manual',
     );
 
-    if (!persisted) {
+    if (persistedTitle == null) {
       debugPrint("[AxonRename] persist failed for id=$conversationID");
       _notificationService.showNotification(
           message:
@@ -696,13 +696,13 @@ class InboxViewModel extends ChangeNotifier {
       return;
     }
 
-    manager.updateConversationTitle(trimmedTitle);
+    manager.updateConversationTitle(persistedTitle);
 
     if (context != null && context.mounted) {
       final conversationProvider =
           Provider.of<ConversationProvider>(context, listen: false);
       if (conversationProvider.conversationID == conversationID) {
-        conversationProvider.updateConversationTitle(trimmedTitle);
+        conversationProvider.updateConversationTitle(persistedTitle);
         debugPrint("[AxonRename] active conversation title updated in memory.");
       }
     }

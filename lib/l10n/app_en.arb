@@ -1055,5 +1055,13 @@
   "offlineSetupNoMatch": "We could not safely recommend a model with the available device and catalogue information. Open Offline Models to review the options manually.",
   "featureCreateMusicTitle": "Create Music",
   "featureCreateMusicDescription": "Describe the style, mood, duration and lyrics you want. Generate music with a compatible music model, then listen and share it. Uses your media credits.",
-  "musicGenerationUnavailable": "No compatible music generator is available in the current catalogue. Please try again later. No music request was sent."
+  "musicGenerationUnavailable": "No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.",
+  "tasksTitle": "Tasks",
+  "tasksIntro": "Keep the things on your mind in one place.",
+  "tasksEmptyTitle": "Nothing on your list yet",
+  "tasksEmptyBody": "Add a task and get it off your mind.",
+  "taskNewTitle": "New task",
+  "taskInputHint": "What needs doing?",
+  "taskReminderAdd": "Add reminder",
+  "taskReminderPermissionNeeded": "Task saved; notification permission is needed for its reminder."
 }

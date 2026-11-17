@@ -1,10 +1,109 @@
 // test/server_test.dart
+// Firebase seals these interfaces; lightweight fakes are used only in tests.
+// ignore_for_file: subtype_of_sealed_class, must_be_immutable
+
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeFirebaseAuth implements FirebaseAuth {
+  _FakeFirebaseAuth(this.currentUser);
+
+  @override
+  final User? currentUser;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeFirebaseUser implements User {
+  _FakeFirebaseUser({this.displayName});
+
+  @override
+  String get uid => 'test-uid';
+
+  @override
+  bool get isAnonymous => false;
+
+  @override
+  final String? displayName;
+
+  @override
+  String? get email => 'fatih@example.com';
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeFirebaseFirestore implements FirebaseFirestore {
+  _FakeFirebaseFirestore(this.collectionReference);
+
+  final CollectionReference<Map<String, dynamic>> collectionReference;
+
+  @override
+  CollectionReference<Map<String, dynamic>> collection(String path) =>
+      collectionReference;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeCollectionReference
+    implements CollectionReference<Map<String, dynamic>> {
+  _FakeCollectionReference(this.documentReference);
+
+  final DocumentReference<Map<String, dynamic>> documentReference;
+
+  @override
+  DocumentReference<Map<String, dynamic>> doc([String? path]) =>
+      documentReference;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeDocumentReference
+    implements DocumentReference<Map<String, dynamic>> {
+  _FakeDocumentReference(this.streams);
+
+  final Stream<DocumentSnapshot<Map<String, dynamic>>> Function() streams;
+
+  @override
+  Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots({
+    bool includeMetadataChanges = false,
+    ListenSource source = ListenSource.defaultSource,
+  }) =>
+      streams();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeDocumentSnapshot
+    implements DocumentSnapshot<Map<String, dynamic>> {
+  @override
+  bool get exists => true;
+
+  @override
+  Map<String, dynamic>? data() => {
+    'uid': 'test-uid',
+    'username': 'Recovered User',
+    'accountType': 'standard',
+  };
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues({});
+
   group('UserProvider Tests', () {
     late UserProvider userProvider;
 
@@ -12,6 +111,65 @@ void main() {
       // We pass nothing, so it defaults to "real" instances lazily.
       // But we won't touch methods that trigger them.
       userProvider = UserProvider();
+    });
+
+    test('retries a profile listener after permission is denied', () async {
+      final user = _FakeFirebaseUser();
+      final profileSnapshot = _FakeDocumentSnapshot();
+      final firstAttempt =
+          StreamController<DocumentSnapshot<Map<String, dynamic>>>();
+      final retryAttempt =
+          StreamController<DocumentSnapshot<Map<String, dynamic>>>();
+      var snapshotAttempts = 0;
+      final document = _FakeDocumentReference(() {
+        snapshotAttempts++;
+        return snapshotAttempts == 1 ? firstAttempt.stream : retryAttempt.stream;
+      });
+      final firestore = _FakeFirebaseFirestore(
+        _FakeCollectionReference(document),
+      );
+      final provider = UserProvider(
+        auth: _FakeFirebaseAuth(user),
+        firestore: firestore,
+      );
+      addTearDown(() async {
+        provider.dispose();
+        await firstAttempt.close();
+        await retryAttempt.close();
+      });
+
+      provider.listenToUserData(user);
+      firstAttempt.addError(
+        FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'permission-denied',
+        ),
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 1100));
+      expect(snapshotAttempts, 2);
+
+      retryAttempt.add(profileSnapshot);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(provider.username, 'Recovered User');
+      expect(provider.isAnonymous, false);
+    });
+
+    test('linked Firebase identity overrides stale anonymous profile cache', () {
+      final user = _FakeFirebaseUser(displayName: 'Fatih');
+
+      final provider = UserProvider(
+        auth: _FakeFirebaseAuth(user),
+        initialData: {
+          'uid': 'test-uid',
+          'accountType': 'anonymous',
+          'username': 'Guest',
+        },
+      );
+      addTearDown(provider.dispose);
+
+      expect(provider.isAnonymous, false);
+      expect(provider.username, 'Fatih');
     });
 
     test('Initial state logic (skipping isLoggedIn)', () {

@@ -14,6 +14,7 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/app.dart';
+import 'package:cortex/device_orientation.dart';
 import 'package:cortex/screen.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
@@ -147,6 +148,12 @@ class BootstrapResult {
 class AppBootstrap {
   static Future<BootstrapResult> init() async {
     final stopwatch = Stopwatch()..start();
+    final displayViews = WidgetsBinding.instance.platformDispatcher.views;
+    final logicalDisplaySize = displayViews.isEmpty ||
+            displayViews.first.devicePixelRatio <= 0
+        ? Size.zero
+        : displayViews.first.physicalSize /
+            displayViews.first.devicePixelRatio;
 
     // Register AI tools here (moved out of the gatekeeper's post-frame path)
     // so the splash's first animated frames start with an uncontended frame.
@@ -191,10 +198,9 @@ class AppBootstrap {
         }),
         FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
         SharedPreferences.getInstance().then((p) => prefs = p),
-        SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-        ]),
+        SystemChrome.setPreferredOrientations(
+          preferredDeviceOrientations(logicalDisplaySize),
+        ),
         ModelImageCache.loadPaths(),
       ]);
     } catch (e) {

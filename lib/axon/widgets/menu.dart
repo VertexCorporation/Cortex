@@ -11,6 +11,7 @@ class AxonMenu extends StatelessWidget {
   final double screenHeight;
   final int activeTab;
   final VoidCallback onLibraryTap;
+  final VoidCallback onTasksTap;
   final VoidCallback onDocumentsTap;
   final VoidCallback onCreateAITap;
   final VoidCallback onArtsTap;
@@ -23,6 +24,7 @@ class AxonMenu extends StatelessWidget {
     required this.screenHeight,
     required this.activeTab,
     required this.onLibraryTap,
+    required this.onTasksTap,
     required this.onDocumentsTap,
     required this.onCreateAITap,
     required this.onArtsTap,
@@ -52,6 +54,19 @@ class AxonMenu extends StatelessWidget {
             referenceWidth: referenceWidth,
             reduceIconSize: true,
             isActive: activeTab == 1,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          AxonItem(
+            label: Localizations.localeOf(context).languageCode == 'tr'
+                ? 'Görevler'
+                : 'Tasks',
+            iconPath: 'assets/icons/checkmark.svg',
+            onTap: onTasksTap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: activeTab == 7,
           ),
           SizedBox(height: verticalSpacing),
 

@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/rag/extractors.dart';
 import 'package:uuid/uuid.dart';
 
 import 'document_artifacts.dart';
@@ -534,12 +535,60 @@ class ToolRegistry {
     }
   }
 
+  static Future<String> _readDocument(Map<String, dynamic> args) async {
+    final scope = args['document_scope']?.toString();
+    if (scope == null || scope.isEmpty) {
+      return 'Error: Missing document_scope for read_document.';
+    }
+
+    _pruneExpiredDocumentContexts();
+    final scoped = _documentsByScope[scope];
+    if (scoped == null) {
+      return 'Error: Document is unavailable or its scope has expired.';
+    }
+
+    final path = scoped.document['path']?.toString();
+    final extension = scoped.document['extension']?.toString().toLowerCase();
+    if (path == null || path.isEmpty || extension == null) {
+      return 'Error: Document information is incomplete.';
+    }
+
+    final file = File(path);
+    if (!await file.exists()) {
+      return 'Error: The attached document is no longer available on this device.';
+    }
+    if (await file.length() > DocumentArtifactService.maxSourceBytes) {
+      return 'Error: The document exceeds the 20 MB reading limit.';
+    }
+
+    if (DocTextExtractor.supportsOnDevice(extension) ||
+        DocTextExtractor.textExtensions.contains(extension)) {
+      try {
+        final text = await DocTextExtractor().extractText(path);
+        if (text == null || text.trim().isEmpty) {
+          return 'The document could not be read. Scanned PDFs may need OCR, '
+              'which is not available in the app yet.';
+        }
+        const maxCharacters = 60000;
+        final excerpt = text.length > maxCharacters
+            ? '${text.substring(0, maxCharacters)}\n[Document text truncated.]'
+            : text;
+        final fileName = scoped.document['fileName']?.toString() ?? 'document';
+        return 'Document: $fileName\n$excerpt';
+      } catch (e) {
+        return 'The document could not be read on this device: $e';
+      }
+    }
+
+    return _executeOnServer('read_document', args);
+  }
+
   static void initialize() {
     register(CortexTool(
       name: 'read_document',
       description: 'Read document content.',
       parameters: {},
-      function: (args) => _executeOnServer('read_document', args),
+      function: _readDocument,
     ));
 
     register(CortexTool(
