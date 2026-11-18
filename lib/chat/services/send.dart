@@ -400,14 +400,14 @@ class SendService {
           )
           .join(' ');
 
-      final didRename = await ChatStorageService.renameConversation(
+      final persistedTitle = await ChatStorageService.renameConversation(
         newConvIdForTitle,
         cleanTitle,
         source: 'titlegen_sse',
         expectedCurrentTitle: defaultTitleForServer,
       );
 
-      if (!didRename) {
+      if (persistedTitle == null) {
         debugPrint(
           "[TitleGen] Skipped applying server-side title for $newConvIdForTitle because the title changed before completion.",
         );
@@ -415,7 +415,7 @@ class SendService {
       }
 
       if (_conversationProvider.conversationID == newConvIdForTitle) {
-        _conversationProvider.updateConversationTitle(cleanTitle);
+        _conversationProvider.updateConversationTitle(persistedTitle);
       }
     }
 
@@ -785,7 +785,7 @@ class SendService {
                       // user manually renamed the chat while TitleGen was running,
                       // the WHERE guard below prevents the generated title from
                       // silently overwriting their choice.
-                      final didRename =
+                      final persistedTitle =
                           await ChatStorageService.renameConversation(
                             newConvId,
                             cleanTitle,
@@ -793,7 +793,7 @@ class SendService {
                             expectedCurrentTitle: defaultTitle,
                           );
 
-                      if (!didRename) {
+                      if (persistedTitle == null) {
                         debugPrint(
                           "[TitleGen] Skipped applying generated title for $newConvId because the title changed before completion.",
                         );
@@ -802,7 +802,7 @@ class SendService {
 
                       if (_conversationProvider.conversationID == newConvId) {
                         _conversationProvider.updateConversationTitle(
-                          cleanTitle,
+                          persistedTitle,
                         );
                       }
                     }

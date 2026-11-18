@@ -36,10 +36,20 @@ import 'roleplay/screens/discover.dart';
 import 'notifications/introvert.dart';
 
 import 'rag/screens/documents.dart';
+import 'tasks/screen.dart';
 import 'stack.dart';
 import 'boundary.dart';
 
-enum MainScreenView { chat, library, news, create, arts, roleplay, documents }
+enum MainScreenView {
+  chat,
+  library,
+  news,
+  create,
+  arts,
+  roleplay,
+  documents,
+  tasks,
+}
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -96,6 +106,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return _cachedAxonWidget = Axon(
       onNewChatTap: () => startNewConversation(),
       onLibraryTap: switchToLibrary,
+      onTasksTap: openTasksScreen,
       onDocumentsTap: _openDocumentLibrary,
       onCreateAITap: switchToCreate,
       onArtsTap: openArtsScreen,
@@ -268,6 +279,11 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   void _openDocumentLibrary() {
     closeAxon();
     _updateCurrentView(MainScreenView.documents);
+  }
+
+  void openTasksScreen() {
+    closeAxon();
+    _updateCurrentView(MainScreenView.tasks);
   }
 
   void _closeAxonWithAnimation() {
@@ -765,6 +781,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         return 5;
       case MainScreenView.documents:
         return 6;
+      case MainScreenView.tasks:
+        return 7;
     }
   }
 
@@ -799,6 +817,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         const RepaintBoundary(child: DiscoverScreen()),
         // Index 6: Documents
         const RepaintBoundary(child: DocumentLibraryScreen()),
+        // Index 7: Tasks and local reminders
+        const RepaintBoundary(child: TasksScreen()),
       ],
     );
   }

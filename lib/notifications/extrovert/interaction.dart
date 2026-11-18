@@ -46,6 +46,8 @@ extension ExtrovertInteraction on ExtrovertNotificationService {
       debugPrint("[Extrovert] Navigating to FundsScreen (Special Offer)");
       navigatorKey.currentState
           ?.push(MaterialPageRoute(builder: (_) => const FundsScreen()));
+    } else if (screen == 'tasks') {
+      _openTasksFromNotification();
     } else if (finalData['notification_title_key'] ==
         'notificationRateAppTitle') {
       debugPrint("TODO: Open the app store for rating.");
@@ -54,6 +56,23 @@ extension ExtrovertInteraction on ExtrovertNotificationService {
       debugPrint(
           "No specific navigation action for this notification. Defaulting to home screen.");
     }
+  }
+
+  Future<void> _openTasksFromNotification() async {
+    navigatorKey.currentState?.popUntil((route) => route.isFirst);
+    for (var attempt = 0; attempt < 8; attempt++) {
+      final state = mainScreenKey?.currentState;
+      if (state != null) {
+        try {
+          (state as dynamic).openTasksScreen();
+        } catch (e) {
+          debugPrint('[Extrovert] Could not open tasks screen: $e');
+        }
+        return;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
+    debugPrint('[Extrovert] Tasks screen was not ready after notification tap.');
   }
 
   Future<void> _openChatFromNotification(String? conversationId) async {

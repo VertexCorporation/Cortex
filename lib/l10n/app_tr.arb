@@ -949,5 +949,13 @@
   "offlineSetupNoMatch": "Cihaz ve katalog bilgileriyle güvenli bir model öneremedik. Seçenekleri elle incelemek için İnternetsiz Modeller’i aç.",
   "featureCreateMusicTitle": "Müzik oluştur",
   "featureCreateMusicDescription": "İstediğin tarzı, duyguyu, süreyi ve sözleri anlat. Uyumlu bir müzik modeliyle üret, dinle ve paylaş. Medya kredilerini kullanır.",
-  "musicGenerationUnavailable": "Güncel katalogda uyumlu bir müzik üreticisi bulunamadı. Lütfen daha sonra tekrar dene. Müzik isteği gönderilmedi."
+  "musicGenerationUnavailable": "Güncel katalogda uyumlu bir müzik üreticisi bulunamadı. Lütfen daha sonra tekrar dene. Müzik isteği gönderilmedi.",
+  "tasksTitle": "Görevler",
+  "tasksIntro": "Aklındaki işleri burada toparla.",
+  "tasksEmptyTitle": "Henüz görev yok",
+  "tasksEmptyBody": "Bir görev ekle, aklından çıksın.",
+  "taskNewTitle": "Yeni görev",
+  "taskInputHint": "Ne yapacaksın?",
+  "taskReminderAdd": "Hatırlatıcı ekle",
+  "taskReminderPermissionNeeded": "Görev kaydedildi; hatırlatıcı için bildirim izni gerekli."
 }

@@ -37,7 +37,7 @@ class ChatStorageService {
 
   static bool isFluxMode = false;
 
-  static Future<void> saveConversation(
+  static Future<String?> saveConversation(
     String id,
     String title,
     List<dynamic> _, {
@@ -46,23 +46,63 @@ class ChatStorageService {
     String? modelImagePath,
     bool isStarred = false,
   }) async {
-    if (isFluxMode) return;
+    if (isFluxMode) return null;
     try {
       final db = await DbHelper().db;
-      await db.insert('conversations', {
-        'id': id,
-        'title': title,
-        'modelId': modelId,
-        'modelTitle': modelTitle ?? '',
-        'modelImagePath': modelImagePath ?? '',
-        'isStarred': isStarred ? 1 : 0,
-        'lastMessageDate': DateTime.now().millisecondsSinceEpoch,
-      }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      final savedTitle = await db.transaction((txn) async {
+        final existing = await txn.query(
+          'conversations',
+          columns: ['title'],
+          where: 'id = ?',
+          whereArgs: [id],
+          limit: 1,
+        );
+        if (existing.isNotEmpty) return existing.first['title'] as String?;
+
+        final uniqueTitle = await _uniqueConversationTitle(txn, title, id);
+        await txn.insert('conversations', {
+          'id': id,
+          'title': uniqueTitle,
+          'modelId': modelId,
+          'modelTitle': modelTitle ?? '',
+          'modelImagePath': modelImagePath ?? '',
+          'isStarred': isStarred ? 1 : 0,
+          'lastMessageDate': DateTime.now().millisecondsSinceEpoch,
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
+        return uniqueTitle;
+      });
 
       AppDataState().markUserDataAsChanged();
+      return savedTitle;
     } catch (e) {
       _handleDiskError(e, 'saveConversation');
+      return null;
     }
+  }
+
+  static Future<String> _uniqueConversationTitle(
+    DatabaseExecutor executor,
+    String requestedTitle,
+    String conversationId,
+  ) async {
+    final baseTitle = requestedTitle.trim().isEmpty
+        ? 'New Chat'
+        : requestedTitle.trim();
+    var candidate = baseTitle;
+    var suffix = 2;
+
+    while ((await executor.query(
+      'conversations',
+      columns: ['id'],
+      where: 'id != ? AND title = ? COLLATE NOCASE',
+      whereArgs: [conversationId, candidate],
+      limit: 1,
+    )).isNotEmpty) {
+      candidate = '$baseTitle ($suffix)';
+      suffix++;
+    }
+
+    return candidate;
   }
 
   // --- FEATURE: Deep Search ---
@@ -687,7 +727,7 @@ class ChatStorageService {
     }
   }
 
-  static Future<bool> renameConversation(
+  static Future<String?> renameConversation(
     String id,
     String newTitle, {
     String source = 'unknown',
@@ -698,36 +738,58 @@ class ChatStorageService {
       debugPrint(
         "[ChatStorage.rename] Skipped empty rename. source=$source id='$id' titleLength=${trimmedTitle.length}",
       );
-      return false;
+      return null;
     }
 
     try {
       final db = await DbHelper().db;
-      final whereArgs = expectedCurrentTitle == null
-          ? <Object?>[id]
-          : <Object?>[id, expectedCurrentTitle];
+      final updatedTitle = await db.transaction((txn) async {
+        final rows = await txn.query(
+          'conversations',
+          columns: ['title'],
+          where: 'id = ?',
+          whereArgs: [id],
+          limit: 1,
+        );
+        if (rows.isEmpty) return null;
+        final currentTitle = rows.first['title'] as String?;
+        if (expectedCurrentTitle != null &&
+            currentTitle != expectedCurrentTitle) {
+          return null;
+        }
 
-      final affectedRows = await db.update(
-        'conversations',
-        {'title': trimmedTitle},
-        where: expectedCurrentTitle == null ? 'id = ?' : 'id = ? AND title = ?',
-        whereArgs: whereArgs,
-      );
+        final uniqueTitle = await _uniqueConversationTitle(
+          txn,
+          trimmedTitle,
+          id,
+        );
+        final where = expectedCurrentTitle == null
+            ? 'id = ?'
+            : 'id = ? AND title = ?';
+        final whereArgs = expectedCurrentTitle == null
+            ? <Object?>[id]
+            : <Object?>[id, expectedCurrentTitle];
+        final affectedRows = await txn.update(
+          'conversations',
+          {'title': uniqueTitle},
+          where: where,
+          whereArgs: whereArgs,
+        );
+        return affectedRows > 0 ? uniqueTitle : null;
+      });
 
       debugPrint(
-        "[ChatStorage.rename] source=$source id=$id affectedRows=$affectedRows expected=${expectedCurrentTitle != null} title='$trimmedTitle'",
+        "[ChatStorage.rename] source=$source id=$id updated=${updatedTitle != null} expected=${expectedCurrentTitle != null} title='$updatedTitle'",
       );
 
-      if (affectedRows <= 0) {
-        return false;
-      }
+      if (updatedTitle == null) return null;
 
       AppDataState().markUserDataAsChanged();
-      _titleController.add({"id": id, "title": trimmedTitle});
-      return true;
+      _titleController.add({"id": id, "title": updatedTitle});
+      return updatedTitle;
     } catch (e) {
       _handleDiskError(e, 'renameConversation');
-      return false;
+      return null;
     }
   }
 

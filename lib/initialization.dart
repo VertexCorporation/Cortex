@@ -121,6 +121,11 @@ class AppInitializer with ChangeNotifier {
   void setRegistrationStatus(bool isRegistering) {
     _isRegistering = isRegistering;
     if (!isRegistering) {
+      // authStateChanges may have emitted while registration was suppressed.
+      _currentUser = FirebaseAuth.instance.currentUser;
+      if (_currentUser != null) {
+        _userProvider.listenToUserData(_currentUser!);
+      }
       _runInBackground(_determineUserFlow);
     }
   }
@@ -131,6 +136,10 @@ class AppInitializer with ChangeNotifier {
 
   /// Mutex to prevent concurrent _determineUserFlow() executions.
   bool _isDeterminingFlow = false;
+
+  // Auth changes ignored during registration must be reconciled after an
+  // in-flight startup/user flow releases its mutex.
+  bool _rerunUserFlowWhenIdle = false;
 
   /// Flag used to follow post startup tasks.
   bool _isPostStartupTasksRunning = false;
@@ -430,8 +439,9 @@ class AppInitializer with ChangeNotifier {
     }
   }
 
-  /// Verifies the user with the server (Reload + Firestore).
-  /// If this fails, we log the user out (Late-Fail strategy).
+  /// Verifies the Firebase session and waits for its Firestore profile.
+  /// A missing or temporarily unreadable profile is not proof that the Auth
+  /// session is invalid; UserProvider retries its profile listener.
   Future<void> _verifyUserSessionRemote() async {
     try {
       dev.log("[AppInitializer] Verifying remote session...");
@@ -446,13 +456,13 @@ class AppInitializer with ChangeNotifier {
       // Load fresh data (Credits, etc.)
       _userProvider.listenToUserData(_currentUser!);
 
-      // Check Firestore Document existence (Security check)
+      // Wait for the profile without invalidating the Firebase Auth session.
       if (_currentUser!.emailVerified) {
         final docExists = await _waitForUserDocument(_currentUser!.uid);
         if (!docExists) {
           dev.log(
-              "[AppInitializer] Critical: User verified but no doc. Logging out.");
-          await signOut();
+            "[AppInitializer] Profile is not available yet; preserving the verified Firebase session.",
+          );
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -724,6 +734,7 @@ class AppInitializer with ChangeNotifier {
   Future<void> _determineUserFlow() async {
     if (_isDeterminingFlow) {
       dev.log("[AppInitializer] _determineUserFlow already running. Skipping.");
+      _rerunUserFlowWhenIdle = true;
       return;
     }
     _isDeterminingFlow = true;
@@ -825,11 +836,14 @@ class AppInitializer with ChangeNotifier {
 
             _updateStatus(AppStatus.ready);
           } else {
-            // Critical: User verified, internet works, but NO doc exists after retries.
-            // This implies a deleted account or data corruption.
+            // Auth identity and profile provisioning are separate operations.
+            // A delayed/missing profile must not turn a successful login into
+            // an anonymous session; the profile listener keeps retrying.
             debugPrint(
-                "[_determineUserFlow] Critical: Verified user missing doc. Signing out.");
-            await signOut();
+              "[_determineUserFlow] Profile is not available yet. Preserving Firebase session.",
+            );
+            _userProvider.listenToUserData(user);
+            _updateStatus(AppStatus.ready);
           }
         } else {
           // 5. Handle Unverified User
@@ -946,6 +960,10 @@ class AppInitializer with ChangeNotifier {
       } // end catch (e, s)
     } finally {
       _isDeterminingFlow = false;
+      if (_rerunUserFlowWhenIdle) {
+        _rerunUserFlowWhenIdle = false;
+        _runInBackground(_determineUserFlow);
+      }
     }
   }
 
