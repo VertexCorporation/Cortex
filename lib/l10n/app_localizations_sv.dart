@@ -770,6 +770,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get requestFailed => 'Ett fel uppstod, försök igen.';
 
   @override
+  String get errorDetailsHint => 'Tryck för att se detaljerna.';
+
+  @override
   String get changeModel => 'Ändra';
 
   @override
@@ -2275,29 +2278,4 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get musicGenerationUnavailable =>
       'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
-
-  @override
-  String get tasksTitle => 'Tasks';
-
-  @override
-  String get tasksIntro => 'Keep the things on your mind in one place.';
-
-  @override
-  String get tasksEmptyTitle => 'Nothing on your list yet';
-
-  @override
-  String get tasksEmptyBody => 'Add a task and get it off your mind.';
-
-  @override
-  String get taskNewTitle => 'New task';
-
-  @override
-  String get taskInputHint => 'What needs doing?';
-
-  @override
-  String get taskReminderAdd => 'Add reminder';
-
-  @override
-  String get taskReminderPermissionNeeded =>
-      'Task saved; notification permission is needed for its reminder.';
 }

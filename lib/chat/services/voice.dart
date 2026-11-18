@@ -6,6 +6,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/server/user.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -400,6 +401,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _initTts() async {
+    // Web: flutter_tts's web implementation lacks setSharedInstance and the
+    // iOS audio category setup; degrade silently (TTS on web is a no-op —
+    // see TtsService).
+    if (kIsWeb) return;
     debugPrint("[VoiceService] Initializing TTS...");
     await _flutterTts.setVolume(1.0); // Maximum volume
     await _flutterTts.setSharedInstance(true);

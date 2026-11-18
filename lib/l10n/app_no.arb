@@ -262,6 +262,7 @@
   "ocean": "Havet",
   "scarletSnow": "Scarlet Snow",
   "requestFailed": "Det oppsto en feil, prøv igjen.",
+  "errorDetailsHint": "Trykk for å se detaljene.",
   "changeModel": "Endre",
   "edit": "Rediger",
   "editingMessageInfo": "Redigering av denne meldingen vil starte samtalen på nytt herfra.",

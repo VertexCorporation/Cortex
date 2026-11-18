@@ -1,8 +1,8 @@
 import 'package:cortex/design.dart';
 // lib/library/screen/model/widgets/header.dart
 
-import 'dart:io';
 import 'package:cortex/app.dart';
+import 'package:cortex/local_media.dart';
 import 'package:cortex/performance/file_probe_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -147,14 +147,17 @@ class ModelHeader extends StatelessWidget {
         );
       }
       if (localExists) {
-        return Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: SvgPicture.file(
-            File(imagePath),
-            fit: BoxFit.contain,
-            colorFilter: svgColorFilter,
-          ),
+        final localSvg = localSvgFile(
+          imagePath,
+          fit: BoxFit.contain,
+          colorFilter: svgColorFilter,
         );
+        if (localSvg != null) {
+          return Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: localSvg,
+          );
+        }
       }
       return fallbackImage;
     }
@@ -163,7 +166,8 @@ class ModelHeader extends StatelessWidget {
     if (isAsset) {
       imageProvider = AssetImage(imagePath);
     } else if (localExists) {
-      imageProvider = FileImage(File(imagePath));
+      imageProvider = localFileImage(imagePath) ??
+          const AssetImage('assets/icons/transparent.png');
     } else {
       imageProvider = const AssetImage('assets/icons/transparent.png');
     }

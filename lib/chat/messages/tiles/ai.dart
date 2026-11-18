@@ -1,8 +1,6 @@
 import 'package:cortex/design.dart';
 import 'package:cortex/startup/splash.dart';
 
-import 'dart:io';
-
 import 'package:flutter/scheduler.dart';
 
 import 'ai/reveal_timeline.dart';
@@ -11,6 +9,7 @@ import 'ai/reveal_text.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/backend/data/entity.dart';
+import 'package:cortex/local_media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';

@@ -671,6 +671,7 @@
   "reportNotTrue": "هذا غير صحيح",
   "reportSubmitted": "تم إرسال البلاغ بنجاح",
   "requestFailed": "حدث خطأ، يرجى المحاولة مرة أخرى.",
+  "errorDetailsHint": "اضغط لعرض التفاصيل.",
   "resendCode": "إعادة إرسال بريد التحقق",
   "restorePurchases": "استعادة المشتريات",
   "resume": "استئناف",

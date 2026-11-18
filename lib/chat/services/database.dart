@@ -1,4 +1,4 @@
-// lib/chat/services/database.dart
+﻿// lib/chat/services/database.dart
 
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
@@ -22,6 +22,17 @@ class DbHelper {
   }
 
   Future<Database> _open() async {
+    if (kIsWeb) {
+      // Web: the ffi-web factory stores the database in IndexedDB. A bare
+      // relative path is required there (path_provider is unavailable).
+      _db = await openDatabase(
+        'chat.sqlite',
+        version: _latestVersion,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+      );
+      return _db!;
+    }
     final dir = await getApplicationDocumentsDirectory();
     final path = join(dir.path, 'chat.sqlite');
     _db = await openDatabase(
@@ -256,3 +267,5 @@ class DbHelper {
     }
   }
 }
+
+

@@ -200,6 +200,8 @@ class ModelLocalStateProvider extends ChangeNotifier
 
   /// Checks if a model's file exists on disk using its path.
   bool isModelOnDisk(String? path) {
+    // Web never holds local model files; avoid touching dart:io there.
+    if (kIsWeb) return false;
     if (path == null || path.isEmpty) {
       debugPrint(
           "[ModelLocalStateProvider] isModelOnDisk check failed: Path is null or empty.");
@@ -393,6 +395,18 @@ class ModelLocalStateProvider extends ChangeNotifier
   //================================================================================
 
   Future<void> _initializeDependencies() async {
+    if (kIsWeb) {
+      // The browser has no app-support directory and model downloads are not
+      // supported on web: file paths intentionally stay empty so all file
+      // probing short-circuits. System info still loads for compatibility
+      // badges.
+      if (_systemInfo == null) {
+        _systemInfo = await SystemInfoProvider.fetchSystemInfo();
+        notifyListeners();
+      }
+      return;
+    }
+
     if (_filesDirectoryPath.isEmpty) {
       if (Platform.isAndroid) {
         final dir = await getExternalStorageDirectory();

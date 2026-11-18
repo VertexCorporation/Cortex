@@ -671,6 +671,7 @@
   "reportNotTrue": "Dies ist nicht wahr",
   "reportSubmitted": "Meldung erfolgreich eingereicht",
   "requestFailed": "Ein Fehler ist aufgetreten, bitte versuche es erneut.",
+  "errorDetailsHint": "Zum Anzeigen der Details tippen.",
   "resendCode": "Bestätigungs-E-Mail erneut senden",
   "restorePurchases": "Käufe wiederherstellen",
   "resume": "Fortsetzen",

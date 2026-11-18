@@ -671,6 +671,7 @@
   "reportNotTrue": "Ini tidak benar",
   "reportSubmitted": "Laporan berhasil dikirim",
   "requestFailed": "Terjadi kesalahan, silakan coba lagi.",
+  "errorDetailsHint": "Ketuk untuk melihat detailnya.",
   "resendCode": "Kirim ulang email verifikasi",
   "restorePurchases": "Pulihkan Pembelian",
   "resume": "Lanjutkan",

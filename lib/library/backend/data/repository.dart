@@ -20,7 +20,7 @@ import 'package:cortex/library/backend/data/image.dart';
 import 'package:cortex/library/backend/data/user.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import '../../../crash_report.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -128,7 +128,7 @@ class ModelRepository {
     } catch (e, s) {
       debugPrint(
           "[ModelRepository] CRITICAL Error during initialization: $e\n$s");
-      FirebaseCrashlytics.instance.recordError(
+      reportError(
         e,
         s,
         reason: 'ModelRepository initialization failure in _syncCompleter',
@@ -445,7 +445,7 @@ class ModelRepository {
     } catch (e, s) {
       debugPrint(
           "[ModelRepository] CRITICAL ERROR during sync orchestration: $e\n$s");
-      FirebaseCrashlytics.instance.recordError(e, s,
+      reportError(e, s,
           reason: 'ModelRepository sync orchestration failure');
       return false;
     }
@@ -467,13 +467,12 @@ class ModelRepository {
       bool alwaysRecord = false}) {
     final description = error == null ? mode : '$mode ($error)';
     debugPrint("[ModelRepository] Model sync failure: $description");
-    FirebaseCrashlytics.instance.log('ModelCatalogSync failed: $description');
+    reportLog('ModelCatalogSync failed: $description');
     if (critical || alwaysRecord) {
-      FirebaseCrashlytics.instance.recordError(
+      reportError(
         error ?? Exception('ModelCatalogSyncFailed:$mode'),
         stack ?? StackTrace.current,
         reason: 'ModelCatalogSyncFailed:$mode',
-        fatal: false,
       );
     }
   }
@@ -916,6 +915,9 @@ class ModelRepository {
   /// Downloads and caches model images from Firebase Storage.
   Future<void> _syncModelImages(List<Map<String, dynamic>> allModels,
       Map<String, String> localAssetMap) async {
+    // Web: there is no local file system for the image cache; model images
+    // fall back to their asset/network sources there.
+    if (kIsWeb) return;
     final docsDir = await getApplicationDocumentsDirectory();
     final imageCacheDir = Directory(p.join(docsDir.path, 'model_images'));
     if (!await imageCacheDir.exists()) {
@@ -992,7 +994,7 @@ class ModelRepository {
           } else {
             debugPrint(
                 "[ModelRepository] An unexpected FirebaseFunctionsException occurred for '$modelId': ${e.code} - ${e.message}");
-            FirebaseCrashlytics.instance.recordError(e, s,
+            reportError(e, s,
                 reason:
                     'Unexpected Firebase Functions error in image sync for $modelId');
           }
@@ -1004,13 +1006,13 @@ class ModelRepository {
           } else {
             debugPrint(
                 "[ModelRepository] CRITICAL: Dio download failed for model '$modelId' image. Error: $e");
-            FirebaseCrashlytics.instance.recordError(e, s,
+            reportError(e, s,
                 reason: 'Failed to download model image for $modelId with Dio');
           }
         } catch (e, s) {
           debugPrint(
               "[ModelRepository] An unexpected generic error occurred during image sync for '$modelId': $e");
-          FirebaseCrashlytics.instance.recordError(e, s,
+          reportError(e, s,
               reason: 'Unexpected generic failure in image sync for $modelId');
         }
       }

@@ -773,6 +773,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get requestFailed => 'Er is een fout opgetreden, probeer het opnieuw.';
 
   @override
+  String get errorDetailsHint => 'Tik om de details te bekijken.';
+
+  @override
   String get changeModel => 'Wijzigen';
 
   @override
@@ -2289,29 +2292,4 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get musicGenerationUnavailable =>
       'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
-
-  @override
-  String get tasksTitle => 'Tasks';
-
-  @override
-  String get tasksIntro => 'Keep the things on your mind in one place.';
-
-  @override
-  String get tasksEmptyTitle => 'Nothing on your list yet';
-
-  @override
-  String get tasksEmptyBody => 'Add a task and get it off your mind.';
-
-  @override
-  String get taskNewTitle => 'New task';
-
-  @override
-  String get taskInputHint => 'What needs doing?';
-
-  @override
-  String get taskReminderAdd => 'Add reminder';
-
-  @override
-  String get taskReminderPermissionNeeded =>
-      'Task saved; notification permission is needed for its reminder.';
 }

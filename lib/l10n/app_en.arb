@@ -276,6 +276,7 @@
   "ocean": "Ocean",
   "scarletSnow": "Scarlet Snow",
   "requestFailed": "An error occurred, please try again.",
+  "errorDetailsHint": "Tap to see the details.",
   "changeModel": "Change",
   "edit": "Edit",
   "editingMessageInfo": "Editing this message will restart the conversation from here.",

@@ -1,5 +1,6 @@
 // lib/chat/screen/selected/widgets/input/service.dart
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -8,8 +9,10 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -88,12 +91,20 @@ class InputService {
         for (final pickedFile in pickedFiles) {
           if (!_canAddMoreAttachments(inputProvider)) break;
 
-          final File file = File(pickedFile.path);
-          // ImagePicker already tells us which picker was used. Do not infer
-          // this again from a temporary cache filename, which may have a
-          // generic or missing extension on some Android/iOS devices.
-          await _validateAndAddAttachment(inputProvider, file,
-              isImage: pickedImages);
+          // Web: dart:io File operations are unavailable in the browser, so
+          // the picked file is validated from bytes and stored as a `data:`
+          // URL path (Utils.processAttachment renders it as an image block).
+          if (kIsWeb) {
+            await _validateAndAddWebAttachment(inputProvider, pickedFile,
+                isImage: pickedImages);
+          } else {
+            final File file = File(pickedFile.path);
+            // ImagePicker already tells us which picker was used. Do not infer
+            // this again from a temporary cache filename, which may have a
+            // generic or missing extension on some Android/iOS devices.
+            await _validateAndAddAttachment(inputProvider, file,
+                isImage: pickedImages);
+          }
         }
 
         if (pickedImages && context.mounted) {
@@ -116,9 +127,16 @@ class InputService {
 
         if (pickedFile == null) return;
 
-        final File file = File(pickedFile.path);
-        await _validateAndAddAttachment(inputProvider, file,
-            isImage: pickedImage);
+        // Web: dart:io operations are unavailable — validate from bytes and
+        // keep the attachment as a `data:` URL path (see the gallery branch).
+        if (kIsWeb) {
+          await _validateAndAddWebAttachment(inputProvider, pickedFile,
+              isImage: pickedImage);
+        } else {
+          final File file = File(pickedFile.path);
+          await _validateAndAddAttachment(inputProvider, file,
+              isImage: pickedImage);
+        }
         if (pickedImage && context.mounted) {
           _promoteSelectedSeriesForImage(context);
         }
@@ -181,6 +199,37 @@ class InputService {
       return false;
     }
     return true;
+  }
+
+  /// Validates file size and adds it to the provider if safe.
+  /// Web implementation: reads the picked file's bytes (dart:io operations
+  /// are unavailable in the browser) and stores the attachment as a `data:`
+  /// URL path so the send pipeline (Utils.processAttachment) can render it
+  /// as a media block without touching dart:io.
+  Future<void> _validateAndAddWebAttachment(
+      InputProvider inputProvider, XFile pickedFile,
+      {required bool isImage}) async {
+    try {
+      final bytes = await pickedFile.readAsBytes();
+      if (bytes.lengthInBytes > _maxFileSizeInBytes) {
+        debugPrint(
+            "Web attachment rejected: Size (${bytes.lengthInBytes / 1024 / 1024} MB) exceeds limit.");
+        return;
+      }
+
+      final mimeType = lookupMimeType(pickedFile.name, headerBytes: bytes) ??
+          (isImage ? 'image/jpeg' : 'application/octet-stream');
+      final dataUrl = 'data:$mimeType;base64,${base64Encode(bytes)}';
+      final type = isImage || mimeType.startsWith('image/')
+          ? AttachmentType.image
+          : AttachmentType.document;
+
+      debugPrint(
+          "InputService: Web attachment validated (${bytes.lengthInBytes} bytes). Adding to provider.");
+      inputProvider.addAttachment(File(dataUrl), isImage: type == AttachmentType.image);
+    } catch (e) {
+      debugPrint("Error validating web attachment: $e");
+    }
   }
 
   /// Validates file size and adds it to the provider if safe.

@@ -671,6 +671,7 @@
   "reportNotTrue": "Esto no es cierto",
   "reportSubmitted": "Reporte enviado con éxito",
   "requestFailed": "Ocurrió un error, por favor inténtalo de nuevo.",
+  "errorDetailsHint": "Toca para ver los detalles.",
   "resendCode": "Reenviar correo de verificación",
   "restorePurchases": "Restaurar compras",
   "resume": "Reanudar",

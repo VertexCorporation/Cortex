@@ -278,13 +278,13 @@ class FundsBackend with ChangeNotifier {
       log('Starting background preload of premium screen data...',
           name: logName);
 
-      // 1. Preload products (Don't abort if it fails, we still want the offer state)
-      final inAppPurchase = InAppPurchase.instance;
+      // 1. Preload products (Don't abort if it fails, we still want the offer
+      //    state). Store billing has no web implementation, so skip it there.
       bool productsLoaded = false;
 
-      if (await inAppPurchase.isAvailable()) {
-        final response =
-            await inAppPurchase.queryProductDetails(_subscriptionIds);
+      if (!kIsWeb && await InAppPurchase.instance.isAvailable()) {
+        final response = await InAppPurchase.instance
+            .queryProductDetails(_subscriptionIds);
         if (response.error == null && response.productDetails.isNotEmpty) {
           CacheService.set(CacheKey.premiumProducts, response.productDetails);
           log('Products cached: ${response.productDetails.length} items',
@@ -294,6 +294,8 @@ class FundsBackend with ChangeNotifier {
           log('Failed to fetch products: ${response.error?.message ?? "empty"}',
               name: logName);
         }
+      } else if (kIsWeb) {
+        log('In-app purchases not available on web.', name: logName);
       } else {
         log('In-app purchases not available.', name: logName);
       }
@@ -391,8 +393,15 @@ class FundsBackend with ChangeNotifier {
   void _startListeningToPurchases() {
     _purchaseStreamSubscription?.cancel();
 
-    _purchaseStreamSubscription = _inAppPurchase.purchaseStream
-        .listen(_onPurchaseUpdated, onError: _onPurchaseStreamError);
+    // in_app_purchase ships no web implementation: its platform instance is
+    // never registered in the browser and touching the purchase stream throws
+    // LateInitializationError synchronously — which, when this runs during a
+    // provider build, becomes a full red error screen. Web entitlements come
+    // from Fulcrum instead; only the auth listener is wired there.
+    if (!kIsWeb) {
+      _purchaseStreamSubscription = _inAppPurchase.purchaseStream
+          .listen(_onPurchaseUpdated, onError: _onPurchaseStreamError);
+    }
 
     _authSubscription?.cancel();
     _authSubscription = _auth.authStateChanges().listen((user) {

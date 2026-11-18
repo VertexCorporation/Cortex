@@ -108,10 +108,31 @@ class _AiErrorWidgetState extends State<_AiErrorWidget>
                         size: CortexDesign.icon),
                     SizedBox(width: screenWidth * 0.02),
                     Expanded(
-                      child: Text(AppLocalizations.of(context)!.requestFailed,
-                          style: TextStyle(
-                              color: AppColors.septenaryColor,
-                              fontSize: dynamicFontSize)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              AppLocalizations.of(context)!.requestFailed,
+                              style: TextStyle(
+                                  color: AppColors.septenaryColor,
+                                  fontSize: dynamicFontSize)),
+                          // The real error text is behind the tap; surface
+                          // that affordance while the details are collapsed.
+                          if (!_isExpandedError)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                AppLocalizations.of(context)!
+                                    .errorDetailsHint,
+                                style: TextStyle(
+                                    color: AppColors.septenaryColor
+                                        .withValues(alpha: 0.7),
+                                    fontSize: dynamicFontSize * 0.72),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                     AnimatedRotation(
                       turns: _isExpandedError ? 0.50 : 0.0,

@@ -249,18 +249,20 @@ class _AiHeader extends StatelessWidget {
                 fit: BoxFit.contain,
                 placeholderBuilder: (_) => fallbackWidget,
               )
-            : SvgPicture.file(
-                File(avatarPath),
-                width: iconSize,
-                height: iconSize,
-                colorFilter: ColorFilter.mode(identityColor, BlendMode.srcIn),
-                fit: BoxFit.contain,
-                placeholderBuilder: (_) => fallbackWidget,
-              );
+            : (localSvgFile(
+                  avatarPath,
+                  width: iconSize,
+                  height: iconSize,
+                  colorFilter: ColorFilter.mode(identityColor, BlendMode.srcIn),
+                  fit: BoxFit.contain,
+                  placeholderBuilder: (_) => fallbackWidget,
+                ) ??
+                fallbackWidget);
       } else {
         ImageProvider imageProvider = isAsset
             ? AssetImage(avatarPath) as ImageProvider
-            : FileImage(File(avatarPath));
+            : (localFileImage(avatarPath) ??
+                const AssetImage('assets/icons/self.svg'));
         final int cacheSize = (containerSize * 3).toInt().clamp(50, 200);
         imageProvider = ResizeImage(
           imageProvider,

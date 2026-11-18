@@ -22,7 +22,10 @@ class TtsService with ChangeNotifier {
   factory TtsService() => _instance;
   TtsService._internal();
 
-  final FlutterTts _flutterTts = FlutterTts();
+  /// Lazy: constructing FlutterTts on web makes the plugin's web
+  /// implementation call the unimplemented `setSharedInstance`, which throws
+  /// before any of the web guards below can run. Web never touches this.
+  late final FlutterTts _flutterTts = FlutterTts();
 
   // ── Remote voice ─────────────────────────────────────────────────────────
   //
@@ -70,6 +73,15 @@ class TtsService with ChangeNotifier {
 
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    // Web: flutter_tts's web implementation is partial (setSharedInstance is
+    // unimplemented and every call throws PlatformException). Degrade to a
+    // silent no-op so the voice UI stays usable without TTS audio.
+    if (kIsWeb) {
+      _isInitialized = true;
+      debugPrint('[TtsService] Web platform: TTS degraded to no-op.');
+      return;
+    }
 
     try {
       await _flutterTts.setLanguage('en-US');
@@ -139,6 +151,8 @@ class TtsService with ChangeNotifier {
   bool _isInterrupted = false; // To prevent completion handler from clearing state during seek/pause
 
   Future<void> speak(String text, {String? languageCode}) async {
+    // Web: TTS is degraded to a no-op (see initialize).
+    if (kIsWeb) return;
     if (!_isInitialized) {
       await initialize();
     }
@@ -421,14 +435,21 @@ class TtsService with ChangeNotifier {
   }
 
   Future<void> stop() async {
-    _isInterrupted = false; // Allow completion handler to clean up
+    // Web: TTS is a no-op; still reset the visible state.
     _ttsTimer?.cancel();
+    _state = TtsState.idle;
+    _progress = 0.0;
+    _currentText = '';
+    _originalText = '';
+    _currentOffset = 0;
+    notifyListeners();
+    if (kIsWeb) return;
+    _isInterrupted = false; // Allow completion handler to clean up
     await _stopRemote();
     _engine = _TtsEngine.device;
     _chunks = const [];
     _chunkStarts = const [];
     await _flutterTts.stop();
-    // Handler will be called, but we can double check:
     _state = TtsState.idle;
     _progress = 0.0;
     _currentText = '';
@@ -438,6 +459,7 @@ class TtsService with ChangeNotifier {
   }
 
   Future<void> pause() async {
+    if (kIsWeb) return;
     if (_state != TtsState.playing) return;
 
     _isInterrupted = true; // Don't treat this as "finished"
@@ -486,6 +508,7 @@ class TtsService with ChangeNotifier {
   }
 
   Future<void> seek(double newProgress) async {
+    if (kIsWeb) return;
     if (_originalText.isEmpty) return;
 
     _isInterrupted = true;
@@ -527,6 +550,7 @@ class TtsService with ChangeNotifier {
 
   /// Set language based on app locale
   Future<void> setLanguage(String languageCode) async {
+    if (kIsWeb) return;
     String ttsLang;
     switch (languageCode) {
       case 'tr':
@@ -577,6 +601,10 @@ class TtsService with ChangeNotifier {
 
   @override
   void dispose() {
+    if (kIsWeb) {
+      super.dispose();
+      return;
+    }
     _flutterTts.stop();
     unawaited(_stopRemote());
     _remotePlayer?.dispose();

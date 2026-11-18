@@ -127,11 +127,30 @@ class ApiService {
     // trace can follow one request end-to-end across services.
     final String generationId = const Uuid().v4();
 
-    final user = _auth.currentUser;
-    if (user == null) {
+    var candidate = _auth.currentUser;
+    if (candidate == null && kDebugMode) {
+      // DEBUG-ONLY SELF-HEAL: a lost/failed anonymous session (e.g. the
+      // startup login raced a flaky network) should not block debug testing
+      // behind the generic sign-in gate. Try once to establish an anonymous
+      // session inline; if it cannot be established (web targets without the
+      // Firebase console's localhost allowlist still cannot authenticate),
+      // the regular gate below fires exactly as in release builds.
+      try {
+        final credential = await FirebaseAuth.instance
+            .signInAnonymously()
+            .timeout(const Duration(seconds: 8));
+        candidate = credential.user;
+        debugPrint(
+            '[ApiService] Debug anonymous session established: ${candidate?.uid}');
+      } catch (e) {
+        debugPrint('[ApiService] Debug anonymous sign-in failed: $e');
+      }
+    }
+    if (candidate == null) {
       throw ApiException(localizations.errorUserNotAuthenticated,
           statusCode: 401, code: 'NO_USER');
     }
+    final user = candidate;
 
     void ensureCurrentUser() {
       if (_auth.currentUser?.uid != user.uid) {
@@ -382,15 +401,19 @@ class ApiService {
         debugPrint(
             "[ChatRequest] GenID: $generationId | Model: $targetModel | Attachments: image=$payloadImages video=$payloadVideos audio=$payloadAudios | Messages: ${messages.length} | Stream: true");
 
-        // Set up options with connection reuse
+        // Set up options with connection reuse.
+        // Web: `Cache-Control`/`Connection` are dropped because the browser
+        // cannot send `Connection` at all and `Cache-Control` was not in the
+        // gateway's CORS preflight allow list — including them rejected the
+        // preflight and every chat request failed before reaching the server.
         final options = Options(
           responseType: ResponseType.stream,
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json; charset=UTF-8',
             'Accept': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive', // Connection persistence
+            if (!kIsWeb) 'Cache-Control': 'no-cache',
+            if (!kIsWeb) 'Connection': 'keep-alive', // Connection persistence
           },
           sendTimeout: const Duration(seconds: 30),
         );
@@ -850,9 +873,12 @@ class ApiService {
         return await attemptRequestWithFailover(token);
       }
       if (e.type == DioExceptionType.cancel) throw UserCancelledException();
+      debugPrint(
+          '[ApiService] Chat request failed: type=${e.type} error=${e.error} message=${e.message}');
       throw ApiException(localizations.errorNetwork, code: 'CONNECTION_ERROR');
     } catch (e) {
       if (e is UserCancelledException || e is ApiException) rethrow;
+      debugPrint('[ApiService] Chat request failed (untyped): $e');
       throw ApiException(localizations.errorNetwork);
     } finally {
       _cancelToken = null;

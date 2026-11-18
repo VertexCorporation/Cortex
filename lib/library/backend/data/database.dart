@@ -14,9 +14,10 @@ class DatabaseHelper {
   DatabaseHelper._privateConstructor();
 
   Future<Database?> get database async {
-    // [NEW] Bypass sqflite entirely on web
-    if (kIsWeb) return null;
-
+    // On web the default sqflite factory is the IndexedDB-backed ffi-web
+    // factory (set once in main), so the catalog persists exactly like on
+    // mobile. The legacy bypass returned null here, which emptied the whole
+    // model catalog on web.
     if (_database != null) return _database!;
     // Share the whole initialization, including getDatabasesPath/onCreate.
     // Clear failures as well so a later call can retry.

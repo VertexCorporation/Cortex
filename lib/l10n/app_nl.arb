@@ -671,6 +671,7 @@
   "reportNotTrue": "Dit is niet waar",
   "reportSubmitted": "Rapport succesvol ingediend",
   "requestFailed": "Er is een fout opgetreden, probeer het opnieuw.",
+  "errorDetailsHint": "Tik om de details te bekijken.",
   "resendCode": "Verificatie e-mail opnieuw verzenden",
   "restorePurchases": "Aankopen herstellen",
   "resume": "Hervatten",

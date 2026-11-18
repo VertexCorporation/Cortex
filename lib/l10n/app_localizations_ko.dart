@@ -761,6 +761,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get requestFailed => '오류가 발생했습니다. 다시 시도해주세요.';
 
   @override
+  String get errorDetailsHint => '탭하면 자세한 내용이 표시됩니다.';
+
+  @override
   String get changeModel => '변경';
 
   @override
@@ -2223,29 +2226,4 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get musicGenerationUnavailable =>
       'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.';
-
-  @override
-  String get tasksTitle => 'Tasks';
-
-  @override
-  String get tasksIntro => 'Keep the things on your mind in one place.';
-
-  @override
-  String get tasksEmptyTitle => 'Nothing on your list yet';
-
-  @override
-  String get tasksEmptyBody => 'Add a task and get it off your mind.';
-
-  @override
-  String get taskNewTitle => 'New task';
-
-  @override
-  String get taskInputHint => 'What needs doing?';
-
-  @override
-  String get taskReminderAdd => 'Add reminder';
-
-  @override
-  String get taskReminderPermissionNeeded =>
-      'Task saved; notification permission is needed for its reminder.';
 }
