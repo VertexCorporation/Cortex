@@ -122,6 +122,9 @@ dev_dependencies:
 
 dependency_overrides:
   archive: ^3.6.1
+  # Keep iOS microphone startup resilient to AVAudioSession sample-rate changes.
+  record_ios:
+    path: vendor/record_ios
 
 flutter_launcher_icons:
   android: true
