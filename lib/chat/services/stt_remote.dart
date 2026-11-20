@@ -28,8 +28,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:record/record.dart';
 
-import 'voice_health.dart';
 import 'stt_route.dart';
+import 'voice_audio_session.dart';
+import 'voice_health.dart';
 
 /// Proxies may return JSON as text or HTML/plain-text errors on 5xx.
 /// Decode only objects; never cast an infrastructure error body to a map.
@@ -1054,14 +1055,21 @@ class RemoteSttService {
     // Serialized with every other lifecycle operation: rapid repeated calls
     // can never open a second microphone or socket on top of the first — the
     // race that used to leave a ghost recorder streaming forever.
-    return _exclusive(
-      () => _startInternal(
-        onResult: onResult,
-        onClosed: onClosed,
-        onLease: onLease,
-        mode: mode,
-      ),
-    );
+    return _exclusive(() async {
+      try {
+        return await _startInternal(
+          onResult: onResult,
+          onClosed: onClosed,
+          onLease: onLease,
+          mode: mode,
+        );
+      } catch (error) {
+        _fail('START_FAILED', error);
+        unawaited(_report());
+        await _stopInternal();
+        return false;
+      }
+    });
   }
 
   Future<bool> _openDynamicRoute(
@@ -1966,6 +1974,15 @@ class RemoteSttService {
     required int epoch,
     void Function(SttCloseInfo info)? onClosed,
   }) async {
+    if (IosVoiceAudioSession.isSupported) {
+      try {
+        await recorder.ios?.manageAudioSession(false);
+        await IosVoiceAudioSession.activate();
+      } catch (error) {
+        _fail('IOS_AUDIO_SESSION_FAILED', error);
+        return false;
+      }
+    }
     // The capture is configured with three deliberate additions, all born on
     // a real-device failure:
     //
@@ -1989,7 +2006,7 @@ class RemoteSttService {
     //  * `androidConfig` — the VOICE_COMMUNICATION audio source plus
     //    AudioManagerMode.modeInCommunication put the capture in the same
     //    audio domain Voice Mode's playback now runs in (see
-    //    RemoteTtsService._voiceContext), which is the configuration Android
+    //    RemoteTtsService's audio context), which is the configuration Android
     //    needs to reference-cancel the app's own speaker output inside the
     //    mic signal. Without it the HAL AEC has no reference for our playback
     //    and the assistant's spoken words transcribed back as user speech.

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 
-import 'tts_remote.dart';
+import 'voice_audio_session.dart';
 
 /// Bundled, quiet interaction cues. No network, recorder, focus request, or
 /// changes to the application's existing play-and-record session.
@@ -16,16 +16,17 @@ class VoiceInteractionSounds {
     final generation = ++_generation;
     try {
       final player = _player ??= AudioPlayer();
-      await player.setAudioContext(
-        AudioContext(
-          iOS: RemoteTtsService.voiceAudioContext.iOS,
-          android: const AudioContextAndroid(
-            contentType: AndroidContentType.sonification,
-            usageType: AndroidUsageType.media,
-            audioFocus: AndroidAudioFocus.none,
+      if (!IosVoiceAudioSession.isSupported) {
+        await player.setAudioContext(
+          AudioContext(
+            android: const AudioContextAndroid(
+              contentType: AndroidContentType.sonification,
+              usageType: AndroidUsageType.media,
+              audioFocus: AndroidAudioFocus.none,
+            ),
           ),
-        ),
-      );
+        );
+      }
       if (generation != _generation) return;
       await player.stop();
       if (generation != _generation) return;

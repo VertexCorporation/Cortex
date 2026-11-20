@@ -12,6 +12,8 @@
 //   * only the exact 403 + voice_daily_limit refusal is a spent allowance
 //     — an outage (401, non-JSON 5xx crash page) is never a spent one, and
 //     a mint that never opened a socket never keeps its reservation.
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cortex/chat/services/voice.dart';
@@ -26,6 +28,8 @@ class MockSpeechService extends SpeechService {
   int startCount = 0;
   int stopCount = 0;
   bool shouldFailStart = false;
+  bool shouldThrowOnStart = false;
+  Completer<void>? stopBarrier;
   bool _listening = false;
   double level = 0.0;
   bool remoteActive = false;
@@ -62,6 +66,9 @@ class MockSpeechService extends SpeechService {
     void Function(SttResult result)? onSttResult,
   }) async {
     startCount++;
+    if (shouldThrowOnStart) {
+      throw PlatformException(code: 'speech_engine_unavailable');
+    }
     lastOwner = owner;
     onClosedCallback = onClosed;
     onLeaseCallback = onLease;
@@ -75,6 +82,8 @@ class MockSpeechService extends SpeechService {
   @override
   Future<void> stopListening() async {
     stopCount++;
+    final barrier = stopBarrier;
+    if (barrier != null) await barrier.future;
     _listening = false;
     micLive = false;
   }
@@ -111,6 +120,7 @@ class MockFlutterTts extends FlutterTts {
   VoidCallback? _startHandler;
   VoidCallback? _completionHandler;
   bool isSpeakingMock = false;
+  bool shouldThrowOnSpeak = false;
 
   @override
   Future<dynamic> setSharedInstance(bool? shared) async => 1;
@@ -144,6 +154,9 @@ class MockFlutterTts extends FlutterTts {
   @override
   Future<dynamic> speak(String text, {bool focus = false}) async {
     lastSpokenText = text;
+    if (shouldThrowOnSpeak) {
+      throw PlatformException(code: 'audio_output_unavailable');
+    }
     isSpeakingMock = true;
     if (_startHandler != null) _startHandler!();
 
@@ -215,6 +228,51 @@ void main() {
     expect(voiceService.state, VoiceState.idle);
     expect(voiceService.isSessionActive, false);
     expect(voiceService.lastEndReason, isNull);
+  });
+
+  test(
+    'a speech startup exception ends connecting and permits retry',
+    () async {
+      mockSpeechService.shouldThrowOnStart = true;
+      await startTestSession();
+      expect(voiceService.state, VoiceState.failed);
+      expect(voiceService.lastEndReason, VoiceEndReason.error);
+      expect(voiceService.isSessionActive, isFalse);
+
+      mockSpeechService.shouldThrowOnStart = false;
+      await startTestSession();
+      expect(voiceService.state, VoiceState.listening);
+    },
+  );
+
+  test('a new capture waits for the previous audio teardown', () async {
+    await startTestSession();
+    final stopped = mockSpeechService.stopBarrier = Completer<void>();
+    final stopping = voiceService.stopSession();
+    final restarting = startTestSession();
+
+    await Future<void>.delayed(Duration.zero);
+    expect(voiceService.state, VoiceState.connecting);
+    expect(mockSpeechService.startCount, 1);
+
+    stopped.complete();
+    await stopping;
+    await restarting;
+    expect(voiceService.state, VoiceState.listening);
+    expect(mockSpeechService.startCount, 2);
+  });
+
+  test('native playback failure advances the sentence queue', () async {
+    await startTestSession();
+    mockFlutterTts.shouldThrowOnSpeak = true;
+    voiceService.onAiStreamCallback('First sentence.');
+    await Future<void>.delayed(Duration.zero);
+    expect(mockFlutterTts.lastSpokenText, 'First sentence.');
+
+    mockFlutterTts.shouldThrowOnSpeak = false;
+    voiceService.onAiStreamCallback('Second sentence.');
+    await Future<void>.delayed(Duration.zero);
+    expect(mockFlutterTts.lastSpokenText, 'Second sentence.');
   });
 
   test(
@@ -816,7 +874,9 @@ void main() {
     var requests = 0;
     voiceService.configureFlow(
       modelIds: List.filled(4, 'cortex/auto'),
-      onFlowTurn: (_, _) { requests++; },
+      onFlowTurn: (_, _) {
+        requests++;
+      },
     );
     voiceService.startFlowWithPrompt('Discuss the topic.');
     voiceService.setAiGenerationComplete(true);

@@ -2277,4 +2277,29 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get musicGenerationUnavailable =>
       'Güncel katalogda uyumlu bir müzik üreticisi bulunamadı. Lütfen daha sonra tekrar dene. Müzik isteği gönderilmedi.';
+
+  @override
+  String get tasksTitle => 'Görevler';
+
+  @override
+  String get tasksIntro => 'Aklındaki işleri burada toparla.';
+
+  @override
+  String get tasksEmptyTitle => 'Henüz görev yok';
+
+  @override
+  String get tasksEmptyBody => 'Bir görev ekle, aklından çıksın.';
+
+  @override
+  String get taskNewTitle => 'Yeni görev';
+
+  @override
+  String get taskInputHint => 'Ne yapacaksın?';
+
+  @override
+  String get taskReminderAdd => 'Hatırlatıcı ekle';
+
+  @override
+  String get taskReminderPermissionNeeded =>
+      'Görev kaydedildi; hatırlatıcı için bildirim izni gerekli.';
 }

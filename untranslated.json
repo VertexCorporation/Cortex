@@ -53,7 +53,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "az": [
@@ -76,7 +84,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "cs": [
@@ -133,7 +149,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "de": [
@@ -190,7 +214,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "es": [
@@ -247,7 +279,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "fr": [
@@ -304,7 +344,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "hi": [
@@ -361,7 +409,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "hu": [
@@ -418,7 +474,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "id": [
@@ -475,7 +539,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "it": [
@@ -532,7 +604,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "ja": [
@@ -589,7 +669,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "ko": [
@@ -646,7 +734,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "nl": [
@@ -703,7 +799,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "no": [
@@ -760,7 +864,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "pt": [
@@ -817,7 +929,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "ru": [
@@ -874,7 +994,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "sv": [
@@ -931,7 +1059,15 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ],
 
   "tr": [
@@ -993,6 +1129,14 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded"
   ]
 }

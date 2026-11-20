@@ -1,9 +1,16 @@
+import AVFoundation
 import UIKit
 import Flutter
 import flutter_downloader
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
+    private var previousVoiceAudioConfiguration: (
+        category: AVAudioSession.Category,
+        mode: AVAudioSession.Mode,
+        options: AVAudioSession.CategoryOptions
+    )?
+
     override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -41,8 +48,60 @@ import flutter_downloader
             }
         }
 
+        let voiceAudioChannel = FlutterMethodChannel(name: "com.vertex.cortex/voice_audio",
+            binaryMessenger: controller.binaryMessenger)
+        voiceAudioChannel.setMethodCallHandler { [weak self] call, result in
+            self?.handleVoiceAudio(call, result: result)
+        }
+
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    private func handleVoiceAudio(_ call: FlutterMethodCall, result: FlutterResult) {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            switch call.method {
+            case "activate":
+                if previousVoiceAudioConfiguration == nil {
+                    previousVoiceAudioConfiguration = (session.category, session.mode, session.categoryOptions)
+                }
+                let options: AVAudioSession.CategoryOptions = [
+                    .mixWithOthers, .defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP
+                ]
+                if session.category != .playAndRecord || session.mode != .voiceChat
+                    || session.categoryOptions != options {
+                    try session.setCategory(.playAndRecord, mode: .voiceChat, options: options)
+                }
+                try session.setActive(true)
+            case "deactivate":
+                if let previous = previousVoiceAudioConfiguration {
+                    var releaseError: Error?
+                    do {
+                        try session.setActive(false, options: .notifyOthersOnDeactivation)
+                    } catch {
+                        releaseError = error
+                    }
+                    do {
+                        try session.setCategory(previous.category, mode: previous.mode, options: previous.options)
+                    } catch {
+                        if releaseError == nil {
+                            releaseError = error
+                        }
+                    }
+                    if let releaseError = releaseError {
+                        throw releaseError
+                    }
+                    previousVoiceAudioConfiguration = nil
+                }
+            default:
+                result(FlutterMethodNotImplemented)
+                return
+            }
+            result(nil)
+        } catch {
+            result(FlutterError(code: "voice_audio_session", message: error.localizedDescription, details: nil))
+        }
     }
 
     private func getTotalRAMInMB() -> Int {
