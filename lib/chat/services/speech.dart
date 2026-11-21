@@ -84,6 +84,12 @@ class SpeechService with ChangeNotifier {
   bool get isListening => _isListening;
   SpeechOwner? get currentOwner => _owner;
 
+  /// Endpoint-only frames carry control information, never transcript text.
+  /// Keep them out of the cumulative transcript accumulator.
+  @visibleForTesting
+  static bool shouldAccumulateRemoteTranscript(SttResult result) =>
+      result.text.trim().isNotEmpty;
+
   /// True when the most recent remote mint was refused because the daily
   /// realtime-voice allowance is exhausted (server 403 voice_daily_limit).
   bool get remoteVoiceLimitReached => _remote.dailyVoiceLimitReached;
@@ -292,6 +298,7 @@ class SpeechService with ChangeNotifier {
           // Voice Mode's barge-in gating reads it. Dictation callers pass
           // no handler and pay nothing for it.
           onSttResult?.call(result);
+          if (!shouldAccumulateRemoteTranscript(result)) return;
           final rawCumulative = result.isFinal
               ? _appendFinal(result.text)
               : _withInterim(result.text);

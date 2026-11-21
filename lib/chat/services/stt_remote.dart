@@ -79,12 +79,19 @@ class SttResult {
   const SttResult(
     this.text, {
     required this.isFinal,
+    this.isEndOfTurn = false,
     this.confidence,
     this.language,
   });
 
   final String text;
   final bool isFinal;
+
+  /// Provider signal that the user's complete utterance has ended.
+  ///
+  /// This is intentionally distinct from [isFinal]: Deepgram may finalize a
+  /// segment before its endpointing window decides the user is done.
+  final bool isEndOfTurn;
   final double? confidence;
   final String? language;
 }
@@ -886,7 +893,7 @@ class RemoteSttService {
         if (epoch != _epoch || socketGen != _socketGen) return;
         if (message is! String) return;
         _captureAssemblyUsage(message);
-        final result = _parseAssemblyTranscript(message);
+        final result = parseAssemblyTranscript(message);
         if (result != null) onResult(result);
       },
       onError: (Object e) {
@@ -987,7 +994,7 @@ class RemoteSttService {
         if (epoch != _epoch || socketGen != _socketGen || message is! String) {
           return;
         }
-        final result = _parseElevenLabsTranscript(message);
+        final result = parseElevenLabsTranscript(message);
         if (result != null) {
           _transcriptsSeen++;
           onResult(result);
@@ -1387,7 +1394,15 @@ class RemoteSttService {
         if (epoch != _epoch || socketGen != _socketGen) return;
         if (message is! String) return;
         _captureDeepgramUsage(message);
-        final result = _parseTranscript(message);
+        final result = parseDeepgramTranscript(
+          message,
+          onProviderError: (msgCode, detail) {
+            if (msgCode != null && msgCode.isNotEmpty) {
+              _lastErrorMsgCode = msgCode;
+            }
+            _fail('DEEPGRAM_ERROR', detail);
+          },
+        );
         if (result != null) {
           _transcriptsSeen++;
           onResult(result);
@@ -2357,7 +2372,11 @@ class RemoteSttService {
 
   /// Deepgram wraps transcripts in a Results envelope; anything else on the
   /// socket (metadata, keep-alives) is not a transcript.
-  SttResult? _parseTranscript(String raw) {
+  @visibleForTesting
+  static SttResult? parseDeepgramTranscript(
+    String raw, {
+    void Function(String? msgCode, Object? detail)? onProviderError,
+  }) {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic>) return null;
@@ -2371,11 +2390,8 @@ class RemoteSttService {
         // The `msg_code` (e.g. NET-0002) is what the close classification
         // needs; the close frame itself often does not repeat it.
         final msgCode = decoded['msg_code'];
-        if (msgCode is String && msgCode.isNotEmpty) {
-          _lastErrorMsgCode = msgCode;
-        }
-        _fail(
-          "DEEPGRAM_ERROR",
+        onProviderError?.call(
+          msgCode is String ? msgCode : null,
           decoded['err_msg'] ?? decoded['description'] ?? raw,
         );
         return null;
@@ -2383,12 +2399,29 @@ class RemoteSttService {
 
       if (type != 'Results') return null;
 
+      final speechFinal = decoded['speech_final'] == true;
       final alternatives =
           decoded['channel']?['alternatives'] as List<dynamic>?;
-      if (alternatives == null || alternatives.isEmpty) return null;
+      if (alternatives == null || alternatives.isEmpty) {
+        return speechFinal
+            ? SttResult(
+                '',
+                isFinal: decoded['is_final'] == true,
+                isEndOfTurn: true,
+              )
+            : null;
+      }
 
       final transcript = alternatives.first?['transcript'];
-      if (transcript is! String || transcript.trim().isEmpty) return null;
+      if (transcript is! String || transcript.trim().isEmpty) {
+        return speechFinal
+            ? SttResult(
+                '',
+                isFinal: decoded['is_final'] == true,
+                isEndOfTurn: true,
+              )
+            : null;
+      }
 
       // The alternative's own confidence, when the provider reports one —
       // barge-in gates on it.
@@ -2396,6 +2429,7 @@ class RemoteSttService {
       return SttResult(
         transcript.trim(),
         isFinal: decoded['is_final'] == true,
+        isEndOfTurn: speechFinal,
         confidence: confidence is num ? confidence.toDouble() : null,
         language: decoded['language'] is String
             ? decoded['language'] as String
@@ -2445,7 +2479,8 @@ class RemoteSttService {
     } catch (_) {}
   }
 
-  SttResult? _parseAssemblyTranscript(String raw) {
+  @visibleForTesting
+  static SttResult? parseAssemblyTranscript(String raw) {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic> || decoded['type'] != 'Turn') {
@@ -2461,6 +2496,7 @@ class RemoteSttService {
       return SttResult(
         transcript.trim(),
         isFinal: decoded['end_of_turn'] == true,
+        isEndOfTurn: decoded['end_of_turn'] == true,
         confidence: confidence is num ? confidence.toDouble() : null,
         language: decoded['language'] is String
             ? decoded['language'] as String
@@ -2472,7 +2508,8 @@ class RemoteSttService {
     }
   }
 
-  SttResult? _parseElevenLabsTranscript(String raw) {
+  @visibleForTesting
+  static SttResult? parseElevenLabsTranscript(String raw) {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic>) return null;
@@ -2487,6 +2524,7 @@ class RemoteSttService {
       return SttResult(
         text.trim(),
         isFinal: finalResult,
+        isEndOfTurn: finalResult,
         confidence: confidence is num ? confidence.toDouble() : null,
         language: decoded['language_code'] is String
             ? decoded['language_code'] as String

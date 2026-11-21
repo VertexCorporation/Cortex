@@ -12,8 +12,9 @@
 // expanded presentations share those controls; only X restores text input.
 // Orb taps change geometry without affecting composer state.
 //
-// NO TEXT anywhere on the stage: no transcript panel, no status or
-// countdown line. Voice Mode V2 rides the NORMAL chat pipeline — STT
+// No transcript or countdown is overlaid on the stage. A compact status and
+// live level meter make capture, thinking and playback visible while Voice
+// Mode V2 rides the NORMAL chat pipeline — STT
 // commits a real user bubble, the AI reply lands as a normal message
 // and TTS speaks it — so the conversation behind the dim IS the
 // transcript. Fullscreen keeps only the orb; tapping the orb again
@@ -33,6 +34,7 @@ import 'package:cortex/chat/services/flow.dart';
 import 'package:cortex/chat/services/tts_remote.dart';
 import 'package:cortex/chat/screen/widgets/voice_orb.dart';
 import 'package:cortex/funds/funds.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/server/subscription.dart';
 import 'package:cortex/server/user.dart';
@@ -398,12 +400,22 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
           0.0,
           double.infinity,
         );
-        // Leave enough room for the bounded listening/user-speech scale
-        // envelope so the expanded sphere stays inside the usable stage.
-        final fullOrbSize = math.min(
-          288.0,
+        final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+        final estimatedStatusHeight = 36 * textScale + 18;
+        // In a short landscape viewport, treat the status and orb as one
+        // centered stack and reserve room for both plus their spacing.
+        final desiredOrbSize = math.min(
+          224.0,
           math.min(size.width * 0.70, usableHeight * 0.78),
         );
+        final shortStage =
+            usableHeight < desiredOrbSize + estimatedStatusHeight + 28;
+        final fullOrbSize = shortStage
+            ? math.min(
+                desiredOrbSize,
+                math.max(0.0, usableHeight - estimatedStatusHeight - 28),
+              )
+            : desiredOrbSize;
 
         return AnimatedBuilder(
           animation: Listenable.merge([
@@ -446,7 +458,9 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
             // 0.40·height fraction did.
             final fullCenter = Offset(
               size.width / 2,
-              safeTop + (size.height - safeTop - widget.bottomSafe) / 2,
+              shortStage
+                  ? safeTop + 8 + estimatedStatusHeight + 12 + fullOrbSize / 2
+                  : safeTop + (size.height - safeTop - widget.bottomSafe) / 2,
             );
             final collapseOrigin = Offset(
               size.width / 2,
@@ -458,6 +472,12 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
               presence,
             )!;
             final center = Offset.lerp(entryCenter, fullCenter, expandT)!;
+            // The status stays above the orb throughout the geometry
+            // transition, so it moves continuously without changing sides.
+            final statusTop = math.max(
+              safeTop + 8,
+              center.dy - orbSize / 2 - estimatedStatusHeight - 12,
+            );
 
             return IgnorePointer(
               // The overlay owns no interaction while it has fully faded out.
@@ -484,6 +504,24 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                       ),
                     ),
                   ),
+                  if (voiceService.state != VoiceState.idle)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: statusTop,
+                      child: IgnorePointer(
+                        child: Opacity(
+                          opacity: presence,
+                          child: Center(
+                            child: _VoiceStatusIndicator(
+                              controller: _orb,
+                              state: voiceService.state,
+                              voiceLimitReached: voiceService.voiceLimitReached,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             );
@@ -492,4 +530,184 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
       },
     );
   }
+}
+
+/// A clear, live status for the shared iOS/Android voice surface. The meter
+/// listens directly to the orb's smoothed microphone/output envelope, so it
+/// animates without rebuilding the rest of the chat screen.
+class _VoiceStatusIndicator extends StatelessWidget {
+  const _VoiceStatusIndicator({
+    required this.controller,
+    required this.state,
+    required this.voiceLimitReached,
+  });
+
+  final VoiceOrbController controller;
+  final VoiceState state;
+  final bool voiceLimitReached;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final label = switch (state) {
+      VoiceState.connecting => l10n.voiceConnecting,
+      VoiceState.listening => l10n.listening,
+      VoiceState.processing => l10n.thinking,
+      VoiceState.speaking => l10n.voiceSpeaking,
+      VoiceState.failed =>
+        voiceLimitReached ? l10n.voiceDailyLimitReached : l10n.voiceUnavailable,
+      VoiceState.idle => '',
+    };
+    // Voice chrome follows Cortex's active theme exactly. The liquid orb can
+    // remain expressive, but controls/status never introduce a foreign accent
+    // color into the app's black/white surface language.
+    final foreground = AppColors.primaryColor.computeLuminance() > 0.5
+        ? const Color(0xFF2D2A26)
+        : const Color(0xFFE8E3DC);
+
+    return Semantics(
+      container: true,
+      excludeSemantics: true,
+      liveRegion: true,
+      label: label,
+      child: ConstrainedBox(
+        key: const ValueKey('voice_live_status'),
+        constraints: BoxConstraints(
+          maxWidth: math.max(0.0, MediaQuery.sizeOf(context).width - 24),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+          decoration: BoxDecoration(
+            color: AppColors.background.withValues(alpha: 0.97),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.85)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.10),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final maxLabelWidth = math.max(48.0, constraints.maxWidth - 90);
+              final icon = state == VoiceState.listening
+                  ? Icon(Icons.mic_rounded, size: 17, color: foreground)
+                  : state == VoiceState.speaking
+                  ? Icon(Icons.volume_up_rounded, size: 17, color: foreground)
+                  : SizedBox(
+                      width: 17,
+                      height: 17,
+                      child: state == VoiceState.failed
+                          ? Icon(
+                              Icons.mic_off_rounded,
+                              size: 17,
+                              color: foreground,
+                            )
+                          : CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: foreground,
+                            ),
+                    );
+              return Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 10,
+                runSpacing: 4,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      icon,
+                      const SizedBox(width: 8),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: maxLabelWidth),
+                        child: Text(
+                          label,
+                          maxLines: 2,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: foreground,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  _VoiceActivityBars(controller: controller, color: foreground),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VoiceActivityBars extends StatelessWidget {
+  const _VoiceActivityBars({required this.controller, required this.color});
+
+  final VoiceOrbController controller;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      key: const ValueKey('voice_activity_bars'),
+      width: 42,
+      height: 20,
+      child: CustomPaint(painter: _VoiceActivityPainter(controller, color)),
+    );
+  }
+}
+
+class _VoiceActivityPainter extends CustomPainter {
+  _VoiceActivityPainter(this.controller, this.color)
+    : super(repaint: controller);
+
+  final VoiceOrbController controller;
+  final Color color;
+  static const _weights = [0.50, 0.76, 1.0, 0.76, 0.50];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final phase = controller.phase;
+    final envelope = switch (phase) {
+      VoiceOrbPhase.listening || VoiceOrbPhase.flow => controller.micSmooth,
+      VoiceOrbPhase.speaking => controller.ttsSmooth,
+      _ => 0.0,
+    }.clamp(0.0, 1.0);
+    final active =
+        phase == VoiceOrbPhase.listening ||
+        phase == VoiceOrbPhase.flow ||
+        phase == VoiceOrbPhase.speaking;
+    final paint = Paint()
+      ..color = color.withValues(alpha: active ? 0.9 : 0.42)
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round;
+    final gap = 5.5;
+    final barWidth = 2.4;
+    final totalWidth = _weights.length * barWidth + (_weights.length - 1) * gap;
+    final startX = (size.width - totalWidth) / 2 + barWidth / 2;
+
+    for (var i = 0; i < _weights.length; i++) {
+      final idleWave = 0.5 + 0.5 * math.sin(controller.timeSec * 5 + i * 0.9);
+      final base = active ? 3.5 + idleWave * 2.5 : 3.5;
+      final height = (base + envelope * 11 * _weights[i]).clamp(3.5, 17.0);
+      final x = startX + i * (barWidth + gap);
+      canvas.drawLine(
+        Offset(x, (size.height - height) / 2),
+        Offset(x, (size.height + height) / 2),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _VoiceActivityPainter oldDelegate) =>
+      oldDelegate.controller != controller || oldDelegate.color != color;
 }

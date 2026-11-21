@@ -53,6 +53,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
 
   String _currentLocale = "en-US";
   Timer? _silenceTimer;
+  Timer? _providerEndTurnTimer;
+  bool _providerEndTurnPending = false;
   Timer? _adaptiveSegmentTimer;
   Timer? _voiceTimer;
   Function(String)? _onFinalSentence; // Callback to send text to AI
@@ -143,7 +145,21 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// assistant audio) for this long is an abandoned session — end it rather
   /// than letting it consume provider time and daily allowance forever.
   static const Duration _inactivityTimeout = Duration(seconds: 90);
-  static const Duration _adaptiveSegmentPause = Duration(milliseconds: 700);
+
+  /// Fallback endpoint delay when the recognizer does not expose a turn-end
+  /// signal. Short enough to feel conversational while tolerating a natural
+  /// pause between clauses.
+  static const Duration _voiceTurnSilence = Duration(milliseconds: 1400);
+
+  /// Remote transcription can pause for network/provider jitter; keep its
+  /// fallback at the historical two-second window unless the provider sends
+  /// a trusted explicit end-of-turn event.
+  static const Duration _remoteVoiceTurnSilence = Duration(milliseconds: 2200);
+
+  /// Gives the transcript callback paired with a provider endpoint event a
+  /// moment to update the turn buffer before submitting it.
+  static const Duration _providerEndTurnSettle = Duration(milliseconds: 180);
+  static const Duration _adaptiveSegmentPause = Duration(milliseconds: 400);
   static const int _adaptiveSegmentMinimum = 42;
   static const int _adaptiveSegmentMaximum = 220;
   Timer? _inactivityTimer;
@@ -344,6 +360,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   void _cancelAllTimers() {
     _silenceTimer?.cancel();
     _silenceTimer = null;
+    _providerEndTurnTimer?.cancel();
+    _providerEndTurnTimer = null;
+    _providerEndTurnPending = false;
     _adaptiveSegmentTimer?.cancel();
     _adaptiveSegmentTimer = null;
     _voiceTimer?.cancel();
@@ -930,6 +949,8 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     final gen = _ensureSession();
     if (context != null) _lastContext = context;
     _silenceTimer?.cancel();
+    _providerEndTurnTimer?.cancel();
+    _providerEndTurnPending = false;
     _emptyNativeRestarts = 0;
     unawaited(_beginListening(gen));
   }
@@ -942,6 +963,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     final gen = _activeGeneration;
     if (gen == null) return;
     _silenceTimer?.cancel();
+    _providerEndTurnTimer?.cancel();
+    _providerEndTurnTimer = null;
+    _providerEndTurnPending = false;
     if (hasRecognizedText) {
       await _finalizeUserSpeech(gen);
     } else {
@@ -974,10 +998,28 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     _armInactivityTimer(gen);
     _silenceTimer?.cancel();
-    _silenceTimer = Timer(const Duration(seconds: 2), () {
+    _providerEndTurnTimer?.cancel();
+    _providerEndTurnTimer = null;
+    final silenceDelay = _speechService.isRemoteActive
+        ? _remoteVoiceTurnSilence
+        : _voiceTurnSilence;
+    _silenceTimer = Timer(silenceDelay, () {
       if (gen != _activeGeneration) return;
       if (turnId != _turns.currentTurnId) return; // this turn already ended
       VoiceTelemetry.mark('user speech endpoint detected');
+      unawaited(_finalizeUserSpeech(gen, turnId: turnId));
+    });
+  }
+
+  void _scheduleProviderEndTurn(int gen, int turnId) {
+    if (gen != _activeGeneration || turnId != _turns.currentTurnId) return;
+    _silenceTimer?.cancel();
+    _providerEndTurnTimer?.cancel();
+    _providerEndTurnTimer = Timer(_providerEndTurnSettle, () {
+      _providerEndTurnTimer = null;
+      _providerEndTurnPending = false;
+      if (gen != _activeGeneration || turnId != _turns.currentTurnId) return;
+      VoiceTelemetry.mark('provider end-of-turn detected');
       unawaited(_finalizeUserSpeech(gen, turnId: turnId));
     });
   }
@@ -999,6 +1041,9 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
     if (context != null && context.mounted && !_checkLimits(context)) return;
 
     _silenceTimer?.cancel();
+    _providerEndTurnTimer?.cancel();
+    _providerEndTurnTimer = null;
+    _providerEndTurnPending = false;
     _armInactivityTimer(gen);
 
     if (isTestMode) {
@@ -1607,6 +1652,10 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
         // stale-fragment guard.
         _turns.ingest(turnId: turnId, raw: text);
         _resetSilenceTimer(gen);
+        if (_providerEndTurnPending) {
+          _providerEndTurnPending = false;
+          _scheduleProviderEndTurn(gen, turnId);
+        }
         break;
       default:
         break;
@@ -1618,13 +1667,24 @@ class VoiceService extends ChangeNotifier with WidgetsBindingObserver {
   /// word-count gate, echo fingerprint, post-TTS discard window — see
   /// [BargeInDetector]). In the other states the text path alone is enough.
   void _onSttStructuredResult(int gen, SttResult result) {
-    if (gen != _activeGeneration || result.text.isEmpty) return;
+    if (gen != _activeGeneration) return;
     if (_state == VoiceState.speaking) {
+      if (result.text.isEmpty) return;
       _bargeIn.onUserTranscript(
         text: result.text,
         confidence: result.confidence,
       );
       if (_bargeIn.shouldBargeIn) _interruptForBargeIn(gen);
+    } else if (_state == VoiceState.listening) {
+      // The structured event precedes its paired text callback in
+      // SpeechService; _onSttResult consumes this flag after ingesting text.
+      _providerEndTurnPending = result.isEndOfTurn;
+      if (_providerEndTurnPending && result.text.trim().isEmpty) {
+        // Deepgram can send a speech_final boundary with an empty transcript;
+        // the finalized words are already buffered by the preceding frames.
+        final turnId = _turns.currentTurnId;
+        if (turnId != null) _scheduleProviderEndTurn(gen, turnId);
+      }
     }
   }
 

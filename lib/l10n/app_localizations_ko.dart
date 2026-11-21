@@ -1644,6 +1644,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get listening => '듣는 중';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => '요즘 어때요?';
 
   @override

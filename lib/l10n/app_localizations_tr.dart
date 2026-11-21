@@ -1682,6 +1682,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get listening => 'Dinliyor';
 
   @override
+  String get voiceConnecting => 'Mikrofona bağlanıyor';
+
+  @override
+  String get voiceSpeaking => 'Konuşuyor';
+
+  @override
+  String get voiceUnavailable => 'Mikrofon kullanılamıyor';
+
+  @override
   String get defaultViewTitle => 'Ne haber?';
 
   @override

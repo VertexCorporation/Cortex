@@ -1703,6 +1703,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get listening => 'Hört zu';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => 'Alles klar?';
 
   @override

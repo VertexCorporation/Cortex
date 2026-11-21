@@ -1681,6 +1681,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get listening => 'सुन रहा है';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => 'क्या चल रहा है?';
 
   @override

@@ -1641,6 +1641,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get listening => '聞き取り中';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => '元気？';
 
   @override

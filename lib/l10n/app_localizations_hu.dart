@@ -1691,6 +1691,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get listening => 'Hallgatás';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => 'Mi újság?';
 
   @override

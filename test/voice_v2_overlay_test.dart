@@ -145,6 +145,7 @@ Future<void> _pumpOverlay(
   VoidCallback? onExited,
   NavigatorObserver? observer,
   UserProvider? user,
+  double textScale = 1,
   Duration initialPump = const Duration(milliseconds: 400),
 }) async {
   await tester.pumpWidget(
@@ -162,6 +163,11 @@ Future<void> _pumpOverlay(
         navigatorObservers: [?observer],
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         home: Scaffold(
           body: Stack(
             children: [
@@ -510,10 +516,7 @@ void main() {
         tester.getCenter(find.byType(VoiceOrb)).dy,
         closeTo(32 + (800 - 32) / 2, 1),
       );
-      expect(
-        tester.getSize(find.byType(VoiceOrb)).width,
-        closeTo(390 * 0.70, 1),
-      );
+      expect(tester.getSize(find.byType(VoiceOrb)).width, closeTo(224, 1));
     },
   );
 
@@ -798,7 +801,7 @@ void main() {
   );
 
   testWidgets(
-    'the fullscreen stage carries NO text — the chat itself is the transcript',
+    'the fullscreen stage shows live state without exposing the transcript',
     (tester) async {
       tester.view.physicalSize = const Size(390, 800);
       tester.view.devicePixelRatio = 1;
@@ -826,23 +829,107 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 500));
 
-      // The stage exists — dim + orb — but NOT a single Text widget: the
-      // service publishes a live transcript AND remaining seconds (240),
-      // and the overlay renders NEITHER. Speech lives in the normal chat
-      // pipeline; the conversation behind the dim is the transcript.
+      // The stage gives a clear recording state while keeping the partial
+      // transcript in the normal chat pipeline.
       expect(find.byKey(const ValueKey('voice_stage_dim')), findsNothing);
       expect(find.byType(VoiceOrb), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byType(VoiceSessionOverlay),
-          matching: find.byType(Text),
-        ),
-        findsNothing,
-      );
+      expect(find.text('Listening'), findsOneWidget);
+      expect(find.byKey(const ValueKey('voice_activity_bars')), findsOneWidget);
       expect(find.text('these words must never render'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'daily-limit failure stays clear on narrow screens at 200% text',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final input = InputProvider()..setVoiceModeActive(true);
+      final panelHeight = ValueNotifier<double>(80);
+      addTearDown(input.dispose);
+      addTearDown(panelHeight.dispose);
+
+      await _pumpOverlay(
+        tester,
+        input: input,
+        voice: _OverlayVoice(VoiceState.failed, exhausted: true),
+        panelHeight: panelHeight,
+        active: true,
+        textScale: 2,
+      );
+
+      expect(
+        find.text("You've used today's voice time. It renews after midnight."),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('fullscreen status and orb fit a short landscape viewport', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 240);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final input = InputProvider()..setVoiceModeActive(true);
+    final panelHeight = ValueNotifier<double>(64);
+    addTearDown(input.dispose);
+    addTearDown(panelHeight.dispose);
+
+    await _pumpOverlay(
+      tester,
+      input: input,
+      voice: _OverlayVoice(VoiceState.listening),
+      panelHeight: panelHeight,
+      active: true,
+    );
+    await tester.tap(find.byType(VoiceOrb));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    final status = find.byKey(const ValueKey('voice_live_status'));
+    final orb = find.byType(VoiceOrb);
+    expect(tester.getTopLeft(status).dy, greaterThanOrEqualTo(0));
+    expect(
+      tester.getBottomLeft(status).dy,
+      lessThanOrEqualTo(tester.getTopLeft(orb).dy),
+    );
+    expect(tester.getBottomRight(orb).dy, lessThanOrEqualTo(240));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('live listening surface matches its visual contract', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final input = InputProvider()..setVoiceOverlayExpanded(true);
+    final panelHeight = ValueNotifier<double>(92);
+    addTearDown(panelHeight.dispose);
+    await _pumpOverlay(
+      tester,
+      input: input,
+      voice: _OverlayVoice(VoiceState.listening),
+      panelHeight: panelHeight,
+      active: true,
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+
+    await expectLater(
+      find.byKey(const ValueKey('voice_live_status')),
+      matchesGoldenFile('goldens/voice_live_listening.png'),
+    );
+  });
 
   testWidgets(
     'repeated compact/fullscreen cycles keep one orb and accumulate nothing',

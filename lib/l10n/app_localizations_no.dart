@@ -1680,6 +1680,15 @@ class AppLocalizationsNo extends AppLocalizations {
   String get listening => 'Lytter';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => 'Hva skjer?';
 
   @override

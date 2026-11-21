@@ -1693,6 +1693,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get listening => 'Sedang Mendengarkan';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => 'Apa kabar?';
 
   @override
