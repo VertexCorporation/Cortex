@@ -137,6 +137,38 @@ class Utils {
     }
   }
 
+  /// Detects images by extension or content when picker cache paths are extensionless.
+  static Future<bool> isImageAttachmentPath(String path) async {
+    final lowerPath = path.toLowerCase();
+    if (lowerPath.startsWith('data:image/')) return true;
+    if (lowerPath.startsWith('http://') || lowerPath.startsWith('https://')) {
+      return RegExp(r'\.(jpg|jpeg|png|webp|gif|bmp|heic|heif)(\?|$)')
+          .hasMatch(lowerPath);
+    }
+    if (RegExp(r'\.(jpg|jpeg|png|webp|gif|bmp|heic|heif)$')
+        .hasMatch(lowerPath)) {
+      return true;
+    }
+    try {
+      final file = File(path);
+      if (!await file.exists()) return false;
+      final handle = await file.open();
+      late final List<int> probe;
+      try {
+        probe = await handle.read(512);
+      } finally {
+        await handle.close();
+      }
+      return lookupMimeType(
+            path,
+            headerBytes: probe.isEmpty ? null : probe,
+          )?.startsWith('image/') ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Processes an attachment path and returns the correct OpenAI-compatible content block.
   /// - Images -> { "type": "image_url", "image_url": { "url": "..." } }
   /// - Text Files -> { "type": "text", "text": "..." }

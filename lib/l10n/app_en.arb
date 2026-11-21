@@ -1064,5 +1064,9 @@
   "taskNewTitle": "New task",
   "taskInputHint": "What needs doing?",
   "taskReminderAdd": "Add reminder",
-  "taskReminderPermissionNeeded": "Task saved; notification permission is needed for its reminder."
+  "taskReminderPermissionNeeded": "Task saved; notification permission is needed for its reminder.",
+  "examReminderSuggestion": "Looks like you have an exam coming up. Want a reminder to review?",
+  "examReminderAction": "Set reminder",
+  "examReminderTaskTitle": "Review exam notes",
+  "examReminderNotification": "Ready to go over your exam notes?"
 }

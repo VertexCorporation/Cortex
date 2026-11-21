@@ -104,6 +104,9 @@
                 <data android:pathPattern=".*\\.gguf" />
             </intent-filter>
 
+            <intent-filter>
+                <action android:name="es.antonborri.home_widget.action.LAUNCH" />
+            </intent-filter>
         </activity>
 
         <!-- Notification Receivers -->
@@ -207,6 +210,28 @@
                 android:value="5" />
         </provider>
 
+        <receiver
+            android:name="com.vertex.cortex.CortexQuickChatSchemaHomeWidgetReceiver"
+            android:label="@string/home_widget_cortex_quick_chat_schema_label"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/cortex_quick_chat_schema_home_widget" />
+        </receiver>
+        <receiver
+            android:name="com.vertex.cortex.CortexTasksSchemaHomeWidgetReceiver"
+            android:label="@string/home_widget_cortex_tasks_schema_label"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/cortex_tasks_schema_home_widget" />
+        </receiver>
     </application>
 
     <!-- ========================================== -->

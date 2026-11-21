@@ -53,7 +53,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "az": [
@@ -76,7 +88,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "cs": [
@@ -133,7 +157,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "de": [
@@ -190,7 +226,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "es": [
@@ -247,7 +295,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "fr": [
@@ -304,7 +364,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "hi": [
@@ -361,7 +433,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "hu": [
@@ -418,7 +502,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "id": [
@@ -475,7 +571,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "it": [
@@ -532,7 +640,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "ja": [
@@ -589,7 +709,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "ko": [
@@ -646,7 +778,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "nl": [
@@ -703,7 +847,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "no": [
@@ -760,7 +916,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "pt": [
@@ -817,7 +985,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "ru": [
@@ -874,7 +1054,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "sv": [
@@ -931,7 +1123,19 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ],
 
   "tr": [
@@ -993,6 +1197,18 @@
     "offlineSetupNoMatch",
     "featureCreateMusicTitle",
     "featureCreateMusicDescription",
-    "musicGenerationUnavailable"
+    "musicGenerationUnavailable",
+    "tasksTitle",
+    "tasksIntro",
+    "tasksEmptyTitle",
+    "tasksEmptyBody",
+    "taskNewTitle",
+    "taskInputHint",
+    "taskReminderAdd",
+    "taskReminderPermissionNeeded",
+    "examReminderSuggestion",
+    "examReminderAction",
+    "examReminderTaskTitle",
+    "examReminderNotification"
   ]
 }

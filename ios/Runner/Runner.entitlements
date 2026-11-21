@@ -14,5 +14,9 @@
 	<true/>
 	<key>com.apple.developer.kernel.increased-memory-limit</key>
 	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.vertex.cortex</string>
+	</array>
 </dict>
 </plist>

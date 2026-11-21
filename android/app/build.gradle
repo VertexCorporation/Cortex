@@ -93,6 +93,7 @@ flutter {
 }
 
 dependencies {
+    implementation 'androidx.glance:glance-appwidget:1.2.0'
     implementation project(':llama')
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")

@@ -23,6 +23,7 @@ import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/chat/services/voice_health.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/notifications/extrovert.dart';
+import 'package:cortex/tasks/exam_reminder.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -1306,6 +1307,12 @@ class SendService {
           langCode: langCode,
           modelService: _modelService,
         ).ignore();
+      }
+
+      if (!isRegenerate && !isContinue && !isHidden &&
+          !flowParticipantTurn && currentAttachmentPaths.isEmpty &&
+          context.mounted) {
+        ExamReminderSuggestion.offer(context, text);
       }
 
       AnalyticsService().logMessageSent(

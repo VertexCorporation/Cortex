@@ -40,6 +40,8 @@ import 'package:cortex/startup/splash.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:home_widget/home_widget.dart'
+    if (dart.library.html) 'package:cortex/platform/home_widget_stub.dart';
 import 'package:sqflite/sqflite.dart' show databaseFactory;
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart' show databaseFactoryFfiWeb;
 
@@ -381,10 +383,22 @@ class _AppGatekeeperState extends State<AppGatekeeper> {
   bool _startupReady = false;
   bool _bootstrapFailed = false;
   bool _splashGone = false;
+  StreamSubscription<Uri?>? _widgetClickSubscription;
+  Uri? _pendingWidgetUri;
 
   @override
   void initState() {
     super.initState();
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS)) {
+      _widgetClickSubscription = HomeWidget.widgetClicked.listen(_queueWidgetUri);
+      unawaited(
+        HomeWidget.initiallyLaunchedFromHomeWidget()
+            .then(_queueWidgetUri)
+            .catchError((Object _) {}),
+      );
+    }
     // The splash starts animating on the first post-frame callback. Bootstrap
     // work (Firebase, App Check, storage) competes for the platform main
     // thread, so it starts one frame later: the first animated splash frames
@@ -408,6 +422,39 @@ class _AppGatekeeperState extends State<AppGatekeeper> {
 
   void _ready() {
     if (mounted && !_startupReady) setState(() => _startupReady = true);
+    _dispatchPendingWidgetUri();
+  }
+
+  void _queueWidgetUri(Uri? uri) {
+    if (uri == null || uri.scheme != 'cortex' ||
+        !uri.queryParameters.containsKey('homeWidget')) {
+      return;
+    }
+    _pendingWidgetUri = uri;
+    _dispatchPendingWidgetUri();
+  }
+
+  Future<void> _dispatchPendingWidgetUri() async {
+    for (var attempt = 0; attempt < 20; attempt++) {
+      if (!mounted || _pendingWidgetUri == null) return;
+      await WidgetsBinding.instance.endOfFrame;
+      final main = mainScreenKey.currentState;
+      final uri = _pendingWidgetUri;
+      if (!_startupReady || main == null || uri == null) continue;
+      _pendingWidgetUri = null;
+      if (uri.host == 'tasks') {
+        main.openTasksScreen();
+      } else if (uri.host == 'chat') {
+        main.startNewConversation();
+      }
+      return;
+    }
+  }
+
+  @override
+  void dispose() {
+    _widgetClickSubscription?.cancel();
+    super.dispose();
   }
 
   @override

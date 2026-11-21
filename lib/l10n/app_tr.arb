@@ -957,5 +957,9 @@
   "taskNewTitle": "Yeni görev",
   "taskInputHint": "Ne yapacaksın?",
   "taskReminderAdd": "Hatırlatıcı ekle",
-  "taskReminderPermissionNeeded": "Görev kaydedildi; hatırlatıcı için bildirim izni gerekli."
+  "taskReminderPermissionNeeded": "Görev kaydedildi; hatırlatıcı için bildirim izni gerekli.",
+  "examReminderSuggestion": "Yaklaşan bir sınavın var gibi. Tekrar için hatırlatma ister misin?",
+  "examReminderAction": "Hatırlat",
+  "examReminderTaskTitle": "Sınav notlarını tekrar et",
+  "examReminderNotification": "Sınav notlarının üstünden geçmeye hazır mısın?"
 }

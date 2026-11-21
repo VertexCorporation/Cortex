@@ -152,7 +152,7 @@ class ContextService {
     // 2. Attachment Content
     if (includeImage && message.hasAttachments) {
       for (final path in message.attachmentPaths) {
-        if (_isImageFile(path) ||
+        if (await Utils.isImageAttachmentPath(path) ||
             (includeAllMedia && (_isVideoFile(path) || _isAudioFile(path)))) {
           final String? base64Image = await Utils.formatBase64Media(path);
           if (base64Image != null) {
@@ -196,20 +196,6 @@ class ContextService {
     }
 
     return results;
-  }
-
-  bool _isImageFile(String path) {
-    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
-    return [
-      'jpg',
-      'jpeg',
-      'png',
-      'webp',
-      'gif',
-      'bmp',
-      'heic',
-      'heif',
-    ].contains(ext);
   }
 
   bool _isVideoFile(String path) {

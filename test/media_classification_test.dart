@@ -66,5 +66,19 @@ void main() {
 
       await dir.delete(recursive: true);
     });
+
+    test('recognizes an extensionless picker-cache image by its bytes', () async {
+      final dir = await Directory.systemTemp.createTemp('cortex_media_test');
+      final pickerCacheFile = File('${dir.path}/picker_cache_item');
+      await pickerCacheFile.writeAsBytes([
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+      ]);
+
+      expect(await Utils.isImageAttachmentPath(pickerCacheFile.path), isTrue);
+      final block = await Utils.processAttachment(pickerCacheFile.path);
+      expect(block?['type'], 'image_url');
+
+      await dir.delete(recursive: true);
+    });
   });
 }

@@ -63,6 +63,16 @@
 		6E76C9F0F0D24B81E5E5D861 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DC732890F6B215C1EAB7145 /* Pods_Runner.framework */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		AAA493016780F644F83738BB /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343EEA91BC15E30D72B19B32 /* Pods_RunnerTests.framework */; };
+		F8BFF1132895BEE21E934725 /* CortexQuickChatSchemaHomeWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3B37E93C5C13F77D7D745CCA /* CortexQuickChatSchemaHomeWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AAC4CEF609815FC3EAE05FF0 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C697649F75F5C9CE61112D5D /* WidgetKit.framework */; };
+		DF9582BF0B954386CF9C2969 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34424B02DFD1A4676E3F9450 /* SwiftUI.framework */; };
+		FB527E57DDFC24C860EDAD91 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296C09F40AB8917F082420EA /* Widget.swift */; };
+		CEF0FE57566E670815DAE2E9 /* WidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4950AE2CD77D081F42C98832 /* WidgetBundle.swift */; };
+		17844E70CADA5CB946E4EA4A /* CortexTasksSchemaHomeWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9F5D45A3868801226C78C181 /* CortexTasksSchemaHomeWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0D8132453B967920C869928F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AE8B7D4B9F70CDD138189C2 /* WidgetKit.framework */; };
+		738BB0B49882A955168A4DD6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B406119AF84E1FC98414BAF /* SwiftUI.framework */; };
+		0C5D5C6C9A0078E7C002D73E /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F5869BFC146F741763E2E1 /* Widget.swift */; };
+		0B13DC6C1D213C27AEA86F56 /* WidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38187AD374B323545EBCBB89 /* WidgetBundle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +82,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		C225F1DA048E5B5F5478561C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2BCFA55FBB067CC49BC511B5;
+			remoteInfo = CortexQuickChatSchemaHomeWidget;
+		};
+		5E5DEE11D7FD4D94B219A943 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 075DF7943524706B48042FDA;
+			remoteInfo = CortexTasksSchemaHomeWidget;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -85,6 +109,28 @@
 				051A5D152EDB40520098915E /* llama.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E94B296473BD3B3FF9BB39BA /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F8BFF1132895BEE21E934725 /* CortexQuickChatSchemaHomeWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B13E87CBBC70E134766091B1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				17844E70CADA5CB946E4EA4A /* CortexTasksSchemaHomeWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -138,6 +184,21 @@
 		A6B8C26DAD35223334A174D8 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		BCB0A237D3D78BB7EB81A787 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		E25EAA82B035AC74C5646619 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+		68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = HomeWidget.xcconfig; path = Flutter/HomeWidget.xcconfig; sourceTree = "<group>"; };
+		3B37E93C5C13F77D7D745CCA /* CortexQuickChatSchemaHomeWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CortexQuickChatSchemaHomeWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C697649F75F5C9CE61112D5D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		34424B02DFD1A4676E3F9450 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		770145C9BB837D7E50BA4AD3 /* CortexQuickChatSchemaHomeWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CortexQuickChatSchemaHomeWidget.entitlements; sourceTree = "<group>"; };
+		296C09F40AB8917F082420EA /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
+		4950AE2CD77D081F42C98832 /* WidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBundle.swift; sourceTree = "<group>"; };
+		F4BE3D531F699AC083C1B66D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9F5D45A3868801226C78C181 /* CortexTasksSchemaHomeWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CortexTasksSchemaHomeWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4AE8B7D4B9F70CDD138189C2 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		9B406119AF84E1FC98414BAF /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		B4F145766C94984D084D9630 /* CortexTasksSchemaHomeWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CortexTasksSchemaHomeWidget.entitlements; sourceTree = "<group>"; };
+		78F5869BFC146F741763E2E1 /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
+		38187AD374B323545EBCBB89 /* WidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBundle.swift; sourceTree = "<group>"; };
+		3C5F60B05E9CF45FB6789252 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +218,24 @@
 				051A5D172EDB4BB80098915E /* StoreKit.framework in Frameworks */,
 				6E76C9F0F0D24B81E5E5D861 /* Pods_Runner.framework in Frameworks */,
 				051A5D142EDB40520098915E /* llama.xcframework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D2D514F03A4D63F71B68DF32 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DF9582BF0B954386CF9C2969 /* SwiftUI.framework in Frameworks */,
+				AAC4CEF609815FC3EAE05FF0 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E04CF78F49B7BFCCED04A289 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				738BB0B49882A955168A4DD6 /* SwiftUI.framework in Frameworks */,
+				0D8132453B967920C869928F /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +441,7 @@
 				9740EEB21CF90195004384FC /* Debug.xcconfig */,
 				7AFA3C8E1D35360C0083082E /* Release.xcconfig */,
 				9740EEB31CF90195004384FC /* Generated.xcconfig */,
+				68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */,
 			);
 			name = Flutter;
 			sourceTree = "<group>";
@@ -395,6 +475,10 @@
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				92E18F6BD4BC8EC917631346 /* Frameworks */,
 				C1C25F44EE9A97D5A7A98927 /* Pods */,
+				770145C9BB837D7E50BA4AD3 /* CortexQuickChatSchemaHomeWidget.entitlements */,
+				D7B57BC11A97B2E0E363C437 /* CortexQuickChatSchemaHomeWidget */,
+				B4F145766C94984D084D9630 /* CortexTasksSchemaHomeWidget.entitlements */,
+				357387EEB235933F2E94110C /* CortexTasksSchemaHomeWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -403,6 +487,8 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				3B37E93C5C13F77D7D745CCA /* CortexQuickChatSchemaHomeWidget.appex */,
+				9F5D45A3868801226C78C181 /* CortexTasksSchemaHomeWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -434,6 +520,26 @@
 				E25EAA82B035AC74C5646619 /* Pods-RunnerTests.profile.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D7B57BC11A97B2E0E363C437 /* CortexQuickChatSchemaHomeWidget */ = {
+			isa = PBXGroup;
+			children = (
+				296C09F40AB8917F082420EA /* Widget.swift */,
+				4950AE2CD77D081F42C98832 /* WidgetBundle.swift */,
+				F4BE3D531F699AC083C1B66D /* Info.plist */,
+			);
+			path = CortexQuickChatSchemaHomeWidget;
+			sourceTree = "<group>";
+		};
+		357387EEB235933F2E94110C /* CortexTasksSchemaHomeWidget */ = {
+			isa = PBXGroup;
+			children = (
+				78F5869BFC146F741763E2E1 /* Widget.swift */,
+				38187AD374B323545EBCBB89 /* WidgetBundle.swift */,
+				3C5F60B05E9CF45FB6789252 /* Info.plist */,
+			);
+			path = CortexTasksSchemaHomeWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -468,20 +574,58 @@
 				051A5CF82EDB1C550098915E /* Sources */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
-				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				E94B296473BD3B3FF9BB39BA /* Embed Foundation Extensions */,
+				B13E87CBBC70E134766091B1 /* Embed Foundation Extensions */,
 				ADFAF2D3E7ABEC7835807012 /* [CP] Embed Pods Frameworks */,
 				A9FBB9F5645787E4C0B6D925 /* [CP] Copy Pods Resources */,
 				05CA17CC2EE048EA00FCE005 /* ShellScript */,
 				A177A5A10000000000000001 /* Verify llama signature */,
+				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9BC81B93B988AAAAACEA99FD /* PBXTargetDependency */,
+				C246D0F04C4EF5A1C2A17BA2 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
+		};
+		2BCFA55FBB067CC49BC511B5 /* CortexQuickChatSchemaHomeWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B083494A570D01191EC7A56 /* Build configuration list for PBXNativeTarget "CortexQuickChatSchemaHomeWidget" */;
+			buildPhases = (
+				C4B9C291BE220304341395F7 /* Sources */,
+				D2D514F03A4D63F71B68DF32 /* Frameworks */,
+				44E6ED5ADA7859939F78AE7C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CortexQuickChatSchemaHomeWidget;
+			productName = CortexQuickChatSchemaHomeWidget;
+			productReference = 3B37E93C5C13F77D7D745CCA /* CortexQuickChatSchemaHomeWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		075DF7943524706B48042FDA /* CortexTasksSchemaHomeWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3805C2FB1600D1BED6E902E5 /* Build configuration list for PBXNativeTarget "CortexTasksSchemaHomeWidget" */;
+			buildPhases = (
+				6B079C3E3646FEABEF9ED1CC /* Sources */,
+				E04CF78F49B7BFCCED04A289 /* Frameworks */,
+				F47E3191594F2EF09E16D4E3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CortexTasksSchemaHomeWidget;
+			productName = CortexTasksSchemaHomeWidget;
+			productReference = 9F5D45A3868801226C78C181 /* CortexTasksSchemaHomeWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -535,6 +679,8 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				2BCFA55FBB067CC49BC511B5 /* CortexQuickChatSchemaHomeWidget */,
+				075DF7943524706B48042FDA /* CortexTasksSchemaHomeWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -594,6 +740,20 @@
 				05CA187F2EE0523B00FCE005 /* InfoPlist.strings in Resources */,
 				05CA18802EE0523B00FCE005 /* LaunchScreen.storyboard in Resources */,
 				05CA18812EE0523B00FCE005 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		44E6ED5ADA7859939F78AE7C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F47E3191594F2EF09E16D4E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -775,6 +935,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C4B9C291BE220304341395F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB527E57DDFC24C860EDAD91 /* Widget.swift in Sources */,
+				CEF0FE57566E670815DAE2E9 /* WidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6B079C3E3646FEABEF9ED1CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C5D5C6C9A0078E7C002D73E /* Widget.swift in Sources */,
+				0B13DC6C1D213C27AEA86F56 /* WidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -782,6 +960,16 @@
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		9BC81B93B988AAAAACEA99FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2BCFA55FBB067CC49BC511B5 /* CortexQuickChatSchemaHomeWidget */;
+			targetProxy = C225F1DA048E5B5F5478561C /* PBXContainerItemProxy */;
+		};
+		C246D0F04C4EF5A1C2A17BA2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 075DF7943524706B48042FDA /* CortexTasksSchemaHomeWidget */;
+			targetProxy = 5E5DEE11D7FD4D94B219A943 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1338,6 +1526,198 @@
 			};
 			name = Release;
 		};
+		7434BDD534FBC8202EC8508F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CortexQuickChatSchemaHomeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = ZTGTV53AJ7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_FILE = CortexQuickChatSchemaHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortexQuickChatSchemaHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vertex.cortex.CortexQuickChatSchemaHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Cortex Distribution CortexQuickChatSchemaHomeWidget";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4CD758C33E926A9E22F7471D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CortexQuickChatSchemaHomeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = ZTGTV53AJ7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_FILE = CortexQuickChatSchemaHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortexQuickChatSchemaHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vertex.cortex.CortexQuickChatSchemaHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Cortex Distribution CortexQuickChatSchemaHomeWidget";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A01D9587F336DBAE438ACDB5 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CortexQuickChatSchemaHomeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = ZTGTV53AJ7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_FILE = CortexQuickChatSchemaHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortexQuickChatSchemaHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vertex.cortex.CortexQuickChatSchemaHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Cortex Distribution CortexQuickChatSchemaHomeWidget";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
+		EB107C3A553F8C7F3CF62984 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CortexTasksSchemaHomeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = ZTGTV53AJ7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_FILE = CortexTasksSchemaHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortexTasksSchemaHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vertex.cortex.CortexTasksSchemaHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Cortex Distribution CortexTasksSchemaHomeWidget";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F18EE22073ECFA2D86ED9982 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CortexTasksSchemaHomeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = ZTGTV53AJ7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_FILE = CortexTasksSchemaHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortexTasksSchemaHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vertex.cortex.CortexTasksSchemaHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Cortex Distribution CortexTasksSchemaHomeWidget";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D02F835CAB7E957DB8A62BDA /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68EC8D0B1D2F26069F27AD05 /* HomeWidget.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CortexTasksSchemaHomeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = ZTGTV53AJ7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_FILE = CortexTasksSchemaHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortexTasksSchemaHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vertex.cortex.CortexTasksSchemaHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Cortex Distribution CortexTasksSchemaHomeWidget";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1367,6 +1747,26 @@
 				97C147061CF9000F007C117D /* Debug */,
 				97C147071CF9000F007C117D /* Release */,
 				249021D4217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5B083494A570D01191EC7A56 /* Build configuration list for PBXNativeTarget "CortexQuickChatSchemaHomeWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7434BDD534FBC8202EC8508F /* Debug */,
+				4CD758C33E926A9E22F7471D /* Release */,
+				A01D9587F336DBAE438ACDB5 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3805C2FB1600D1BED6E902E5 /* Build configuration list for PBXNativeTarget "CortexTasksSchemaHomeWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB107C3A553F8C7F3CF62984 /* Debug */,
+				F18EE22073ECFA2D86ED9982 /* Release */,
+				D02F835CAB7E957DB8A62BDA /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

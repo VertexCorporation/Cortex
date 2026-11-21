@@ -4121,6 +4121,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No compatible music generator is available in the current catalogue. Please try again later. No music request was sent.'**
   String get musicGenerationUnavailable;
+
+  /// No description provided for @tasksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get tasksTitle;
+
+  /// No description provided for @tasksIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the things on your mind in one place.'**
+  String get tasksIntro;
+
+  /// No description provided for @tasksEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on your list yet'**
+  String get tasksEmptyTitle;
+
+  /// No description provided for @tasksEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a task and get it off your mind.'**
+  String get tasksEmptyBody;
+
+  /// No description provided for @taskNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New task'**
+  String get taskNewTitle;
+
+  /// No description provided for @taskInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What needs doing?'**
+  String get taskInputHint;
+
+  /// No description provided for @taskReminderAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get taskReminderAdd;
+
+  /// No description provided for @taskReminderPermissionNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Task saved; notification permission is needed for its reminder.'**
+  String get taskReminderPermissionNeeded;
+
+  /// No description provided for @examReminderSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Looks like you have an exam coming up. Want a reminder to review?'**
+  String get examReminderSuggestion;
+
+  /// No description provided for @examReminderAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Set reminder'**
+  String get examReminderAction;
+
+  /// No description provided for @examReminderTaskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review exam notes'**
+  String get examReminderTaskTitle;
+
+  /// No description provided for @examReminderNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to go over your exam notes?'**
+  String get examReminderNotification;
 }
 
 class _AppLocalizationsDelegate
