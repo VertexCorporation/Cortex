@@ -26,7 +26,8 @@ subprojects {
                 if (details.requested.group == 'androidx.activity') {
                     details.useVersion "1.9.3"
                 }
-                if (details.requested.group == 'androidx.core') {
+                if (details.requested.group == 'androidx.core' &&
+                        details.requested.name in ['core', 'core-ktx']) {
                     details.useVersion "1.15.0"
                 }
                 if (details.requested.group == 'androidx.browser') {
