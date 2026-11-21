@@ -12,6 +12,8 @@
 //   * only the exact 403 + voice_daily_limit refusal is a spent allowance
 //     — an outage (401, non-JSON 5xx crash page) is never a spent one, and
 //     a mint that never opened a socket never keeps its reservation.
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cortex/chat/services/voice.dart';
@@ -26,6 +28,8 @@ class MockSpeechService extends SpeechService {
   int startCount = 0;
   int stopCount = 0;
   bool shouldFailStart = false;
+  bool shouldThrowOnStart = false;
+  Completer<void>? stopBarrier;
   bool _listening = false;
   double level = 0.0;
   bool remoteActive = false;
@@ -62,6 +66,9 @@ class MockSpeechService extends SpeechService {
     void Function(SttResult result)? onSttResult,
   }) async {
     startCount++;
+    if (shouldThrowOnStart) {
+      throw PlatformException(code: 'speech_engine_unavailable');
+    }
     lastOwner = owner;
     onClosedCallback = onClosed;
     onLeaseCallback = onLease;
@@ -75,6 +82,8 @@ class MockSpeechService extends SpeechService {
   @override
   Future<void> stopListening() async {
     stopCount++;
+    final barrier = stopBarrier;
+    if (barrier != null) await barrier.future;
     _listening = false;
     micLive = false;
   }
@@ -111,6 +120,7 @@ class MockFlutterTts extends FlutterTts {
   VoidCallback? _startHandler;
   VoidCallback? _completionHandler;
   bool isSpeakingMock = false;
+  bool shouldThrowOnSpeak = false;
 
   @override
   Future<dynamic> setSharedInstance(bool? shared) async => 1;
@@ -144,6 +154,9 @@ class MockFlutterTts extends FlutterTts {
   @override
   Future<dynamic> speak(String text, {bool focus = false}) async {
     lastSpokenText = text;
+    if (shouldThrowOnSpeak) {
+      throw PlatformException(code: 'audio_output_unavailable');
+    }
     isSpeakingMock = true;
     if (_startHandler != null) _startHandler!();
 
@@ -218,6 +231,51 @@ void main() {
   });
 
   test(
+    'a speech startup exception ends connecting and permits retry',
+    () async {
+      mockSpeechService.shouldThrowOnStart = true;
+      await startTestSession();
+      expect(voiceService.state, VoiceState.failed);
+      expect(voiceService.lastEndReason, VoiceEndReason.error);
+      expect(voiceService.isSessionActive, isFalse);
+
+      mockSpeechService.shouldThrowOnStart = false;
+      await startTestSession();
+      expect(voiceService.state, VoiceState.listening);
+    },
+  );
+
+  test('a new capture waits for the previous audio teardown', () async {
+    await startTestSession();
+    final stopped = mockSpeechService.stopBarrier = Completer<void>();
+    final stopping = voiceService.stopSession();
+    final restarting = startTestSession();
+
+    await Future<void>.delayed(Duration.zero);
+    expect(voiceService.state, VoiceState.connecting);
+    expect(mockSpeechService.startCount, 1);
+
+    stopped.complete();
+    await stopping;
+    await restarting;
+    expect(voiceService.state, VoiceState.listening);
+    expect(mockSpeechService.startCount, 2);
+  });
+
+  test('native playback failure advances the sentence queue', () async {
+    await startTestSession();
+    mockFlutterTts.shouldThrowOnSpeak = true;
+    voiceService.onAiStreamCallback('First sentence.');
+    await Future<void>.delayed(Duration.zero);
+    expect(mockFlutterTts.lastSpokenText, 'First sentence.');
+
+    mockFlutterTts.shouldThrowOnSpeak = false;
+    voiceService.onAiStreamCallback('Second sentence.');
+    await Future<void>.delayed(Duration.zero);
+    expect(mockFlutterTts.lastSpokenText, 'Second sentence.');
+  });
+
+  test(
     'rapid repeated startSession creates exactly ONE active session',
     () async {
       await startTestSession();
@@ -284,8 +342,8 @@ void main() {
     mockSpeechService.emit('Hello world');
     expect(voiceService.liveTranscript, 'Hello world');
 
-    // The silence timer (2s) finalizes the turn.
-    await Future<void>.delayed(const Duration(milliseconds: 2500));
+    // The fallback endpoint finalizes after a short, natural pause.
+    await Future<void>.delayed(const Duration(milliseconds: 1650));
 
     expect(submittedTurns, ['Hello world']);
     expect(voiceService.state, VoiceState.processing);
@@ -300,6 +358,42 @@ void main() {
       reason: 'the continuous model never re-mints between turns',
     );
   });
+
+  test(
+    'provider end-of-turn submits after its short transcript settle window',
+    () async {
+      await startTestSession();
+      mockSpeechService.emitStructured(
+        const SttResult(
+          'Hello from the provider',
+          isFinal: true,
+          isEndOfTurn: true,
+        ),
+      );
+
+      expect(voiceService.liveTranscript, 'Hello from the provider');
+      expect(submittedTurns, isEmpty);
+      await Future<void>.delayed(const Duration(milliseconds: 260));
+
+      expect(submittedTurns, ['Hello from the provider']);
+      expect(voiceService.state, VoiceState.processing);
+    },
+  );
+
+  test(
+    'adaptive TTS starts a long clause after a shorter stream pause',
+    () async {
+      await startTestSession();
+      voiceService.onAiStreamCallback(
+        'This is a long response clause that can be spoken before generation ends',
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      expect(mockFlutterTts.lastSpokenText, isNull);
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      expect(mockFlutterTts.lastSpokenText, isNotNull);
+    },
+  );
 
   test(
     'a session whose engines cannot start ends as failed, not stuck',
@@ -334,6 +428,75 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     expect(mockFlutterTts.lastSpokenText, "How are you?");
   });
+
+  test(
+    'empty provider endpoint finalizes transcript buffered by earlier frames',
+    () async {
+      await startTestSession();
+      mockSpeechService.emit('Please answer this already recognized question');
+      mockSpeechService.emitStructured(
+        const SttResult('', isFinal: true, isEndOfTurn: true),
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 260));
+
+      expect(submittedTurns, [
+        'Please answer this already recognized question',
+      ]);
+      expect(voiceService.state, VoiceState.processing);
+    },
+  );
+
+  test(
+    'delayed partial transcripts do not get cut by the fallback endpoint',
+    () async {
+      await startTestSession();
+      mockSpeechService.emit('A complete thought with a delayed final frame');
+
+      await Future<void>.delayed(const Duration(milliseconds: 1050));
+      expect(submittedTurns, isEmpty);
+      expect(voiceService.state, VoiceState.listening);
+
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(submittedTurns, ['A complete thought with a delayed final frame']);
+    },
+  );
+
+  test(
+    'remote STT allows a 1.5 second network gap before fallback endpoint',
+    () async {
+      mockSpeechService.remoteActive = true;
+      await startTestSession();
+      mockSpeechService.emit('A remote transcript waiting for its final frame');
+
+      await Future<void>.delayed(const Duration(milliseconds: 1550));
+      expect(submittedTurns, isEmpty);
+      expect(voiceService.state, VoiceState.listening);
+
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(submittedTurns, [
+        'A remote transcript waiting for its final frame',
+      ]);
+    },
+  );
+
+  test(
+    'remote STT allows a 1.5 second network gap before fallback endpoint',
+    () async {
+      mockSpeechService.remoteActive = true;
+      await startTestSession();
+      mockSpeechService.emit('A remote transcript waiting for its final frame');
+
+      await Future<void>.delayed(const Duration(milliseconds: 1550));
+      expect(submittedTurns, isEmpty);
+      expect(voiceService.state, VoiceState.listening);
+
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(submittedTurns, [
+        'A remote transcript waiting for its final frame',
+      ]);
+    },
+  );
 
   test(
     'VoiceService resumes listening after AI finishes without re-minting',
@@ -816,7 +979,9 @@ void main() {
     var requests = 0;
     voiceService.configureFlow(
       modelIds: List.filled(4, 'cortex/auto'),
-      onFlowTurn: (_, _) { requests++; },
+      onFlowTurn: (_, _) {
+        requests++;
+      },
     );
     voiceService.startFlowWithPrompt('Discuss the topic.');
     voiceService.setAiGenerationComplete(true);

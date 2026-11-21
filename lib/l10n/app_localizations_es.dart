@@ -1702,6 +1702,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get listening => 'Escuchando';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => '¿Qué pasa?';
 
   @override

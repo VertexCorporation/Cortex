@@ -1694,6 +1694,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get listening => 'Прослушивание';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => 'Как дела?';
 
   @override

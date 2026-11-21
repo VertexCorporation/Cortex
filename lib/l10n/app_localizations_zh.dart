@@ -1595,6 +1595,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get listening => '正在听';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => '最近怎么样？';
 
   @override

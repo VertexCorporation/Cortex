@@ -22,6 +22,7 @@ import 'package:cortex/network/fulcrum_http.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import 'voice_audio_session.dart';
 import 'voice_health.dart';
 
 class RemoteTtsService {
@@ -57,20 +58,8 @@ class RemoteTtsService {
   /// means the server picks.
   String? activeVoiceId;
 
-  /// The audio session voice mode needs. flutter_tts configures this itself,
-  /// so playing through audioplayers instead means configuring it here too —
-  /// otherwise iOS routes playback to the earpiece and the microphone drops
-  /// out mid-conversation.
-  static final AudioContext voiceAudioContext = AudioContext(
-    iOS: AudioContextIOS(
-      category: AVAudioSessionCategory.playAndRecord,
-      options: const {
-        AVAudioSessionOptions.allowBluetooth,
-        AVAudioSessionOptions.allowBluetoothA2DP,
-        AVAudioSessionOptions.mixWithOthers,
-        AVAudioSessionOptions.defaultToSpeaker,
-      },
-    ),
+  // iOS voice playback inherits the recorder's shared AVAudioSession.
+  static final AudioContext _voiceAudioContext = AudioContext(
     android: AudioContextAndroid(
       isSpeakerphoneOn: true,
       stayAwake: true,
@@ -104,9 +93,9 @@ class RemoteTtsService {
   );
 
   Future<AudioPlayer> _ensurePlayer() async {
-    if (!_contextConfigured) {
+    if (!_contextConfigured && !IosVoiceAudioSession.isSupported) {
       try {
-        await AudioPlayer.global.setAudioContext(voiceAudioContext);
+        await AudioPlayer.global.setAudioContext(_voiceAudioContext);
         _contextConfigured = true;
       } catch (e) {
         debugPrint("[RemoteTts] Could not set audio context: $e");
@@ -299,14 +288,33 @@ class RemoteTtsService {
         final frame = (value.inMilliseconds * _envelopeRateHz / 1000).floor();
         outputLevel.value = envelope[frame.clamp(0, envelope.length - 1)];
       });
-      await player.play(
-        BytesSource(bytes, mimeType: _isWave(bytes) ? 'audio/wav' : null),
-      );
-      await completer.future;
+      final playback = player
+          .play(
+            BytesSource(bytes, mimeType: _isWave(bytes) ? 'audio/wav' : null),
+          )
+          .then((_) => completer.future);
+      if (IosVoiceAudioSession.isSupported) {
+        // Darwin player setup can stall without completing or reporting an
+        // error. Bound the wait by the PCM duration plus time to prepare.
+        final duration = Duration(
+          milliseconds: 1000 * envelope.length ~/ _envelopeRateHz,
+        );
+        await playback.timeout(
+          (duration > Duration.zero ? duration : const Duration(minutes: 1)) +
+              const Duration(seconds: 5),
+        );
+      } else {
+        await playback;
+      }
       VoiceTelemetry.mark('TTS playback complete$name');
       return true;
     } catch (e) {
       debugPrint("[RemoteTts] play failed: $e");
+      if (e is TimeoutException && generation == _generation) {
+        try {
+          await _player?.stop().timeout(const Duration(seconds: 5));
+        } catch (_) {}
+      }
       return false;
     } finally {
       outputLevel.value = 0;

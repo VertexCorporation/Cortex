@@ -3132,6 +3132,24 @@ abstract class AppLocalizations {
   /// **'Listening'**
   String get listening;
 
+  /// No description provided for @voiceConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to microphone'**
+  String get voiceConnecting;
+
+  /// No description provided for @voiceSpeaking.
+  ///
+  /// In en, this message translates to:
+  /// **'Speaking'**
+  String get voiceSpeaking;
+
+  /// No description provided for @voiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone unavailable'**
+  String get voiceUnavailable;
+
   /// No description provided for @defaultViewTitle.
   ///
   /// In en, this message translates to:

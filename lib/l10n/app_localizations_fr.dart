@@ -1707,6 +1707,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get listening => 'À l\'écoute';
 
   @override
+  String get voiceConnecting => 'Connecting to microphone';
+
+  @override
+  String get voiceSpeaking => 'Speaking';
+
+  @override
+  String get voiceUnavailable => 'Microphone unavailable';
+
+  @override
   String get defaultViewTitle => 'Quoi de neuf?';
 
   @override

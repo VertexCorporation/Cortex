@@ -34,14 +34,16 @@ class SpeechService with ChangeNotifier {
   final FrameCoalescer _levelNotifications = FrameCoalescer();
 
   bool _usingRemote = false;
+  bool _usingNative = false;
   bool _remoteLevelAttached = false;
   bool _disposed = false;
   String _finalizedText = "";
-  bool _isAvailable = false;
   bool _isDeviceSupported = true;
   bool _isListening = false;
   double _soundLevel = 0.0;
-  String _localeId = "en_US";
+  Completer<bool>? _nativeStart;
+  Future<void> _engineOperation = Future.value();
+  static const _nativeListenTimeout = Duration(seconds: 5);
 
   /// The committed text of the previous VOICE user turn, in the exact raw
   /// cumulative form the engines emit (armed by [beginNewUserTurn]).
@@ -82,6 +84,12 @@ class SpeechService with ChangeNotifier {
   bool get isListening => _isListening;
   SpeechOwner? get currentOwner => _owner;
 
+  /// Endpoint-only frames carry control information, never transcript text.
+  /// Keep them out of the cumulative transcript accumulator.
+  @visibleForTesting
+  static bool shouldAccumulateRemoteTranscript(SttResult result) =>
+      result.text.trim().isNotEmpty;
+
   /// True when the most recent remote mint was refused because the daily
   /// realtime-voice allowance is exhausted (server 403 voice_daily_limit).
   bool get remoteVoiceLimitReached => _remote.dailyVoiceLimitReached;
@@ -91,7 +99,7 @@ class SpeechService with ChangeNotifier {
 
   double get soundLevel =>
       _usingRemote ? _remote.soundLevel.value : _soundLevel;
-  bool get isAvailable => _isAvailable;
+  bool get isAvailable => _usingRemote || _speech.isAvailable;
   bool get isDeviceSupported => _isDeviceSupported;
 
   void _notifyNow() {
@@ -124,17 +132,25 @@ class SpeechService with ChangeNotifier {
   Future<bool> _initializeDevice() async {
     return _speech.initialize(
       onStatus: (status) {
-        // A status event from a capture nobody owns anymore (or one that was
-        // superseded) must not resurrect listening state.
-        if (_usingRemote || _disposed || _owner == null) return;
-        final listening = status == 'listening';
+        if (!_usingNative || _disposed) return;
+        final listening = status == SpeechToText.listeningStatus;
+        if (!listening &&
+            status != SpeechToText.notListeningStatus &&
+            status != SpeechToText.doneStatus) {
+          return;
+        }
+        final startup = _nativeStart;
+        if (startup != null) {
+          if (!startup.isCompleted) startup.complete(listening);
+          return;
+        }
         final changed = listening != _isListening;
         _isListening = listening;
         if (!listening) _soundLevel = 0.0;
-        if (changed || !listening) _notifyNow();
+        if (changed) _notifyNow();
       },
       onError: (e) {
-        if (_usingRemote || _disposed || _owner == null) return;
+        if (!_usingNative || _disposed) return;
         _isListening = false;
         _soundLevel = 0.0;
         if (e.errorMsg.contains('recognition service') ||
@@ -142,6 +158,11 @@ class SpeechService with ChangeNotifier {
           _isDeviceSupported = false;
         }
         debugPrint("Speech error: ${e.errorMsg}");
+        final startup = _nativeStart;
+        if (startup != null) {
+          if (!startup.isCompleted) startup.complete(false);
+          return;
+        }
         _notifyNow();
       },
     );
@@ -150,12 +171,9 @@ class SpeechService with ChangeNotifier {
   Future<void> checkAvailability() async {
     if (_disposed) return;
     try {
-      final available = await _initializeDevice();
+      final available = await _exclusive(_initializeDevice);
       if (_disposed) return;
-      if (available) {
-        _isAvailable = true;
-        _isDeviceSupported = true;
-      }
+      if (available) _isDeviceSupported = true;
     } catch (e) {
       debugPrint("Speech Check Critical Failure: $e");
       _isDeviceSupported = false;
@@ -213,13 +231,47 @@ class SpeechService with ChangeNotifier {
     void Function(SttCloseInfo info)? onClosed,
     void Function(SttLease lease)? onLease,
     void Function(SttResult result)? onSttResult,
-  }) async {
-    if (_disposed) return false;
-
-    // 1. Ownership arbitration FIRST: the bump kills every callback of the
-    //    previous capture; the engines are torn down — remote socket, native
-    //    recognizer, whatever was running — before the new capture begins.
+  }) {
+    if (_disposed) return Future.value(false);
     final int generation = ++_generation;
+    _cancelNativeStart();
+    return _exclusive(() async {
+      if (_disposed || generation != _generation) return false;
+      try {
+        return await _startListening(
+          generation: generation,
+          locale: locale,
+          onResult: onResult,
+          owner: owner,
+          languageState: languageState,
+          onClosed: onClosed,
+          onLease: onLease,
+          onSttResult: onSttResult,
+        );
+      } finally {
+        if (generation == _generation && !_isListening) {
+          await _stopEngines();
+        }
+      }
+    });
+  }
+
+  Future<T> _exclusive<T>(Future<T> Function() operation) {
+    final result = _engineOperation.then((_) => operation());
+    _engineOperation = result.then<void>((_) {}, onError: (Object _) {});
+    return result;
+  }
+
+  Future<bool> _startListening({
+    required int generation,
+    required String locale,
+    required Function(String text) onResult,
+    required SpeechOwner owner,
+    VoiceLanguageState? languageState,
+    void Function(SttCloseInfo info)? onClosed,
+    void Function(SttLease lease)? onLease,
+    void Function(SttResult result)? onSttResult,
+  }) async {
     await _stopEngines();
     if (_disposed || generation != _generation) return false;
 
@@ -246,6 +298,7 @@ class SpeechService with ChangeNotifier {
           // Voice Mode's barge-in gating reads it. Dictation callers pass
           // no handler and pay nothing for it.
           onSttResult?.call(result);
+          if (!shouldAccumulateRemoteTranscript(result)) return;
           final rawCumulative = result.isFinal
               ? _appendFinal(result.text)
               : _withInterim(result.text);
@@ -265,23 +318,21 @@ class SpeechService with ChangeNotifier {
             _isListening = false;
             _detachRemoteLevel();
           }
-          _notifyNow();
           onClosed?.call(info);
+          _notifyNow();
         },
-        onLease: onLease,
+        onLease: (lease) {
+          if (!_disposed && generation == _generation) onLease?.call(lease);
+        },
         mode: mode,
       );
 
       if (_disposed || generation != _generation) {
-        // Superseded or disposed mid-flight: nothing of ours may become
-        // active now. The engines were already torn down by the newer owner.
-        if (startedRemote) await _remote.stop();
         return false;
       }
 
       if (startedRemote) {
         _usingRemote = true;
-        _isAvailable = true;
         _isDeviceSupported = true;
         _isListening = true;
         _attachRemoteLevel();
@@ -297,67 +348,85 @@ class SpeechService with ChangeNotifier {
     // 3. Native path: always for dictation, the fallback for voice/flow.
     if (!_isDeviceSupported) return false;
 
-    if (!_isAvailable) {
+    if (!_speech.isAvailable) {
       bool initSuccess = false;
       try {
         initSuccess = await _initializeDevice();
-      } on PlatformException catch (e) {
-        debugPrint("Speech recognition not available (PlatformException): $e");
+      } on MissingPluginException catch (e) {
+        debugPrint("Native speech recognition is unavailable: $e");
         _isDeviceSupported = false;
         _notifyNow();
         return false;
       } catch (e) {
         debugPrint("Speech initialization failed in startListening: $e");
-        _isDeviceSupported = false;
-        _notifyNow();
         return false;
       }
 
       if (_disposed || !initSuccess || generation != _generation) {
         return false;
       }
-      _isAvailable = true;
     }
 
     // Locale mapping (app language → installed recognizer locale, English
     // fallback) happens here so BOTH dictation and the native fallback of
     // Voice/Flow honor the application language.
-    _localeId = await _resolveNativeLocaleId(locale);
+    final localeId = await _resolveNativeLocaleId(locale);
     if (_disposed || generation != _generation) return false;
 
-    await _speech.listen(
-      localeId: _localeId,
-      onResult: (result) {
-        if (_disposed || generation != _generation) return;
-        final rawCumulative = result.recognizedWords;
-        _lastRawCumulative = rawCumulative;
-        onResult(_capitalize(_stripStale(rawCumulative)));
-      },
-      onSoundLevelChange: (level) {
-        if (_disposed || !_isListening || generation != _generation) return;
-        final normalized = ((level + 10) / 20).clamp(0.0, 1.0).toDouble();
-        // Tiny microphone noise changes are not visually distinguishable. Skip
-        // them before the frame coalescer to reduce scheduling work further.
-        if ((normalized - _soundLevel).abs() < 0.005) return;
-        _soundLevel = normalized;
-        _notifyVisualLevel();
-      },
-      listenOptions: SpeechListenOptions(
-        cancelOnError: true,
-        listenMode: ListenMode.dictation,
-        partialResults: true,
-      ),
-    );
-
-    if (_disposed || generation != _generation) {
-      try {
-        await _speech.stop();
-      } catch (_) {}
+    final startup = _nativeStart = Completer<bool>();
+    _usingNative = true;
+    try {
+      // listen() returns even if the platform rejected the request. The
+      // status callback is the acknowledgment that the recognizer is live.
+      final started = await _speech
+          .listen(
+            localeId: localeId,
+            onResult: (result) {
+              if (_disposed || generation != _generation) return;
+              final rawCumulative = result.recognizedWords;
+              _lastRawCumulative = rawCumulative;
+              onResult(_capitalize(_stripStale(rawCumulative)));
+            },
+            onSoundLevelChange: (level) {
+              if (_disposed || !_isListening || generation != _generation) {
+                return;
+              }
+              final normalized = ((level + 10) / 20).clamp(0.0, 1.0).toDouble();
+              // Tiny microphone noise changes are not visually distinguishable. Skip
+              // them before the frame coalescer to reduce scheduling work further.
+              if ((normalized - _soundLevel).abs() < 0.005) return;
+              _soundLevel = normalized;
+              _notifyVisualLevel();
+            },
+            listenOptions: SpeechListenOptions(
+              cancelOnError: true,
+              listenMode: ListenMode.dictation,
+              partialResults: true,
+            ),
+          )
+          .then((_) => startup.future)
+          .timeout(_nativeListenTimeout);
+      if (_disposed ||
+          generation != _generation ||
+          !started ||
+          _speech.lastError != null ||
+          !_speech.isListening) {
+        return false;
+      }
+      _isListening = true;
+      _notifyNow();
+      return true;
+    } catch (e) {
+      debugPrint('[Speech] Native recognizer failed to start: $e');
       return false;
+    } finally {
+      _nativeStart = null;
     }
-    _isListening = true;
-    _notifyNow();
-    return true;
+  }
+
+  void _cancelNativeStart() {
+    final startup = _nativeStart;
+    if (startup != null && !startup.isCompleted) startup.complete(false);
   }
 
   /// Tears down whatever engines might be running. RemoteSttService.stop is
@@ -365,32 +434,38 @@ class SpeechService with ChangeNotifier {
   /// unconditionally guarantees no ghost recorder or WebSocket can ever
   /// survive a transition, even from an unexpected path.
   Future<void> _stopEngines() async {
+    _owner = null;
+    _isListening = false;
+    _soundLevel = 0.0;
     _usingRemote = false;
+    final usingNative = _usingNative;
+    _usingNative = false;
     _detachRemoteLevel();
     try {
       await _remote.stop();
     } catch (e) {
       debugPrint("[Speech] Remote stop failed: $e");
     }
-    if (_isAvailable) {
+    if (usingNative) {
       try {
         await _speech.stop();
       } catch (_) {}
     }
   }
 
-  Future<void> stopListening() async {
-    if (_disposed) return;
+  Future<void> stopListening() {
+    if (_disposed) return Future.value();
     // Invalidate callbacks first, then release the microphone.
-    _generation++;
-    _owner = null;
-    await _stopEngines();
-    _isListening = false;
-    _soundLevel = 0.0;
-    _finalizedText = "";
-    _turnPrefix = "";
-    _lastRawCumulative = "";
-    _notifyNow();
+    final generation = ++_generation;
+    _cancelNativeStart();
+    return _exclusive(() async {
+      await _stopEngines();
+      if (_disposed || generation != _generation) return;
+      _finalizedText = "";
+      _turnPrefix = "";
+      _lastRawCumulative = "";
+      _notifyNow();
+    });
   }
 
   /// True when the remote capture's microphone is still live after a socket
@@ -482,8 +557,10 @@ class SpeechService with ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
-    _owner = null;
+    _generation++;
+    _cancelNativeStart();
     _detachRemoteLevel();
+    unawaited(_exclusive(_stopEngines));
     _levelNotifications.dispose();
     super.dispose();
   }
