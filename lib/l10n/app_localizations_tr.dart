@@ -2314,15 +2314,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get examReminderSuggestion =>
-      'Yaklaşan bir sınavın var gibi. Tekrar için hatırlatma ister misin?';
+      'Bunun için sana bir hatırlatma kurayım mı?';
 
   @override
   String get examReminderAction => 'Hatırlat';
 
   @override
-  String get examReminderTaskTitle => 'Sınav notlarını tekrar et';
+  String get examReminderTaskTitle => 'Bunun için takip hatırlatması';
 
   @override
-  String get examReminderNotification =>
-      'Sınav notlarının üstünden geçmeye hazır mısın?';
+  String get examReminderNotification => 'Takip etme zamanı';
 }

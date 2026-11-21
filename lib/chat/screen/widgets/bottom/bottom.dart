@@ -52,6 +52,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
   // Local controllers for the InputField
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  late final InputProvider _inputProvider;
 
   // We use a GlobalKey to access InputField state (specifically for button enabling logic)
   final GlobalKey<InputFieldState> _inputFieldKey =
@@ -63,6 +64,8 @@ class _ChatInputPanelState extends State<ChatInputPanel>
   @override
   void initState() {
     super.initState();
+    _inputProvider = context.read<InputProvider>();
+    _inputProvider.addListener(_syncGlobalDraft);
     _editPanelSizeFactor = CurvedAnimation(
       parent: widget.editPanelController,
       curve: Curves.easeOut,
@@ -75,7 +78,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     );
 
     // Initialize from Global Draft
-    final draft = context.read<InputProvider>().globalDraft;
+    final draft = _inputProvider.globalDraft;
     if (draft.isNotEmpty) {
       _textController.text = draft;
     }
@@ -84,6 +87,16 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     _textController.addListener(() {
       context.read<InputProvider>().updateGlobalDraft(_textController.text);
     });
+  }
+
+  void _syncGlobalDraft() {
+    if (!mounted) return;
+    final draft = _inputProvider.globalDraft;
+    if (_textController.text == draft) return;
+    _textController.value = TextEditingValue(
+      text: draft,
+      selection: TextSelection.collapsed(offset: draft.length),
+    );
   }
 
   /// Public method to request keyboard focus on the chat input field.
@@ -110,6 +123,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
   @override
   void dispose() {
+    _inputProvider.removeListener(_syncGlobalDraft);
     _textController.dispose();
     _focusNode.dispose();
     super.dispose();

@@ -164,5 +164,15 @@ void main() {
       inputProvider.clearAllInput();
       expect(inputProvider.globalDraft, isEmpty);
     });
+
+    test('external study action updates mounted composer listeners', () {
+      var notifications = 0;
+      inputProvider.addListener(() => notifications++);
+
+      inputProvider.setGlobalDraftFromAction('Create an audio lesson');
+
+      expect(inputProvider.globalDraft, 'Create an audio lesson');
+      expect(notifications, 1);
+    });
   });
 }

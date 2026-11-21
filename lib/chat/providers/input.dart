@@ -359,6 +359,15 @@ class InputProvider with ChangeNotifier {
     }
   }
 
+  /// Replaces the composer draft from an external flow such as a document
+  /// study template. Unlike keystroke updates this notifies the composer so
+  /// an already-mounted input field reflects the change immediately.
+  void setGlobalDraftFromAction(String text) {
+    if (_globalDraft == text) return;
+    _globalDraft = text;
+    notifyListeners();
+  }
+
   // -------------------- Global Reset --------------------
 
   void resetInputState() {

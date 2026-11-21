@@ -8,6 +8,7 @@ import 'package:cortex/design.dart';
 //   document chat, syncing the choice into [InputProvider].
 
 import 'dart:io';
+
 import 'package:cortex/app.dart';
 import 'package:cortex/appbar.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -157,7 +158,9 @@ class _DocumentLibraryScreenViewState
             child: Text(
               l10n.delete,
               style: const TextStyle(
-                  color: Colors.redAccent, fontWeight: FontWeight.bold),
+                color: Colors.redAccent,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -171,17 +174,15 @@ class _DocumentLibraryScreenViewState
     await ragProvider.removeDocument(doc.id);
     // Drop the deleted document from the active document chat selection.
     if (inputProvider.ragEnabled) {
-      inputProvider.setRagDocuments(
-        ragProvider.selectedDocumentIds.toList(),
-      );
+      inputProvider.setRagDocuments(ragProvider.selectedDocumentIds.toList());
     }
   }
 
   void _reindex(RagDocument doc) {
     context.read<RagProvider>().indexFile(
-          filePath: doc.filePath,
-          title: doc.title,
-        );
+      filePath: doc.filePath,
+      title: doc.title,
+    );
   }
 
   // ---------------------------------------------------------------------
@@ -197,6 +198,41 @@ class _DocumentLibraryScreenViewState
 
     inputProvider.setRagDocuments(selected);
     inputProvider.setRagEnabled(true);
+    Navigator.of(context).pop();
+  }
+
+  void _startStudyOutput(_StudyOutput output) {
+    final ragProvider = context.read<RagProvider>();
+    final inputProvider = context.read<InputProvider>();
+    final selected = ragProvider.documents
+        .where(
+          (doc) =>
+              ragProvider.selectedDocumentIds.contains(doc.id) &&
+              doc.status == RagDocumentStatus.indexed,
+        )
+        .map((doc) => doc.id)
+        .toList(growable: false);
+    if (selected.isEmpty) return;
+
+    final isTurkish = Localizations.localeOf(context).languageCode == 'tr';
+    final prompt = switch (output) {
+      _StudyOutput.audioLesson =>
+        isTurkish
+            ? 'Seçili kaynak belgelerime dayanarak yaklaşık 5 dakikalık, doğal anlatımlı bir sesli ders metni hazırla. Konuyu merak uyandıran kısa bir girişle aç; temel fikirleri örneklerle açıkla; sonunda kısa tekrar ve üç kontrol sorusu ekle. Yalnızca kaynaklarda olan bilgileri kullan, her bölümün sonunda kaynak belge ve sayfa/bölüm bilgisini belirt; kaynakta olmayan noktaları açıkça söyle. Metni Cortex’te sesli dinlemeye uygun, akıcı biçimde yaz.'
+            : 'Using only my selected source documents, write a natural, roughly five-minute audio lesson. Open with a short hook, explain the key ideas with examples, and end with a recap and three check questions. Cite the source document and page/section for each part, and clearly flag anything the sources do not establish. Make the script easy to listen to with Cortex read-aloud.',
+      _StudyOutput.podcast =>
+        isTurkish
+            ? 'Seçili kaynakları kullanarak iki sunuculu, yaklaşık 6 dakikalık öğretici bir podcast diyaloğu yaz. Konuşma doğal ve eğlenceli olsun; sunucular birbirine soru sorsun, örnek ve kısa tekrarlar kullansın. Kaynak dışı bilgi ekleme; ilgili noktalarda belge ve sayfa/bölüm adını söyle. Sonda dinleyiciye üç kısa soru sor.'
+            : 'Create a roughly six-minute educational podcast dialogue between two hosts using only my selected sources. Make it conversational and lively, with questions, examples, and short recaps. Do not add unsupported facts; mention the source document and page/section for each key claim. End with three quick listener questions. Format it for Cortex read-aloud.',
+      _StudyOutput.presentation =>
+        isTurkish
+            ? 'Seçili kaynakları kullanarak 8 slaytlık, öğretici ve görsel hiyerarşisi net bir sunum hazırla. Önce ana mesajı belirle; her slaytta kısa başlık, en fazla 4 madde ve konuşmacı notları olsun. Kaynak belge ve sayfa/bölüm bilgisini notlarda göster; kaynakta olmayan bilgi ekleme. create_document aracı mevcutsa sunumu .pptx olarak oluştur ve ekle; değilse slaytları düzenli bir taslak halinde ver.'
+            : 'Create a clear, teachable eight-slide presentation from my selected sources. Establish one main takeaway; give every slide a concise title, at most four bullets, and speaker notes. Cite source document and page/section in the notes; do not add unsupported facts. If create_document is available, create and attach a polished .pptx; otherwise provide the complete slide outline.',
+    };
+
+    inputProvider.setRagDocuments(selected);
+    inputProvider.setRagEnabled(true);
+    inputProvider.setGlobalDraftFromAction(prompt);
     Navigator.of(context).pop();
   }
 
@@ -251,49 +287,62 @@ class _DocumentLibraryScreenViewState
                     ),
                   )
                 : documents.isEmpty
-                    ? _EmptyState(
-                        icon: SvgPicture.asset(
-                          'assets/icons/attachment.svg',
-                          width: 56,
-                          height: 56,
-                          colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor.inverted
-                                .withValues(alpha: 0.2),
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        title: l10n.ragEmptyTitle,
-                        description: l10n.ragEmptyDescription,
-                        actionLabel: l10n.ragAddDocuments,
-                        onAction: _addDocuments,
-                      )
-                    : ListView.builder(
-                        padding: EdgeInsets.fromLTRB(
-                            CortexDesign.readingInset(
-                                MediaQuery.sizeOf(context).width),
-                            8,
-                            CortexDesign.readingInset(
-                                MediaQuery.sizeOf(context).width),
-                            24),
-                        itemCount: documents.length,
-                        itemBuilder: (context, index) {
-                          final doc = documents[index];
-                          return _DocumentTile(
-                            document: doc,
-                            isSelected: selectedIds.contains(doc.id) &&
-                                doc.status == RagDocumentStatus.indexed,
-                            isIndexing: ragProvider.isIndexing(doc.filePath),
-                            onTap: () {
-                              if (doc.status != RagDocumentStatus.indexed) {
-                                _reindex(doc);
-                              } else {
-                                _onToggleSelection(doc.id);
-                              }
-                            },
-                            onDelete: () => _confirmDelete(doc),
-                          );
-                        },
+                ? _EmptyState(
+                    icon: SvgPicture.asset(
+                      'assets/icons/attachment.svg',
+                      width: 56,
+                      height: 56,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor.inverted.withValues(alpha: 0.2),
+                        BlendMode.srcIn,
                       ),
+                    ),
+                    title: l10n.ragEmptyTitle,
+                    description: l10n.ragEmptyDescription,
+                    actionLabel: l10n.ragAddDocuments,
+                    onAction: _addDocuments,
+                  )
+                : ListView(
+                    padding: EdgeInsets.fromLTRB(
+                      CortexDesign.readingInset(
+                        MediaQuery.sizeOf(context).width,
+                      ),
+                      8,
+                      CortexDesign.readingInset(
+                        MediaQuery.sizeOf(context).width,
+                      ),
+                      24,
+                    ),
+                    children: [
+                      _LearningStudioCard(
+                        selectedCount: documents
+                            .where(
+                              (doc) =>
+                                  selectedIds.contains(doc.id) &&
+                                  doc.status == RagDocumentStatus.indexed,
+                            )
+                            .length,
+                        onChoose: _startStudyOutput,
+                      ),
+                      const SizedBox(height: 12),
+                      for (final doc in documents)
+                        _DocumentTile(
+                          document: doc,
+                          isSelected:
+                              selectedIds.contains(doc.id) &&
+                              doc.status == RagDocumentStatus.indexed,
+                          isIndexing: ragProvider.isIndexing(doc.filePath),
+                          onTap: () {
+                            if (doc.status != RagDocumentStatus.indexed) {
+                              _reindex(doc);
+                            } else {
+                              _onToggleSelection(doc.id);
+                            }
+                          },
+                          onDelete: () => _confirmDelete(doc),
+                        ),
+                    ],
+                  ),
           ),
           if (documents.isNotEmpty)
             _BottomBar(
@@ -322,10 +371,174 @@ class _DocumentLibraryScreenViewState
     if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ));
+      ..showSnackBar(
+        SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+      );
+  }
+}
+
+enum _StudyOutput { audioLesson, podcast, presentation }
+
+class _LearningStudioCard extends StatelessWidget {
+  const _LearningStudioCard({
+    required this.selectedCount,
+    required this.onChoose,
+  });
+
+  final int selectedCount;
+  final ValueChanged<_StudyOutput> onChoose;
+
+  @override
+  Widget build(BuildContext context) {
+    final isTurkish = Localizations.localeOf(context).languageCode == 'tr';
+    final text = AppColors.primaryColor.inverted;
+    final accent = AppColors.primaryColor;
+    final enabled = selectedCount > 0;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: accent.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.auto_awesome_rounded, color: accent, size: 21),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  isTurkish
+                      ? 'Cortex Öğrenme Stüdyosu'
+                      : 'Cortex Learning Studio',
+                  style: TextStyle(
+                    color: text,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (enabled)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: Text(
+                    isTurkish
+                        ? '$selectedCount kaynak'
+                        : '$selectedCount sources',
+                    style: TextStyle(color: accent, fontSize: 11),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isTurkish
+                ? 'Seçtiğin güvenilir belgelerden dinlenebilir ders, podcast veya sunum hazırla.'
+                : 'Turn trusted documents you choose into a listenable lesson, podcast, or presentation.',
+            style: TextStyle(
+              color: text.withValues(alpha: 0.72),
+              height: 1.4,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 13),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _StudioAction(
+                icon: Icons.headphones_rounded,
+                label: isTurkish ? 'Sesli ders' : 'Audio lesson',
+                enabled: enabled,
+                onTap: () => onChoose(_StudyOutput.audioLesson),
+              ),
+              _StudioAction(
+                icon: Icons.graphic_eq_rounded,
+                label: 'Podcast',
+                enabled: enabled,
+                onTap: () => onChoose(_StudyOutput.podcast),
+              ),
+              _StudioAction(
+                icon: Icons.slideshow_rounded,
+                label: isTurkish ? 'Sunum' : 'Slides',
+                enabled: enabled,
+                onTap: () => onChoose(_StudyOutput.presentation),
+              ),
+            ],
+          ),
+          if (!enabled) ...[
+            const SizedBox(height: 9),
+            Text(
+              isTurkish
+                  ? 'Önce aşağıdan en az bir belge seç.'
+                  : 'Select at least one document below to get started.',
+              style: TextStyle(
+                color: text.withValues(alpha: 0.54),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StudioAction extends StatelessWidget {
+  const _StudioAction({
+    required this.icon,
+    required this.label,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = AppColors.primaryColor.inverted;
+    return Material(
+      color: color.withValues(alpha: enabled ? 0.08 : 0.035),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: color.withValues(alpha: enabled ? 1 : 0.4),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color.withValues(alpha: enabled ? 1 : 0.4),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -439,8 +652,10 @@ class _DocumentTile extends StatelessWidget {
                       'assets/icons/regenerate.svg',
                       width: CortexDesign.icon,
                       height: CortexDesign.icon,
-                      colorFilter:
-                          ColorFilter.mode(Colors.redAccent, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                        Colors.redAccent,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   )
                 else if (isSelected)
@@ -618,9 +833,7 @@ class _BottomBar extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
         decoration: BoxDecoration(
           color: AppColors.background,
-          border: Border(
-            top: BorderSide(color: AppColors.border, width: 0.6),
-          ),
+          border: Border(top: BorderSide(color: AppColors.border, width: 0.6)),
         ),
         child: Row(
           children: [
@@ -676,8 +889,8 @@ class _StadiumButton extends StatelessWidget {
       color: !isEnabled
           ? inverted.withValues(alpha: 0.12)
           : isDestructive
-              ? Colors.redAccent.withValues(alpha: 0.15)
-              : inverted,
+          ? Colors.redAccent.withValues(alpha: 0.15)
+          : inverted,
       shape: StadiumBorder(
         side: isDestructive
             ? BorderSide(color: Colors.redAccent.withValues(alpha: 0.6))
@@ -697,8 +910,8 @@ class _StadiumButton extends StatelessWidget {
               color: !isEnabled
                   ? inverted.withValues(alpha: 0.4)
                   : isDestructive
-                      ? Colors.redAccent
-                      : AppColors.primaryColor,
+                  ? Colors.redAccent
+                  : AppColors.primaryColor,
             ),
           ),
         ),

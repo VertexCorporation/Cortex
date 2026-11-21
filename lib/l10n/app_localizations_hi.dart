@@ -2312,14 +2312,14 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get examReminderSuggestion =>
-      'Looks like you have an exam coming up. Want a reminder to review?';
+      'Would you like a reminder to follow up on this?';
 
   @override
   String get examReminderAction => 'Set reminder';
 
   @override
-  String get examReminderTaskTitle => 'Review exam notes';
+  String get examReminderTaskTitle => 'Follow up on this';
 
   @override
-  String get examReminderNotification => 'Ready to go over your exam notes?';
+  String get examReminderNotification => 'Time to follow up';
 }

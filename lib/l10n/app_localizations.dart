@@ -4191,7 +4191,7 @@ abstract class AppLocalizations {
   /// No description provided for @examReminderSuggestion.
   ///
   /// In en, this message translates to:
-  /// **'Looks like you have an exam coming up. Want a reminder to review?'**
+  /// **'Would you like a reminder to follow up on this?'**
   String get examReminderSuggestion;
 
   /// No description provided for @examReminderAction.
@@ -4203,13 +4203,13 @@ abstract class AppLocalizations {
   /// No description provided for @examReminderTaskTitle.
   ///
   /// In en, this message translates to:
-  /// **'Review exam notes'**
+  /// **'Follow up on this'**
   String get examReminderTaskTitle;
 
   /// No description provided for @examReminderNotification.
   ///
   /// In en, this message translates to:
-  /// **'Ready to go over your exam notes?'**
+  /// **'Time to follow up'**
   String get examReminderNotification;
 }
 
