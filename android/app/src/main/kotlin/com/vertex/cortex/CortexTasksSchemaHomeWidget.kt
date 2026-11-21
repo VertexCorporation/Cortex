@@ -65,17 +65,17 @@ class CortexTasksSchemaHomeWidget : GlanceAppWidget() {
     GlanceTheme {
             Box(modifier = GlanceModifier.background(GlanceTheme.colors.widgetBackground).padding(16.dp).fillMaxSize().clickable(onClick = actionStartActivity<MainActivity>(context, Uri.parse("cortex://tasks?homeWidget"))), contentAlignment = Alignment.Center) {
                 Box(
-                    modifier = GlanceModifier.background(ColorProvider(day = Color(0xFF343540), night = Color(0xFF343540))).cornerRadius(24.0.dp).padding(1.0.dp)
+                    modifier = GlanceModifier.background(ColorProvider(day = Color(0xFFDADADA), night = Color(0xFF2C2C2C))).cornerRadius(24.0.dp).padding(1.0.dp)
                 ) {
                     Box(
-                        modifier = GlanceModifier.background(ColorProvider(day = Color(0xFF171820), night = Color(0xFF171820))).cornerRadius(23.0.dp)
+                        modifier = GlanceModifier.background(ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFF090909))).cornerRadius(23.0.dp)
                     ) {
                         Column(modifier = GlanceModifier.padding(start = 16.0.dp, top = 16.0.dp, end = 16.0.dp, bottom = 16.0.dp), horizontalAlignment = Alignment.Start) {
-                            Text(text = "CORTEX  ·  TASKS", style = TextStyle(color = ColorProvider(day = Color(0xFFBDA7FF), night = Color(0xFFBDA7FF)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                            Text(text = "CORTEX  ·  TASKS", style = TextStyle(color = ColorProvider(day = Color(0xFF0D62FE), night = Color(0xFF7C9CFF)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
                             Spacer(modifier = GlanceModifier.height(10.0.dp))
-                            Text(text = widgetData.nextTask ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFFF5F3FA), night = Color(0xFFF5F3FA)), fontSize = 22.sp, fontWeight = FontWeight.Bold))
+                            Text(text = widgetData.nextTask ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF171717), night = Color(0xFFF5F5F5)), fontSize = 22.sp, fontWeight = FontWeight.Bold))
                             Spacer(modifier = GlanceModifier.height(6.0.dp))
-                            Text(text = widgetData.taskCount ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFFAAA9B4), night = Color(0xFFAAA9B4)), fontSize = 12.sp, fontWeight = FontWeight.Normal))
+                            Text(text = widgetData.taskCount ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF666666), night = Color(0xFF9B9B9B)), fontSize = 12.sp, fontWeight = FontWeight.Normal))
                         }
                     }
                 }

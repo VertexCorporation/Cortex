@@ -7,9 +7,18 @@ import 'package:home_widget_generator/home_widget_generator.dart';
   iOS: HomeWidgetIOSConfiguration(groupId: 'group.com.vertex.cortex'),
   widget: HWDecoratedBox(
     decoration: HWBoxDecoration(
-      color: HWColor.fixed(0xFF171820),
+      color: HWColor.themed(
+        light: HWColor.fixed(0xFFFFFFFF),
+        dark: HWColor.fixed(0xFF090909),
+      ),
       borderRadius: HWBorderRadius.circular(24),
-      border: HWBoxBorder(color: HWColor.fixed(0xFF343540), thickness: 1),
+      border: HWBoxBorder(
+        color: HWColor.themed(
+          light: HWColor.fixed(0xFFDADADA),
+          dark: HWColor.fixed(0xFF2C2C2C),
+        ),
+        thickness: 1,
+      ),
     ),
     child: HWPadding(
       padding: HWEdgeInsets.all(16),
@@ -20,7 +29,10 @@ import 'package:home_widget_generator/home_widget_generator.dart';
             'CORTEX',
             style: HWRoleTextStyle(
               role: HWTextStyleRole.caption,
-              color: HWColor.fixed(0xFFBDA7FF),
+              color: HWColor.themed(
+                light: HWColor.fixed(0xFF0D62FE),
+                dark: HWColor.fixed(0xFF7C9CFF),
+              ),
               fontWeight: HWFontWeight.bold,
             ),
           ),
@@ -29,7 +41,10 @@ import 'package:home_widget_generator/home_widget_generator.dart';
             'Start a new chat',
             style: HWRoleTextStyle(
               role: HWTextStyleRole.title,
-              color: HWColor.fixed(0xFFF5F3FA),
+              color: HWColor.themed(
+                light: HWColor.fixed(0xFF171717),
+                dark: HWColor.fixed(0xFFF5F5F5),
+              ),
               fontWeight: HWFontWeight.bold,
             ),
           ),
@@ -38,7 +53,10 @@ import 'package:home_widget_generator/home_widget_generator.dart';
             'Tap to talk to Cortex',
             style: HWRoleTextStyle(
               role: HWTextStyleRole.caption,
-              color: HWColor.fixed(0xFFAAA9B4),
+              color: HWColor.themed(
+                light: HWColor.fixed(0xFF666666),
+                dark: HWColor.fixed(0xFF9B9B9B),
+              ),
             ),
           ),
         ],
