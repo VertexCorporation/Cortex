@@ -558,12 +558,12 @@ class _VoiceStatusIndicator extends StatelessWidget {
         voiceLimitReached ? l10n.voiceDailyLimitReached : l10n.voiceUnavailable,
       VoiceState.idle => '',
     };
-    // Voice chrome follows Cortex's active theme exactly. The liquid orb can
-    // remain expressive, but controls/status never introduce a foreign accent
-    // color into the app's black/white surface language.
-    final foreground = AppColors.primaryColor.computeLuminance() > 0.5
-        ? const Color(0xFF2D2A26)
-        : const Color(0xFFE8E3DC);
+    // The voice capsule is deliberately pure Cortex monochrome in every
+    // theme: black glass, white content, neutral border. The liquid orb can
+    // remain expressive without making the controls look like a foreign UI.
+    const foreground = Color(0xFFF4F4F4);
+    const capsuleBackground = Color(0xFF090909);
+    const capsuleBorder = Color(0xFF2C2C2C);
 
     return Semantics(
       container: true,
@@ -578,9 +578,9 @@ class _VoiceStatusIndicator extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
           decoration: BoxDecoration(
-            color: AppColors.background.withValues(alpha: 0.97),
+            color: capsuleBackground.withValues(alpha: 0.97),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.border.withValues(alpha: 0.85)),
+            border: Border.all(color: capsuleBorder),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.10),
