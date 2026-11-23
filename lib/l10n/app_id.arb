@@ -883,5 +883,6 @@
   "creditWarningExhaustedMessage": "Anda telah menggunakan semua kredit hari ini. Kredit pulih dalam {renewalTime}. Upgrade agar bisa terus tanpa batas.",
   "creditWarningUltraExhaustedMessage": "Anda telah mencapai batas penggunaan hari ini. Batas pulih dalam {renewalTime}.",
   "creditRenewalDurationHour": "{count, plural, other {{count} jam}}",
-  "creditRenewalDurationMinute": "{count, plural, other {{count} menit}}"
+  "creditRenewalDurationMinute": "{count, plural, other {{count} menit}}",
+  "taskReminderMayBeDelayed": "Pengingat disimpan. Android dapat menundanya karena izin alarm tepat dinonaktifkan."
 }

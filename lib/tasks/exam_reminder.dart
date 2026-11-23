@@ -142,6 +142,7 @@ class ExamReminderSuggestion {
     final title = _taskTitle(message);
     final notifications = context.read<ExtrovertNotificationService>();
     int? notificationId;
+    var reminderMayBeDelayed = false;
     try {
       if (await notifications.requestTaskReminderPermission()) {
         notificationId = DateTime.now().microsecondsSinceEpoch & 0x7fffffff;
@@ -150,6 +151,8 @@ class ExamReminderSuggestion {
           title: '$title — ${l10n.examReminderNotification}',
           scheduledAt: reminder,
         );
+        reminderMayBeDelayed = !await notifications
+            .canScheduleTaskReminderExactly();
       }
     } catch (_) {
       notificationId = null;
@@ -171,6 +174,9 @@ class ExamReminderSuggestion {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.taskReminderPermissionNeeded)),
       );
+    } else if (context.mounted && reminderMayBeDelayed) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.taskReminderMayBeDelayed)));
     }
   }
 

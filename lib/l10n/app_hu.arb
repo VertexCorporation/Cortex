@@ -636,5 +636,6 @@
   "creditWarningExhaustedMessage": "Mára az összes kreditjét elhasználta. {renewalTime} múlva megújulnak. Korlátok nélküli folytatáshoz frissítsen.",
   "creditWarningUltraExhaustedMessage": "Elérte a mai használati limitjét. {renewalTime} múlva megújul.",
   "creditRenewalDurationHour": "{count, plural, one {{count} óra} other {{count} óra}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} perc} other {{count} perc}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} perc} other {{count} perc}}",
+  "taskReminderMayBeDelayed": "Az emlékeztető mentve. Az Android késleltetheti, mert a pontos riasztások engedélye ki van kapcsolva."
 }

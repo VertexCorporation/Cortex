@@ -2313,6 +2313,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Görev kaydedildi; hatırlatıcı için bildirim izni gerekli.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'Hatırlatıcı kaydedildi. Kesin alarm izni kapalı olduğu için Android bildirimi geciktirebilir.';
+
+  @override
   String get examReminderSuggestion =>
       'Bunun için sana bir hatırlatma kurayım mı?';
 

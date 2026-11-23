@@ -2330,6 +2330,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'Promemoria salvato. Android potrebbe ritardarlo perché l\'autorizzazione per gli allarmi esatti è disattivata.';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

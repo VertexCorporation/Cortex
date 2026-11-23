@@ -4188,6 +4188,12 @@ abstract class AppLocalizations {
   /// **'Task saved; notification permission is needed for its reminder.'**
   String get taskReminderPermissionNeeded;
 
+  /// No description provided for @taskReminderMayBeDelayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder saved. Android may delay it because exact alarm access is off.'**
+  String get taskReminderMayBeDelayed;
+
   /// No description provided for @examReminderSuggestion.
   ///
   /// In en, this message translates to:

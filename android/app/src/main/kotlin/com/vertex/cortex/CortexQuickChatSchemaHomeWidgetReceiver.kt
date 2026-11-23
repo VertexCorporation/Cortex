@@ -1,12 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 package com.vertex.cortex
 
-import android.content.Context
-import es.antonborri.home_widget.HomeWidgetGlanceWidgetReceiver
-
-class CortexQuickChatSchemaHomeWidgetReceiver : HomeWidgetGlanceWidgetReceiver<CortexQuickChatSchemaHomeWidget>() {
-  override val glanceAppWidget = CortexQuickChatSchemaHomeWidget()
-
-  override fun previewFingerprint(context: Context): String =
-      glanceAppWidget.previewFingerprint(context)
-}
+/** Keeps the existing widget component ID while using the compact native UI. */
+class CortexQuickChatSchemaHomeWidgetReceiver : CortexAppWidgetProvider()

@@ -883,5 +883,6 @@
   "creditWarningExhaustedMessage": "Hai usato tutti i crediti di oggi. Si rinnovano tra {renewalTime}. Fai l'upgrade per continuare senza limiti.",
   "creditWarningUltraExhaustedMessage": "Hai raggiunto il limite di utilizzo di oggi. Si rinnova tra {renewalTime}.",
   "creditRenewalDurationHour": "{count, plural, one {{count} ora} many {{count} ore} other {{count} ore}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} minuto} many {{count} minuti} other {{count} minuti}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minuto} many {{count} minuti} other {{count} minuti}}",
+  "taskReminderMayBeDelayed": "Promemoria salvato. Android potrebbe ritardarlo perché l'autorizzazione per gli allarmi esatti è disattivata."
 }

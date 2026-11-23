@@ -111,6 +111,7 @@ class _TasksScreenState extends State<TasksScreen> {
 
     int? notificationId;
     var reminderScheduled = false;
+    var reminderMayBeDelayed = false;
     if (reminder != null && reminder!.isAfter(DateTime.now())) {
       final notifications = context.read<ExtrovertNotificationService>();
       final allowed = await notifications.requestTaskReminderPermission();
@@ -123,6 +124,8 @@ class _TasksScreenState extends State<TasksScreen> {
             scheduledAt: reminder!,
           );
           reminderScheduled = true;
+          reminderMayBeDelayed = !await notifications
+              .canScheduleTaskReminderExactly();
         } catch (_) {
           notificationId = null;
         }
@@ -145,6 +148,9 @@ class _TasksScreenState extends State<TasksScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.taskReminderPermissionNeeded)),
       );
+    } else if (reminderMayBeDelayed && mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.taskReminderMayBeDelayed)));
     }
   }
 

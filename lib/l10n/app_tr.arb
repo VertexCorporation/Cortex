@@ -961,6 +961,7 @@
   "taskInputHint": "Ne yapacaksın?",
   "taskReminderAdd": "Hatırlatıcı ekle",
   "taskReminderPermissionNeeded": "Görev kaydedildi; hatırlatıcı için bildirim izni gerekli.",
+  "taskReminderMayBeDelayed": "Hatırlatıcı kaydedildi. Kesin alarm izni kapalı olduğu için Android bildirimi geciktirebilir.",
   "examReminderSuggestion": "Bunun için sana bir hatırlatma kurayım mı?",
   "examReminderAction": "Hatırlat",
   "examReminderTaskTitle": "Bunun için takip hatırlatması",

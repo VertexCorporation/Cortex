@@ -2322,6 +2322,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'Az emlékeztető mentve. Az Android késleltetheti, mert a pontos riasztások engedélye ki van kapcsolva.';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

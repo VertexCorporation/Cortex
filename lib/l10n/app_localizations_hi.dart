@@ -2311,6 +2311,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'रिमाइंडर सहेजा गया। सटीक अलार्म की अनुमति बंद होने के कारण Android सूचना में देरी कर सकता है।';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

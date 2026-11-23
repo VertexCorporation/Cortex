@@ -883,5 +883,6 @@
   "creditWarningExhaustedMessage": "Je hebt alle credits voor vandaag gebruikt. Ze worden vernieuwd over {renewalTime}. Upgrade om zonder limieten door te gaan.",
   "creditWarningUltraExhaustedMessage": "Je hebt je gebruikerslimiet voor vandaag bereikt. Hij wordt vernieuwd over {renewalTime}.",
   "creditRenewalDurationHour": "{count, plural, one {{count} uur} other {{count} uur}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} minuut} other {{count} minuten}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minuut} other {{count} minuten}}",
+  "taskReminderMayBeDelayed": "Herinnering opgeslagen. Android kan deze vertragen omdat toegang tot exacte alarmen uitstaat."
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
 import 'package:battery_plus/battery_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -78,12 +79,14 @@ class ExtrovertNotificationService {
         final _ = timezone.local;
       } catch (e) {
         debugPrint(
-            "[ExtrovertNotificationService] Timezone local not set. Defaulting to UTC to prevent crash.");
+          "[ExtrovertNotificationService] Timezone local not set. Defaulting to UTC to prevent crash.",
+        );
         timezone.setLocalLocation(timezone.getLocation('UTC'));
       }
     } catch (e) {
       debugPrint(
-          "[ExtrovertNotificationService] Error initializing timezones: $e");
+        "[ExtrovertNotificationService] Error initializing timezones: $e",
+      );
     }
 
     final prefs = await SharedPreferences.getInstance();
@@ -122,19 +125,23 @@ class ExtrovertNotificationService {
   Future<void> _initializeLocalNotifications() async {
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_fcmChannel);
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_engagementChannel);
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_greetingsChannel);
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(
           const AndroidNotificationChannel(
             'task_reminders',
@@ -148,10 +155,10 @@ class ExtrovertNotificationService {
         AndroidInitializationSettings('ic_notification');
     const DarwinInitializationSettings initSettingsIOS =
         DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        );
 
     final InitializationSettings initSettings = InitializationSettings(
       android: initSettingsAndroid,
@@ -169,17 +176,53 @@ class ExtrovertNotificationService {
     if (!_isInitialized) await initialize();
     final ios = await _localNotifications
         .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
+          IOSFlutterLocalNotificationsPlugin
+        >()
         ?.requestPermissions(alert: true, badge: true, sound: true);
     final macos = await _localNotifications
         .resolvePlatformSpecificImplementation<
-            MacOSFlutterLocalNotificationsPlugin>()
+          MacOSFlutterLocalNotificationsPlugin
+        >()
         ?.requestPermissions(alert: true, badge: true, sound: true);
     final android = await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
+
+    final androidNotifications = _localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (Platform.isAndroid && android == true) {
+      var canScheduleExactly =
+          await androidNotifications?.canScheduleExactNotifications() ?? false;
+      if (!canScheduleExactly) {
+        await androidNotifications?.requestExactAlarmsPermission();
+        canScheduleExactly =
+            await androidNotifications?.canScheduleExactNotifications() ??
+            false;
+      }
+      _canScheduleExactTaskReminders = canScheduleExactly;
+    }
     return ios ?? macos ?? android ?? true;
+  }
+
+  bool _canScheduleExactTaskReminders = false;
+  bool get canScheduleExactTaskReminders =>
+      !Platform.isAndroid || _canScheduleExactTaskReminders;
+
+  Future<bool> canScheduleTaskReminderExactly() async {
+    if (!Platform.isAndroid) return true;
+    final allowed =
+        await _localNotifications
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >()
+            ?.canScheduleExactNotifications() ??
+        false;
+    _canScheduleExactTaskReminders = allowed;
+    return allowed;
   }
 
   Future<void> scheduleTaskReminder({
@@ -209,7 +252,16 @@ class ExtrovertNotificationService {
         ),
       ),
       payload: jsonEncode({'screen': 'tasks'}),
-      androidScheduleMode: AndroidScheduleMode.inexact,
+      androidScheduleMode:
+          Platform.isAndroid &&
+              (await _localNotifications
+                      .resolvePlatformSpecificImplementation<
+                        AndroidFlutterLocalNotificationsPlugin
+                      >()
+                      ?.canScheduleExactNotifications() ??
+                  false)
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
 

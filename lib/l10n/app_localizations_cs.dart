@@ -2314,6 +2314,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'Připomínka je uložena. Android může oznámení zpozdit, protože přesné budíky nejsou povoleny.';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

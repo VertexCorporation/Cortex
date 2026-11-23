@@ -2328,6 +2328,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'Напоминание сохранено. Android может задержать его, так как разрешение на точные будильники отключено.';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

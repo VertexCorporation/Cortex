@@ -2308,6 +2308,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'تم حفظ التذكير. قد يؤخر Android الإشعار لأن إذن التنبيهات الدقيقة غير مفعّل.';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

@@ -666,5 +666,6 @@
   "creditWarningExhaustedMessage": "Du har brukt alle kredittene dine for i dag. De fornyes om {renewalTime}. Oppgrader for å fortsette uten grenser.",
   "creditWarningUltraExhaustedMessage": "Du har nådd dagens bruksgrense. Den fornyes om {renewalTime}.",
   "creditRenewalDurationHour": "{count, plural, one {{count} time} other {{count} timer}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} minutt} other {{count} minutter}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minutt} other {{count} minutter}}",
+  "taskReminderMayBeDelayed": "Påminnelsen er lagret. Android kan forsinke den fordi tilgang til nøyaktige alarmer er slått av."
 }

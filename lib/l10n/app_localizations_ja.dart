@@ -2258,6 +2258,10 @@ class AppLocalizationsJa extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'リマインダーを保存しました。正確なアラームの権限が無効なため、Androidで通知が遅れる場合があります。';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

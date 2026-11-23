@@ -636,5 +636,6 @@
   "creditWarningExhaustedMessage": "Využili jste všechny kredity na dnešek. Obnoví se za {renewalTime}. Upgradujte, abyste mohli pokračovat bez omezení.",
   "creditWarningUltraExhaustedMessage": "Dosažili jste dnešního limitu využití. Obnoví se za {renewalTime}.",
   "creditRenewalDurationHour": "{count, plural, one {{count} hodina} few {{count} hodiny} many {{count} hodin} other {{count} hodin}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} minuta} few {{count} minuty} many {{count} minut} other {{count} minut}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minuta} few {{count} minuty} many {{count} minut} other {{count} minut}}",
+  "taskReminderMayBeDelayed": "Připomínka je uložena. Android může oznámení zpozdit, protože přesné budíky nejsou povoleny."
 }

@@ -883,5 +883,6 @@
   "creditWarningExhaustedMessage": "Vous avez utilisé tous vos crédits pour aujourd'hui. Ils se renouvellent dans {renewalTime}. Passez à un abonnement payant pour continuer sans limite.",
   "creditWarningUltraExhaustedMessage": "Vous avez atteint votre limite d'utilisation pour aujourd'hui. Elle se renouvelle dans {renewalTime}.",
   "creditRenewalDurationHour": "{count, plural, one {{count} heure} many {{count} heures} other {{count} heures}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} minute} many {{count} minutes} other {{count} minutes}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} minute} many {{count} minutes} other {{count} minutes}}",
+  "taskReminderMayBeDelayed": "Rappel enregistré. Android peut le retarder, car l'accès aux alarmes exactes est désactivé."
 }

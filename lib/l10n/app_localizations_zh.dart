@@ -2203,6 +2203,9 @@ class AppLocalizationsZh extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed => '提醒已保存。由于精确闹钟权限已关闭，Android 可能会延迟通知。';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

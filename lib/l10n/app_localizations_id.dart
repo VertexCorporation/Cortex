@@ -2320,6 +2320,10 @@ class AppLocalizationsId extends AppLocalizations {
       'Task saved; notification permission is needed for its reminder.';
 
   @override
+  String get taskReminderMayBeDelayed =>
+      'Pengingat disimpan. Android dapat menundanya karena izin alarm tepat dinonaktifkan.';
+
+  @override
   String get examReminderSuggestion =>
       'Would you like a reminder to follow up on this?';
 

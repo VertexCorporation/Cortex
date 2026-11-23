@@ -24,9 +24,33 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : FlutterFragmentActivity() {
     companion object {
         private var voiceBackgroundChannel: MethodChannel? = null
+        private var widgetChannel: MethodChannel? = null
+        private var pendingWidgetQa: Map<String, String>? = null
+        private var widgetFlutterReady = false
 
         fun notifyVoiceStopRequested() {
             voiceBackgroundChannel?.invokeMethod("stopRequested", null)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleWidgetLaunchIntent(intent)
+    }
+
+    private fun handleWidgetLaunchIntent(intent: Intent?) {
+        val prompt = intent?.getStringExtra(CortexWidgetAskActivity.EXTRA_WIDGET_PROMPT)
+        val answer = intent?.getStringExtra(CortexWidgetAskActivity.EXTRA_WIDGET_ANSWER)
+        if (!prompt.isNullOrBlank()) {
+            intent.removeExtra(CortexWidgetAskActivity.EXTRA_WIDGET_PROMPT)
+            intent.removeExtra(CortexWidgetAskActivity.EXTRA_WIDGET_ANSWER)
+            val payload = mapOf("prompt" to prompt, "answer" to (answer ?: ""))
+            if (widgetFlutterReady && widgetChannel != null) {
+                widgetChannel?.invokeMethod("onWidgetContinue", payload)
+            } else {
+                pendingWidgetQa = payload
+            }
         }
     }
     
@@ -75,6 +99,7 @@ class MainActivity : FlutterFragmentActivity() {
         // Transparent system bars for proper Edge-to-Edge rendering.
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
+        handleWidgetLaunchIntent(intent)
     }
 
     /* ────────────────  CONSTANTS  ──────────────── */
@@ -90,6 +115,23 @@ class MainActivity : FlutterFragmentActivity() {
         super.configureFlutterEngine(flutterEngine)
 
         val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        widgetChannel = MethodChannel(messenger, "com.vertex.cortex/widget")
+        widgetChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "consumeInitialWidgetQa" -> {
+                    widgetFlutterReady = true
+                    val data = pendingWidgetQa
+                    pendingWidgetQa = null
+                    result.success(data)
+                }
+                "refreshWidgets" -> {
+                    CortexAppWidgetProvider.updateAllWidgets(this)
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
 
         voiceBackgroundChannel = MethodChannel(
             messenger,

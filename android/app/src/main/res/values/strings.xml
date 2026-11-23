@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="widget_title">Cortex AI</string>
+    <string name="widget_description">Ask Cortex AI anything directly from your home screen</string>
+    <string name="widget_ask_hint">Ask Cortex anything…</string>
+    <string name="widget_voice_desc">Voice question</string>
     <string name="flutter_downloader_notification_started">Download started</string>
     <string name="flutter_downloader_notification_in_progress">Download in progress</string>
     <string name="flutter_downloader_notification_canceled">Download canceled</string>

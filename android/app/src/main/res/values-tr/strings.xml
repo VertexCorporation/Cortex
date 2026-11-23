@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="widget_title">Cortex AI</string>
+    <string name="widget_description">Ana ekranınızdan uygulamayı açmadan Cortex AI\'a soru sorun</string>
+    <string name="widget_ask_hint">Cortex\'e bir şey sor…</string>
+    <string name="widget_voice_desc">Sesli soru sor</string>
     <string name="flutter_downloader_notification_started">İndirme başlatıldı</string>
     <string name="flutter_downloader_notification_in_progress">İndirme sürüyor</string>
     <string name="flutter_downloader_notification_canceled">İndirme iptal edildi</string>

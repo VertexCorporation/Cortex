@@ -31,6 +31,7 @@
     <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!-- Storage & Media -->
     <!-- Android 13+ (API 33+) Media Permissions -->
@@ -160,6 +161,15 @@
             android:stopWithTask="false"
             android:foregroundServiceType="microphone" />
 
+        <activity
+            android:name=".CortexWidgetAskActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.vertex.cortex.widget"
+            android:theme="@style/WidgetOverlayTheme"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+
         <!-- ========================================== -->
         <!-- FLUTTER DOWNLOADER & WORKMANAGER SETTINGS -->
         <!-- ========================================== -->
@@ -211,15 +221,15 @@
         </provider>
 
         <receiver
-            android:name="com.vertex.cortex.CortexQuickChatSchemaHomeWidgetReceiver"
-            android:label="@string/home_widget_cortex_quick_chat_schema_label"
+            android:name=".CortexQuickChatSchemaHomeWidgetReceiver"
+            android:label="@string/widget_title"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/cortex_quick_chat_schema_home_widget" />
+                android:resource="@xml/cortex_widget_info" />
         </receiver>
         <receiver
             android:name="com.vertex.cortex.CortexTasksSchemaHomeWidgetReceiver"

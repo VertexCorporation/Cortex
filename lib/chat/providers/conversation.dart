@@ -382,6 +382,66 @@ class ConversationProvider with ChangeNotifier {
     _isEphemeral = false;
   }
 
+  /// Saves a short Q&A created from the Android home-screen quick-ask widget.
+  Future<void> importWidgetQaSession({
+    required String id,
+    required String prompt,
+    required String answer,
+    required String modelId,
+    String? modelTitle,
+    String? modelImagePath,
+  }) async {
+    _streamThrottleTimer?.cancel();
+    _streamThrottleTimer = null;
+    _hasPendingStreamUpdate = false;
+
+    final rawTitle = prompt.trim();
+    final title = rawTitle.length > 36
+        ? '${rawTitle.substring(0, 36)}…'
+        : (rawTitle.isEmpty ? 'Cortex Widget' : rawTitle);
+    final userMessage = Message(
+      text: prompt,
+      isUserMessage: true,
+      model: modelId,
+    );
+    final assistantMessage = Message(
+      text: answer,
+      isUserMessage: false,
+      isThinking: false,
+      model: modelId,
+    );
+
+    _conversationID = id;
+    _conversationTitle = title;
+    _messages = [userMessage, assistantMessage];
+    _isWaitingForResponse = false;
+    _responseStopped = false;
+    _isLoadingMessages = false;
+    _justFinishedLoading = true;
+    _isEphemeral = false;
+    notifyListeners();
+
+    try {
+      final savedTitle = await ChatStorageService.saveConversation(
+        id,
+        title,
+        const [],
+        modelId: modelId,
+        modelTitle: modelTitle,
+        modelImagePath: modelImagePath,
+      );
+      if (savedTitle != null && _conversationID == id) {
+        _conversationTitle = savedTitle;
+      }
+      await ChatStorageService.upsertMessage(id, 0, userMessage);
+      await ChatStorageService.upsertMessage(id, 1, assistantMessage);
+      CacheService.invalidateConversationCache();
+      notifyListeners();
+    } catch (error) {
+      debugPrint('[ConversationProvider] Widget Q&A save failed: $error');
+    }
+  }
+
   /// Prepares the conversation state for a regeneration action in a single, atomic operation.
   ///
   /// This method replaces the previous two-step fade-out/finalize process. It works for two scenarios:

@@ -24,4 +24,13 @@
         <!-- MUST be true for Edge-to-Edge to deliver proper WindowInsets to Flutter -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
+    <style name="WidgetOverlayTheme" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.55</item>
+        <item name="android:windowSoftInputMode">stateVisible|adjustResize</item>
+    </style>
 </resources>

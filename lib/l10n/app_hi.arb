@@ -883,5 +883,6 @@
   "creditWarningExhaustedMessage": "आपने आज के सारे क्रेडिट इस्तेमाल कर लिए। ये {renewalTime} में नवीनीकृत होंगे। बिना सीमा जारी रखने के लिए अपग्रेड करें।",
   "creditWarningUltraExhaustedMessage": "आप आज की उपयोग सीमा तक पहुँच गए हैं। यह {renewalTime} में नवीनीकृत होगी।",
   "creditRenewalDurationHour": "{count, plural, one {{count} घंटा} other {{count} घंटे}}",
-  "creditRenewalDurationMinute": "{count, plural, one {{count} मिनट} other {{count} मिनट}}"
+  "creditRenewalDurationMinute": "{count, plural, one {{count} मिनट} other {{count} मिनट}}",
+  "taskReminderMayBeDelayed": "रिमाइंडर सहेजा गया। सटीक अलार्म की अनुमति बंद होने के कारण Android सूचना में देरी कर सकता है।"
 }

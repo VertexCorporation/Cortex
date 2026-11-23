@@ -3,10 +3,13 @@ import 'package:cortex/design.dart';
 
 import 'dart:async';
 
+import 'package:uuid/uuid.dart';
+
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'main.dart';
 
@@ -59,6 +62,9 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+  static const MethodChannel _widgetChannel = MethodChannel(
+    'com.vertex.cortex/widget',
+  );
   final GlobalKey<ChatControllerState> chatScreenKey =
       GlobalKey<ChatControllerState>();
   final GlobalKey<LibraryScreenState> libraryScreenKey =
@@ -136,6 +142,28 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      _widgetChannel.setMethodCallHandler((call) async {
+        if (call.method == 'onWidgetContinue' && call.arguments is Map) {
+          final args = Map<Object?, Object?>.from(call.arguments as Map);
+          await _handleWidgetContinue(
+            args['prompt']?.toString() ?? '',
+            args['answer']?.toString() ?? '',
+          );
+        }
+      });
+      _widgetChannel
+          .invokeMethod<dynamic>('consumeInitialWidgetQa')
+          .then((data) {
+            if (data is Map) {
+              _handleWidgetContinue(
+                data['prompt']?.toString() ?? '',
+                data['answer']?.toString() ?? '',
+              );
+            }
+          })
+          .catchError((_) {});
+    }
     _axonController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -156,6 +184,35 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       context.read<ModelCatalogProvider>().initialize(context: context);
       context.read<ModelLocalStateProvider>().initialize(context: context);
     });
+  }
+
+  Future<void> _handleWidgetContinue(String prompt, String answer) async {
+    if (!mounted || prompt.trim().isEmpty || answer.trim().isEmpty) return;
+    await context.read<AppInitializer>().onCoreServicesReady;
+    if (!mounted) return;
+
+    _updateCurrentView(MainScreenView.chat);
+    closeAxon();
+    final session = context.read<ChatSessionProvider>();
+    final conversation = context.read<ConversationProvider>();
+    context.read<InputProvider>().resetInputState();
+    await conversation.importWidgetQaSession(
+      id: const Uuid().v4(),
+      prompt: prompt,
+      answer: answer,
+      modelId: session.modelId ?? 'cortex/auto',
+      modelTitle: session.modelTitle,
+      modelImagePath: session.modelImagePath,
+    );
+    if (mounted) {
+      _requestChatKeyboardFocus(
+        initialDelayMs: 250,
+        controllerRetries: 8,
+        focusRetries: 7,
+        retryDelayMs: 220,
+        source: 'widget_continue',
+      );
+    }
   }
 
   @override
