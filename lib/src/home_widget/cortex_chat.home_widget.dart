@@ -9,6 +9,32 @@ import 'package:home_widget/home_widget.dart';
 class CortexQuickChatSchemaHomeWidget {
   const CortexQuickChatSchemaHomeWidget._();
 
+  static const String _$appGroupId = 'group.com.vertex.cortex';
+
+  static const String _$paramPrefix = 'home_widget.CortexQuickChatSchema';
+
+  static Future<void> saveData({
+    String? messageHint,
+  }) {
+    return Future.wait([
+      if (messageHint != null) HomeWidget.saveWidgetData<String>('${_$paramPrefix}.messageHint', messageHint, appGroupId: _$appGroupId),
+    ]);
+  }
+
+  static Future<void> deleteData({
+    bool messageHint = false,
+  }) {
+    return Future.wait([
+      if (messageHint) HomeWidget.saveWidgetData('${_$paramPrefix}.messageHint', null, appGroupId: _$appGroupId),
+    ]);
+  }
+
+  static Future<({String? messageHint})> getData() async {
+    return (
+      messageHint: await HomeWidget.getWidgetData<String>('${_$paramPrefix}.messageHint', defaultValue: 'Ask anything', appGroupId: _$appGroupId),
+    );
+  }
+
 
   static Future<bool?> updateWidget() {
     return HomeWidget.updateWidget(

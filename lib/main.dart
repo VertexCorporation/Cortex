@@ -445,7 +445,7 @@ class _AppGatekeeperState extends State<AppGatekeeper> {
       if (uri.host == 'tasks') {
         main.openTasksScreen();
       } else if (uri.host == 'chat') {
-        main.startNewConversation();
+        main.startNewConversation(autoFocus: true);
       }
       return;
     }

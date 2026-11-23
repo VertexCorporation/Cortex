@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show Locale;
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/src/home_widget/cortex_tasks.home_widget.dart'
     if (dart.library.html) 'package:cortex/platform/tasks_home_widget_stub.dart';
 
@@ -53,11 +55,17 @@ class TaskService {
       return a.dueAt!.compareTo(b.dueAt!);
     });
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final languageCode = prefs.getString('language_code') ?? 'en';
+      final localizations = lookupAppLocalizations(Locale(languageCode));
       await CortexTasksSchemaHomeWidget.saveData(
-        nextTask: openTasks.isEmpty ? 'Henüz görev yok' : openTasks.first.title,
+        widgetTitle: localizations.tasksTitle,
+        nextTask: openTasks.isEmpty
+            ? localizations.tasksEmptyTitle
+            : openTasks.first.title,
         taskCount: openTasks.isEmpty
-            ? 'Görev eklemek için dokun'
-            : '${openTasks.length} açık görev',
+            ? localizations.taskInputHint
+            : '${openTasks.length} · ${localizations.tasksTitle}',
       );
       await CortexTasksSchemaHomeWidget.updateWidget();
     } catch (_) {

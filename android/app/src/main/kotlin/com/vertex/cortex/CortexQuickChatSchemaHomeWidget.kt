@@ -20,13 +20,16 @@ import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import es.antonborri.home_widget.HomeWidgetPlugin
 import androidx.glance.layout.Column
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.text.TextStyle
 import androidx.glance.color.ColorProvider
 import androidx.compose.ui.unit.sp
 import androidx.glance.text.FontWeight
 import androidx.glance.layout.height
 import androidx.compose.ui.unit.dp
-import androidx.glance.layout.Spacer
+import androidx.glance.layout.Row
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.appwidget.cornerRadius
 import androidx.core.os.ConfigurationCompat
@@ -49,28 +52,37 @@ class CortexQuickChatSchemaHomeWidget : GlanceAppWidget() {
 
   fun previewFingerprint(context: Context): String {
     val hwLocales = hwCurrentLocales(context)
+    val hwPreviewData =
+        CortexQuickChatSchemaData.fromPreferences(HomeWidgetPlugin.getData(context))
     return listOf(
-      "03b711d7",
+      "9b768c17",
       hwLocales.joinToString(","),
+      hwPreviewData.toString(),
     ).joinToString("|")
   }
 
   @Composable
   private fun WidgetContent(context: Context, currentState: HomeWidgetGlanceState) {
+    val prefs = currentState.preferences
+    val widgetData = CortexQuickChatSchemaData.fromPreferences(prefs)
     GlanceTheme {
-            Box(modifier = GlanceModifier.background(GlanceTheme.colors.widgetBackground).padding(16.dp).fillMaxSize().clickable(onClick = actionStartActivity<MainActivity>(context, Uri.parse("cortex://chat?homeWidget"))), contentAlignment = Alignment.Center) {
+            Box(modifier = GlanceModifier.background(GlanceTheme.colors.widgetBackground).fillMaxSize().clickable(onClick = actionStartActivity<MainActivity>(context, Uri.parse("cortex://chat?homeWidget"))), contentAlignment = Alignment.Center) {
                 Box(
-                    modifier = GlanceModifier.background(ColorProvider(day = Color(0xFFDADADA), night = Color(0xFF2C2C2C))).cornerRadius(24.0.dp).padding(1.0.dp)
+                    modifier = GlanceModifier.fillMaxSize().background(ColorProvider(day = Color(0xFFE2E5EC), night = Color(0xFF30333D))).cornerRadius(22.0.dp).padding(1.0.dp)
                 ) {
                     Box(
-                        modifier = GlanceModifier.background(ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFF090909))).cornerRadius(23.0.dp)
+                        modifier = GlanceModifier.fillMaxSize().background(ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFF101116))).cornerRadius(21.0.dp)
                     ) {
-                        Column(modifier = GlanceModifier.padding(start = 16.0.dp, top = 16.0.dp, end = 16.0.dp, bottom = 16.0.dp), horizontalAlignment = Alignment.Start) {
-                            Text(text = "CORTEX", style = TextStyle(color = ColorProvider(day = Color(0xFF0D62FE), night = Color(0xFF7C9CFF)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
-                            Spacer(modifier = GlanceModifier.height(10.0.dp))
-                            Text(text = "Start a new chat", style = TextStyle(color = ColorProvider(day = Color(0xFF171717), night = Color(0xFFF5F5F5)), fontSize = 22.sp, fontWeight = FontWeight.Bold))
-                            Spacer(modifier = GlanceModifier.height(6.0.dp))
-                            Text(text = "Tap to talk to Cortex", style = TextStyle(color = ColorProvider(day = Color(0xFF666666), night = Color(0xFF9B9B9B)), fontSize = 12.sp, fontWeight = FontWeight.Normal))
+                        Column(modifier = GlanceModifier.fillMaxSize().padding(start = 14.0.dp, top = 12.0.dp, end = 14.0.dp, bottom = 12.0.dp), horizontalAlignment = Alignment.Start) {
+                            Spacer(modifier = GlanceModifier.defaultWeight())
+                            Text(text = "CORTEX AI", style = TextStyle(color = ColorProvider(day = Color(0xFF3366E8), night = Color(0xFF91A9FF)), fontSize = 11.sp, fontWeight = FontWeight.Bold))
+                            Spacer(modifier = GlanceModifier.height(9.0.dp))
+                            Row(modifier = GlanceModifier.background(ColorProvider(day = Color(0xFFF3F5F9), night = Color(0xFF1B1E26))).cornerRadius(16.0.dp).padding(start = 12.0.dp, top = 10.0.dp, end = 12.0.dp, bottom = 10.0.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = widgetData.messageHint ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF737985), night = Color(0xFFADB3C0)), fontSize = 14.sp))
+                                Spacer(modifier = GlanceModifier.defaultWeight())
+                                Text(text = "↗", style = TextStyle(color = ColorProvider(day = Color(0xFF3366E8), night = Color(0xFF91A9FF)), fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                            }
+                            Spacer(modifier = GlanceModifier.defaultWeight())
                         }
                     }
                 }
@@ -79,6 +91,21 @@ class CortexQuickChatSchemaHomeWidget : GlanceAppWidget() {
 
   }
 }
+
+data class CortexQuickChatSchemaData(
+    val messageHint: String? = null,
+) {
+    companion object {
+        private const val PREFERENCES_PREFIX = "home_widget.CortexQuickChatSchema"
+
+        fun fromPreferences(prefs: android.content.SharedPreferences): CortexQuickChatSchemaData {
+            return CortexQuickChatSchemaData(
+                messageHint = prefs.getString("${PREFERENCES_PREFIX}.messageHint", "Ask anything"),
+            )
+        }
+    }
+}
+
 
 private fun hwCurrentLocales(context: Context): List<String> {
     val configured = ConfigurationCompat

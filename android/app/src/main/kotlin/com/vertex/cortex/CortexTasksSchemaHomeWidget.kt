@@ -20,13 +20,14 @@ import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import es.antonborri.home_widget.HomeWidgetPlugin
 import androidx.glance.layout.Column
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.text.TextStyle
 import androidx.glance.color.ColorProvider
 import androidx.compose.ui.unit.sp
 import androidx.glance.text.FontWeight
 import androidx.glance.layout.height
 import androidx.compose.ui.unit.dp
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.padding
 import androidx.glance.appwidget.cornerRadius
 import androidx.core.os.ConfigurationCompat
@@ -52,7 +53,7 @@ class CortexTasksSchemaHomeWidget : GlanceAppWidget() {
     val hwPreviewData =
         CortexTasksSchemaData.fromPreferences(HomeWidgetPlugin.getData(context))
     return listOf(
-      "93fd12a2",
+      "a34faa8e",
       hwLocales.joinToString(","),
       hwPreviewData.toString(),
     ).joinToString("|")
@@ -63,19 +64,21 @@ class CortexTasksSchemaHomeWidget : GlanceAppWidget() {
     val prefs = currentState.preferences
     val widgetData = CortexTasksSchemaData.fromPreferences(prefs)
     GlanceTheme {
-            Box(modifier = GlanceModifier.background(GlanceTheme.colors.widgetBackground).padding(16.dp).fillMaxSize().clickable(onClick = actionStartActivity<MainActivity>(context, Uri.parse("cortex://tasks?homeWidget"))), contentAlignment = Alignment.Center) {
+            Box(modifier = GlanceModifier.background(GlanceTheme.colors.widgetBackground).fillMaxSize().clickable(onClick = actionStartActivity<MainActivity>(context, Uri.parse("cortex://tasks?homeWidget"))), contentAlignment = Alignment.Center) {
                 Box(
-                    modifier = GlanceModifier.background(ColorProvider(day = Color(0xFFDADADA), night = Color(0xFF2C2C2C))).cornerRadius(24.0.dp).padding(1.0.dp)
+                    modifier = GlanceModifier.fillMaxSize().background(ColorProvider(day = Color(0xFFE2E5EC), night = Color(0xFF30333D))).cornerRadius(22.0.dp).padding(1.0.dp)
                 ) {
                     Box(
-                        modifier = GlanceModifier.background(ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFF090909))).cornerRadius(23.0.dp)
+                        modifier = GlanceModifier.fillMaxSize().background(ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFF101116))).cornerRadius(21.0.dp)
                     ) {
-                        Column(modifier = GlanceModifier.padding(start = 16.0.dp, top = 16.0.dp, end = 16.0.dp, bottom = 16.0.dp), horizontalAlignment = Alignment.Start) {
-                            Text(text = "CORTEX  ·  TASKS", style = TextStyle(color = ColorProvider(day = Color(0xFF0D62FE), night = Color(0xFF7C9CFF)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
-                            Spacer(modifier = GlanceModifier.height(10.0.dp))
-                            Text(text = widgetData.nextTask ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF171717), night = Color(0xFFF5F5F5)), fontSize = 22.sp, fontWeight = FontWeight.Bold))
-                            Spacer(modifier = GlanceModifier.height(6.0.dp))
-                            Text(text = widgetData.taskCount ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF666666), night = Color(0xFF9B9B9B)), fontSize = 12.sp, fontWeight = FontWeight.Normal))
+                        Column(modifier = GlanceModifier.fillMaxSize().padding(start = 14.0.dp, top = 12.0.dp, end = 14.0.dp, bottom = 12.0.dp), horizontalAlignment = Alignment.Start) {
+                            Spacer(modifier = GlanceModifier.defaultWeight())
+                            Text(text = widgetData.widgetTitle ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF3366E8), night = Color(0xFF91A9FF)), fontSize = 11.sp, fontWeight = FontWeight.Bold))
+                            Spacer(modifier = GlanceModifier.height(7.0.dp))
+                            Text(text = widgetData.nextTask ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF171A21), night = Color(0xFFF2F3F7)), fontSize = 16.sp, fontWeight = FontWeight.Bold))
+                            Spacer(modifier = GlanceModifier.height(3.0.dp))
+                            Text(text = widgetData.taskCount ?: "", style = TextStyle(color = ColorProvider(day = Color(0xFF737985), night = Color(0xFFADB3C0)), fontSize = 12.sp))
+                            Spacer(modifier = GlanceModifier.defaultWeight())
                         }
                     }
                 }
@@ -86,6 +89,7 @@ class CortexTasksSchemaHomeWidget : GlanceAppWidget() {
 }
 
 data class CortexTasksSchemaData(
+    val widgetTitle: String? = null,
     val nextTask: String? = null,
     val taskCount: String? = null,
 ) {
@@ -94,8 +98,9 @@ data class CortexTasksSchemaData(
 
         fun fromPreferences(prefs: android.content.SharedPreferences): CortexTasksSchemaData {
             return CortexTasksSchemaData(
-                nextTask = prefs.getString("${PREFERENCES_PREFIX}.nextTask", "No tasks yet"),
-                taskCount = prefs.getString("${PREFERENCES_PREFIX}.taskCount", "Open your Cortex tasks"),
+                widgetTitle = prefs.getString("${PREFERENCES_PREFIX}.widgetTitle", "Tasks"),
+                nextTask = prefs.getString("${PREFERENCES_PREFIX}.nextTask", "Nothing on your list yet"),
+                taskCount = prefs.getString("${PREFERENCES_PREFIX}.taskCount", "Tap to add a task"),
             )
         }
     }

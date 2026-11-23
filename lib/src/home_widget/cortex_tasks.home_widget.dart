@@ -14,29 +14,34 @@ class CortexTasksSchemaHomeWidget {
   static const String _$paramPrefix = 'home_widget.CortexTasksSchema';
 
   static Future<void> saveData({
+    String? widgetTitle,
     String? nextTask,
     String? taskCount,
   }) {
     return Future.wait([
+      if (widgetTitle != null) HomeWidget.saveWidgetData<String>('${_$paramPrefix}.widgetTitle', widgetTitle, appGroupId: _$appGroupId),
       if (nextTask != null) HomeWidget.saveWidgetData<String>('${_$paramPrefix}.nextTask', nextTask, appGroupId: _$appGroupId),
       if (taskCount != null) HomeWidget.saveWidgetData<String>('${_$paramPrefix}.taskCount', taskCount, appGroupId: _$appGroupId),
     ]);
   }
 
   static Future<void> deleteData({
+    bool widgetTitle = false,
     bool nextTask = false,
     bool taskCount = false,
   }) {
     return Future.wait([
+      if (widgetTitle) HomeWidget.saveWidgetData('${_$paramPrefix}.widgetTitle', null, appGroupId: _$appGroupId),
       if (nextTask) HomeWidget.saveWidgetData('${_$paramPrefix}.nextTask', null, appGroupId: _$appGroupId),
       if (taskCount) HomeWidget.saveWidgetData('${_$paramPrefix}.taskCount', null, appGroupId: _$appGroupId),
     ]);
   }
 
-  static Future<({String? nextTask, String? taskCount})> getData() async {
+  static Future<({String? widgetTitle, String? nextTask, String? taskCount})> getData() async {
     return (
-      nextTask: await HomeWidget.getWidgetData<String>('${_$paramPrefix}.nextTask', defaultValue: 'No tasks yet', appGroupId: _$appGroupId),
-      taskCount: await HomeWidget.getWidgetData<String>('${_$paramPrefix}.taskCount', defaultValue: 'Open your Cortex tasks', appGroupId: _$appGroupId),
+      widgetTitle: await HomeWidget.getWidgetData<String>('${_$paramPrefix}.widgetTitle', defaultValue: 'Tasks', appGroupId: _$appGroupId),
+      nextTask: await HomeWidget.getWidgetData<String>('${_$paramPrefix}.nextTask', defaultValue: 'Nothing on your list yet', appGroupId: _$appGroupId),
+      taskCount: await HomeWidget.getWidgetData<String>('${_$paramPrefix}.taskCount', defaultValue: 'Tap to add a task', appGroupId: _$appGroupId),
     );
   }
 

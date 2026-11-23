@@ -5,9 +5,14 @@
 // - Cortex: wraps [MaterialApp] with theming, localization, and navigator key.
 // - InvertedColor: small color utility variant used across the app.
 
+import 'dart:async';
+
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/language.dart';
+import 'package:cortex/src/home_widget/cortex_chat.home_widget.dart'
+    if (dart.library.html) 'package:cortex/platform/home_widget_stub.dart';
+import 'package:cortex/tasks/service.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/design.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +33,7 @@ class Cortex extends StatelessWidget {
 
   static ThemeData? _cachedThemeData;
   static String? _cachedThemeName;
+  static String? _lastWidgetLocaleCode;
 
   static ThemeData themeFor(String currentTheme) {
     if (_cachedThemeName == currentTheme && _cachedThemeData != null) {
@@ -161,6 +167,23 @@ class Cortex extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, LocaleProvider>(
       builder: (context, themeProvider, localeProvider, _) {
+        final locale = localeProvider.locale;
+        if (_lastWidgetLocaleCode != locale.languageCode) {
+          _lastWidgetLocaleCode = locale.languageCode;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            unawaited(() async {
+              try {
+                await CortexQuickChatSchemaHomeWidget.saveData(
+                  messageHint: lookupAppLocalizations(locale).messageHint,
+                );
+                await CortexQuickChatSchemaHomeWidget.updateWidget();
+                await TaskService().load();
+              } catch (_) {
+                // A home-screen widget is an optional presentation surface.
+              }
+            }());
+          });
+        }
         return MaterialApp(
           navigatorKey: navigatorKey,
           navigatorObservers: <NavigatorObserver>[

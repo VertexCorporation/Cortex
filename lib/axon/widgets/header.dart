@@ -60,7 +60,7 @@ class AxonHeader extends StatelessWidget {
     if (!isUserStateReady) {
       initials = '';
     } else if (userProvider.isAnonymous) {
-      final String anonString = localizations.anonymousEntity;
+      final String anonString = localizations.guest;
       initials = anonString.isNotEmpty ? anonString[0].toUpperCase() : '?';
     } else {
       initials = userProvider.profileInitial;

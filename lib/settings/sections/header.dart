@@ -185,7 +185,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
     final String email;
 
     if (isAnonymous) {
-      displayName = l10n.anonymousEntity;
+      displayName = l10n.guest;
       email = l10n.betterWithAnAccount;
     } else {
       displayName = userData?['username'] as String? ?? l10n.user;
