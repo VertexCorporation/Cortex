@@ -8,6 +8,8 @@ import 'package:cortex/chat/services/compression.dart';
 import 'package:cortex/chat/services/metrics.dart';
 import 'package:cortex/chat/services/pii_filter.dart';
 import 'package:cortex/chat/services/flow.dart';
+import 'package:cortex/chat/services/storage.dart';
+import 'package:flutter/foundation.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -30,6 +32,7 @@ class ContextService {
   /// Builds the list of messages for the API context.
   Future<List<Map<String, dynamic>>> buildContextMessages({
     bool includeLastUser = true,
+    bool includePastConversationRecall = true,
     required String targetModelId,
     required String langCode,
     bool isCharacterModel = false,
@@ -45,6 +48,63 @@ class ContextService {
               m.includeInContext && !m.isThinking && !m.isError && m.isVisible,
         )
         .toList();
+
+    // Retrieve only current-account chat excerpts, and never add them to a
+    // continuation or regeneration where the original context already exists.
+    if (includePastConversationRecall &&
+        !ChatStorageService.isFluxMode &&
+        !isCharacterModel &&
+        !preserveFlowHistory &&
+        history.isNotEmpty) {
+      final currentUser = history.lastWhere(
+        (message) => message.isUserMessage,
+        orElse: () => history.first,
+      );
+      final currentConversationId = _conversationProvider.conversationID;
+      if (currentUser.isUserMessage &&
+          currentUser.text.trim().length >= 8 &&
+          currentConversationId != null) {
+        try {
+          final earlierTurns = await ChatStorageService.findRelevantPastTurns(
+            query: currentUser.text,
+            currentConversationId: currentConversationId,
+          );
+          if (earlierTurns.isNotEmpty) {
+            final excerpts = earlierTurns
+                .map((turn) {
+                  final title = LocalPiiRedactionFilter.redact(
+                    turn['title'] ?? 'Earlier chat',
+                  );
+                  final rawUserText = turn['user'] ?? '';
+                  final redactedUserText = LocalPiiRedactionFilter.redact(
+                    rawUserText,
+                  );
+                  final userText = redactedUserText.length > 500
+                      ? redactedUserText.substring(0, 500)
+                      : redactedUserText;
+                  final rawAssistantText = turn['assistant'] ?? '';
+                  final redactedAssistantText = LocalPiiRedactionFilter.redact(
+                    rawAssistantText,
+                  );
+                  final assistantText = redactedAssistantText.length > 700
+                      ? redactedAssistantText.substring(0, 700)
+                      : redactedAssistantText;
+                  return 'Chat: $title\nUser: $userText\nCortex: $assistantText';
+                })
+                .join('\n\n');
+            contextMessages.add({
+              'role': 'assistant',
+              'content':
+                  'Relevant excerpts from your earlier Cortex chats. '
+                  'Use only as background for the current question:\n$excerpts',
+            });
+          }
+        } catch (error) {
+          // Recall is optional: never block a chat send when local search fails.
+          debugPrint('[Context] Past-chat recall skipped: $error');
+        }
+      }
+    }
 
     final bool isLowEnd = _isLowEndModel(targetModelId);
 

@@ -1,4 +1,4 @@
-﻿// lib/chat/services/database.dart
+// lib/chat/services/database.dart
 
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
@@ -12,7 +12,7 @@ class DbHelper {
 
   Database? _db;
   Future<Database>? _openingDb;
-  static const int _latestVersion = 13; // Define the latest version here
+  static const int _latestVersion = 14; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -58,7 +58,8 @@ class DbHelper {
         isStarred       INTEGER DEFAULT 0,
         starredDate     INTEGER DEFAULT 0,
         lastMessageDate INTEGER DEFAULT 0,
-        isArchived      INTEGER DEFAULT 0
+        isArchived      INTEGER DEFAULT 0,
+        ownerUid        TEXT
       );
     ''');
     await d.execute('''
@@ -83,6 +84,14 @@ class DbHelper {
     await d.execute('''
       CREATE UNIQUE INDEX messages_conv_idx
       ON messages(conversationId, idx);
+    ''');
+    await d.execute('''
+      CREATE INDEX idx_messages_ts
+      ON messages(ts DESC);
+    ''');
+    await d.execute('''
+      CREATE INDEX idx_conversations_owner
+      ON conversations(ownerUid);
     ''');
     await d.execute('''
       CREATE TABLE recent_models (
@@ -243,6 +252,17 @@ class DbHelper {
             'ALTER TABLE messages ADD COLUMN flowParticipant TEXT;',
           );
           break;
+        case 14:
+          batch.execute('ALTER TABLE conversations ADD COLUMN ownerUid TEXT;');
+          batch.execute('''
+            CREATE INDEX IF NOT EXISTS idx_messages_ts
+            ON messages(ts DESC);
+          ''');
+          batch.execute('''
+            CREATE INDEX IF NOT EXISTS idx_conversations_owner
+            ON conversations(ownerUid);
+          ''');
+          break;
       }
     }
     await batch.commit();
@@ -267,5 +287,3 @@ class DbHelper {
     }
   }
 }
-
-

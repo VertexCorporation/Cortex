@@ -206,8 +206,9 @@ class OfflineService {
   // Public API
   // ===========================================================================
 
-  /// Queries AVAILABLE (free) RAM and returns an optimal context size.
-  /// Uses 80% of free RAM to leave headroom for the OS and other apps.
+  /// Queries available RAM and caps context when memory is under pressure.
+  /// KV-cache allocation grows with context size, so device tier alone is not
+  /// enough when other apps or the loaded model are using memory.
   Future<int> _computeOptimalContextSize() async {
     try {
       const memoryChannel = MethodChannel('com.vertex.cortex/memory');
@@ -221,20 +222,26 @@ class OfflineService {
       // Calculate free RAM
       int freeRAM = totalRAM - usedRAM;
 
-      // If freeRAM is negative or abnormally low, fall back to safe defaults
+      // If freeRAM is negative or abnormally low, use a conservative budget.
       if (freeRAM <= 0) {
         freeRAM = 1024;
       }
 
-      // We should assume that the model itself takes huge RAM (e.g. 2-5 GB).
-      // So instead of just looking at current freeRAM, we use a conservative clamp based on total RAM or cap it around 4096 to prevent silent OOM crashes in native libraries.
+      // Base the budget on device tier, then cap it by current free memory.
       int nCtx = 2048;
       if (totalRAM >= 8192) {
-        nCtx = 8192; // 8GB+ devices can handle 8K
+        nCtx = 8192;
       } else if (totalRAM >= 6144) {
-        nCtx = 4096; // 6GB devices
+        nCtx = 4096;
       } else {
-        nCtx = 2048; // Standard safe fallback
+        nCtx = 2048;
+      }
+      if (freeRAM < 1536) {
+        nCtx = 1024;
+      } else if (freeRAM < 3072 && nCtx > 2048) {
+        nCtx = 2048;
+      } else if (freeRAM < 5120 && nCtx > 4096) {
+        nCtx = 4096;
       }
 
       debugPrint(

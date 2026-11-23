@@ -1475,6 +1475,7 @@ class SendService {
           // appended manually below — it is marked `isThinking` for the UI and
           // therefore excluded from the provider history.
           includeLastUser: !isContinue,
+          includePastConversationRecall: !isContinue,
           targetModelId: modelId,
           langCode: langCode,
           isCharacterModel: isCharacterModel,

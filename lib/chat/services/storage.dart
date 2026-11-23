@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cortex/cache.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cortex/rag/retrieval.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -62,6 +64,7 @@ class ChatStorageService {
         final uniqueTitle = await _uniqueConversationTitle(txn, title, id);
         await txn.insert('conversations', {
           'id': id,
+          'ownerUid': FirebaseAuth.instance.currentUser?.uid,
           'title': uniqueTitle,
           'modelId': modelId,
           'modelTitle': modelTitle ?? '',
@@ -103,6 +106,71 @@ class ChatStorageService {
     }
 
     return candidate;
+  }
+
+  /// Returns a small set of relevant turns from this Firebase user's earlier
+  /// chats. Older records without an owner are intentionally skipped so a
+  /// shared device never exposes one account's history to another.
+  static Future<List<Map<String, String>>> findRelevantPastTurns({
+    required String query,
+    required String currentConversationId,
+    int limit = 2,
+  }) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final tokenizer = RagTokenizer();
+    final terms = tokenizer.tokenize(query).toSet().take(8).toList();
+    if (uid == null || terms.isEmpty || limit <= 0) return const [];
+
+    try {
+      final db = await DbHelper().db;
+      final rows = await db.rawQuery(
+        '''
+        SELECT m.text, m.ts, c.title,
+          COALESCE(a.text, '') AS answer
+        FROM messages m
+        JOIN conversations c ON c.id = m.conversationId
+        LEFT JOIN messages a
+          ON a.conversationId = m.conversationId
+          AND a.idx = m.idx + 1 AND a.isUser = 0
+          AND a.includeInContext = 1
+        WHERE c.ownerUid = ? AND m.conversationId != ?
+          AND m.isUser = 1 AND m.includeInContext = 1
+          AND m.text IS NOT NULL AND length(trim(m.text)) > 0
+        ORDER BY m.ts DESC
+        LIMIT 250
+        ''',
+        [uid, currentConversationId],
+      );
+
+      final ranked = <({Map<String, dynamic> row, int hits})>[];
+      for (final row in rows) {
+        final text = (row['text'] as String?) ?? '';
+        final messageTerms = tokenizer.tokenize(text).toSet();
+        final hits = terms.where(messageTerms.contains).length;
+        if (hits > 0) ranked.add((row: row, hits: hits));
+      }
+      ranked.sort((a, b) {
+        final byHits = b.hits.compareTo(a.hits);
+        if (byHits != 0) return byHits;
+        return ((b.row['ts'] as int?) ?? 0).compareTo(
+          (a.row['ts'] as int?) ?? 0,
+        );
+      });
+
+      return ranked.take(limit).map((match) {
+        final row = match.row;
+        return {
+          'title': (row['title'] as String?)?.trim().isNotEmpty == true
+              ? (row['title'] as String).trim()
+              : 'Earlier chat',
+          'user': (row['text'] as String).trim(),
+          'assistant': (row['answer'] as String? ?? '').trim(),
+        };
+      }).toList();
+    } catch (error) {
+      debugPrint('[Storage] Past-chat recall skipped: $error');
+      return const [];
+    }
   }
 
   // --- FEATURE: Deep Search ---
