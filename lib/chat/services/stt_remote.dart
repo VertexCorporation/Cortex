@@ -1550,11 +1550,13 @@ class RemoteSttService {
   /// stall, recovers the AUDIO CAPTURE path (a fresh recorder on the same
   /// epoch), leaving the socket alone when it is still open.
 
-  /// Picks the built-in microphone so record_android does not run its
-  /// 8 kHz default-device probe before opening the real 16 kHz stream.
-  /// Falls back to a null device (the probe) when the platform list cannot
-  /// be read — a working-but-slower microphone beats none.
+  /// On Android, picks the built-in microphone so record_android does not run
+  /// its 8 kHz default-device probe before opening the real 16 kHz stream.
+  /// On iOS, leaves input selection to AVAudioSession so connected headset
+  /// microphones and the active system route are preserved.
   Future<InputDevice?> _resolveInputDevice(AudioRecorder recorder) async {
+    if (!Platform.isAndroid) return null;
+
     try {
       final devices = await recorder.listInputDevices();
       for (final device in devices) {
