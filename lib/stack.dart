@@ -29,14 +29,17 @@ class FadeIndexedStack extends StatelessWidget {
             duration: duration,
             child: TickerMode(
               enabled: isActive,
-              child: isActive
-                  ? list[i]
-                  : MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        viewInsets: EdgeInsets.zero,
-                      ),
-                      child: list[i],
-                    ),
+              // Keep the same element shape while a screen becomes active or
+              // inactive. Swapping this MediaQuery wrapper in and out tears
+              // down descendants (including inherited-widget dependents and
+              // GlobalKey subtrees) on every tab change.
+              child: MediaQuery(
+                data: isActive
+                    ? MediaQuery.of(context)
+                    : MediaQuery.of(context)
+                          .copyWith(viewInsets: EdgeInsets.zero),
+                child: list[i],
+              ),
             ),
           ),
         );
