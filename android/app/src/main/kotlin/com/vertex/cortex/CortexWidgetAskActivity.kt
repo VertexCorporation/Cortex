@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.widget.Toast
@@ -72,12 +73,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -101,6 +106,13 @@ class CortexWidgetAskActivity : ComponentActivity() {
 
         try {
             FirebaseApp.initializeApp(this)
+            FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+                if ((applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+                    DebugAppCheckProviderFactory.getInstance()
+                } else {
+                    PlayIntegrityAppCheckProviderFactory.getInstance()
+                }
+            )
         } catch (_: Exception) {
         }
 
@@ -623,6 +635,16 @@ class CortexWidgetAskActivity : ComponentActivity() {
             if (isTurkish) "Oturum do\u011Frulanamad\u0131." else "Authentication failed."
         )
 
+        val appCheckToken = try {
+            withContext(Dispatchers.IO) {
+                withTimeout(1_500) {
+                    FirebaseAppCheck.getInstance().getAppCheckToken(false).await().token
+                }
+            }
+        } catch (_: Exception) {
+            null
+        }
+
         withContext(Dispatchers.IO) {
             val url = URL(PROXY_URL)
             val conn = (url.openConnection() as HttpURLConnection).apply {
@@ -632,6 +654,9 @@ class CortexWidgetAskActivity : ComponentActivity() {
                 doOutput = true
                 doInput = true
                 setRequestProperty("Authorization", "Bearer $idToken")
+                if (!appCheckToken.isNullOrBlank()) {
+                    setRequestProperty("X-Firebase-AppCheck", appCheckToken)
+                }
                 setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                 setRequestProperty("Accept", "text/event-stream")
                 setRequestProperty("Cache-Control", "no-cache")
