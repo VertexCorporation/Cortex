@@ -351,6 +351,14 @@ class AppBootstrap {
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // PERFORMANCE: a large number of unguarded debugPrint calls in hot paths
+  // ship console I/O in release builds, where it costs frame time (visible
+  // on web) with zero dev value. Silence them in release only — debug and
+  // profile keep full logging.
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
+
   // Web: sqflite runs through the ffi-web factory (IndexedDB-backed). Set it
   // once before any database is opened; the rest of the sqflite code is
   // unchanged (see the sqflite_common_ffi_web docs).
@@ -362,8 +370,40 @@ void main() {
   // We limit the cache to 50 images or 30MB, whichever comes first, to prevent OOM errors.
   PaintingBinding.instance.imageCache.maximumSize = 50;
   PaintingBinding.instance.imageCache.maximumSizeBytes = 30 * 1024 * 1024;
+  _tuneImageCacheForDevice();
 
   runApp(const AppGatekeeper());
+}
+
+/// Relaxes the image cache on capable hardware so gallery/library browsing
+/// does not thrash the 50-entry/30MB ceiling (constant evictions + decodes
+/// are felt as scroll stutter). Runs after the safe defaults above, keeps
+/// the restrictive setting on low-RAM devices, and is best-effort: any
+/// channel failure leaves the defaults in place.
+Future<void> _tuneImageCacheForDevice() async {
+  int ramMB = kIsWeb ? 4096 : 1024;
+  if (!kIsWeb) {
+    try {
+      ramMB = await const MethodChannel('com.vertex.cortex/memory')
+              .invokeMethod<int>('getDeviceMemory') ??
+          1024;
+    } catch (_) {
+      // Channel unavailable (desktop/test): assume the safe low default.
+    }
+  }
+
+  final cache = PaintingBinding.instance.imageCache;
+  if (ramMB >= 6000) {
+    cache.maximumSize = 1000;
+    cache.maximumSizeBytes = 200 * 1024 * 1024;
+  } else if (ramMB >= 3000) {
+    cache.maximumSize = 500;
+    cache.maximumSizeBytes = 100 * 1024 * 1024;
+  } else if (ramMB >= 2000) {
+    cache.maximumSize = 200;
+    cache.maximumSizeBytes = 60 * 1024 * 1024;
+  }
+  // Below 2GB: keep the 1GB-device defaults set above.
 }
 
 /// Top-level widget responsible for:
