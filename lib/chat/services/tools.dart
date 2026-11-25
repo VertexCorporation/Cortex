@@ -381,6 +381,13 @@ class ToolRegistry {
     final document = Map<String, dynamic>.from(scoped.document);
     final path = document.remove('path')?.toString();
     document.remove('scope');
+
+    // Web attachments carry their payload embedded (there is no local file
+    // system in the browser): the data is already in place, no file I/O.
+    if (document['data'] is String && (document['data'] as String).isNotEmpty) {
+      return document;
+    }
+
     if (path == null || path.isEmpty) return null;
 
     final file = File(path);

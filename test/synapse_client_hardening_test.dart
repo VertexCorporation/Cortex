@@ -40,11 +40,21 @@ void main() {
 
   group('ModelSecurity model paths', () {
     test('preserves ordinary legacy IDs', () {
+      // The helper absolutizes filesDir (on Windows a POSIX-style absolute
+      // input is drive-qualified, so a literal '/tmp/...' expectation is
+      // platform-dependent). The contract under test is that an ordinary
+      // legacy ID keeps its own filename, inside the model directory, with
+      // the .gguf extension appended — asserted here in a way that holds
+      // on every platform.
+      final base = p.normalize(p.absolute('/tmp/cortex-models'));
       final path = ModelSecurity.resolveModelFilePath(
         filesDir: '/tmp/cortex-models',
         modelId: 'gemma-3-4b-q4',
       );
-      expect(path, p.normalize('/tmp/cortex-models/gemma-3-4b-q4.gguf'));
+      expect(p.isWithin(base, path), isTrue,
+          reason: 'resolved path must stay inside the model directory');
+      expect(p.basename(path), 'gemma-3-4b-q4.gguf',
+          reason: 'ordinary legacy IDs must keep their own filename');
     });
 
     test('prevents traversal outside the model directory', () {
