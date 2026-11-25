@@ -121,6 +121,58 @@ class Utils {
     return null;
   }
 
+  /// Web: turns a non-media `data:` URL attachment into a scoped document
+  /// whose payload is embedded as base64. Mirrors the io binary-document
+  /// contract from [processAttachment], minus the file path — the browser has
+  /// none, and read_document must not attempt dart:io materialization for
+  /// these entries.
+  static Map<String, dynamic>? _processDataUrlDocument(String path) {
+    final uri = Uri.tryParse(path);
+    final uriData = uri?.data;
+    if (uriData == null) {
+      debugPrint("[Utils] Attachment data URL could not be parsed.");
+      return null;
+    }
+
+    final bytes = uriData.contentAsBytes();
+    if (bytes.isEmpty) {
+      debugPrint("[Utils] Attachment data URL is empty.");
+      return null;
+    }
+
+    final mimeType = uriData.mimeType.isNotEmpty
+        ? uriData.mimeType
+        : 'application/octet-stream';
+    final extension = mimeType.split('/').isEmpty || mimeType == 'application/octet-stream'
+        ? ''
+        : mimeType.split('/').last.split('-').first.toLowerCase();
+    String docType = 'document';
+    if (extension == 'pdf') {
+      docType = 'PDF';
+    } else if (['doc', 'docx', 'odt'].contains(extension)) {
+      docType = 'Word document';
+    } else if (['xls', 'xlsx', 'ods', 'csv'].contains(extension)) {
+      docType = 'spreadsheet';
+    } else if (['ppt', 'pptx', 'odp'].contains(extension)) {
+      docType = 'presentation';
+    }
+
+    final scope = _uuid.v4();
+    return {
+      "type": "text",
+      "text":
+          "[Attached: attachment ($docType)]\nDocument scope: $scope\nUse the read_document tool with document_scope=\"$scope\" to extract and read this file. Do not reuse a scope from another message.",
+      "_document": {
+        "scope": scope,
+        "data": base64Encode(bytes),
+        "media_type": mimeType,
+        "fileName": 'attachment.${extension.isEmpty ? 'bin' : extension}',
+        "extension": extension,
+        "size": bytes.length,
+      },
+    };
+  }
+
   /// Reads only enough bytes for MIME sniffing. Some Android/iOS picker cache
   /// files have generic or missing extensions even though they contain a valid
   /// image. Relying only on the path can therefore make a visible attachment
@@ -203,6 +255,16 @@ class Utils {
             "type": mediaType,
             mediaType: {"url": path}
           };
+        }
+
+        // Web attachments always arrive as `data:` URLs (there is no local
+        // file system there). Non-media payloads (PDF, DOCX, ...) cannot
+        // fall through to the dart:io File branch — File operations throw
+        // on web and the attachment would be silently dropped. Instead they
+        // are registered as scoped documents with their payload embedded, so
+        // read_document needs no file materialization on the browser.
+        if (lowerPath.startsWith('data:')) {
+          return _processDataUrlDocument(path);
         }
       }
 

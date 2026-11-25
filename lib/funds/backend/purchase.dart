@@ -8,6 +8,21 @@ extension FundsPurchase on FundsBackend {
       return;
     }
 
+    // Web: in-app purchase has no web implementation — the product list is
+    // empty there, but a stale cache or a racing tap must not reach the
+    // plugin (its platform instance is never initialized on web and throws).
+    if (kIsWeb) {
+      log('Purchase blocked: store billing is unavailable on web.',
+          name: FundsBackend._logName);
+      _notificationService?.showNotification(
+        message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
+        type: NotificationType.error,
+        oneLine: false,
+      );
+      _setPurchasePending(false);
+      return;
+    }
+
     _setPurchasePending(true);
 
     final user = _auth.currentUser;
@@ -207,6 +222,14 @@ extension FundsPurchase on FundsBackend {
 
   Future<void> restorePurchases() async {
     if (isPurchasePending) return;
+
+    // Web: no store billing implementation exists (see purchase()).
+    if (kIsWeb) {
+      log('Restore blocked: store billing is unavailable on web.',
+          name: FundsBackend._logName);
+      return;
+    }
+
     _setPurchasePending(true);
 
     try {

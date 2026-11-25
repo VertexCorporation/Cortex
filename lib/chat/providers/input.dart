@@ -37,9 +37,23 @@ class InputAttachment {
 
   const InputAttachment({required this.file, required this.type});
 
-  String get fileName => p.basename(file.path);
+  /// Web attachments are `data:` URLs (see InputService): their path carries
+  /// no file name, so name/extension are derived from the embedded MIME type
+  /// there instead of the meaningless path tail.
+  String get fileName {
+    final path = file.path;
+    if (path.startsWith('data:')) {
+      final ext = _dataUrlExtension(path);
+      return 'attachment.${ext.isEmpty ? 'bin' : ext}';
+    }
+    return p.basename(path);
+  }
 
-  String get extension => p.extension(file.path).toLowerCase();
+  String get extension {
+    final path = file.path;
+    if (path.startsWith('data:')) return _dataUrlExtension(path);
+    return p.extension(path).toLowerCase();
+  }
 
   /// Display provider that works on every platform: on web the attachment
   /// "path" is a `data:` URL (dart:io File operations are unavailable in the
@@ -47,6 +61,18 @@ class InputAttachment {
   ImageProvider get displayImage => kIsWeb
       ? NetworkImage(file.path)
       : FileImage(file) as ImageProvider;
+
+  static String _dataUrlExtension(String dataUrl) {
+    // Tolerate parameter-less data URLs ("data:<mime>,...") as well.
+    final end = dataUrl.contains(';')
+        ? dataUrl.indexOf(';')
+        : dataUrl.indexOf(',');
+    if (end <= 5) return '';
+    final header = dataUrl.substring(5, end);
+    final subtype = header.split('/');
+    if (subtype.length < 2) return '';
+    return subtype[1].split('-').first.toLowerCase();
+  }
 }
 
 /// A dedicated provider responsible for managing the transient state of the user input area.
