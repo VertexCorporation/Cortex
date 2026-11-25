@@ -35,7 +35,7 @@ class InputAttachment {
   final File file;
   final AttachmentType type;
 
-  const InputAttachment({required this.file, required this.type});
+  InputAttachment({required this.file, required this.type});
 
   /// Web attachments are `data:` URLs (see InputService): their path carries
   /// no file name, so name/extension are derived from the embedded MIME type
@@ -58,20 +58,29 @@ class InputAttachment {
   /// Display provider that works on every platform: on web the attachment
   /// "path" is a `data:` URL (dart:io File operations are unavailable in the
   /// browser), which the web image engine decodes natively.
-  ImageProvider get displayImage => kIsWeb
-      ? NetworkImage(file.path)
-      : FileImage(file) as ImageProvider;
+  ///
+  /// Cached: the provider is created once per attachment instead of on
+  /// every build, so hot rebuilds (composer expansion, strip animations)
+  /// stop re-allocating providers for multi-megabyte data: URLs.
+  ImageProvider get displayImage {
+    if (_displayImage != null) return _displayImage!;
+    return _displayImage = kIsWeb
+        ? NetworkImage(file.path) as ImageProvider
+        : FileImage(file);
+  }
+
+  ImageProvider? _displayImage;
 
   static String _dataUrlExtension(String dataUrl) {
     // Tolerate parameter-less data URLs ("data:<mime>,...") as well.
-    final end = dataUrl.contains(';')
-        ? dataUrl.indexOf(';')
-        : dataUrl.indexOf(',');
-    if (end <= 5) return '';
+    final end = dataUrl.contains(";")
+        ? dataUrl.indexOf(";")
+        : dataUrl.indexOf(",");
+    if (end <= 5) return "";
     final header = dataUrl.substring(5, end);
-    final subtype = header.split('/');
-    if (subtype.length < 2) return '';
-    return subtype[1].split('-').first.toLowerCase();
+    final subtype = header.split("/");
+    if (subtype.length < 2) return "";
+    return subtype[1].split("-").first.toLowerCase();
   }
 }
 
