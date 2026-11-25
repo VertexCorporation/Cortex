@@ -259,11 +259,13 @@ class ContextService {
   }
 
   bool _isVideoFile(String path) {
+    if (path.startsWith('data:')) return path.startsWith('data:video/');
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
     return ['mp4', 'mov', 'm4v', 'webm', 'mkv', 'avi'].contains(ext);
   }
 
   bool _isAudioFile(String path) {
+    if (path.startsWith('data:')) return path.startsWith('data:audio/');
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
     return ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac', 'opus'].contains(ext);
   }
